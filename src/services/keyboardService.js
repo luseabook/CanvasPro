@@ -1,19 +1,32 @@
 import appStore from '../core/stores/appStore.js';
-import { getShortcuts, handleShortcutKeydown, isRecording } from '../modules/shortcuts.js';
+import { hasActiveModalInteraction } from './modalInteractionScope.js';
+import { dispatchScopedEscape } from './escapeScope.js';
+import {
+  getShortcuts,
+  handleShortcutKeydown,
+  isRecording,
+  resolveShortcutActionForEvent,
+} from '../modules/shortcuts.js';
 import {
   buildJumpShortcutBinding,
   normalizeCommentNoteJumpShortcut,
   parseJumpShortcutFromKeydown,
 } from '../modules/commentNoteJumpShortcut.js';
 import { hasActiveReadonlyTextSelection } from '../components/aigenText/readonlyTextSelection.js';
+import { toggleDevMode } from '../modules/devEntry.js';
 import { getSelectedSyncPlayableVideoCount } from '../modules/videoSyncPlayback.js';
-let _spaceHeld = false,
-  _listeners = [];
-const ALIGN_HOLD_TRIGGER_MS = 220;
+import {
+  isCanvasPanShortcutHeld,
+  releaseCanvasPanShortcut,
+  setCanvasPanShortcutHeld,
+} from './canvasPanShortcutState.js';
+let _listeners = [],
+  _settingsShortcutRoot = null;
+const ALIGN_HOLD_TRIGGER_MS = 0xdc;
 let _alignHoldTimer = null,
-  _alignHoldActive = false,
+  _alignHoldActive = ![],
   _alignHoldKey = '';
-const MODIFIER_ALIAS_MAP = Object.freeze({
+const MODIFIER_ALIAS_MAP = Object['freeze']({
     CTRL: 'Ctrl',
     CONTROL: 'Ctrl',
     CMD: 'Ctrl',
@@ -23,7 +36,7 @@ const MODIFIER_ALIAS_MAP = Object.freeze({
     ALT: 'Alt',
     OPTION: 'Alt',
   }),
-  NAMED_KEY_ALIAS_MAP = Object.freeze({
+  NAMED_KEY_ALIAS_MAP = Object['freeze']({
     SPACE: 'Space',
     ESC: 'Escape',
     ESCAPE: 'Escape',
@@ -31,267 +44,368 @@ const MODIFIER_ALIAS_MAP = Object.freeze({
     TAB: 'Tab',
     DELETE: 'Delete',
     BACKSPACE: 'Backspace',
-  });
+  }),
+  INTERACTION_MODIFIER_SHORTCUTS = new Set(['cut-edge', 'duplicate-with-edges', 'multi-select']),
+  ACTIVE_WHITEBOARD_EDITOR_SELECTOR = '.whiteboard-node-component.is-whiteboard-editing';
 function normalizeShortcutKeyPart(value) {
-  const list = String(value ?? '').trim();
+  const list = String(value ?? '')['trim']();
   if (!list) return '';
-  if (list === ' ') return 'Space';
-  const item = list.toUpperCase();
+  if (list === '\x20') return 'Space';
+  const item = list['toUpperCase']();
   if (MODIFIER_ALIAS_MAP[item]) return MODIFIER_ALIAS_MAP[item];
   if (NAMED_KEY_ALIAS_MAP[item]) return NAMED_KEY_ALIAS_MAP[item];
-  if (list.length === 1) return list.toUpperCase();
-  return list[0].toUpperCase() + list.slice(1).toLowerCase();
+  if (list['length'] === 0x1) return list['toUpperCase']();
+  return list[0x0]['toUpperCase']() + list['slice'](0x1)['toLowerCase']();
 }
 function getPanShortcutParts() {
   const key = getShortcuts?.() || {},
-    list2 = key?.['pan-canvas']?.keys,
-    list3 = Array.isArray(list2) && list2.length > 0 ? list2 : ['Space'];
-  return new Set(list3.map((item2) => normalizeShortcutKeyPart(item2)).filter(Boolean));
-}
-function setPanShortcutHeld(index) {
-  ((_spaceHeld = index === true), (window._spaceHeld = _spaceHeld));
-  const el = document.getElementById('v2-wrap');
-  if (el) el.style.cursor = _spaceHeld ? 'var(--grab-cursor)' : '';
+    list2 = key?.['pan-canvas']?.['keys'],
+    list3 = Array['isArray'](list2) && list2['length'] > 0x0 ? list2 : ['Space'];
+  return new Set(list3['map']((index) => normalizeShortcutKeyPart(index))['filter'](Boolean));
 }
 function shouldReleasePanShortcut(event) {
-  if (!_spaceHeld) return false;
-  const result = event?.key === ' ' || event?.code === 'Space' ? 'Space' : event?.key,
+  if (!isCanvasPanShortcutHeld()) return ![];
+  const result =
+      event?.['key'] === '\x20' || event?.['code'] === 'Space' ? 'Space' : event?.['key'],
     shortcutKeyPart = normalizeShortcutKeyPart(result);
-  if (!shortcutKeyPart) return false;
-  return getPanShortcutParts().has(shortcutKeyPart);
+  if (!shortcutKeyPart) return ![];
+  return getPanShortcutParts()['has'](shortcutKeyPart);
 }
 function isAudioClipModeActive() {
-  const el2 = document.getElementById('v2-wrap');
-  return !!el2?.classList.contains('is-audio-clip-mode');
+  const el = document['getElementById']('v2-wrap');
+  return !!el?.['classList']['contains']('is-audio-clip-mode');
 }
 function isEscFeatureModeActive(enabled) {
-  return !!enabled?.matting?.active || !!enabled?.annotate?.active || isAudioClipModeActive();
+  return (
+    !!enabled?.['matting']?.['active'] || !!enabled?.['annotate']?.['active'] || isAudioClipModeActive()
+  );
 }
 function isCommentNoteShortcutRecording() {
-  return window.__commentNoteShortcutRecording === true;
+  return window['__commentNoteShortcutRecording'] === !![];
 }
 function dispatchShortcutAction(detail) {
-  window.dispatchEvent(new CustomEvent('shortcut-action', { detail: detail }));
+  window['dispatchEvent'](new CustomEvent('shortcut-action', { detail: detail }));
 }
 function isRepeatSuppressedShortcut(data) {
   const options = String(data || '');
-  return options === 'panorama-scene-camera-create' || options.startsWith('panorama-scene-camera-');
+  return (
+    options === 'upload-file' ||
+    options === 'open-settings' ||
+    options === 'panorama-scene-camera-create' ||
+    options['startsWith']('panorama-scene-camera-')
+  );
 }
-function resolveCommentNoteJumpActionId(enabled2, target) {
-  if (!enabled2 || target?.repeat) return null;
-  const jumpShortcutBinding = buildJumpShortcutBinding(parseJumpShortcutFromKeydown(target));
+function isInteractionModifierShortcut(target) {
+  return INTERACTION_MODIFIER_SHORTCUTS['has'](String(target || ''));
+}
+function resolveCommentNoteJumpActionId(enabled2, source) {
+  if (!enabled2 || source?.['repeat']) return null;
+  const jumpShortcutBinding = buildJumpShortcutBinding(parseJumpShortcutFromKeydown(source));
   if (!jumpShortcutBinding) return null;
-  const source = enabled2.nodes || {};
-  for (const [next, enabled3] of Object.entries(source)) {
-    if (!enabled3 || enabled3.type !== 'comment-note') continue;
-    const map = normalizeCommentNoteJumpShortcut(enabled3.jumpShortcut),
-      jumpShortcutBinding2 = buildJumpShortcutBinding(map.keys);
+  const next = enabled2['nodes'] || {};
+  for (const [current, enabled3] of Object['entries'](next)) {
+    if (!enabled3 || enabled3['type'] !== 'comment-note') continue;
+    const map = normalizeCommentNoteJumpShortcut(enabled3['jumpShortcut']),
+      jumpShortcutBinding2 = buildJumpShortcutBinding(map['keys']);
     if (!jumpShortcutBinding2 || jumpShortcutBinding2 !== jumpShortcutBinding) continue;
-    return 'comment-note-jump::' + next;
+    return 'comment-note-jump::' + current;
   }
   return null;
 }
 function _clearAlignHoldState() {
   (_alignHoldTimer && (clearTimeout(_alignHoldTimer), (_alignHoldTimer = null)),
-    (_alignHoldActive = false),
+    (_alignHoldActive = ![]),
     (_alignHoldKey = ''));
 }
 function isEditingText() {
-  const current = document.activeElement,
-    entry = current?.tagName;
+  const entry = document['activeElement'],
+    record = entry?.['tagName'];
   return (
-    entry === 'INPUT' ||
-    entry === 'TEXTAREA' ||
-    current?.contentEditable === 'true' ||
-    current?.isContentEditable === true
+    record === 'INPUT' ||
+    record === 'TEXTAREA' ||
+    entry?.['contentEditable'] === 'true' ||
+    entry?.['isContentEditable'] === !![]
   );
 }
-function isPlainCopyShortcut(event2) {
+function handleSettingsKeyDown(event2) {
+  if (
+    event2['isComposing'] ||
+    event2['repeat'] ||
+    isRecording() ||
+    isCommentNoteShortcutRecording() ||
+    isEditingText()
+  )
+    return;
+  if (resolveShortcutActionForEvent(event2, ['open-settings']) !== 'open-settings') return;
+  (event2['preventDefault'](), event2['stopPropagation'](), dispatchShortcutAction('open-settings'));
+}
+function isPlainCopyShortcut(event3) {
   return (
-    (event2?.ctrlKey || event2?.metaKey) &&
-    !event2?.shiftKey &&
-    !event2?.altKey &&
-    (String(event2?.key || '').toLowerCase() === 'c' || event2?.code === 'KeyC')
+    (event3?.['ctrlKey'] || event3?.['metaKey']) &&
+    !event3?.['shiftKey'] &&
+    !event3?.['altKey'] &&
+    (String(event3?.['key'] || '')['toLowerCase']() === 'c' || event3?.['code'] === 'KeyC')
   );
 }
-function hasExpandedMediaClipNode(record) {
-  const payload = record?.nodes || {};
-  return Object.values(payload).some(
-    (item3) => item3?.type === 'media-clip' && item3?.mediaClip?.expanded === true,
+function isActiveWhiteboardEditorTarget(event4) {
+  const el2 = event4?.['target'] || document['activeElement'];
+  return Boolean(el2?.['closest']?.(ACTIVE_WHITEBOARD_EDITOR_SELECTOR));
+}
+function isDevModeToggleShortcut(event5) {
+  if (
+    window['LOCAL_DEV_BUILD'] !== !![] ||
+    event5?.['repeat'] ||
+    event5?.['ctrlKey'] ||
+    event5?.['metaKey'] ||
+    event5?.['altKey']
+  )
+    return ![];
+  return (
+    event5?.['code'] === 'Backslash' ||
+    event5?.['key'] === '\x5c' ||
+    event5?.['key'] === '|' ||
+    event5?.['key'] === '、'
   );
 }
-function buildShortcutContext(mattingActive, { audioClipModeActive: audioClipModeActive = false } = {}) {
-  const list4 = Array.isArray(mattingActive?.selectedNodeIds) ? mattingActive.selectedNodeIds : [],
-    selectedNodeType = list4.length === 1 ? mattingActive?.nodes?.[list4[0]]?.type || '' : '',
-    handle = list4.length === 1 ? mattingActive?.nodes?.[list4[0]] || null : null,
-    state = selectedNodeType === 'panorama-360' ? handle?.panorama360Node || null : handle?.sceneNode || null;
+function hasExpandedMediaClipNode(payload) {
+  const handle = payload?.['nodes'] || {};
+  return Object['values'](handle)['some'](
+    (state) => state?.['type'] === 'media-clip' && state?.['mediaClip']?.['expanded'] === !![],
+  );
+}
+function buildShortcutContext(mattingActive, { audioClipModeActive: audioClipModeActive = ![] } = {}) {
+  const list4 = Array['isArray'](mattingActive?.['selectedNodeIds']) ? mattingActive['selectedNodeIds'] : [],
+    selectedNodeType = list4['length'] === 0x1 ? mattingActive?.['nodes']?.[list4[0x0]]?.['type'] || '' : '',
+    config = list4['length'] === 0x1 ? mattingActive?.['nodes']?.[list4[0x0]] || null : null,
+    scope =
+      selectedNodeType === 'panorama-360'
+        ? config?.['panorama360Node'] || null
+        : config?.['sceneNode'] || null;
   return {
-    mattingActive: mattingActive?.matting?.active,
-    annotateActive: mattingActive?.annotate?.active,
-    videoKeyingActive: mattingActive?.videoKeying?.active,
+    mattingActive: mattingActive?.['matting']?.['active'],
+    annotateActive: mattingActive?.['annotate']?.['active'],
+    videoKeyingActive: mattingActive?.['videoKeying']?.['active'],
     featureModeActive:
-      !!mattingActive?.matting?.active ||
-      !!mattingActive?.annotate?.active ||
-      !!mattingActive?.videoClip?.active ||
-      !!mattingActive?.videoKeying?.active ||
+      !!mattingActive?.['matting']?.['active'] ||
+      !!mattingActive?.['annotate']?.['active'] ||
+      !!mattingActive?.['videoClip']?.['active'] ||
+      !!mattingActive?.['videoKeying']?.['active'] ||
       audioClipModeActive,
-    alignFeatureEnabled: mattingActive?.ui?.alignFeatureEnabled !== false,
+    alignFeatureEnabled: mattingActive?.['ui']?.['alignFeatureEnabled'] !== ![],
     selectedNodeType: selectedNodeType,
-    selectedSyncPlayableVideoCount: getSelectedSyncPlayableVideoCount(mattingActive?.nodes || {}, list4),
+    selectedSyncPlayableVideoCount: getSelectedSyncPlayableVideoCount(mattingActive?.['nodes'] || {}, list4),
     mediaClipExpandedEditing: hasExpandedMediaClipNode(mattingActive),
     panoramaSceneEditing:
       (selectedNodeType === 'panorama-scene' || selectedNodeType === 'panorama-360') &&
-      state?.ui?.isEditing === true,
+      scope?.['ui']?.['isEditing'] === !![],
+    panoramaSceneFlyMode:
+      selectedNodeType === 'panorama-scene' &&
+      scope?.['ui']?.['isEditing'] === !![] &&
+      scope?.['ui']?.['navigationMode'] === 'fly',
   };
 }
-function handleKeyDown(event3) {
+function isPanoramaSceneNavigationKey(input, enabled4) {
+  if (
+    !enabled4?.['panoramaSceneEditing'] ||
+    input?.['ctrlKey'] ||
+    input?.['metaKey'] ||
+    input?.['altKey']
+  )
+    return ![];
+  if (input?.['code'] === 'KeyF') return !![];
+  return (
+    enabled4['panoramaSceneFlyMode'] === !![] &&
+    ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE']['includes'](input?.['code'])
+  );
+}
+function handleKeyDown(event6) {
+  if (hasActiveModalInteraction()) return;
+  if (dispatchScopedEscape(event6)) return;
+  if (isRecording()) return;
   if (isCommentNoteShortcutRecording()) return;
-  // A modal story editor owns all keys, including Save and Space.
-  if (event3.target?.closest?.('.sw-studio, .node-media-export-dialog, .timeline-export-dialog')) return;
-  // Capture-phase canvas shortcuts must not delete an embedded editor while typing.
-  // Let editors handle their own keys, while keeping Save and canvas-pan shortcuts.
-  const whiteboardTarget = event3.target?.closest?.('.wb-node, .cw-node, .sw-node');
-  const whiteboardSave = (event3.ctrlKey || event3.metaKey) && String(event3.key).toLowerCase() === 's';
-  if (whiteboardTarget && !whiteboardSave && event3.key !== ' ') return;
-  const config = appStore.getStateRaw();
-  if (event3.code === 'Escape' && isEscFeatureModeActive(config)) {
-    (event3.preventDefault(), event3.stopImmediatePropagation(), dispatchShortcutAction('escape-all'));
+  if (
+    event6['target']?.['closest']?.('.v2-canvas-ctx-menu') ||
+    globalThis['document']?.['querySelector']?.(
+      '.v2-canvas-ctx-menu, .v2-material-context-menu, .panorama-scene-object-menu.is-visible',
+    )
+  )
+    return;
+  if (isDevModeToggleShortcut(event6) && !isEditingText() && !isActiveWhiteboardEditorTarget(event6)) {
+    (event6['preventDefault'](), toggleDevMode());
+    return;
+  }
+  if (document['body']?.['classList']?.['contains']?.('storyboard-3d-editor-open')) return;
+  const output = appStore['getStateRaw']();
+  if (event6['code'] === 'Escape' && isEscFeatureModeActive(output)) {
+    (event6['preventDefault'](),
+      event6['stopImmediatePropagation'](),
+      dispatchShortcutAction('escape-all'));
     return;
   }
   if (isEditingText()) {
-    if (event3.code === 'Escape') {
-      const { pickConnectMode: pickConnectMode } = appStore.getStateRaw();
+    if (event6['code'] === 'Escape') {
+      const { pickConnectMode: pickConnectMode } = appStore['getStateRaw']();
       pickConnectMode &&
-        pickConnectMode.active &&
-        (appStore.setPickConnectMode({ active: false }), event3.preventDefault(), event3.stopPropagation());
+        pickConnectMode['active'] &&
+        (appStore['setPickConnectMode']({ active: ![] }),
+        event6['preventDefault'](),
+        event6['stopPropagation']());
     }
     return;
   }
-  if (isPlainCopyShortcut(event3) && hasActiveReadonlyTextSelection(document)) return;
+  if (isActiveWhiteboardEditorTarget(event6)) return;
+  if (isPlainCopyShortcut(event6) && hasActiveReadonlyTextSelection(document)) return;
   const audioClipModeActive2 = isAudioClipModeActive();
   if (audioClipModeActive2) return;
-  if (config.videoKeying?.active || config.videoClip?.active) {
-    if (event3.code === 'Escape') return;
-    (event3.preventDefault(), event3.stopPropagation());
+  if (
+    (event6['key'] === '\x20' || event6['code'] === 'Space') &&
+    !event6['ctrlKey'] &&
+    !event6['metaKey'] &&
+    !event6['altKey'] &&
+    !event6['shiftKey'] &&
+    event6['target']?.['closest']?.('button')
+  )
+    return;
+  if (output['videoKeying']?.['active'] || output['videoClip']?.['active']) {
+    if (event6['code'] === 'Escape') return;
+    (event6['preventDefault'](), event6['stopPropagation']());
     return;
   }
   if (
-    config.annotate?.active &&
-    !event3.ctrlKey &&
-    !event3.metaKey &&
-    !event3.altKey &&
-    String(event3.key || '').toUpperCase() === 'T'
+    output['annotate']?.['active'] &&
+    !event6['ctrlKey'] &&
+    !event6['metaKey'] &&
+    !event6['altKey'] &&
+    String(event6['key'] || '')['toUpperCase']() === 'T'
   ) {
-    (event3.preventDefault(),
-      event3.stopPropagation(),
-      window.dispatchEvent(new CustomEvent('shortcut-action', { detail: 'editor-tool-text' })));
+    (event6['preventDefault'](),
+      event6['stopPropagation'](),
+      window['dispatchEvent'](new CustomEvent('shortcut-action', { detail: 'editor-tool-text' })));
     return;
   }
-  if (event3.code === 'Escape') {
-    const { pickConnectMode: pickConnectMode2 } = appStore.getStateRaw();
-    if (pickConnectMode2 && pickConnectMode2.active) {
-      (appStore.setPickConnectMode({ active: false }), event3.preventDefault(), event3.stopPropagation());
+  if (event6['code'] === 'Escape') {
+    const { pickConnectMode: pickConnectMode2 } = appStore['getStateRaw']();
+    if (pickConnectMode2 && pickConnectMode2['active']) {
+      (appStore['setPickConnectMode']({ active: ![] }),
+        event6['preventDefault'](),
+        event6['stopPropagation']());
       return;
     }
   }
-  if (event3.key === 'Control') {
-    const el3 = document.getElementById('pick-connect-overlay');
-    el3 && el3.style.display !== 'none' && (el3.style.cursor = 'var(--connect-cursor)');
+  if (event6['key'] === 'Control') {
+    const el3 = document['getElementById']('pick-connect-overlay');
+    el3 &&
+      el3['style']['display'] !== 'none' &&
+      (el3['style']['cursor'] = 'var(--connect-cursor)');
   }
-  if (isRecording()) return;
-  const scope = appStore.getStateRaw(),
-    shortcutContext = buildShortcutContext(scope, { audioClipModeActive: audioClipModeActive2 }),
-    detail2 = handleShortcutKeydown(event3, shortcutContext);
-  if (event3.repeat && isRepeatSuppressedShortcut(detail2)) {
-    event3.preventDefault();
+  const value2 = appStore['getStateRaw'](),
+    shortcutContext = buildShortcutContext(value2, { audioClipModeActive: audioClipModeActive2 });
+  if (isPanoramaSceneNavigationKey(event6, shortcutContext)) {
+    event6['preventDefault']();
+    return;
+  }
+  const detail2 = handleShortcutKeydown(event6, shortcutContext);
+  if (event6['repeat'] && isRepeatSuppressedShortcut(detail2)) {
+    event6['preventDefault']();
     return;
   }
   if (detail2 === 'pan-canvas') {
-    event3.preventDefault();
-    !event3.repeat && setPanShortcutHeld(true);
+    event6['preventDefault']();
+    !event6['repeat'] && setCanvasPanShortcutHeld(!![]);
     return;
   }
   if (detail2 === 'align-feature') {
-    const input = String(scope.ui?.alignFeatureTriggerMode || 'click'),
-      output = input === 'hold' || input === 'click' || input === 'off' ? input : 'click';
-    if (output === 'off' || shortcutContext.alignFeatureEnabled === false) return;
-    event3.preventDefault();
-    if (output === 'click') {
+    const value3 = String(value2['ui']?.['alignFeatureTriggerMode'] || 'click'),
+      value4 = value3 === 'hold' || value3 === 'click' || value3 === 'off' ? value3 : 'click';
+    if (value4 === 'off' || shortcutContext['alignFeatureEnabled'] === ![]) return;
+    event6['preventDefault']();
+    if (value4 === 'click') {
       dispatchShortcutAction('align-feature-toggle');
       return;
     }
-    if (event3.repeat) return;
+    if (event6['repeat']) return;
     (_clearAlignHoldState(),
-      (_alignHoldKey = (event3.code || '') + '|' + (event3.key || '')),
+      (_alignHoldKey = (event6['code'] || '') + '|' + (event6['key'] || '')),
       (_alignHoldTimer = setTimeout(() => {
         ((_alignHoldTimer = null),
-          (_alignHoldActive = true),
+          (_alignHoldActive = !![]),
           dispatchShortcutAction('align-feature-hold-start'));
       }, ALIGN_HOLD_TRIGGER_MS)));
     return;
   }
+  if (isInteractionModifierShortcut(detail2)) return;
   if (detail2) {
-    (event3.preventDefault(), window.dispatchEvent(new CustomEvent('shortcut-action', { detail: detail2 })));
+    (event6['preventDefault'](),
+      window['dispatchEvent'](new CustomEvent('shortcut-action', { detail: detail2 })));
     return;
   }
-  if (!shortcutContext.featureModeActive) {
-    const commentNoteJumpActionId = resolveCommentNoteJumpActionId(scope, event3);
+  if (!shortcutContext['featureModeActive']) {
+    const commentNoteJumpActionId = resolveCommentNoteJumpActionId(value2, event6);
     if (commentNoteJumpActionId) {
-      (event3.preventDefault(), dispatchShortcutAction(commentNoteJumpActionId));
+      (event6['preventDefault'](), dispatchShortcutAction(commentNoteJumpActionId));
       return;
     }
   }
-  const value2 =
-    event3.key === 'Delete' ||
-    event3.key === 'Del' ||
-    event3.key === 'Backspace' ||
-    event3.code === 'Delete' ||
-    event3.code === 'Backspace';
-  !shortcutContext.featureModeActive &&
-    value2 &&
-    (event3.preventDefault(), event3.stopPropagation(), event3.stopImmediatePropagation());
+  const value5 =
+    event6['key'] === 'Delete' ||
+    event6['key'] === 'Del' ||
+    event6['key'] === 'Backspace' ||
+    event6['code'] === 'Delete' ||
+    event6['code'] === 'Backspace';
+  !shortcutContext['featureModeActive'] &&
+    value5 &&
+    (event6['preventDefault'](), event6['stopPropagation'](), event6['stopImmediatePropagation']());
 }
-function handleKeyUp(event4) {
+function handleKeyUp(event7) {
   if (_alignHoldKey) {
-    const value3 = (event4.code || '') + '|' + (event4.key || ''),
-      value4 =
-        value3 === _alignHoldKey || event4.code === 'Tab' || String(event4.key || '').toLowerCase() === 'tab';
-    if (value4) {
-      const value5 = _alignHoldActive;
-      (_clearAlignHoldState(), value5 && dispatchShortcutAction('align-feature-hold-end'));
+    const value6 = (event7['code'] || '') + '|' + (event7['key'] || ''),
+      value7 =
+        value6 === _alignHoldKey ||
+        event7['code'] === 'Tab' ||
+        String(event7['key'] || '')['toLowerCase']() === 'tab';
+    if (value7) {
+      const value8 = _alignHoldActive;
+      (_clearAlignHoldState(), value8 && dispatchShortcutAction('align-feature-hold-end'));
     }
   }
-  shouldReleasePanShortcut(event4) && setPanShortcutHeld(false);
-  if (event4.key === 'Control') {
-    const el4 = document.getElementById('pick-connect-overlay');
-    el4 && el4.style.display !== 'none' && (el4.style.cursor = '');
+  shouldReleasePanShortcut(event7) && releaseCanvasPanShortcut();
+  if (event7['key'] === 'Control') {
+    const el4 = document['getElementById']('pick-connect-overlay');
+    el4 && el4['style']['display'] !== 'none' && (el4['style']['cursor'] = '');
   }
 }
 export function isSpaceHeld() {
-  return _spaceHeld;
+  return isCanvasPanShortcutHeld();
+}
+function handleWindowBlur() {
+  (_clearAlignHoldState(), releaseCanvasPanShortcut());
 }
 export function addShortcutListener(handler) {
-  _listeners.push(handler);
-  const value6 = (value7) => handler(value7.detail);
+  _listeners['push'](handler);
+  const value9 = (value10) => handler(value10['detail']);
   return (
-    window.addEventListener('shortcut-action', value6),
+    window['addEventListener']('shortcut-action', value9),
     () => {
-      const value8 = _listeners.indexOf(handler);
-      (value8 > -1 && _listeners.splice(value8, 1), window.removeEventListener('shortcut-action', value6));
+      const value11 = _listeners['indexOf'](handler);
+      (value11 > -0x1 && _listeners['splice'](value11, 0x1),
+        window['removeEventListener']('shortcut-action', value9));
     }
   );
 }
 export function initKeyboardService() {
-  (window.addEventListener('keydown', handleKeyDown, true),
-    document.addEventListener('keyup', handleKeyUp),
-    window.addEventListener('blur', _clearAlignHoldState),
-    (_spaceHeld = false),
-    (window._spaceHeld = false));
+  (window['addEventListener']('keydown', handleKeyDown, !![]),
+    window['addEventListener']('keyup', handleKeyUp, !![]),
+    window['addEventListener']('blur', handleWindowBlur),
+    (_settingsShortcutRoot = document['querySelector']?.('#settingsOverlay .settings-modal')),
+    _settingsShortcutRoot?.['addEventListener']('keydown', handleSettingsKeyDown),
+    releaseCanvasPanShortcut());
 }
 export function destroyKeyboardService() {
-  (window.removeEventListener('keydown', handleKeyDown, true),
-    document.removeEventListener('keyup', handleKeyUp),
-    window.removeEventListener('blur', _clearAlignHoldState),
+  (window['removeEventListener']('keydown', handleKeyDown, !![]),
+    window['removeEventListener']('keyup', handleKeyUp, !![]),
+    window['removeEventListener']('blur', handleWindowBlur),
+    _settingsShortcutRoot?.['removeEventListener']('keydown', handleSettingsKeyDown),
+    (_settingsShortcutRoot = null),
     _clearAlignHoldState(),
-    setPanShortcutHeld(false));
+    releaseCanvasPanShortcut());
 }

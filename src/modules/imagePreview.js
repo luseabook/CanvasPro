@@ -1,293 +1,588 @@
-import {
-  resolveCanvasImageDisplayUrl,
-  resolveCanvasImageSourceUrl,
-} from '../services/canvasMediaLocalService.js';
 import { getImage } from './storage.js';
 import { firstNonEmpty } from '../utils/validators.js';
+import { createImageLoadDiagnostics, getImageLoadTiming } from '../services/imageLoadDiagnostics.js';
 import {
+  resolveCanvasImageDisplayUrl,
   resolveCanvasImagePreviewUrl,
+  resolveCanvasImageSourceUrl,
   resolveCanvasImageThumbUrl,
 } from '../services/canvasMediaLocalService.js';
-import { attachMediaElementPlaybackSource } from '../services/desktopMediaBlobSource.js';
-export async function resolveNodeImagePreviewSource(enabled) {
+import {
+  attachMediaElementPlaybackSource,
+  clearDesktopMediaPlaybackSourceMetadata,
+} from '../services/desktopMediaBlobSource.js';
+import {
+  acquireLocalVideoPlaybackObjectUrl,
+  releaseLocalVideoPlaybackObjectUrlOwner,
+} from '../services/localVideoPlaybackObjectUrlService.js';
+import {
+  claimVideoPlaybackOwnership,
+  detachVideoPlaybackRecovery,
+} from '../components/video-node/mediaPlaybackRecovery.js';
+export async function resolveNodeImageOriginalSource(enabled) {
   if (!enabled) return null;
-  const value = Array.isArray(enabled.images) ? enabled.images : [],
-    item = enabled.mainImageIndex || 0,
+  const value = Array['isArray'](enabled['images']) ? enabled['images'] : [],
+    item = enabled['mainImageIndex'] || 0x0,
     key = value[item] || null,
-    nonEmpty = firstNonEmpty(key?.sourceId, enabled.sourceId);
+    nonEmpty = firstNonEmpty(key?.['sourceId'], enabled['sourceId']);
   if (nonEmpty)
     try {
       const image = await getImage(nonEmpty);
-      if (image) return { url: URL.createObjectURL(image), revokeUrlOnClose: true };
+      if (image) return { url: URL['createObjectURL'](image), revokeUrlOnClose: !![] };
     } catch (index) {}
-  const url = firstNonEmpty(resolveCanvasImagePreviewUrl(key), resolveCanvasImagePreviewUrl(enabled));
-  if (url) return { url: url, revokeUrlOnClose: false };
-  const url2 = firstNonEmpty(resolveCanvasImageThumbUrl(key), resolveCanvasImageThumbUrl(enabled));
-  if (url2) return { url: url2, revokeUrlOnClose: false };
+  const url = firstNonEmpty(
+    resolveCanvasImageSourceUrl(key),
+    resolveCanvasImageSourceUrl(enabled),
+  );
+  if (url) return { url: url, revokeUrlOnClose: ![] };
   return null;
 }
-function markSidebarSubmenuOwner(el, result) {
-  const data = String(result || '').trim();
-  if (data) el.dataset.sidebarSubmenuOwner = data;
+export async function resolveNodeImagePreviewSource(result) {
+  const response = await resolveNodeImageOriginalSource(result);
+  if (response?.['url']) return response;
+  const data = Array['isArray'](result?.['images']) ? result['images'] : [],
+    options = result?.['mainImageIndex'] || 0x0,
+    target = data[options] || null,
+    url2 = firstNonEmpty(
+      resolveCanvasImagePreviewUrl(target),
+      resolveCanvasImagePreviewUrl(result),
+    );
+  if (url2) return { url: url2, revokeUrlOnClose: ![] };
+  const url3 = firstNonEmpty(
+    resolveCanvasImageThumbUrl(target),
+    resolveCanvasImageThumbUrl(result),
+  );
+  if (url3) return { url: url3, revokeUrlOnClose: ![] };
+  return null;
+}
+function markSidebarSubmenuOwner(el, source) {
+  const next = String(source || '')['trim']();
+  if (next) el['dataset']['sidebarSubmenuOwner'] = next;
+}
+function collectUniquePreviewUrls(list = []) {
+  const list2 = [],
+    map = new Set();
+  for (const current of list) {
+    const enabled2 = String(current || '')['trim']();
+    if (!enabled2 || map['has'](enabled2)) continue;
+    (map['add'](enabled2), list2['push'](enabled2));
+  }
+  return list2;
+}
+function resolveImmediateNodeImagePreviewUrls(entry, record = '') {
+  const payload = Array['isArray'](entry?.['images']) ? entry['images'] : [],
+    handle = Math['max'](0x0, Number(entry?.['mainImageIndex']) || 0x0),
+    state = payload[handle] || payload[0x0] || null;
+  return collectUniquePreviewUrls([
+    record,
+    resolveCanvasImageDisplayUrl(state),
+    resolveCanvasImageDisplayUrl(entry),
+    resolveCanvasImagePreviewUrl(state),
+    resolveCanvasImagePreviewUrl(entry),
+    resolveCanvasImageThumbUrl(state),
+    resolveCanvasImageThumbUrl(entry),
+  ]);
 }
 const IMAGE_PREVIEW_MIN_SCALE = 0.25,
-  IMAGE_PREVIEW_MAX_SCALE = 6,
+  IMAGE_PREVIEW_MAX_SCALE = 0x6,
   IMAGE_PREVIEW_WHEEL_INTENSITY = 0.0015;
-function clampNumber(options, target, source) {
-  const next = Number(options);
-  if (!Number.isFinite(next)) return target;
-  return Math.min(source, Math.max(target, next));
+let activeImagePreviewClose = null,
+  activeVideoPreviewClose = null,
+  videoPreviewOwnerSequence = 0x0;
+export function closeActiveImagePreview() {
+  if (typeof activeImagePreviewClose !== 'function') return ![];
+  const run = activeImagePreviewClose;
+  return (run(), !![]);
+}
+export function closeActiveVideoPreview() {
+  if (typeof activeVideoPreviewClose !== 'function') return ![];
+  const run2 = activeVideoPreviewClose;
+  return (run2(), !![]);
+}
+function clampNumber(config, scope, input) {
+  const output = Number(config);
+  if (!Number['isFinite'](output)) return scope;
+  return Math['min'](input, Math['max'](scope, output));
 }
 function stopPreviewEvent(event) {
-  (event?.preventDefault?.(), event?.stopPropagation?.());
+  (event?.['preventDefault']?.(), event?.['stopPropagation']?.());
 }
 function getOverlayCenterPoint(el2) {
-  const x = el2.getBoundingClientRect?.();
+  const x = el2['getBoundingClientRect']?.();
   if (!x)
-    return { x: (globalThis.window?.innerWidth || 0) / 2, y: (globalThis.window?.innerHeight || 0) / 2 };
-  return { x: x.left + x.width / 2, y: x.top + x.height / 2 };
+    return {
+      x: (globalThis['window']?.['innerWidth'] || 0x0) / 0x2,
+      y: (globalThis['window']?.['innerHeight'] || 0x0) / 0x2,
+    };
+  return { x: x['left'] + x['width'] / 0x2, y: x['top'] + x['height'] / 0x2 };
 }
 function isPointerInsideElementBounds(el3, event2) {
-  if (!el3 || !event2) return false;
-  const current = Number(event2.clientX),
-    entry = Number(event2.clientY);
-  if (!Number.isFinite(current) || !Number.isFinite(entry)) return event2.target === el3;
-  const box = el3.getBoundingClientRect?.();
-  if (!box) return event2.target === el3;
-  const record = Number(box.left),
-    payload = Number(box.top),
-    handle = Number.isFinite(Number(box.right)) ? Number(box.right) : record + Number(box.width || 0),
-    state = Number.isFinite(Number(box.bottom)) ? Number(box.bottom) : payload + Number(box.height || 0);
+  if (!el3 || !event2) return ![];
+  const value2 = Number(event2['clientX']),
+    value3 = Number(event2['clientY']);
+  if (!Number['isFinite'](value2) || !Number['isFinite'](value3))
+    return event2['target'] === el3;
+  const box = el3['getBoundingClientRect']?.();
+  if (!box) return event2['target'] === el3;
+  const value4 = Number(box['left']),
+    value5 = Number(box['top']),
+    value6 = Number['isFinite'](Number(box['right']))
+      ? Number(box['right'])
+      : value4 + Number(box['width'] || 0x0),
+    value7 = Number['isFinite'](Number(box['bottom']))
+      ? Number(box['bottom'])
+      : value5 + Number(box['height'] || 0x0);
   if (
-    !Number.isFinite(record) ||
-    !Number.isFinite(payload) ||
-    !Number.isFinite(handle) ||
-    !Number.isFinite(state) ||
-    handle <= record ||
-    state <= payload
+    !Number['isFinite'](value4) ||
+    !Number['isFinite'](value5) ||
+    !Number['isFinite'](value6) ||
+    !Number['isFinite'](value7) ||
+    value6 <= value4 ||
+    value7 <= value5
   )
-    return event2.target === el3;
-  return current >= record && current <= handle && entry >= payload && entry <= state;
+    return event2['target'] === el3;
+  return value2 >= value4 && value2 <= value6 && value3 >= value5 && value3 <= value7;
 }
 function applyImagePreviewTransform(el4, el5, box2) {
-  (el4.style.setProperty('--image-preview-offset-x', Math.round(box2.offsetX * 100) / 100 + 'px'),
-    el4.style.setProperty('--image-preview-offset-y', Math.round(box2.offsetY * 100) / 100 + 'px'),
-    el5.style.setProperty('--image-preview-scale', String(Math.round(box2.scale * 0x3e8) / 0x3e8)));
+  (el4['style']['setProperty'](
+    '--image-preview-offset-x',
+    Math['round'](box2['offsetX'] * 0x64) / 0x64 + 'px',
+  ),
+    el4['style']['setProperty'](
+      '--image-preview-offset-y',
+      Math['round'](box2['offsetY'] * 0x64) / 0x64 + 'px',
+    ),
+    el5['style']['setProperty'](
+      '--image-preview-scale',
+      String(Math['round'](box2['scale'] * 0x3e8) / 0x3e8),
+    ));
 }
-export function openImagePreview(enabled2, enabled3 = {}) {
-  if (!enabled2) return () => {};
-  const config = !!enabled3.revokeUrlOnClose,
-    offsetX = { scale: 1, offsetX: 0, offsetY: 0 };
+export function openImagePreview(enabled3, value8 = {}) {
+  const enabled4 = value8['deferredSource'] === !![];
+  if (!enabled3 && !enabled4) return () => {};
+  (closeActiveVideoPreview(), closeActiveImagePreview());
+  let list3 = collectUniquePreviewUrls([
+    enabled3,
+    ...(Array['isArray'](value8['fallbackUrls']) ? value8['fallbackUrls'] : []),
+  ]);
+  const value9 = new Set();
+  if (value8['revokeUrlOnClose'] && enabled3) value9['add'](enabled3);
+  const offsetX = { scale: 0x1, offsetX: 0x0, offsetY: 0x0 };
   let event3 = null,
-    scope = false;
-  const el6 = document.createElement('div');
-  ((el6.className = 'v2-image-preview-overlay'),
-    (el6.style.zIndex = '99999'),
-    markSidebarSubmenuOwner(el6, enabled3.sidebarSubmenuOwner));
-  const el7 = document.createElement('div');
-  el7.className = 'v2-image-preview-stage';
-  const el8 = document.createElement('img');
-  ((el8.className = 'v2-image-preview-media'),
-    (el8.src = enabled2),
-    (el8.alt = enabled3.alt || 'Image preview'),
-    (el8.draggable = false),
-    applyImagePreviewTransform(el7, el8, offsetX));
-  const run = () => {
-      (globalThis.window?.removeEventListener?.('pointermove', run2, true),
-        globalThis.window?.removeEventListener?.('pointerup', run3, true),
-        globalThis.window?.removeEventListener?.('pointercancel', run3, true));
+    enabled5 = ![];
+  const el6 = document['createElement']('div');
+  ((el6['className'] = 'v2-image-preview-overlay'),
+    (el6['style']['zIndex'] = '99999'),
+    markSidebarSubmenuOwner(el6, value8['sidebarSubmenuOwner']));
+  const el7 = document['createElement']('div');
+  el7['className'] = 'v2-image-preview-stage';
+  const el8 = document['createElement']('img');
+  ((el8['className'] = 'v2-image-preview-media'),
+    (el8['alt'] = value8['alt'] || 'Image preview'),
+    (el8['draggable'] = ![]));
+  let value10 = 0x0;
+  const run3 = (value11) => {
+      if (!list3[value11]) return ![];
+      return (
+        (value10 = value11),
+        el6['classList']['add']('is-loading'),
+        el6['classList']['remove']('is-error'),
+        value8['loadDiagnostics']?.['mark']('source-assigned'),
+        (el8['src'] = list3[value10]),
+        !![]
+      );
+    },
+    value12 = () => {
+      (value8['loadDiagnostics']?.['mark']('image-loaded', getImageLoadTiming(el8)),
+        el6['classList']['remove']('is-loading', 'is-error'),
+        globalThis['window']?.['requestAnimationFrame']?.(() =>
+          globalThis['window']['requestAnimationFrame'](() => {
+            if (!enabled5) value8['loadDiagnostics']?.['mark']('paint-opportunity');
+          }),
+        ));
+    },
+    value13 = () => {
+      value8['loadDiagnostics']?.['mark']('error');
+      const value14 = value10 + 0x1;
+      if (value14 < list3['length']) {
+        run3(value14);
+        return;
+      }
+      (el6['classList']['remove']('is-loading'), el6['classList']['add']('is-error'));
+    };
+  (el8['addEventListener']('load', value12), el8['addEventListener']('error', value13));
+  if (!run3(0x0)) el6['classList']['add']('is-loading');
+  applyImagePreviewTransform(el7, el8, offsetX);
+  const run4 = () => {
+      (globalThis['window']?.['removeEventListener']?.('pointermove', run5, !![]),
+        globalThis['window']?.['removeEventListener']?.('pointerup', run6, !![]),
+        globalThis['window']?.['removeEventListener']?.('pointercancel', run6, !![]));
     },
     handler = () => {
-      (run(), el6.classList.remove('is-panning'), (event3 = null));
+      (run4(), el6['classList']['remove']('is-panning'), (event3 = null));
     },
     handler2 = () => {
-      if (scope) return;
-      ((scope = true), document.removeEventListener('keydown', input, true), handler(), el6.remove());
-      if (config)
+      if (enabled5) return;
+      ((enabled5 = !![]),
+        value8['loadDiagnostics']?.['finish'](),
+        document['removeEventListener']('keydown', value15, !![]),
+        handler(),
+        el8['removeEventListener']('load', value12),
+        el8['removeEventListener']('error', value13),
+        el6['remove']());
+      for (const value16 of value9) {
         try {
-          URL.revokeObjectURL(enabled2);
-        } catch (output) {}
+          URL['revokeObjectURL'](value16);
+        } catch (value17) {}
+      }
+      if (activeImagePreviewClose === handler2) activeImagePreviewClose = null;
     },
-    input = (event4) => {
-      event4.key === 'Escape' && (event4.preventDefault(), event4.stopPropagation(), handler2());
+    value15 = (event4) => {
+      event4['key'] === 'Escape' &&
+        (event4['preventDefault']?.(), event4['stopPropagation']?.(), handler2());
     },
-    value2 = (event5) => {
+    value18 = (event5) => {
       stopPreviewEvent(event5);
-      const value3 = offsetX.scale,
-        value4 = Math.exp(-Number(event5.deltaY || 0) * IMAGE_PREVIEW_WHEEL_INTENSITY),
-        clampNumber2 = clampNumber(value3 * value4, IMAGE_PREVIEW_MIN_SCALE, IMAGE_PREVIEW_MAX_SCALE);
-      if (clampNumber2 === value3) return;
+      const value19 = offsetX['scale'],
+        value20 = Math['exp'](-Number(event5['deltaY'] || 0x0) * IMAGE_PREVIEW_WHEEL_INTENSITY),
+        clampNumber2 = clampNumber(value19 * value20, IMAGE_PREVIEW_MIN_SCALE, IMAGE_PREVIEW_MAX_SCALE);
+      if (clampNumber2 === value19) return;
       const box3 = getOverlayCenterPoint(el6),
-        value5 = Number(event5.clientX || 0) - box3.x,
-        value6 = Number(event5.clientY || 0) - box3.y,
-        value7 = clampNumber2 / value3;
-      ((offsetX.offsetX = value5 - (value5 - offsetX.offsetX) * value7),
-        (offsetX.offsetY = value6 - (value6 - offsetX.offsetY) * value7),
-        (offsetX.scale = clampNumber2),
+        value21 = Number(event5['clientX'] || 0x0) - box3['x'],
+        value22 = Number(event5['clientY'] || 0x0) - box3['y'],
+        value23 = clampNumber2 / value19;
+      ((offsetX['offsetX'] = value21 - (value21 - offsetX['offsetX']) * value23),
+        (offsetX['offsetY'] = value22 - (value22 - offsetX['offsetY']) * value23),
+        (offsetX['scale'] = clampNumber2),
         applyImagePreviewTransform(el7, el8, offsetX));
     },
-    value8 = (pointerId) => {
-      if (pointerId.button != null && pointerId.button !== 0) return;
-      if (!isPointerInsideElementBounds(el8, pointerId)) return;
+    value24 = (pointerId) => {
+      const count = Number(pointerId?.['button'] ?? 0x0),
+        enabled6 = count === 0x1;
+      if (!enabled6 && count !== 0x0) return;
+      if (!enabled6 && !isPointerInsideElementBounds(el8, pointerId)) return;
       (stopPreviewEvent(pointerId),
         handler(),
         (event3 = {
-          pointerId: pointerId.pointerId,
-          startX: Number(pointerId.clientX || 0),
-          startY: Number(pointerId.clientY || 0),
-          offsetX: offsetX.offsetX,
-          offsetY: offsetX.offsetY,
+          pointerId: pointerId['pointerId'],
+          startX: Number(pointerId['clientX'] || 0x0),
+          startY: Number(pointerId['clientY'] || 0x0),
+          offsetX: offsetX['offsetX'],
+          offsetY: offsetX['offsetY'],
         }),
-        el6.classList.add('is-panning'),
-        el7.setPointerCapture?.(pointerId.pointerId),
-        globalThis.window?.addEventListener?.('pointermove', run2, true),
-        globalThis.window?.addEventListener?.('pointerup', run3, true),
-        globalThis.window?.addEventListener?.('pointercancel', run3, true));
+        el6['classList']['add']('is-panning'),
+        el7['setPointerCapture']?.(pointerId['pointerId']),
+        globalThis['window']?.['addEventListener']?.('pointermove', run5, !![]),
+        globalThis['window']?.['addEventListener']?.('pointerup', run6, !![]),
+        globalThis['window']?.['addEventListener']?.('pointercancel', run6, !![]));
     };
-  function run2(event6) {
+  function run5(event6) {
     if (!event3) return;
-    if (event3.pointerId != null && event6.pointerId != null && event6.pointerId !== event3.pointerId) return;
+    if (
+      event3['pointerId'] != null &&
+      event6['pointerId'] != null &&
+      event6['pointerId'] !== event3['pointerId']
+    )
+      return;
     (stopPreviewEvent(event6),
-      (offsetX.offsetX = event3.offsetX + Number(event6.clientX || 0) - event3.startX),
-      (offsetX.offsetY = event3.offsetY + Number(event6.clientY || 0) - event3.startY),
+      (offsetX['offsetX'] =
+        event3['offsetX'] + Number(event6['clientX'] || 0x0) - event3['startX']),
+      (offsetX['offsetY'] =
+        event3['offsetY'] + Number(event6['clientY'] || 0x0) - event3['startY']),
       applyImagePreviewTransform(el7, el8, offsetX));
   }
-  function run3(event7) {
+  function run6(event7) {
     if (!event3) return;
-    if (event3.pointerId != null && event7?.pointerId != null && event7.pointerId !== event3.pointerId)
+    if (
+      event3['pointerId'] != null &&
+      event7?.['pointerId'] != null &&
+      event7['pointerId'] !== event3['pointerId']
+    )
       return;
     stopPreviewEvent(event7);
     try {
-      el7.releasePointerCapture?.(event3.pointerId);
-    } catch (value9) {}
+      el7['releasePointerCapture']?.(event3['pointerId']);
+    } catch (value25) {}
     handler();
   }
   return (
-    el6.addEventListener('click', (event8) => {
+    el6['addEventListener']('click', (event8) => {
       if (isPointerInsideElementBounds(el8, event8)) {
-        event8.stopPropagation();
+        event8['stopPropagation']();
         return;
       }
       handler2();
     }),
-    el6.addEventListener('wheel', value2, { passive: false }),
-    el8.addEventListener('pointerdown', value8),
-    el8.addEventListener('dragstart', stopPreviewEvent),
-    el7.appendChild(el8),
-    el6.appendChild(el7),
-    document.addEventListener('keydown', input, true),
-    document.body.appendChild(el6),
+    el6['addEventListener']('wheel', value18, { passive: ![] }),
+    el6['addEventListener']('pointerdown', value24),
+    el6['addEventListener']('auxclick', (event9) => {
+      if (event9['button'] === 0x1) stopPreviewEvent(event9);
+    }),
+    el8['addEventListener']('dragstart', stopPreviewEvent),
+    el7['appendChild'](el8),
+    el6['appendChild'](el7),
+    document['addEventListener']('keydown', value15, !![]),
+    document['body']['appendChild'](el6),
+    (activeImagePreviewClose = handler2),
+    (handler2['setSources'] = (value26, value27 = {}) => {
+      if (enabled5) return ![];
+      const list4 = collectUniquePreviewUrls(value26);
+      if (list4['length'] === 0x0)
+        return (
+          el6['classList']['remove']('is-loading'),
+          el6['classList']['add']('is-error'),
+          ![]
+        );
+      return (
+        (list3 = list4),
+        value27['revokeUrlOnClose'] && list4['forEach']((value28) => value9['add'](value28)),
+        run3(0x0)
+      );
+    }),
+    (handler2['setError'] = () => {
+      if (enabled5) return ![];
+      return (
+        el6['classList']['remove']('is-loading'),
+        el6['classList']['add']('is-error'),
+        !![]
+      );
+    }),
     handler2
   );
 }
-export function openVideoPreview(enabled4, enabled5 = {}) {
-  if (!enabled4) return () => {};
-  const el9 = document.createElement('div');
-  (markSidebarSubmenuOwner(el9, enabled5.sidebarSubmenuOwner),
-    Object.assign(el9.style, {
-      position: 'fixed',
-      inset: '0',
-      background: 'var(--overlay-dim)',
-      zIndex: '99999',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'zoom-out',
-    }));
-  const el10 = document.createElement('video');
-  ((el10.controls = true),
-    (el10.autoplay = enabled5.autoplay !== false),
-    (el10.loop = enabled5.loop !== false),
-    (el10.muted = !!enabled5.muted),
-    void attachMediaElementPlaybackSource(el10, enabled4, { preload: 'auto' }).catch(() => {
-      !String(el10.getAttribute?.('src') || el10.src || '').trim() && ((el10.src = enabled4), el10.load?.());
-    }),
-    Object.assign(el10.style, { maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }));
-  const run4 = () => {
-      document.removeEventListener('keydown', value10, true);
+export function openVideoPreview(value29, enabled7 = {}) {
+  const enabled8 = String(value29 || '')['trim']();
+  if (!enabled8) return () => {};
+  (closeActiveImagePreview(), closeActiveVideoPreview());
+  const run7 =
+      typeof enabled7['acquirePlaybackUrl'] === 'function'
+        ? enabled7['acquirePlaybackUrl']
+        : acquireLocalVideoPlaybackObjectUrl,
+    handler3 =
+      typeof enabled7['releasePlaybackUrlOwner'] === 'function'
+        ? enabled7['releasePlaybackUrlOwner']
+        : releaseLocalVideoPlaybackObjectUrlOwner,
+    handler4 =
+      typeof enabled7['attachSource'] === 'function'
+        ? enabled7['attachSource']
+        : attachMediaElementPlaybackSource,
+    label = 'video-preview:' + ++videoPreviewOwnerSequence,
+    value30 = String(enabled7['playbackUrl'] || '')['trim']();
+  let enabled9 = ![],
+    value31 = ![],
+    value32 = ![],
+    value33 = 0x0,
+    value34 = '';
+  const el9 = document['createElement']('div');
+  el9['className'] = 'v2-image-preview-overlay v2-video-preview-overlay is-loading';
+  if (enabled7['overlayDataset'] && typeof enabled7['overlayDataset'] === 'object')
+    for (const [enabled10, value35] of Object['entries'](enabled7['overlayDataset'])) {
+      if (!enabled10 || value35 == null) continue;
+      el9['dataset'][enabled10] = String(value35);
+    }
+  (markSidebarSubmenuOwner(el9, enabled7['sidebarSubmenuOwner']),
+    el9['setAttribute']?.('role', 'dialog'),
+    el9['setAttribute']?.('aria-modal', 'true'),
+    el9['setAttribute']?.('aria-label', enabled7['ariaLabel'] || 'Video\x20preview'));
+  const el10 = document['createElement']('video');
+  ((el10['className'] = 'v2-video-preview-media'),
+    (el10['controls'] = !![]),
+    (el10['autoplay'] = enabled7['autoplay'] !== ![]),
+    (el10['loop'] = enabled7['loop'] === !![]),
+    (el10['muted'] = !!enabled7['muted']),
+    (el10['playsInline'] = !![]),
+    (el10['preload'] = 'auto'));
+  const run8 = () =>
+      String(el10['getAttribute']?.('src') || el10['src'] || el10['currentSrc'] || '')[
+        'trim'
+      ](),
+    handler5 = () => {
+      (clearDesktopMediaPlaybackSourceMetadata(el10), el10['removeAttribute']?.('src'));
       try {
-        el10.pause();
-      } catch (value11) {}
-      el9.remove();
+        el10['load']?.();
+      } catch {}
+      value34 = '';
     },
-    value10 = (event9) => {
-      event9.key === 'Escape' && (event9.preventDefault(), event9.stopPropagation(), run4());
+    handler6 = () => {
+      if (enabled9) return;
+      (el9['classList']['add']('is-loading'), el9['classList']['remove']('is-error'));
+    },
+    handler7 = () => {
+      if (enabled9) return;
+      el9['classList']['remove']('is-loading', 'is-error');
+    },
+    handler8 = () => {
+      if (enabled9) return;
+      (el9['classList']['remove']('is-loading'), el9['classList']['add']('is-error'));
+    },
+    handler9 = () => {
+      if (enabled9 || enabled7['autoplay'] === ![]) return ![];
+      const enabled11 = run8();
+      if (!enabled11 || value34 === enabled11) return ![];
+      value34 = enabled11;
+      if (
+        !claimVideoPlaybackOwnership(el10, {
+          label: label,
+          minBufferAhead: 0.5,
+          readyTimeoutMs: 0x15e,
+          recoveryDebounceMs: 0x96,
+          recoveryCooldownMs: 0x1f4,
+          shouldRecover: () => !enabled9 && el10['isConnected'] !== ![] && !el10['paused'],
+        })
+      )
+        return ![];
+      try {
+        const promise = el10['play']?.();
+        promise?.['catch']?.(() => {});
+      } catch {}
+      return !![];
     };
-  (el9.addEventListener('click', (event10) => {
-    if (event10.target === el9) run4();
-  }),
-    el9.appendChild(el10),
-    document.addEventListener('keydown', value10, true),
-    document.body.appendChild(el9));
+  let promise2;
   try {
-    const promise = el10.play?.();
-    promise && typeof promise.catch === 'function' && promise.catch(() => {});
-  } catch (value12) {}
-  return run4;
-}
-export async function openNodeImagePreview(value13) {
-  const revokeUrlOnClose = await resolveNodeImagePreviewSource(value13);
-  if (!revokeUrlOnClose) return () => {};
-  return openImagePreview(revokeUrlOnClose.url, { revokeUrlOnClose: revokeUrlOnClose.revokeUrlOnClose });
-}
-
-export async function resolveNodeImageOriginalSource(enabled6) {
-  if (!enabled6) return null;
-  const value14 = Array['isArray'](enabled6['images']) ? enabled6['images'] : [],
-    value15 = enabled6['mainImageIndex'] || 0x0,
-    value16 = value14[value15] || null,
-    nonEmpty2 = firstNonEmpty(value16?.['sourceId'], enabled6['sourceId']);
-  if (nonEmpty2)
-    try {
-      const image2 = await getImage(nonEmpty2);
-      if (image2) return { url: URL['createObjectURL'](image2), revokeUrlOnClose: !![] };
-    } catch (value17) {}
-  const nonEmpty3 = firstNonEmpty(
-    resolveCanvasImageSourceUrl(value16),
-    resolveCanvasImageSourceUrl(enabled6),
-  );
-  if (nonEmpty3) return { url: nonEmpty3, revokeUrlOnClose: ![] };
-  return null;
-}
-
-function collectUniquePreviewUrls(list = []) {
-  const list2 = [],
-    map = new Set();
-  for (const value18 of list) {
-    const enabled7 = String(value18 || '')['trim']();
-    if (!enabled7 || map['has'](enabled7)) continue;
-    (map['add'](enabled7), list2['push'](enabled7));
+    promise2 = Promise['resolve'](run7(enabled8, label))['then'](
+      (value36) => String(value36 || '')['trim'](),
+      () => '',
+    );
+  } catch {
+    promise2 = Promise['resolve']('');
   }
-  return list2;
+  const run9 = async (value37) => {
+      if (enabled9) return ![];
+      const playbackUrl = String(value37 || enabled8)['trim']();
+      if (!playbackUrl) return ![];
+      const value38 = ++value33;
+      try {
+        const value39 = handler4(el10, enabled8, {
+          playbackUrl: playbackUrl,
+          preload: 'auto',
+          load: !![],
+          shouldAssign: () => !enabled9 && value38 === value33,
+        });
+        handler9();
+        const value40 = await value39;
+        if (enabled9 || value38 !== value33) return ![];
+        if (!String(value40 || '')['trim']() && !run8()) return ![];
+        return (handler9(), !![]);
+      } catch {
+        return ![];
+      }
+    },
+    handler10 = async (value41 = '') => {
+      if (enabled9) return ![];
+      if (value32) return (handler8(), ![]);
+      ((value32 = !![]), handler6());
+      const value42 = await promise2;
+      if (enabled9) return ![];
+      const value43 = String(value41 || '')['trim'](),
+        value44 = run8(),
+        uniquePreviewUrls = collectUniquePreviewUrls([value42, enabled8])['filter'](
+          (value45) => value45 !== value43 && value45 !== value44,
+        );
+      for (const value46 of uniquePreviewUrls) {
+        if (run8()) handler5();
+        if (await run9(value46)) return !![];
+      }
+      return (handler8(), ![]);
+    },
+    value47 = () => handler7(),
+    value48 = () => {
+      void handler10(run8());
+    };
+  (el10['addEventListener']('loadeddata', value47),
+    el10['addEventListener']('canplay', value47),
+    el10['addEventListener']('playing', value47),
+    el10['addEventListener']('error', value48));
+  const run10 = () => {
+      if (value31) return;
+      value31 = !![];
+      try {
+        handler3(label);
+      } catch {}
+    },
+    handler11 = () => {
+      if (enabled9) return;
+      ((enabled9 = !![]),
+        (value33 += 0x1),
+        document['removeEventListener']('keydown', value49, !![]),
+        el10['removeEventListener']?.('loadeddata', value47),
+        el10['removeEventListener']?.('canplay', value47),
+        el10['removeEventListener']?.('playing', value47),
+        el10['removeEventListener']?.('error', value48));
+      try {
+        el10['pause']();
+      } catch (value50) {}
+      (detachVideoPlaybackRecovery(el10), handler5(), run10(), el9['remove']());
+      if (activeVideoPreviewClose === handler11) activeVideoPreviewClose = null;
+    },
+    value49 = (event10) => {
+      event10['key'] === 'Escape' &&
+        (event10['preventDefault']?.(), event10['stopPropagation']?.(), handler11());
+    };
+  return (
+    el9['addEventListener']('click', (event11) => {
+      if (event11['target'] === el9) handler11();
+    }),
+    el9['appendChild'](el10),
+    document['addEventListener']('keydown', value49, !![]),
+    document['body']['appendChild'](el9),
+    (activeVideoPreviewClose = handler11),
+    value30
+      ? void run9(value30)['then']((enabled12) => {
+          if (!enabled12) void handler10(value30);
+        })
+      : void promise2['then']((value51) => {
+          if (enabled9) return ![];
+          return run9(value51 || enabled8);
+        })['then']((value52) => {
+          if (!enabled9 && value52 === ![]) void handler10(run8());
+        }),
+    handler11
+  );
 }
-
-function resolveImmediateNodeImagePreviewUrls(value19, value20 = '') {
-  const value21 = Array['isArray'](value19?.['images']) ? value19['images'] : [],
-    value22 = Math['max'](0x0, Number(value19?.['mainImageIndex']) || 0x0),
-    value23 = value21[value22] || value21[0x0] || null;
-  return collectUniquePreviewUrls([
-    value20,
-    resolveCanvasImageDisplayUrl(value23),
-    resolveCanvasImageDisplayUrl(value19),
-    resolveCanvasImagePreviewUrl(value23),
-    resolveCanvasImagePreviewUrl(value19),
-    resolveCanvasImageThumbUrl(value23),
-    resolveCanvasImageThumbUrl(value19),
-  ]);
-}
-
-let activeImagePreviewClose = null,
-  activeVideoPreviewClose = null,
-  videoPreviewOwnerSequence = 0x0;
-
-export function closeActiveImagePreview() {
-  if (typeof activeImagePreviewClose !== 'function') return ![];
-  const run5 = activeImagePreviewClose;
-  return (run5(), !![]);
-}
-
-export function closeActiveVideoPreview() {
-  if (typeof activeVideoPreviewClose !== 'function') return ![];
-  const run6 = activeVideoPreviewClose;
-  return (run6(), !![]);
+export async function openNodeImagePreview(value53, args = {}) {
+  const loadDiagnostics = createImageLoadDiagnostics('node-image-preview'),
+    fallbackUrls = resolveImmediateNodeImagePreviewUrls(value53, args['currentSrc']),
+    enabled13 = fallbackUrls['length'] > 0x0,
+    value54 = enabled13
+      ? openImagePreview(fallbackUrls[0x0], {
+          ...args,
+          loadDiagnostics: loadDiagnostics,
+          fallbackUrls: fallbackUrls['slice'](0x1),
+          revokeUrlOnClose: ![],
+        })
+      : openImagePreview('', {
+          ...args,
+          loadDiagnostics: loadDiagnostics,
+          deferredSource: !![],
+          revokeUrlOnClose: ![],
+        }),
+    handler12 =
+      typeof args['sourceResolver'] === 'function'
+        ? args['sourceResolver']
+        : resolveNodeImagePreviewSource;
+  return (
+    void Promise['resolve']()
+      ['then'](() => {
+        return (loadDiagnostics['mark']('resolve-start'), handler12(value53));
+      })
+      ['then']((revokeUrlOnClose) => {
+        loadDiagnostics['mark']('resolve-end', { hasSource: !!revokeUrlOnClose?.['url'] });
+        if (!revokeUrlOnClose?.['url']) {
+          if (!enabled13) value54['setError']?.();
+          return;
+        }
+        const enabled14 = value54['setSources']?.(
+          collectUniquePreviewUrls([revokeUrlOnClose['url'], ...fallbackUrls]),
+          { revokeUrlOnClose: revokeUrlOnClose['revokeUrlOnClose'] },
+        );
+        if (!enabled14 && revokeUrlOnClose['revokeUrlOnClose'])
+          try {
+            URL['revokeObjectURL'](revokeUrlOnClose['url']);
+          } catch (value55) {}
+      })
+      ['catch'](() => {
+        if (!enabled13) value54['setError']?.();
+      }),
+    value54
+  );
 }

@@ -1,192 +1,135 @@
 import {
   canUseLocalAssetCleanup,
   formatCleanupBytes,
-  scanLegacyLocalAssetCleanup,
   scanLocalAssetCleanup,
   summarizeLocalAssetCleanupScan,
   trashLocalAssetCleanup,
 } from '../../services/localAssetCleanupService.js';
 import { t } from '../../i18n/index.js';
 import { showError, showSuccess } from '../../services/toastService.js';
-const MAX_RENDERED_ITEMS = 120,
-  CURRENT_CLEANUP_IDS = Object.freeze({
-    card: 'localAssetCleanupCard',
-    scanBtn: 'btnLocalAssetCleanupScan',
-    trashBtn: 'btnLocalAssetCleanupTrash',
-    status: 'localAssetCleanupStatus',
-    count: 'localAssetCleanupCount',
-    size: 'localAssetCleanupSize',
-    list: 'localAssetCleanupList',
-  }),
-  LEGACY_CLEANUP_IDS = Object.freeze({
-    card: 'legacyAssetCleanupCard',
-    scanBtn: 'btnLegacyAssetCleanupScan',
-    trashBtn: 'btnLegacyAssetCleanupTrash',
-    status: 'legacyAssetCleanupStatus',
-    count: 'legacyAssetCleanupCount',
-    size: 'legacyAssetCleanupSize',
-    list: 'legacyAssetCleanupList',
+import { createLocalAssetCleanupList } from './localAssetCleanupList.js';
+const text = (value, item = {}) => t('settings.fileSave.localCleanup.' + value, item),
+  runtimeText = (key, index = {}) => t('settings.fileSave.cleanupRuntime.' + key, index);
+export function initLocalAssetCleanupSettings() {
+  const el = document['getElementById']('localAssetCleanupCard'),
+    el2 = document['getElementById']('btnLocalAssetCleanupScan'),
+    el3 = document['getElementById']('btnLocalAssetCleanupTrash');
+  if (!el || !el2 || !el3) return;
+  el['hidden'] = !canUseLocalAssetCleanup();
+  if (el['hidden'] || el['dataset']['cleanupInitialized']) return;
+  el['dataset']['cleanupInitialized'] = 'true';
+  const el4 = document['getElementById']('localAssetCleanupStatus'),
+    el5 = document['getElementById']('localAssetCleanupCount'),
+    el6 = document['getElementById']('localAssetCleanupSize');
+  let response = null,
+    result = ![];
+  const localAssetCleanupList = createLocalAssetCleanupList({
+    list: document['getElementById']('localAssetCleanupList'),
+    toolbar: document['getElementById']('localAssetCleanupToolbar'),
+    details: document['getElementById']('localAssetCleanupDetails'),
+    onSelectionChange: (list) => {
+      el3['disabled'] = result || !list['length'];
+    },
   });
-function fileSaveText(value, item = {}) {
-  return t('settings.fileSave.' + value, item);
-}
-function cleanupText(key, index = {}) {
-  return fileSaveText('cleanupRuntime.' + key, index);
-}
-function errorMessage(error) {
-  return error?.message || fileSaveText('runtime.unknownError');
-}
-function getElements(response) {
-  return {
-    card: document.getElementById(response.card),
-    scanBtn: document.getElementById(response.scanBtn),
-    trashBtn: document.getElementById(response.trashBtn),
-    status: document.getElementById(response.status),
-    count: document.getElementById(response.count),
-    size: document.getElementById(response.size),
-    list: document.getElementById(response.list),
-  };
-}
-function setButtonBusy(el, enabled, result) {
-  if (!el) return;
-  el.disabled = !!enabled;
-  if (result) el.textContent = result;
-}
-function setStatus(el2, data, options = '') {
-  if (!el2) return;
-  ((el2.textContent = data || ''),
-    el2.classList.toggle('is-error', options === 'error'),
-    el2.classList.toggle('is-success', options === 'success'));
-}
-function createItemRow(target) {
-  const el3 = document.createElement('div');
-  el3.className = 'settings-local-cleanup-item';
-  const el4 = document.createElement('div');
-  ((el4.className = 'settings-local-cleanup-path'),
-    (el4.textContent = target?.localPath || ''),
-    (el4.title = target?.localPath || ''));
-  const el5 = document.createElement('div');
-  return (
-    (el5.className = 'settings-local-cleanup-meta'),
-    (el5.textContent = formatCleanupBytes(target?.size) + ' · ' + (target?.kind || cleanupText('mediaKind'))),
-    el3.appendChild(el4),
-    el3.appendChild(el5),
-    el3
-  );
-}
-function renderScanResult(source, response2) {
-  const count = Array.isArray(source?.items) ? source.items : [];
-  response2.count && (response2.count.textContent = String(Number(source?.orphanCount || 0)));
-  response2.size && (response2.size.textContent = formatCleanupBytes(source?.orphanBytes || 0));
-  setStatus(response2.status, summarizeLocalAssetCleanupScan(source), count.length > 0 ? '' : 'success');
-  if (response2.list) {
-    (response2.list.replaceChildren(),
-      (response2.list.hidden = count.length === 0),
-      count.slice(0, MAX_RENDERED_ITEMS).forEach((item2) => {
-        response2.list.appendChild(createItemRow(item2));
-      }));
-    if (count.length > MAX_RENDERED_ITEMS) {
-      const el6 = document.createElement('div');
-      ((el6.className = 'settings-local-cleanup-more'),
-        (el6.textContent = cleanupText('moreFiles', { count: count.length - MAX_RENDERED_ITEMS })),
-        response2.list.appendChild(el6));
-    }
+  function run(data, options = '') {
+    ((el4['textContent'] = data),
+      el4['classList']['toggle']('is-error', options === 'error'),
+      el4['classList']['toggle']('is-success', options === 'success'));
   }
-  response2.trashBtn && (response2.trashBtn.disabled = count.length === 0);
-}
-function resetScanResult(next) {
-  if (next.count) next.count.textContent = '0';
-  if (next.size) next.size.textContent = '0 B';
-  next.list && ((next.list.hidden = true), next.list.replaceChildren());
-  if (next.trashBtn) next.trashBtn.disabled = true;
-}
-function initCleanupCard({ ids: ids, scan: scan, textScope: textScope }) {
-  const response3 = getElements(ids);
-  if (!response3.card || !response3.scanBtn || !response3.trashBtn) return;
-  const prefix = (current, entry = {}) => fileSaveText(textScope + '.' + current, entry),
-    canUseLocalAssetCleanup2 = canUseLocalAssetCleanup();
-  response3.card.hidden = !canUseLocalAssetCleanup2;
-  if (!canUseLocalAssetCleanup2) return;
-  let enabled2 = null;
-  (resetScanResult(response3),
-    setStatus(response3.status, prefix('idle')),
-    response3.scanBtn.addEventListener('click', async () => {
-      ((enabled2 = null),
-        resetScanResult(response3),
-        setStatus(response3.status, prefix('scanning')),
-        setButtonBusy(response3.scanBtn, true, prefix('scanBusy')),
-        (response3.trashBtn.disabled = true));
+  function run2(target, source) {
+    ((result = target), (el2['disabled'] = target));
+    for (const [el7, next] of [
+      [el2, 'scan'],
+      [el3, 'trash'],
+    ]) {
+      (el7['setAttribute']('aria-busy', String(target && source === next)),
+        (el7['textContent'] = text(
+          target && source === next ? next + 'Busy' : next,
+        )));
+    }
+    localAssetCleanupList['setBusy'](target);
+  }
+  function run3(args) {
+    ((response = args
+      ? { ...args, items: Array['isArray'](args['items']) ? args['items'] : [] }
+      : null),
+      (el5['textContent'] = String(response?.['items']['length'] || 0x0)),
+      (el6['textContent'] = formatCleanupBytes(response?.['orphanBytes'])),
+      localAssetCleanupList['setScan'](response));
+    if (response) run(summarizeLocalAssetCleanupScan(response), response['ok'] ? '' : 'error');
+  }
+  (run3(null),
+    run(text('idle')),
+    el2['addEventListener']('click', async () => {
+      if (result) return;
+      (run3(null), run2(!![], 'scan'), run(text('scanning')));
       try {
-        const args = await scan(),
-          record = { ...args, items: Array.isArray(args?.items) ? args.items : [] };
-        ((enabled2 = record),
-          renderScanResult(record, response3),
-          Number(record?.orphanCount || 0) > 0
-            ? window.showToast?.(prefix('scanSuccess'), 'success')
-            : showSuccess(prefix('scanEmpty')));
-      } catch (error2) {
-        (console.error('[Settings] 本地素材清理扫描失败:', error2),
-          setStatus(response3.status, error2?.message || cleanupText('scanFailed'), 'error'),
-          showError(cleanupText('scanFailedDetail', { error: errorMessage(error2) })));
+        run3(await scanLocalAssetCleanup());
+      } catch (error) {
+        (run(error?.['message'] || runtimeText('scanFailed'), 'error'),
+          showError(
+            runtimeText('scanFailedDetail', { error: error?.['message'] || runtimeText('scanFailed') }),
+          ));
       } finally {
-        (setButtonBusy(response3.scanBtn, false, prefix('scan')),
-          (response3.trashBtn.disabled = !enabled2?.items?.length));
+        run2(![]);
       }
     }),
-    response3.trashBtn.addEventListener('click', async () => {
-      const count2 = Array.isArray(enabled2?.items) ? enabled2.items : [];
-      if (count2.length === 0) return;
-      const enabled3 =
-        typeof window.confirm === 'function' &&
-        window.confirm(
-          cleanupText('confirmTrash', {
-            prefix: prefix('confirmPrefix'),
-            count: count2.length,
-            bytes: formatCleanupBytes(enabled2.orphanBytes),
-          }),
-        );
-      if (!enabled3) return;
-      (setStatus(response3.status, prefix('trashing')),
-        setButtonBusy(response3.trashBtn, true, prefix('trashBusy')),
-        (response3.scanBtn.disabled = true));
+    el3['addEventListener']('click', async () => {
+      if (result || !response?.['ok'] || response['canTrash'] === ![]) return;
+      const count = localAssetCleanupList['selectedItems']();
+      if (!count['length']) return;
+      const enabled = window['confirm']?.(
+        runtimeText('confirmTrash', {
+          count: count['length'],
+          bytes: formatCleanupBytes(
+            count['reduce']((current, entry) => current + Number(entry['size'] || 0x0), 0x0),
+          ),
+        }),
+      );
+      if (!enabled) return;
+      (run2(!![], 'trash'), run(text('trashing')));
       try {
-        const count3 = await trashLocalAssetCleanup(
-            enabled2,
-            count2.map((item3) => item3.localPath),
+        const count2 = await trashLocalAssetCleanup(
+            response,
+            count['map']((record) => record['localPath']),
           ),
-          skipped = Array.isArray(count3?.skipped) ? count3.skipped.length : 0,
-          failed = Array.isArray(count3?.errors) ? count3.errors.length : 0,
-          message = cleanupText('trashedMessage', {
-            count: count3?.trashedCount || 0,
-            bytes: formatCleanupBytes(count3?.trashedBytes || 0),
+          skipped = count2?.['skipped']?.['length'] || 0x0,
+          failed = count2?.['errors']?.['length'] || 0x0,
+          message = runtimeText('trashedMessage', {
+            count: count2?.['trashedCount'] || 0x0,
+            bytes: formatCleanupBytes(count2?.['trashedBytes']),
           }),
-          args2 = await scan();
-        ((enabled2 = { ...args2, items: Array.isArray(args2?.items) ? args2.items : [] }),
-          renderScanResult(enabled2, response3),
-          setStatus(
-            response3.status,
+          message2 =
             skipped || failed
-              ? cleanupText('trashPartial', { message: message, skipped: skipped, failed: failed })
-              : message,
-            failed ? 'error' : 'success',
-          ),
-          failed ? showError(cleanupText('trashPartialToast')) : showSuccess(prefix('success')));
+              ? runtimeText('trashPartial', { message: message, skipped: skipped, failed: failed })
+              : message;
+        run3(null);
+        try {
+          const response2 = await scanLocalAssetCleanup();
+          (run3(response2),
+            run(
+              response2['ok'] ? message2 : message2 + '；' + runtimeText('scanIncomplete'),
+              failed || !response2['ok'] ? 'error' : 'success',
+            ));
+        } catch (error2) {
+          run(
+            runtimeText('refreshFailed', {
+              message: message2,
+              error: error2?.['message'] || runtimeText('scanFailed'),
+            }),
+            'error',
+          );
+        }
+        if (failed) showError(runtimeText('trashPartialToast'));
+        else showSuccess(message2);
       } catch (error3) {
-        (console.error('[Settings] 本地素材清理失败:', error3),
-          setStatus(response3.status, error3?.message || cleanupText('trashFailed'), 'error'),
-          showError(cleanupText('trashFailedDetail', { error: errorMessage(error3) })));
+        (run3(null),
+          run(error3?.['message'] || runtimeText('trashFailed'), 'error'),
+          showError(
+            runtimeText('trashFailedDetail', { error: error3?.['message'] || runtimeText('trashFailed') }),
+          ));
       } finally {
-        (setButtonBusy(response3.trashBtn, false, prefix('trash')),
-          (response3.scanBtn.disabled = false),
-          (response3.trashBtn.disabled = !enabled2?.items?.length));
+        run2(![]);
       }
-    }));
-}
-export function initLocalAssetCleanupSettings() {
-  (initCleanupCard({ ids: CURRENT_CLEANUP_IDS, scan: scanLocalAssetCleanup, textScope: 'localCleanup' }),
-    initCleanupCard({
-      ids: LEGACY_CLEANUP_IDS,
-      scan: scanLegacyLocalAssetCleanup,
-      textScope: 'legacyCleanup',
     }));
 }

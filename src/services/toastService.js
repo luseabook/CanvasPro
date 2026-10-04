@@ -1,48 +1,135 @@
+import {
+  inferProviderIdFromApiKeyMessage,
+  isApiKeyConfigurationMessage,
+  openProviderApiKeySettings,
+} from '../modules/providerApiKeyMissingToast.js';
+import {
+  isSubscriptionAccessConfigurationMessage,
+  openSubscriptionAccessSettings,
+} from '../modules/subscriptionAccessMissingToast.js';
+import { logDiagnosticEvent } from './diagnosticsService.js';
 const DEFAULT_DURATION = 0xb54,
   ALERT_DURATION = 0x1388,
+  SETTINGS_ACTION_LABEL = '去设置',
   ICONS = { ok: '', warn: '⚠️', error: '✕', success: '✓' };
-export function showToast(value, item = 'ok', key) {
-  const el = document.getElementById('v2-toast-wrap');
+function resolveToastActionOptions(message, value = {}) {
+  if (value?.['actionLabel'] || typeof value?.['onAction'] === 'function') return value || {};
+  if (isApiKeyConfigurationMessage(message)) {
+    const providerId = inferProviderIdFromApiKeyMessage(message);
+    return {
+      ...(value || {}),
+      actionLabel: SETTINGS_ACTION_LABEL,
+      onAction: () => {
+        openProviderApiKeySettings({ providerId: providerId, message: message });
+      },
+    };
+  }
+  if (isSubscriptionAccessConfigurationMessage(message))
+    return {
+      ...(value || {}),
+      actionLabel: SETTINGS_ACTION_LABEL,
+      onAction: () => {
+        openSubscriptionAccessSettings();
+      },
+    };
+  return value || {};
+}
+export function showToast(item, key = 'ok', index, result = {}) {
+  const level = key === 'warning' ? 'warn' : key;
+  (level === 'error' || level === 'warn') &&
+    void logDiagnosticEvent({
+      type: 'ui.alert_presented',
+      level: level,
+      source: 'renderer',
+      message: String(item || 'User-visible\x20alert'),
+      context: { toastType: level },
+    });
+  const el = document['getElementById']('v2-toast-wrap');
   if (!el) {
-    console.warn('[Toast]', value);
+    console['warn']('[Toast]', item);
     return;
   }
-  const index = item === 'warning' ? 'warn' : item,
-    enabled = index === 'error' || index === 'warn',
-    result = enabled ? ALERT_DURATION : DEFAULT_DURATION,
-    data = Number.isFinite(Number(key)) ? Math.max(0, Number(key)) : result,
-    options = enabled ? Math.max(ALERT_DURATION, data) : data,
-    target = ICONS[index] ?? '',
-    el2 = document.createElement('div');
-  el2.className = 'v2-toast' + (index !== 'ok' ? ' ' + index : '');
-  options > DEFAULT_DURATION && !enabled && el2.classList.add('is-long');
-  if (target) {
-    const el3 = document.createElement('span');
-    ((el3.className = 'v2-toast-icon'), (el3.textContent = target), el2.appendChild(el3));
+  const enabled = level === 'error' || level === 'warn',
+    data = enabled ? ALERT_DURATION : DEFAULT_DURATION,
+    options = Number['isFinite'](Number(index)) ? Math['max'](0x0, Number(index)) : data,
+    target = enabled ? Math['max'](ALERT_DURATION, options) : options,
+    source = ICONS[level] ?? '',
+    el2 = document['createElement']('div'),
+    handler = () => {
+      (el2['remove'](),
+        el['childElementCount'] === 0x0 &&
+          el['matches']?.(':popover-open') &&
+          el['hidePopover']());
+    };
+  (el2['style']?.['setProperty']('--toast-exit-delay', Math['max'](0x0, target - 0x12c) + 'ms'),
+    (el2['className'] = 'v2-toast' + (level !== 'ok' ? '\x20' + level : '')));
+  target > DEFAULT_DURATION && !enabled && el2['classList']['add']('is-long');
+  if (source) {
+    const el3 = document['createElement']('span');
+    ((el3['className'] = 'v2-toast-icon'),
+      (el3['textContent'] = source),
+      el2['appendChild'](el3));
   }
-  const el4 = document.createElement('span');
-  const message = String(value ?? '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  ((el4.textContent = message.length > 320 ? message.slice(0, 319) + '…' : message),
-    el2.appendChild(el4),
-    el.appendChild(el2),
-    setTimeout(() => {
-      el2.remove();
-    }, options));
+  const el4 = document['createElement']('span');
+  ((el4['textContent'] = item), el2['appendChild'](el4));
+  const toastActionOptions = resolveToastActionOptions(item, result);
+  if (typeof toastActionOptions?.['renderContent'] === 'function') toastActionOptions['renderContent'](el4);
+  if (typeof toastActionOptions?.['onClick'] === 'function') {
+    const next = (event) => {
+      if (event?.['type'] === 'keydown' && !['Enter', '\x20']['includes'](event['key'])) return;
+      event?.['preventDefault']?.();
+      try {
+        toastActionOptions['onClick']();
+      } finally {
+        handler();
+      }
+    };
+    (el2['classList']['add']('is-clickable'),
+      el2['setAttribute']('role', 'button'),
+      el2['setAttribute']('tabindex', '0'),
+      el2['setAttribute'](
+        'aria-label',
+        String(toastActionOptions['ariaLabel'] || item + '，点击查看')['trim'](),
+      ),
+      el2['addEventListener']('click', next),
+      el2['addEventListener']('keydown', next));
+  }
+  const current = String(toastActionOptions?.['actionLabel'] || '')['trim']();
+  if (current && typeof toastActionOptions?.['onAction'] === 'function') {
+    const el5 = document['createElement']('button');
+    ((el5['type'] = 'button'),
+      (el5['className'] = 'v2-toast-action'),
+      (el5['textContent'] = current),
+      el5['addEventListener']('click', (event2) => {
+        (event2['preventDefault'](), event2['stopPropagation']());
+        try {
+          toastActionOptions['onAction']();
+        } finally {
+          handler();
+        }
+      }),
+      el2['appendChild'](el5));
+  }
+  el['appendChild'](el2);
+  if (typeof el['showPopover'] === 'function') {
+    el['setAttribute']('popover', 'manual');
+    if (el['matches'](':popover-open')) el['hidePopover']();
+    el['showPopover']();
+  }
+  setTimeout(handler, target);
 }
-export function showSuccess(source, next) {
-  showToast(source, 'success', next);
+export function showSuccess(entry, record) {
+  showToast(entry, 'success', record);
 }
-export function showError(current, entry) {
-  showToast(current, 'error', entry);
+export function showError(payload, handle) {
+  showToast(payload, 'error', handle);
 }
-export function showWarning(record, payload) {
-  showToast(record, 'warn', payload);
+export function showWarning(state, config) {
+  showToast(state, 'warn', config);
 }
 export function initToastService() {
-  ((window.showToast = showToast),
-    (window.showSuccess = showSuccess),
-    (window.showError = showError),
-    (window.showWarning = showWarning));
+  ((window['showToast'] = showToast),
+    (window['showSuccess'] = showSuccess),
+    (window['showError'] = showError),
+    (window['showWarning'] = showWarning));
 }

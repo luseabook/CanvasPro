@@ -229,3 +229,27 @@ HEAD 原件同样必挂，属循环导入 + 求值顺序的环境性产物；应
 **口径提示**：483 口径（scope 1238）为手工维护账，与 reach 脚本现口径（scope 1992，
 孤立 291）已不同源；组表历史欠账（b150–153 的 22 件未逐组摊销）已在合计行一次理平（445），
 组间分布以头部叙述为准。
+
+## 11. 第 155 批续：干净件 gain≥1 清尾（21 取 17）
+
+候选重算后取授权目录 gain≥1 全部 18 件 + `src/ui/rendererUiEvents`（gain 2）+
+`src/services`（keyboardService、toastService 各 gain 1），共 21 件。
+manifests 聚合件（modelRegistry gain 5、vendorTextModelApiManifests gain 4 等）与 api 域
+仍按闭包分组原则留待规格裁决。
+
+| 归因失败 | 处理 |
+| --- | --- |
+| `SourceImageNode.js`（4 例：mount 起始/hydration/预载限额/缩略图保持） | **回滚** |
+| `video-node/mediaPlaybackRecovery.js`（2 例：loading feedback 跳过、stalled reload 延迟） | **回滚** |
+| `nodeToolbar/videoActions/keyingAction.js` + `removeAction.js`（SourceVideoNode 抠像按钮取消 1 例） | **回滚** |
+| 其余 17 件 | **保留**（0 失败） |
+
+机械工序 21/21 全过（共改名 3,840、闸门 PASS、`node --check` 21/21、导出面 0 丢弃、
+3 件超集：CanvasTabManager +2、EdgeController +4、rendererUiEvents +1）。
+保留 17 件后：孤立 291 → **272**（直接 16 + 链式 3：materialComparisonImageCache/Playback/Viewport；
+368 口径累计接通 **96**）；483 口径删 8 件为 **437/1238**。
+全量 **11185/11182/3**，失败名单与基线逐条一致（3 例 installerSafety 偶发复现，属基线内）。
+
+**新经验：`execFileSync`/`spawnSync` 在沙箱里会被静默杀掉（`status=null signal=null`，stdout 空）**
+——大批量目录测试（737 文件）必须用 shell 分批循环跑（每批 ≤150 文件避免 E2BIG），
+而不是 Node 脚本聚合调用。此前手工批次未踩到是因为文件数少、直接命令行传参。

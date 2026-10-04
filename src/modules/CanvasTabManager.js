@@ -1,8 +1,15 @@
 import { clearRendererCache } from '../core/renderer.js';
+import { captureBackgroundTaskCanvas } from './backgroundTaskCanvasSnapshot.js';
 import { warmupCanvasVisibleMedia } from '../core/canvasMediaWarmup.js';
-import { commit } from './history.js';
-import appStore from '../core/stores/appStore.js';
+import { getCanvasMediaSchedulerStats } from './canvasMediaScheduler.js';
+import { resetHistory } from './history.js';
+import appStore, { createStore } from '../core/stores/appStore.js';
 import { isGenerationTaskTerminalStatus } from '../core/generationTaskLifecycle.js';
+import {
+  handoffActiveGenerationTasks,
+  hasActiveGenerationTasksForStore,
+  restoreActiveGenerationTasks,
+} from '../core/generationTaskRuntime.js';
 import { startVideoThumbBackfill } from './videoThumbBackfill.js';
 import { sanitizeMultiCanvasDataForPersistence } from '../utils/thumbnailPersistence.js';
 import { createStableSignature } from '../utils/stableSignature.js';
@@ -14,181 +21,515 @@ import {
   normalizeCanvasVisualSnapshot,
 } from './canvasVisualSnapshot.js';
 import { t } from '../i18n/index.js';
+import { desktopBridge } from '../services/desktopBridge.js';
+import { saveTextDownload } from '../services/downloadSaveService.js';
+import { showContextMenu } from './interaction/contextMenuPresenter.js';
+import {
+  assertCanvasProjectSaveAllowed,
+  normalizeCanvasProjectAccess,
+} from '../services/canvasProjectAccess.js';
+import { createCanvasProjectBadge } from '../components/sharedProjectIcon.js';
 function canvasTabsText(value, item = {}) {
   return t('canvasTabs.' + value, item);
 }
 function markPerf(key) {
-  if (typeof performance?.mark !== 'function') return;
-  performance.mark(key);
+  if (typeof performance?.['mark'] !== 'function') return;
+  performance['mark'](key);
 }
 function measurePerf(index, result, data) {
-  if (typeof performance?.measure !== 'function') return;
+  if (typeof performance?.['measure'] !== 'function') return;
   try {
-    performance.measure(index, result, data);
+    performance['measure'](index, result, data);
   } catch {}
 }
 const CANVAS_MEDIA_WARMUP_OPEN_DELAY_MS = 0x15e,
-  CANVAS_MEDIA_WARMUP_OPEN_MAX_JOBS = 96,
-  CANVAS_MEDIA_WARMUP_SNAPSHOT_MAX_JOBS = 48;
-function createEmptyCanvasSnapshot() {
-  return { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1.1 }, assets: [], _persistRevHint: 0 };
+  CANVAS_MEDIA_WARMUP_OPEN_MAX_JOBS = 0x60,
+  CANVAS_MEDIA_WARMUP_SNAPSHOT_MAX_JOBS = 0x30,
+  VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS = [0x4b0, 0xbb8, 0x1b58, 0x36b0, 0x55f0],
+  DENSE_VISUAL_SNAPSHOT_NODE_COUNT = 0x78,
+  DENSE_VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS = [0x2328, 0x4650, 0x7530, 0xafc8],
+  VISUAL_SNAPSHOT_BACKFILL_RETRY_MS = 0x9c4,
+  VISUAL_SNAPSHOT_INTERACTION_SETTLE_MS = 0x1f4;
+function countCanvasNodes(list) {
+  if (Array['isArray'](list)) return list['length'];
+  if (list && typeof list === 'object') return Object['keys'](list)['length'];
+  return 0x0;
 }
-function cloneMultiDataSnapshot(options) {
+function isChromeShellRuntime() {
+  const options = String(
+    globalThis['location']?.['search'] || globalThis['window']?.['location']?.['search'] || '',
+  );
+  return new URLSearchParams(options)['get']('aicRuntime') === 'chrome-shell';
+}
+function createEmptyCanvasSnapshot() {
+  return {
+    nodes: [],
+    edges: [],
+    viewport: { x: 0x0, y: 0x0, zoom: 1.1 },
+    assets: [],
+    storyboard3dProjects: [],
+    _persistRevHint: 0x0,
+    _contentPersistRevHint: 0x0,
+  };
+}
+function cloneMultiDataSnapshot(target) {
   if (typeof structuredClone === 'function')
     try {
-      return structuredClone(options);
+      return structuredClone(target);
     } catch {}
   try {
-    return JSON.parse(JSON.stringify(options));
+    return JSON['parse'](JSON['stringify'](target));
   } catch {
     return { canvases: [], activeCanvasId: null };
   }
 }
-function isRecoverableTaskStatus(target) {
-  const enabled = String(target || '').trim();
+function isRecoverableTaskStatus(source) {
+  const enabled = String(source || '')['trim']();
   return !enabled || !isGenerationTaskTerminalStatus(enabled);
 }
 function markRecoveringGenerationNode(args) {
   if (!args || typeof args !== 'object') return args;
-  if (!args.generationStartTime || args.generationDuration != null) return args;
-  const source = { ...args };
-  let enabled2 = false;
-  String(source.rhTaskId || '').trim() &&
-    isRecoverableTaskStatus(source.rhTaskStatus) &&
-    ((source.rhTaskRecovering = true), (enabled2 = true));
-  String(source.dreaminaSubmitId || '').trim() &&
-    isRecoverableTaskStatus(source.dreaminaTaskStatus) &&
-    isRecoverableTaskStatus(source.dreaminaTaskPhase) &&
-    ((source.dreaminaTaskRecovering = true), (enabled2 = true));
-  String(source.asyncTaskId || '').trim() &&
-    isRecoverableTaskStatus(source.asyncTaskStatus) &&
-    ((source.asyncTaskRecovering = true), (enabled2 = true));
+  if (!args['generationStartTime'] || args['generationDuration'] != null) return args;
+  const next = { ...args };
+  let enabled2 = ![];
+  String(next['rhTaskId'] || '')['trim']() &&
+    isRecoverableTaskStatus(next['rhTaskStatus']) &&
+    ((next['rhTaskRecovering'] = !![]), (enabled2 = !![]));
+  String(next['dreaminaSubmitId'] || '')['trim']() &&
+    isRecoverableTaskStatus(next['dreaminaTaskStatus']) &&
+    isRecoverableTaskStatus(next['dreaminaTaskPhase']) &&
+    ((next['dreaminaTaskRecovering'] = !![]), (enabled2 = !![]));
+  String(next['asyncTaskId'] || '')['trim']() &&
+    isRecoverableTaskStatus(next['asyncTaskStatus']) &&
+    ((next['asyncTaskRecovering'] = !![]), (enabled2 = !![]));
   if (!enabled2) return args;
   return (
-    (source.isGenerating = true),
-    (source.jobStatus = isRecoverableTaskStatus(source.jobStatus) ? 'running' : source.jobStatus),
-    (source.generationDuration = null),
-    source
+    (next['isGenerating'] = !![]),
+    (next['jobStatus'] = isRecoverableTaskStatus(next['jobStatus'])
+      ? 'running'
+      : next['jobStatus']),
+    (next['generationDuration'] = null),
+    next
   );
 }
 function markRecoveringGenerationSnapshot(nodes) {
   if (!nodes || typeof nodes !== 'object') return nodes;
-  if (Array.isArray(nodes.nodes))
+  if (Array['isArray'](nodes['nodes']))
     return {
       ...nodes,
-      nodes: nodes.nodes.map((item2) => markRecoveringGenerationNode(item2)),
+      nodes: nodes['nodes']['map']((current) => markRecoveringGenerationNode(current)),
     };
-  if (nodes.nodes && typeof nodes.nodes === 'object')
+  if (nodes['nodes'] && typeof nodes['nodes'] === 'object')
     return {
       ...nodes,
-      nodes: Object.fromEntries(
-        Object.entries(nodes.nodes).map(([next, current]) => [next, markRecoveringGenerationNode(current)]),
+      nodes: Object['fromEntries'](
+        Object['entries'](nodes['nodes'])['map'](([entry, record]) => [
+          entry,
+          markRecoveringGenerationNode(record),
+        ]),
       ),
     };
   return nodes;
 }
 function getCanvasNodesList(options2 = {}) {
-  const entry = options2?.nodes;
-  if (Array.isArray(entry)) return entry;
-  if (entry && typeof entry === 'object') return Object.values(entry);
+  const payload = options2?.['nodes'];
+  if (Array['isArray'](payload)) return payload;
+  if (payload && typeof payload === 'object') return Object['values'](payload);
   return [];
 }
 function hasLiveGenerationNode(enabled3 = {}) {
-  if (!enabled3 || typeof enabled3 !== 'object') return false;
-  if (enabled3.isGenerating !== true || enabled3.generationDuration != null) return false;
-  const list = [
-    enabled3.jobStatus,
-    enabled3.rhTaskStatus,
-    enabled3.dreaminaTaskStatus,
-    enabled3.dreaminaTaskPhase,
-    enabled3.asyncTaskStatus,
-    enabled3.mediaTaskStatus,
+  if (!enabled3 || typeof enabled3 !== 'object') return ![];
+  if (enabled3['isGenerating'] !== !![] || enabled3['generationDuration'] != null) return ![];
+  const list2 = [
+    enabled3['jobStatus'],
+    enabled3['rhTaskStatus'],
+    enabled3['dreaminaTaskStatus'],
+    enabled3['dreaminaTaskPhase'],
+    enabled3['asyncTaskStatus'],
+    enabled3['mediaTaskStatus'],
   ];
-  return !list.some((item3) => {
-    const enabled4 = String(item3 || '')
-      .trim()
-      .toLowerCase();
-    if (!enabled4 || enabled4 === 'idle') return false;
+  return !list2['some']((handle) => {
+    const enabled4 = String(handle || '')
+      ['trim']()
+      ['toLowerCase']();
+    if (!enabled4 || enabled4 === 'idle') return ![];
     return isGenerationTaskTerminalStatus(enabled4);
   });
 }
 function canvasHasLiveGeneration(options3 = {}) {
-  return getCanvasNodesList(options3).some((item4) => hasLiveGenerationNode(item4));
+  return getCanvasNodesList(options3)['some']((state) => hasLiveGenerationNode(state));
 }
-export function buildTabsRenderSignature(list2 = [], record = null) {
+export function buildTabsRenderSignature(list3 = [], config = null) {
   return (
-    (record || '') +
+    (config || '') +
     '::' +
-    (Array.isArray(list2) ? list2 : [])
-      .map((error) => (error?.id || '') + ':' + (error?.name || ''))
-      .join('|')
+    (Array['isArray'](list3) ? list3 : [])
+      ['map']((error) => (error?.['id'] || '') + ':' + (error?.['name'] || ''))
+      ['join']('|')
+  );
+}
+export function getCanvasTabScrollMetrics(el = {}) {
+  const scrollWidth = Math['max'](0x0, Number(el['scrollWidth']) || 0x0),
+    clientWidth = Math['max'](
+      0x0,
+      Number(el['clientWidth']) ||
+        Number(el['getBoundingClientRect']?.()['width']) ||
+        Number(el['offsetWidth']) ||
+        0x0,
+    ),
+    maxScrollLeft = Math['max'](0x0, scrollWidth - clientWidth),
+    scrollLeft = Math['min'](maxScrollLeft, Math['max'](0x0, Number(el['scrollLeft']) || 0x0));
+  return { clientWidth: clientWidth, maxScrollLeft: maxScrollLeft, scrollLeft: scrollLeft, scrollWidth: scrollWidth };
+}
+export function scrollCanvasTabsWithWheel(enabled5, event = {}) {
+  if (!enabled5) return ![];
+  const {
+    clientWidth: clientWidth2,
+    maxScrollLeft: maxScrollLeft2,
+    scrollLeft: scrollLeft2,
+  } = getCanvasTabScrollMetrics(enabled5);
+  if (maxScrollLeft2 <= 0x1) return ![];
+  const count = Number(event['deltaX']) || 0x0,
+    scope = Number(event['deltaY']) || 0x0,
+    enabled6 = Math['abs'](count) > Math['abs'](scope) && count !== 0x0 ? count : scope;
+  if (!enabled6) return ![];
+  const count2 = Number(event['deltaMode']) || 0x0,
+    input = count2 === 0x1 ? 0x10 : count2 === 0x2 ? Math['max'](clientWidth2, 0x1) : 0x1,
+    output = Math['min'](maxScrollLeft2, Math['max'](0x0, scrollLeft2 + enabled6 * input));
+  if (output === scrollLeft2) return ![];
+  return ((enabled5['scrollLeft'] = output), event['preventDefault']?.(), !![]);
+}
+function normalizeCanvasProjectContext(isTemporary = {}, value2 = {}) {
+  const value3 = String(value2['canvasId'] || '')['trim'](),
+    projectName = String(isTemporary['projectName'] || value2['projectName'] || '')['trim']();
+  return {
+    projectId: String(isTemporary['projectId'] || value2['projectId'] || value3)['trim'](),
+    filename: String(isTemporary['filename'] || '')['trim'](),
+    projectName: projectName,
+    recentId: String(isTemporary['recentId'] || '')['trim'](),
+    displayPath: String(isTemporary['displayPath'] || '')['trim'](),
+    lastModified: Math['max'](0x0, Number(isTemporary['lastModified'] || 0x0) || 0x0),
+    isTemporary: isTemporary['isTemporary'] === !![],
+    workspaceProjectScoped: isTemporary['workspaceProjectScoped'] !== ![],
+  };
+}
+function captureCurrentProjectContext(canvasId = {}) {
+  if (typeof window === 'undefined')
+    return normalizeCanvasProjectContext(
+      {},
+      { canvasId: canvasId?.['id'], projectName: canvasId?.['name'] },
+    );
+  return normalizeCanvasProjectContext(
+    {
+      projectId: window['currentProjectId'],
+      filename: window['_v2CurrentFile'],
+      projectName:
+        globalThis['document']?.['getElementById']?.('projectNameText')?.['textContent'] ||
+        canvasId?.['name'],
+      recentId: window['_v2CurrentRecentProjectId'],
+      displayPath: window['_v2CurrentProjectDisplayPath'],
+      lastModified: window['_v2CurrentProjectLastModified'],
+      workspaceProjectScoped: window['_v2WorkspaceProjectScoped'] !== ![],
+    },
+    { canvasId: canvasId?.['id'], projectName: canvasId?.['name'] },
   );
 }
 const CanvasTabManager = {
   _canvases: [],
+  _projectBadges: new Map(),
   _activeId: null,
+  _projectContextByCanvasId: new Map(),
   _lastPersistRevByCanvas: new Map(),
+  _lastContentPersistRevByCanvas: new Map(),
   _savedSignatureByCanvas: new Map(),
   _lastTabsRenderSignature: '',
-  _tabContainerBound: false,
+  _tabContainerBound: ![],
   _visualSnapshotBackfillTimers: [],
+  _visualSnapshotIdleRetryTimer: null,
+  _visualSnapshotIdleRetryCanvasId: null,
+  _visualSnapshotBackfillCapturePromise: null,
+  _visualSnapshotBackfillGeneration: 0x0,
+  _visualSnapshotInteractionGuardDocument: null,
+  _visualSnapshotInteractionGuardHandlers: null,
+  _visualSnapshotActivePointers: new Set(),
+  _visualSnapshotSettleUntil: 0x0,
   _mediaWarmupTimer: null,
-  _getStorePersistRev() {
-    return Number(appStore.getStateRaw()?._persistRev || 0);
+  _tabOverflowResizeObserver: null,
+  _taskSafeCanvasTransitionPromise: null,
+  _backgroundTaskStores: new Map(),
+  _showTaskTransitionBlocked(value4, value5 = 'switchBlockedByTasks') {
+    const count3 = Math['max'](
+      0x1,
+      Number(value4?.['blockers']?.['length'] || value4?.['activeCount'] || 0x0),
+    );
+    window['showToast']?.(canvasTabsText(value5, { count: count3 }), 'warn');
   },
-  _rememberCanvasPersistRev(enabled5 = this._activeId) {
-    if (!enabled5) return;
-    this._lastPersistRevByCanvas.set(enabled5, this._getStorePersistRev());
+  async _runTaskSafeCanvasTransition(handler) {
+    if ((await appStore['getGraphMutationPolicy']?.()?.['beforeWorkspaceTransition']?.()) === ![]) return ![];
+    if (this['_taskSafeCanvasTransitionPromise']) return this['_taskSafeCanvasTransitionPromise'];
+    const value6 = (async () => {
+      return handler();
+    })();
+    this['_taskSafeCanvasTransitionPromise'] = value6;
+    try {
+      return await value6;
+    } finally {
+      this['_taskSafeCanvasTransitionPromise'] === value6 &&
+        (this['_taskSafeCanvasTransitionPromise'] = null);
+    }
+  },
+  _getStorePersistRev() {
+    return Number(appStore['getStateRaw']()?.['_persistRev'] || 0x0);
+  },
+  _getStoreContentPersistRev() {
+    return Number(appStore['getStateRaw']()?.['_contentPersistRev'] || 0x0);
+  },
+  _rememberCanvasPersistRev(enabled7 = this['_activeId']) {
+    if (!enabled7) return;
+    (this['_lastPersistRevByCanvas']['set'](enabled7, this['_getStorePersistRev']()),
+      this['_lastContentPersistRevByCanvas']['set'](enabled7, this['_getStoreContentPersistRev']()));
   },
   _scheduleWorkspaceCacheSave() {
-    return window._triggerLocalCacheSave?.();
+    return window['_triggerLocalCacheSave']?.();
+  },
+  _syncBackgroundTaskCanvas(
+    value7,
+    store,
+    { persist: persist = !![], updatedNodeId: updatedNodeId } = {},
+  ) {
+    const value8 = this['_canvases']['findIndex']((value9) => value9['id'] === value7);
+    if (value8 === -0x1 || !store) return ![];
+    const captureBackgroundTaskCanvas2 = captureBackgroundTaskCanvas(store, this['_canvases'][value8], updatedNodeId),
+      value10 = captureBackgroundTaskCanvas2['snapshot'],
+      value11 = Number(store['getStateRaw']()?.['_persistRev'] || 0x0),
+      value12 = Number(store['getStateRaw']()?.['_contentPersistRev'] || 0x0),
+      value13 = this['_buildCanvasRecord'](this['_canvases'][value8], value10);
+    return (
+      (value13['_persistRevHint'] = value11),
+      (value13['_contentPersistRevHint'] = value12),
+      (this['_canvases'][value8] = value13),
+      captureBackgroundTaskCanvas2['remember'](value13),
+      persist && (this['_scheduleWorkspaceCacheSave'](), this['_notifyDirtyStateChanged']()),
+      !![]
+    );
+  },
+  _handoffActiveCanvasTasks(taskScopeId = this['_activeId']) {
+    if (!taskScopeId || !hasActiveGenerationTasksForStore(appStore))
+      return { ok: !![], movedCount: 0x0, taskScopeId: taskScopeId || '' };
+    let targetStore = null,
+      handoffActiveGenerationTasks2 = null;
+    try {
+      return (
+        (targetStore = createStore()),
+        targetStore['hydrateTrustedSnapshot'](appStore['serialize'](), { preserveLiveGeneration: !![] }),
+        (handoffActiveGenerationTasks2 = handoffActiveGenerationTasks({
+          sourceStore: appStore,
+          targetStore: targetStore,
+          taskScopeId: taskScopeId,
+          mirrorTaskState: ({ updatedNodeId: updatedNodeId2 } = {}) =>
+            this['_syncBackgroundTaskCanvas'](taskScopeId, targetStore, {
+              persist: !![],
+              updatedNodeId: updatedNodeId2,
+            }),
+        })),
+        handoffActiveGenerationTasks2['movedCount'] > 0x0 &&
+          (this['_backgroundTaskStores']['set'](taskScopeId, targetStore),
+          this['_syncBackgroundTaskCanvas'](taskScopeId, targetStore, { persist: ![] })),
+        handoffActiveGenerationTasks2
+      );
+    } catch (error2) {
+      return (
+        restoreActiveGenerationTasks({ taskScopeId: taskScopeId, targetStore: appStore }),
+        this['_backgroundTaskStores']['delete'](taskScopeId),
+        console['error']('[CanvasTabManager] Failed to hand off active generation tasks:', error2),
+        {
+          ok: ![],
+          movedCount: 0x0,
+          activeCount: Number(handoffActiveGenerationTasks2?.['movedCount'] || 0x1),
+          taskScopeId: taskScopeId,
+          blockers: [{ reason: 'background-store-handoff-failed', error: error2 }],
+        }
+      );
+    }
+  },
+  _restoreActiveCanvasTasks(taskScopeId2 = this['_activeId']) {
+    const restoreActiveGenerationTasks2 = restoreActiveGenerationTasks({ taskScopeId: taskScopeId2, targetStore: appStore });
+    return (this['_backgroundTaskStores']['delete'](taskScopeId2), restoreActiveGenerationTasks2);
   },
   _scheduleWorkspaceMetaCacheSave() {
-    return window._triggerLocalCacheMetaSave?.() ?? window._triggerLocalCacheSave?.();
+    return window['_triggerLocalCacheMetaSave']?.() ?? window['_triggerLocalCacheSave']?.();
   },
   _markCanvasMetaDirty() {
-    return this._scheduleWorkspaceMetaCacheSave();
+    return this['_scheduleWorkspaceMetaCacheSave']();
   },
   _notifyDirtyStateChanged() {
-    if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return;
+    if (typeof window === 'undefined' || typeof window['dispatchEvent'] !== 'function') return;
     if (typeof CustomEvent === 'function') {
-      window.dispatchEvent(new CustomEvent('aicanvas:dirty-state-changed'));
+      window['dispatchEvent'](new CustomEvent('aicanvas:dirty-state-changed'));
       return;
     }
-    typeof Event === 'function' && window.dispatchEvent(new Event('aicanvas:dirty-state-changed'));
+    typeof Event === 'function' && window['dispatchEvent'](new Event('aicanvas:dirty-state-changed'));
+  },
+  _notifyActiveCanvasChanged(reason = 'switch') {
+    const canvasId2 = this['_activeId'] || '';
+    if (!canvasId2 || typeof window === 'undefined' || typeof window['dispatchEvent'] !== 'function') return;
+    const detail = {
+      canvasId: canvasId2,
+      reason: reason,
+      projectContext: this['getCanvasProjectContext'](canvasId2),
+    };
+    if (typeof CustomEvent === 'function') {
+      window['dispatchEvent'](new CustomEvent('aicanvas:active-canvas-changed', { detail: detail }));
+      return;
+    }
+    if (typeof Event === 'function') {
+      const event2 = new Event('aicanvas:active-canvas-changed');
+      ((event2['detail'] = detail), window['dispatchEvent'](event2));
+    }
+  },
+  _applyActiveCanvasProjectContext() {
+    if (typeof window === 'undefined') return ![];
+    const enabled8 = this['getCanvasProjectContext']();
+    if (!enabled8) return ![];
+    ((window['currentProjectId'] = enabled8['projectId']),
+      (window['_v2CurrentFile'] = enabled8['filename']),
+      (window['_v2CurrentRecentProjectId'] = enabled8['recentId']),
+      (window['_v2CurrentProjectDisplayPath'] = enabled8['displayPath']),
+      (window['_v2CurrentProjectLastModified'] = enabled8['lastModified']),
+      (window['_v2WorkspaceProjectScoped'] = enabled8['workspaceProjectScoped']));
+    const el2 = globalThis['document']?.['getElementById']?.('projectNameText');
+    if (el2) {
+      ((el2['textContent'] =
+        enabled8['projectName'] ||
+        this['_canvases']['find']((value14) => value14?.['id'] === this['_activeId'])?.['name'] ||
+        ''),
+        el2['parentElement']?.['querySelector']?.('.canvas-project-badge')?.['remove']());
+      const value15 = this['getCanvasProjectAccess'](),
+        canvasProjectBadge = createCanvasProjectBadge(value15);
+      if (canvasProjectBadge) el2['before']?.(canvasProjectBadge);
+    }
+    return !![];
+  },
+  setCanvasProjectContext(canvasId3, value16 = {}, { persist: persist = !![] } = {}) {
+    const projectName2 = this['_canvases']['find']((value17) => value17?.['id'] === canvasId3);
+    if (!projectName2) return null;
+    const args2 = normalizeCanvasProjectContext(value16, {
+      canvasId: canvasId3,
+      projectName: projectName2['name'],
+    });
+    return (
+      this['_projectContextByCanvasId']['set'](canvasId3, args2),
+      canvasId3 === this['_activeId'] &&
+        (this['_applyActiveCanvasProjectContext'](), this['_notifyActiveCanvasChanged']('context')),
+      persist && this['_markCanvasMetaDirty'](),
+      { ...args2 }
+    );
+  },
+  getCanvasProjectContext(value18 = this['_activeId']) {
+    const args3 = this['_projectContextByCanvasId']['get'](value18);
+    return args3 ? { ...args3 } : null;
+  },
+  findCanvasIdByProjectIdentity(options4 = {}) {
+    const run = (value19, { path: path = ![] } = {}) => {
+        const value20 = String(value19 || '')
+          ['trim']()
+          ['toLowerCase']();
+        return path ? value20['replace'](/\\/g, '/') : value20;
+      },
+      value21 = run(options4['projectName']),
+      value22 = [
+        ['recentId', run(options4['recentId'])],
+        ['displayPath', run(options4['displayPath'], { path: !![] })],
+        ['filename', run(options4['filename'], { path: !![] })],
+        ['projectId', run(options4['projectId'])],
+      ]['filter'](([, value23]) => value23);
+    for (const [path2, value24] of value22) {
+      const list4 = [];
+      for (const canvas of this['_canvases']) {
+        const context = this['_projectContextByCanvasId']['get'](canvas?.['id']);
+        if (!context) continue;
+        const value25 = run(context[path2], {
+          path: path2 === 'displayPath' || path2 === 'filename',
+        });
+        value25 === value24 && list4['push']({ canvas: canvas, context: context });
+      }
+      if (list4['length'] === 0x0) continue;
+      if (value21) {
+        const canvas2 =
+          list4['find'](({ canvas: canvas3 }) => run(canvas3?.['name']) === value21) ||
+          list4['find'](({ context: context2 }) => run(context2?.['projectName']) === value21);
+        if (canvas2) return canvas2['canvas']['id'];
+      }
+      return list4[0x0]['canvas']['id'];
+    }
+    if (value21) {
+      const list5 = this['_canvases']['filter'](
+        (error3) => run(error3?.['name']) === value21,
+      );
+      if (list5['length'] === 0x1) return list5[0x0]['id'];
+    }
+    return '';
   },
   _getTabsRenderSignature() {
-    return buildTabsRenderSignature(this._canvases, this._activeId);
+    return (
+      buildTabsRenderSignature(this['_canvases'], this['_activeId']) +
+      this['_canvases']
+        ['map']((value26) => this['_projectBadges']['get'](value26['id']) || '')
+        ['join'](':')
+    );
   },
-  _buildCanvasStructureDigest(payload, handle) {
-    const list3 = Array.isArray(payload)
-      ? payload
-      : payload && typeof payload === 'object'
-        ? Object.values(payload)
+  getCanvasProjectAccess(value27 = this['_activeId']) {
+    const args4 = normalizeCanvasProjectAccess(
+      this['_canvases']['find']((value28) => value28['id'] === value27)?.['projectAccess'],
+    );
+    return args4 ? { ...args4, badge: this['_projectBadges']['get'](value27) || '' } : null;
+  },
+  setCanvasProjectAccess(value29, value30) {
+    const enabled9 = this['_canvases']['find']((value31) => value31['id'] === value29);
+    if (!enabled9) return;
+    const args5 = normalizeCanvasProjectAccess(value30);
+    if (args5?.['badge']) this['_projectBadges']['set'](value29, args5['badge']);
+    else this['_projectBadges']['delete'](value29);
+    const value32 = args5 ? { ...args5, badge: '' } : null;
+    JSON['stringify'](enabled9['projectAccess']) !== JSON['stringify'](value32) &&
+      ((enabled9['projectAccess'] = value32), this['_markCanvasMetaDirty']());
+    this['renderTabs']();
+    if (value29 === this['_activeId']) this['_applyActiveCanvasProjectContext']();
+  },
+  _buildCanvasStructureDigest(value33, value34) {
+    const list6 = Array['isArray'](value33)
+      ? value33
+      : value33 && typeof value33 === 'object'
+        ? Object['values'](value33)
         : [];
-    let state = '' + list3.length;
-    for (const enabled6 of list3) {
-      if (!enabled6 || typeof enabled6 !== 'object') continue;
-      state += '|';
-      for (const config of handle) {
-        state += String(enabled6[config] ?? '') + ',';
+    let value35 = '' + list6['length'];
+    for (const enabled10 of list6) {
+      if (!enabled10 || typeof enabled10 !== 'object') continue;
+      value35 += '|';
+      for (const value36 of value34) {
+        value35 += String(enabled10[value36] ?? '') + ',';
       }
     }
-    return state;
+    return value35;
   },
   _buildCanvasSavedSignature(id) {
-    const box = id?.viewport && typeof id.viewport === 'object' ? id.viewport : { x: 0, y: 0, zoom: 1.1 },
-      persistRevHint = Number.isFinite(id?._persistRevHint) ? Number(id._persistRevHint) : 0;
+    const box =
+        id?.['viewport'] && typeof id['viewport'] === 'object'
+          ? id['viewport']
+          : { x: 0x0, y: 0x0, zoom: 1.1 },
+      persistRevHint = Number['isFinite'](id?.['_persistRevHint'])
+        ? Number(id['_persistRevHint'])
+        : 0x0;
     return createStableSignature({
-      id: id?.id ?? null,
-      name: id?.name ?? '未命名画布',
+      id: id?.['id'] ?? null,
+      name: id?.['name'] ?? '未命名画布',
       persistRevHint: persistRevHint,
       viewport: {
-        x: Number(box.x) || 0,
-        y: Number(box.y) || 0,
-        zoom: Number(box.zoom) || 1.1,
+        x: Number(box['x']) || 0x0,
+        y: Number(box['y']) || 0x0,
+        zoom: Number(box['zoom']) || 1.1,
       },
-      nodes: this._buildCanvasStructureDigest(id?.nodes, [
+      nodes: this['_buildCanvasStructureDigest'](id?.['nodes'], [
         'id',
         'type',
         'x',
@@ -197,743 +538,1141 @@ const CanvasTabManager = {
         'height',
         'parentId',
       ]),
-      edges: this._buildCanvasStructureDigest(id?.edges, ['id', 'sourceId', 'targetId']),
-      assets: this._buildCanvasStructureDigest(id?.assets, ['id', 'type', 'localPath']),
+      edges: this['_buildCanvasStructureDigest'](id?.['edges'], ['id', 'sourceId', 'targetId']),
+      assets: this['_buildCanvasStructureDigest'](id?.['assets'], ['id', 'type', 'localPath']),
+      storyboard3dProjects: this['_buildCanvasStructureDigest'](id?.['storyboard3dProjects'], [
+        'id',
+        'name',
+        'updatedAt',
+      ]),
     });
   },
-  _resetSavedCanvasSignatures({ markClean: markClean = true } = {}) {
-    this._savedSignatureByCanvas = new Map();
+  _resetSavedCanvasSignatures({ markClean: markClean = !![] } = {}) {
+    this['_savedSignatureByCanvas'] = new Map();
     if (!markClean) return;
-    this._canvases.forEach((enabled7) => {
-      if (!enabled7?.id) return;
-      this._savedSignatureByCanvas.set(enabled7.id, this._buildCanvasSavedSignature(enabled7));
+    this['_canvases']['forEach']((enabled11) => {
+      if (!enabled11?.['id']) return;
+      this['_savedSignatureByCanvas']['set'](enabled11['id'], this['_buildCanvasSavedSignature'](enabled11));
     });
   },
   _removeTabContextMenu() {
-    const el = document.getElementById('tab-context-menu');
-    if (el) el.remove();
+    (this['_tabContextMenuSession']?.['close']?.({ restoreFocus: ![] }),
+      (this['_tabContextMenuSession'] = null),
+      document['getElementById']('tab-context-menu')?.['remove']());
   },
-  _startTabRename(el2) {
-    if (!el2) return;
-    ((el2.contentEditable = 'true'), el2.focus());
-    const scope = document.createRange();
-    scope.selectNodeContents(el2);
-    const enabled8 = window.getSelection?.();
-    if (!enabled8) return;
-    (enabled8.removeAllRanges(), enabled8.addRange(scope));
-  },
-  _commitTabRename(el3, { deferRender: deferRender = false } = {}) {
+  _startTabRename(el3) {
     if (!el3) return;
-    const el4 = el3.closest('.canvas-tab'),
-      enabled9 = el4?.dataset?.id;
-    if (!enabled9) return;
-    const error2 = this._canvases.find((item5) => item5.id === enabled9);
-    if (!error2) return;
-    const input = error2.name,
-      output = String(el3.textContent || '').trim();
-    ((el3.contentEditable = 'false'),
-      this.renameCanvas(enabled9, output),
-      (el3.textContent = this._canvases.find((item6) => item6.id === enabled9)?.name || input));
+    ((el3['contentEditable'] = 'true'), el3['focus']());
+    const value37 = document['createRange']();
+    value37['selectNodeContents'](el3);
+    const enabled12 = window['getSelection']?.();
+    if (!enabled12) return;
+    (enabled12['removeAllRanges'](), enabled12['addRange'](value37));
+  },
+  _commitTabRename(el4, { deferRender: deferRender = ![] } = {}) {
+    if (!el4) return;
+    const el5 = el4['closest']('.canvas-tab'),
+      enabled13 = el5?.['dataset']?.['id'];
+    if (!enabled13) return;
+    const error4 = this['_canvases']['find']((value38) => value38['id'] === enabled13);
+    if (!error4) return;
+    const value39 = error4['name'],
+      value40 = String(el4['textContent'] || '')['trim']();
+    ((el4['contentEditable'] = 'false'),
+      this['renameCanvas'](enabled13, value40),
+      (el4['textContent'] =
+        this['_canvases']['find']((value41) => value41['id'] === enabled13)?.['name'] || value39));
     if (deferRender) {
-      window.setTimeout(() => this.renderTabs(), 0);
+      window['setTimeout'](() => this['renderTabs'](), 0x0);
       return;
     }
-    this.renderTabs();
+    this['renderTabs']();
   },
-  _bindTabContainerEvents(el5) {
-    if (this._tabContainerBound || !el5) return;
-    this._tabContainerBound = true;
-    let value2 = '',
-      count = 0;
-    const run = (event) => {
-        const el6 = event.target.closest('.canvas-tab');
-        if (!el6 || !el5.contains(el6)) return '';
-        return el6.dataset.id || '';
+  _bindTabContainerEvents(el6) {
+    if (this['_tabContainerBound'] || !el6) return;
+    this['_tabContainerBound'] = !![];
+    let value42 = '',
+      count4 = 0x0;
+    const run2 = (event3) => {
+        const el7 = event3['target']['closest']('.canvas-tab');
+        if (!el7 || !el6['contains'](el7)) return '';
+        return el7['dataset']['id'] || '';
       },
-      handler = (event2) => {
-        if (event2.button !== 1) return false;
-        const enabled10 = run(event2);
-        if (!enabled10) return false;
+      handler2 = (event4) => {
+        if (event4['button'] !== 0x1) return ![];
+        const enabled14 = run2(event4);
+        if (!enabled14) return ![];
         return (
-          event2.preventDefault(),
-          event2.stopPropagation(),
-          (value2 = enabled10),
-          (count = Date.now()),
-          void this.deleteCanvas(enabled10),
-          true
+          event4['preventDefault'](),
+          event4['stopPropagation'](),
+          (value42 = enabled14),
+          (count4 = Date['now']()),
+          void this['deleteCanvas'](enabled14),
+          !![]
         );
       };
-    (el5.addEventListener('click', (event3) => {
-      const el7 = event3.target.closest('.canvas-tab');
-      if (!el7 || !el5.contains(el7)) return;
-      const enabled11 = el7.dataset.id;
-      if (!enabled11) return;
-      const enabled12 = this._canvases.find((item7) => item7.id === enabled11);
-      if (!enabled12) return;
-      const value3 = event3.target.closest('.canvas-tab-close');
-      if (value3) {
-        (event3.stopPropagation(), void this.deleteCanvas(enabled11));
+    (el6['addEventListener']('click', (event5) => {
+      const el8 = event5['target']['closest']('.canvas-tab');
+      if (!el8 || !el6['contains'](el8)) return;
+      const enabled15 = el8['dataset']['id'];
+      if (!enabled15) return;
+      const enabled16 = this['_canvases']['find']((value43) => value43['id'] === enabled15);
+      if (!enabled16) return;
+      const value44 = event5['target']['closest']('.canvas-tab-close');
+      if (value44) {
+        (event5['stopPropagation'](), void this['deleteCanvas'](enabled15));
         return;
       }
-      const value4 = el7.querySelector('.canvas-tab-name'),
-        value5 = enabled11 === this._activeId;
-      if (value5) {
-        if (value4?.contentEditable === 'true') return;
-        this._startTabRename(value4);
+      const value45 = el8['querySelector']('.canvas-tab-name'),
+        value46 = enabled15 === this['_activeId'];
+      if (value46) {
+        if (value45?.['contentEditable'] === 'true') return;
+        this['_startTabRename'](value45);
         return;
       }
-      this.switchTo(enabled11);
+      this['switchTo'](enabled15);
     }),
-      el5.addEventListener('pointerdown', (value6) => {
-        handler(value6);
+      el6['addEventListener']('pointerdown', (value47) => {
+        handler2(value47);
       }),
-      el5.addEventListener('auxclick', (event4) => {
-        if (event4.button !== 1) return;
-        const enabled13 = run(event4);
-        if (!enabled13) return;
-        (event4.preventDefault(), event4.stopPropagation());
-        if (enabled13 === value2 && Date.now() - count < 0x320) return;
-        ((value2 = enabled13), (count = Date.now()), void this.deleteCanvas(enabled13));
+      el6['addEventListener']('auxclick', (event6) => {
+        if (event6['button'] !== 0x1) return;
+        const enabled17 = run2(event6);
+        if (!enabled17) return;
+        (event6['preventDefault'](), event6['stopPropagation']());
+        if (enabled17 === value42 && Date['now']() - count4 < 0x320) return;
+        ((value42 = enabled17), (count4 = Date['now']()), void this['deleteCanvas'](enabled17));
       }),
-      el5.addEventListener('contextmenu', async (clientX2) => {
-        const el8 = clientX2.target.closest('.canvas-tab');
-        if (!el8 || !el5.contains(el8)) return;
-        const enabled14 = el8.dataset.id;
-        if (!enabled14) return;
-        const enabled15 = this._canvases.find((item8) => item8.id === enabled14);
-        if (!enabled15) return;
-        (clientX2.preventDefault(), clientX2.stopPropagation());
-        const run2 = () => {
-          this._showTabContextMenu(enabled15, { clientX: clientX2.clientX, clientY: clientX2.clientY });
+      el6['addEventListener']('contextmenu', async (clientX2) => {
+        const el9 = clientX2['target']['closest']('.canvas-tab');
+        if (!el9 || !el6['contains'](el9)) return;
+        const enabled18 = el9['dataset']['id'];
+        if (!enabled18) return;
+        const enabled19 = this['_canvases']['find']((value48) => value48['id'] === enabled18);
+        if (!enabled19) return;
+        (clientX2['preventDefault'](), clientX2['stopPropagation']());
+        const run3 = () => {
+          this['_showTabContextMenu'](enabled19, {
+            clientX: clientX2['clientX'],
+            clientY: clientX2['clientY'],
+          });
         };
-        (enabled14 !== this._activeId && (await this.switchTo(enabled14)), run2());
+        (enabled18 !== this['_activeId'] && (await this['switchTo'](enabled18)), run3());
       }),
-      el5.addEventListener('focusout', (event5) => {
-        const enabled16 = event5.target.closest('.canvas-tab-name');
-        if (!enabled16 || !el5.contains(enabled16)) return;
-        if (enabled16.contentEditable !== 'true') return;
-        this._commitTabRename(enabled16, { deferRender: true });
+      el6['addEventListener']('focusout', (event7) => {
+        const enabled20 = event7['target']['closest']('.canvas-tab-name');
+        if (!enabled20 || !el6['contains'](enabled20)) return;
+        if (enabled20['contentEditable'] !== 'true') return;
+        this['_commitTabRename'](enabled20, { deferRender: !![] });
       }),
-      el5.addEventListener('keydown', (event6) => {
-        const el9 = event6.target.closest('.canvas-tab-name');
-        if (!el9 || !el5.contains(el9)) return;
-        if (el9.contentEditable !== 'true') return;
-        if (event6.key === 'Enter') {
-          (event6.preventDefault(), el9.blur());
+      el6['addEventListener']('keydown', (event8) => {
+        const el10 = event8['target']['closest']('.canvas-tab-name');
+        if (!el10 || !el6['contains'](el10)) return;
+        if (el10['contentEditable'] !== 'true') return;
+        if (event8['key'] === 'Enter') {
+          (event8['preventDefault'](), el10['blur']());
           return;
         }
-        if (event6.key === 'Escape') {
-          event6.preventDefault();
-          const value7 = el9.closest('.canvas-tab')?.dataset?.id,
-            error3 = this._canvases.find((item9) => item9.id === value7);
-          if (error3) el9.textContent = error3.name;
-          el9.blur();
+        if (event8['key'] === 'Escape') {
+          event8['preventDefault']();
+          const value49 = el10['closest']('.canvas-tab')?.['dataset']?.['id'],
+            error5 = this['_canvases']['find']((value50) => value50['id'] === value49);
+          if (error5) el10['textContent'] = error5['name'];
+          el10['blur']();
         }
-      }));
-  },
-  _showTabContextMenu(filename, { clientX: clientX = 0, clientY: clientY = 0 } = {}) {
-    if (!filename) return;
-    this._removeTabContextMenu();
-    const el10 = document.createElement('div');
-    ((el10.id = 'tab-context-menu'),
-      (el10.className = 'v2-dropdown-menu open'),
-      (el10.style.position = 'fixed'),
-      (el10.style.left = clientX + 'px'),
-      (el10.style.top = clientY + 'px'),
-      (el10.style.zIndex = 0x270f),
-      (el10.style.minWidth = '120px'));
-    const value8 = 'http://www.w3.org/2000/svg',
-      handler2 = () => {
-        const el11 = document.createElementNS(value8, 'svg');
-        return (
-          el11.setAttribute('width', '14'),
-          el11.setAttribute('height', '14'),
-          el11.setAttribute('viewBox', '0 0 24 24'),
-          el11.setAttribute('fill', 'none'),
-          el11.setAttribute('stroke', 'currentColor'),
-          el11.setAttribute('stroke-width', '2'),
-          el11
-        );
-      },
-      value9 = (() => {
-        const el12 = handler2(),
-          el13 = document.createElementNS(value8, 'path');
-        el13.setAttribute('d', 'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z');
-        const el14 = document.createElementNS(value8, 'polyline');
-        el14.setAttribute('points', '17 21 17 13 7 13 7 21');
-        const el15 = document.createElementNS(value8, 'polyline');
-        return (
-          el15.setAttribute('points', '7 3 7 8 15 8'),
-          el12.appendChild(el13),
-          el12.appendChild(el14),
-          el12.appendChild(el15),
-          el12
-        );
-      })(),
-      value10 = (() => {
-        const el16 = handler2(),
-          el17 = document.createElementNS(value8, 'path');
-        el17.setAttribute('d', 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z');
-        const el18 = document.createElementNS(value8, 'polyline');
-        el18.setAttribute('points', '14 2 14 8 20 8');
-        const el19 = document.createElementNS(value8, 'line');
-        (el19.setAttribute('x1', '12'),
-          el19.setAttribute('y1', '18'),
-          el19.setAttribute('x2', '12'),
-          el19.setAttribute('y2', '12'));
-        const el20 = document.createElementNS(value8, 'line');
-        return (
-          el20.setAttribute('x1', '9'),
-          el20.setAttribute('y1', '15'),
-          el20.setAttribute('x2', '15'),
-          el20.setAttribute('y2', '15'),
-          el16.appendChild(el17),
-          el16.appendChild(el18),
-          el16.appendChild(el19),
-          el16.appendChild(el20),
-          el16
-        );
-      })(),
-      value11 = (() => {
-        const el21 = handler2(),
-          el22 = document.createElementNS(value8, 'rect');
-        (el22.setAttribute('x', '3'),
-          el22.setAttribute('y', '5'),
-          el22.setAttribute('width', '18'),
-          el22.setAttribute('height', '14'),
-          el22.setAttribute('rx', '2'));
-        const el23 = document.createElementNS(value8, 'path');
-        return (
-          el23.setAttribute('d', 'M8 9h8M12 9v6m0 0-3-3m3 3 3-3'),
-          el21.appendChild(el22),
-          el21.appendChild(el23),
-          el21
-        );
-      })(),
-      value12 = (() => {
-        const el24 = handler2(),
-          el25 = document.createElementNS(value8, 'polyline');
-        el25.setAttribute('points', '3 6 5 6 21 6');
-        const el26 = document.createElementNS(value8, 'path');
-        return (
-          el26.setAttribute(
-            'd',
-            'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2',
-          ),
-          el24.appendChild(el25),
-          el24.appendChild(el26),
-          el24
-        );
-      })(),
-      handler3 = (value13, value14, handler4, value15 = false) => {
-        const el27 = document.createElement('div');
-        el27.className = 'v2-menu-row';
-        if (value15) el27.style.color = 'var(--red)';
-        const el28 = document.createElement('span');
-        ((el28.className = 'v2-menu-icon'), el28.appendChild(value14.cloneNode(true)));
-        const el29 = document.createElement('span');
-        ((el29.className = 'v2-menu-text'),
-          (el29.textContent = value13),
-          el27.appendChild(el28),
-          el27.appendChild(el29),
-          el27.addEventListener('pointerdown', (event7) => {
-            (event7.stopPropagation(), el10.remove(), handler4());
-          }),
-          el27.addEventListener('contextmenu', (event8) => event8.preventDefault()),
-          el10.appendChild(el27));
-      };
-    (handler3(canvasTabsText('contextMenu.save'), value9, () => {
-      if (window._v2SaveProject) window._v2SaveProject(filename.name);
-    }),
-      handler3(canvasTabsText('contextMenu.saveAs'), value10, () => {
-        if (window.electronAPI?.project && typeof window._v2SaveProjectAsLocal === 'function') {
-          window._v2SaveProjectAsLocal();
-          return;
-        }
-        const value16 = this.getMultiDataSnapshot({ sanitizeForPersistence: true }) || {},
-          blob = new Blob([JSON.stringify(value16, null, 2)], { type: 'application/json' }),
-          value17 = URL.createObjectURL(blob),
-          el30 = document.createElement('a');
-        ((el30.href = value17),
-          (el30.download = filename.name + '.json'),
-          document.body.appendChild(el30),
-          el30.click(),
-          document.body.removeChild(el30),
-          URL.revokeObjectURL(value17),
-          window.showToast?.(canvasTabsText('downloadedWorkflow', { filename: filename.name + '.json' })));
-      }));
-    typeof window._v2ExportCurrentProjectPackage === 'function' &&
-      handler3(canvasTabsText('contextMenu.collectProject'), value11, () => {
-        window._v2ExportCurrentProjectPackage({ canvasId: filename.id, projectName: filename.name });
-      });
-    const value18 = document.createElement('div');
-    ((value18.className = 'v2-menu-sep'),
-      el10.appendChild(value18),
-      handler3(
-        canvasTabsText('contextMenu.delete'),
-        value12,
-        () => {
-          void this.deleteCanvas(filename.id);
+      }),
+      el6['addEventListener']('scroll', () => this['_updateTabScrollHints'](el6), {
+        passive: !![],
+      }),
+      el6['addEventListener'](
+        'wheel',
+        (event9) => {
+          (event9['stopPropagation']?.(),
+            scrollCanvasTabsWithWheel(el6, event9) && this['_updateTabScrollHints'](el6));
         },
-        true,
-      ),
-      document.body.appendChild(el10));
-    const value19 = (event9) => {
-      !el10.contains(event9.target) &&
-        (el10.remove(), document.removeEventListener('pointerdown', value19, true));
-    };
-    requestAnimationFrame(() => document.addEventListener('pointerdown', value19, true));
+        { passive: ![] },
+      ));
+    const run4 = globalThis['ResizeObserver'];
+    if (typeof run4 === 'function') {
+      (this['_tabOverflowResizeObserver']?.['disconnect']?.(),
+        (this['_tabOverflowResizeObserver'] = new run4(() => {
+          this['_updateTabScrollHints'](el6);
+        })),
+        this['_tabOverflowResizeObserver']['observe'](el6));
+      const value51 = this['_getTabScrollShell'](el6);
+      value51 && value51 !== el6 && this['_tabOverflowResizeObserver']['observe'](value51);
+    }
+    this['_updateTabScrollHints'](el6);
+  },
+  _getTabScrollShell(el11) {
+    return (
+      el11?.['closest']?.('.canvas-tabs-wrap') ||
+      globalThis['document']?.['getElementById']?.('canvasTabsWrap') ||
+      null
+    );
+  },
+  _updateTabScrollHints(value52) {
+    const el12 = this['_getTabScrollShell'](value52);
+    if (!el12?.['classList']) return;
+    const { maxScrollLeft: maxScrollLeft3, scrollLeft: scrollLeft3 } = getCanvasTabScrollMetrics(value52),
+      value53 = maxScrollLeft3 > 0x1;
+    (el12['classList']['toggle']('has-overflow', value53),
+      el12['classList']['toggle']('has-left-fade', value53 && scrollLeft3 > 0x1),
+      el12['classList']['toggle']('has-right-fade', value53 && scrollLeft3 < maxScrollLeft3 - 0x1));
+  },
+  _revealActiveTab(el13) {
+    const value54 = el13?.['querySelector']?.('.canvas-tab.active');
+    value54?.['scrollIntoView']?.({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
+  },
+  _showTabContextMenu(canvasId4, { clientX: clientX = 0x0, clientY: clientY = 0x0 } = {}) {
+    if (!canvasId4) return;
+    this['_removeTabContextMenu']();
+    const list7 = [
+      {
+        label: canvasTabsText('contextMenu.save'),
+        icon: 'save',
+        shortcutActionId: 'save',
+        action: () => {
+          window['_v2SaveProject']?.(canvasId4['name'], { canvasId: canvasId4['id'] });
+        },
+      },
+      {
+        label: canvasTabsText('contextMenu.saveAs'),
+        icon: 'save-as',
+        shortcutActionId: 'context-canvas-tab-save-as',
+        action: async () => {
+          try {
+            assertCanvasProjectSaveAllowed({ canvases: [canvasId4] }, this);
+          } catch (error6) {
+            window['showToast']?.(error6['message'], 'warn');
+            return;
+          }
+          if (
+            desktopBridge['project']['isAvailable']() &&
+            typeof window['_v2SaveProjectAsLocal'] === 'function'
+          ) {
+            window['_v2SaveProjectAsLocal']({ canvasId: canvasId4['id'] });
+            return;
+          }
+          const args6 = this['getMultiDataSnapshot']({ sanitizeForPersistence: !![] }) || {},
+            list8 = Array['isArray'](args6['canvases']) ? args6['canvases'] : [],
+            canvases =
+              list8['find'](
+                (value55) => String(value55?.['id'] || '') === String(canvasId4['id'] || ''),
+              ) || canvasId4,
+            value56 = {
+              ...args6,
+              canvases: canvases ? [canvases] : [],
+              activeCanvasId: canvases?.['id'] || canvasId4['id'] || null,
+            },
+            filename = canvasId4['name'] + '.aicanvas',
+            saveTextDownload2 = await saveTextDownload({
+              filename: filename,
+              content: JSON['stringify'](value56, null, 0x2),
+              mimeType: 'application/json',
+              filterName: 'SHUO Canvas Project',
+            });
+          if (saveTextDownload2?.['canceled']) return;
+          window['showToast']?.(canvasTabsText('downloadedWorkflow', { filename: filename }));
+        },
+      },
+    ];
+    (typeof window['_v2ExportCurrentProjectPackage'] === 'function' &&
+      list7['push']({
+        label: canvasTabsText('contextMenu.collectProject'),
+        icon: 'package-export',
+        shortcutActionId: 'context-canvas-tab-collect-project',
+        action: () => {
+          window['_v2ExportCurrentProjectPackage']({
+            canvasId: canvasId4['id'],
+            projectName: canvasId4['name'],
+          });
+        },
+      }),
+      list7['push']('sep', {
+        label: canvasTabsText('contextMenu.delete'),
+        icon: 'delete',
+        danger: !![],
+        shortcutActionId: 'context-canvas-tab-delete',
+        action: () => void this['deleteCanvas'](canvasId4['id']),
+      }),
+      (this['_tabContextMenuSession'] = showContextMenu(clientX, clientY, list7, {
+        className: 'v2-canvas-ctx-menu canvas-tab-context-menu',
+        ensureItemIcons: !![],
+        restoreTarget: document['querySelector']?.(
+          '.canvas-tab[data-id="' +
+            (globalThis['CSS']?.['escape']?.(String(canvasId4['id'])) || String(canvasId4['id'])) +
+            '\x22]',
+        ),
+        onClose: () => {
+          this['_tabContextMenuSession'] = null;
+        },
+      })),
+      (this['_tabContextMenuSession']['menu']['id'] = 'tab-context-menu'));
   },
   _clearCanvasSurface() {
     clearRendererCache();
-    const el31 = document.getElementById('v2-canvas');
-    if (!el31) return;
-    Array.from(el31.children).forEach((el32) => {
-      if (el32.classList.contains('v2-node')) el32.remove();
+    const el14 = document['getElementById']('v2-canvas');
+    if (!el14) return;
+    Array['from'](el14['children'])['forEach']((el15) => {
+      if (el15['classList']['contains']('v2-node')) el15['remove']();
     });
   },
-  _buildCanvasRecord(args2 = {}, viewport = {}) {
-    const args3 = createEmptyCanvasSnapshot(),
-      _persistRevHint = Number.isFinite(args2?._persistRevHint)
-        ? args2._persistRevHint
-        : Number.isFinite(viewport?._persistRevHint)
-          ? viewport._persistRevHint
-          : args3._persistRevHint;
+  _buildCanvasRecord(args7 = {}, viewport = {}) {
+    const args8 = createEmptyCanvasSnapshot(),
+      _persistRevHint = Number['isFinite'](args7?.['_persistRevHint'])
+        ? args7['_persistRevHint']
+        : Number['isFinite'](viewport?.['_persistRevHint'])
+          ? viewport['_persistRevHint']
+          : args8['_persistRevHint'],
+      _contentPersistRevHint = Number['isFinite'](args7?.['_contentPersistRevHint'])
+        ? args7['_contentPersistRevHint']
+        : Number['isFinite'](viewport?.['_contentPersistRevHint'])
+          ? viewport['_contentPersistRevHint']
+          : args8['_contentPersistRevHint'];
     return {
-      ...args2,
-      nodes: Array.isArray(viewport?.nodes)
-        ? viewport.nodes
-        : viewport?.nodes && typeof viewport.nodes === 'object'
-          ? viewport.nodes
-          : args3.nodes,
-      edges: Array.isArray(viewport?.edges)
-        ? viewport.edges
-        : viewport?.edges && typeof viewport.edges === 'object'
-          ? viewport.edges
-          : args3.edges,
+      ...args7,
+      ...(args7['projectAccess']
+        ? { projectAccess: { ...normalizeCanvasProjectAccess(args7['projectAccess']), badge: '' } }
+        : {}),
+      nodes: Array['isArray'](viewport?.['nodes'])
+        ? viewport['nodes']
+        : viewport?.['nodes'] && typeof viewport['nodes'] === 'object'
+          ? viewport['nodes']
+          : args8['nodes'],
+      edges: Array['isArray'](viewport?.['edges'])
+        ? viewport['edges']
+        : viewport?.['edges'] && typeof viewport['edges'] === 'object'
+          ? viewport['edges']
+          : args8['edges'],
       viewport:
-        viewport?.viewport && typeof viewport.viewport === 'object'
-          ? { ...viewport.viewport }
-          : { ...args3.viewport },
-      assets: Array.isArray(viewport?.assets) ? viewport.assets : args3.assets,
+        viewport?.['viewport'] && typeof viewport['viewport'] === 'object'
+          ? { ...viewport['viewport'] }
+          : { ...args8['viewport'] },
+      assets: Array['isArray'](viewport?.['assets']) ? viewport['assets'] : args8['assets'],
+      storyboard3dProjects: Array['isArray'](viewport?.['storyboard3dProjects'])
+        ? viewport['storyboard3dProjects']
+        : args8['storyboard3dProjects'],
       visualSnapshot:
-        normalizeCanvasVisualSnapshot(viewport?.visualSnapshot) ||
-        normalizeCanvasVisualSnapshot(args2?.visualSnapshot) ||
+        normalizeCanvasVisualSnapshot(viewport?.['visualSnapshot']) ||
+        normalizeCanvasVisualSnapshot(args7?.['visualSnapshot']) ||
         null,
       _persistRevHint: _persistRevHint,
+      _contentPersistRevHint: _contentPersistRevHint,
     };
   },
   _clearVisualSnapshotBackfillTimers() {
-    for (const value20 of this._visualSnapshotBackfillTimers || []) {
-      clearTimeout(value20);
+    for (const value57 of this['_visualSnapshotBackfillTimers'] || []) {
+      clearTimeout(value57);
     }
-    this._visualSnapshotBackfillTimers = [];
+    ((this['_visualSnapshotBackfillTimers'] = []), this['_clearVisualSnapshotIdleRetryTimer']());
   },
-  _isVisualSnapshotWorthReplacing(enabled17, enabled18, { force: force = false } = {}) {
-    if (!enabled18) return false;
-    if (!enabled17) return true;
-    const value21 = Math.max(0, Number(enabled17.readyMediaNodeCount ?? enabled17.mediaNodeCount) || 0),
-      value22 = Math.max(0, Number(enabled18.readyMediaNodeCount ?? enabled18.mediaNodeCount) || 0);
-    if (value22 > value21) return true;
-    if (value22 < value21) return false;
-    const value23 = Math.max(0, Number(enabled17.visibleNodeCount) || 0),
-      value24 = Math.max(0, Number(enabled18.visibleNodeCount) || 0);
-    if (value24 > value23) return true;
-    return force && value24 >= value23;
+  _clearVisualSnapshotIdleRetryTimer() {
+    (this['_visualSnapshotIdleRetryTimer'] !== null && clearTimeout(this['_visualSnapshotIdleRetryTimer']),
+      (this['_visualSnapshotIdleRetryTimer'] = null),
+      (this['_visualSnapshotIdleRetryCanvasId'] = null));
   },
-  _captureActiveVisualSnapshot({ force: force = false, persistIfChanged: persistIfChanged = false } = {}) {
-    if (!this._activeId) return null;
-    const value25 = this._canvases.findIndex((item10) => item10.id === this._activeId);
-    if (value25 === -1) return null;
+  _getVisualSnapshotNow() {
+    return Date['now']();
+  },
+  _holdVisualSnapshotCaptureAfterInteraction() {
+    this['_visualSnapshotSettleUntil'] = Math['max'](
+      Number(this['_visualSnapshotSettleUntil']) || 0x0,
+      this['_getVisualSnapshotNow']() + VISUAL_SNAPSHOT_INTERACTION_SETTLE_MS,
+    );
+  },
+  _invalidateVisualSnapshotBackfillCapture() {
+    return (
+      (this['_visualSnapshotBackfillGeneration'] =
+        (Number(this['_visualSnapshotBackfillGeneration']) || 0x0) + 0x1),
+      this['_visualSnapshotBackfillGeneration']
+    );
+  },
+  _deferVisualSnapshotBackfillAfterInteraction() {
+    (this['_holdVisualSnapshotCaptureAfterInteraction'](),
+      this['_invalidateVisualSnapshotBackfillCapture'](),
+      this['_clearVisualSnapshotBackfillTimers'](),
+      this['_activeId'] && this['_scheduleVisualSnapshotIdleRetry'](this['_activeId']));
+  },
+  _bindVisualSnapshotInteractionGuard() {
+    const el16 = typeof document !== 'undefined' ? document : null;
+    if (!el16 || typeof el16['addEventListener'] !== 'function') return;
+    if (this['_visualSnapshotInteractionGuardDocument'] === el16) return;
+    const el17 = this['_visualSnapshotInteractionGuardDocument'],
+      value58 = this['_visualSnapshotInteractionGuardHandlers'];
+    el17 &&
+      value58 &&
+      (el17['removeEventListener']?.('pointerdown', value58['pointerdown'], !![]),
+      el17['removeEventListener']?.('pointerup', value58['pointerup'], !![]),
+      el17['removeEventListener']?.('pointercancel', value58['pointercancel'], !![]),
+      el17['removeEventListener']?.('wheel', value58['wheel'], !![]));
+    this['_visualSnapshotActivePointers'] = new Set();
+    const run5 = (event10) =>
+        Number['isFinite'](event10?.['pointerId']) ? event10['pointerId'] : 'primary',
+      value59 = {
+        pointerdown: (value60) => {
+          (this['_visualSnapshotActivePointers']['add'](run5(value60)),
+            this['_deferVisualSnapshotBackfillAfterInteraction']());
+        },
+        pointerup: (value61) => {
+          (this['_visualSnapshotActivePointers']['delete'](run5(value61)),
+            this['_deferVisualSnapshotBackfillAfterInteraction']());
+        },
+        pointercancel: (value62) => {
+          (this['_visualSnapshotActivePointers']['delete'](run5(value62)),
+            this['_deferVisualSnapshotBackfillAfterInteraction']());
+        },
+        wheel: () => {
+          this['_deferVisualSnapshotBackfillAfterInteraction']();
+        },
+      };
+    (el16['addEventListener']('pointerdown', value59['pointerdown'], !![]),
+      el16['addEventListener']('pointerup', value59['pointerup'], !![]),
+      el16['addEventListener']('pointercancel', value59['pointercancel'], !![]),
+      el16['addEventListener']('wheel', value59['wheel'], { capture: !![], passive: !![] }),
+      (this['_visualSnapshotInteractionGuardDocument'] = el16),
+      (this['_visualSnapshotInteractionGuardHandlers'] = value59));
+  },
+  _getActiveCanvasNodeCount() {
+    const value63 = this['_canvases']['find']((value64) => value64['id'] === this['_activeId']),
+      countCanvasNodes2 = countCanvasNodes(value63?.['nodes']);
+    if (countCanvasNodes2 > 0x0) return countCanvasNodes2;
+    return countCanvasNodes(appStore['getStateRaw']?.()?.['nodes']);
+  },
+  _resolveVisualSnapshotBackfillDelays() {
+    return this['_getActiveCanvasNodeCount']() >= DENSE_VISUAL_SNAPSHOT_NODE_COUNT
+      ? DENSE_VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS
+      : VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS;
+  },
+  _isViewportBusyForVisualSnapshot() {
+    const dom = typeof document !== 'undefined' ? document : null,
+      value65 = dom?.['body']?.['classList'],
+      value66 = dom?.['documentElement']?.['classList'];
+    return Boolean(
+      value65?.['contains']?.('is-panning') ||
+      value65?.['contains']?.('is-zooming') ||
+      value65?.['contains']?.('is-viewport-animating') ||
+      value65?.['contains']?.('is-dragging') ||
+      value66?.['contains']?.('is-connecting-mode'),
+    );
+  },
+  _isVisualSnapshotInteractionBusy() {
+    if (this['_isViewportBusyForVisualSnapshot']())
+      return (this['_holdVisualSnapshotCaptureAfterInteraction'](), !![]);
+    if ((this['_visualSnapshotActivePointers']?.['size'] || 0x0) > 0x0) return !![];
+    return this['_getVisualSnapshotNow']() < (Number(this['_visualSnapshotSettleUntil']) || 0x0);
+  },
+  _hasPendingVideoLoadForVisualSnapshot() {
+    const value67 = typeof document !== 'undefined' ? document : null,
+      el18 = value67?.['getElementById']?.('v2-canvas');
+    if (!el18?.['querySelectorAll']) return ![];
+    return Array['from'](el18['querySelectorAll']('video'))['some']((el19) => {
+      if (el19?.['isConnected'] === ![] || el19?.['error']) return ![];
+      const enabled21 = String(
+        el19?.['currentSrc'] || el19?.['getAttribute']?.('src') || el19?.['src'] || '',
+      )['trim']();
+      return !!enabled21 && Number(el19?.['readyState'] || 0x0) < 0x2;
+    });
+  },
+  _shouldDeferVisualSnapshotBackfill() {
+    if (this['_isVisualSnapshotInteractionBusy']()) return !![];
+    if (this['_getActiveCanvasNodeCount']() < DENSE_VISUAL_SNAPSHOT_NODE_COUNT) return ![];
+    if (this['_hasPendingVideoLoadForVisualSnapshot']()) return !![];
+    const canvasMediaSchedulerStats = getCanvasMediaSchedulerStats();
+    return (
+      Number(canvasMediaSchedulerStats['imagePreloadActive'] || 0x0) > 0x0 ||
+      Number(canvasMediaSchedulerStats['imagePreloadQueued'] || 0x0) > 0x0
+    );
+  },
+  _isVisualSnapshotWorthReplacing(enabled22, enabled23, { force: force = ![] } = {}) {
+    if (!enabled23) return ![];
+    if (!enabled22) return !![];
+    const value68 = Math['max'](
+        0x0,
+        Number(enabled22['readyMediaNodeCount'] ?? enabled22['mediaNodeCount']) || 0x0,
+      ),
+      value69 = Math['max'](
+        0x0,
+        Number(enabled23['readyMediaNodeCount'] ?? enabled23['mediaNodeCount']) || 0x0,
+      );
+    if (value69 > value68) return !![];
+    if (value69 < value68) return ![];
+    const value70 = Math['max'](0x0, Number(enabled22['visibleNodeCount']) || 0x0),
+      value71 = Math['max'](0x0, Number(enabled23['visibleNodeCount']) || 0x0);
+    if (value71 > value70) return !![];
+    return force && value71 >= value70;
+  },
+  _captureActiveVisualSnapshot({ force: force = ![], persistIfChanged: persistIfChanged = ![] } = {}) {
+    if (!this['_activeId']) return null;
+    if (this['_isVisualSnapshotInteractionBusy']())
+      return (this['_scheduleVisualSnapshotIdleRetry'](this['_activeId']), null);
+    const value72 = this['_canvases']['findIndex']((value73) => value73['id'] === this['_activeId']);
+    if (value72 === -0x1) return null;
     if (typeof document === 'undefined') return null;
-    const canvasEl = document.getElementById('v2-canvas');
+    const canvasEl = document['getElementById']('v2-canvas');
     if (!canvasEl) return null;
-    const nodes2 = appStore.getStateRaw?.() || {},
+    const nodes2 = appStore['getStateRaw']?.() || {},
       visualSnapshot = captureCanvasVisualSnapshot({
         canvasEl: canvasEl,
-        containerEl: canvasEl.parentElement || document.getElementById('v2-container'),
-        nodes: nodes2.nodes,
-        edges: nodes2.edges,
-        viewport: nodes2.viewport,
+        containerEl: canvasEl['parentElement'] || document['getElementById']('v2-container'),
+        nodes: nodes2['nodes'],
+        edges: nodes2['edges'],
+        viewport: nodes2['viewport'],
         force: force,
       });
     if (!visualSnapshot) return null;
-    const value26 = this._canvases[value25]?.visualSnapshot || null;
-    if (!this._isVisualSnapshotWorthReplacing(value26, visualSnapshot, { force: force })) return null;
+    const value74 = this['_canvases'][value72]?.['visualSnapshot'] || null;
+    if (!this['_isVisualSnapshotWorthReplacing'](value74, visualSnapshot, { force: force })) return null;
     return (
-      (this._canvases[value25] = { ...this._canvases[value25], visualSnapshot: visualSnapshot }),
-      persistIfChanged && this._scheduleWorkspaceMetaCacheSave(),
+      (this['_canvases'][value72] = { ...this['_canvases'][value72], visualSnapshot: visualSnapshot }),
+      persistIfChanged && this['_scheduleWorkspaceMetaCacheSave'](),
       visualSnapshot
     );
   },
-  _getActiveVisualSnapshotCaptureInput({ force: force = false } = {}) {
-    if (!this._activeId) return null;
-    const idx = this._canvases.findIndex((item11) => item11.id === this._activeId);
-    if (idx === -1) return null;
+  _getActiveVisualSnapshotCaptureInput({ force: force = ![] } = {}) {
+    if (!this['_activeId']) return null;
+    const idx = this['_canvases']['findIndex']((value75) => value75['id'] === this['_activeId']);
+    if (idx === -0x1) return null;
     if (typeof document === 'undefined') return null;
-    const canvasEl2 = document.getElementById('v2-canvas');
+    const canvasEl2 = document['getElementById']('v2-canvas');
     if (!canvasEl2) return null;
-    const nodes3 = appStore.getStateRaw?.() || {};
+    const nodes3 = appStore['getStateRaw']?.() || {};
     return {
       idx: idx,
+      canvasId: this['_activeId'],
       canvasEl: canvasEl2,
-      containerEl: canvasEl2.parentElement || document.getElementById('v2-container'),
-      nodes: nodes3.nodes,
-      edges: nodes3.edges,
-      viewport: nodes3.viewport,
+      containerEl: canvasEl2['parentElement'] || document['getElementById']('v2-container'),
+      nodes: nodes3['nodes'],
+      edges: nodes3['edges'],
+      viewport: nodes3['viewport'],
       force: force,
     };
   },
   async _captureActiveVisualSnapshotAsync({
-    force: force = false,
-    persistIfChanged: persistIfChanged = false,
+    force: force = ![],
+    persistIfChanged: persistIfChanged = ![],
   } = {}) {
-    const enabled19 = this._getActiveVisualSnapshotCaptureInput({ force: force });
-    if (!enabled19) return null;
-    const visualSnapshot2 =
-      (await captureCanvasVisualSnapshotFromElectron(enabled19)) || captureCanvasVisualSnapshot(enabled19);
+    const value76 = Number(this['_visualSnapshotBackfillGeneration']) || 0x0,
+      enabled24 = this['_getActiveVisualSnapshotCaptureInput']({ force: force });
+    if (!enabled24) return null;
+    if (this['_isVisualSnapshotInteractionBusy']())
+      return (this['_scheduleVisualSnapshotIdleRetry'](enabled24['canvasId']), null);
+    let visualSnapshot2 = await captureCanvasVisualSnapshotFromElectron(enabled24);
+    if (
+      this['_activeId'] !== enabled24['canvasId'] ||
+      value76 !== (Number(this['_visualSnapshotBackfillGeneration']) || 0x0) ||
+      this['_isVisualSnapshotInteractionBusy']()
+    )
+      return (
+        this['_activeId'] === enabled24['canvasId'] &&
+          this['_scheduleVisualSnapshotIdleRetry'](enabled24['canvasId']),
+        null
+      );
+    if (!visualSnapshot2) {
+      if (isChromeShellRuntime() && countCanvasNodes(enabled24['nodes']) >= DENSE_VISUAL_SNAPSHOT_NODE_COUNT)
+        return null;
+      visualSnapshot2 = captureCanvasVisualSnapshot(enabled24);
+    }
     if (!visualSnapshot2) return null;
-    const value27 = this._canvases[enabled19.idx]?.visualSnapshot || null;
-    if (!this._isVisualSnapshotWorthReplacing(value27, visualSnapshot2, { force: force })) return null;
+    if (
+      this['_activeId'] !== enabled24['canvasId'] ||
+      value76 !== (Number(this['_visualSnapshotBackfillGeneration']) || 0x0) ||
+      this['_isVisualSnapshotInteractionBusy']()
+    )
+      return (
+        this['_activeId'] === enabled24['canvasId'] &&
+          this['_scheduleVisualSnapshotIdleRetry'](enabled24['canvasId']),
+        null
+      );
+    const value77 = this['_canvases']['findIndex'](
+      (value78) => value78['id'] === enabled24['canvasId'],
+    );
+    if (value77 === -0x1) return null;
+    const value79 = this['_canvases'][value77]?.['visualSnapshot'] || null;
+    if (!this['_isVisualSnapshotWorthReplacing'](value79, visualSnapshot2, { force: force })) return null;
     return (
-      (this._canvases[enabled19.idx] = { ...this._canvases[enabled19.idx], visualSnapshot: visualSnapshot2 }),
-      persistIfChanged && this._scheduleWorkspaceMetaCacheSave(),
+      (this['_canvases'][value77] = { ...this['_canvases'][value77], visualSnapshot: visualSnapshot2 }),
+      persistIfChanged && this['_scheduleWorkspaceMetaCacheSave'](),
       visualSnapshot2
     );
   },
-  _showCanvasVisualSnapshot(value28) {
+  _showCanvasVisualSnapshot(value80) {
     return (
       hideCanvasVisualSnapshotOverlay(),
-      this._scheduleCanvasVisibleMediaWarmup(value28, {
+      this['_scheduleCanvasVisibleMediaWarmup'](value80, {
         delayMs: CANVAS_MEDIA_WARMUP_OPEN_DELAY_MS,
         maxJobs: CANVAS_MEDIA_WARMUP_SNAPSHOT_MAX_JOBS,
       }),
-      false
+      ![]
     );
   },
-  _warmupCanvasVisibleMedia(canvas, { maxJobs: maxJobs2 } = {}) {
-    if (typeof document === 'undefined' || !canvas) return null;
-    if (typeof document.getElementById !== 'function') return null;
-    const value29 = document.getElementById('v2-canvas'),
-      containerEl = value29?.parentElement || document.getElementById('v2-container');
-    return warmupCanvasVisibleMedia({ canvas: canvas, containerEl: containerEl, maxJobs: maxJobs2 });
+  _warmupCanvasVisibleMedia(canvas4, { maxJobs: maxJobs2 } = {}) {
+    if (typeof document === 'undefined' || !canvas4) return null;
+    if (typeof document['getElementById'] !== 'function') return null;
+    const value81 = document['getElementById']('v2-canvas'),
+      containerEl = value81?.['parentElement'] || document['getElementById']('v2-container');
+    return warmupCanvasVisibleMedia({ canvas: canvas4, containerEl: containerEl, maxJobs: maxJobs2 });
   },
   _clearCanvasVisibleMediaWarmupTimer() {
-    this._mediaWarmupTimer !== null &&
-      (clearTimeout(this._mediaWarmupTimer), (this._mediaWarmupTimer = null));
+    this['_mediaWarmupTimer'] !== null &&
+      (clearTimeout(this['_mediaWarmupTimer']), (this['_mediaWarmupTimer'] = null));
   },
   _scheduleCanvasVisibleMediaWarmup(
-    enabled20,
+    enabled25,
     {
       delayMs: delayMs = CANVAS_MEDIA_WARMUP_OPEN_DELAY_MS,
       maxJobs: maxJobs = CANVAS_MEDIA_WARMUP_OPEN_MAX_JOBS,
     } = {},
   ) {
-    this._clearCanvasVisibleMediaWarmupTimer();
-    if (!enabled20) return null;
-    const value30 = enabled20.id || null,
+    this['_clearCanvasVisibleMediaWarmupTimer']();
+    if (!enabled25) return null;
+    const value82 = enabled25['id'] || null,
       timer = setTimeout(
         () => {
-          this._mediaWarmupTimer = null;
-          if (value30 && this._activeId !== value30) return;
-          this._warmupCanvasVisibleMedia(enabled20, { maxJobs: maxJobs });
+          this['_mediaWarmupTimer'] = null;
+          if (value82 && this['_activeId'] !== value82) return;
+          this['_warmupCanvasVisibleMedia'](enabled25, { maxJobs: maxJobs });
         },
-        Math.max(0, Number(delayMs) || 0),
+        Math['max'](0x0, Number(delayMs) || 0x0),
       );
-    return (timer?.unref?.(), (this._mediaWarmupTimer = timer), timer);
+    return (timer?.['unref']?.(), (this['_mediaWarmupTimer'] = timer), timer);
   },
   _scheduleVisualSnapshotBackfill() {
-    this._clearVisualSnapshotBackfillTimers();
-    if (!this._activeId) return;
-    const value31 = this._activeId,
-      list4 = [0x4b0, 0xbb8, 0x1b58, 0x36b0, 0x55f0];
-    this._visualSnapshotBackfillTimers = list4.map((item12) => {
-      const timer2 = setTimeout(() => {
-        if (this._activeId !== value31) return;
-        void this._captureActiveVisualSnapshotAsync({ force: false, persistIfChanged: true });
-      }, item12);
-      return (timer2?.unref?.(), timer2);
-    });
+    this['_clearVisualSnapshotBackfillTimers']();
+    if (!this['_activeId']) return;
+    (this['_invalidateVisualSnapshotBackfillCapture'](), this['_bindVisualSnapshotInteractionGuard']());
+    const value83 = this['_activeId'];
+    this['_visualSnapshotBackfillTimers'] = this['_resolveVisualSnapshotBackfillDelays']()['map'](
+      (value84) => this['_scheduleVisualSnapshotBackfillTimer'](value83, value84),
+    );
   },
-  _hydrateCanvasSnapshot(value32, { preserveLiveGeneration: preserveLiveGeneration = false } = {}) {
+  _scheduleVisualSnapshotIdleRetry(value85, value86 = VISUAL_SNAPSHOT_BACKFILL_RETRY_MS) {
+    if (
+      this['_visualSnapshotIdleRetryTimer'] !== null &&
+      this['_visualSnapshotIdleRetryCanvasId'] === value85
+    )
+      return this['_visualSnapshotIdleRetryTimer'];
+    this['_clearVisualSnapshotIdleRetryTimer']();
+    const timer2 = setTimeout(
+      () => {
+        if (this['_visualSnapshotIdleRetryTimer'] !== timer2) return;
+        ((this['_visualSnapshotIdleRetryTimer'] = null), (this['_visualSnapshotIdleRetryCanvasId'] = null));
+        if (this['_activeId'] !== value85) return;
+        if (this['_shouldDeferVisualSnapshotBackfill']()) {
+          this['_scheduleVisualSnapshotIdleRetry'](value85);
+          return;
+        }
+        void this['_requestVisualSnapshotBackfillCapture'](value85);
+      },
+      Math['max'](0x0, Number(value86) || 0x0),
+    );
+    return (
+      timer2?.['unref']?.(),
+      (this['_visualSnapshotIdleRetryTimer'] = timer2),
+      (this['_visualSnapshotIdleRetryCanvasId'] = value85),
+      timer2
+    );
+  },
+  _requestVisualSnapshotBackfillCapture(value87) {
+    if (this['_activeId'] !== value87) return Promise['resolve'](null);
+    if (this['_shouldDeferVisualSnapshotBackfill']())
+      return (this['_scheduleVisualSnapshotIdleRetry'](value87), Promise['resolve'](null));
+    if (this['_visualSnapshotBackfillCapturePromise']) return this['_visualSnapshotBackfillCapturePromise'];
+    const value88 = this['_captureActiveVisualSnapshotAsync']({ force: ![], persistIfChanged: !![] }),
+      value89 = Promise['resolve'](value88)['finally'](() => {
+        this['_visualSnapshotBackfillCapturePromise'] === value89 &&
+          (this['_visualSnapshotBackfillCapturePromise'] = null);
+      });
+    return ((this['_visualSnapshotBackfillCapturePromise'] = value89), value89);
+  },
+  _scheduleVisualSnapshotBackfillTimer(value90, value91) {
+    const timer3 = setTimeout(
+      () => {
+        this['_visualSnapshotBackfillTimers'] = (this['_visualSnapshotBackfillTimers'] || [])['filter'](
+          (value92) => value92 !== timer3,
+        );
+        if (this['_activeId'] !== value90) return;
+        if (this['_shouldDeferVisualSnapshotBackfill']()) {
+          this['_scheduleVisualSnapshotIdleRetry'](value90);
+          return;
+        }
+        (this['_clearVisualSnapshotIdleRetryTimer'](),
+          void this['_requestVisualSnapshotBackfillCapture'](value90));
+      },
+      Math['max'](0x0, Number(value91) || 0x0),
+    );
+    return (timer3?.['unref']?.(), timer3);
+  },
+  _hydrateCanvasSnapshot(value93, { preserveLiveGeneration: preserveLiveGeneration = ![] } = {}) {
     (markPerf('hydrateTrustedSnapshot:start'),
-      appStore.hydrateTrustedSnapshot(value32, { preserveLiveGeneration: preserveLiveGeneration }),
+      appStore['hydrateTrustedSnapshot'](value93, { preserveLiveGeneration: preserveLiveGeneration }),
       markPerf('hydrateTrustedSnapshot:end'),
       measurePerf('hydrateTrustedSnapshot', 'hydrateTrustedSnapshot:start', 'hydrateTrustedSnapshot:end'),
-      this._rememberCanvasPersistRev());
+      this['_rememberCanvasPersistRev']());
   },
-  hydrateActiveCanvasSnapshot(value33) {
-    if (!this._activeId) return;
-    const value34 = this._canvases.findIndex((item13) => item13.id === this._activeId);
-    if (value34 === -1) return;
-    ((this._canvases[value34] = this._buildCanvasRecord(this._canvases[value34], value33)),
-      this._scheduleCanvasVisibleMediaWarmup(this._canvases[value34]),
-      this._clearCanvasSurface(),
-      this._hydrateCanvasSnapshot(this._canvases[value34]),
-      this._scheduleVisualSnapshotBackfill());
+  hydrateActiveCanvasSnapshot(value94) {
+    if (!this['_activeId']) return;
+    const value95 = this['_canvases']['findIndex']((value96) => value96['id'] === this['_activeId']);
+    if (value95 === -0x1) return;
+    ((this['_canvases'][value95] = this['_buildCanvasRecord'](this['_canvases'][value95], value94)),
+      this['_scheduleCanvasVisibleMediaWarmup'](this['_canvases'][value95]),
+      this['_clearCanvasSurface'](),
+      this['_hydrateCanvasSnapshot'](this['_canvases'][value95]),
+      this['_scheduleVisualSnapshotBackfill']());
   },
-  init(value35, { markClean: markClean = true } = {}) {
-    ((this._canvases = Array.isArray(value35.canvases)
-      ? value35.canvases.map((item14) => this._buildCanvasRecord(item14, item14))
-      : []),
-      (this._lastPersistRevByCanvas = new Map()),
-      (this._savedSignatureByCanvas = new Map()),
-      (this._lastTabsRenderSignature = ''));
-    if (this._canvases.length === 0) {
-      const id2 = 'canvas_default_' + Date.now();
-      (this._canvases.push({
+  init(value97, { markClean: markClean = !![] } = {}) {
+    ((this['_projectBadges'] = new Map()),
+      this['_bindVisualSnapshotInteractionGuard'](),
+      this['_invalidateVisualSnapshotBackfillCapture'](),
+      (this['_backgroundTaskStores'] = new Map()),
+      (this['_canvases'] = Array['isArray'](value97['canvases'])
+        ? value97['canvases']['map']((value98) => this['_buildCanvasRecord'](value98, value98))
+        : []));
+    const map = new Map(
+      (Array['isArray'](value97?.['projectContexts']) ? value97['projectContexts'] : [])
+        ['filter']((value99) => value99?.['canvasId'])
+        ['map']((value100) => [String(value100['canvasId']), value100]),
+    );
+    ((this['_projectContextByCanvasId'] = new Map()),
+      (this['_lastPersistRevByCanvas'] = new Map()),
+      (this['_lastContentPersistRevByCanvas'] = new Map()),
+      (this['_savedSignatureByCanvas'] = new Map()),
+      (this['_lastTabsRenderSignature'] = ''));
+    if (this['_canvases']['length'] === 0x0) {
+      const id2 = 'canvas_default_' + Date['now']();
+      (this['_canvases']['push']({
         id: id2,
         name: canvasTabsText('defaultCanvasName'),
         ...createEmptyCanvasSnapshot(),
       }),
-        (this._activeId = id2),
-        this._hydrateCanvasSnapshot(this._canvases[0]));
+        (this['_activeId'] = id2),
+        this['_projectContextByCanvasId']['set'](
+          id2,
+          normalizeCanvasProjectContext(
+            { projectName: this['_canvases'][0x0]['name'], isTemporary: !![] },
+            { canvasId: id2, projectName: this['_canvases'][0x0]['name'] },
+          ),
+        ),
+        this['_hydrateCanvasSnapshot'](this['_canvases'][0x0]));
     } else {
-      this._activeId = value35.activeCanvasId || (this._canvases[0]?.id ?? null);
-      const value36 = this._canvases.find((item15) => item15.id === this._activeId) || this._canvases[0];
-      value36 &&
-        (this._showCanvasVisualSnapshot(value36),
-        this._hydrateCanvasSnapshot(value36),
-        this._scheduleVisualSnapshotBackfill());
+      const value101 =
+        this['_canvases']['find']((value102) => value102?.['id'] === value97['activeCanvasId']) ||
+        this['_canvases'][0x0];
+      this['_activeId'] = value101?.['id'] ?? null;
+      const captureCurrentProjectContext2 = captureCurrentProjectContext(value101);
+      (this['_canvases']['forEach']((projectId) => {
+        const value103 = map['get'](String(projectId?.['id'])),
+          value104 =
+            projectId['id'] === this['_activeId']
+              ? captureCurrentProjectContext2
+              : {
+                  projectId: projectId['name'] || projectId['id'],
+                  projectName: projectId['name'],
+                  isTemporary: !![],
+                  workspaceProjectScoped: !![],
+                };
+        this['_projectContextByCanvasId']['set'](
+          projectId['id'],
+          normalizeCanvasProjectContext(value103 || value104, {
+            canvasId: projectId['id'],
+            projectName: projectId['name'],
+          }),
+        );
+      }),
+        value101 &&
+          (this['_showCanvasVisualSnapshot'](value101),
+          this['_hydrateCanvasSnapshot'](value101),
+          this['_scheduleVisualSnapshotBackfill']()));
     }
-    (this._resetSavedCanvasSignatures({ markClean: markClean }),
-      this.renderTabs(),
+    (resetHistory(),
+      this['_resetSavedCanvasSignatures']({ markClean: markClean }),
+      this['renderTabs'](),
       startVideoThumbBackfill(),
-      this._notifyDirtyStateChanged());
+      this['_applyActiveCanvasProjectContext'](),
+      this['_notifyActiveCanvasChanged']('init'),
+      this['_notifyDirtyStateChanged']());
+  },
+  replaceWorkspace(value105, { markClean: markClean = !![] } = {}) {
+    return (
+      this['_flushCurrentCanvas'](),
+      this['_clearVisualSnapshotBackfillTimers'](),
+      this['_clearCanvasVisibleMediaWarmupTimer'](),
+      this['_clearCanvasSurface'](),
+      this['init'](value105, { markClean: markClean }),
+      this['_scheduleWorkspaceCacheSave'](),
+      !![]
+    );
   },
   _flushCurrentCanvas() {
-    if (!this._activeId) return;
-    const value37 = this._canvases.findIndex((item16) => item16.id === this._activeId);
-    if (value37 === -1) return;
+    if (!this['_activeId']) return;
+    const value106 = this['_canvases']['findIndex']((value107) => value107['id'] === this['_activeId']);
+    if (value106 === -0x1) return;
     flushAllPendingPromptHtmlCommits();
-    const value38 = this._getStorePersistRev();
-    if (this._lastPersistRevByCanvas.get(this._activeId) === value38) return;
-    const markRecoveringGenerationSnapshot2 = markRecoveringGenerationSnapshot(appStore.serialize()),
-      value39 = this._buildCanvasRecord(this._canvases[value37], markRecoveringGenerationSnapshot2);
-    ((value39._persistRevHint = value38),
-      (this._canvases[value37] = value39),
-      this._lastPersistRevByCanvas.set(this._activeId, value38));
+    const _persistRevHint2 = this['_getStorePersistRev']();
+    if (this['_lastPersistRevByCanvas']['get'](this['_activeId']) === _persistRevHint2) return;
+    const _contentPersistRevHint2 = this['_getStoreContentPersistRev']();
+    if (this['_lastContentPersistRevByCanvas']['get'](this['_activeId']) === _contentPersistRevHint2) {
+      const box2 = appStore['getStateRaw']()?.['viewport'] || {};
+      ((this['_canvases'][value106] = {
+        ...this['_canvases'][value106],
+        viewport: {
+          x: Number(box2['x']) || 0x0,
+          y: Number(box2['y']) || 0x0,
+          zoom: Number(box2['zoom']) || 1.1,
+        },
+        _persistRevHint: _persistRevHint2,
+        _contentPersistRevHint: _contentPersistRevHint2,
+      }),
+        this['_lastPersistRevByCanvas']['set'](this['_activeId'], _persistRevHint2));
+      return;
+    }
+    const markRecoveringGenerationSnapshot2 = markRecoveringGenerationSnapshot(appStore['serialize']()),
+      value108 = this['_buildCanvasRecord'](this['_canvases'][value106], markRecoveringGenerationSnapshot2);
+    ((value108['_persistRevHint'] = _persistRevHint2),
+      (value108['_contentPersistRevHint'] = _contentPersistRevHint2),
+      (this['_canvases'][value106] = value108),
+      this['_lastPersistRevByCanvas']['set'](this['_activeId'], _persistRevHint2),
+      this['_lastContentPersistRevByCanvas']['set'](this['_activeId'], _contentPersistRevHint2));
   },
-  async switchTo(value40) {
-    if (value40 === this._activeId) return;
-    const enabled21 = this._canvases.find((item17) => item17.id === value40);
-    if (!enabled21) return;
-    return (
-      this._flushCurrentCanvas(),
-      this._captureActiveVisualSnapshot({ force: true }),
-      this._showCanvasVisualSnapshot(enabled21),
-      this._clearCanvasSurface(),
-      (this._activeId = value40),
-      this._hydrateCanvasSnapshot(enabled21, { preserveLiveGeneration: canvasHasLiveGeneration(enabled21) }),
-      this._scheduleVisualSnapshotBackfill(),
-      commit(),
-      this.renderTabs(),
-      startVideoThumbBackfill(),
-      this._markCanvasMetaDirty(),
-      this._notifyDirtyStateChanged(),
-      true
-    );
+  async switchTo(value109) {
+    if (value109 === this['_activeId']) return;
+    if (!this['_canvases']['some']((value110) => value110['id'] === value109)) return;
+    return this['_runTaskSafeCanvasTransition'](() => {
+      let enabled26 = this['_canvases']['find']((value111) => value111['id'] === value109);
+      if (!enabled26 || value109 === this['_activeId']) return ![];
+      this['_flushCurrentCanvas']();
+      const response = this['_handoffActiveCanvasTasks'](this['_activeId']);
+      if (response?.['ok'] === ![]) return (this['_showTaskTransitionBlocked'](response), ![]);
+      const value112 = this['_backgroundTaskStores']['get'](value109);
+      return (
+        value112 &&
+          (this['_syncBackgroundTaskCanvas'](value109, value112, { persist: ![] }),
+          (enabled26 = this['_canvases']['find']((value113) => value113['id'] === value109))),
+        this['_showCanvasVisualSnapshot'](enabled26),
+        this['_clearCanvasSurface'](),
+        (this['_activeId'] = value109),
+        this['_hydrateCanvasSnapshot'](enabled26, {
+          preserveLiveGeneration: canvasHasLiveGeneration(enabled26),
+        }),
+        this['_restoreActiveCanvasTasks'](value109),
+        this['_scheduleVisualSnapshotBackfill'](),
+        resetHistory(),
+        this['renderTabs'](),
+        startVideoThumbBackfill(),
+        this['_applyActiveCanvasProjectContext'](),
+        this['_notifyActiveCanvasChanged']('switch'),
+        this['_markCanvasMetaDirty'](),
+        this['_notifyDirtyStateChanged'](),
+        !![]
+      );
+    });
   },
-  addCanvas() {
-    (this._flushCurrentCanvas(),
-      this._captureActiveVisualSnapshot({ force: true }),
-      this._clearCanvasSurface());
-    const id3 = 'canvas_' + Date.now(),
-      name = canvasTabsText('newCanvasName', { index: this._canvases.length + 1 });
-    return (
-      this._canvases.push({ id: id3, name: name, ...createEmptyCanvasSnapshot() }),
-      (this._activeId = id3),
-      this._hydrateCanvasSnapshot(createEmptyCanvasSnapshot()),
-      this._scheduleVisualSnapshotBackfill(),
-      commit(),
-      this.renderTabs(),
-      startVideoThumbBackfill(),
-      this._markCanvasMetaDirty(),
-      this._notifyDirtyStateChanged(),
-      true
-    );
+  async addCanvas() {
+    return this['_runTaskSafeCanvasTransition'](() => {
+      this['_flushCurrentCanvas']();
+      const response2 = this['_handoffActiveCanvasTasks'](this['_activeId']);
+      if (response2?.['ok'] === ![]) return (this['_showTaskTransitionBlocked'](response2), ![]);
+      this['_clearCanvasSurface']();
+      const id3 = 'canvas_' + Date['now'](),
+        name = canvasTabsText('newCanvasName', { index: this['_canvases']['length'] + 0x1 });
+      return (
+        this['_canvases']['push']({ id: id3, name: name, ...createEmptyCanvasSnapshot() }),
+        this['_projectContextByCanvasId']['set'](
+          id3,
+          normalizeCanvasProjectContext(
+            { projectName: name, isTemporary: !![] },
+            { canvasId: id3, projectName: name },
+          ),
+        ),
+        (this['_activeId'] = id3),
+        this['_hydrateCanvasSnapshot'](createEmptyCanvasSnapshot()),
+        this['_scheduleVisualSnapshotBackfill'](),
+        resetHistory(),
+        this['renderTabs'](),
+        startVideoThumbBackfill(),
+        this['_applyActiveCanvasProjectContext'](),
+        this['_notifyActiveCanvasChanged']('add'),
+        this['_markCanvasMetaDirty'](),
+        this['_notifyDirtyStateChanged'](),
+        !![]
+      );
+    });
   },
-  async _confirmDeleteDirtyCanvas(value41, { skipDirtyConfirm: skipDirtyConfirm = false } = {}) {
-    if (skipDirtyConfirm || !this.isCanvasDirty(value41?.id)) return true;
-    return this._showUnsavedDeleteConfirm(value41);
+  async _confirmDeleteDirtyCanvas(value114, { skipDirtyConfirm: skipDirtyConfirm = ![] } = {}) {
+    if (skipDirtyConfirm || !this['isCanvasDirty'](value114?.['id'])) return !![];
+    return this['_showUnsavedDeleteConfirm'](value114);
   },
   _showUnsavedDeleteConfirm(name2) {
-    if (typeof document === 'undefined' || !document.body) return Promise.resolve(false);
+    if (typeof document === 'undefined' || !document['body']) return Promise['resolve'](![]);
     return (
-      document.getElementById('canvas-delete-confirm-overlay')?.remove(),
-      new Promise((handler5) => {
-        const el33 = document.createElement('div');
-        ((el33.id = 'canvas-delete-confirm-overlay'), (el33.className = 'custom-confirm-overlay'));
-        const el34 = document.createElement('div');
-        el34.className = 'custom-confirm-box';
-        const el35 = document.createElement('div');
-        ((el35.className = 'confirm-title'), (el35.textContent = canvasTabsText('deleteUnsaved.title')));
-        const el36 = document.createElement('div');
-        ((el36.className = 'confirm-msg'),
-          (el36.textContent = canvasTabsText('deleteUnsaved.message', {
-            name: name2?.name || canvasTabsText('untitledCanvas'),
+      document['getElementById']('canvas-delete-confirm-overlay')?.['remove'](),
+      new Promise((handler3) => {
+        const el20 = document['createElement']('div');
+        ((el20['id'] = 'canvas-delete-confirm-overlay'),
+          (el20['className'] = 'custom-confirm-overlay'));
+        const el21 = document['createElement']('div');
+        el21['className'] = 'custom-confirm-box';
+        const el22 = document['createElement']('div');
+        ((el22['className'] = 'confirm-title'),
+          (el22['textContent'] = canvasTabsText('deleteUnsaved.title')));
+        const el23 = document['createElement']('div');
+        ((el23['className'] = 'confirm-msg'),
+          (el23['textContent'] = canvasTabsText('deleteUnsaved.message', {
+            name: name2?.['name'] || canvasTabsText('untitledCanvas'),
           })));
-        const el37 = document.createElement('div');
-        el37.className = 'confirm-btns';
-        const el38 = document.createElement('button');
-        ((el38.type = 'button'),
-          (el38.className = 'confirm-btn confirm-cancel'),
-          (el38.textContent = canvasTabsText('deleteUnsaved.cancel')));
-        const el39 = document.createElement('button');
-        ((el39.type = 'button'),
-          (el39.className = 'confirm-btn confirm-ok'),
-          (el39.textContent = canvasTabsText('deleteUnsaved.delete')),
-          el37.appendChild(el38),
-          el37.appendChild(el39),
-          el34.appendChild(el35),
-          el34.appendChild(el36),
-          el34.appendChild(el37),
-          el33.appendChild(el34),
-          document.body.appendChild(el33));
-        let value42 = false;
-        const run3 = (value43) => {
-            if (value42) return;
-            ((value42 = true),
-              document.removeEventListener('keydown', value44, true),
-              el33.remove(),
-              handler5(value43));
+        const el24 = document['createElement']('div');
+        el24['className'] = 'confirm-btns';
+        const el25 = document['createElement']('button');
+        ((el25['type'] = 'button'),
+          (el25['className'] = 'confirm-btn confirm-cancel'),
+          (el25['textContent'] = canvasTabsText('deleteUnsaved.cancel')));
+        const el26 = document['createElement']('button');
+        ((el26['type'] = 'button'),
+          (el26['className'] = 'confirm-btn confirm-ok'),
+          (el26['textContent'] = canvasTabsText('deleteUnsaved.delete')),
+          el24['appendChild'](el25),
+          el24['appendChild'](el26),
+          el21['appendChild'](el22),
+          el21['appendChild'](el23),
+          el21['appendChild'](el24),
+          el20['appendChild'](el21),
+          document['body']['appendChild'](el20));
+        let value115 = ![];
+        const run6 = (value116) => {
+            if (value115) return;
+            ((value115 = !![]),
+              document['removeEventListener']('keydown', value117, !![]),
+              el20['remove'](),
+              handler3(value116));
           },
-          value44 = (event10) => {
-            if (event10.key === 'Escape') {
-              (event10.preventDefault(), run3(false));
+          value117 = (event11) => {
+            if (event11['key'] === 'Escape') {
+              (event11['preventDefault'](), run6(![]));
               return;
             }
-            event10.key === 'Enter' && !event10.isComposing && (event10.preventDefault(), run3(true));
+            event11['key'] === 'Enter' &&
+              !event11['isComposing'] &&
+              (event11['preventDefault'](), run6(!![]));
           };
-        (el33.addEventListener('click', (event11) => {
-          if (event11.target === el33) run3(false);
+        (el20['addEventListener']('click', (event12) => {
+          if (event12['target'] === el20) run6(![]);
         }),
-          el38.addEventListener('click', () => run3(false)),
-          el39.addEventListener('click', () => run3(true)),
-          document.addEventListener('keydown', value44, true),
-          el38.focus?.());
+          el25['addEventListener']('click', () => run6(![])),
+          el26['addEventListener']('click', () => run6(!![])),
+          document['addEventListener']('keydown', value117, !![]),
+          el25['focus']?.());
       })
     );
   },
-  async deleteCanvas(value45, value46 = {}) {
-    if (this._canvases.length <= 1) return (window.showToast(canvasTabsText('keepOneCanvas'), 'warn'), false);
-    const value47 = this._canvases.findIndex((item18) => item18.id === value45);
-    if (value47 === -1) return false;
-    const value48 = this._canvases[value47],
-      enabled22 = await this._confirmDeleteDirtyCanvas(value48, value46);
-    if (!enabled22) return false;
-    (this._canvases.splice(value47, 1),
-      this._lastPersistRevByCanvas.delete(value45),
-      this._savedSignatureByCanvas.delete(value45));
-    if (this._activeId === value45) {
-      const value49 = this._canvases[Math.max(0, value47 - 1)];
-      ((this._activeId = value49.id),
-        this._showCanvasVisualSnapshot(value49),
-        this._clearCanvasSurface(),
-        this._hydrateCanvasSnapshot(value49, {
-          preserveLiveGeneration: canvasHasLiveGeneration(value49),
+  async deleteCanvas(value118, value119 = {}) {
+    if (
+      value118 === this['_activeId'] &&
+      (await appStore['getGraphMutationPolicy']?.()?.['beforeWorkspaceTransition']?.()) === ![]
+    )
+      return ![];
+    if (this['_canvases']['length'] <= 0x1)
+      return (window['showToast'](canvasTabsText('keepOneCanvas'), 'warn'), ![]);
+    const value120 = this['_canvases']['findIndex']((value121) => value121['id'] === value118);
+    if (value120 === -0x1) return ![];
+    if (value118 === this['_activeId']) this['_flushCurrentCanvas']();
+    const value122 = this['_canvases'][value120];
+    if (canvasHasLiveGeneration(value122))
+      return (this['_showTaskTransitionBlocked']({ activeCount: 0x1 }, 'deleteBlockedByTasks'), ![]);
+    const enabled27 = await this['_confirmDeleteDirtyCanvas'](value122, value119);
+    if (!enabled27) return ![];
+    (this['_canvases']['splice'](value120, 0x1),
+      this['_projectContextByCanvasId']['delete'](value118),
+      this['_backgroundTaskStores']['delete'](value118),
+      this['_lastPersistRevByCanvas']['delete'](value118),
+      this['_lastContentPersistRevByCanvas']['delete'](value118),
+      this['_savedSignatureByCanvas']['delete'](value118));
+    if (this['_activeId'] === value118) {
+      const value123 = this['_canvases'][Math['max'](0x0, value120 - 0x1)];
+      ((this['_activeId'] = value123['id']),
+        this['_showCanvasVisualSnapshot'](value123),
+        this['_clearCanvasSurface'](),
+        this['_hydrateCanvasSnapshot'](value123, {
+          preserveLiveGeneration: canvasHasLiveGeneration(value123),
         }),
-        this._scheduleVisualSnapshotBackfill(),
-        commit());
+        this['_scheduleVisualSnapshotBackfill'](),
+        resetHistory(),
+        this['_applyActiveCanvasProjectContext'](),
+        this['_notifyActiveCanvasChanged']('delete'));
     }
     return (
-      this.renderTabs(),
+      this['renderTabs'](),
       startVideoThumbBackfill(),
-      this._markCanvasMetaDirty(),
-      this._notifyDirtyStateChanged(),
-      true
+      this['_markCanvasMetaDirty'](),
+      this['_notifyDirtyStateChanged'](),
+      !![]
     );
   },
-  renameCanvas(value50, value51) {
-    const error4 = this._canvases.find((item19) => item19.id === value50);
-    if (!error4) return;
-    const enabled23 = String(value51 || '').trim(),
-      value52 = String(error4.name || '').trim();
-    if (!enabled23 || enabled23 === value52) return;
-    ((error4.name = enabled23), this._markCanvasMetaDirty(), this._notifyDirtyStateChanged());
+  renameCanvas(value124, value125) {
+    const error7 = this['_canvases']['find']((value126) => value126['id'] === value124);
+    if (!error7) return;
+    const enabled28 = String(value125 || '')['trim'](),
+      value127 = String(error7['name'] || '')['trim']();
+    if (!enabled28 || enabled28 === value127) return;
+    ((error7['name'] = enabled28),
+      this['renderTabs'](),
+      this['_markCanvasMetaDirty'](),
+      this['_notifyDirtyStateChanged']());
   },
-  markCanvasClean(enabled24 = this._activeId) {
-    if (!enabled24) return false;
-    if (enabled24 === this._activeId) this._flushCurrentCanvas();
-    const enabled25 = this._canvases.find((item20) => item20.id === enabled24);
-    if (!enabled25) return false;
+  captureCanvasSaveCheckpoint(canvasId5 = this['_activeId'], { name: name3 } = {}) {
+    if (canvasId5 === this['_activeId']) this['_flushCurrentCanvas']();
+    const args9 = this['_canvases']['find']((value128) => value128['id'] === canvasId5);
+    if (!args9) return null;
+    return Object['freeze']({
+      canvasId: canvasId5,
+      signature: this['_buildCanvasSavedSignature'](
+        name3 === undefined ? args9 : { ...args9, name: name3 },
+      ),
+    });
+  },
+  markCanvasClean(enabled29 = this['_activeId'], { checkpoint: checkpoint } = {}) {
+    if (!enabled29) return ![];
+    if (checkpoint && checkpoint['canvasId'] !== enabled29) return ![];
+    if (enabled29 === this['_activeId']) this['_flushCurrentCanvas']();
+    const enabled30 = this['_canvases']['find']((value129) => value129['id'] === enabled29);
+    if (!enabled30) return ![];
     return (
-      this._savedSignatureByCanvas.set(enabled24, this._buildCanvasSavedSignature(enabled25)),
-      this._notifyDirtyStateChanged(),
-      true
+      this['_savedSignatureByCanvas']['set'](
+        enabled29,
+        checkpoint?.['signature'] || this['_buildCanvasSavedSignature'](enabled30),
+      ),
+      this['_notifyDirtyStateChanged'](),
+      !![]
     );
   },
   markAllCanvasesClean() {
     return (
-      this._flushCurrentCanvas(),
-      this._resetSavedCanvasSignatures({ markClean: true }),
-      this._notifyDirtyStateChanged(),
-      true
+      this['_flushCurrentCanvas'](),
+      this['_resetSavedCanvasSignatures']({ markClean: !![] }),
+      this['_notifyDirtyStateChanged'](),
+      !![]
     );
   },
-  isCanvasDirty(enabled26 = this._activeId) {
-    if (!enabled26) return false;
-    if (enabled26 === this._activeId) this._flushCurrentCanvas();
-    const enabled27 = this._canvases.find((item21) => item21.id === enabled26);
-    if (!enabled27) return false;
-    const enabled28 = this._savedSignatureByCanvas.get(enabled26);
-    if (!enabled28) return true;
-    return enabled28 !== this._buildCanvasSavedSignature(enabled27);
+  isCanvasDirty(enabled31 = this['_activeId']) {
+    if (!enabled31) return ![];
+    if (enabled31 === this['_activeId']) this['_flushCurrentCanvas']();
+    const enabled32 = this['_canvases']['find']((value130) => value130['id'] === enabled31);
+    if (!enabled32) return ![];
+    const enabled33 = this['_savedSignatureByCanvas']['get'](enabled31);
+    if (!enabled33) return !![];
+    return enabled33 !== this['_buildCanvasSavedSignature'](enabled32);
   },
   hasDirtyCanvases() {
     return (
-      this._flushCurrentCanvas(),
-      this._canvases.some((item22) => {
-        const enabled29 = item22?.id;
-        if (!enabled29) return false;
-        const enabled30 = this._savedSignatureByCanvas.get(enabled29);
-        return !enabled30 || enabled30 !== this._buildCanvasSavedSignature(item22);
+      this['_flushCurrentCanvas'](),
+      this['_canvases']['some']((value131) => {
+        const enabled34 = value131?.['id'];
+        if (!enabled34) return ![];
+        const enabled35 = this['_savedSignatureByCanvas']['get'](enabled34);
+        return !enabled35 || enabled35 !== this['_buildCanvasSavedSignature'](value131);
       })
     );
   },
   getMultiDataSnapshot({
-    sanitizeForPersistence: sanitizeForPersistence = false,
-    captureVisualSnapshot: captureVisualSnapshot = true,
+    sanitizeForPersistence: sanitizeForPersistence = ![],
+    captureVisualSnapshot: captureVisualSnapshot = !![],
+    includeProjectContexts: includeProjectContexts = ![],
   } = {}) {
-    this._flushCurrentCanvas();
-    captureVisualSnapshot && this._captureActiveVisualSnapshot({ force: false });
+    this['_flushCurrentCanvas']();
+    captureVisualSnapshot && this['_captureActiveVisualSnapshot']({ force: ![] });
     const cloneMultiDataSnapshot2 = cloneMultiDataSnapshot({
-      canvases: this._canvases,
-      activeCanvasId: this._activeId,
+      canvases: this['_canvases'],
+      activeCanvasId: this['_activeId'],
+      ...(includeProjectContexts
+        ? {
+            projectContexts: this['_canvases']
+              ['map']((canvasId6) => {
+                const args10 = this['_projectContextByCanvasId']['get'](canvasId6?.['id']);
+                return args10 ? { canvasId: canvasId6['id'], ...args10 } : null;
+              })
+              ['filter'](Boolean),
+          }
+        : {}),
     });
     if (!sanitizeForPersistence) return cloneMultiDataSnapshot2;
     return sanitizeMultiCanvasDataForPersistence(cloneMultiDataSnapshot2 || {});
   },
   getMultiData() {
-    return this.getMultiDataSnapshot();
+    return this['getMultiDataSnapshot']();
+  },
+  getPersistableMultiDataSnapshot({ includeProjectContexts: includeProjectContexts = ![] } = {}) {
+    return (
+      this['_flushCurrentCanvas'](),
+      {
+        canvases: this['_canvases']['map']((args11) => ({
+          ...args11,
+          viewport: { ...(args11?.['viewport'] || {}) },
+        })),
+        activeCanvasId: this['_activeId'],
+        ...(includeProjectContexts
+          ? {
+              projectContexts: this['_canvases']
+                ['map']((canvasId7) => {
+                  const args12 = this['_projectContextByCanvasId']['get'](canvasId7?.['id']);
+                  return args12 ? { canvasId: canvasId7['id'], ...args12 } : null;
+                })
+                ['filter'](Boolean),
+            }
+          : {}),
+      }
+    );
   },
   getActiveCanvasId() {
-    return this._activeId || '';
+    return this['_activeId'] || '';
+  },
+  getPersistenceRevisionSnapshot() {
+    const activeCanvasId = this['_activeId'] || '',
+      value132 = this['_getStorePersistRev']();
+    return {
+      activeCanvasId: activeCanvasId,
+      canvases: this['_canvases']['map']((persistRev) => ({
+        id: String(persistRev?.['id'] || ''),
+        name: String(persistRev?.['name'] || ''),
+        persistRev:
+          persistRev?.['id'] === activeCanvasId ? value132 : Number(persistRev?.['_persistRevHint']) || 0x0,
+        contentPersistRev:
+          persistRev?.['id'] === activeCanvasId
+            ? this['_getStoreContentPersistRev']()
+            : Number(persistRev?.['_contentPersistRevHint']) || 0x0,
+      })),
+    };
   },
   renderTabs() {
-    const enabled31 = document.getElementById('canvasTabs');
-    if (!enabled31) return;
-    this._bindTabContainerEvents(enabled31);
-    const value53 = this._getTabsRenderSignature();
-    if (value53 === this._lastTabsRenderSignature) return;
-    ((this._lastTabsRenderSignature = value53), this._removeTabContextMenu());
-    const el40 = document.createDocumentFragment();
-    (this._canvases.forEach((error5) => {
-      const value54 = error5.id === this._activeId,
-        el41 = document.createElement('div');
-      ((el41.className = 'canvas-tab' + (value54 ? ' active' : '')), (el41.dataset.id = error5.id));
-      const el42 = document.createElement('span');
-      ((el42.className = 'canvas-tab-name'), (el42.title = error5.name), (el42.textContent = error5.name));
-      const el43 = document.createElement('button');
-      ((el43.type = 'button'),
-        (el43.className = 'canvas-tab-close'),
-        (el43.title = canvasTabsText('closeCanvas')),
-        (el43.textContent = '×'),
-        el41.appendChild(el42),
-        el41.appendChild(el43),
-        el40.appendChild(el41));
+    const enabled36 = document['getElementById']('canvasTabs');
+    if (!enabled36) return;
+    this['_bindTabContainerEvents'](enabled36);
+    const value133 = this['_getTabsRenderSignature']();
+    if (value133 === this['_lastTabsRenderSignature']) return;
+    ((this['_lastTabsRenderSignature'] = value133), this['_removeTabContextMenu']());
+    const el27 = document['createDocumentFragment']();
+    (this['_canvases']['forEach']((error8) => {
+      const value134 = error8['id'] === this['_activeId'],
+        el28 = document['createElement']('div');
+      ((el28['className'] = 'canvas-tab' + (value134 ? ' active' : '')),
+        (el28['dataset']['id'] = error8['id']));
+      const el29 = document['createElement']('span');
+      ((el29['className'] = 'canvas-tab-name'),
+        (el29['dataset']['tooltip'] = error8['name']),
+        (el29['dataset']['tooltipOverflow'] = 'true'),
+        (el29['textContent'] = error8['name']));
+      const el30 = document['createElement']('button');
+      ((el30['type'] = 'button'),
+        (el30['className'] = 'canvas-tab-close'),
+        (el30['title'] = canvasTabsText('closeCanvas')),
+        (el30['textContent'] = '×'),
+        el28['appendChild'](el29));
+      const value135 = this['getCanvasProjectAccess'](error8['id']),
+        canvasProjectBadge2 = createCanvasProjectBadge(value135);
+      if (canvasProjectBadge2) el28['prepend'](canvasProjectBadge2);
+      (el28['appendChild'](el30), el27['appendChild'](el28));
     }),
-      enabled31.replaceChildren(el40));
+      enabled36['replaceChildren'](el27),
+      this['_revealActiveTab'](enabled36),
+      this['_updateTabScrollHints'](enabled36));
   },
 };
 export default CanvasTabManager;

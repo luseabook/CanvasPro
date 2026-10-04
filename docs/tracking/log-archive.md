@@ -3,6 +3,8 @@
 > 由 `docs/TRACKING.md` §9 第 4 条维护：TRACKING.md §11 只保留最新 10 条，挤出来的旧日志移到这里，最新的在上。
 > 只追加，不改写已有内容。
 
+
+- 2026-10-04（154 批·接线第 5 小样）：升代授权目录 gain≥2 干净件 13 取 11（AssetManager、sceneNodeActions、shortcuts、ImageCrop/FreeAngle/Matting、agent 两件、imageAnnotate/rendering、SourceAudioNode、textGenerationResultRenderer，改名 3999、导出面 0 丢弃），孤立 313→**291**（累计 77；483 口径 445/1238，imageAnnotate 组清零）。resultRenderModule（7）与 previewControlsModule（1）回滚；desktopProjectFileStore 5 例 stash 复核为 HEAD 既有环境失败。全量 11185/11184/0 零失败。
 - 2026-10-04（152 批·接线第 3 小样）：升代 api 干净件 10 取 3（imageUploadApi、runninghubWorkflowApi、sceneDetectionApi，落地件改名 231、导出面 0 丢弃），再接通孤立 4 件（368 口径 345→341；483 口径 api 组 4→2 为 472/1238）。7 件行为回归回滚：ModelApiManifestNormalizer 50 例、aiImageApi 38、aiVideoApi 9、resolvers/index 7、aiTextApi 6、providerConnectionTestApi 6、aiAudioApi 1——api 域新代含密集真实行为变化，回归密度远高于 core/commands。全量 11185/11182/3 与基线逐条一致。
 
 - 2026-10-04（151 批·接线第 2 小样）：升代 `src/core` 干净件 6 取 5（rendererResizePreview、viewportFocus、viewportPanPreview、stores/legacyKernelStore、stores/facadeStore，改名 1092、导出面不变），再接通孤立 11 件（368 口径 356→345；483 口径删 previewCommitSession 为 473/1238）。generationTaskRuntime 自身测试回归已回滚。发现既有雷：stores/runtime.js 与 legacyKernelStore 循环导入、直连入口 TDZ（HEAD 同挂，非本批引入）。全量 11185/11185/0，基线 3 个 installerSafety 失败本轮未复现（偶发），改动相关新增 0。

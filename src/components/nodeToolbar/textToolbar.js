@@ -4,17 +4,22 @@ import appStore from '../../core/stores/appStore.js';
 import { registerStaticInnerHTML, sanitizeRichTextHtml } from '../../utils/dom.js';
 import { TEXT_TOOLBAR_HTML } from './textToolbarHtml.js';
 import { bindStoryboardScriptToolbarAction } from './storyboardScriptAction.js';
+import {
+  bindNodeToolbarFullscreenOverlay,
+  closeExistingNodeToolbarFullscreen,
+} from './fullscreenOverlayToggle.js';
 import { t } from '../../i18n/index.js';
 export { TEXT_TOOLBAR_HTML };
 registerStaticInnerHTML('toolbar:text', TEXT_TOOLBAR_HTML);
+const TEXT_FULLSCREEN_OVERLAY_SELECTOR = "[data-node-toolbar-text-fullscreen-overlay='true']";
 function textToolbarText(value) {
   return t('nodeToolbar.text.' + value);
 }
 export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
   if (!toolbarEl) return;
-  (toolbarEl.addEventListener('pointerdown', (event) => event.stopPropagation()),
-    toolbarEl.addEventListener('dblclick', (event2) => {
-      (event2.preventDefault(), event2.stopPropagation());
+  (toolbarEl['addEventListener']('pointerdown', (event) => event['stopPropagation']()),
+    toolbarEl['addEventListener']('dblclick', (event2) => {
+      (event2['preventDefault'](), event2['stopPropagation']());
     }));
   const run = (...args) => {
       for (const item of args) {
@@ -23,212 +28,219 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
       return '';
     },
     handler2 = () => {
-      const enabled = typeof nodeData?.id === 'string' ? nodeData.id : '';
+      const enabled = typeof nodeData?.['id'] === 'string' ? nodeData['id'] : '';
       if (!enabled) return nodeData || {};
-      const key = typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
-      return key?.nodes?.[enabled] || nodeData || {};
+      const key =
+        typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
+      return key?.['nodes']?.[enabled] || nodeData || {};
     },
-    handler3 = (index) => String(index ?? '').replace(/\r\n?/g, '\n'),
-    handler4 = (result) => handler3(result).replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ''),
+    handler3 = (index) => String(index ?? '')['replace'](/\r\n?/g, '\x0a'),
+    handler4 = (result) => handler3(result)['replace'](/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ''),
     handler5 = (data) => {
       const options = handler4(data);
-      return options
-        .split('\n')
-        .filter((item2) => item2.trim() !== '')
-        .join('\n');
+      return options['split']('\x0a')
+        ['filter']((target) => target['trim']() !== '')
+        ['join']('\x0a');
     },
-    handler6 = (target) => {
-      const sanitizeRichTextHtml2 = sanitizeRichTextHtml(typeof target === 'string' ? target : '');
-      if (!sanitizeRichTextHtml2.trim()) return '';
-      const el = document.createElement('div');
-      el.innerHTML = sanitizeRichTextHtml2;
-      const run2 = (source) =>
-          source?.nodeType === Node.ELEMENT_NODE && String(source.tagName || '').toLowerCase() === 'br',
+    handler6 = (source) => {
+      const sanitizeRichTextHtml2 = sanitizeRichTextHtml(typeof source === 'string' ? source : '');
+      if (!sanitizeRichTextHtml2['trim']()) return '';
+      const el = document['createElement']('div');
+      el['innerHTML'] = sanitizeRichTextHtml2;
+      const run2 = (next) =>
+          next?.['nodeType'] === Node['ELEMENT_NODE'] &&
+          String(next['tagName'] || '')['toLowerCase']() === 'br',
         handler7 = (el2) => {
-          const next = String(el2?.tagName || '').toLowerCase(),
-            current = next === 'hr' || !!el2.querySelector?.('img, video, audio, canvas, svg, iframe, hr'),
-            enabled2 = handler4(el2.innerText || el2.textContent || '').trim();
-          return !!enabled2 || current;
+          const current = String(el2?.['tagName'] || '')['toLowerCase'](),
+            entry =
+              current === 'hr' ||
+              !!el2['querySelector']?.('img, video, audio, canvas, svg, iframe, hr'),
+            enabled2 = handler4(el2['innerText'] || el2['textContent'] || '')['trim']();
+          return !!enabled2 || entry;
         },
         list = [];
-      let entry = false,
-        record = false;
+      let record = ![],
+        enabled3 = ![];
       return (
-        Array.from(el.childNodes).forEach((el3) => {
-          if (el3.nodeType === Node.TEXT_NODE) {
-            if (!handler4(el3.textContent || '').trim()) return;
-            record && (list.push(document.createElement('br')), (record = false));
-            (list.push(el3), (entry = true));
+        Array['from'](el['childNodes'])['forEach']((el3) => {
+          if (el3['nodeType'] === Node['TEXT_NODE']) {
+            if (!handler4(el3['textContent'] || '')['trim']()) return;
+            enabled3 && (list['push'](document['createElement']('br')), (enabled3 = ![]));
+            (list['push'](el3), (record = !![]));
             return;
           }
-          if (el3.nodeType !== Node.ELEMENT_NODE) return;
+          if (el3['nodeType'] !== Node['ELEMENT_NODE']) return;
           if (run2(el3)) {
-            if (entry) record = true;
+            if (record) enabled3 = !![];
             return;
           }
           const payload = el3;
           if (!handler7(payload)) return;
-          (record && (list.push(document.createElement('br')), (record = false)),
-            list.push(payload),
-            (entry = true));
+          (enabled3 && (list['push'](document['createElement']('br')), (enabled3 = ![])),
+            list['push'](payload),
+            (record = !![]));
         }),
-        el.replaceChildren(...list),
-        el.innerHTML || ''
+        el['replaceChildren'](...list),
+        el['innerHTML'] || ''
       );
     },
     handler8 = (handle) => {
-      const el4 = document.createElement('div');
+      const el4 = document['createElement']('div');
       return handler3(handle)
-        .split('\n')
-        .map((item3) => {
-          return ((el4.textContent = item3), el4.innerHTML);
+        ['split']('\x0a')
+        ['map']((state) => {
+          return ((el4['textContent'] = state), el4['innerHTML']);
         })
-        .join('<br>');
+        ['join']('<br>');
     },
     handler9 = ({ rawText: rawText, richHtml: richHtml } = {}) => {
-      const state = typeof rawText === 'string' ? rawText : '',
+      const config = typeof rawText === 'string' ? rawText : '',
         sanitizeRichTextHtml3 = sanitizeRichTextHtml(typeof richHtml === 'string' ? richHtml : ''),
-        enabled3 = typeof nodeData?.id === 'string' ? nodeData.id : '';
-      if (!enabled3) {
-        window._triggerLocalCacheSave?.();
+        enabled4 = typeof nodeData?.['id'] === 'string' ? nodeData['id'] : '';
+      if (!enabled4) {
+        window['_triggerLocalCacheSave']?.();
         return;
       }
-      const config = handler2(),
-        scope = String(config?.type || nodeData?.type || ''),
-        input = {};
-      (scope === 'ai-text' ||
-        Object.prototype.hasOwnProperty.call(config || {}, 'outputText') ||
-        Object.prototype.hasOwnProperty.call(nodeData || {}, 'outputText')) &&
-        (input.outputText = state);
-      (scope === 'source-text' ||
-        scope === 'text' ||
-        Object.prototype.hasOwnProperty.call(config || {}, 'content') ||
-        Object.prototype.hasOwnProperty.call(nodeData || {}, 'content')) &&
-        ((input.content = state), (input.contentHtml = sanitizeRichTextHtml3));
-      if (!Object.keys(input).length) input.content = state;
+      const scope = handler2(),
+        input = String(scope?.['type'] || nodeData?.['type'] || ''),
+        output = {};
+      (input === 'ai-text' ||
+        Object['prototype']['hasOwnProperty']['call'](scope || {}, 'outputText') ||
+        Object['prototype']['hasOwnProperty']['call'](nodeData || {}, 'outputText')) &&
+        (output['outputText'] = config);
+      (input === 'source-text' ||
+        input === 'text' ||
+        Object['prototype']['hasOwnProperty']['call'](scope || {}, 'content') ||
+        Object['prototype']['hasOwnProperty']['call'](nodeData || {}, 'content')) &&
+        ((output['content'] = config), (output['contentHtml'] = sanitizeRichTextHtml3));
+      if (!Object['keys'](output)['length']) output['content'] = config;
       try {
-        (appStore.updateNodeData(enabled3, input), Object.assign(nodeData, input));
-      } catch (output) {
-        console.warn('[TextToolbar] Persist fullscreen text failed:', output);
+        (appStore['updateNodeData'](enabled4, output), Object['assign'](nodeData, output));
+      } catch (value2) {
+        console['warn']('[TextToolbar]\x20Persist\x20fullscreen\x20text\x20failed:', value2);
       }
-      window._triggerLocalCacheSave?.();
+      window['_triggerLocalCacheSave']?.();
     },
-    el5 = toolbarEl.querySelector('.act-copy');
+    el5 = toolbarEl['querySelector']('.act-copy');
   if (el5) {
-    const list2 = Array.from(el5.childNodes).map((item4) => item4.cloneNode(true)),
-      value2 = el5.getAttribute('data-tooltip') || textToolbarText('copy'),
-      value3 = el5.getAttribute('aria-label') || '';
+    const list2 = Array['from'](el5['childNodes'])['map']((value3) =>
+        value3['cloneNode'](!![]),
+      ),
+      value4 = el5['getAttribute']('data-tooltip') || textToolbarText('copy'),
+      value5 = el5['getAttribute']('aria-label') || '';
     let setTimeout2 = null;
-    el5.addEventListener('click', (event3) => {
-      event3.stopPropagation();
-      const text = handler ? handler() : nodeData.content || nodeData.resultText || '';
+    el5['addEventListener']('click', (event3) => {
+      event3['stopPropagation']();
+      const text = handler ? handler() : nodeData['content'] || nodeData['resultText'] || '';
       if (!text) {
         showWarning(textToolbarText('noTextToCopy'));
         return;
       }
-      navigator.clipboard
-        .writeText(text)
-        .then(() => {
+      navigator['clipboard']
+        ['writeText'](text)
+        ['then'](() => {
           markSystemClipboardWrite({ text: text });
           setTimeout2 && (clearTimeout(setTimeout2), (setTimeout2 = null));
-          el5.replaceChildren();
-          const value4 = 'http://www.w3.org/2000/svg',
-            el6 = document.createElementNS(value4, 'svg');
-          (el6.setAttribute('viewBox', '0 0 24 24'),
-            el6.setAttribute('fill', 'none'),
-            el6.setAttribute('stroke', 'currentColor'),
-            el6.setAttribute('stroke-width', '2'),
-            el6.setAttribute('width', '16'),
-            el6.setAttribute('height', '16'));
-          const el7 = document.createElementNS(value4, 'polyline');
-          (el7.setAttribute('points', '20 6 9 17 4 12'),
-            el6.appendChild(el7),
-            el5.appendChild(el6),
-            el5.classList.add('is-copied'),
-            el5.setAttribute('data-tooltip', textToolbarText('copied')),
-            el5.setAttribute('aria-label', textToolbarText('copied')),
+          el5['replaceChildren']();
+          const value6 = 'http://www.w3.org/2000/svg',
+            el6 = document['createElementNS'](value6, 'svg');
+          (el6['setAttribute']('viewBox', '0 0 24 24'),
+            el6['setAttribute']('fill', 'none'),
+            el6['setAttribute']('stroke', 'currentColor'),
+            el6['setAttribute']('stroke-width', '2'),
+            el6['setAttribute']('width', '16'),
+            el6['setAttribute']('height', '16'));
+          const el7 = document['createElementNS'](value6, 'polyline');
+          (el7['setAttribute']('points', '20\x206\x209\x2017\x204\x2012'),
+            el6['appendChild'](el7),
+            el5['appendChild'](el6),
+            el5['classList']['add']('is-copied'),
+            el5['setAttribute']('data-tooltip', textToolbarText('copied')),
+            el5['setAttribute']('aria-label', textToolbarText('copied')),
             (setTimeout2 = setTimeout(() => {
-              (el5.replaceChildren(...list2.map((item5) => item5.cloneNode(true))),
-                el5.setAttribute('data-tooltip', value2));
-              if (value3) el5.setAttribute('aria-label', value3);
-              else el5.removeAttribute('aria-label');
-              (el5.classList.remove('is-copied'), (setTimeout2 = null));
+              (el5['replaceChildren'](...list2['map']((value7) => value7['cloneNode'](!![]))),
+                el5['setAttribute']('data-tooltip', value4));
+              if (value5) el5['setAttribute']('aria-label', value5);
+              else el5['removeAttribute']('aria-label');
+              (el5['classList']['remove']('is-copied'), (setTimeout2 = null));
             }, 0x7d0)));
         })
-        .catch((value5) => {
-          (console.error('复制失败:', value5), showError(textToolbarText('copyFailed')));
+        ['catch']((value8) => {
+          (console['error']('复制失败:', value8), showError(textToolbarText('copyFailed')));
         });
     });
   }
-  const el8 = toolbarEl.querySelector('.act-clear-empty-lines');
+  const el8 = toolbarEl['querySelector']('.act-clear-empty-lines');
   el8 &&
-    el8.addEventListener('click', (event4) => {
-      event4.stopPropagation();
-      const value6 = handler2(),
-        value7 = run(
+    el8['addEventListener']('click', (event4) => {
+      event4['stopPropagation']();
+      const value9 = handler2(),
+        value10 = run(
           handler ? handler() : undefined,
-          value6?.content,
-          value6?.outputText,
-          nodeData?.content,
-          nodeData?.outputText,
-          nodeData?.resultText,
+          value9?.['content'],
+          value9?.['outputText'],
+          nodeData?.['content'],
+          nodeData?.['outputText'],
+          nodeData?.['resultText'],
         ),
-        enabled4 = handler3(value7);
-      if (!enabled4.trim()) {
+        enabled5 = handler3(value10);
+      if (!enabled5['trim']()) {
         showWarning(textToolbarText('noTextToClean'));
         return;
       }
-      const rawText2 = handler5(enabled4);
-      if (handler4(rawText2) === handler4(enabled4)) {
-        window.showToast?.(textToolbarText('noBlankLines'), 'info');
+      const rawText2 = handler5(enabled5);
+      if (handler4(rawText2) === handler4(enabled5)) {
+        window['showToast']?.(textToolbarText('noBlankLines'), 'info');
         return;
       }
-      const value8 = run(value6?.contentHtml, nodeData?.contentHtml);
-      let richHtml2 = handler6(value8);
-      if (value8.trim()) {
-        const value9 = handler3(value8).trim(),
-          value10 = handler3(richHtml2).trim();
-        value9 === value10 && (richHtml2 = handler8(rawText2));
+      const value11 = run(value9?.['contentHtml'], nodeData?.['contentHtml']);
+      let richHtml2 = handler6(value11);
+      if (value11['trim']()) {
+        const value12 = handler3(value11)['trim'](),
+          value13 = handler3(richHtml2)['trim']();
+        value12 === value13 && (richHtml2 = handler8(rawText2));
       }
       (handler9({ rawText: rawText2, richHtml: richHtml2 }),
-        window.showToast?.(textToolbarText('clearedBlankLines'), 'success'));
+        window['showToast']?.(textToolbarText('clearedBlankLines'), 'success'));
     });
   bindStoryboardScriptToolbarAction({
     toolbarEl: toolbarEl,
     nodeData: nodeData,
     store: appStore,
     getStateSnapshot: () =>
-      typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState(),
+      typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState'](),
   });
-  const el9 = toolbarEl.querySelector('.act-fullscreen');
+  const el9 = toolbarEl['querySelector']('.act-fullscreen');
   el9 &&
-    el9.addEventListener('click', (event5) => {
-      event5.stopPropagation();
-      const value11 = handler2(),
-        value12 = run(
-          value11?.content,
-          value11?.outputText,
+    el9['addEventListener']('click', (event5) => {
+      event5['stopPropagation']();
+      if (closeExistingNodeToolbarFullscreen(TEXT_FULLSCREEN_OVERLAY_SELECTOR)) return;
+      const value14 = handler2(),
+        value15 = run(
+          value14?.['content'],
+          value14?.['outputText'],
           handler ? handler() : undefined,
-          nodeData?.content,
-          nodeData?.resultText,
+          nodeData?.['content'],
+          nodeData?.['resultText'],
         ),
-        value13 = run(value11?.contentHtml, nodeData?.contentHtml),
-        sanitizeRichTextHtml4 = sanitizeRichTextHtml(value13),
-        el10 = document.createElement('div');
-      Object.assign(el10.style, {
-        position: 'fixed',
-        inset: '0',
-        background: 'var(--overlay-dim)',
-        zIndex: '99999',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backdropFilter: 'blur(4px)',
-      });
-      const el11 = document.createElement('div');
-      Object.assign(el11.style, {
+        value16 = run(value14?.['contentHtml'], nodeData?.['contentHtml']),
+        sanitizeRichTextHtml4 = sanitizeRichTextHtml(value16),
+        el10 = document['createElement']('div');
+      ((el10['dataset']['nodeToolbarTextFullscreenOverlay'] = 'true'),
+        Object['assign'](el10['style'], {
+          position: 'fixed',
+          inset: '0',
+          background: 'var(--overlay-dim)',
+          zIndex: '99999',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(4px)',
+        }));
+      const el11 = document['createElement']('div');
+      Object['assign'](el11['style'], {
         background: 'var(--bg-2)',
-        border: '1px solid var(--stroke-08)',
+        border: '1px\x20solid\x20var(--stroke-08)',
         borderRadius: '12px',
         width: '90%',
         maxWidth: '1000px',
@@ -237,19 +249,19 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
         flexDirection: 'column',
         boxShadow: 'var(--shadow-dialog)',
       });
-      const el12 = document.createElement('div');
-      Object.assign(el12.style, {
+      const el12 = document['createElement']('div');
+      Object['assign'](el12['style'], {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '12px 20px',
         borderBottom: '1px solid var(--stroke-05)',
       });
-      const el13 = document.createElement('div'),
-        el14 = document.createElement('button');
-      (el14.setAttribute('data-tooltip', textToolbarText('copy')),
-        el14.setAttribute('aria-label', textToolbarText('copy')),
-        Object.assign(el14.style, {
+      const el13 = document['createElement']('div'),
+        el14 = document['createElement']('button');
+      (el14['setAttribute']('data-tooltip', textToolbarText('copy')),
+        el14['setAttribute']('aria-label', textToolbarText('copy')),
+        Object['assign'](el14['style'], {
           background: 'transparent',
           border: 'none',
           color: 'var(--text-muted)',
@@ -260,134 +272,137 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
           alignItems: 'center',
           transition: 'background 0.2s',
         }));
-      const value14 = 'http://www.w3.org/2000/svg',
-        el15 = document.createElementNS(value14, 'svg');
-      (el15.setAttribute('viewBox', '0 0 24 24'),
-        el15.setAttribute('fill', 'none'),
-        el15.setAttribute('stroke', 'currentColor'),
-        el15.setAttribute('stroke-width', '2'),
-        el15.setAttribute('width', '16'),
-        el15.setAttribute('height', '16'));
-      const el16 = document.createElementNS(value14, 'rect');
-      (el16.setAttribute('x', '9'),
-        el16.setAttribute('y', '9'),
-        el16.setAttribute('width', '13'),
-        el16.setAttribute('height', '13'),
-        el16.setAttribute('rx', '2'),
-        el16.setAttribute('ry', '2'));
-      const el17 = document.createElementNS(value14, 'path');
-      (el17.setAttribute('d', 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'),
-        el15.appendChild(el16),
-        el15.appendChild(el17),
-        el14.appendChild(el15),
-        el13.appendChild(el14),
-        (el14.onmouseenter = () => (el14.style.background = 'var(--white-10)')),
-        (el14.onmouseleave = () => (el14.style.background = 'transparent')));
-      const el18 = document.createElement('div');
-      Object.assign(el18.style, { display: 'flex', alignItems: 'center', gap: '4px' });
-      const run3 = (error, value15, value16 = null, value17 = '') => {
+      const value17 = 'http://www.w3.org/2000/svg',
+        el15 = document['createElementNS'](value17, 'svg');
+      (el15['setAttribute']('viewBox', '0\x200\x2024\x2024'),
+        el15['setAttribute']('fill', 'none'),
+        el15['setAttribute']('stroke', 'currentColor'),
+        el15['setAttribute']('stroke-width', '2'),
+        el15['setAttribute']('width', '16'),
+        el15['setAttribute']('height', '16'));
+      const el16 = document['createElementNS'](value17, 'rect');
+      (el16['setAttribute']('x', '9'),
+        el16['setAttribute']('y', '9'),
+        el16['setAttribute']('width', '13'),
+        el16['setAttribute']('height', '13'),
+        el16['setAttribute']('rx', '2'),
+        el16['setAttribute']('ry', '2'));
+      const el17 = document['createElementNS'](value17, 'path');
+      (el17['setAttribute']('d', 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'),
+        el15['appendChild'](el16),
+        el15['appendChild'](el17),
+        el14['appendChild'](el15),
+        el13['appendChild'](el14),
+        (el14['onmouseenter'] = () => (el14['style']['background'] = 'var(--white-10)')),
+        (el14['onmouseleave'] = () => (el14['style']['background'] = 'transparent')));
+      const el18 = document['createElement']('div');
+      Object['assign'](el18['style'], { display: 'flex', alignItems: 'center', gap: '4px' });
+      const run3 = (error, value18, value19 = null, value20 = '') => {
           if (error === '|') {
-            const el19 = document.createElement('div');
+            const el19 = document['createElement']('div');
             return (
-              Object.assign(el19.style, {
+              Object['assign'](el19['style'], {
                 width: '1px',
                 height: '14px',
                 background: 'var(--stroke-10)',
-                margin: '0 4px',
+                margin: '0\x204px',
               }),
               el19
             );
           }
-          const el20 = document.createElement('button');
-          value17 && (el20.setAttribute('data-tooltip', value17), el20.setAttribute('aria-label', value17));
-          el20.replaceChildren();
-          if (error && typeof error === 'object' && error.kind === 'svg') {
-            const el21 = document.createElementNS(value14, 'svg');
-            (el21.setAttribute('viewBox', '0 0 24 24'),
-              el21.setAttribute('fill', 'none'),
-              el21.setAttribute('stroke', 'currentColor'),
-              el21.setAttribute('stroke-width', '2'),
-              el21.setAttribute('width', '14'),
-              el21.setAttribute('height', '14'));
-            if (error.name === 'ul') {
-              const el22 = document.createElementNS(value14, 'line');
-              (el22.setAttribute('x1', '8'),
-                el22.setAttribute('y1', '6'),
-                el22.setAttribute('x2', '21'),
-                el22.setAttribute('y2', '6'));
-              const el23 = document.createElementNS(value14, 'line');
-              (el23.setAttribute('x1', '8'),
-                el23.setAttribute('y1', '12'),
-                el23.setAttribute('x2', '21'),
-                el23.setAttribute('y2', '12'));
-              const el24 = document.createElementNS(value14, 'line');
-              (el24.setAttribute('x1', '8'),
-                el24.setAttribute('y1', '18'),
-                el24.setAttribute('x2', '21'),
-                el24.setAttribute('y2', '18'));
-              const el25 = document.createElementNS(value14, 'line');
-              (el25.setAttribute('x1', '3'),
-                el25.setAttribute('y1', '6'),
-                el25.setAttribute('x2', '3.01'),
-                el25.setAttribute('y2', '6'));
-              const el26 = document.createElementNS(value14, 'line');
-              (el26.setAttribute('x1', '3'),
-                el26.setAttribute('y1', '12'),
-                el26.setAttribute('x2', '3.01'),
-                el26.setAttribute('y2', '12'));
-              const el27 = document.createElementNS(value14, 'line');
-              (el27.setAttribute('x1', '3'),
-                el27.setAttribute('y1', '18'),
-                el27.setAttribute('x2', '3.01'),
-                el27.setAttribute('y2', '18'),
-                el21.appendChild(el22),
-                el21.appendChild(el23),
-                el21.appendChild(el24),
-                el21.appendChild(el25),
-                el21.appendChild(el26),
-                el21.appendChild(el27));
+          const el20 = document['createElement']('button');
+          value20 &&
+            (el20['setAttribute']('data-tooltip', value20),
+            el20['setAttribute']('aria-label', value20));
+          el20['replaceChildren']();
+          if (error && typeof error === 'object' && error['kind'] === 'svg') {
+            const el21 = document['createElementNS'](value17, 'svg');
+            (el21['setAttribute']('viewBox', '0 0 24 24'),
+              el21['setAttribute']('fill', 'none'),
+              el21['setAttribute']('stroke', 'currentColor'),
+              el21['setAttribute']('stroke-width', '2'),
+              el21['setAttribute']('width', '14'),
+              el21['setAttribute']('height', '14'));
+            if (error['name'] === 'ul') {
+              const el22 = document['createElementNS'](value17, 'line');
+              (el22['setAttribute']('x1', '8'),
+                el22['setAttribute']('y1', '6'),
+                el22['setAttribute']('x2', '21'),
+                el22['setAttribute']('y2', '6'));
+              const el23 = document['createElementNS'](value17, 'line');
+              (el23['setAttribute']('x1', '8'),
+                el23['setAttribute']('y1', '12'),
+                el23['setAttribute']('x2', '21'),
+                el23['setAttribute']('y2', '12'));
+              const el24 = document['createElementNS'](value17, 'line');
+              (el24['setAttribute']('x1', '8'),
+                el24['setAttribute']('y1', '18'),
+                el24['setAttribute']('x2', '21'),
+                el24['setAttribute']('y2', '18'));
+              const el25 = document['createElementNS'](value17, 'line');
+              (el25['setAttribute']('x1', '3'),
+                el25['setAttribute']('y1', '6'),
+                el25['setAttribute']('x2', '3.01'),
+                el25['setAttribute']('y2', '6'));
+              const el26 = document['createElementNS'](value17, 'line');
+              (el26['setAttribute']('x1', '3'),
+                el26['setAttribute']('y1', '12'),
+                el26['setAttribute']('x2', '3.01'),
+                el26['setAttribute']('y2', '12'));
+              const el27 = document['createElementNS'](value17, 'line');
+              (el27['setAttribute']('x1', '3'),
+                el27['setAttribute']('y1', '18'),
+                el27['setAttribute']('x2', '3.01'),
+                el27['setAttribute']('y2', '18'),
+                el21['appendChild'](el22),
+                el21['appendChild'](el23),
+                el21['appendChild'](el24),
+                el21['appendChild'](el25),
+                el21['appendChild'](el26),
+                el21['appendChild'](el27));
             } else {
-              if (error.name === 'ol') {
-                const el28 = document.createElementNS(value14, 'line');
-                (el28.setAttribute('x1', '10'),
-                  el28.setAttribute('y1', '6'),
-                  el28.setAttribute('x2', '21'),
-                  el28.setAttribute('y2', '6'));
-                const el29 = document.createElementNS(value14, 'line');
-                (el29.setAttribute('x1', '10'),
-                  el29.setAttribute('y1', '12'),
-                  el29.setAttribute('x2', '21'),
-                  el29.setAttribute('y2', '12'));
-                const el30 = document.createElementNS(value14, 'line');
-                (el30.setAttribute('x1', '10'),
-                  el30.setAttribute('y1', '18'),
-                  el30.setAttribute('x2', '21'),
-                  el30.setAttribute('y2', '18'));
-                const el31 = document.createElementNS(value14, 'path');
-                el31.setAttribute('d', 'M4 6h1v4');
-                const el32 = document.createElementNS(value14, 'path');
-                el32.setAttribute('d', 'M4 10h2');
-                const el33 = document.createElementNS(value14, 'path');
-                (el33.setAttribute('d', 'M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'),
-                  el21.appendChild(el28),
-                  el21.appendChild(el29),
-                  el21.appendChild(el30),
-                  el21.appendChild(el31),
-                  el21.appendChild(el32),
-                  el21.appendChild(el33));
+              if (error['name'] === 'ol') {
+                const el28 = document['createElementNS'](value17, 'line');
+                (el28['setAttribute']('x1', '10'),
+                  el28['setAttribute']('y1', '6'),
+                  el28['setAttribute']('x2', '21'),
+                  el28['setAttribute']('y2', '6'));
+                const el29 = document['createElementNS'](value17, 'line');
+                (el29['setAttribute']('x1', '10'),
+                  el29['setAttribute']('y1', '12'),
+                  el29['setAttribute']('x2', '21'),
+                  el29['setAttribute']('y2', '12'));
+                const el30 = document['createElementNS'](value17, 'line');
+                (el30['setAttribute']('x1', '10'),
+                  el30['setAttribute']('y1', '18'),
+                  el30['setAttribute']('x2', '21'),
+                  el30['setAttribute']('y2', '18'));
+                const el31 = document['createElementNS'](value17, 'path');
+                el31['setAttribute']('d', 'M4\x206h1v4');
+                const el32 = document['createElementNS'](value17, 'path');
+                el32['setAttribute']('d', 'M4 10h2');
+                const el33 = document['createElementNS'](value17, 'path');
+                (el33['setAttribute']('d', 'M6\x2018H4c0-1\x202-2\x202-3s-1-1.5-2-1'),
+                  el21['appendChild'](el28),
+                  el21['appendChild'](el29),
+                  el21['appendChild'](el30),
+                  el21['appendChild'](el31),
+                  el21['appendChild'](el32),
+                  el21['appendChild'](el33));
               }
             }
-            el20.appendChild(el21);
+            el20['appendChild'](el21);
           } else {
-            el20.textContent = String(error ?? '');
-            if (error === 'B') el20.style.fontWeight = '700';
-            if (error === 'I') el20.style.fontStyle = 'italic';
+            el20['textContent'] = String(error ?? '');
+            if (error === 'B') el20['style']['fontWeight'] = '700';
+            if (error === 'I') el20['style']['fontStyle'] = 'italic';
             ((error === 'H₁' || error === 'H₂' || error === 'H₃') &&
-              ((el20.style.fontSize = '12px'), (el20.style.fontWeight = '700')),
-              error === '¶' && ((el20.style.fontSize = '14px'), (el20.style.fontWeight = '700')));
+              ((el20['style']['fontSize'] = '12px'), (el20['style']['fontWeight'] = '700')),
+              error === '¶' &&
+                ((el20['style']['fontSize'] = '14px'), (el20['style']['fontWeight'] = '700')));
           }
           return (
-            Object.assign(el20.style, {
+            Object['assign'](el20['style'], {
               background: 'transparent',
               border: 'none',
               color: 'var(--text-secondary)',
@@ -402,10 +417,10 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
               fontFamily: 'serif',
               transition: 'all 0.2s',
             }),
-            (el20.onmouseenter = () => (el20.style.background = 'var(--white-10)')),
-            (el20.onmouseleave = () => (el20.style.background = 'transparent')),
-            (el20.onclick = (event6) => {
-              (event6.preventDefault(), document.execCommand(value15, false, value16));
+            (el20['onmouseenter'] = () => (el20['style']['background'] = 'var(--white-10)')),
+            (el20['onmouseleave'] = () => (el20['style']['background'] = 'transparent')),
+            (el20['onclick'] = (event6) => {
+              (event6['preventDefault'](), document['execCommand'](value18, ![], value19));
             }),
             el20
           );
@@ -428,12 +443,16 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
           { l: '|' },
           { l: '—', c: 'insertHorizontalRule', tooltip: textToolbarText('divider') },
         ];
-      list3.forEach((item6) => el18.appendChild(run3(item6.l, item6.c, item6.v, item6.tooltip)));
-      const el34 = document.createElement('div'),
-        el35 = document.createElement('button');
-      (el35.setAttribute('data-tooltip', textToolbarText('close')),
-        el35.setAttribute('aria-label', textToolbarText('close')),
-        Object.assign(el35.style, {
+      list3['forEach']((value21) =>
+        el18['appendChild'](
+          run3(value21['l'], value21['c'], value21['v'], value21['tooltip']),
+        ),
+      );
+      const el34 = document['createElement']('div'),
+        el35 = document['createElement']('button');
+      (el35['setAttribute']('data-tooltip', textToolbarText('close')),
+        el35['setAttribute']('aria-label', textToolbarText('close')),
+        Object['assign'](el35['style'], {
           background: 'transparent',
           border: 'none',
           color: 'var(--text-muted)',
@@ -442,30 +461,30 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
           borderRadius: '6px',
           display: 'flex',
           alignItems: 'center',
-          transition: 'background 0.2s',
+          transition: 'background\x200.2s',
         }));
-      const el36 = document.createElementNS(value14, 'svg');
-      (el36.setAttribute('viewBox', '0 0 24 24'),
-        el36.setAttribute('fill', 'none'),
-        el36.setAttribute('stroke', 'currentColor'),
-        el36.setAttribute('stroke-width', '2'),
-        el36.setAttribute('width', '16'),
-        el36.setAttribute('height', '16'));
-      const el37 = document.createElementNS(value14, 'path');
-      el37.setAttribute('d', 'M18 6L6 18');
-      const el38 = document.createElementNS(value14, 'path');
-      (el38.setAttribute('d', 'M6 6l12 12'),
-        el36.appendChild(el37),
-        el36.appendChild(el38),
-        el35.appendChild(el36),
-        el34.appendChild(el35),
-        (el35.onmouseenter = () => (el35.style.background = 'var(--white-10)')),
-        (el35.onmouseleave = () => (el35.style.background = 'transparent')),
-        el12.appendChild(el13),
-        el12.appendChild(el18),
-        el12.appendChild(el34));
-      const rawText3 = document.createElement('div');
-      (Object.assign(rawText3.style, {
+      const el36 = document['createElementNS'](value17, 'svg');
+      (el36['setAttribute']('viewBox', '0 0 24 24'),
+        el36['setAttribute']('fill', 'none'),
+        el36['setAttribute']('stroke', 'currentColor'),
+        el36['setAttribute']('stroke-width', '2'),
+        el36['setAttribute']('width', '16'),
+        el36['setAttribute']('height', '16'));
+      const el37 = document['createElementNS'](value17, 'path');
+      el37['setAttribute']('d', 'M18 6L6 18');
+      const el38 = document['createElementNS'](value17, 'path');
+      (el38['setAttribute']('d', 'M6 6l12 12'),
+        el36['appendChild'](el37),
+        el36['appendChild'](el38),
+        el35['appendChild'](el36),
+        el34['appendChild'](el35),
+        (el35['onmouseenter'] = () => (el35['style']['background'] = 'var(--white-10)')),
+        (el35['onmouseleave'] = () => (el35['style']['background'] = 'transparent')),
+        el12['appendChild'](el13),
+        el12['appendChild'](el18),
+        el12['appendChild'](el34));
+      const rawText3 = document['createElement']('div');
+      (Object['assign'](rawText3['style'], {
         flex: '1',
         padding: '40px 60px',
         overflowY: 'auto',
@@ -476,49 +495,54 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
         wordBreak: 'break-word',
         whiteSpace: 'pre-wrap',
       }),
-        (rawText3.contentEditable = 'true'),
-        (rawText3.spellcheck = false));
-      sanitizeRichTextHtml4 ? (rawText3.innerHTML = sanitizeRichTextHtml4) : (rawText3.textContent = value12);
-      ((rawText3.className = 'v2-rt-editor'),
-        el11.appendChild(el12),
-        el11.appendChild(rawText3),
-        (el14.onclick = () => {
-          const text2 = rawText3.innerText || '';
-          navigator.clipboard.writeText(text2).then(() => {
+        (rawText3['contentEditable'] = 'true'),
+        (rawText3['spellcheck'] = ![]));
+      sanitizeRichTextHtml4 ? (rawText3['innerHTML'] = sanitizeRichTextHtml4) : (rawText3['textContent'] = value15);
+      ((rawText3['className'] = 'v2-rt-editor'),
+        el11['appendChild'](el12),
+        el11['appendChild'](rawText3),
+        (el14['onclick'] = () => {
+          const text2 = rawText3['innerText'] || '';
+          navigator['clipboard']['writeText'](text2)['then'](() => {
             markSystemClipboardWrite({ text: text2 });
-            const list4 = Array.from(el14.childNodes).map((item7) => item7.cloneNode(true));
-            el14.replaceChildren();
-            const el39 = document.createElementNS(value14, 'svg');
-            (el39.setAttribute('viewBox', '0 0 24 24'),
-              el39.setAttribute('fill', 'none'),
-              el39.setAttribute('stroke', 'currentColor'),
-              el39.setAttribute('stroke-width', '2'),
-              el39.setAttribute('width', '16'),
-              el39.setAttribute('height', '16'));
-            const el40 = document.createElementNS(value14, 'polyline');
-            (el40.setAttribute('points', '20 6 9 17 4 12'),
-              el39.appendChild(el40),
-              el14.appendChild(el39),
+            const list4 = Array['from'](el14['childNodes'])['map']((value22) =>
+              value22['cloneNode'](!![]),
+            );
+            el14['replaceChildren']();
+            const el39 = document['createElementNS'](value17, 'svg');
+            (el39['setAttribute']('viewBox', '0 0 24 24'),
+              el39['setAttribute']('fill', 'none'),
+              el39['setAttribute']('stroke', 'currentColor'),
+              el39['setAttribute']('stroke-width', '2'),
+              el39['setAttribute']('width', '16'),
+              el39['setAttribute']('height', '16'));
+            const el40 = document['createElementNS'](value17, 'polyline');
+            (el40['setAttribute']('points', '20\x206\x209\x2017\x204\x2012'),
+              el39['appendChild'](el40),
+              el14['appendChild'](el39),
               setTimeout(() => {
-                el14.replaceChildren(...list4.map((item8) => item8.cloneNode(true)));
+                el14['replaceChildren'](
+                  ...list4['map']((value23) => value23['cloneNode'](!![])),
+                );
               }, 0x7d0));
           });
         }),
-        el11.addEventListener('click', (event7) => event7.stopPropagation()));
-      const run4 = () => {
-        (handler9({
-          rawText: rawText3.innerText || '',
-          richHtml: sanitizeRichTextHtml(rawText3.innerHTML || ''),
+        el11['addEventListener']('click', (event7) => event7['stopPropagation']()));
+      const run4 = bindNodeToolbarFullscreenOverlay(el10, {
+        onClose() {
+          handler9({
+            rawText: rawText3['innerText'] || '',
+            richHtml: sanitizeRichTextHtml(rawText3['innerHTML'] || ''),
+          });
+        },
+      });
+      ((el35['onclick'] = run4),
+        el10['addEventListener']('click', (event8) => {
+          if (event8['target'] === el10) run4();
         }),
-          el10.remove());
-      };
-      ((el35.onclick = run4),
-        el10.addEventListener('click', (event8) => {
-          if (event8.target === el10) run4();
-        }),
-        el10.appendChild(el11),
-        document.body.appendChild(el10),
-        window._triggerLocalCacheSave?.(),
-        setTimeout(() => rawText3.focus(), 50));
+        el10['appendChild'](el11),
+        document['body']['appendChild'](el10),
+        window['_triggerLocalCacheSave']?.(),
+        setTimeout(() => rawText3['focus'](), 0x32));
     });
 }
