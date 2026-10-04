@@ -19,7 +19,7 @@ try {
         $destination = [IO.Path]::GetFullPath((Join-Path $root $relative))
         if (-not $destination.StartsWith($root + [char]92, [StringComparison]::OrdinalIgnoreCase)) { throw 'Program manifest escaped install directory' }
         # Preserve data folders in place, including legacy webapp/app layouts.
-        if ($relative -match '^(?:(?:resources[/\\](?:app|webapp)[/\\]))?(?:user|user-data|data|output|projects|Canvas Project|AI CanvasPro Files)(?:[/\\]|$)') { continue }
+        if ($relative -match '^(?:(?:resources[/\\](?:app|webapp)[/\\]))?(?:user|user-data|data|output|projects|Canvas Project|Canvas Files|AI CanvasPro Files)(?:[/\\]|$)') { continue }
         $current = $destination
         $linked = $false
         while ($current -and $current -ne $root) {

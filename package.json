@@ -16,7 +16,6 @@
     "migrate:rollback": "node node_modules/knex/bin/cli.js migrate:rollback --knexfile knexfile.cjs",
     "test:stability": "node tools/run-stability-tests.mjs",
     "test:backend": "node tools/run-backend-tests.mjs",
-    "test:e2e": "playwright test",
     "verify:startup": "node tools/verify-startup.mjs",
     "build:win": "electron-builder --win --config electron-builder.win.cjs --publish never",
     "test:desktop": "playwright test --config playwright.desktop.config.js",
