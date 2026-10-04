@@ -20,267 +20,249 @@ export const STORY_ASSET_TAB_LABELS = Object['freeze']({
   library: '总素材',
 });
 const STORY_EPISODE_ASSET_RAIL_TABS = new Set(['assets', 'frames', 'library']);
-function normalizeText(_0x4f86c6) {
-  return String(_0x4f86c6 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-export function normalizeStoryEpisodeAssetRailTab(_0x23641c) {
-  const _0x1a484f = normalizeText(_0x23641c);
-  return STORY_EPISODE_ASSET_RAIL_TABS['has'](_0x1a484f) ? _0x1a484f : 'assets';
+export function normalizeStoryEpisodeAssetRailTab(item) {
+  const text = normalizeText(item);
+  return STORY_EPISODE_ASSET_RAIL_TABS['has'](text) ? text : 'assets';
 }
-export function removeStoryProjectEntry(_0x3576df = [], _0x2078cd = '') {
-  const _0x5a7844 = normalizeText(_0x2078cd);
-  if (!_0x5a7844 || !Array['isArray'](_0x3576df)) return Array['isArray'](_0x3576df) ? [..._0x3576df] : [];
-  return _0x3576df['filter'](
-    (_0x266827) => normalizeText(_0x266827?.['id'] || _0x266827?.['data']?.['project']?.['id']) !== _0x5a7844,
+export function removeStoryProjectEntry(list = [], key = '') {
+  const text2 = normalizeText(key);
+  if (!text2 || !Array['isArray'](list)) return Array['isArray'](list) ? [...list] : [];
+  return list['filter'](
+    (index) => normalizeText(index?.['id'] || index?.['data']?.['project']?.['id']) !== text2,
   );
 }
-export function normalizeStoryProjectSortOrder(_0x4228bf) {
-  return normalizeWorkspaceProjectSortOrder(_0x4228bf);
+export function normalizeStoryProjectSortOrder(result) {
+  return normalizeWorkspaceProjectSortOrder(result);
 }
 export function getStoryProjectHomeEntries(
-  _0x42eca5 = [],
+  list2 = [],
   { query: query = '', sortOrder: sortOrder = 'updated-desc', showArchived: showArchived = ![] } = {},
 ) {
-  return getWorkspaceProjectHomeEntries(_0x42eca5, {
+  return getWorkspaceProjectHomeEntries(list2, {
     query: query,
     sortOrder: sortOrder,
     showArchived: showArchived,
   });
 }
-function hasStoryProjectClipVideoResult(_0x597d93 = {}) {
-  if (
-    normalizeText(_0x597d93?.['result']?.['videoUrl'] || _0x597d93?.['videoUrl'] || _0x597d93?.['resultUrl'])
-  )
+function hasStoryProjectClipVideoResult(options = {}) {
+  if (normalizeText(options?.['result']?.['videoUrl'] || options?.['videoUrl'] || options?.['resultUrl']))
     return !![];
-  return (Array['isArray'](_0x597d93?.['video']?.['results']) ? _0x597d93['video']['results'] : [])['some'](
-    (_0x37422f) =>
+  return (Array['isArray'](options?.['video']?.['results']) ? options['video']['results'] : [])['some'](
+    (response) =>
       normalizeText(
-        _0x37422f?.['videoUrl'] ||
-          _0x37422f?.['url'] ||
-          _0x37422f?.['displayUrl'] ||
-          _0x37422f?.['localPath'] ||
-          _0x37422f?.['displayLocalPath'],
+        response?.['videoUrl'] ||
+          response?.['url'] ||
+          response?.['displayUrl'] ||
+          response?.['localPath'] ||
+          response?.['displayLocalPath'],
       ),
   );
 }
-function resetStoryProjectCopyClipRuntime(_0x51ade1 = {}) {
-  const _0x41cc93 = { ..._0x51ade1 },
-    _0xb5b461 = hasStoryProjectClipVideoResult(_0x41cc93),
-    _0x1784fd =
-      _0x41cc93['generation'] && typeof _0x41cc93['generation'] === 'object'
-        ? { ..._0x41cc93['generation'] }
-        : null;
-  if (_0x1784fd) {
-    const _0x3ff633 = normalizeText(_0x1784fd['status'])['toLowerCase'](),
-      _0x582c69 = ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](_0x3ff633);
-    _0x41cc93['generation'] = {
-      ..._0x1784fd,
-      ...(_0x582c69 ? { status: _0xb5b461 ? 'succeeded' : 'idle' } : {}),
+function resetStoryProjectCopyClipRuntime(args = {}) {
+  const args2 = { ...args },
+    status = hasStoryProjectClipVideoResult(args2),
+    response2 =
+      args2['generation'] && typeof args2['generation'] === 'object' ? { ...args2['generation'] } : null;
+  if (response2) {
+    const text3 = normalizeText(response2['status'])['toLowerCase'](),
+      data = ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](text3);
+    args2['generation'] = {
+      ...response2,
+      ...(data ? { status: status ? 'succeeded' : 'idle' } : {}),
       taskId: '',
       remoteTaskId: '',
       startedAt: 0x0,
     };
   }
-  if (_0x41cc93['result'] && typeof _0x41cc93['result'] === 'object') {
-    const _0x7bca96 = { ..._0x41cc93['result'] },
-      _0x5430a8 = normalizeText(_0x7bca96['status'])['toLowerCase'](),
-      _0x28443c = ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](_0x5430a8);
-    _0x41cc93['result'] = {
-      ..._0x7bca96,
-      ...(_0x28443c ? { status: _0xb5b461 ? 'succeeded' : 'idle' } : {}),
+  if (args2['result'] && typeof args2['result'] === 'object') {
+    const response3 = { ...args2['result'] },
+      text4 = normalizeText(response3['status'])['toLowerCase'](),
+      target = ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](text4);
+    args2['result'] = {
+      ...response3,
+      ...(target ? { status: status ? 'succeeded' : 'idle' } : {}),
       taskId: '',
     };
   }
-  return _0x41cc93;
+  return args2;
 }
 export function duplicateStoryProjectEntry(
-  _0x3d7004 = {},
+  options2 = {},
   { projectId: projectId = '', now: now = Date['now']() } = {},
 ) {
-  const _0x45ce14 =
-      _0x3d7004 && typeof _0x3d7004 === 'object' && !Array['isArray'](_0x3d7004) ? _0x3d7004 : null,
-    _0x404d93 = _0x45ce14?.['data'];
-  if (!_0x404d93?.['project']) return null;
-  const _0x194d78 =
-      normalizeText(projectId) || 'story-' + Math['max'](0x1, Number(now) || Date['now']()) + '-copy',
-    _0x2c25c9 = JSON['parse'](JSON['stringify'](_0x45ce14)),
-    _0x3b800f =
-      (normalizeText(_0x404d93['project']['title'] || _0x45ce14['title']) || '未命名故事') + '\x20副本',
-    _0x439198 = _0x2c25c9['data'];
+  const source = options2 && typeof options2 === 'object' && !Array['isArray'](options2) ? options2 : null,
+    enabled = source?.['data'];
+  if (!enabled?.['project']) return null;
+  const id = normalizeText(projectId) || 'story-' + Math['max'](0x1, Number(now) || Date['now']()) + '-copy',
+    args3 = JSON['parse'](JSON['stringify'](source)),
+    title = (normalizeText(enabled['project']['title'] || source['title']) || '未命名故事') + '\x20副本',
+    data2 = args3['data'];
   return (
-    (_0x439198['project'] = {
-      ..._0x439198['project'],
-      id: _0x194d78,
-      title: _0x3b800f,
+    (data2['project'] = {
+      ...data2['project'],
+      id: id,
+      title: title,
       backgroundTasks: [],
     }),
-    _0x439198['project']['summaryStatus'] === 'generating' &&
-      (_0x439198['project']['summaryStatus'] = normalizeText(_0x439198['project']['summary'])
+    data2['project']['summaryStatus'] === 'generating' &&
+      (data2['project']['summaryStatus'] = normalizeText(data2['project']['summary'])
         ? 'completed'
         : 'pending'),
-    _0x439198['project']['outlineStatus'] === 'generating' &&
-      (_0x439198['project']['outlineStatus'] =
-        Array['isArray'](_0x439198['episodes']) && _0x439198['episodes']['length'] ? 'completed' : 'pending'),
-    (_0x439198['episodes'] = (Array['isArray'](_0x439198['episodes']) ? _0x439198['episodes'] : [])['map'](
-      (_0x128ff4) => ({
-        ..._0x128ff4,
-        clips: (Array['isArray'](_0x128ff4?.['clips']) ? _0x128ff4['clips'] : [])['map'](
-          resetStoryProjectCopyClipRuntime,
-        ),
-      }),
-    )),
-    settleInterruptedStoryVideoReplication(_0x439198, {
+    data2['project']['outlineStatus'] === 'generating' &&
+      (data2['project']['outlineStatus'] =
+        Array['isArray'](data2['episodes']) && data2['episodes']['length'] ? 'completed' : 'pending'),
+    (data2['episodes'] = (Array['isArray'](data2['episodes']) ? data2['episodes'] : [])['map']((args4) => ({
+      ...args4,
+      clips: (Array['isArray'](args4?.['clips']) ? args4['clips'] : [])['map'](
+        resetStoryProjectCopyClipRuntime,
+      ),
+    }))),
+    settleInterruptedStoryVideoReplication(data2, {
       message: '副本不会继续原项目中的视频解析任务，请点击重试。',
     }),
     {
-      ..._0x2c25c9,
-      id: _0x194d78,
-      title: _0x3b800f,
+      ...args3,
+      id: id,
+      title: title,
       createdAt: Number(now) || Date['now'](),
       updatedAt: Number(now) || Date['now'](),
       archivedAt: 0x0,
       projectTitleEdited: !![],
-      data: _0x439198,
+      data: data2,
     }
   );
 }
-function cloneStoryProjectUiValue(_0x5e153a, _0x138fc7) {
-  if (!_0x5e153a || typeof _0x5e153a !== 'object') return _0x138fc7;
+function cloneStoryProjectUiValue(enabled2, next) {
+  if (!enabled2 || typeof enabled2 !== 'object') return next;
   try {
-    return JSON['parse'](JSON['stringify'](_0x5e153a));
+    return JSON['parse'](JSON['stringify'](enabled2));
   } catch {
-    return _0x138fc7;
+    return next;
   }
 }
-export function normalizeStoryProjectVoiceEditor(_0xe11d7f, _0x36e463) {
-  const _0x14c04b = cloneStoryProjectUiValue(_0xe11d7f, null);
-  if (!_0x14c04b || Array['isArray'](_0x14c04b)) return null;
-  const _0x4d9f54 = normalizeText(_0x14c04b['assetId']),
-    _0x22efd4 = (Array['isArray'](_0x36e463?.['assets']) ? _0x36e463['assets'] : [])['find'](
-      (_0x3594d6) => normalizeText(_0x3594d6?.['id']) === _0x4d9f54 && _0x3594d6?.['kind'] === 'character',
+export function normalizeStoryProjectVoiceEditor(current, entry) {
+  const args5 = cloneStoryProjectUiValue(current, null);
+  if (!args5 || Array['isArray'](args5)) return null;
+  const assetId = normalizeText(args5['assetId']),
+    enabled3 = (Array['isArray'](entry?.['assets']) ? entry['assets'] : [])['find'](
+      (record) => normalizeText(record?.['id']) === assetId && record?.['kind'] === 'character',
     );
-  if (!_0x22efd4) return null;
-  return { ..._0x14c04b, assetId: _0x4d9f54, isGenerating: ![] };
+  if (!enabled3) return null;
+  return { ...args5, assetId: assetId, isGenerating: ![] };
 }
-export function createStoryProjectUiState(_0x1c48ea = {}) {
+export function createStoryProjectUiState(view = {}) {
   return {
-    view: _0x1c48ea['view'] === 'episode' ? 'episode' : 'project',
-    step: normalizeStoryWorkspaceStep(_0x1c48ea['step']),
-    assetFilter: Object['hasOwn'](STORY_ASSET_TAB_LABELS, _0x1c48ea['assetFilter'])
-      ? _0x1c48ea['assetFilter']
+    view: view['view'] === 'episode' ? 'episode' : 'project',
+    step: normalizeStoryWorkspaceStep(view['step']),
+    assetFilter: Object['hasOwn'](STORY_ASSET_TAB_LABELS, view['assetFilter'])
+      ? view['assetFilter']
       : 'character',
-    assetSplitRatio: normalizeStoryAssetSplitRatio(_0x1c48ea['assetSplitRatio']),
-    assetDetailSplitRatio: normalizeStoryAssetDetailSplitRatio(_0x1c48ea['assetDetailSplitRatio']),
+    assetSplitRatio: normalizeStoryAssetSplitRatio(view['assetSplitRatio']),
+    assetDetailSplitRatio: normalizeStoryAssetDetailSplitRatio(view['assetDetailSplitRatio']),
     episodeAssetPanelRatio: normalizeStoryEpisodePanelRatios(
-      _0x1c48ea['episodeAssetPanelRatio'],
-      _0x1c48ea['episodeEditorPanelRatio'],
+      view['episodeAssetPanelRatio'],
+      view['episodeEditorPanelRatio'],
     )['left'],
     episodeEditorPanelRatio: normalizeStoryEpisodePanelRatios(
-      _0x1c48ea['episodeAssetPanelRatio'],
-      _0x1c48ea['episodeEditorPanelRatio'],
+      view['episodeAssetPanelRatio'],
+      view['episodeEditorPanelRatio'],
     )['center'],
-    episodeAssetRailTab: normalizeStoryEpisodeAssetRailTab(_0x1c48ea['episodeAssetRailTab']),
-    assetAppearanceIndexes: cloneStoryProjectUiValue(_0x1c48ea['assetAppearanceIndexes'], {}),
-    outlineSectionOpenState: cloneStoryProjectUiValue(_0x1c48ea['outlineSectionOpenState'], {}),
-    pageScrollPositions: cloneStoryProjectUiValue(_0x1c48ea['pageScrollPositions'], {}),
-    selectedAssetId: normalizeText(_0x1c48ea['selectedAssetId']),
-    selectedEpisodeId: normalizeText(_0x1c48ea['selectedEpisodeId']),
-    selectedClipId: normalizeText(_0x1c48ea['selectedClipId']),
-    characterVoiceEditor: _0x1c48ea['characterVoiceEditor']
-      ? { ...cloneStoryProjectUiValue(_0x1c48ea['characterVoiceEditor'], {}), isGenerating: ![] }
+    episodeAssetRailTab: normalizeStoryEpisodeAssetRailTab(view['episodeAssetRailTab']),
+    assetAppearanceIndexes: cloneStoryProjectUiValue(view['assetAppearanceIndexes'], {}),
+    outlineSectionOpenState: cloneStoryProjectUiValue(view['outlineSectionOpenState'], {}),
+    pageScrollPositions: cloneStoryProjectUiValue(view['pageScrollPositions'], {}),
+    selectedAssetId: normalizeText(view['selectedAssetId']),
+    selectedEpisodeId: normalizeText(view['selectedEpisodeId']),
+    selectedClipId: normalizeText(view['selectedClipId']),
+    characterVoiceEditor: view['characterVoiceEditor']
+      ? { ...cloneStoryProjectUiValue(view['characterVoiceEditor'], {}), isGenerating: ![] }
       : null,
     assetBreakdownVisibleCount: Math['max'](
       0x0,
-      Math['trunc'](Number(_0x1c48ea['assetBreakdownVisibleCount']) || 0x0),
+      Math['trunc'](Number(view['assetBreakdownVisibleCount']) || 0x0),
     ),
   };
 }
 export function applyStoryLibraryAdditionUiState(
-  _0x439123 = {},
+  enabled4 = {},
   { targetAssetId: targetAssetId = '', selectedAppearanceIndex: selectedAppearanceIndex = 0x0 } = {},
 ) {
-  if (!_0x439123 || typeof _0x439123 !== 'object' || Array['isArray'](_0x439123)) return _0x439123;
-  const _0x4f9ae5 = normalizeText(targetAssetId);
+  if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4)) return enabled4;
+  const text5 = normalizeText(targetAssetId);
   return (
-    _0x4f9ae5 &&
-      (_0x439123['assetAppearanceIndexes'] = {
-        ...(_0x439123['assetAppearanceIndexes'] || {}),
-        [_0x4f9ae5]: Math['max'](0x0, Math['trunc'](Number(selectedAppearanceIndex) || 0x0)),
+    text5 &&
+      (enabled4['assetAppearanceIndexes'] = {
+        ...(enabled4['assetAppearanceIndexes'] || {}),
+        [text5]: Math['max'](0x0, Math['trunc'](Number(selectedAppearanceIndex) || 0x0)),
       }),
-    (_0x439123['assetSelectionMode'] = ![]),
-    (_0x439123['selectedAssetIds'] = []),
-    _0x439123
+    (enabled4['assetSelectionMode'] = ![]),
+    (enabled4['selectedAssetIds'] = []),
+    enabled4
   );
 }
-export function applyStoryProjectUiState(_0x193050 = {}, _0x300e8c = {}, _0x3909cb = _0x193050['data']) {
-  if (!_0x193050 || typeof _0x193050 !== 'object') return _0x193050;
-  const _0x4a4438 =
-      _0x300e8c && typeof _0x300e8c === 'object' && !Array['isArray'](_0x300e8c) ? _0x300e8c : {},
-    _0x5d6c1f = Array['isArray'](_0x3909cb?.['episodes']) ? _0x3909cb['episodes'] : [],
-    _0x4dffa9 = Array['isArray'](_0x3909cb?.['assets']) ? _0x3909cb['assets'] : [],
-    _0x2409af = normalizeStoryWorkspaceStep(_0x4a4438['step']);
-  ((_0x193050['step'] =
-    (_0x2409af === 0x0 || _0x3909cb?.['project']?.['outlineStatus'] !== 'stale') &&
-    canEnterStoryWorkspaceStep(_0x3909cb, _0x2409af)
-      ? _0x2409af
-      : _0x3909cb?.['project']?.['collaboration']?.['stage'] === 'writing'
+export function applyStoryProjectUiState(enabled5 = {}, payload = {}, handle = enabled5['data']) {
+  if (!enabled5 || typeof enabled5 !== 'object') return enabled5;
+  const state = payload && typeof payload === 'object' && !Array['isArray'](payload) ? payload : {},
+    list3 = Array['isArray'](handle?.['episodes']) ? handle['episodes'] : [],
+    list4 = Array['isArray'](handle?.['assets']) ? handle['assets'] : [],
+    storyWorkspaceStep = normalizeStoryWorkspaceStep(state['step']);
+  ((enabled5['step'] =
+    (storyWorkspaceStep === 0x0 || handle?.['project']?.['outlineStatus'] !== 'stale') &&
+    canEnterStoryWorkspaceStep(handle, storyWorkspaceStep)
+      ? storyWorkspaceStep
+      : handle?.['project']?.['collaboration']?.['stage'] === 'writing'
         ? 0x0
         : 0x1),
-    (_0x193050['assetFilter'] = Object['hasOwn'](STORY_ASSET_TAB_LABELS, _0x4a4438['assetFilter'])
-      ? _0x4a4438['assetFilter']
+    (enabled5['assetFilter'] = Object['hasOwn'](STORY_ASSET_TAB_LABELS, state['assetFilter'])
+      ? state['assetFilter']
       : 'character'),
-    (_0x193050['assetSplitRatio'] = normalizeStoryAssetSplitRatio(_0x4a4438['assetSplitRatio'])),
-    (_0x193050['assetDetailSplitRatio'] = normalizeStoryAssetDetailSplitRatio(
-      _0x4a4438['assetDetailSplitRatio'],
+    (enabled5['assetSplitRatio'] = normalizeStoryAssetSplitRatio(state['assetSplitRatio'])),
+    (enabled5['assetDetailSplitRatio'] = normalizeStoryAssetDetailSplitRatio(
+      state['assetDetailSplitRatio'],
     )));
-  const _0x1695d5 = normalizeStoryEpisodePanelRatios(
-    _0x4a4438['episodeAssetPanelRatio'],
-    _0x4a4438['episodeEditorPanelRatio'],
+  const box = normalizeStoryEpisodePanelRatios(
+    state['episodeAssetPanelRatio'],
+    state['episodeEditorPanelRatio'],
   );
-  ((_0x193050['episodeAssetPanelRatio'] = _0x1695d5['left']),
-    (_0x193050['episodeEditorPanelRatio'] = _0x1695d5['center']),
-    (_0x193050['episodeAssetRailTab'] = normalizeStoryEpisodeAssetRailTab(_0x4a4438['episodeAssetRailTab'])),
-    (_0x193050['assetAppearanceIndexes'] = cloneStoryProjectUiValue(_0x4a4438['assetAppearanceIndexes'], {})),
-    (_0x193050['outlineSectionOpenState'] = cloneStoryProjectUiValue(
-      _0x4a4438['outlineSectionOpenState'],
-      {},
-    )),
-    (_0x193050['pageScrollPositions'] = cloneStoryProjectUiValue(_0x4a4438['pageScrollPositions'], {})));
-  const _0x37920e = normalizeText(_0x4a4438['selectedAssetId']);
-  _0x193050['selectedAssetId'] =
-    _0x193050['assetFilter'] === 'library' ||
-    _0x4dffa9['some']((_0x1ae84d) => normalizeText(_0x1ae84d?.['id']) === _0x37920e)
-      ? _0x37920e
+  ((enabled5['episodeAssetPanelRatio'] = box['left']),
+    (enabled5['episodeEditorPanelRatio'] = box['center']),
+    (enabled5['episodeAssetRailTab'] = normalizeStoryEpisodeAssetRailTab(state['episodeAssetRailTab'])),
+    (enabled5['assetAppearanceIndexes'] = cloneStoryProjectUiValue(state['assetAppearanceIndexes'], {})),
+    (enabled5['outlineSectionOpenState'] = cloneStoryProjectUiValue(state['outlineSectionOpenState'], {})),
+    (enabled5['pageScrollPositions'] = cloneStoryProjectUiValue(state['pageScrollPositions'], {})));
+  const text6 = normalizeText(state['selectedAssetId']);
+  enabled5['selectedAssetId'] =
+    enabled5['assetFilter'] === 'library' ||
+    list4['some']((config) => normalizeText(config?.['id']) === text6)
+      ? text6
       : normalizeText(
-          _0x4dffa9['find']((_0x2b81cc) => _0x2b81cc?.['kind'] === _0x193050['assetFilter'])?.['id'] ||
-            _0x4dffa9[0x0]?.['id'],
+          list4['find']((scope) => scope?.['kind'] === enabled5['assetFilter'])?.['id'] || list4[0x0]?.['id'],
         );
-  const _0x2826ea = normalizeText(_0x4a4438['selectedEpisodeId']),
-    _0x482444 =
-      _0x5d6c1f['find']((_0x2bdb94) => normalizeText(_0x2bdb94?.['id']) === _0x2826ea) ||
-      _0x5d6c1f[0x0] ||
-      null;
-  _0x193050['selectedEpisodeId'] = normalizeText(_0x482444?.['id']);
-  const _0x4924a7 = normalizeText(_0x4a4438['selectedClipId']),
-    _0x4a53a6 = Array['isArray'](_0x482444?.['clips']) ? _0x482444['clips'] : [];
-  ((_0x193050['selectedClipId'] = normalizeText(
-    _0x4a53a6['find']((_0x190a75) => normalizeText(_0x190a75?.['id']) === _0x4924a7)?.['id'] ||
-      _0x4a53a6[0x0]?.['id'],
+  const text7 = normalizeText(state['selectedEpisodeId']),
+    input = list3['find']((output) => normalizeText(output?.['id']) === text7) || list3[0x0] || null;
+  enabled5['selectedEpisodeId'] = normalizeText(input?.['id']);
+  const text8 = normalizeText(state['selectedClipId']),
+    list5 = Array['isArray'](input?.['clips']) ? input['clips'] : [];
+  ((enabled5['selectedClipId'] = normalizeText(
+    list5['find']((value2) => normalizeText(value2?.['id']) === text8)?.['id'] || list5[0x0]?.['id'],
   )),
-    (_0x193050['characterVoiceEditor'] = normalizeStoryProjectVoiceEditor(
-      _0x4a4438['characterVoiceEditor'],
-      _0x3909cb,
+    (enabled5['characterVoiceEditor'] = normalizeStoryProjectVoiceEditor(
+      state['characterVoiceEditor'],
+      handle,
     )),
-    (_0x193050['view'] =
-      _0x4a4438['view'] === 'episode' && canEnterStoryWorkspaceStep(_0x3909cb, 0x3) && Boolean(_0x482444)
+    (enabled5['view'] =
+      state['view'] === 'episode' && canEnterStoryWorkspaceStep(handle, 0x3) && Boolean(input)
         ? 'episode'
         : 'project'));
-  if (_0x193050['view'] === 'episode') _0x193050['step'] = 0x3;
+  if (enabled5['view'] === 'episode') enabled5['step'] = 0x3;
   return (
-    (_0x193050['assetBreakdownVisibleCount'] = Math['max'](
+    (enabled5['assetBreakdownVisibleCount'] = Math['max'](
       0x0,
-      Math['trunc'](Number(_0x4a4438['assetBreakdownVisibleCount']) || 0x0),
+      Math['trunc'](Number(state['assetBreakdownVisibleCount']) || 0x0),
     )),
-    _0x193050
+    enabled5
   );
 }

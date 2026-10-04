@@ -33,27 +33,27 @@ const RH_HAILUO_H3_MODE_FIELD_ID = 'rh_hailuo_h3_mode',
     Object['freeze']({ value: 'ultra', label: '超清' }),
   ]),
   RH_HAILUO_H3_DURATION_OPTIONS = Object['freeze'](
-    Array['from']({ length: 0xd }, (_0x54b816, _0x1ef139) => {
-      const _0x514465 = _0x1ef139 + 0x3;
-      return Object['freeze']({ value: _0x514465, label: _0x514465 + 's', displayLabel: _0x514465 + 'S' });
+    Array['from']({ length: 0xd }, (value, item) => {
+      const value2 = item + 0x3;
+      return Object['freeze']({ value: value2, label: value2 + 's', displayLabel: value2 + 'S' });
     }),
   );
 function createModeSlot({
-  id: _0x4a2b99,
-  kind: _0x4b0333,
-  label: _0x3df6dc,
-  mode: _0xd8dab0,
-  description: _0x15686b,
-  displayOrder: _0x4a3904,
+  id: id,
+  kind: kind,
+  label: label,
+  mode: mode,
+  description: description,
+  displayOrder: displayOrder,
 }) {
   return Object['freeze']({
-    id: _0x4a2b99,
-    kind: _0x4b0333,
-    label: _0x3df6dc,
-    description: _0x15686b,
-    displayOrder: _0x4a3904,
+    id: id,
+    kind: kind,
+    label: label,
+    description: description,
+    displayOrder: displayOrder,
     required: ![],
-    showWhen: Object['freeze']({ field: RH_HAILUO_H3_MODE_FIELD_ID, value: _0xd8dab0 }),
+    showWhen: Object['freeze']({ field: RH_HAILUO_H3_MODE_FIELD_ID, value: mode }),
   });
 }
 const RH_HAILUO_H3_FIXED_INPUT_SLOTS = Object['freeze']([
@@ -238,17 +238,15 @@ export const rhVideoHailuoH3OmniExecutionManifest = createRunningHubVideoExecuti
     defaultAspectRatio: '自适应',
     dimensionMultiple: 0x20,
     imageLoaderNodes: Object['freeze'](
-      ['60', '72', '128', '129', '164', '165', '178', '179', '180']['map']((_0x5838a4) =>
-        Object['freeze']({ nodeId: _0x5838a4, fieldName: 'image' }),
+      ['60', '72', '128', '129', '164', '165', '178', '179', '180']['map']((nodeId) =>
+        Object['freeze']({ nodeId: nodeId, fieldName: 'image' }),
       ),
     ),
     videoLoaderNodes: Object['freeze'](
-      ['68', '158', '161']['map']((_0x198c78) => Object['freeze']({ nodeId: _0x198c78, fieldName: 'video' })),
+      ['68', '158', '161']['map']((nodeId2) => Object['freeze']({ nodeId: nodeId2, fieldName: 'video' })),
     ),
     audioLoaderNodes: Object['freeze'](
-      ['133', '139', '155']['map']((_0x16d40b) =>
-        Object['freeze']({ nodeId: _0x16d40b, fieldName: 'audio' }),
-      ),
+      ['133', '139', '155']['map']((nodeId3) => Object['freeze']({ nodeId: nodeId3, fieldName: 'audio' })),
     ),
     firstLastFrameNode: Object['freeze']({
       nodeId: '120',

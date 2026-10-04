@@ -32,8 +32,8 @@ const RH_BERNINI_FUNCTION_BY_INPUT_MODE = Object.freeze({
     vrc2v: 'vrc2v视频区域控制到视频：源视频加参考图像，适合带区域控制诉求的视频编辑。',
     ads2v: 'ads2v广告插入到视频：源视频加参考视频，适合把广告或参考视频内容插入到源视频。',
   });
-function buildFunctionHelp(..._0x5282fa) {
-  return _0x5282fa.map((_0x4ecae4) => RH_BERNINI_FUNCTION_HELP[_0x4ecae4]).join('\n');
+function buildFunctionHelp(...list) {
+  return list.map((item) => RH_BERNINI_FUNCTION_HELP[item]).join('\n');
 }
 const RH_BERNINI_USAGE_TABLE = Object.freeze([
   '| 任务类型 | 使用方法 | 提示词示例 |',
@@ -156,17 +156,15 @@ export const rhVideoBerniniV1ModelManifest = createRunningHubVideoModelManifest(
         field: 'rhBerniniInputMode',
         values: Object.freeze(['image', 'video', 'videoImage']),
       }),
-      options: RH_BERNINI_FUNCTION_OPTIONS.map((_0x395bb6) => {
-        const _0xb2b052 = Object.entries(RH_BERNINI_FUNCTION_BY_INPUT_MODE)
-          .filter(([, _0x2a2898]) => _0x2a2898.includes(_0x395bb6.value))
-          .map(([_0x47f045]) => _0x47f045);
+      options: RH_BERNINI_FUNCTION_OPTIONS.map((el) => {
+        const list2 = Object.entries(RH_BERNINI_FUNCTION_BY_INPUT_MODE)
+          .filter(([, list3]) => list3.includes(el.value))
+          .map(([value]) => value);
         return Object.freeze({
-          ..._0x395bb6,
+          ...el,
           hideWhen: Object.freeze({
             field: 'rhBerniniInputMode',
-            values: Object.freeze(
-              RH_BERNINI_INPUT_MODES.filter((_0x646a1c) => !_0xb2b052.includes(_0x646a1c)),
-            ),
+            values: Object.freeze(RH_BERNINI_INPUT_MODES.filter((item2) => !list2.includes(item2))),
           }),
         });
       }),

@@ -17,7 +17,7 @@ let currentLocale = DEFAULT_LOCALE;
 function canUseStorage() {
   try {
     return !!globalThis.localStorage;
-  } catch (_0x19bcee) {
+  } catch (value) {
     return false;
   }
 }
@@ -25,112 +25,109 @@ function readStoredLocale() {
   if (!canUseStorage()) return '';
   try {
     return globalThis.localStorage.getItem(STORAGE_KEY) || '';
-  } catch (_0x21e32d) {
+  } catch (item) {
     return '';
   }
 }
-function persistLocale(_0x283618) {
+function persistLocale(key) {
   if (!canUseStorage()) return;
   try {
-    globalThis.localStorage.setItem(STORAGE_KEY, _0x283618);
-  } catch (_0x54f444) {}
+    globalThis.localStorage.setItem(STORAGE_KEY, key);
+  } catch (index) {}
 }
-export function normalizeLocale(_0x260d10) {
-  const _0x3d08ae = String(_0x260d10 || '').trim();
-  if (!_0x3d08ae) return '';
-  if (SUPPORTED_LOCALES.includes(_0x3d08ae)) return _0x3d08ae;
-  const _0x2890a4 = _0x3d08ae.toLowerCase().replace('_', '-');
-  if (localeAliases[_0x2890a4]) return localeAliases[_0x2890a4];
-  const _0x2f556b = _0x2890a4.split('-')[0];
-  return localeAliases[_0x2f556b] || '';
+export function normalizeLocale(result) {
+  const enabled = String(result || '').trim();
+  if (!enabled) return '';
+  if (SUPPORTED_LOCALES.includes(enabled)) return enabled;
+  const data = enabled.toLowerCase().replace('_', '-');
+  if (localeAliases[data]) return localeAliases[data];
+  const options = data.split('-')[0];
+  return localeAliases[options] || '';
 }
 function readNavigatorLocale() {
-  const _0x556f6b = globalThis.navigator,
-    _0x33fde2 = [...(Array.isArray(_0x556f6b?.languages) ? _0x556f6b.languages : []), _0x556f6b?.language];
-  for (const _0x28ca2b of _0x33fde2) {
-    const _0x98bed3 = normalizeLocale(_0x28ca2b);
-    if (_0x98bed3) return _0x98bed3;
+  const target = globalThis.navigator,
+    source = [...(Array.isArray(target?.languages) ? target.languages : []), target?.language];
+  for (const next of source) {
+    const locale = normalizeLocale(next);
+    if (locale) return locale;
   }
   return '';
 }
-function readPath(_0x5b3750, _0x38479a) {
-  const _0x29cefc = String(_0x38479a || '')
+function readPath(current, entry) {
+  const record = String(entry || '')
     .split('.')
     .filter(Boolean);
-  let _0x4777b8 = _0x5b3750;
-  for (const _0xa6a6bc of _0x29cefc) {
-    if (!_0x4777b8 || typeof _0x4777b8 !== 'object' || !(_0xa6a6bc in _0x4777b8)) return undefined;
-    _0x4777b8 = _0x4777b8[_0xa6a6bc];
+  let enabled2 = current;
+  for (const payload of record) {
+    if (!enabled2 || typeof enabled2 !== 'object' || !(payload in enabled2)) return undefined;
+    enabled2 = enabled2[payload];
   }
-  return _0x4777b8;
+  return enabled2;
 }
-function interpolate(_0x310c60, _0x537f7e = {}) {
-  return String(_0x310c60).replace(/\{(\w+)\}/g, (_0x490389, _0x1f3ae0) => {
-    if (!(_0x1f3ae0 in _0x537f7e)) return _0x490389;
-    const _0x237bd1 = _0x537f7e[_0x1f3ae0];
-    return _0x237bd1 == null ? '' : String(_0x237bd1);
+function interpolate(handle, state = {}) {
+  return String(handle).replace(/\{(\w+)\}/g, (config, scope) => {
+    if (!(scope in state)) return config;
+    const input = state[scope];
+    return input == null ? '' : String(input);
   });
 }
-function applyDocumentLocale(_0x5aa32d) {
-  const _0x45bc4f = globalThis.document;
-  if (!_0x45bc4f?.documentElement) return;
-  ((_0x45bc4f.documentElement.lang = _0x5aa32d), (_0x45bc4f.documentElement.dir = 'ltr'));
-  if (_0x45bc4f.title != null) _0x45bc4f.title = t('app.documentTitle', {}, { locale: _0x5aa32d });
+function applyDocumentLocale(locale2) {
+  const dom = globalThis.document;
+  if (!dom?.documentElement) return;
+  ((dom.documentElement.lang = locale2), (dom.documentElement.dir = 'ltr'));
+  if (dom.title != null) dom.title = t('app.documentTitle', {}, { locale: locale2 });
 }
-function notifyLocaleChange(_0x395113) {
-  (listeners.forEach((_0x220990) => {
+function notifyLocaleChange(locale3) {
+  (listeners.forEach((handler) => {
     try {
-      _0x220990(_0x395113);
-    } catch (_0x270e44) {
-      console.error('[i18n] locale listener failed', _0x270e44);
+      handler(locale3);
+    } catch (output) {
+      console.error('[i18n] locale listener failed', output);
     }
   }),
     typeof globalThis.CustomEvent === 'function' &&
       typeof globalThis.dispatchEvent === 'function' &&
-      globalThis.dispatchEvent(new CustomEvent('aicanvas:locale-change', { detail: { locale: _0x395113 } })));
+      globalThis.dispatchEvent(new CustomEvent('aicanvas:locale-change', { detail: { locale: locale3 } })));
 }
 export function getLocale() {
   return currentLocale;
 }
-export function setLocale(_0x138fe3, _0x166756 = {}) {
-  const _0x416cf7 = normalizeLocale(_0x138fe3) || DEFAULT_LOCALE,
-    _0x7454c5 = _0x416cf7 !== currentLocale;
-  currentLocale = _0x416cf7;
-  if (_0x166756.persist !== false) persistLocale(_0x416cf7);
-  applyDocumentLocale(_0x416cf7);
-  if (_0x7454c5 && _0x166756.notify !== false) notifyLocaleChange(_0x416cf7);
+export function setLocale(value2, value3 = {}) {
+  const locale4 = normalizeLocale(value2) || DEFAULT_LOCALE,
+    value4 = locale4 !== currentLocale;
+  currentLocale = locale4;
+  if (value3.persist !== false) persistLocale(locale4);
+  applyDocumentLocale(locale4);
+  if (value4 && value3.notify !== false) notifyLocaleChange(locale4);
   return currentLocale;
 }
-export function initI18n(_0x28de06 = {}) {
-  const _0x10f93a = _0x28de06.useNavigatorLocale === true,
-    _0xe0be44 =
-      normalizeLocale(_0x28de06.locale) ||
+export function initI18n(persist = {}) {
+  const value5 = persist.useNavigatorLocale === true,
+    locale5 =
+      normalizeLocale(persist.locale) ||
       normalizeLocale(readStoredLocale()) ||
-      (_0x10f93a ? readNavigatorLocale() : '') ||
+      (value5 ? readNavigatorLocale() : '') ||
       DEFAULT_LOCALE;
-  return setLocale(_0xe0be44, { persist: _0x28de06.persist === true, notify: _0x28de06.notify === true });
+  return setLocale(locale5, { persist: persist.persist === true, notify: persist.notify === true });
 }
-export function onLocaleChange(_0x5d3b27) {
-  if (typeof _0x5d3b27 !== 'function') return () => {};
-  return (listeners.add(_0x5d3b27), () => listeners.delete(_0x5d3b27));
+export function onLocaleChange(value6) {
+  if (typeof value6 !== 'function') return () => {};
+  return (listeners.add(value6), () => listeners.delete(value6));
 }
-export function t(_0x5b0e3b, _0x3edfe3 = {}, _0x138b8f = {}) {
-  const _0x504312 = normalizeLocale(_0x138b8f.locale) || currentLocale,
-    _0x22d05f =
-      readPath(dictionaries[_0x504312], _0x5b0e3b) ??
-      readPath(dictionaries[DEFAULT_LOCALE], _0x5b0e3b) ??
-      _0x5b0e3b;
-  return interpolate(_0x22d05f, _0x3edfe3);
+export function t(value7, value8 = {}, value9 = {}) {
+  const locale6 = normalizeLocale(value9.locale) || currentLocale,
+    path =
+      readPath(dictionaries[locale6], value7) ?? readPath(dictionaries[DEFAULT_LOCALE], value7) ?? value7;
+  return interpolate(path, value8);
 }
-function getScopedElements(_0x1d1577, _0x203c94) {
-  const _0x4b5706 = _0x1d1577 || globalThis.document;
-  if (!_0x4b5706) return [];
-  const _0x122a44 = [];
+function getScopedElements(value10, value11) {
+  const el = value10 || globalThis.document;
+  if (!el) return [];
+  const list = [];
   return (
-    typeof _0x4b5706.matches === 'function' && _0x4b5706.matches(_0x203c94) && _0x122a44.push(_0x4b5706),
-    typeof _0x4b5706.querySelectorAll === 'function' &&
-      _0x122a44.push(...Array.from(_0x4b5706.querySelectorAll(_0x203c94))),
-    _0x122a44
+    typeof el.matches === 'function' && el.matches(value11) && list.push(el),
+    typeof el.querySelectorAll === 'function' && list.push(...Array.from(el.querySelectorAll(value11))),
+    list
   );
 }
 const ATTRIBUTE_BINDINGS = Object.freeze([
@@ -141,168 +138,160 @@ const ATTRIBUTE_BINDINGS = Object.freeze([
   Object.freeze({ keyAttr: 'data-i18n-tooltip', targetAttr: 'data-tooltip' }),
   Object.freeze({ keyAttr: 'data-i18n-tooltip-right', targetAttr: 'data-tooltip-right' }),
 ]);
-export function applyI18n(_0x2c22bd = globalThis.document) {
-  (getScopedElements(_0x2c22bd, '[data-i18n]').forEach((_0x5832cb) => {
-    const _0x2c48af = _0x5832cb.getAttribute('data-i18n');
-    if (!_0x2c48af) return;
-    _0x5832cb.textContent = t(_0x2c48af);
+export function applyI18n(value12 = globalThis.document) {
+  (getScopedElements(value12, '[data-i18n]').forEach((el2) => {
+    const enabled3 = el2.getAttribute('data-i18n');
+    if (!enabled3) return;
+    el2.textContent = t(enabled3);
   }),
-    ATTRIBUTE_BINDINGS.forEach(({ keyAttr: _0x7b793c, targetAttr: _0x1d5db1 }) => {
-      getScopedElements(_0x2c22bd, '[' + _0x7b793c + ']').forEach((_0x381c5b) => {
-        const _0xa0448a = _0x381c5b.getAttribute(_0x7b793c);
-        if (!_0xa0448a) return;
-        _0x381c5b.setAttribute(_0x1d5db1, t(_0xa0448a));
+    ATTRIBUTE_BINDINGS.forEach(({ keyAttr: keyAttr, targetAttr: targetAttr }) => {
+      getScopedElements(value12, '[' + keyAttr + ']').forEach((el3) => {
+        const enabled4 = el3.getAttribute(keyAttr);
+        if (!enabled4) return;
+        el3.setAttribute(targetAttr, t(enabled4));
       });
     }),
     applyDocumentLocale(currentLocale));
 }
-function getCustomLocaleSelectParts(_0x24f0ba) {
-  const _0x43d61c = _0x24f0ba?.closest?.('.settings-preset-select');
-  if (!_0x43d61c) return {};
-  const _0x4bf9a5 = _0x43d61c.querySelector?.('[data-i18n-locale-trigger]'),
-    _0x235d2c = _0x43d61c.querySelector?.('[data-i18n-locale-trigger-text]'),
-    _0x1ff9ea = _0x43d61c.querySelector?.('[data-i18n-locale-menu]'),
-    _0x19d7d3 = _0x1ff9ea?.querySelectorAll
-      ? Array.from(_0x1ff9ea.querySelectorAll('[data-i18n-locale-option]'))
-      : [];
+function getCustomLocaleSelectParts(el4) {
+  const control = el4?.closest?.('.settings-preset-select');
+  if (!control) return {};
+  const trigger = control.querySelector?.('[data-i18n-locale-trigger]'),
+    triggerText = control.querySelector?.('[data-i18n-locale-trigger-text]'),
+    menu = control.querySelector?.('[data-i18n-locale-menu]'),
+    options2 = menu?.querySelectorAll ? Array.from(menu.querySelectorAll('[data-i18n-locale-option]')) : [];
   return {
-    control: _0x43d61c,
-    trigger: _0x4bf9a5,
-    triggerText: _0x235d2c,
-    menu: _0x1ff9ea,
-    options: _0x19d7d3,
+    control: control,
+    trigger: trigger,
+    triggerText: triggerText,
+    menu: menu,
+    options: options2,
   };
 }
-function getLocaleSelectOptionLabel(_0x1b55d5, _0x51f431, _0x540ae6 = []) {
-  const _0x29b8c8 = _0x1b55d5?.options
-      ? Array.from(_0x1b55d5.options).find((_0x45196c) => _0x45196c.value === _0x51f431)
-      : null,
-    _0x356330 = _0x540ae6.find((_0x4521db) => _0x4521db.dataset?.value === _0x51f431);
-  return _0x29b8c8?.textContent || _0x356330?.textContent || _0x51f431;
+function getLocaleSelectOptionLabel(value13, value14, list2 = []) {
+  const el5 = value13?.options ? Array.from(value13.options).find((el6) => el6.value === value14) : null,
+    el7 = list2.find((el8) => el8.dataset?.value === value14);
+  return el5?.textContent || el7?.textContent || value14;
 }
 function setCustomLocaleMenuOpen(
-  _0x49e053,
-  _0x121c0d,
+  el9,
+  enabled5,
   { focusOption: focusOption = false, focusTrigger: focusTrigger = false } = {},
 ) {
   const {
-    control: _0xf50e79,
-    trigger: _0x376b44,
-    menu: _0x3d8be2,
-    options: _0x475ddd,
-  } = getCustomLocaleSelectParts(_0x49e053);
-  if (!_0xf50e79 || !_0x376b44 || !_0x3d8be2) return;
-  const _0x34d664 = !!_0x121c0d;
-  (_0xf50e79.classList?.toggle('is-open', _0x34d664),
-    _0x376b44.setAttribute?.('aria-expanded', _0x34d664 ? 'true' : 'false'),
-    (_0x3d8be2.hidden = !_0x34d664));
-  if (_0x34d664 && focusOption) {
-    const _0x27d18d =
-      _0x475ddd.find((_0x4ecbc2) => _0x4ecbc2.dataset?.value === _0x49e053.value && !_0x4ecbc2.disabled) ||
-      _0x475ddd.find((_0x163dc1) => !_0x163dc1.disabled);
-    _0x27d18d?.focus?.();
-  } else !_0x34d664 && focusTrigger && _0x376b44.focus?.();
+    control: control2,
+    trigger: trigger2,
+    menu: menu2,
+    options: options3,
+  } = getCustomLocaleSelectParts(el9);
+  if (!control2 || !trigger2 || !menu2) return;
+  const enabled6 = !!enabled5;
+  (control2.classList?.toggle('is-open', enabled6),
+    trigger2.setAttribute?.('aria-expanded', enabled6 ? 'true' : 'false'),
+    (menu2.hidden = !enabled6));
+  if (enabled6 && focusOption) {
+    const el10 =
+      options3.find((el11) => el11.dataset?.value === el9.value && !el11.disabled) ||
+      options3.find((el12) => !el12.disabled);
+    el10?.focus?.();
+  } else !enabled6 && focusTrigger && trigger2.focus?.();
 }
-function isCustomLocaleMenuOpen(_0x4cd606) {
-  return !!getCustomLocaleSelectParts(_0x4cd606).control?.classList?.contains('is-open');
+function isCustomLocaleMenuOpen(value15) {
+  return !!getCustomLocaleSelectParts(value15).control?.classList?.contains('is-open');
 }
-function moveCustomLocaleOptionFocus(_0x3499a9, _0x38e4fd) {
-  const { options: _0x114c49 } = getCustomLocaleSelectParts(_0x3499a9),
-    _0x5b0044 = _0x114c49.filter((_0x39271b) => !_0x39271b.disabled);
-  if (_0x5b0044.length === 0) return;
-  const _0x3a017a = _0x3499a9?.ownerDocument?.activeElement || globalThis.document?.activeElement;
-  let _0x317259 = _0x5b0044.indexOf(_0x3a017a);
-  _0x317259 < 0 &&
-    (_0x317259 = _0x5b0044.findIndex((_0x150c02) => _0x150c02.dataset?.value === _0x3499a9.value));
-  const _0x462188 = (Math.max(_0x317259, 0) + _0x38e4fd + _0x5b0044.length) % _0x5b0044.length;
-  _0x5b0044[_0x462188]?.focus?.();
+function moveCustomLocaleOptionFocus(el13, value16) {
+  const { options: options4 } = getCustomLocaleSelectParts(el13),
+    list3 = options4.filter((el14) => !el14.disabled);
+  if (list3.length === 0) return;
+  const value17 = el13?.ownerDocument?.activeElement || globalThis.document?.activeElement;
+  let count = list3.indexOf(value17);
+  count < 0 && (count = list3.findIndex((el15) => el15.dataset?.value === el13.value));
+  const value18 = (Math.max(count, 0) + value16 + list3.length) % list3.length;
+  list3[value18]?.focus?.();
 }
-function commitLocaleSelect(_0x32ffbf, _0x5e6147) {
-  (setLocale(_0x32ffbf.value), applyI18n(_0x5e6147), syncLocaleSelects(_0x5e6147));
+function commitLocaleSelect(el16, value19) {
+  (setLocale(el16.value), applyI18n(value19), syncLocaleSelects(value19));
 }
-function syncCustomLocaleSelect(_0x338f18) {
-  const { triggerText: _0x4cf70a, options: _0x130357 } = getCustomLocaleSelectParts(_0x338f18);
-  if (!_0x4cf70a && _0x130357.length === 0) return;
-  const _0xf65094 = _0x338f18.value || currentLocale;
-  (_0x4cf70a && (_0x4cf70a.textContent = getLocaleSelectOptionLabel(_0x338f18, _0xf65094, _0x130357)),
-    _0x130357.forEach((_0x29de3b) => {
-      const _0x460e97 = _0x29de3b.dataset?.value === _0xf65094;
-      (_0x29de3b.classList?.toggle('is-active', _0x460e97),
-        _0x29de3b.setAttribute?.('aria-selected', _0x460e97 ? 'true' : 'false'));
+function syncCustomLocaleSelect(el17) {
+  const { triggerText: triggerText2, options: options5 } = getCustomLocaleSelectParts(el17);
+  if (!triggerText2 && options5.length === 0) return;
+  const value20 = el17.value || currentLocale;
+  (triggerText2 && (triggerText2.textContent = getLocaleSelectOptionLabel(el17, value20, options5)),
+    options5.forEach((el18) => {
+      const value21 = el18.dataset?.value === value20;
+      (el18.classList?.toggle('is-active', value21),
+        el18.setAttribute?.('aria-selected', value21 ? 'true' : 'false'));
     }));
 }
-function bindCustomLocaleSelect(_0x575589, _0x395aa9) {
-  const { control: _0x1f7a3e, trigger: _0x2b6be7, menu: _0x2b1a62 } = getCustomLocaleSelectParts(_0x575589);
-  if (!_0x1f7a3e || !_0x2b6be7 || !_0x2b1a62 || _0x2b6be7.dataset?.i18nLocaleBound === '1') return;
-  ((_0x2b6be7.dataset.i18nLocaleBound = '1'),
-    _0x2b6be7.addEventListener?.('click', () => {
-      setCustomLocaleMenuOpen(_0x575589, !isCustomLocaleMenuOpen(_0x575589), { focusOption: true });
+function bindCustomLocaleSelect(el19, value22) {
+  const { control: control3, trigger: trigger3, menu: menu3 } = getCustomLocaleSelectParts(el19);
+  if (!control3 || !trigger3 || !menu3 || trigger3.dataset?.i18nLocaleBound === '1') return;
+  ((trigger3.dataset.i18nLocaleBound = '1'),
+    trigger3.addEventListener?.('click', () => {
+      setCustomLocaleMenuOpen(el19, !isCustomLocaleMenuOpen(el19), { focusOption: true });
     }),
-    _0x2b6be7.addEventListener?.('keydown', (_0x2ea630) => {
-      (_0x2ea630.key === 'ArrowDown' || _0x2ea630.key === 'Enter' || _0x2ea630.key === ' ') &&
-        (_0x2ea630.preventDefault?.(), setCustomLocaleMenuOpen(_0x575589, true, { focusOption: true }));
+    trigger3.addEventListener?.('keydown', (event) => {
+      (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') &&
+        (event.preventDefault?.(), setCustomLocaleMenuOpen(el19, true, { focusOption: true }));
     }),
-    _0x2b1a62.addEventListener?.('click', (_0x4b0299) => {
-      const _0x569e2d = _0x4b0299.target?.closest?.('[data-i18n-locale-option]');
-      if (!_0x569e2d || _0x569e2d.disabled) return;
-      ((_0x575589.value = _0x569e2d.dataset?.value || _0x575589.value),
-        commitLocaleSelect(_0x575589, _0x395aa9),
-        setCustomLocaleMenuOpen(_0x575589, false, { focusTrigger: true }));
+    menu3.addEventListener?.('click', (event2) => {
+      const el20 = event2.target?.closest?.('[data-i18n-locale-option]');
+      if (!el20 || el20.disabled) return;
+      ((el19.value = el20.dataset?.value || el19.value),
+        commitLocaleSelect(el19, value22),
+        setCustomLocaleMenuOpen(el19, false, { focusTrigger: true }));
     }),
-    _0x2b1a62.addEventListener?.('keydown', (_0x4321a6) => {
-      if (_0x4321a6.key === 'Escape')
-        (_0x4321a6.preventDefault?.(), setCustomLocaleMenuOpen(_0x575589, false, { focusTrigger: true }));
+    menu3.addEventListener?.('keydown', (event3) => {
+      if (event3.key === 'Escape')
+        (event3.preventDefault?.(), setCustomLocaleMenuOpen(el19, false, { focusTrigger: true }));
       else {
-        if (_0x4321a6.key === 'ArrowDown')
-          (_0x4321a6.preventDefault?.(), moveCustomLocaleOptionFocus(_0x575589, 1));
+        if (event3.key === 'ArrowDown') (event3.preventDefault?.(), moveCustomLocaleOptionFocus(el19, 1));
         else {
-          if (_0x4321a6.key === 'ArrowUp')
-            (_0x4321a6.preventDefault?.(), moveCustomLocaleOptionFocus(_0x575589, -1));
+          if (event3.key === 'ArrowUp') (event3.preventDefault?.(), moveCustomLocaleOptionFocus(el19, -1));
           else {
-            if (_0x4321a6.key === 'Enter' || _0x4321a6.key === ' ') {
-              _0x4321a6.preventDefault?.();
-              const _0x57860e =
-                _0x575589?.ownerDocument?.activeElement?.closest?.('[data-i18n-locale-option]');
-              if (!_0x57860e || _0x57860e.disabled) return;
-              ((_0x575589.value = _0x57860e.dataset?.value || _0x575589.value),
-                commitLocaleSelect(_0x575589, _0x395aa9),
-                setCustomLocaleMenuOpen(_0x575589, false, { focusTrigger: true }));
+            if (event3.key === 'Enter' || event3.key === ' ') {
+              event3.preventDefault?.();
+              const el21 = el19?.ownerDocument?.activeElement?.closest?.('[data-i18n-locale-option]');
+              if (!el21 || el21.disabled) return;
+              ((el19.value = el21.dataset?.value || el19.value),
+                commitLocaleSelect(el19, value22),
+                setCustomLocaleMenuOpen(el19, false, { focusTrigger: true }));
             }
           }
         }
       }
     }));
-  const _0x3f5f16 = _0x575589?.ownerDocument || globalThis.document;
-  _0x3f5f16?.addEventListener?.('pointerdown', (_0xf527f4) => {
-    if (!isCustomLocaleMenuOpen(_0x575589)) return;
-    if (typeof _0x1f7a3e.contains === 'function' && _0x1f7a3e.contains(_0xf527f4.target)) return;
-    setCustomLocaleMenuOpen(_0x575589, false);
+  const el22 = el19?.ownerDocument || globalThis.document;
+  el22?.addEventListener?.('pointerdown', (event4) => {
+    if (!isCustomLocaleMenuOpen(el19)) return;
+    if (typeof control3.contains === 'function' && control3.contains(event4.target)) return;
+    setCustomLocaleMenuOpen(el19, false);
   });
 }
-function syncLocaleSelects(_0x3067c6 = globalThis.document) {
-  getScopedElements(_0x3067c6, '[data-i18n-locale-select]').forEach((_0x389398) => {
-    if ('value' in _0x389398) _0x389398.value = currentLocale;
-    syncCustomLocaleSelect(_0x389398);
+function syncLocaleSelects(value23 = globalThis.document) {
+  getScopedElements(value23, '[data-i18n-locale-select]').forEach((el23) => {
+    if ('value' in el23) el23.value = currentLocale;
+    syncCustomLocaleSelect(el23);
   });
 }
-function bindLocaleSelects(_0x5aaccb = globalThis.document) {
-  getScopedElements(_0x5aaccb, '[data-i18n-locale-select]').forEach((_0x557f73) => {
-    (_0x557f73.dataset?.i18nLocaleBound !== '1' &&
-      ((_0x557f73.dataset.i18nLocaleBound = '1'),
-      _0x557f73.addEventListener?.('change', () => {
-        commitLocaleSelect(_0x557f73, _0x5aaccb);
+function bindLocaleSelects(value24 = globalThis.document) {
+  getScopedElements(value24, '[data-i18n-locale-select]').forEach((el24) => {
+    (el24.dataset?.i18nLocaleBound !== '1' &&
+      ((el24.dataset.i18nLocaleBound = '1'),
+      el24.addEventListener?.('change', () => {
+        commitLocaleSelect(el24, value24);
       })),
-      bindCustomLocaleSelect(_0x557f73, _0x5aaccb));
+      bindCustomLocaleSelect(el24, value24));
   });
 }
-export function initI18nDomBindings(_0x2c8f70 = globalThis.document) {
+export function initI18nDomBindings(value25 = globalThis.document) {
   return (
     initI18n(),
-    applyI18n(_0x2c8f70),
-    bindLocaleSelects(_0x2c8f70),
-    syncLocaleSelects(_0x2c8f70),
+    applyI18n(value25),
+    bindLocaleSelects(value25),
+    syncLocaleSelects(value25),
     onLocaleChange(() => {
-      (applyI18n(_0x2c8f70), syncLocaleSelects(_0x2c8f70));
+      (applyI18n(value25), syncLocaleSelects(value25));
     })
   );
 }

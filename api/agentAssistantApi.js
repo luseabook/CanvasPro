@@ -27,180 +27,174 @@ export const AGENT_ASSISTANT_SYSTEM_PROMPT = [
   'Canvas context is read-only in this response channel. You may analyze it, but never claim that you created, changed, generated, selected, or arranged canvas content.',
   'When the user later asks to place content on the canvas, the product will route that turn to canvas tools.',
 ]['join']('\x0a');
-function truncateText(_0x1ef99f, _0x4badbd) {
-  const _0x3dfcbc = String(_0x1ef99f || '');
-  if (_0x3dfcbc['length'] <= _0x4badbd) return _0x3dfcbc;
-  return _0x3dfcbc['slice'](0x0, Math['max'](0x0, _0x4badbd - 0x3)) + '...';
+function truncateText(value, item) {
+  const list = String(value || '');
+  if (list['length'] <= item) return list;
+  return list['slice'](0x0, Math['max'](0x0, item - 0x3)) + '...';
 }
-function normalizeLocale(_0x570a42 = '') {
-  return String(_0x570a42 || '')
+function normalizeLocale(key = '') {
+  return String(key || '')
     ['toLowerCase']()
     ['startsWith']('en')
     ? 'en-US'
     : 'zh-CN';
 }
-function normalizeHistory(_0x2d55f4 = [], _0x5ba813 = '') {
-  if (!Array['isArray'](_0x2d55f4)) return [];
-  const _0x20f3cc = _0x2d55f4['slice']();
-  if (_0x20f3cc['at'](-0x1)?.['role'] === 'user' && _0x20f3cc['at'](-0x1)?.['content'] === _0x5ba813)
-    _0x20f3cc['pop']();
-  const _0x45d07d = _0x20f3cc['findLastIndex'](
-      (_0x141fc5) =>
-        _0x141fc5['role'] === 'assistant' &&
-        (!_0x141fc5['status'] ||
-          _0x141fc5['status'] === 'chat' ||
-          (_0x141fc5['assistantContext'] && ['stopped', 'failed']['includes'](_0x141fc5['status']))),
+function normalizeHistory(list2 = [], index = '') {
+  if (!Array['isArray'](list2)) return [];
+  const list3 = list2['slice']();
+  if (list3['at'](-0x1)?.['role'] === 'user' && list3['at'](-0x1)?.['content'] === index) list3['pop']();
+  const result = list3['findLastIndex'](
+      (response) =>
+        response['role'] === 'assistant' &&
+        (!response['status'] ||
+          response['status'] === 'chat' ||
+          (response['assistantContext'] && ['stopped', 'failed']['includes'](response['status']))),
     ),
-    _0x12a5e1 = _0x20f3cc['map']((_0x1262e2 = {}, _0xf848d1) => ({
-      role: String(_0x1262e2['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
+    list4 = list3['map']((choice = {}, data) => ({
+      role: String(choice['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
       content: compactAgentConversationText(
-        _0x1262e2['content'] || _0x1262e2['reply'] || _0x1262e2['message'] || _0x1262e2['question'] || '',
-        _0xf848d1 === _0x45d07d ? 0x3e80 : ASSISTANT_HISTORY_ENTRY_LIMIT,
+        choice['content'] || choice['reply'] || choice['message'] || choice['question'] || '',
+        data === result ? 0x3e80 : ASSISTANT_HISTORY_ENTRY_LIMIT,
       ),
-      ...(_0x1262e2['assistantContext']?.['choice']
-        ? { choice: _0x1262e2['assistantContext']['choice'] }
-        : {}),
-    }))['filter']((_0x3ef7fa) => _0x3ef7fa['content']),
-    _0x58ce89 = _0x12a5e1['at'](-0x1);
+      ...(choice['assistantContext']?.['choice'] ? { choice: choice['assistantContext']['choice'] } : {}),
+    }))['filter']((options) => options['content']),
+    target = list4['at'](-0x1);
   return (
-    _0x58ce89?.['role'] === 'user' && _0x58ce89['content'] === String(_0x5ba813 || '') && _0x12a5e1['pop'](),
-    _0x12a5e1['slice'](-ASSISTANT_HISTORY_LIMIT)
+    target?.['role'] === 'user' && target['content'] === String(index || '') && list4['pop'](),
+    list4['slice'](-ASSISTANT_HISTORY_LIMIT)
   );
 }
-function compactCanvasContext(_0x277973 = {}) {
-  const _0x5fcae9 = _0x277973?.['canvas'] || {};
+function compactCanvasContext(canvas = {}) {
+  const projectId = canvas?.['canvas'] || {};
   return {
-    projectId: _0x5fcae9['projectId'] || '',
-    selectedNodeIds: Array['isArray'](_0x5fcae9['selectedNodeIds'])
-      ? _0x5fcae9['selectedNodeIds']['slice'](0x0, 0xc)
+    projectId: projectId['projectId'] || '',
+    selectedNodeIds: Array['isArray'](projectId['selectedNodeIds'])
+      ? projectId['selectedNodeIds']['slice'](0x0, 0xc)
       : [],
-    inputRefs: Array['isArray'](_0x5fcae9['inputRefs']) ? _0x5fcae9['inputRefs']['slice'](0x0, 0xc) : [],
-    nodes: (Array['isArray'](_0x5fcae9['nodes']) ? _0x5fcae9['nodes'] : [])
+    inputRefs: Array['isArray'](projectId['inputRefs']) ? projectId['inputRefs']['slice'](0x0, 0xc) : [],
+    nodes: (Array['isArray'](projectId['nodes']) ? projectId['nodes'] : [])
       ['slice'](0x0, 0x18)
-      ['map']((_0x5e4274 = {}) => ({
-        id: _0x5e4274['id'] || _0x5e4274['nodeId'] || '',
-        type: _0x5e4274['type'] || '',
-        name: truncateText(_0x5e4274['name'] || _0x5e4274['label'] || '', 0x78),
-        promptPreview: truncateText(_0x5e4274['promptPreview'] || '', 0x320),
-        contentPreview: truncateText(_0x5e4274['contentPreview'] || '', 0x320),
-        model: _0x5e4274['model'] || '',
-        provider: _0x5e4274['provider'] || '',
-        status: _0x5e4274['status'] || _0x5e4274['jobStatus'] || '',
+      ['map']((id = {}) => ({
+        id: id['id'] || id['nodeId'] || '',
+        type: id['type'] || '',
+        name: truncateText(id['name'] || id['label'] || '', 0x78),
+        promptPreview: truncateText(id['promptPreview'] || '', 0x320),
+        contentPreview: truncateText(id['contentPreview'] || '', 0x320),
+        model: id['model'] || '',
+        provider: id['provider'] || '',
+        status: id['status'] || id['jobStatus'] || '',
       })),
   };
 }
-function compactSkills(_0x22aeae = {}, _0x2a77f = 0x1f40, _0x2aa6f6 = 0xfa0) {
-  return (Array['isArray'](_0x22aeae?.['skills']) ? _0x22aeae['skills'] : [])
+function compactSkills(options2 = {}, source = 0x1f40, next = 0xfa0) {
+  return (Array['isArray'](options2?.['skills']) ? options2['skills'] : [])
     ['slice'](0x0, 0x2)
-    ['map']((_0x9f95a8 = {}) => ({
-      id: String(_0x9f95a8['id'] || ''),
-      title: truncateText(_0x9f95a8['title'] || _0x9f95a8['id'] || '', 0x78),
-      description: truncateText(_0x9f95a8['description'] || '', 0x1f4),
-      instructions: truncateText(_0x9f95a8['instructions'] || '', _0x2a77f),
-      source: String(_0x9f95a8['source'] || ''),
-      resourceNames: Array['isArray'](_0x9f95a8['resourceNames'])
-        ? _0x9f95a8['resourceNames']['slice'](0x0, 0xc)['map']((_0x465267) => truncateText(_0x465267, 0xa0))
+    ['map']((options3 = {}) => ({
+      id: String(options3['id'] || ''),
+      title: truncateText(options3['title'] || options3['id'] || '', 0x78),
+      description: truncateText(options3['description'] || '', 0x1f4),
+      instructions: truncateText(options3['instructions'] || '', source),
+      source: String(options3['source'] || ''),
+      resourceNames: Array['isArray'](options3['resourceNames'])
+        ? options3['resourceNames']['slice'](0x0, 0xc)['map']((current) => truncateText(current, 0xa0))
         : [],
-      resources: (Array['isArray'](_0x9f95a8['resources']) ? _0x9f95a8['resources'] : [])
+      resources: (Array['isArray'](options3['resources']) ? options3['resources'] : [])
         ['slice'](0x0, 0x8)
-        ['map']((_0x2d8a62 = {}) => ({
-          name: truncateText(_0x2d8a62['name'], 0xa0),
-          content: truncateText(_0x2d8a62['content'], _0x2aa6f6),
+        ['map']((error = {}) => ({
+          name: truncateText(error['name'], 0xa0),
+          content: truncateText(error['content'], next),
         })),
     }))
-    ['filter']((_0x53b949) => _0x53b949['id'] && (_0x53b949['description'] || _0x53b949['instructions']));
+    ['filter']((entry) => entry['id'] && (entry['description'] || entry['instructions']));
 }
 function buildAssistantPrompt({
-  message: _0x119faa,
-  context: _0x2d5ee5,
-  history: _0x1bae10,
-  contextDigest: _0x323b01,
-  projectMemory: _0x285fa1,
-  externalInformation: _0x3d5273,
-  locale: _0x27d12d,
+  message: message,
+  context: context,
+  history: history2,
+  contextDigest: contextDigest2,
+  projectMemory: projectMemory2,
+  externalInformation: externalInformation2,
+  locale: locale,
 }) {
-  const _0x3063b7 = {
+  const canvas2 = {
     languagePolicy:
-      normalizeLocale(_0x27d12d) === 'en-US'
+      normalizeLocale(locale) === 'en-US'
         ? 'Reply\x20in\x20English\x20unless\x20the\x20user\x20explicitly\x20requests\x20another\x20language.'
         : '使用简体中文回复，除非用户明确要求其他语言。',
-    history: normalizeHistory(_0x1bae10, _0x119faa),
-    contextDigest: compactAgentContextDigestForPrompt(_0x323b01),
-    projectMemory: compactAgentProjectMemoryForPrompt(_0x285fa1),
-    externalInformation: compactAgentExternalInformationForPrompt(_0x3d5273),
-    skills: compactSkills(_0x2d5ee5),
-    canvas: compactCanvasContext(_0x2d5ee5),
-    ...(_0x2d5ee5?.['workspace']
+    history: normalizeHistory(history2, message),
+    contextDigest: compactAgentContextDigestForPrompt(contextDigest2),
+    projectMemory: compactAgentProjectMemoryForPrompt(projectMemory2),
+    externalInformation: compactAgentExternalInformationForPrompt(externalInformation2),
+    skills: compactSkills(context),
+    canvas: compactCanvasContext(context),
+    ...(context?.['workspace']
       ? {
           workspace: {
-            title: truncateText(_0x2d5ee5['workspace']['title'], 0xc8),
-            brief: truncateText(_0x2d5ee5['workspace']['brief'], 0x1388),
-            document: compactAgentConversationText(_0x2d5ee5['workspace']['document'], 0x5dc0),
-            selection: truncateText(_0x2d5ee5['workspace']['selection'], 0x1770),
+            title: truncateText(context['workspace']['title'], 0xc8),
+            brief: truncateText(context['workspace']['brief'], 0x1388),
+            document: compactAgentConversationText(context['workspace']['document'], 0x5dc0),
+            selection: truncateText(context['workspace']['selection'], 0x1770),
             capabilities: ['discuss', 'draft'],
           },
         }
       : {}),
-    userMessage: String(_0x119faa || ''),
+    userMessage: String(message || ''),
   };
-  let _0x43bfd8 = JSON['stringify'](_0x3063b7);
-  if (_0x43bfd8['length'] <= AGENT_ASSISTANT_PROMPT_MAX_CHARS) return _0x43bfd8;
-  ((_0x3063b7['canvas']['nodes'] = _0x3063b7['canvas']['nodes']
-    ['slice'](0x0, 0x8)
-    ['map']((_0x73ac4c) => ({
-      ..._0x73ac4c,
-      promptPreview: truncateText(_0x73ac4c['promptPreview'], 0xf0),
-      contentPreview: truncateText(_0x73ac4c['contentPreview'], 0xf0),
-    }))),
-    (_0x43bfd8 = JSON['stringify'](_0x3063b7)));
-  _0x43bfd8['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS &&
-    ((_0x3063b7['externalInformation'] = compactAgentExternalInformationForPrompt(_0x3d5273, {
+  let list5 = JSON['stringify'](canvas2);
+  if (list5['length'] <= AGENT_ASSISTANT_PROMPT_MAX_CHARS) return list5;
+  ((canvas2['canvas']['nodes'] = canvas2['canvas']['nodes']['slice'](0x0, 0x8)['map']((args) => ({
+    ...args,
+    promptPreview: truncateText(args['promptPreview'], 0xf0),
+    contentPreview: truncateText(args['contentPreview'], 0xf0),
+  }))),
+    (list5 = JSON['stringify'](canvas2)));
+  list5['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS &&
+    ((canvas2['externalInformation'] = compactAgentExternalInformationForPrompt(externalInformation2, {
       maxContentChars: 0xfa0,
     })),
-    (_0x43bfd8 = JSON['stringify'](_0x3063b7)));
-  _0x43bfd8['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS &&
-    ((_0x3063b7['skills'] = compactSkills(_0x2d5ee5, 0x7d0, 0x4b0)),
-    (_0x43bfd8 = JSON['stringify'](_0x3063b7)));
-  while (_0x43bfd8['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS && _0x3063b7['history']['length'] > 0x2) {
-    (_0x3063b7['history']['shift'](), (_0x43bfd8 = JSON['stringify'](_0x3063b7)));
+    (list5 = JSON['stringify'](canvas2)));
+  list5['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS &&
+    ((canvas2['skills'] = compactSkills(context, 0x7d0, 0x4b0)), (list5 = JSON['stringify'](canvas2)));
+  while (list5['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS && canvas2['history']['length'] > 0x2) {
+    (canvas2['history']['shift'](), (list5 = JSON['stringify'](canvas2)));
   }
-  _0x43bfd8['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS &&
-    ((_0x3063b7['canvas']['nodes'] = []),
-    (_0x3063b7['skills'] = compactSkills(_0x2d5ee5, 0x4b0, 0xf0)),
-    (_0x3063b7['history'] = _0x3063b7['history']['map']((_0x45d1a4) => ({
-      ..._0x45d1a4,
-      content: compactAgentConversationText(_0x45d1a4['content'], 0x7d0),
+  list5['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS &&
+    ((canvas2['canvas']['nodes'] = []),
+    (canvas2['skills'] = compactSkills(context, 0x4b0, 0xf0)),
+    (canvas2['history'] = canvas2['history']['map']((args2) => ({
+      ...args2,
+      content: compactAgentConversationText(args2['content'], 0x7d0),
     }))),
-    (_0x43bfd8 = JSON['stringify'](_0x3063b7)));
-  if (_0x43bfd8['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS)
+    (list5 = JSON['stringify'](canvas2)));
+  if (list5['length'] > AGENT_ASSISTANT_PROMPT_MAX_CHARS)
     throw new Error(
-      normalizeLocale(_0x27d12d) === 'en-US'
+      normalizeLocale(locale) === 'en-US'
         ? 'This\x20message\x20exceeds\x20the\x20conversation\x20context\x20budget.\x20Please\x20send\x20it\x20in\x20smaller\x20sections.'
         : '本次消息超出了对话上下文容量，请分段发送。',
     );
-  return _0x43bfd8;
+  return list5;
 }
-function getResultText(_0x29998c) {
-  return typeof _0x29998c === 'string'
-    ? _0x29998c
-    : _0x29998c?.['text'] || _0x29998c?.['outputText'] || _0x29998c?.['content'] || '';
+function getResultText(response2) {
+  return typeof response2 === 'string'
+    ? response2
+    : response2?.['text'] || response2?.['outputText'] || response2?.['content'] || '';
 }
-function appendExternalSourceCitations(_0x1280d7, _0x3115a9, _0x25f96e = '') {
-  const _0x2cf8e4 = compactAgentExternalInformationForPrompt(_0x3115a9),
-    _0x48ab0a = _0x2cf8e4['map']((_0x4fc5ac) => ({
-      kind: _0x4fc5ac['sourceKind'],
-      value: _0x4fc5ac['sourceKind'] === 'document' ? _0x4fc5ac['displayName'] : _0x4fc5ac['finalUrl'],
-    }))['filter']((_0x163fb6) => _0x163fb6['value'] && !_0x1280d7['includes'](_0x163fb6['value']));
-  if (_0x48ab0a['length'] === 0x0) return _0x1280d7;
-  const _0x5950e6 = normalizeLocale(_0x25f96e) === 'en-US' ? 'Sources' : '来源',
-    _0x39ef51 = _0x48ab0a['map']((_0x3e30d0) =>
-      _0x3e30d0['kind'] === 'document' ? '《' + _0x3e30d0['value'] + '》' : '<' + _0x3e30d0['value'] + '>',
+function appendExternalSourceCitations(list6, record, payload = '') {
+  const list7 = compactAgentExternalInformationForPrompt(record),
+    list8 = list7['map']((kind) => ({
+      kind: kind['sourceKind'],
+      value: kind['sourceKind'] === 'document' ? kind['displayName'] : kind['finalUrl'],
+    }))['filter']((el) => el['value'] && !list6['includes'](el['value']));
+  if (list8['length'] === 0x0) return list6;
+  const locale2 = normalizeLocale(payload) === 'en-US' ? 'Sources' : '来源',
+    list9 = list8['map']((el2) =>
+      el2['kind'] === 'document' ? '《' + el2['value'] + '》' : '<' + el2['value'] + '>',
     );
-  return _0x1280d7 + '\x0a\x0a' + _0x5950e6 + '：' + _0x39ef51['join']('、');
+  return list6 + '\x0a\x0a' + locale2 + '：' + list9['join']('、');
 }
 export async function requestAgentAssistantReply({
-  message: _0x150586,
-  context: _0x35731e,
+  message: message2,
+  context: context2,
   history: history = [],
   contextDigest: contextDigest = null,
   projectMemory: projectMemory = null,
@@ -211,48 +205,42 @@ export async function requestAgentAssistantReply({
   onTrace: onTrace = null,
   onText: onText = null,
 } = {}) {
-  const _0x1d255b = String(settings['model'] || '')['trim'](),
-    _0x524aea = String(settings['provider'] || '')['trim'](),
-    _0x307b19 = String(settings['providerProfileId'] || '')['trim']();
-  if (!_0x1d255b || !_0x524aea) throw new Error('Agent model is not configured.');
+  const model = String(settings['model'] || '')['trim'](),
+    provider = String(settings['provider'] || '')['trim'](),
+    providerProfileId = String(settings['providerProfileId'] || '')['trim']();
+  if (!model || !provider) throw new Error('Agent model is not configured.');
   onTrace?.({
     type: 'agent_response_channel_selected',
     channel: 'assistant.message',
-    provider: _0x524aea,
-    model: _0x1d255b,
+    provider: provider,
+    model: model,
   });
-  const _0x16c3fb = buildAssistantPrompt({
-      message: _0x150586,
-      context: _0x35731e,
+  const prompt = buildAssistantPrompt({
+      message: message2,
+      context: context2,
       history: history,
       contextDigest: contextDigest,
       projectMemory: projectMemory,
       externalInformation: externalInformation,
       locale: settings['locale'],
     }),
-    _0x14be13 = buildInjectedAgentSkillTrace(_0x16c3fb, { channel: 'assistant.message' });
-  if (_0x14be13) onTrace?.(_0x14be13);
-  const _0x22787e = await request({
-      ...(typeof onText === 'function'
-        ? { onText: (_0xf7b782) => onText(getAgentStreamingProse(_0xf7b782)) }
-        : {}),
-      model: _0x1d255b,
-      provider: _0x524aea,
+    injectedAgentSkillTrace = buildInjectedAgentSkillTrace(prompt, { channel: 'assistant.message' });
+  if (injectedAgentSkillTrace) onTrace?.(injectedAgentSkillTrace);
+  const request2 = await request({
+      ...(typeof onText === 'function' ? { onText: (handle) => onText(getAgentStreamingProse(handle)) } : {}),
+      model: model,
+      provider: provider,
       ...buildAgentModelRequestParams(settings),
-      ...(_0x307b19 ? { providerProfileId: _0x307b19 } : {}),
-      prompt: _0x16c3fb,
+      ...(providerProfileId ? { providerProfileId: providerProfileId } : {}),
+      prompt: prompt,
       systemPrompt: AGENT_ASSISTANT_SYSTEM_PROMPT,
       temperature: Number['isFinite'](Number(settings['temperature']))
         ? Number(settings['temperature'])
         : 0.7,
       ...(signal ? { signal: signal } : {}),
     }),
-    _0x25e51b = normalizeAgentAssistantReply(getResultText(_0x22787e));
-  if (!_0x25e51b['reply']) throw new Error('Agent assistant returned empty text.');
-  const _0x40c179 = appendExternalSourceCitations(
-    _0x25e51b['reply'],
-    externalInformation,
-    settings['locale'],
-  );
-  return { ..._0x25e51b, reply: _0x40c179 };
+    args3 = normalizeAgentAssistantReply(getResultText(request2));
+  if (!args3['reply']) throw new Error('Agent assistant returned empty text.');
+  const reply = appendExternalSourceCitations(args3['reply'], externalInformation, settings['locale']);
+  return { ...args3, reply: reply };
 }

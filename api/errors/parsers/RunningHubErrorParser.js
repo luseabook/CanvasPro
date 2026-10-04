@@ -162,199 +162,198 @@ const RH_ERROR_CODE_MAP = {
     APIKEY_TASK_IS_QUEUED: 0x32d,
     WEBAPP_NOT_EXISTS: 0x385,
   };
-function isPlainObject(_0x4b6803) {
-  return !!_0x4b6803 && typeof _0x4b6803 === 'object' && !Array.isArray(_0x4b6803);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array.isArray(enabled);
 }
-function toNonEmptyString(_0x38c322) {
-  const _0x5301c0 = String(_0x38c322 ?? '').trim();
-  return _0x5301c0 || '';
+function toNonEmptyString(value) {
+  const item = String(value ?? '').trim();
+  return item || '';
 }
-function toMessageString(_0x38c242) {
-  if (isPlainObject(_0x38c242))
-    return toNonEmptyString(_0x38c242.errorMessage || _0x38c242.message || _0x38c242.error || _0x38c242.msg);
-  return toNonEmptyString(_0x38c242);
+function toMessageString(error) {
+  if (isPlainObject(error))
+    return toNonEmptyString(error.errorMessage || error.message || error.error || error.msg);
+  return toNonEmptyString(error);
 }
-function parseJsonObject(_0x53641f) {
-  const _0x4fe543 = toNonEmptyString(_0x53641f);
-  if (!_0x4fe543 || !/^[{[]/.test(_0x4fe543)) return null;
+function parseJsonObject(key) {
+  const toNonEmptyString2 = toNonEmptyString(key);
+  if (!toNonEmptyString2 || !/^[{[]/.test(toNonEmptyString2)) return null;
   try {
-    const _0x74c5cc = JSON.parse(_0x4fe543);
-    return _0x74c5cc && typeof _0x74c5cc === 'object' ? _0x74c5cc : null;
+    const index = JSON.parse(toNonEmptyString2);
+    return index && typeof index === 'object' ? index : null;
   } catch {
     return null;
   }
 }
-function collectCandidateObjects(_0x3c61a7) {
-  if (!_0x3c61a7 || typeof _0x3c61a7 !== 'object') return [];
-  const _0x8c42f0 = [],
-    _0xf0dd32 = (_0x216264) => {
-      if (isPlainObject(_0x216264)) _0x8c42f0.push(_0x216264);
+function collectCandidateObjects(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return [];
+  const list = [],
+    handler = (result) => {
+      if (isPlainObject(result)) list.push(result);
     },
-    _0x4c0259 = (_0x5507e0) => {
-      if (!Array.isArray(_0x5507e0)) return;
-      _0x5507e0.forEach(_0xf0dd32);
+    handler2 = (list2) => {
+      if (!Array.isArray(list2)) return;
+      list2.forEach(handler);
     };
   return (
-    _0xf0dd32(_0x3c61a7),
-    _0x4c0259(_0x3c61a7),
-    _0xf0dd32(_0x3c61a7.data),
-    _0xf0dd32(_0x3c61a7.result),
-    _0xf0dd32(_0x3c61a7.output),
-    _0xf0dd32(_0x3c61a7.response),
-    _0x4c0259(_0x3c61a7.data),
-    _0x4c0259(_0x3c61a7.results),
-    _0x8c42f0
+    handler(enabled2),
+    handler2(enabled2),
+    handler(enabled2.data),
+    handler(enabled2.result),
+    handler(enabled2.output),
+    handler(enabled2.response),
+    handler2(enabled2.data),
+    handler2(enabled2.results),
+    list
   );
 }
-function extractFailureBaseMessage(_0x406621, _0x51d5cb) {
-  const _0x119a8a = collectCandidateObjects(_0x406621);
-  for (const _0x3b1d9f of _0x119a8a) {
-    const _0x57e6f7 = [
-      _0x3b1d9f.errorMessage,
-      _0x3b1d9f.error,
-      _0x3b1d9f.message,
-      _0x3b1d9f.msg,
-      _0x3b1d9f.failure_reason,
-    ];
-    for (const _0x1a5b2d of _0x57e6f7) {
-      const _0x402cd5 = toMessageString(_0x1a5b2d);
-      if (_0x402cd5) return _0x402cd5;
+function extractFailureBaseMessage(data, options) {
+  const candidateObjects = collectCandidateObjects(data);
+  for (const error2 of candidateObjects) {
+    const target = [error2.errorMessage, error2.error, error2.message, error2.msg, error2.failure_reason];
+    for (const source of target) {
+      const toMessageString2 = toMessageString(source);
+      if (toMessageString2) return toMessageString2;
     }
   }
-  return toNonEmptyString(_0x51d5cb) || '任务执行失败';
+  return toNonEmptyString(options) || '任务执行失败';
 }
-function extractDetailFromText(_0xc85361) {
-  const _0x50c45b = toNonEmptyString(_0xc85361);
-  if (!_0x50c45b) return { nodeId: '', exceptionMessage: '' };
-  const _0x4ee495 = _0x50c45b.match(/["']?node_id["']?\s*[:=]\s*["']?([^"',}\]\n\r]*)/i),
-    _0x1917bf = _0x50c45b.match(/["']?exception_message["']?\s*[:=]\s*["']?([^"',}\]\n\r]*)/i);
-  return { nodeId: toNonEmptyString(_0x4ee495?.[1]), exceptionMessage: toNonEmptyString(_0x1917bf?.[1]) };
+function extractDetailFromText(next) {
+  const toNonEmptyString3 = toNonEmptyString(next);
+  if (!toNonEmptyString3) return { nodeId: '', exceptionMessage: '' };
+  const current = toNonEmptyString3.match(/["']?node_id["']?\s*[:=]\s*["']?([^"',}\]\n\r]*)/i),
+    entry = toNonEmptyString3.match(/["']?exception_message["']?\s*[:=]\s*["']?([^"',}\]\n\r]*)/i);
+  return { nodeId: toNonEmptyString(current?.[1]), exceptionMessage: toNonEmptyString(entry?.[1]) };
 }
-function extractDetailFromValue(_0x28cfce) {
-  const _0x3d7703 = parseJsonObject(_0x28cfce),
-    _0x192cfe = _0x3d7703 || _0x28cfce;
-  if (isPlainObject(_0x192cfe)) {
-    const _0x504bf1 = toNonEmptyString(_0x192cfe.node_id || _0x192cfe.nodeId),
-      _0x5ec658 = toNonEmptyString(_0x192cfe.exception_message || _0x192cfe.exceptionMessage);
-    if (_0x504bf1 || _0x5ec658) return { nodeId: _0x504bf1, exceptionMessage: _0x5ec658 };
+function extractDetailFromValue(record) {
+  const jsonObject = parseJsonObject(record),
+    payload = jsonObject || record;
+  if (isPlainObject(payload)) {
+    const nodeId = toNonEmptyString(payload.node_id || payload.nodeId),
+      exceptionMessage = toNonEmptyString(payload.exception_message || payload.exceptionMessage);
+    if (nodeId || exceptionMessage) return { nodeId: nodeId, exceptionMessage: exceptionMessage };
   }
-  if (typeof _0x192cfe === 'string') return extractDetailFromText(_0x192cfe);
+  if (typeof payload === 'string') return extractDetailFromText(payload);
   return { nodeId: '', exceptionMessage: '' };
 }
-function extractFailedReasonDetails(_0x1a688c) {
-  const _0x500421 = collectCandidateObjects(_0x1a688c);
-  for (const _0xdab356 of _0x500421) {
-    const _0x29afb9 = extractDetailFromValue(_0xdab356);
-    if (_0x29afb9.nodeId || _0x29afb9.exceptionMessage) return _0x29afb9;
-    const _0x3b6d40 = _0xdab356.failedReason ?? _0xdab356.failed_reason,
-      _0x5eff0c = extractDetailFromValue(_0x3b6d40);
-    if (_0x5eff0c.nodeId || _0x5eff0c.exceptionMessage) return _0x5eff0c;
-    const _0x299398 = extractDetailFromValue(_0xdab356.data?.failedReason ?? _0xdab356.data?.failed_reason);
-    if (_0x299398.nodeId || _0x299398.exceptionMessage) return _0x299398;
+function extractFailedReasonDetails(handle) {
+  const candidateObjects2 = collectCandidateObjects(handle);
+  for (const state of candidateObjects2) {
+    const extractDetailFromValue2 = extractDetailFromValue(state);
+    if (extractDetailFromValue2.nodeId || extractDetailFromValue2.exceptionMessage)
+      return extractDetailFromValue2;
+    const config = state.failedReason ?? state.failed_reason,
+      extractDetailFromValue3 = extractDetailFromValue(config);
+    if (extractDetailFromValue3.nodeId || extractDetailFromValue3.exceptionMessage)
+      return extractDetailFromValue3;
+    const extractDetailFromValue4 = extractDetailFromValue(
+      state.data?.failedReason ?? state.data?.failed_reason,
+    );
+    if (extractDetailFromValue4.nodeId || extractDetailFromValue4.exceptionMessage)
+      return extractDetailFromValue4;
   }
   return { nodeId: '', exceptionMessage: '' };
 }
-export function appendRunningHubFailureDetails(_0xe6cd94, _0x930cbd) {
-  const _0x66a563 = toNonEmptyString(_0xe6cd94) || '任务执行失败',
-    { nodeId: _0x554756, exceptionMessage: _0x21fffa } = extractFailedReasonDetails(_0x930cbd),
-    _0x3549a6 = [_0x66a563];
-  if (_0x554756) _0x3549a6.push('node_id: ' + _0x554756);
-  if (_0x21fffa) _0x3549a6.push('exception_message: ' + _0x21fffa);
-  return _0x3549a6.join('\n');
+export function appendRunningHubFailureDetails(scope, input) {
+  const toNonEmptyString4 = toNonEmptyString(scope) || '任务执行失败',
+    { nodeId: nodeId2, exceptionMessage: exceptionMessage2 } = extractFailedReasonDetails(input),
+    list3 = [toNonEmptyString4];
+  if (nodeId2) list3.push('node_id: ' + nodeId2);
+  if (exceptionMessage2) list3.push('exception_message: ' + exceptionMessage2);
+  return list3.join('\n');
 }
-export function formatRunningHubFailureMessage(_0x3faabf, _0xabcfe1 = '任务执行失败') {
-  return appendRunningHubFailureDetails(extractFailureBaseMessage(_0x3faabf, _0xabcfe1), _0x3faabf);
+export function formatRunningHubFailureMessage(output, value2 = '任务执行失败') {
+  return appendRunningHubFailureDetails(extractFailureBaseMessage(output, value2), output);
 }
-function extractErrorCode(_0x3906e0) {
-  if (_0x3906e0.code && typeof _0x3906e0.code === 'number') return _0x3906e0.code;
-  const _0x45df4c = _0x3906e0.msg || _0x3906e0.message || _0x3906e0.errorMessage || _0x3906e0.error || '';
-  for (const [_0x5269c1, _0x8d11cc] of Object.entries(RH_ERROR_MSG_MAP)) {
-    if (_0x45df4c.includes(_0x5269c1)) return _0x8d11cc;
+function extractErrorCode(error3) {
+  if (error3.code && typeof error3.code === 'number') return error3.code;
+  const list4 = error3.msg || error3.message || error3.errorMessage || error3.error || '';
+  for (const [value3, value4] of Object.entries(RH_ERROR_MSG_MAP)) {
+    if (list4.includes(value3)) return value4;
   }
   return null;
 }
-export function parseError(_0x1a9454, _0x388556) {
-  if (!_0x1a9454) return null;
-  const _0x4be2d8 = parseTaskError(_0x1a9454);
-  if (_0x4be2d8) return _0x4be2d8;
-  const _0x12bb9b = extractErrorCode(_0x1a9454);
-  if (_0x12bb9b && RH_ERROR_CODE_MAP[_0x12bb9b]) {
-    const _0x355912 = RH_ERROR_CODE_MAP[_0x12bb9b];
+export function parseError(error4, status) {
+  if (!error4) return null;
+  const taskError = parseTaskError(error4);
+  if (taskError) return taskError;
+  const code = extractErrorCode(error4);
+  if (code && RH_ERROR_CODE_MAP[code]) {
+    const type = RH_ERROR_CODE_MAP[code];
     return new ApiError({
-      type: _0x355912.type,
+      type: type.type,
       provider: 'runninghub',
-      code: _0x12bb9b,
-      message: appendRunningHubFailureDetails(_0x355912.message, _0x1a9454),
-      status: _0x388556,
-      retryable: _0x355912.retryable ?? (_0x12bb9b >= 0x3ed && _0x12bb9b !== 0x3f7),
+      code: code,
+      message: appendRunningHubFailureDetails(type.message, error4),
+      status: status,
+      retryable: type.retryable ?? (code >= 0x3ed && code !== 0x3f7),
     });
   }
-  const _0x591684 = _0x1a9454.errorMessage || _0x1a9454.error || _0x1a9454.message || _0x1a9454.msg || '',
-    _0x2bbae8 = String(_0x591684).toUpperCase();
+  const value5 = error4.errorMessage || error4.error || error4.message || error4.msg || '',
+    list5 = String(value5).toUpperCase();
   if (
-    _0x2bbae8.includes('BALANCE') ||
-    _0x2bbae8.includes('WALLET') ||
-    _0x2bbae8.includes('余额') ||
-    _0x2bbae8.includes('资金')
+    list5.includes('BALANCE') ||
+    list5.includes('WALLET') ||
+    list5.includes('余额') ||
+    list5.includes('资金')
   )
-    return ApiError.insufficientBalance('runninghub', _0x12bb9b || _0x388556);
+    return ApiError.insufficientBalance('runninghub', code || status);
   if (
-    _0x388556 === 0x191 ||
-    _0x2bbae8.includes('API_KEY') ||
-    _0x2bbae8.includes('UNAUTHORIZED') ||
-    _0x2bbae8.includes('AUTH')
+    status === 0x191 ||
+    list5.includes('API_KEY') ||
+    list5.includes('UNAUTHORIZED') ||
+    list5.includes('AUTH')
   )
-    return ApiError.authError('runninghub', _0x12bb9b || _0x388556, _0x591684);
+    return ApiError.authError('runninghub', code || status, value5);
   if (
-    _0x388556 === 0x1ad ||
-    _0x2bbae8.includes('RATE_LIMIT') ||
-    _0x2bbae8.includes('TOO_MANY') ||
-    _0x2bbae8.includes('繁忙')
+    status === 0x1ad ||
+    list5.includes('RATE_LIMIT') ||
+    list5.includes('TOO_MANY') ||
+    list5.includes('繁忙')
   )
-    return ApiError.rateLimit('runninghub', _0x12bb9b || _0x388556);
+    return ApiError.rateLimit('runninghub', code || status);
   if (
-    _0x2bbae8.includes('CONTENT') ||
-    _0x2bbae8.includes('审核') ||
-    _0x2bbae8.includes('真人') ||
-    _0x2bbae8.includes('PHOTOREALISTIC')
+    list5.includes('CONTENT') ||
+    list5.includes('审核') ||
+    list5.includes('真人') ||
+    list5.includes('PHOTOREALISTIC')
   )
-    return ApiError.contentFiltered('runninghub', _0x591684);
-  const _0x56e356 = (_0x1a9454.status || '').toUpperCase();
-  if (_0x56e356 === 'FAILED' || _0x56e356 === 'ERROR')
+    return ApiError.contentFiltered('runninghub', value5);
+  const value6 = (error4.status || '').toUpperCase();
+  if (value6 === 'FAILED' || value6 === 'ERROR')
     return ApiError.taskFailed(
       'runninghub',
-      formatRunningHubFailureMessage(_0x1a9454, _0x591684 || '任务执行失败'),
+      formatRunningHubFailureMessage(error4, value5 || '任务执行失败'),
     );
-  if (_0x388556 >= 0x190) return ApiError.fromHttpStatus(_0x388556, 'runninghub', _0x591684);
+  if (status >= 0x190) return ApiError.fromHttpStatus(status, 'runninghub', value5);
   return null;
 }
-export function parseTaskError(_0x44e9ee) {
-  if (!_0x44e9ee) return null;
-  const _0x3898ee = collectCandidateObjects(_0x44e9ee).find((_0x14ba4c) => {
-      const _0x273f30 = String(
-        _0x14ba4c.status || _0x14ba4c.taskStatus || _0x14ba4c.task_status || '',
+export function parseTaskError(response) {
+  if (!response) return null;
+  const candidateObjects3 = collectCandidateObjects(response).find((response2) => {
+      const value7 = String(
+        response2.status || response2.taskStatus || response2.task_status || '',
       ).toUpperCase();
-      return _0x273f30 === 'FAILED' || _0x273f30 === 'ERROR';
+      return value7 === 'FAILED' || value7 === 'ERROR';
     }),
-    _0x4de2d0 = _0x3898ee ? 'FAILED' : (_0x44e9ee.status || _0x44e9ee.taskStatus || '').toUpperCase();
-  if (_0x4de2d0 === 'FAILED' || _0x4de2d0 === 'ERROR') {
-    const _0x5b1444 = _0x3898ee || _0x44e9ee,
-      _0x330830 = extractFailureBaseMessage(_0x5b1444, '未知错误');
-    for (const [_0x1ddf27, _0x365861] of Object.entries(RH_ERROR_MSG_MAP)) {
-      if (_0x330830.includes(_0x1ddf27) && RH_ERROR_CODE_MAP[_0x365861]) {
-        const _0xd30b85 = RH_ERROR_CODE_MAP[_0x365861];
+    value8 = candidateObjects3 ? 'FAILED' : (response.status || response.taskStatus || '').toUpperCase();
+  if (value8 === 'FAILED' || value8 === 'ERROR') {
+    const value9 = candidateObjects3 || response,
+      list6 = extractFailureBaseMessage(value9, '未知错误');
+    for (const [value10, code2] of Object.entries(RH_ERROR_MSG_MAP)) {
+      if (list6.includes(value10) && RH_ERROR_CODE_MAP[code2]) {
+        const type2 = RH_ERROR_CODE_MAP[code2];
         return new ApiError({
-          type: _0xd30b85.type,
+          type: type2.type,
           provider: 'runninghub',
-          code: _0x365861,
-          message: appendRunningHubFailureDetails(_0xd30b85.message, _0x5b1444),
-          retryable: _0xd30b85.retryable ?? false,
+          code: code2,
+          message: appendRunningHubFailureDetails(type2.message, value9),
+          retryable: type2.retryable ?? false,
         });
       }
     }
-    return ApiError.taskFailed('runninghub', formatRunningHubFailureMessage(_0x5b1444, _0x330830));
+    return ApiError.taskFailed('runninghub', formatRunningHubFailureMessage(value9, list6));
   }
-  if (_0x4de2d0 === 'TIMEOUT') return ApiError.taskTimeout('runninghub');
+  if (value8 === 'TIMEOUT') return ApiError.taskTimeout('runninghub');
   return null;
 }
 export default { parseError: parseError, parseTaskError: parseTaskError };

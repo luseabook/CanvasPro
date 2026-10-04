@@ -2,140 +2,135 @@ import { createAIGenerateNodeTaskOrchestrationModule } from './taskOrchestration
 import { isWorkflowModel } from '../../manifests/index.js';
 import { submitTask, resumeTask, cancelTask } from '../../core/generationTaskRuntime.js';
 import { getGenerationRatioMediaSize } from '../../modules/generationRatioSource.js';
-const readState = (_0x134c97) => _0x134c97['getStateRaw']?.() || _0x134c97['getState'](),
-  cancelled = (_0x13004a) => ({
+const readState = (store) => store['getStateRaw']?.() || store['getState'](),
+  cancelled = (targetNodeId) => ({
     ok: ![],
     status: 'cancelled',
     reason: 'target-changed',
-    targetNodeId: _0x13004a,
+    targetNodeId: targetNodeId,
   });
 export function createImageGenerationExecutionOwner({
-  store: _0x5f5798,
-  getScopeId: _0x3a539f,
+  store: store2,
+  getScopeId: getScopeId,
   dependencies: dependencies = {},
 }) {
-  if (!_0x5f5798 || typeof _0x3a539f !== 'function')
+  if (!store2 || typeof getScopeId !== 'function')
     throw new TypeError('Image\x20execution\x20requires\x20a\x20Store\x20and\x20canvas\x20scope\x20reader');
-  const _0x572f6a = new Map();
-  let _0x484292 = ![];
-  function _0x3028c3(_0x4c4d46, _0x30bd1f) {
-    let _0x55477b = null,
-      _0x26b74c = ![],
-      _0x49b151 = null,
-      _0x52d12f = ![];
-    const _0x48e45c = () =>
-        !_0x484292 &&
-        !_0x26b74c &&
-        _0x3a539f() === _0x30bd1f &&
-        readState(_0x5f5798)['nodes']?.[_0x4c4d46]?.['type'] === 'ai-image',
-      _0x5c9fa1 = () => _0x55477b?.['store'] || _0x5f5798,
-      _0x30b79d = () =>
-        (_0x55477b?.['background'] === !![] || _0x48e45c()) && !!readState(_0x5c9fa1())['nodes']?.[_0x4c4d46],
-      _0x52fd19 = {
-        getState: () => (_0x30b79d() ? readState(_0x5c9fa1()) : { nodes: {}, edges: {} }),
-        getStateRaw: () => _0x52fd19['getState'](),
-        getIncomingEdges: (_0x471d41) =>
-          _0x30b79d() ? _0x5c9fa1()['getIncomingEdges']?.(_0x471d41) || [] : [],
-        updateNodeData: (_0x339d7c, _0x30295f) => {
-          if (_0x30b79d() && readState(_0x5c9fa1())['nodes']?.[_0x339d7c])
-            _0x5c9fa1()['updateNodeData'](_0x339d7c, _0x30295f);
+  const map = new Map();
+  let enabled = ![];
+  function run(nodeId, taskScopeId) {
+    let enabled2 = null,
+      enabled3 = ![],
+      value = null,
+      submitting = ![];
+    const isTargetCurrent = () =>
+        !enabled &&
+        !enabled3 &&
+        getScopeId() === taskScopeId &&
+        readState(store2)['nodes']?.[nodeId]?.['type'] === 'ai-image',
+      store3 = () => enabled2?.['store'] || store2,
+      handler = () =>
+        (enabled2?.['background'] === !![] || isTargetCurrent()) && !!readState(store3())['nodes']?.[nodeId],
+      store4 = {
+        getState: () => (handler() ? readState(store3()) : { nodes: {}, edges: {} }),
+        getStateRaw: () => store4['getState'](),
+        getIncomingEdges: (item) => (handler() ? store3()['getIncomingEdges']?.(item) || [] : []),
+        updateNodeData: (key, index) => {
+          if (handler() && readState(store3())['nodes']?.[key]) store3()['updateNodeData'](key, index);
         },
       },
-      _0x46d732 = () => {
-        if (_0x48e45c()) _0x49b151?.['onStateChange']?.(_0x3d3a12['getGenerationStatus']());
+      startLoading = () => {
+        if (isTargetCurrent()) value?.['onStateChange']?.(args['getGenerationStatus']());
       },
-      _0x57bf44 = async (_0x51365e, _0x3fceab, _0x419528) => {
-        if (!_0x48e45c()) return cancelled(_0x4c4d46);
-        return _0x51365e(
+      handler2 = async (handler3, args2, args3) => {
+        if (!isTargetCurrent()) return cancelled(nodeId);
+        return handler3(
           {
-            ..._0x3fceab,
-            startBuilder: async (_0x4c17e3) => {
-              return ((_0x55477b = _0x4c17e3), _0x3fceab['startBuilder']?.(_0x4c17e3));
+            ...args2,
+            startBuilder: async (result) => {
+              return ((enabled2 = result), args2['startBuilder']?.(result));
             },
-            onTaskStart: (_0x308d9b) => {
-              const _0x280430 = _0x3fceab['onTaskStart']?.(_0x308d9b);
-              return (_0x46d732(), _0x280430);
+            onTaskStart: (data) => {
+              const options = args2['onTaskStart']?.(data);
+              return (startLoading(), options);
             },
           },
-          { ..._0x419528, store: _0x5c9fa1(), taskScopeId: _0x30bd1f, isTargetCurrent: _0x48e45c },
+          { ...args3, store: store3(), taskScopeId: taskScopeId, isTargetCurrent: isTargetCurrent },
         );
       },
-      _0x59484e = createAIGenerateNodeTaskOrchestrationModule({
+      aIGenerateNodeTaskOrchestrationModule = createAIGenerateNodeTaskOrchestrationModule({
         ...dependencies,
-        store: _0x52fd19,
-        isTargetCurrent: _0x48e45c,
-        startLoading: _0x46d732,
-        stopLoading: _0x46d732,
-        getInputRatioSize: ({ nodeData: _0x3788c7, edge: _0x57ba7c, includeNodeFrame: _0xb7e62 }) =>
-          getGenerationRatioMediaSize(_0x3788c7, _0x57ba7c, { includeNodeFrame: _0xb7e62 }),
+        store: store4,
+        isTargetCurrent: isTargetCurrent,
+        startLoading: startLoading,
+        stopLoading: startLoading,
+        getInputRatioSize: ({ nodeData: nodeData, edge: edge, includeNodeFrame: includeNodeFrame }) =>
+          getGenerationRatioMediaSize(nodeData, edge, { includeNodeFrame: includeNodeFrame }),
         taskRuntime: {
-          submitTask: (_0x2062a4, _0x429aba) => _0x57bf44(submitTask, _0x2062a4, _0x429aba),
-          resumeTask: (_0x24fe8f, _0x48a411) => _0x57bf44(resumeTask, _0x24fe8f, _0x48a411),
-          cancelTask: (_0x117072, _0x5e6ee2) => cancelTask(_0x117072, { ..._0x5e6ee2, store: _0x5c9fa1() }),
+          submitTask: (target, source) => handler2(submitTask, target, source),
+          resumeTask: (next, current) => handler2(resumeTask, next, current),
+          cancelTask: (entry, args4) => cancelTask(entry, { ...args4, store: store3() }),
         },
       }),
-      _0x1e97eb = Object['assign'](Object['create'](_0x59484e), {
-        nodeId: _0x4c4d46,
-        _data: readState(_0x5f5798)['nodes'][_0x4c4d46],
+      args5 = Object['assign'](Object['create'](aIGenerateNodeTaskOrchestrationModule), {
+        nodeId: nodeId,
+        _data: readState(store2)['nodes'][nodeId],
         _isRunninghubWorkflowModel: isWorkflowModel,
-        _updateSubmitButtonState: _0x46d732,
+        _updateSubmitButtonState: startLoading,
       }),
-      _0x13a22c = async (_0x2e1fec, _0x2cc812) => {
-        if (!_0x48e45c()) return cancelled(_0x4c4d46);
-        if (_0x52d12f) return { ok: ![], status: 'running', targetNodeId: _0x4c4d46 };
-        (_0x49b151?.['flushPrompt']?.(), (_0x55477b = null), (_0x52d12f = !![]), _0x46d732());
+      handler4 = async (record, payload) => {
+        if (!isTargetCurrent()) return cancelled(nodeId);
+        if (submitting) return { ok: ![], status: 'running', targetNodeId: nodeId };
+        (value?.['flushPrompt']?.(), (enabled2 = null), (submitting = !![]), startLoading());
         try {
-          return await _0x2e1fec['apply'](_0x1e97eb, _0x2cc812);
+          return await record['apply'](args5, payload);
         } finally {
-          ((_0x52d12f = ![]), _0x46d732());
+          ((submitting = ![]), startLoading());
         }
       },
-      _0x3d3a12 = {
-        buildPayload: (_0x5d453d) => {
-          if (!_0x48e45c()) return null;
-          return (_0x49b151?.['flushPrompt']?.(), _0x1e97eb['_buildPayload'](_0x5d453d));
+      args = {
+        buildPayload: (handle) => {
+          if (!isTargetCurrent()) return null;
+          return (value?.['flushPrompt']?.(), args5['_buildPayload'](handle));
         },
-        runGeneration: (_0x36c26f = {}) => _0x13a22c(_0x59484e['runGeneration'], [_0x36c26f]),
-        runPreset: (_0x477409, _0x9a1c10 = {}) => _0x13a22c(_0x59484e['_onGenerate'], [_0x477409, _0x9a1c10]),
+        runGeneration: (options2 = {}) =>
+          handler4(aIGenerateNodeTaskOrchestrationModule['runGeneration'], [options2]),
+        runPreset: (state, config = {}) =>
+          handler4(aIGenerateNodeTaskOrchestrationModule['_onGenerate'], [state, config]),
         getGenerationStatus: () => ({
-          ..._0x1e97eb['getGenerationStatus'](),
-          submitting: _0x52d12f && !_0x55477b,
-          isGenerating: _0x52d12f || _0x1e97eb['getGenerationStatus']()['isGenerating'],
+          ...args5['getGenerationStatus'](),
+          submitting: submitting && !enabled2,
+          isGenerating: submitting || args5['getGenerationStatus']()['isGenerating'],
         }),
         cancelGeneration: async () => {
-          if (!_0x55477b)
+          if (!enabled2)
             return (
-              _0x49b151?.['onStateChange']?.({
-                ..._0x3d3a12['getGenerationStatus'](),
+              value?.['onStateChange']?.({
+                ...args['getGenerationStatus'](),
                 isGenerating: ![],
                 submitting: ![],
                 jobStatus: 'cancelled',
               }),
-              (_0x26b74c = !![]),
-              { ok: !![], status: 'cancelled', reason: 'user-cancelled', targetNodeId: _0x4c4d46 }
+              (enabled3 = !![]),
+              { ok: !![], status: 'cancelled', reason: 'user-cancelled', targetNodeId: nodeId }
             );
-          if (
-            _0x1e97eb['_isRunninghubWorkflowModel'](
-              _0x1e97eb['_data']?.['model'],
-              _0x1e97eb['_data']?.['provider'],
-            )
-          )
-            return _0x1e97eb['cancelGeneration']();
-          return cancelTask(_0x4c4d46, { store: _0x5c9fa1(), abortLocal: !![] });
+          if (args5['_isRunninghubWorkflowModel'](args5['_data']?.['model'], args5['_data']?.['provider']))
+            return args5['cancelGeneration']();
+          return cancelTask(nodeId, { store: store3(), abortLocal: !![] });
         },
         resumeGeneration: () => {
-          const _0x890e13 = _0x52fd19['getState']()['nodes']?.[_0x4c4d46] || {};
+          const scope = store4['getState']()['nodes']?.[nodeId] || {};
           if (
-            _0x52d12f ||
+            submitting ||
             !(
-              _0x1e97eb['_isRunningHubRecoverableRunningTask'](_0x890e13) ||
-              _0x1e97eb['_isDreaminaRecoverableRunningTask'](_0x890e13) ||
-              _0x1e97eb['_isAsyncRecoverableRunningTask'](_0x890e13) ||
-              _0x1e97eb['_shouldFallbackRegenerateAsyncTask'](_0x890e13)
+              args5['_isRunningHubRecoverableRunningTask'](scope) ||
+              args5['_isDreaminaRecoverableRunningTask'](scope) ||
+              args5['_isAsyncRecoverableRunningTask'](scope) ||
+              args5['_shouldFallbackRegenerateAsyncTask'](scope)
             )
           )
-            return _0x3d3a12['getGenerationStatus']();
-          return _0x13a22c(async function () {
+            return args['getGenerationStatus']();
+          return handler4(async function () {
             return (
               await this['_maybeResumeRunningHubTaskImpl'](),
               await this['_maybeResumeDreaminaTaskImpl'](),
@@ -152,106 +147,101 @@ export function createImageGenerationExecutionOwner({
             );
           }, []);
         },
-        attachPresentation(_0x28b896) {
+        attachPresentation(input) {
           return (
-            (_0x49b151 = _0x28b896),
-            _0x46d732(),
+            (value = input),
+            startLoading(),
             () => {
-              if (_0x49b151 === _0x28b896) _0x49b151 = null;
+              if (value === input) value = null;
             }
           );
         },
         reconcile() {
-          if (!_0x48e45c()) _0x49b151 = null;
-          if (_0x55477b?.['background'] === !![]) return;
-          if (!_0x48e45c()) {
-            _0x26b74c = !![];
-            if (_0x55477b && _0x52d12f) void cancelTask(_0x4c4d46, { store: _0x5c9fa1(), abortLocal: !![] });
+          if (!isTargetCurrent()) value = null;
+          if (enabled2?.['background'] === !![]) return;
+          if (!isTargetCurrent()) {
+            enabled3 = !![];
+            if (enabled2 && submitting) void cancelTask(nodeId, { store: store3(), abortLocal: !![] });
           }
         },
-        isReusable: () => !_0x26b74c,
-        isPending: () => _0x52d12f,
+        isReusable: () => !enabled3,
+        isPending: () => submitting,
         dispose() {
-          ((_0x26b74c = !![]), (_0x49b151 = null));
-          if (_0x55477b && _0x52d12f) void cancelTask(_0x4c4d46, { store: _0x5c9fa1(), abortLocal: !![] });
+          ((enabled3 = !![]), (value = null));
+          if (enabled2 && submitting) void cancelTask(nodeId, { store: store3(), abortLocal: !![] });
         },
       };
-    return _0x3d3a12;
+    return args;
   }
-  let _0x8c365a = readState(_0x5f5798)['nodes'],
-    _0x1af744 = readState(_0x5f5798)['_nodesRev'],
-    _0x286f0b = readState(_0x5f5798)['_nodeMembershipRev'],
-    _0x3da863 = _0x3a539f();
-  const _0x36c681 = _0x5f5798['subscribeRaw']?.((_0x85ac83) => {
-    const _0x5ce0fe = _0x3a539f();
+  let state2 = readState(store2)['nodes'],
+    state3 = readState(store2)['_nodesRev'],
+    state4 = readState(store2)['_nodeMembershipRev'],
+    output = getScopeId();
+  const value2 = store2['subscribeRaw']?.((state5) => {
+    const value3 = getScopeId();
     if (
-      _0x85ac83['_nodesRev'] !== undefined &&
-      _0x8c365a === _0x85ac83['nodes'] &&
-      _0x1af744 === _0x85ac83['_nodesRev'] &&
-      _0x3da863 === _0x5ce0fe
+      state5['_nodesRev'] !== undefined &&
+      state2 === state5['nodes'] &&
+      state3 === state5['_nodesRev'] &&
+      output === value3
     )
       return;
-    const _0x5e8529 =
-      _0x8c365a !== _0x85ac83['nodes'] ||
-      _0x286f0b !== _0x85ac83['_nodeMembershipRev'] ||
-      _0x3da863 !== _0x5ce0fe;
-    ((_0x8c365a = _0x85ac83['nodes']),
-      (_0x1af744 = _0x85ac83['_nodesRev']),
-      (_0x286f0b = _0x85ac83['_nodeMembershipRev']),
-      (_0x3da863 = _0x5ce0fe));
-    for (const [_0x5bdbb2, _0x54c1d7] of _0x572f6a) {
-      for (const [_0x95dc0c, _0x172d95] of _0x54c1d7) {
-        _0x172d95['reconcile']();
-        if (!_0x172d95['isPending']() && (_0x5bdbb2 !== _0x3a539f() || !_0x172d95['isReusable']()))
-          _0x54c1d7['delete'](_0x95dc0c);
+    const value4 = state2 !== state5['nodes'] || state4 !== state5['_nodeMembershipRev'] || output !== value3;
+    ((state2 = state5['nodes']),
+      (state3 = state5['_nodesRev']),
+      (state4 = state5['_nodeMembershipRev']),
+      (output = value3));
+    for (const [value5, map2] of map) {
+      for (const [value6, enabled4] of map2) {
+        enabled4['reconcile']();
+        if (!enabled4['isPending']() && (value5 !== getScopeId() || !enabled4['isReusable']()))
+          map2['delete'](value6);
       }
-      if (!_0x54c1d7['size']) _0x572f6a['delete'](_0x5bdbb2);
+      if (!map2['size']) map['delete'](value5);
     }
-    if (_0x5e8529) _0x1fc171();
+    if (value4) run2();
   });
-  let _0x55a281 = ![];
-  function _0x1fc171() {
-    if (_0x484292 || _0x55a281) return;
-    ((_0x55a281 = !![]),
+  let value7 = ![];
+  function run2() {
+    if (enabled || value7) return;
+    ((value7 = !![]),
       queueMicrotask(() => {
-        _0x55a281 = ![];
-        if (_0x484292) return;
-        for (const _0x25cfd6 of Object['values'](readState(_0x5f5798)['nodes'] || {})) {
-          _0x25cfd6['type'] === 'ai-image' &&
-            (_0x25cfd6['isGenerating'] ||
-              _0x25cfd6['rhTaskId'] ||
-              _0x25cfd6['asyncTaskId'] ||
-              _0x25cfd6['dreaminaSubmitId']) &&
-            Promise['resolve'](_0x47c383['resolve'](_0x25cfd6['id'])?.['resumeGeneration']())['catch'](
-              (_0xf29fbd) => console['error']('[imageGenerationExecution] recovery failed', _0xf29fbd),
+        value7 = ![];
+        if (enabled) return;
+        for (const value8 of Object['values'](readState(store2)['nodes'] || {})) {
+          value8['type'] === 'ai-image' &&
+            (value8['isGenerating'] ||
+              value8['rhTaskId'] ||
+              value8['asyncTaskId'] ||
+              value8['dreaminaSubmitId']) &&
+            Promise['resolve'](promise['resolve'](value8['id'])?.['resumeGeneration']())['catch']((value9) =>
+              console['error']('[imageGenerationExecution] recovery failed', value9),
             );
         }
       }));
   }
-  const _0x47c383 = {
-    resolve(_0x485544, _0x2d9e2c = {}) {
+  const promise = {
+    resolve(value10, value11 = {}) {
       if (
-        _0x484292 ||
-        (_0x2d9e2c['store'] && _0x2d9e2c['store'] !== _0x5f5798) ||
-        readState(_0x5f5798)['nodes']?.[_0x485544]?.['type'] !== 'ai-image'
+        enabled ||
+        (value11['store'] && value11['store'] !== store2) ||
+        readState(store2)['nodes']?.[value10]?.['type'] !== 'ai-image'
       )
         return null;
-      const _0x238a8d = _0x3a539f();
-      let _0x3c3b1b = _0x572f6a['get'](_0x238a8d);
-      !_0x3c3b1b && ((_0x3c3b1b = new Map()), _0x572f6a['set'](_0x238a8d, _0x3c3b1b));
-      let _0x2efa71 = _0x3c3b1b['get'](_0x485544);
+      const value12 = getScopeId();
+      let map3 = map['get'](value12);
+      !map3 && ((map3 = new Map()), map['set'](value12, map3));
+      let enabled5 = map3['get'](value10);
       return (
-        !_0x2efa71?.['isReusable']() &&
-          ((_0x2efa71 = _0x3028c3(_0x485544, _0x238a8d)), _0x3c3b1b['set'](_0x485544, _0x2efa71)),
-        _0x2efa71
+        !enabled5?.['isReusable']() && ((enabled5 = run(value10, value12)), map3['set'](value10, enabled5)),
+        enabled5
       );
     },
     dispose() {
-      ((_0x484292 = !![]), _0x36c681?.());
-      for (const _0x1c1ac6 of _0x572f6a['values']())
-        for (const _0x1d2b67 of _0x1c1ac6['values']()) _0x1d2b67['dispose']();
-      _0x572f6a['clear']();
+      ((enabled = !![]), value2?.());
+      for (const map4 of map['values']()) for (const value13 of map4['values']()) value13['dispose']();
+      map['clear']();
     },
   };
-  return (_0x1fc171(), _0x47c383);
+  return (run2(), promise);
 }

@@ -12,231 +12,224 @@ export const SMART_CLIP_DEFAULT_OUTPUT_MODE = SMART_CLIP_OUTPUT_MODE_SEGMENTS;
 export const SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON = 'person';
 const SMART_CLIP_MODE_OPTIONS = Object['freeze'](['stable', 'balanced', 'sensitive']),
   SMART_CLIP_STATUS_POLL_INTERVAL_MS = 0x320;
-function toErrorMessage(_0x4b11bc, _0x5145ef) {
-  return String(_0x4b11bc?.['message'] || _0x4b11bc || _0x5145ef || 'Smart\x20clip\x20failed');
+function toErrorMessage(error, value) {
+  return String(error?.['message'] || error || value || 'Smart\x20clip\x20failed');
 }
 export class SmartClipJobError extends Error {
-  constructor(
-    _0x936b1e,
-    { code: code = 'smart_clip_failed', stage: stage = 'unknown', jobId: jobId = '' } = {},
-  ) {
-    (super(String(_0x936b1e || 'Smart clip failed')),
+  constructor(item, { code: code = 'smart_clip_failed', stage: stage = 'unknown', jobId: jobId = '' } = {}) {
+    (super(String(item || 'Smart clip failed')),
       (this['name'] = 'SmartClipJobError'),
       (this['code'] = code),
       (this['stage'] = stage),
       (this['jobId'] = String(jobId || '')));
   }
 }
-export function normalizeSmartClipMaxSegments(_0x6ed87b) {
-  const _0x1a630e = Number(_0x6ed87b),
-    _0xaa5af6 = Number['isFinite'](_0x1a630e) ? Math['round'](_0x1a630e) : SMART_CLIP_DEFAULT_SEGMENTS;
-  return Math['max'](SMART_CLIP_MIN_SEGMENTS, Math['min'](SMART_CLIP_MAX_SEGMENTS, _0xaa5af6));
+export function normalizeSmartClipMaxSegments(key) {
+  const index = Number(key),
+    result = Number['isFinite'](index) ? Math['round'](index) : SMART_CLIP_DEFAULT_SEGMENTS;
+  return Math['max'](SMART_CLIP_MIN_SEGMENTS, Math['min'](SMART_CLIP_MAX_SEGMENTS, result));
 }
-export function normalizeSmartClipFps(_0x2d0418) {
-  const _0x4398c5 = Number(_0x2d0418),
-    _0x10e674 = Number['isFinite'](_0x4398c5) ? Math['round'](_0x4398c5) : SMART_CLIP_DEFAULT_FPS;
-  return SMART_CLIP_FPS_OPTIONS['includes'](_0x10e674) ? _0x10e674 : SMART_CLIP_DEFAULT_FPS;
+export function normalizeSmartClipFps(data) {
+  const options = Number(data),
+    target = Number['isFinite'](options) ? Math['round'](options) : SMART_CLIP_DEFAULT_FPS;
+  return SMART_CLIP_FPS_OPTIONS['includes'](target) ? target : SMART_CLIP_DEFAULT_FPS;
 }
-export function normalizeSmartClipMaxSegmentDuration(_0x514823) {
-  if (_0x514823 === undefined || _0x514823 === null || _0x514823 === '') return 0x0;
-  const _0x326d11 = Number(_0x514823);
-  if (!Number['isFinite'](_0x326d11) || _0x326d11 <= 0x0) return 0x0;
-  return Math['max'](0x1, Math['min'](SMART_CLIP_MAX_SEGMENT_DURATION_SECONDS, _0x326d11));
+export function normalizeSmartClipMaxSegmentDuration(source) {
+  if (source === undefined || source === null || source === '') return 0x0;
+  const count = Number(source);
+  if (!Number['isFinite'](count) || count <= 0x0) return 0x0;
+  return Math['max'](0x1, Math['min'](SMART_CLIP_MAX_SEGMENT_DURATION_SECONDS, count));
 }
-export function normalizeSmartClipOutputMode(_0x41068a) {
-  const _0x5e0ca2 = String(_0x41068a || '')['trim']();
-  if (_0x5e0ca2 === SMART_CLIP_OUTPUT_MODE_ANALYSIS) return SMART_CLIP_OUTPUT_MODE_ANALYSIS;
-  return _0x5e0ca2 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES
+export function normalizeSmartClipOutputMode(next) {
+  const current = String(next || '')['trim']();
+  if (current === SMART_CLIP_OUTPUT_MODE_ANALYSIS) return SMART_CLIP_OUTPUT_MODE_ANALYSIS;
+  return current === SMART_CLIP_OUTPUT_MODE_KEYFRAMES
     ? SMART_CLIP_OUTPUT_MODE_KEYFRAMES
     : SMART_CLIP_DEFAULT_OUTPUT_MODE;
 }
-export function normalizeSmartClipMode(_0xed7da3) {
-  const _0x4fb7f0 = String(_0xed7da3 || '')
+export function normalizeSmartClipMode(entry) {
+  const record = String(entry || '')
     ['trim']()
     ['toLowerCase']();
-  return SMART_CLIP_MODE_OPTIONS['includes'](_0x4fb7f0) ? _0x4fb7f0 : 'stable';
+  return SMART_CLIP_MODE_OPTIONS['includes'](record) ? record : 'stable';
 }
-export function normalizeSmartClipRunOptions(_0x1d5571 = {}) {
-  const _0x3e493f = _0x1d5571 && typeof _0x1d5571 === 'object' ? _0x1d5571 : {};
+export function normalizeSmartClipRunOptions(options2 = {}) {
+  const payload = options2 && typeof options2 === 'object' ? options2 : {};
   return {
-    mode: normalizeSmartClipMode(_0x3e493f['mode']),
-    ...(_0x3e493f['unlimitedSegments'] === !![]
+    mode: normalizeSmartClipMode(payload['mode']),
+    ...(payload['unlimitedSegments'] === !![]
       ? { unlimitedSegments: !![] }
-      : { maxSegments: normalizeSmartClipMaxSegments(_0x3e493f['maxSegments']) }),
-    fps: normalizeSmartClipFps(_0x3e493f['fps']),
-    outputMode: normalizeSmartClipOutputMode(_0x3e493f['outputMode']),
-    ...(String(_0x3e493f['keyframeSelectionPolicy'] || '')
+      : { maxSegments: normalizeSmartClipMaxSegments(payload['maxSegments']) }),
+    fps: normalizeSmartClipFps(payload['fps']),
+    outputMode: normalizeSmartClipOutputMode(payload['outputMode']),
+    ...(String(payload['keyframeSelectionPolicy'] || '')
       ['trim']()
       ['toLowerCase']() === SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON
       ? { keyframeSelectionPolicy: SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON }
       : {}),
-    ...(_0x3e493f['preserveWholeVideo'] === !![] ? { preserveWholeVideo: !![] } : {}),
-    ...(normalizeSmartClipMaxSegmentDuration(_0x3e493f['maxSegmentDurationSec']) > 0x0
-      ? { maxSegmentDurationSec: normalizeSmartClipMaxSegmentDuration(_0x3e493f['maxSegmentDurationSec']) }
+    ...(payload['preserveWholeVideo'] === !![] ? { preserveWholeVideo: !![] } : {}),
+    ...(normalizeSmartClipMaxSegmentDuration(payload['maxSegmentDurationSec']) > 0x0
+      ? { maxSegmentDurationSec: normalizeSmartClipMaxSegmentDuration(payload['maxSegmentDurationSec']) }
       : {}),
   };
 }
-function emitProgress(_0x1aa1e3, _0x32f0ec) {
-  if (typeof _0x1aa1e3 !== 'function') return;
+function emitProgress(handler, handle) {
+  if (typeof handler !== 'function') return;
   try {
-    _0x1aa1e3(_0x32f0ec);
+    handler(handle);
   } catch {}
 }
-function isCancelled(_0x351d21, _0x3679b8) {
-  return _0x351d21?.['aborted'] === !![] || (typeof _0x3679b8 === 'function' && _0x3679b8() === ![]);
+function isCancelled(state, handler2) {
+  return state?.['aborted'] === !![] || (typeof handler2 === 'function' && handler2() === ![]);
 }
-function throwIfCancelled(_0x15ee80, _0x152a3a, _0xa50e93 = '') {
-  if (!isCancelled(_0x15ee80, _0x152a3a)) return;
+function throwIfCancelled(config, scope, jobId2 = '') {
+  if (!isCancelled(config, scope)) return;
   throw new SmartClipJobError('Smart clip cancelled', {
     code: 'cancelled',
     stage: 'cancelled',
-    jobId: _0xa50e93,
+    jobId: jobId2,
   });
 }
-function waitForNextPoll(_0x2c9397, _0x454fdf) {
-  const _0x4e12ff = Math['max'](0x0, Number(_0x2c9397) || 0x0);
-  if (_0x4e12ff <= 0x0) return Promise['resolve']();
-  return new Promise((_0x4b7698, _0x2f51e3) => {
-    let _0x177023 = ![];
-    const _0x19c337 = (_0x2392e5) => {
-        if (_0x177023) return;
-        ((_0x177023 = !![]), _0x454fdf?.['removeEventListener']?.('abort', _0x2a62f0), _0x2392e5());
+function waitForNextPoll(input, el) {
+  const count2 = Math['max'](0x0, Number(input) || 0x0);
+  if (count2 <= 0x0) return Promise['resolve']();
+  return new Promise((output, handler3) => {
+    let value2 = ![];
+    const run = (handler4) => {
+        if (value2) return;
+        ((value2 = !![]), el?.['removeEventListener']?.('abort', handler5), handler4());
       },
-      _0x3abe53 = setTimeout(() => _0x19c337(_0x4b7698), _0x4e12ff),
-      _0x2a62f0 = () => {
-        (clearTimeout(_0x3abe53),
-          _0x19c337(() =>
-            _0x2f51e3(
+      setTimeout2 = setTimeout(() => run(output), count2),
+      handler5 = () => {
+        (clearTimeout(setTimeout2),
+          run(() =>
+            handler3(
               new SmartClipJobError('Smart clip cancelled', { code: 'cancelled', stage: 'cancelled' }),
             ),
           ));
       };
-    if (_0x454fdf?.['aborted']) _0x2a62f0();
-    else _0x454fdf?.['addEventListener']?.('abort', _0x2a62f0, { once: !![] });
+    if (el?.['aborted']) handler5();
+    else el?.['addEventListener']?.('abort', handler5, { once: !![] });
   });
 }
-function readResponseData(_0x55d3bf) {
-  if (
-    _0x55d3bf &&
-    typeof _0x55d3bf === 'object' &&
-    Object['prototype']['hasOwnProperty']['call'](_0x55d3bf, 'data')
-  )
-    return _0x55d3bf['data'];
-  return _0x55d3bf;
+function readResponseData(value3) {
+  if (value3 && typeof value3 === 'object' && Object['prototype']['hasOwnProperty']['call'](value3, 'data'))
+    return value3['data'];
+  return value3;
 }
 export async function runSmartClipJob({
-  src: _0x7738fa,
-  options: _0x1d1609,
-  onProgress: _0x37dd9f,
-  shouldContinue: _0x167e17,
-  signal: _0x32cadd,
+  src: src,
+  options: options3,
+  onProgress: onProgress,
+  shouldContinue: shouldContinue,
+  signal: signal,
   request: request = requester,
   pollIntervalMs: pollIntervalMs = SMART_CLIP_STATUS_POLL_INTERVAL_MS,
   wait: wait = waitForNextPoll,
 } = {}) {
-  const _0x11d554 = String(_0x7738fa || '')['trim']();
-  if (!_0x11d554)
+  const src2 = String(src || '')['trim']();
+  if (!src2)
     throw new SmartClipJobError('Missing smart clip source', { code: 'invalid_source', stage: 'prepare' });
   if (typeof request !== 'function') throw new TypeError('Smart clip request function is required');
-  const _0x57bb9d = normalizeSmartClipRunOptions(_0x1d1609);
-  throwIfCancelled(_0x32cadd, _0x167e17);
-  let _0x4e0913;
+  const options4 = normalizeSmartClipRunOptions(options3);
+  throwIfCancelled(signal, shouldContinue);
+  let response;
   try {
-    _0x4e0913 = await request({
+    response = await request({
       url: '/api/v2/video/smart_clip',
       method: 'POST',
       provider: 'local',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON['stringify']({ src: _0x11d554, options: _0x57bb9d }),
+      body: JSON['stringify']({ src: src2, options: options4 }),
       allow404Null: !![],
       returnMeta: !![],
-      signal: _0x32cadd,
+      signal: signal,
     });
-  } catch (_0xd6dccf) {
-    if (_0x32cadd?.['aborted'] || _0xd6dccf?.['code'] === 'cancelled')
+  } catch (value4) {
+    if (signal?.['aborted'] || value4?.['code'] === 'cancelled')
       throw new SmartClipJobError('Smart clip cancelled', { code: 'cancelled', stage: 'cancelled' });
-    throw new SmartClipJobError(toErrorMessage(_0xd6dccf, 'Smart clip start failed'), {
+    throw new SmartClipJobError(toErrorMessage(value4, 'Smart clip start failed'), {
       code: 'start_failed',
       stage: 'start',
     });
   }
-  if (_0x4e0913?.['status'] === 0x194 || readResponseData(_0x4e0913) == null)
+  if (response?.['status'] === 0x194 || readResponseData(response) == null)
     throw new SmartClipJobError('Smart clip endpoint unavailable', {
       code: 'endpoint_unavailable',
       stage: 'start',
     });
-  const _0x2eec21 = readResponseData(_0x4e0913) || {};
-  if (!_0x2eec21['success'])
-    throw new SmartClipJobError(_0x2eec21['error'] || 'Smart\x20clip\x20start\x20failed', {
+  const response2 = readResponseData(response) || {};
+  if (!response2['success'])
+    throw new SmartClipJobError(response2['error'] || 'Smart\x20clip\x20start\x20failed', {
       code: 'start_failed',
       stage: 'start',
     });
-  const _0x51ba99 = String(_0x2eec21['jobId'] || '')['trim']();
-  if (!_0x51ba99)
+  const jobId3 = String(response2['jobId'] || '')['trim']();
+  if (!jobId3)
     throw new SmartClipJobError('Smart\x20clip\x20start\x20response\x20is\x20missing\x20jobId', {
       code: 'missing_job_id',
       stage: 'start',
     });
   for (;;) {
-    throwIfCancelled(_0x32cadd, _0x167e17, _0x51ba99);
-    let _0x5cf457;
+    throwIfCancelled(signal, shouldContinue, jobId3);
+    let request2;
     try {
-      _0x5cf457 = await request({
-        url: '/api/v2/video/smart_clip/status?jobId=' + encodeURIComponent(_0x51ba99),
+      request2 = await request({
+        url: '/api/v2/video/smart_clip/status?jobId=' + encodeURIComponent(jobId3),
         method: 'GET',
         provider: 'local',
         timeout: 0x4e20,
         returnMeta: !![],
-        signal: _0x32cadd,
+        signal: signal,
       });
-    } catch (_0xeaaa21) {
-      if (_0x32cadd?.['aborted'] || _0xeaaa21?.['code'] === 'cancelled')
+    } catch (value5) {
+      if (signal?.['aborted'] || value5?.['code'] === 'cancelled')
         throw new SmartClipJobError('Smart clip cancelled', {
           code: 'cancelled',
           stage: 'cancelled',
-          jobId: _0x51ba99,
+          jobId: jobId3,
         });
-      throw new SmartClipJobError(toErrorMessage(_0xeaaa21, 'Smart clip status failed'), {
+      throw new SmartClipJobError(toErrorMessage(value5, 'Smart clip status failed'), {
         code: 'status_failed',
         stage: 'status',
-        jobId: _0x51ba99,
+        jobId: jobId3,
       });
     }
-    const _0x2ea371 = readResponseData(_0x5cf457) || {};
-    emitProgress(_0x37dd9f, {
-      ..._0x2ea371,
-      jobId: _0x51ba99,
-      outputMode: normalizeSmartClipOutputMode(_0x2ea371['outputMode'] || _0x57bb9d['outputMode']),
+    const job = readResponseData(request2) || {};
+    emitProgress(onProgress, {
+      ...job,
+      jobId: jobId3,
+      outputMode: normalizeSmartClipOutputMode(job['outputMode'] || options4['outputMode']),
     });
-    if (_0x2ea371['status'] === 'error' || _0x2ea371['status'] === 'failed')
-      throw new SmartClipJobError(_0x2ea371['error'] || 'Smart clip job failed', {
+    if (job['status'] === 'error' || job['status'] === 'failed')
+      throw new SmartClipJobError(job['error'] || 'Smart clip job failed', {
         code: 'job_failed',
-        stage: String(_0x2ea371['stage'] || 'processing'),
-        jobId: _0x51ba99,
+        stage: String(job['stage'] || 'processing'),
+        jobId: jobId3,
       });
-    if (_0x2ea371['status'] === 'cancelled')
-      throw new SmartClipJobError(_0x2ea371['error'] || 'Smart clip cancelled', {
+    if (job['status'] === 'cancelled')
+      throw new SmartClipJobError(job['error'] || 'Smart clip cancelled', {
         code: 'cancelled',
-        stage: String(_0x2ea371['stage'] || 'cancelled'),
-        jobId: _0x51ba99,
+        stage: String(job['stage'] || 'cancelled'),
+        jobId: jobId3,
       });
-    if (_0x2ea371['status'] === 'done' || _0x2ea371['status'] === 'complete')
+    if (job['status'] === 'done' || job['status'] === 'complete')
       return {
-        jobId: _0x51ba99,
-        outputMode: normalizeSmartClipOutputMode(_0x2ea371['outputMode'] || _0x57bb9d['outputMode']),
-        segments: Array['isArray'](_0x2ea371['segments']) ? _0x2ea371['segments'] : [],
-        job: _0x2ea371,
+        jobId: jobId3,
+        outputMode: normalizeSmartClipOutputMode(job['outputMode'] || options4['outputMode']),
+        segments: Array['isArray'](job['segments']) ? job['segments'] : [],
+        job: job,
       };
     try {
-      await wait(pollIntervalMs, _0x32cadd);
-    } catch (_0x5c8ed8) {
-      if (_0x32cadd?.['aborted'] || _0x5c8ed8?.['code'] === 'cancelled')
+      await wait(pollIntervalMs, signal);
+    } catch (value6) {
+      if (signal?.['aborted'] || value6?.['code'] === 'cancelled')
         throw new SmartClipJobError('Smart clip cancelled', {
           code: 'cancelled',
           stage: 'cancelled',
-          jobId: _0x51ba99,
+          jobId: jobId3,
         });
-      throw _0x5c8ed8;
+      throw value6;
     }
   }
 }

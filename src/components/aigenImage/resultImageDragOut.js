@@ -3,85 +3,85 @@ import { buildCanvasLocalImageFields } from '../../services/canvasMediaLocalServ
 import { generateId, screenToWorld } from '../../core/math.js';
 import { t } from '../../i18n/index.js';
 export const RESULT_IMAGE_DRAG_OUT_THRESHOLD_PX = 6;
-function asObject(_0x59787d) {
-  return _0x59787d && typeof _0x59787d === 'object' && !Array.isArray(_0x59787d) ? _0x59787d : null;
+function asObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
 }
-function firstNonEmptyString(..._0x2bfb32) {
-  for (const _0x50fca5 of _0x2bfb32) {
-    const _0x1becaf = String(_0x50fca5 || '').trim();
-    if (_0x1becaf) return _0x1becaf;
+function firstNonEmptyString(...args) {
+  for (const item of args) {
+    const key = String(item || '').trim();
+    if (key) return key;
   }
   return '';
 }
-function toPositiveInt(_0x849518) {
-  const _0x14417a = Number(_0x849518);
-  if (!Number.isFinite(_0x14417a) || _0x14417a <= 0) return 0;
-  return Math.max(1, Math.round(_0x14417a));
+function toPositiveInt(index) {
+  const count = Number(index);
+  if (!Number.isFinite(count) || count <= 0) return 0;
+  return Math.max(1, Math.round(count));
 }
-function pickImageWidth(_0xc8337b) {
+function pickImageWidth(box) {
   return (
-    toPositiveInt(_0xc8337b?.originalWidth) ||
-    toPositiveInt(_0xc8337b?.imageWidth) ||
-    toPositiveInt(_0xc8337b?.width) ||
-    toPositiveInt(_0xc8337b?.metadata?.width)
+    toPositiveInt(box?.originalWidth) ||
+    toPositiveInt(box?.imageWidth) ||
+    toPositiveInt(box?.width) ||
+    toPositiveInt(box?.metadata?.width)
   );
 }
-function pickImageHeight(_0x575287) {
+function pickImageHeight(box2) {
   return (
-    toPositiveInt(_0x575287?.originalHeight) ||
-    toPositiveInt(_0x575287?.imageHeight) ||
-    toPositiveInt(_0x575287?.height) ||
-    toPositiveInt(_0x575287?.metadata?.height)
+    toPositiveInt(box2?.originalHeight) ||
+    toPositiveInt(box2?.imageHeight) ||
+    toPositiveInt(box2?.height) ||
+    toPositiveInt(box2?.metadata?.height)
   );
 }
 function pickFallbackSize({ fallbackWidth: fallbackWidth = 0, fallbackHeight: fallbackHeight = 0 } = {}) {
-  const _0x400954 = toPositiveInt(fallbackWidth),
-    _0x251ff8 = toPositiveInt(fallbackHeight);
-  return _0x400954 > 0 && _0x251ff8 > 0 ? { width: _0x400954, height: _0x251ff8 } : null;
+  const width2 = toPositiveInt(fallbackWidth),
+    height2 = toPositiveInt(fallbackHeight);
+  return width2 > 0 && height2 > 0 ? { width: width2, height: height2 } : null;
 }
-function fileNameFromPath(_0x5179e5) {
-  const _0x4c7ce3 = String(_0x5179e5 || '')
+function fileNameFromPath(result) {
+  const enabled = String(result || '')
     .replace(/\\/g, '/')
     .replace(/^\/+/, '');
-  if (!_0x4c7ce3) return '';
-  const _0x4f3e1c = _0x4c7ce3.split('/');
-  return String(_0x4f3e1c[_0x4f3e1c.length - 1] || '').trim();
+  if (!enabled) return '';
+  const list = enabled.split('/');
+  return String(list[list.length - 1] || '').trim();
 }
-export function normalizeResultImageForDragOut(_0x4ff4c9) {
-  const _0x5d091a = asObject(_0x4ff4c9);
-  if (!_0x5d091a || firstNonEmptyString(_0x5d091a.error)) return null;
-  const _0x2d8a08 = buildCanvasLocalImageFields(_0x5d091a, { includeSrc: true }),
-    _0x130d1f = firstNonEmptyString(
-      _0x2d8a08.src,
-      _0x2d8a08.imageUrl,
-      _0x2d8a08.sourceUrl,
-      _0x2d8a08.thumbUrl,
-      _0x2d8a08.localPath,
-      _0x2d8a08.originalLocalPath,
-      _0x2d8a08.displayLocalPath,
-      _0x2d8a08.thumbLocalPath,
+export function normalizeResultImageForDragOut(data) {
+  const asObject2 = asObject(data);
+  if (!asObject2 || firstNonEmptyString(asObject2.error)) return null;
+  const args2 = buildCanvasLocalImageFields(asObject2, { includeSrc: true }),
+    nonEmptyString = firstNonEmptyString(
+      args2.src,
+      args2.imageUrl,
+      args2.sourceUrl,
+      args2.thumbUrl,
+      args2.localPath,
+      args2.originalLocalPath,
+      args2.displayLocalPath,
+      args2.thumbLocalPath,
     );
-  if (!_0x130d1f) return null;
-  const _0x120b33 = pickImageWidth(_0x5d091a),
-    _0x8ace94 = pickImageHeight(_0x5d091a),
-    _0x1554a1 = firstNonEmptyString(
-      _0x5d091a.fileName,
-      fileNameFromPath(_0x2d8a08.localPath),
-      fileNameFromPath(_0x2d8a08.originalLocalPath),
-      fileNameFromPath(_0x2d8a08.displayLocalPath),
+  if (!nonEmptyString) return null;
+  const imageWidth = pickImageWidth(asObject2),
+    imageHeight = pickImageHeight(asObject2),
+    fileName = firstNonEmptyString(
+      asObject2.fileName,
+      fileNameFromPath(args2.localPath),
+      fileNameFromPath(args2.originalLocalPath),
+      fileNameFromPath(args2.displayLocalPath),
     );
   return {
-    ..._0x2d8a08,
-    ...(_0x120b33 > 0 ? { imageWidth: _0x120b33, originalWidth: _0x120b33 } : {}),
-    ...(_0x8ace94 > 0 ? { imageHeight: _0x8ace94, originalHeight: _0x8ace94 } : {}),
-    ...(_0x1554a1 ? { fileName: _0x1554a1 } : {}),
+    ...args2,
+    ...(imageWidth > 0 ? { imageWidth: imageWidth, originalWidth: imageWidth } : {}),
+    ...(imageHeight > 0 ? { imageHeight: imageHeight, originalHeight: imageHeight } : {}),
+    ...(fileName ? { fileName: fileName } : {}),
   };
 }
-export function hasUsableResultImageForDragOut(_0x13ede3) {
-  return !!normalizeResultImageForDragOut(_0x13ede3);
+export function hasUsableResultImageForDragOut(options) {
+  return !!normalizeResultImageForDragOut(options);
 }
 export function buildResultImageDragOutNodePayload({
-  image: _0xf43da4,
+  image: image,
   viewport: viewport = { x: 0, y: 0, zoom: 1 },
   screenX: screenX = 0,
   screenY: screenY = 0,
@@ -91,66 +91,62 @@ export function buildResultImageDragOutNodePayload({
   createId: createId = () => generateId('source-image'),
   name: name = '',
 } = {}) {
-  const _0x1dc07a = normalizeResultImageForDragOut(_0xf43da4);
-  if (!_0x1dc07a) return null;
-  const _0x4a215c = String(id || '').trim() || createId(),
-    _0x2782df = toPositiveInt(_0x1dc07a.imageWidth),
-    _0x455340 = toPositiveInt(_0x1dc07a.imageHeight),
-    _0x1d864d = pickFallbackSize({ fallbackWidth: fallbackWidth, fallbackHeight: fallbackHeight }),
-    _0x5e4354 = screenToWorld(screenX, screenY, viewport || { x: 0, y: 0, zoom: 1 }),
-    _0x261db4 =
-      _0x2782df > 0 && _0x455340 > 0
-        ? { naturalWidth: _0x2782df, naturalHeight: _0x455340, needsAutoResize: false }
-        : _0x1d864d
+  const src = normalizeResultImageForDragOut(image);
+  if (!src) return null;
+  const id2 = String(id || '').trim() || createId(),
+    naturalWidth = toPositiveInt(src.imageWidth),
+    naturalHeight = toPositiveInt(src.imageHeight),
+    width3 = pickFallbackSize({ fallbackWidth: fallbackWidth, fallbackHeight: fallbackHeight }),
+    x2 = screenToWorld(screenX, screenY, viewport || { x: 0, y: 0, zoom: 1 }),
+    args3 =
+      naturalWidth > 0 && naturalHeight > 0
+        ? { naturalWidth: naturalWidth, naturalHeight: naturalHeight, needsAutoResize: false }
+        : width3
           ? {
-              width: _0x1d864d.width,
-              height: _0x1d864d.height,
+              width: width3.width,
+              height: width3.height,
               fixedSize: true,
               needsAutoResize: false,
               useExplicitSizeAsSource: true,
             }
           : { needsAutoResize: true },
-    _0x135cf9 = buildSourceMediaNodePayload({
-      ..._0x1dc07a,
-      ..._0x261db4,
-      id: _0x4a215c,
+    box3 = buildSourceMediaNodePayload({
+      ...src,
+      ...args3,
+      id: id2,
       type: 'source-image',
       x: 0,
       y: 0,
-      name: firstNonEmptyString(name, _0x1dc07a.fileName, t('aigenImage.result.imageFallbackName')),
-      src: _0x1dc07a.src || _0x1dc07a.imageUrl || _0x1dc07a.sourceUrl || '',
+      name: firstNonEmptyString(name, src.fileName, t('aigenImage.result.imageFallbackName')),
+      src: src.src || src.imageUrl || src.sourceUrl || '',
     });
   return {
-    ..._0x135cf9,
-    x: _0x5e4354.x - (_0x135cf9.width || 0) / 2,
-    y: _0x5e4354.y - (_0x135cf9.height || 0) / 2,
+    ...box3,
+    x: x2.x - (box3.width || 0) / 2,
+    y: x2.y - (box3.height || 0) / 2,
   };
 }
-function getEventClientPoint(_0x4d3aac) {
+function getEventClientPoint(event) {
   return {
-    x: Number.isFinite(Number(_0x4d3aac?.clientX)) ? Number(_0x4d3aac.clientX) : 0,
-    y: Number.isFinite(Number(_0x4d3aac?.clientY)) ? Number(_0x4d3aac.clientY) : 0,
+    x: Number.isFinite(Number(event?.clientX)) ? Number(event.clientX) : 0,
+    y: Number.isFinite(Number(event?.clientY)) ? Number(event.clientY) : 0,
   };
 }
-function getElementSize(_0x13e204) {
-  const _0x17ba9a =
-    _0x13e204 && typeof _0x13e204.getBoundingClientRect === 'function'
-      ? _0x13e204.getBoundingClientRect()
-      : null;
+function getElementSize(el) {
+  const box4 = el && typeof el.getBoundingClientRect === 'function' ? el.getBoundingClientRect() : null;
   return {
-    width: toPositiveInt(_0x17ba9a?.width) || toPositiveInt(_0x13e204?.offsetWidth),
-    height: toPositiveInt(_0x17ba9a?.height) || toPositiveInt(_0x13e204?.offsetHeight),
+    width: toPositiveInt(box4?.width) || toPositiveInt(el?.offsetWidth),
+    height: toPositiveInt(box4?.height) || toPositiveInt(el?.offsetHeight),
   };
 }
-function resolveOption(_0xc8fe7f, ..._0x209271) {
-  return typeof _0xc8fe7f === 'function' ? _0xc8fe7f(..._0x209271) : _0xc8fe7f;
+function resolveOption(handler, ...args4) {
+  return typeof handler === 'function' ? handler(...args4) : handler;
 }
-function removeGhost(_0x3b328e) {
-  if (!_0x3b328e) return;
-  (_0x3b328e.style &&
-    ((_0x3b328e.style.transition = 'opacity 0.16s cubic-bezier(0.4, 0, 0.2, 1)'),
-    (_0x3b328e.style.opacity = '0')),
-    setTimeout(() => _0x3b328e.remove?.(), 160));
+function removeGhost(el2) {
+  if (!el2) return;
+  (el2.style &&
+    ((el2.style.transition = 'opacity 0.16s cubic-bezier(0.4, 0, 0.2, 1)'), (el2.style.opacity = '0')),
+    setTimeout(() => el2.remove?.(), 160));
 }
 export function createResultImageDragGhost({
   sourceEl: sourceEl = null,
@@ -160,138 +156,132 @@ export function createResultImageDragGhost({
   documentRef: documentRef = globalThis.document,
 } = {}) {
   if (!documentRef?.createElement) return null;
-  const _0x446dc7 = Math.max(1, toPositiveInt(width) || 120),
-    _0x1e0cc6 = Math.max(1, toPositiveInt(height) || 120),
-    _0xeafabc = documentRef.createElement('div');
-  ((_0xeafabc.className = 'v2-ghost-image result-image-drag-ghost'),
-    Object.assign(_0xeafabc.style, { width: _0x446dc7 + 'px', height: _0x1e0cc6 + 'px' }));
-  const _0x66eba0 = documentRef.createElement('img'),
-    _0x39c6b9 = firstNonEmptyString(sourceEl?.currentSrc, sourceEl?.src, fallbackSrc);
-  if (_0x39c6b9) _0x66eba0.setAttribute('src', _0x39c6b9);
-  return (_0xeafabc.appendChild(_0x66eba0), _0xeafabc);
+  const width4 = Math.max(1, toPositiveInt(width) || 120),
+    height3 = Math.max(1, toPositiveInt(height) || 120),
+    el3 = documentRef.createElement('div');
+  ((el3.className = 'v2-ghost-image result-image-drag-ghost'),
+    Object.assign(el3.style, { width: width4 + 'px', height: height3 + 'px' }));
+  const el4 = documentRef.createElement('img'),
+    nonEmptyString2 = firstNonEmptyString(sourceEl?.currentSrc, sourceEl?.src, fallbackSrc);
+  if (nonEmptyString2) el4.setAttribute('src', nonEmptyString2);
+  return (el3.appendChild(el4), el3);
 }
-export function startResultImageDragOutPointer(_0x208726, _0x14bf6b = {}) {
-  if (!_0x208726 || _0x208726.button !== 0) return false;
-  const _0x30bca5 = _0x14bf6b.targetEl || _0x208726.currentTarget;
-  if (!_0x30bca5) return false;
-  _0x208726.stopPropagation?.();
-  const _0x21ba0e = _0x30bca5.ownerDocument || globalThis.document,
-    _0x32ea2f = _0x21ba0e?.body || globalThis.document?.body,
-    _0x4d11b5 = getEventClientPoint(_0x208726);
-  let _0x3fc66f = false,
-    _0x2ef11a = null,
-    _0x22d651 = false;
-  const _0x5c3907 = () => {
-      if (_0x22d651) return;
-      ((_0x22d651 = true),
-        _0x21ba0e?.removeEventListener?.('pointermove', _0x10bcd7, true),
-        _0x21ba0e?.removeEventListener?.('pointerup', _0x3793c5, true),
-        _0x21ba0e?.removeEventListener?.('pointercancel', _0x1a763b, true));
+export function startResultImageDragOutPointer(event2, createId2 = {}) {
+  if (!event2 || event2.button !== 0) return false;
+  const enabled2 = createId2.targetEl || event2.currentTarget;
+  if (!enabled2) return false;
+  event2.stopPropagation?.();
+  const documentRef2 = enabled2.ownerDocument || globalThis.document,
+    el5 = documentRef2?.body || globalThis.document?.body,
+    box5 = getEventClientPoint(event2);
+  let target = false,
+    el6 = null,
+    source = false;
+  const run = () => {
+      if (source) return;
+      ((source = true),
+        documentRef2?.removeEventListener?.('pointermove', run2, true),
+        documentRef2?.removeEventListener?.('pointerup', run3, true),
+        documentRef2?.removeEventListener?.('pointercancel', run4, true));
       try {
-        _0x30bca5.releasePointerCapture?.(_0x208726.pointerId);
+        enabled2.releasePointerCapture?.(event2.pointerId);
       } catch {}
-      _0x14bf6b.onDragEnd?.();
+      createId2.onDragEnd?.();
     },
-    _0x292b62 = (_0x3a2969) => {
-      if (_0x3fc66f) return true;
-      const _0x3f05de = getEventClientPoint(_0x3a2969);
-      if (
-        Math.hypot(_0x3f05de.x - _0x4d11b5.x, _0x3f05de.y - _0x4d11b5.y) <= RESULT_IMAGE_DRAG_OUT_THRESHOLD_PX
-      )
-        return false;
-      const _0xba48b3 = resolveOption(_0x14bf6b.image);
-      if (!hasUsableResultImageForDragOut(_0xba48b3))
+    handler2 = (next) => {
+      if (target) return true;
+      const box6 = getEventClientPoint(next);
+      if (Math.hypot(box6.x - box5.x, box6.y - box5.y) <= RESULT_IMAGE_DRAG_OUT_THRESHOLD_PX) return false;
+      const option = resolveOption(createId2.image);
+      if (!hasUsableResultImageForDragOut(option))
         return (
-          _0x14bf6b.markClickSuppressed?.(),
-          _0x14bf6b.showToast?.(t('aigenImage.result.dragUnavailable'), 'warning'),
-          _0x5c3907(),
+          createId2.markClickSuppressed?.(),
+          createId2.showToast?.(t('aigenImage.result.dragUnavailable'), 'warning'),
+          run(),
           false
         );
-      ((_0x3fc66f = true), _0x14bf6b.markClickSuppressed?.(), _0x14bf6b.onDragStart?.());
-      const _0x397c55 = resolveOption(_0x14bf6b.getGhostSourceElement),
-        _0x3f55fe = resolveOption(_0x14bf6b.getGhostSize) || getElementSize(_0x397c55 || _0x30bca5);
+      ((target = true), createId2.markClickSuppressed?.(), createId2.onDragStart?.());
+      const sourceEl2 = resolveOption(createId2.getGhostSourceElement),
+        width5 = resolveOption(createId2.getGhostSize) || getElementSize(sourceEl2 || enabled2);
       return (
-        (_0x2ef11a =
-          _0x14bf6b.createGhost?.({
-            sourceEl: _0x397c55 || _0x30bca5,
-            fallbackSrc: resolveOption(_0x14bf6b.getFallbackSrc) || '',
-            width: _0x3f55fe.width,
-            height: _0x3f55fe.height,
-            documentRef: _0x21ba0e,
+        (el6 =
+          createId2.createGhost?.({
+            sourceEl: sourceEl2 || enabled2,
+            fallbackSrc: resolveOption(createId2.getFallbackSrc) || '',
+            width: width5.width,
+            height: width5.height,
+            documentRef: documentRef2,
           }) ||
           createResultImageDragGhost({
-            sourceEl: _0x397c55 || _0x30bca5,
-            fallbackSrc: resolveOption(_0x14bf6b.getFallbackSrc) || '',
-            width: _0x3f55fe.width,
-            height: _0x3f55fe.height,
-            documentRef: _0x21ba0e,
+            sourceEl: sourceEl2 || enabled2,
+            fallbackSrc: resolveOption(createId2.getFallbackSrc) || '',
+            width: width5.width,
+            height: width5.height,
+            documentRef: documentRef2,
           })),
-        _0x2ef11a &&
-          (_0x32ea2f?.appendChild?.(_0x2ef11a),
-          (_0x2ef11a.style.transform =
-            'translate(' + _0x3f05de.x + 'px, ' + _0x3f05de.y + 'px) translate(-50%, -50%)')),
+        el6 &&
+          (el5?.appendChild?.(el6),
+          (el6.style.transform = 'translate(' + box6.x + 'px, ' + box6.y + 'px) translate(-50%, -50%)')),
         true
       );
     };
-  function _0x10bcd7(_0x37db57) {
-    if (!_0x292b62(_0x37db57)) return;
-    (_0x37db57.preventDefault?.(), _0x37db57.stopPropagation?.());
-    const _0x2bdcfe = getEventClientPoint(_0x37db57);
-    _0x2ef11a &&
-      (_0x2ef11a.style.transform =
-        'translate(' + _0x2bdcfe.x + 'px, ' + _0x2bdcfe.y + 'px) translate(-50%, -50%)');
+  function run2(event3) {
+    if (!handler2(event3)) return;
+    (event3.preventDefault?.(), event3.stopPropagation?.());
+    const box7 = getEventClientPoint(event3);
+    el6 && (el6.style.transform = 'translate(' + box7.x + 'px, ' + box7.y + 'px) translate(-50%, -50%)');
   }
-  function _0x3793c5(_0x1c925f) {
-    const _0x23e032 = _0x3fc66f;
-    _0x5c3907();
-    if (!_0x23e032) return;
-    (_0x1c925f.preventDefault?.(), _0x1c925f.stopPropagation?.());
-    const _0x51f030 = resolveOption(_0x14bf6b.image),
-      _0x2527ea =
-        resolveOption(_0x14bf6b.getNodeFallbackSize) ||
-        resolveOption(_0x14bf6b.getGhostSize) ||
-        getElementSize(_0x30bca5),
-      _0x2c843b = buildResultImageDragOutNodePayload({
-        image: _0x51f030,
-        viewport: resolveOption(_0x14bf6b.getViewport) || { x: 0, y: 0, zoom: 1 },
-        screenX: Number(_0x1c925f?.clientX ?? _0x4d11b5.x),
-        screenY: Number(_0x1c925f?.clientY ?? _0x4d11b5.y),
-        fallbackWidth: _0x2527ea.width,
-        fallbackHeight: _0x2527ea.height,
-        createId: _0x14bf6b.createId,
-        name: resolveOption(_0x14bf6b.getNodeName),
+  function run3(event4) {
+    const enabled3 = target;
+    run();
+    if (!enabled3) return;
+    (event4.preventDefault?.(), event4.stopPropagation?.());
+    const image2 = resolveOption(createId2.image),
+      fallbackWidth2 =
+        resolveOption(createId2.getNodeFallbackSize) ||
+        resolveOption(createId2.getGhostSize) ||
+        getElementSize(enabled2),
+      resultImageDragOutNodePayload = buildResultImageDragOutNodePayload({
+        image: image2,
+        viewport: resolveOption(createId2.getViewport) || { x: 0, y: 0, zoom: 1 },
+        screenX: Number(event4?.clientX ?? box5.x),
+        screenY: Number(event4?.clientY ?? box5.y),
+        fallbackWidth: fallbackWidth2.width,
+        fallbackHeight: fallbackWidth2.height,
+        createId: createId2.createId,
+        name: resolveOption(createId2.getNodeName),
       });
-    if (!_0x2c843b) {
-      (_0x14bf6b.showToast?.(t('aigenImage.result.dragUnavailable'), 'warning'), removeGhost(_0x2ef11a));
+    if (!resultImageDragOutNodePayload) {
+      (createId2.showToast?.(t('aigenImage.result.dragUnavailable'), 'warning'), removeGhost(el6));
       return;
     }
-    (_0x14bf6b.addNode?.(_0x2c843b),
-      _0x14bf6b.setSelectedNodes?.([_0x2c843b.id]),
-      _0x14bf6b.commit?.(),
-      _0x14bf6b.onCreated?.(_0x2c843b),
-      removeGhost(_0x2ef11a));
+    (createId2.addNode?.(resultImageDragOutNodePayload),
+      createId2.setSelectedNodes?.([resultImageDragOutNodePayload.id]),
+      createId2.commit?.(),
+      createId2.onCreated?.(resultImageDragOutNodePayload),
+      removeGhost(el6));
   }
-  function _0x1a763b(_0x51e555) {
-    (_0x51e555?.stopPropagation?.(), _0x5c3907(), removeGhost(_0x2ef11a));
+  function run4(event5) {
+    (event5?.stopPropagation?.(), run(), removeGhost(el6));
   }
   try {
-    _0x30bca5.setPointerCapture?.(_0x208726.pointerId);
+    enabled2.setPointerCapture?.(event2.pointerId);
   } catch {}
   return (
-    _0x21ba0e?.addEventListener?.('pointermove', _0x10bcd7, true),
-    _0x21ba0e?.addEventListener?.('pointerup', _0x3793c5, true),
-    _0x21ba0e?.addEventListener?.('pointercancel', _0x1a763b, true),
+    documentRef2?.addEventListener?.('pointermove', run2, true),
+    documentRef2?.addEventListener?.('pointerup', run3, true),
+    documentRef2?.addEventListener?.('pointercancel', run4, true),
     true
   );
 }
-export function bindResultImageDragOutGesture(_0x31f4ec, _0x403f87 = {}) {
-  if (!_0x31f4ec?.addEventListener) return () => {};
-  const _0x35d45b = (_0x447d63) => {
-    if (_0x403f87.isEnabled && !_0x403f87.isEnabled()) return;
-    startResultImageDragOutPointer(_0x447d63, { ..._0x403f87, targetEl: _0x31f4ec });
+export function bindResultImageDragOutGesture(targetEl, args5 = {}) {
+  if (!targetEl?.addEventListener) return () => {};
+  const current = (entry) => {
+    if (args5.isEnabled && !args5.isEnabled()) return;
+    startResultImageDragOutPointer(entry, { ...args5, targetEl: targetEl });
   };
   return (
-    _0x31f4ec.addEventListener('pointerdown', _0x35d45b),
-    () => _0x31f4ec.removeEventListener?.('pointerdown', _0x35d45b)
+    targetEl.addEventListener('pointerdown', current),
+    () => targetEl.removeEventListener?.('pointerdown', current)
   );
 }

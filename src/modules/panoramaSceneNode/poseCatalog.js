@@ -23,49 +23,48 @@ export const PANORAMA_CHARACTER_BONES = Object['freeze']([
 ]);
 const BONE_SET = new Set(PANORAMA_CHARACTER_BONES),
   PI = Math['PI'];
-function clampRadians(_0x2a28a2) {
-  const _0x39f10f = Number(_0x2a28a2);
-  if (!Number['isFinite'](_0x39f10f)) return 0x0;
-  return Math['max'](-PI, Math['min'](PI, _0x39f10f));
+function clampRadians(value) {
+  const item = Number(value);
+  if (!Number['isFinite'](item)) return 0x0;
+  return Math['max'](-PI, Math['min'](PI, item));
 }
-function rotation(_0x309827 = 0x0, _0x22fd7d = 0x0, _0x165513 = 0x0) {
-  return { x: _0x309827, y: _0x22fd7d, z: _0x165513 };
+function rotation(x = 0x0, y = 0x0, z = 0x0) {
+  return { x: x, y: y, z: z };
 }
-export function normalizeBonePose(_0x3e1e4e = {}) {
-  const _0x1129e2 = {};
-  for (const _0x260921 of PANORAMA_CHARACTER_BONES) {
-    const _0x2844d4 = _0x3e1e4e?.[_0x260921];
-    if (!_0x2844d4 || typeof _0x2844d4 !== 'object') continue;
-    const _0x1a8dd4 = {
-      x: clampRadians(_0x2844d4['x']),
-      y: clampRadians(_0x2844d4['y']),
-      z: clampRadians(_0x2844d4['z']),
+export function normalizeBonePose(options = {}) {
+  const key = {};
+  for (const index of PANORAMA_CHARACTER_BONES) {
+    const box = options?.[index];
+    if (!box || typeof box !== 'object') continue;
+    const box2 = {
+      x: clampRadians(box['x']),
+      y: clampRadians(box['y']),
+      z: clampRadians(box['z']),
     };
-    if (Math['abs'](_0x1a8dd4['x']) + Math['abs'](_0x1a8dd4['y']) + Math['abs'](_0x1a8dd4['z']) < 1e-8)
-      continue;
-    _0x1129e2[_0x260921] = _0x1a8dd4;
+    if (Math['abs'](box2['x']) + Math['abs'](box2['y']) + Math['abs'](box2['z']) < 1e-8) continue;
+    key[index] = box2;
   }
-  return _0x1129e2;
+  return key;
 }
-function swapSideName(_0x53fd25) {
-  if (_0x53fd25['endsWith']('_l')) return _0x53fd25['slice'](0x0, -0x2) + '_r';
-  if (_0x53fd25['endsWith']('_r')) return _0x53fd25['slice'](0x0, -0x2) + '_l';
-  return _0x53fd25;
+function swapSideName(list) {
+  if (list['endsWith']('_l')) return list['slice'](0x0, -0x2) + '_r';
+  if (list['endsWith']('_r')) return list['slice'](0x0, -0x2) + '_l';
+  return list;
 }
-function mirrorBonePose(_0x18cf5e = {}) {
-  const _0x861c66 = {};
-  for (const [_0x139196, _0x324f0f] of Object['entries'](normalizeBonePose(_0x18cf5e))) {
-    _0x861c66[swapSideName(_0x139196)] = { x: _0x324f0f['x'], y: -_0x324f0f['y'], z: -_0x324f0f['z'] };
+function mirrorBonePose(options2 = {}) {
+  const result = {};
+  for (const [data, x2] of Object['entries'](normalizeBonePose(options2))) {
+    result[swapSideName(data)] = { x: x2['x'], y: -x2['y'], z: -x2['z'] };
   }
-  return _0x861c66;
+  return result;
 }
-function preset(_0x348b19, _0x5a6654, _0x3b5d81, _0x395b66, _0x42637c = []) {
+function preset(id2, name2, category2, target, args = []) {
   return Object['freeze']({
-    id: _0x348b19,
-    name: _0x5a6654,
-    category: _0x3b5d81,
-    tags: Object['freeze']([..._0x42637c]),
-    bones: Object['freeze'](normalizeBonePose(_0x395b66)),
+    id: id2,
+    name: name2,
+    category: category2,
+    tags: Object['freeze']([...args]),
+    bones: Object['freeze'](normalizeBonePose(target)),
   });
 }
 const WAVE_LEFT = {
@@ -317,47 +316,47 @@ const WAVE_LEFT = {
       ['tilt'],
     ),
   ]),
-  PRESET_BY_ID = new Map(PRESETS['map']((_0xcb5e81) => [_0xcb5e81['id'], _0xcb5e81]));
+  PRESET_BY_ID = new Map(PRESETS['map']((source) => [source['id'], source]));
 export const DEFAULT_MANNEQUIN_POSE_ID = 'neutral';
 export function listMannequinPosePresets({ category: category = 'all', query: query = '' } = {}) {
-  const _0x259f32 = String(category || 'all')
+  const next = String(category || 'all')
       ['trim']()
       ['toLowerCase'](),
-    _0xdd6676 = String(query || '')
+    enabled = String(query || '')
       ['trim']()
       ['toLowerCase']();
-  return PRESETS['filter']((_0x231f23) => {
-    if (_0x259f32 !== 'all' && _0x231f23['category'] !== _0x259f32) return ![];
-    if (!_0xdd6676) return !![];
-    return [_0x231f23['id'], _0x231f23['name'], _0x231f23['category'], ..._0x231f23['tags']]
+  return PRESETS['filter']((error) => {
+    if (next !== 'all' && error['category'] !== next) return ![];
+    if (!enabled) return !![];
+    return [error['id'], error['name'], error['category'], ...error['tags']]
       ['join']('\x20')
       ['toLowerCase']()
-      ['includes'](_0xdd6676);
+      ['includes'](enabled);
   });
 }
-export function findMannequinPosePreset(_0x51ae56) {
-  return PRESET_BY_ID['get'](String(_0x51ae56 || '')['trim']()) || null;
+export function findMannequinPosePreset(current) {
+  return PRESET_BY_ID['get'](String(current || '')['trim']()) || null;
 }
-export function resolveMannequinPose(_0x4b882a, _0x2d7815 = null) {
-  const _0x15e2bb = String(_0x4b882a || DEFAULT_MANNEQUIN_POSE_ID)['trim']();
-  if (_0x15e2bb === 'custom' && _0x2d7815) return normalizeCustomMannequinPose(_0x2d7815);
-  return PRESET_BY_ID['get'](_0x15e2bb) || PRESET_BY_ID['get'](DEFAULT_MANNEQUIN_POSE_ID);
+export function resolveMannequinPose(entry, record = null) {
+  const payload = String(entry || DEFAULT_MANNEQUIN_POSE_ID)['trim']();
+  if (payload === 'custom' && record) return normalizeCustomMannequinPose(record);
+  return PRESET_BY_ID['get'](payload) || PRESET_BY_ID['get'](DEFAULT_MANNEQUIN_POSE_ID);
 }
-export function normalizeCustomMannequinPose(_0x1665ac = {}) {
+export function normalizeCustomMannequinPose(error2 = {}) {
   return {
-    id: String(_0x1665ac['id'] || 'custom')['trim']() || 'custom',
+    id: String(error2['id'] || 'custom')['trim']() || 'custom',
     name:
-      String(_0x1665ac['name'] || 'Custom pose')
+      String(error2['name'] || 'Custom pose')
         ['trim']()
         ['slice'](0x0, 0x50) || 'Custom\x20pose',
     category: 'custom',
-    tags: Array['isArray'](_0x1665ac['tags'])
-      ? _0x1665ac['tags']
-          ['map']((_0xad3f60) => String(_0xad3f60 || '')['trim']())
+    tags: Array['isArray'](error2['tags'])
+      ? error2['tags']
+          ['map']((handle) => String(handle || '')['trim']())
           ['filter'](Boolean)
           ['slice'](0x0, 0xc)
       : [],
-    bones: normalizeBonePose(_0x1665ac['bones']),
+    bones: normalizeBonePose(error2['bones']),
   };
 }
 export function createCustomMannequinPose({
@@ -367,18 +366,15 @@ export function createCustomMannequinPose({
 } = {}) {
   return normalizeCustomMannequinPose({ id: id, name: name, bones: bones });
 }
-export function validateCustomMannequinPose(_0x597b01) {
-  const _0xe2fe68 = [];
-  if (!_0x597b01 || typeof _0x597b01 !== 'object') _0xe2fe68['push']('Pose must be an object.');
-  if (!_0x597b01?.['bones'] || typeof _0x597b01['bones'] !== 'object')
-    _0xe2fe68['push']('Pose bones are required.');
-  const _0x1798de = Object['keys'](_0x597b01?.['bones'] || {})['filter'](
-    (_0x38f10f) => !BONE_SET['has'](_0x38f10f),
-  );
-  if (_0x1798de['length'] > 0x0) _0xe2fe68['push']('Unknown\x20bones:\x20' + _0x1798de['join'](',\x20'));
+export function validateCustomMannequinPose(enabled2) {
+  const ok = [];
+  if (!enabled2 || typeof enabled2 !== 'object') ok['push']('Pose must be an object.');
+  if (!enabled2?.['bones'] || typeof enabled2['bones'] !== 'object') ok['push']('Pose bones are required.');
+  const list2 = Object['keys'](enabled2?.['bones'] || {})['filter']((state) => !BONE_SET['has'](state));
+  if (list2['length'] > 0x0) ok['push']('Unknown\x20bones:\x20' + list2['join'](',\x20'));
   return {
-    ok: _0xe2fe68['length'] === 0x0,
-    errors: _0xe2fe68,
-    pose: normalizeCustomMannequinPose(_0x597b01),
+    ok: ok['length'] === 0x0,
+    errors: ok,
+    pose: normalizeCustomMannequinPose(enabled2),
   };
 }

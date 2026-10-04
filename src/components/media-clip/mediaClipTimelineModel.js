@@ -13,169 +13,170 @@ export const MEDIA_CLIP_TIMELINE_FRAME_COUNT_MAX = 22;
 export const MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC = Object.freeze([15, 10, 5, 2, 1]);
 const MEDIA_CLIP_TIMELINE_TICK_STEPS_ASC = Object.freeze([1, 2, 5, 10, 15]),
   MEDIA_CLIP_TIMELINE_MIN_RULER_INTERVALS = 4;
-function toNumber(_0x4d9cdd, _0x3de2d4 = 0) {
-  const _0x170b14 = Number(_0x4d9cdd);
-  return Number.isFinite(_0x170b14) ? _0x170b14 : _0x3de2d4;
+function toNumber(value, item = 0) {
+  const key = Number(value);
+  return Number.isFinite(key) ? key : item;
 }
-function clamp(_0x116622, _0x3a95a7, _0x1138c6) {
-  return Math.max(_0x3a95a7, Math.min(_0x1138c6, _0x116622));
+function clamp(index, result, data) {
+  return Math.max(result, Math.min(data, index));
 }
-function roundMs(_0x2bc178) {
-  return Math.round(toNumber(_0x2bc178, 0) * 0x3e8) / 0x3e8;
+function roundMs(options) {
+  return Math.round(toNumber(options, 0) * 0x3e8) / 0x3e8;
 }
-export function getMediaClipTimelineDisplayDuration(_0x1cc98c = 0) {
-  return Math.max(MEDIA_CLIP_TIMELINE_MIN_DISPLAY_SEC, toNumber(_0x1cc98c, 0));
+export function getMediaClipTimelineDisplayDuration(target = 0) {
+  return Math.max(MEDIA_CLIP_TIMELINE_MIN_DISPLAY_SEC, toNumber(target, 0));
 }
-export function getMediaClipTimelineRatio(_0x222684 = 0, _0x143982 = 0) {
-  const _0x38398a = getMediaClipTimelineDisplayDuration(_0x143982);
-  return clamp(toNumber(_0x222684, 0) / _0x38398a, 0, 1);
+export function getMediaClipTimelineRatio(source = 0, next = 0) {
+  const mediaClipTimelineDisplayDuration = getMediaClipTimelineDisplayDuration(next);
+  return clamp(toNumber(source, 0) / mediaClipTimelineDisplayDuration, 0, 1);
 }
-export function getMediaClipTimelinePercent(_0x2bc128 = 0, _0x178a89 = 0) {
-  return getMediaClipTimelineRatio(_0x2bc128, _0x178a89) * 100;
+export function getMediaClipTimelinePercent(current = 0, entry = 0) {
+  return getMediaClipTimelineRatio(current, entry) * 100;
 }
-export function getMediaClipTimelinePx(_0x2a5c6d = 0, _0x53f859 = {}) {
-  const _0x4057e6 = Math.max(1, toNumber(_0x53f859.trackWidthPx, 1));
-  return getMediaClipTimelineRatio(_0x2a5c6d, _0x53f859.durationSec) * _0x4057e6;
+export function getMediaClipTimelinePx(record = 0, payload = {}) {
+  const handle = Math.max(1, toNumber(payload.trackWidthPx, 1));
+  return getMediaClipTimelineRatio(record, payload.durationSec) * handle;
 }
-export function getMediaClipTimelineSecFromPx(_0x412a2c = 0, _0x49353c = {}) {
-  const _0x2f2aff = Math.max(1, toNumber(_0x49353c.trackWidthPx, 1)),
-    _0x20cc54 = getMediaClipTimelineDisplayDuration(_0x49353c.durationSec);
-  return roundMs(clamp(toNumber(_0x412a2c, 0) / _0x2f2aff, 0, 1) * _0x20cc54);
+export function getMediaClipTimelineSecFromPx(state = 0, config = {}) {
+  const scope = Math.max(1, toNumber(config.trackWidthPx, 1)),
+    mediaClipTimelineDisplayDuration2 = getMediaClipTimelineDisplayDuration(config.durationSec);
+  return roundMs(clamp(toNumber(state, 0) / scope, 0, 1) * mediaClipTimelineDisplayDuration2);
 }
-export function getMediaClipTimelineSecFromClientX(_0xf6129f = 0, _0xe52147 = {}) {
-  const _0x3c55e3 = toNumber(_0xe52147.trackLeftPx, 0);
-  return getMediaClipTimelineSecFromPx(toNumber(_0xf6129f, _0x3c55e3) - _0x3c55e3, _0xe52147);
+export function getMediaClipTimelineSecFromClientX(input = 0, output = {}) {
+  const toNumber2 = toNumber(output.trackLeftPx, 0);
+  return getMediaClipTimelineSecFromPx(toNumber(input, toNumber2) - toNumber2, output);
 }
-export function getMediaClipTimelineDeltaSecFromPx(_0x13c388 = 0, _0x6ec311 = {}) {
-  const _0x4e9c5c = Math.max(1, toNumber(_0x6ec311.trackWidthPx, 1)),
-    _0x4054ee = getMediaClipTimelineDisplayDuration(_0x6ec311.durationSec);
-  return (toNumber(_0x13c388, 0) / _0x4e9c5c) * _0x4054ee;
+export function getMediaClipTimelineDeltaSecFromPx(value2 = 0, value3 = {}) {
+  const value4 = Math.max(1, toNumber(value3.trackWidthPx, 1)),
+    mediaClipTimelineDisplayDuration3 = getMediaClipTimelineDisplayDuration(value3.durationSec);
+  return (toNumber(value2, 0) / value4) * mediaClipTimelineDisplayDuration3;
 }
-export function getMediaClipTimelineRangeRect(_0x60dbbb = {}) {
-  const _0x50aa5f = getMediaClipTimelineDisplayDuration(_0x60dbbb.durationSec),
-    _0x290824 = clamp(toNumber(_0x60dbbb.startSec, 0), 0, _0x50aa5f),
-    _0x356363 = clamp(toNumber(_0x60dbbb.endSec, _0x290824), _0x290824, _0x50aa5f),
-    _0x585e49 = getMediaClipTimelinePercent(_0x290824, _0x50aa5f),
-    _0x3f8af9 = Math.max(_0x585e49, getMediaClipTimelinePercent(_0x356363, _0x50aa5f)),
-    _0x13452e = Math.max(
-      toNumber(_0x60dbbb.minWidthPct, MEDIA_CLIP_TIMELINE_MIN_SEGMENT_WIDTH_PCT),
-      _0x3f8af9 - _0x585e49,
+export function getMediaClipTimelineRangeRect(options2 = {}) {
+  const mediaClipTimelineDisplayDuration4 = getMediaClipTimelineDisplayDuration(options2.durationSec),
+    startSec = clamp(toNumber(options2.startSec, 0), 0, mediaClipTimelineDisplayDuration4),
+    endSec = clamp(toNumber(options2.endSec, startSec), startSec, mediaClipTimelineDisplayDuration4),
+    leftPct = getMediaClipTimelinePercent(startSec, mediaClipTimelineDisplayDuration4),
+    rightPct = Math.max(leftPct, getMediaClipTimelinePercent(endSec, mediaClipTimelineDisplayDuration4)),
+    value5 = Math.max(
+      toNumber(options2.minWidthPct, MEDIA_CLIP_TIMELINE_MIN_SEGMENT_WIDTH_PCT),
+      rightPct - leftPct,
     ),
-    _0x373e13 = Math.max(0, toNumber(_0x60dbbb.trackWidthPx, 0));
+    leftPx = Math.max(0, toNumber(options2.trackWidthPx, 0));
   return {
-    startSec: _0x290824,
-    endSec: _0x356363,
-    leftPct: _0x585e49,
-    rightPct: _0x3f8af9,
-    widthPct: Math.min(100 - _0x585e49, _0x13452e),
-    leftPx: _0x373e13 > 0 ? (_0x585e49 / 100) * _0x373e13 : 0,
-    widthPx: _0x373e13 > 0 ? ((_0x3f8af9 - _0x585e49) / 100) * _0x373e13 : 0,
+    startSec: startSec,
+    endSec: endSec,
+    leftPct: leftPct,
+    rightPct: rightPct,
+    widthPct: Math.min(100 - leftPct, value5),
+    leftPx: leftPx > 0 ? (leftPct / 100) * leftPx : 0,
+    widthPx: leftPx > 0 ? ((rightPct - leftPct) / 100) * leftPx : 0,
   };
 }
-export function getMediaClipTimelinePlayheadModel(_0x1a49d1 = {}) {
-  const _0x24a658 = clamp(
-    toNumber(_0x1a49d1.playheadSec, 0),
+export function getMediaClipTimelinePlayheadModel(options3 = {}) {
+  const sec = clamp(
+    toNumber(options3.playheadSec, 0),
     0,
-    getMediaClipTimelineDisplayDuration(_0x1a49d1.durationSec),
+    getMediaClipTimelineDisplayDuration(options3.durationSec),
   );
   return {
-    sec: _0x24a658,
-    leftPct: getMediaClipTimelinePercent(_0x24a658, _0x1a49d1.durationSec),
-    leftPx: getMediaClipTimelinePx(_0x24a658, _0x1a49d1),
+    sec: sec,
+    leftPct: getMediaClipTimelinePercent(sec, options3.durationSec),
+    leftPx: getMediaClipTimelinePx(sec, options3),
   };
 }
-export function getMediaClipTimelineTrackWidthPx(_0x456c15 = {}) {
-  const _0x16b468 = Math.max(
-      MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX,
-      Math.ceil(toNumber(_0x456c15.viewportWidthPx, 0)),
-    ),
-    _0x3124d9 = getMediaClipTimelineDisplayDuration(_0x456c15.durationSec),
-    _0x3b558a = Math.max(1, toNumber(_0x456c15.pxPerSec, MEDIA_CLIP_TIMELINE_SCROLL_PX_PER_SEC)),
-    _0x20621b = Math.max(0.001, toNumber(_0x456c15.zoom, 1)),
-    _0x2ae605 = Math.max(_0x16b468, _0x3124d9 * _0x3b558a);
-  return Math.ceil(Math.max(_0x16b468, _0x2ae605 * _0x20621b));
+export function getMediaClipTimelineTrackWidthPx(box = {}) {
+  const value6 = Math.max(MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, Math.ceil(toNumber(box.viewportWidthPx, 0))),
+    mediaClipTimelineDisplayDuration5 = getMediaClipTimelineDisplayDuration(box.durationSec),
+    value7 = Math.max(1, toNumber(box.pxPerSec, MEDIA_CLIP_TIMELINE_SCROLL_PX_PER_SEC)),
+    value8 = Math.max(0.001, toNumber(box.zoom, 1)),
+    value9 = Math.max(value6, mediaClipTimelineDisplayDuration5 * value7);
+  return Math.ceil(Math.max(value6, value9 * value8));
 }
-export function getMediaClipFrameCount(_0x328e67 = 0) {
-  const _0x3856cc = Math.max(MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(_0x328e67, 0));
+export function getMediaClipFrameCount(value10 = 0) {
+  const value11 = Math.max(MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(value10, 0));
   return Math.max(
     MEDIA_CLIP_TIMELINE_FRAME_COUNT_MIN,
     Math.min(
       MEDIA_CLIP_TIMELINE_FRAME_COUNT_MAX,
-      Math.ceil(_0x3856cc / MEDIA_CLIP_TIMELINE_FRAME_MIN_WIDTH_PX),
+      Math.ceil(value11 / MEDIA_CLIP_TIMELINE_FRAME_MIN_WIDTH_PX),
     ),
   );
 }
-export function shouldLockMediaClipTimelineWheelScroll(_0x10dd99 = {}) {
-  const _0x52b7c5 = Math.max(0, toNumber(_0x10dd99.trackWidthPx, 0)),
-    _0x229ee7 = Math.max(1, toNumber(_0x10dd99.viewportWidthPx, 1)),
-    _0x149c3f = Math.max(0, toNumber(_0x10dd99.maxScrollPx, 0)),
-    _0x44bb33 = MEDIA_CLIP_TIMELINE_ADD_SLOT_GAP_PX + MEDIA_CLIP_TIMELINE_ADD_SLOT_WIDTH_PX;
-  return _0x149c3f > 0 && _0x52b7c5 <= _0x229ee7 + 1 && _0x149c3f <= _0x44bb33 + 4;
+export function shouldLockMediaClipTimelineWheelScroll(options4 = {}) {
+  const value12 = Math.max(0, toNumber(options4.trackWidthPx, 0)),
+    value13 = Math.max(1, toNumber(options4.viewportWidthPx, 1)),
+    count = Math.max(0, toNumber(options4.maxScrollPx, 0)),
+    value14 = MEDIA_CLIP_TIMELINE_ADD_SLOT_GAP_PX + MEDIA_CLIP_TIMELINE_ADD_SLOT_WIDTH_PX;
+  return count > 0 && value12 <= value13 + 1 && count <= value14 + 4;
 }
-export function getMediaClipTimelineAddSlotLeftPx(_0x55a0ea = {}) {
-  const _0x4fc608 = Math.max(0, toNumber(_0x55a0ea.trackWidthPx, 0)),
-    _0x3ba4f3 = getMediaClipTimelineDisplayDuration(_0x55a0ea.displayDurationSec),
-    _0x9a5b00 = clamp(toNumber(_0x55a0ea.materialEndSec, 0), 0, _0x3ba4f3);
-  if (_0x3ba4f3 <= 0 || _0x4fc608 <= 0) return MEDIA_CLIP_TIMELINE_ADD_SLOT_GAP_PX;
-  return Math.round((_0x9a5b00 / _0x3ba4f3) * _0x4fc608 + MEDIA_CLIP_TIMELINE_ADD_SLOT_GAP_PX);
-}
-export function getMediaClipTimelineContentWidthPx(_0x2d334c = {}) {
-  const _0x1568c5 = Math.max(
-    MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX,
-    Math.ceil(toNumber(_0x2d334c.trackWidthPx, 0)),
+export function getMediaClipTimelineAddSlotLeftPx(options5 = {}) {
+  const count2 = Math.max(0, toNumber(options5.trackWidthPx, 0)),
+    mediaClipTimelineDisplayDuration6 = getMediaClipTimelineDisplayDuration(options5.displayDurationSec),
+    clamp2 = clamp(toNumber(options5.materialEndSec, 0), 0, mediaClipTimelineDisplayDuration6);
+  if (mediaClipTimelineDisplayDuration6 <= 0 || count2 <= 0) return MEDIA_CLIP_TIMELINE_ADD_SLOT_GAP_PX;
+  return Math.round(
+    (clamp2 / mediaClipTimelineDisplayDuration6) * count2 + MEDIA_CLIP_TIMELINE_ADD_SLOT_GAP_PX,
   );
+}
+export function getMediaClipTimelineContentWidthPx(options6 = {}) {
+  const value15 = Math.max(MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, Math.ceil(toNumber(options6.trackWidthPx, 0)));
   return Math.max(
-    _0x1568c5,
-    getMediaClipTimelineAddSlotLeftPx(_0x2d334c) + MEDIA_CLIP_TIMELINE_ADD_SLOT_WIDTH_PX,
+    value15,
+    getMediaClipTimelineAddSlotLeftPx(options6) + MEDIA_CLIP_TIMELINE_ADD_SLOT_WIDTH_PX,
   );
 }
-export function getMediaClipTimelineNextZoom(_0x4f6624 = {}) {
-  const _0x3b2ab8 = Math.max(0.001, toNumber(_0x4f6624.currentZoom, 1)),
-    _0x40e5d4 = Math.max(0.001, toNumber(_0x4f6624.minZoom, 0.5)),
-    _0x45023e = Math.max(_0x40e5d4, toNumber(_0x4f6624.maxZoom, 6)),
-    _0x534266 = Math.max(1.001, toNumber(_0x4f6624.factor, MEDIA_CLIP_TIMELINE_ZOOM_WHEEL_FACTOR)),
-    _0x89054f = toNumber(_0x4f6624.delta, 0);
-  if (!_0x89054f) return clamp(_0x3b2ab8, _0x40e5d4, _0x45023e);
-  return clamp(_0x3b2ab8 * (_0x89054f > 0 ? 1 / _0x534266 : _0x534266), _0x40e5d4, _0x45023e);
+export function getMediaClipTimelineNextZoom(options7 = {}) {
+  const value16 = Math.max(0.001, toNumber(options7.currentZoom, 1)),
+    value17 = Math.max(0.001, toNumber(options7.minZoom, 0.5)),
+    value18 = Math.max(value17, toNumber(options7.maxZoom, 6)),
+    value19 = Math.max(1.001, toNumber(options7.factor, MEDIA_CLIP_TIMELINE_ZOOM_WHEEL_FACTOR)),
+    toNumber3 = toNumber(options7.delta, 0);
+  if (!toNumber3) return clamp(value16, value17, value18);
+  return clamp(value16 * (toNumber3 > 0 ? 1 / value19 : value19), value17, value18);
 }
-export function getMediaClipTimelineZoomScrollLeft(_0x26ab69 = {}) {
-  const _0x7adbd6 = Math.max(1, toNumber(_0x26ab69.viewportWidthPx, 1)),
-    _0x39a836 = clamp(toNumber(_0x26ab69.anchorX, _0x7adbd6 / 2), 0, _0x7adbd6),
-    _0x4f99a8 = Math.max(1, toNumber(_0x26ab69.nextContentWidthPx, 1)),
-    _0x17a0cf = Math.max(0, _0x4f99a8 - _0x7adbd6),
-    _0xc7304 = toNumber(_0x26ab69.anchorSec, NaN),
-    _0x1d4ee6 = Math.max(1, toNumber(_0x26ab69.trackWidthPx, 1));
-  if (Number.isFinite(_0xc7304)) {
-    const _0x1d1346 = getMediaClipTimelineDisplayDuration(_0x26ab69.durationSec),
-      _0x11db9e = clamp(_0xc7304 / _0x1d1346, 0, 1);
-    return Math.max(0, Math.min(_0x17a0cf, Math.round(_0x11db9e * _0x1d4ee6 - _0x39a836)));
+export function getMediaClipTimelineZoomScrollLeft(options8 = {}) {
+  const value20 = Math.max(1, toNumber(options8.viewportWidthPx, 1)),
+    clamp3 = clamp(toNumber(options8.anchorX, value20 / 2), 0, value20),
+    value21 = Math.max(1, toNumber(options8.nextContentWidthPx, 1)),
+    value22 = Math.max(0, value21 - value20),
+    toNumber4 = toNumber(options8.anchorSec, NaN),
+    value23 = Math.max(1, toNumber(options8.trackWidthPx, 1));
+  if (Number.isFinite(toNumber4)) {
+    const mediaClipTimelineDisplayDuration7 = getMediaClipTimelineDisplayDuration(options8.durationSec),
+      clamp4 = clamp(toNumber4 / mediaClipTimelineDisplayDuration7, 0, 1);
+    return Math.max(0, Math.min(value22, Math.round(clamp4 * value23 - clamp3)));
   }
-  const _0x3fb5ff = clamp(toNumber(_0x26ab69.anchorRatio, 0), 0, 1);
-  return Math.max(0, Math.min(_0x17a0cf, Math.round(_0x3fb5ff * _0x4f99a8 - _0x39a836)));
+  const clamp5 = clamp(toNumber(options8.anchorRatio, 0), 0, 1);
+  return Math.max(0, Math.min(value22, Math.round(clamp5 * value21 - clamp3)));
 }
-function chooseTimelineTickStep(_0x2d0847, _0x101328 = 0) {
-  const _0x4d078e = getMediaClipTimelineDisplayDuration(_0x2d0847),
-    _0x4327f3 = Math.max(MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(_0x101328, 0)),
-    _0x2b40dd = _0x4327f3 / Math.max(1, _0x4d078e),
-    _0x1df8f9 = MEDIA_CLIP_TIMELINE_TICK_MIN_SPACING_PX / Math.max(0.001, _0x2b40dd),
-    _0x3078b5 =
-      MEDIA_CLIP_TIMELINE_TICK_STEPS_ASC.find((_0x277976) => _0x277976 >= _0x1df8f9) ||
+function chooseTimelineTickStep(value24, value25 = 0) {
+  const mediaClipTimelineDisplayDuration8 = getMediaClipTimelineDisplayDuration(value24),
+    value26 = Math.max(MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(value25, 0)),
+    value27 = value26 / Math.max(1, mediaClipTimelineDisplayDuration8),
+    value28 = MEDIA_CLIP_TIMELINE_TICK_MIN_SPACING_PX / Math.max(0.001, value27),
+    value29 =
+      MEDIA_CLIP_TIMELINE_TICK_STEPS_ASC.find((item2) => item2 >= value28) ||
       MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC[0],
-    _0x1e32b2 = Math.max(0, MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC.indexOf(_0x3078b5));
-  for (let _0x34ba35 = _0x1e32b2; _0x34ba35 < MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC.length; _0x34ba35 += 1) {
-    const _0x5a4986 = MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC[_0x34ba35];
-    if (_0x5a4986 === 1 || _0x4d078e / _0x5a4986 >= MEDIA_CLIP_TIMELINE_MIN_RULER_INTERVALS) return _0x5a4986;
+    value30 = Math.max(0, MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC.indexOf(value29));
+  for (let value31 = value30; value31 < MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC.length; value31 += 1) {
+    const count3 = MEDIA_CLIP_TIMELINE_TICK_STEPS_SEC[value31];
+    if (count3 === 1 || mediaClipTimelineDisplayDuration8 / count3 >= MEDIA_CLIP_TIMELINE_MIN_RULER_INTERVALS)
+      return count3;
   }
   return 1;
 }
-export function buildMediaClipTimelineTicks(_0x3d69fb, _0x2fd666 = 0) {
-  const _0x34e7c4 = getMediaClipTimelineDisplayDuration(_0x3d69fb),
-    _0x264403 = chooseTimelineTickStep(_0x34e7c4, _0x2fd666),
-    _0x52d742 = [];
-  for (let _0x1abaf5 = 0; _0x1abaf5 <= _0x34e7c4 + 0.001; _0x1abaf5 += _0x264403) {
-    _0x52d742.push(roundMs(_0x1abaf5));
+export function buildMediaClipTimelineTicks(value32, value33 = 0) {
+  const mediaClipTimelineDisplayDuration9 = getMediaClipTimelineDisplayDuration(value32),
+    chooseTimelineTickStep2 = chooseTimelineTickStep(mediaClipTimelineDisplayDuration9, value33),
+    list = [];
+  for (
+    let value34 = 0;
+    value34 <= mediaClipTimelineDisplayDuration9 + 0.001;
+    value34 += chooseTimelineTickStep2
+  ) {
+    list.push(roundMs(value34));
   }
-  return _0x52d742;
+  return list;
 }
 export const MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX = 0x2c;
 
@@ -187,54 +188,53 @@ export const MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT = 0x2ee0;
 
 const MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC = Object['freeze']([0.1, 0.2, 0.5, 0x1, 0x2, 0x5, 0xa, 0xf]);
 
-export function buildMediaClipTimelineRulerMarks(_0x3286cf, _0x32cfd9 = 0x0, _0x198149 = {}) {
-  const _0x272a65 = getMediaClipTimelineDisplayDuration(_0x3286cf),
-    _0x24442c = Math['max'](MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(_0x32cfd9, 0x0)),
-    _0x89c8ff = _0x24442c / Math['max'](0x1, _0x272a65),
-    _0x393edb = Math['max'](0x0, Math['round'](toNumber(_0x198149['frameRate'], 0x0))),
-    _0x4ca16b = _0x393edb > 0x0 ? Math['floor'](_0x272a65 * _0x393edb + 0.0001) : 0x0,
-    _0x344628 =
-      _0x393edb > 0x0 &&
-      _0x89c8ff / _0x393edb >= MEDIA_CLIP_TIMELINE_FRAME_MARK_MIN_SPACING_PX &&
-      _0x4ca16b + 0x1 <= MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT;
-  if (_0x344628) {
-    const _0x109030 = _0x393edb % 0x2 === 0x0 ? _0x393edb / 0x2 : 0x0;
-    return Array['from']({ length: _0x4ca16b + 0x1 }, (_0x33078e, _0x3386f4) => ({
-      sec: _0x3386f4 / _0x393edb,
-      frameIndex: _0x3386f4,
+export function buildMediaClipTimelineRulerMarks(value35, value36 = 0x0, value37 = {}) {
+  const mediaClipTimelineDisplayDuration10 = getMediaClipTimelineDisplayDuration(value35),
+    value38 = Math['max'](MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(value36, 0x0)),
+    value39 = value38 / Math['max'](0x1, mediaClipTimelineDisplayDuration10),
+    count4 = Math['max'](0x0, Math['round'](toNumber(value37['frameRate'], 0x0))),
+    length = count4 > 0x0 ? Math['floor'](mediaClipTimelineDisplayDuration10 * count4 + 0.0001) : 0x0,
+    value40 =
+      count4 > 0x0 &&
+      value39 / count4 >= MEDIA_CLIP_TIMELINE_FRAME_MARK_MIN_SPACING_PX &&
+      length + 0x1 <= MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT;
+  if (value40) {
+    const count5 = count4 % 0x2 === 0x0 ? count4 / 0x2 : 0x0;
+    return Array['from']({ length: length + 0x1 }, (value41, sec2) => ({
+      sec: sec2 / count4,
+      frameIndex: sec2,
       isFrame: !![],
-      isMajor: _0x3386f4 % _0x393edb === 0x0,
-      isMid:
-        _0x3386f4 > 0x0 && _0x109030 > 0x0 && _0x3386f4 % _0x109030 === 0x0 && _0x3386f4 % _0x393edb !== 0x0,
+      isMajor: sec2 % count4 === 0x0,
+      isMid: sec2 > 0x0 && count5 > 0x0 && sec2 % count5 === 0x0 && sec2 % count4 !== 0x0,
     }));
   }
-  const _0x42eba4 = buildMediaClipTimelineTicks(_0x272a65, _0x24442c),
-    _0x358a70 = Math['max'](0.1, Number(_0x42eba4[0x1]) - Number(_0x42eba4[0x0]) || 0x1),
-    _0x551afb =
-      MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC['find']((_0xbfd14a) => {
-        const _0x10034d = _0x358a70 / _0xbfd14a;
+  const list2 = buildMediaClipTimelineTicks(mediaClipTimelineDisplayDuration10, value38),
+    value42 = Math['max'](0.1, Number(list2[0x1]) - Number(list2[0x0]) || 0x1),
+    value43 =
+      MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC['find']((value44) => {
+        const value45 = value42 / value44;
         return (
-          _0xbfd14a <= _0x358a70 &&
-          Math['abs'](_0x10034d - Math['round'](_0x10034d)) < 0.0001 &&
-          _0xbfd14a * _0x89c8ff >= MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX &&
-          Math['ceil'](_0x272a65 / _0xbfd14a) + 0x1 <= MEDIA_CLIP_TIMELINE_RULER_MARK_MAX_COUNT
+          value44 <= value42 &&
+          Math['abs'](value45 - Math['round'](value45)) < 0.0001 &&
+          value44 * value39 >= MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX &&
+          Math['ceil'](mediaClipTimelineDisplayDuration10 / value44) + 0x1 <=
+            MEDIA_CLIP_TIMELINE_RULER_MARK_MAX_COUNT
         );
-      }) || _0x358a70,
-    _0xd26c9a = new Set(_0x42eba4['map']((_0x316834) => _0x316834['toFixed'](0x3))),
-    _0x10c087 = _0x358a70 / 0x2,
-    _0x3b2659 = [];
-  for (let _0x1f81fa = 0x0; _0x1f81fa <= _0x272a65 + 0.001; _0x1f81fa += _0x551afb) {
-    const _0x18a14a = roundMs(_0x1f81fa),
-      _0x311df9 = _0xd26c9a['has'](_0x18a14a['toFixed'](0x3)),
-      _0x25588b = _0x10c087 > 0x0 ? _0x18a14a / _0x10c087 : 0x0;
-    _0x3b2659['push']({
-      sec: _0x18a14a,
+      }) || value42,
+    map = new Set(list2['map']((value46) => value46['toFixed'](0x3))),
+    count6 = value42 / 0x2,
+    list3 = [];
+  for (let value47 = 0x0; value47 <= mediaClipTimelineDisplayDuration10 + 0.001; value47 += value43) {
+    const sec3 = roundMs(value47),
+      isMajor = map['has'](sec3['toFixed'](0x3)),
+      value48 = count6 > 0x0 ? sec3 / count6 : 0x0;
+    list3['push']({
+      sec: sec3,
       frameIndex: -0x1,
       isFrame: ![],
-      isMajor: _0x311df9,
-      isMid:
-        !_0x311df9 && _0x10c087 >= _0x551afb && Math['abs'](_0x25588b - Math['round'](_0x25588b)) < 0.0001,
+      isMajor: isMajor,
+      isMid: !isMajor && count6 >= value43 && Math['abs'](value48 - Math['round'](value48)) < 0.0001,
     });
   }
-  return _0x3b2659;
+  return list3;
 }

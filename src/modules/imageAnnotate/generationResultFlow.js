@@ -42,269 +42,264 @@ const SCENE_CONFIG = {
     successToast: '重绘生成成功',
   },
 };
-export const resolveGenerationRuntime = ({ model: _0x757173, provider: _0x36805b } = {}) => {
-  const _0x1851d7 = String(_0x757173 || '').trim(),
-    _0x4e18d2 = String(_0x36805b || getModelProvider(_0x1851d7) || '').trim(),
-    _0x306e9f = isRunningHubTaskModel(_0x1851d7, _0x4e18d2),
-    _0x141728 = isDreaminaTaskModel(_0x1851d7, _0x4e18d2);
+export const resolveGenerationRuntime = ({ model: model, provider: provider } = {}) => {
+  const model2 = String(model || '').trim(),
+    provider2 = String(provider || getModelProvider(model2) || '').trim(),
+    isRunningHubTask = isRunningHubTaskModel(model2, provider2),
+    isDreaminaTask = isDreaminaTaskModel(model2, provider2);
   return {
-    model: _0x1851d7,
-    provider: _0x4e18d2,
-    isRunningHubTask: _0x306e9f,
-    isDreaminaTask: _0x141728,
-    isAsyncTask: !_0x306e9f && !_0x141728,
-    asyncProvider: _0x4e18d2.toLowerCase(),
-    useOpenapiByModel: isRunningHubModelApiTaskModel(_0x1851d7, _0x4e18d2),
+    model: model2,
+    provider: provider2,
+    isRunningHubTask: isRunningHubTask,
+    isDreaminaTask: isDreaminaTask,
+    isAsyncTask: !isRunningHubTask && !isDreaminaTask,
+    asyncProvider: provider2.toLowerCase(),
+    useOpenapiByModel: isRunningHubModelApiTaskModel(model2, provider2),
   };
 };
 export const buildGenerationOutputText = ({
-  model: _0x4369d9,
-  prompt: _0x58aa65,
+  model: model3,
+  prompt: prompt,
   errorMessage: errorMessage = '',
 } = {}) => {
-  const _0x33633e = ['模型: ' + getModelDisplayName(_0x4369d9), '提示词: ' + String(_0x58aa65 || '').trim()];
+  const list = ['模型: ' + getModelDisplayName(model3), '提示词: ' + String(prompt || '').trim()];
   return (
-    errorMessage && _0x33633e.push('错误: ' + (String(errorMessage || '').trim() || '未知错误')),
-    _0x33633e.join('\n')
+    errorMessage && list.push('错误: ' + (String(errorMessage || '').trim() || '未知错误')),
+    list.join('\n')
   );
 };
-const persistGenerationRuntimeIfNeeded = (_0x30e76d) => {
-  (_0x30e76d?.isRunningHubTask || _0x30e76d?.isDreaminaTask || _0x30e76d?.isAsyncTask) &&
-    persistRunningHubResumeCache();
+const persistGenerationRuntimeIfNeeded = (value) => {
+  (value?.isRunningHubTask || value?.isDreaminaTask || value?.isAsyncTask) && persistRunningHubResumeCache();
 };
 export const buildGenerationRuntimePatch = ({
-  phase: _0x4fddf5,
-  runtime: _0x541a8b,
-  latestNode: _0x51e57b,
-  startTime: _0x32b02b,
+  phase: phase,
+  runtime: runtime,
+  latestNode: latestNode,
+  startTime: startTime,
   taskId: taskId = '',
   taskProvider: taskProvider = '',
   useOpenapiQuery: useOpenapiQuery = false,
   errorMessage: errorMessage = '',
 } = {}) => {
-  const _0x2f1e69 = String(
-    taskId || _0x51e57b?.rhTaskId || _0x51e57b?.dreaminaSubmitId || _0x51e57b?.asyncTaskId || '',
+  const taskId2 = String(
+    taskId || latestNode?.rhTaskId || latestNode?.dreaminaSubmitId || latestNode?.asyncTaskId || '',
   ).trim();
-  if (_0x541a8b?.isRunningHubTask)
+  if (runtime?.isRunningHubTask)
     return buildRunningHubTaskPatch({
-      taskId: _0x2f1e69,
-      status: _0x4fddf5,
-      startedAt: _0x32b02b,
+      taskId: taskId2,
+      status: phase,
+      startedAt: startTime,
       recovering: false,
       useOpenapiQuery:
-        _0x4fddf5 === 'pending'
-          ? _0x541a8b.useOpenapiByModel
-          : _0x4fddf5 === 'running'
+        phase === 'pending'
+          ? runtime.useOpenapiByModel
+          : phase === 'running'
             ? useOpenapiQuery === true ||
-              _0x51e57b?.rhTaskUseOpenapiQuery === true ||
-              _0x541a8b.useOpenapiByModel
-            : _0x51e57b?.rhTaskUseOpenapiQuery === true || _0x541a8b.useOpenapiByModel,
+              latestNode?.rhTaskUseOpenapiQuery === true ||
+              runtime.useOpenapiByModel
+            : latestNode?.rhTaskUseOpenapiQuery === true || runtime.useOpenapiByModel,
     });
-  if (_0x541a8b?.isDreaminaTask)
+  if (runtime?.isDreaminaTask)
     return buildDreaminaTaskPatch({
-      submitId: _0x2f1e69,
-      status: _0x4fddf5 === 'running' ? 'pending' : _0x4fddf5,
-      phase: _0x4fddf5 === 'success' ? 'done' : _0x4fddf5 === 'failed' ? 'failed' : 'generating',
+      submitId: taskId2,
+      status: phase === 'running' ? 'pending' : phase,
+      phase: phase === 'success' ? 'done' : phase === 'failed' ? 'failed' : 'generating',
       label:
-        _0x4fddf5 === 'success'
+        phase === 'success'
           ? '已完成'
-          : _0x4fddf5 === 'failed'
+          : phase === 'failed'
             ? errorMessage || '生成失败'
-            : _0x4fddf5 === 'running'
+            : phase === 'running'
               ? '生成中'
               : '提交中',
-      startedAt: _0x32b02b,
+      startedAt: startTime,
       recovering: false,
     });
-  if (_0x541a8b?.isAsyncTask)
+  if (runtime?.isAsyncTask)
     return buildAsyncTaskPatch({
-      provider: String(taskProvider || _0x51e57b?.asyncTaskProvider || _0x541a8b.asyncProvider || '').trim(),
+      provider: String(taskProvider || latestNode?.asyncTaskProvider || runtime.asyncProvider || '').trim(),
       kind: 'image',
-      taskId: _0x2f1e69,
-      status: _0x4fddf5,
-      startedAt: _0x32b02b,
+      taskId: taskId2,
+      status: phase,
+      startedAt: startTime,
       recovering: false,
     });
   return {};
 };
 const updateGenerationRuntimeNode = ({
-  nodeId: _0x277380,
-  runtime: _0x41e976,
-  startTime: _0x4af1e4,
-  phase: _0x4d6b0f,
+  nodeId: nodeId,
+  runtime: runtime2,
+  startTime: startTime2,
+  phase: phase2,
   taskId: taskId = '',
   taskProvider: taskProvider = '',
   useOpenapiQuery: useOpenapiQuery = false,
   errorMessage: errorMessage = '',
 } = {}) => {
-  const _0x287f08 = String(taskId || '').trim();
-  if (!_0x287f08 && _0x4d6b0f === 'running') return;
-  const _0xdfe258 = appStore.getState().nodes?.[_0x277380];
-  if (!_0xdfe258) return;
-  if (isTaskCancelled(_0xdfe258)) return;
-  (appStore.updateNodeData(_0x277380, {
+  const taskId3 = String(taskId || '').trim();
+  if (!taskId3 && phase2 === 'running') return;
+  const latestNode2 = appStore.getState().nodes?.[nodeId];
+  if (!latestNode2) return;
+  if (isTaskCancelled(latestNode2)) return;
+  (appStore.updateNodeData(nodeId, {
     ...buildGenerationRuntimePatch({
-      phase: _0x4d6b0f,
-      runtime: _0x41e976,
-      latestNode: _0xdfe258,
-      startTime: _0x4af1e4,
-      taskId: _0x287f08 || _0xdfe258?.rhTaskId || _0xdfe258?.dreaminaSubmitId || _0xdfe258?.asyncTaskId || '',
+      phase: phase2,
+      runtime: runtime2,
+      latestNode: latestNode2,
+      startTime: startTime2,
+      taskId:
+        taskId3 || latestNode2?.rhTaskId || latestNode2?.dreaminaSubmitId || latestNode2?.asyncTaskId || '',
       taskProvider: taskProvider,
       useOpenapiQuery: useOpenapiQuery,
       errorMessage: errorMessage,
     }),
   }),
-    persistGenerationRuntimeIfNeeded(_0x41e976));
+    persistGenerationRuntimeIfNeeded(runtime2));
 };
 export const runGenerationResultFlow = async ({
-  scene: _0x556b84,
-  built: _0x5eb369,
-  sourceNode: _0x3b2a70,
-  fallbackModel: _0x2c19d9,
-  fallbackProvider: _0x9d6071,
-  exitController: _0x2eb700,
-  notify: notify = (_0xd1f5e, _0x269003) => window.showToast?.(_0xd1f5e, _0x269003),
+  scene: scene,
+  built: built,
+  sourceNode: sourceNode,
+  fallbackModel: fallbackModel,
+  fallbackProvider: fallbackProvider,
+  exitController: exitController,
+  notify: notify = (item, key) => window.showToast?.(item, key),
 } = {}) => {
-  if (!_0x5eb369?.payload) return;
-  const _0x235050 = SCENE_CONFIG[_0x556b84];
-  if (!_0x235050) throw new Error('未知生成场景: ' + _0x556b84);
-  const _0x17b65c = resolveGenerationRuntime({
-      model: _0x5eb369?.payload?.model || _0x2c19d9,
-      provider: _0x5eb369?.payload?.provider || _0x9d6071,
+  if (!built?.payload) return;
+  const name = SCENE_CONFIG[scene];
+  if (!name) throw new Error('未知生成场景: ' + scene);
+  const provider3 = resolveGenerationRuntime({
+      model: built?.payload?.model || fallbackModel,
+      provider: built?.payload?.provider || fallbackProvider,
     }),
-    _0x12422d = String(_0x5eb369?.payload?.prompt || '').trim(),
-    _0x5672bc = Date.now(),
-    _0x4160f2 = _0x5eb369.inputUrl;
-  let _0x578b3b = null;
-  const _0x5e3896 = () => {
-    if (!_0x578b3b) return false;
-    return isTaskCancelled(appStore.getState().nodes?.[_0x578b3b]);
+    prompt2 = String(built?.payload?.prompt || '').trim(),
+    startedAt = Date.now(),
+    index = built.inputUrl;
+  let id = null;
+  const run = () => {
+    if (!id) return false;
+    return isTaskCancelled(appStore.getState().nodes?.[id]);
   };
   try {
-    const _0x15931e = Number(_0x5eb369?.naturalWidth) || _0x3b2a70?.width || 1,
-      _0x4127ff = Number(_0x5eb369?.naturalHeight) || _0x3b2a70?.height || 1,
-      { width: _0x31ed5a, height: _0x2b1ef5 } = getAutoMediaSizeByShortSide(_0x15931e, _0x4127ff),
-      { x: _0x46e9ed, y: _0x5a8de4 } = calcSafeSpawnPosNearNode(
-        appStore.getState().nodes,
-        _0x3b2a70,
-        _0x31ed5a,
-        _0x2b1ef5,
-      );
-    ((_0x578b3b = generateId(_0x235050.idPrefix)),
+    const result = Number(built?.naturalWidth) || sourceNode?.width || 1,
+      data = Number(built?.naturalHeight) || sourceNode?.height || 1,
+      { width: width, height: height } = getAutoMediaSizeByShortSide(result, data),
+      { x: x, y: y } = calcSafeSpawnPosNearNode(appStore.getState().nodes, sourceNode, width, height);
+    ((id = generateId(name.idPrefix)),
       appStore.addNode(
         buildSourceMediaNodePayload({
-          id: _0x578b3b,
+          id: id,
           type: 'source-image',
-          x: _0x46e9ed,
-          y: _0x5a8de4,
-          width: _0x31ed5a,
-          height: _0x2b1ef5,
+          x: x,
+          y: y,
+          width: width,
+          height: height,
           needsAutoResize: false,
-          name: _0x235050.pendingName,
+          name: name.pendingName,
           src: '',
-          ...buildGenerationStartPatch({ startedAt: _0x5672bc }),
-          provider: _0x17b65c.provider,
-          model: _0x17b65c.model,
-          ...(_0x17b65c.isRunningHubTask
-            ? { rhSourceNodeId: _0x3b2a70?.id || '', rhToolbarTaskType: 'image-' + _0x556b84 }
+          ...buildGenerationStartPatch({ startedAt: startedAt }),
+          provider: provider3.provider,
+          model: provider3.model,
+          ...(provider3.isRunningHubTask
+            ? { rhSourceNodeId: sourceNode?.id || '', rhToolbarTaskType: 'image-' + scene }
             : {}),
-          ...buildGenerationRuntimePatch({ phase: 'pending', runtime: _0x17b65c, startTime: _0x5672bc }),
-          outputText: buildGenerationOutputText({ model: _0x17b65c.model, prompt: _0x12422d }),
+          ...buildGenerationRuntimePatch({ phase: 'pending', runtime: provider3, startTime: startedAt }),
+          outputText: buildGenerationOutputText({ model: provider3.model, prompt: prompt2 }),
         }),
       ),
-      persistGenerationRuntimeIfNeeded(_0x17b65c),
-      appStore.setSelectedNodes([_0x578b3b]));
+      persistGenerationRuntimeIfNeeded(provider3),
+      appStore.setSelectedNodes([id]));
     typeof window.v2FocusOnNodes === 'function'
-      ? window.v2FocusOnNodes([_0x3b2a70?.id, _0x578b3b])
-      : window.v2FocusOnNode?.(_0x578b3b);
-    _0x2eb700?.({ silent: true });
-    const _0x10dc2e = await generateImage(_0x5eb369.payload, {
-      onTaskMeta: ({ taskId: _0x1d45b4, useOpenapiQuery: _0x1c10dc, provider: _0x30750a }) => {
+      ? window.v2FocusOnNodes([sourceNode?.id, id])
+      : window.v2FocusOnNode?.(id);
+    exitController?.({ silent: true });
+    const localPath = await generateImage(built.payload, {
+      onTaskMeta: ({ taskId: taskId4, useOpenapiQuery: useOpenapiQuery2, provider: provider4 }) => {
         updateGenerationRuntimeNode({
-          nodeId: _0x578b3b,
-          runtime: _0x17b65c,
-          startTime: _0x5672bc,
+          nodeId: id,
+          runtime: provider3,
+          startTime: startedAt,
           phase: 'running',
-          taskId: _0x1d45b4,
-          taskProvider: _0x30750a,
-          useOpenapiQuery: _0x1c10dc,
+          taskId: taskId4,
+          taskProvider: provider4,
+          useOpenapiQuery: useOpenapiQuery2,
         });
       },
-      onTaskId: (_0x1722c2) => {
+      onTaskId: (taskId5) => {
         updateGenerationRuntimeNode({
-          nodeId: _0x578b3b,
-          runtime: _0x17b65c,
-          startTime: _0x5672bc,
+          nodeId: id,
+          runtime: provider3,
+          startTime: startedAt,
           phase: 'running',
-          taskId: _0x1722c2,
+          taskId: taskId5,
         });
       },
     });
-    if (_0x5e3896()) return;
-    if (_0x10dc2e?.error) throw new Error(_0x10dc2e.error);
-    const _0x562d79 = appStore.getState().nodes?.[_0x578b3b],
-      _0xd97fef = _0x562d79?.generationStartTime ? Date.now() - _0x562d79.generationStartTime : 0,
-      _0x35a69d = resolveInputRatioBasis(
-        { width: _0x5eb369?.naturalWidth, height: _0x5eb369?.naturalHeight },
-        { width: _0x3b2a70?.width, height: _0x3b2a70?.height },
+    if (run()) return;
+    if (localPath?.error) throw new Error(localPath.error);
+    const latestNode3 = appStore.getState().nodes?.[id],
+      duration = latestNode3?.generationStartTime ? Date.now() - latestNode3.generationStartTime : 0,
+      box = resolveInputRatioBasis(
+        { width: built?.naturalWidth, height: built?.naturalHeight },
+        { width: sourceNode?.width, height: sourceNode?.height },
       ),
-      _0x32e19f = await resolveOutputMediaSize({
-        localPath: _0x10dc2e.localPath,
-        imageUrl: _0x10dc2e.imageUrl,
-        sourceUrl: _0x10dc2e.sourceUrl,
-        thumbUrl: _0x10dc2e.thumbUrl,
-        src: _0x10dc2e.imageUrl || _0x10dc2e.sourceUrl || _0x10dc2e.thumbUrl || '',
+      box2 = await resolveOutputMediaSize({
+        localPath: localPath.localPath,
+        imageUrl: localPath.imageUrl,
+        sourceUrl: localPath.sourceUrl,
+        thumbUrl: localPath.thumbUrl,
+        src: localPath.imageUrl || localPath.sourceUrl || localPath.thumbUrl || '',
       }),
-      _0x14932e =
-        _0x32e19f &&
+      width2 =
+        box2 &&
         shouldSwitchToOutputRatio(
-          _0x35a69d.width,
-          _0x35a69d.height,
-          _0x32e19f.width,
-          _0x32e19f.height,
+          box.width,
+          box.height,
+          box2.width,
+          box2.height,
           OUTPUT_RATIO_SWITCH_THRESHOLD,
         )
-          ? calcDisplaySizeByMedia(_0x32e19f.width, _0x32e19f.height)
-          : calcDisplaySizeByMedia(_0x35a69d.width, _0x35a69d.height);
-    (appStore.updateNodeData(_0x578b3b, {
-      ...buildImageGenerationResultPatch(_0x10dc2e, { startedAt: _0x5672bc, duration: _0xd97fef }),
-      name: _0x235050.resultName,
-      width: _0x14932e.width,
-      height: _0x14932e.height,
+          ? calcDisplaySizeByMedia(box2.width, box2.height)
+          : calcDisplaySizeByMedia(box.width, box.height);
+    (appStore.updateNodeData(id, {
+      ...buildImageGenerationResultPatch(localPath, { startedAt: startedAt, duration: duration }),
+      name: name.resultName,
+      width: width2.width,
+      height: width2.height,
       ...buildGenerationRuntimePatch({
         phase: 'success',
-        runtime: _0x17b65c,
-        latestNode: _0x562d79,
-        startTime: _0x5672bc,
+        runtime: provider3,
+        latestNode: latestNode3,
+        startTime: startedAt,
       }),
-      outputText: buildGenerationOutputText({ model: _0x17b65c.model, prompt: _0x12422d }),
+      outputText: buildGenerationOutputText({ model: provider3.model, prompt: prompt2 }),
     }),
-      persistGenerationRuntimeIfNeeded(_0x17b65c),
-      notify(_0x235050.successToast, 'success'));
-  } catch (_0x4e0806) {
-    if (!_0x578b3b) throw _0x4e0806;
-    if (_0x5e3896()) return;
-    const _0x46fae3 = appStore.getState().nodes?.[_0x578b3b],
-      _0x15ef62 = _0x46fae3?.generationStartTime ? Date.now() - _0x46fae3.generationStartTime : 0,
-      _0x30a1fe = _0x4e0806?.message || '未知错误';
-    (appStore.updateNodeData(_0x578b3b, {
-      ...buildImageGenerationFailurePatch({ error: _0x30a1fe, startedAt: _0x5672bc, duration: _0x15ef62 }),
-      name: _0x235050.failureName,
+      persistGenerationRuntimeIfNeeded(provider3),
+      notify(name.successToast, 'success'));
+  } catch (error) {
+    if (!id) throw error;
+    if (run()) return;
+    const latestNode4 = appStore.getState().nodes?.[id],
+      duration2 = latestNode4?.generationStartTime ? Date.now() - latestNode4.generationStartTime : 0,
+      error2 = error?.message || '未知错误';
+    (appStore.updateNodeData(id, {
+      ...buildImageGenerationFailurePatch({ error: error2, startedAt: startedAt, duration: duration2 }),
+      name: name.failureName,
       ...buildGenerationRuntimePatch({
         phase: 'failed',
-        runtime: _0x17b65c,
-        latestNode: _0x46fae3,
-        startTime: _0x5672bc,
-        errorMessage: _0x30a1fe,
+        runtime: provider3,
+        latestNode: latestNode4,
+        startTime: startedAt,
+        errorMessage: error2,
       }),
       outputText: buildGenerationOutputText({
-        model: _0x17b65c.model,
-        prompt: _0x12422d,
-        errorMessage: _0x30a1fe,
+        model: provider3.model,
+        prompt: prompt2,
+        errorMessage: error2,
       }),
     }),
-      persistGenerationRuntimeIfNeeded(_0x17b65c));
+      persistGenerationRuntimeIfNeeded(provider3));
   } finally {
-    _0x4160f2 && URL.revokeObjectURL(_0x4160f2);
+    index && URL.revokeObjectURL(index);
   }
 };

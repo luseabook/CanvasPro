@@ -2,229 +2,228 @@ import { getWorkspaceProjectTaskPresentation } from '../workspaceProjectHome.js'
 const ACTIVE_STATUSES = new Set(['queued', 'submitting', 'pending', 'running', 'recovering']),
   TERMINAL_STATUSES = new Set(['succeeded', 'failed', 'cancelled', 'interrupted']),
   MAX_PERSISTED_TASKS = 0x3c;
-function normalizeText(_0x5bc0f5) {
-  return String(_0x5bc0f5 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function normalizeStatus(_0x1c2459, _0x47a518 = 'running') {
-  const _0x351346 = normalizeText(_0x1c2459)['toLowerCase']();
-  if (ACTIVE_STATUSES['has'](_0x351346) || TERMINAL_STATUSES['has'](_0x351346)) return _0x351346;
-  return _0x47a518;
+function normalizeStatus(item, key = 'running') {
+  const text = normalizeText(item)['toLowerCase']();
+  if (ACTIVE_STATUSES['has'](text) || TERMINAL_STATUSES['has'](text)) return text;
+  return key;
 }
-function normalizeScope(_0x2bd597 = {}) {
-  const _0x43fba9 =
-    _0x2bd597 && typeof _0x2bd597 === 'object' && !Array['isArray'](_0x2bd597) ? _0x2bd597 : {};
+function normalizeScope(options = {}) {
+  const index = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
   return Object['fromEntries'](
-    Object['entries'](_0x43fba9)
-      ['map'](([_0x429a9a, _0x5c7b37]) => [normalizeText(_0x429a9a), normalizeText(_0x5c7b37)])
-      ['filter'](([_0x5cbe3f, _0x4f3de8]) => _0x5cbe3f && _0x4f3de8),
+    Object['entries'](index)
+      ['map'](([result, data]) => [normalizeText(result), normalizeText(data)])
+      ['filter'](([target, source]) => target && source),
   );
 }
-function getProject(_0x2a61fa = {}) {
-  return _0x2a61fa?.['project'] &&
-    typeof _0x2a61fa['project'] === 'object' &&
-    !Array['isArray'](_0x2a61fa['project'])
-    ? _0x2a61fa['project']
+function getProject(options2 = {}) {
+  return options2?.['project'] &&
+    typeof options2['project'] === 'object' &&
+    !Array['isArray'](options2['project'])
+    ? options2['project']
     : null;
 }
-function cloneSerializable(_0x164077) {
-  if (!_0x164077 || typeof _0x164077 !== 'object') return null;
+function cloneSerializable(enabled) {
+  if (!enabled || typeof enabled !== 'object') return null;
   try {
-    return JSON['parse'](JSON['stringify'](_0x164077));
+    return JSON['parse'](JSON['stringify'](enabled));
   } catch {
     return null;
   }
 }
-function normalizeBatch(_0x37250a) {
-  const _0x47deff = cloneSerializable(_0x37250a);
-  if (!_0x47deff || Array['isArray'](_0x47deff)) return null;
-  const _0x1ef363 = normalizeText(_0x47deff['id']),
-    _0x168b7d = normalizeText(_0x47deff['type']);
-  if (!_0x1ef363 || !_0x168b7d) return null;
-  const _0x30fb42 = Math['max'](0x0, Math['trunc'](Number(_0x47deff['total']) || 0x0)),
-    _0x5d1c4a = Math['max'](
+function normalizeBatch(next) {
+  const args = cloneSerializable(next);
+  if (!args || Array['isArray'](args)) return null;
+  const id = normalizeText(args['id']),
+    type = normalizeText(args['type']);
+  if (!id || !type) return null;
+  const total = Math['max'](0x0, Math['trunc'](Number(args['total']) || 0x0)),
+    completed = Math['max'](
       0x0,
-      Math['min'](
-        _0x30fb42 || Number['MAX_SAFE_INTEGER'],
-        Math['trunc'](Number(_0x47deff['completed']) || 0x0),
-      ),
+      Math['min'](total || Number['MAX_SAFE_INTEGER'], Math['trunc'](Number(args['completed']) || 0x0)),
     );
   return {
-    ..._0x47deff,
-    id: _0x1ef363,
-    type: _0x168b7d,
-    total: _0x30fb42,
-    completed: _0x5d1c4a,
-    label: normalizeText(_0x47deff['label']),
+    ...args,
+    id: id,
+    type: type,
+    total: total,
+    completed: completed,
+    label: normalizeText(args['label']),
   };
 }
-function countLogicalTasks(_0x421682 = []) {
+function countLogicalTasks(list = []) {
   return new Set(
-    _0x421682['map']((_0x10ee77) =>
-      _0x10ee77['batch']?.['id'] ? 'batch:' + _0x10ee77['batch']['id'] : 'task:' + _0x10ee77['id'],
+    list['map']((current) =>
+      current['batch']?.['id'] ? 'batch:' + current['batch']['id'] : 'task:' + current['id'],
     ),
   )['size'];
 }
-function pruneTasks(_0x83221a = []) {
-  const _0x171c9a = _0x83221a['filter']((_0x4d6d7f) => ACTIVE_STATUSES['has'](_0x4d6d7f['status'])),
-    _0x1085fe = _0x83221a['filter']((_0x481f9c) => !ACTIVE_STATUSES['has'](_0x481f9c['status']))['sort'](
-      (_0x5a2fed, _0x18bb21) => Number(_0x18bb21['updatedAt'] || 0x0) - Number(_0x5a2fed['updatedAt'] || 0x0),
+function pruneTasks(list2 = []) {
+  const args2 = list2['filter']((response) => ACTIVE_STATUSES['has'](response['status'])),
+    list3 = list2['filter']((response2) => !ACTIVE_STATUSES['has'](response2['status']))['sort'](
+      (entry, record) => Number(record['updatedAt'] || 0x0) - Number(entry['updatedAt'] || 0x0),
     );
-  return [..._0x171c9a, ..._0x1085fe['slice'](0x0, MAX_PERSISTED_TASKS)];
+  return [...args2, ...list3['slice'](0x0, MAX_PERSISTED_TASKS)];
 }
-export function buildStoryBackgroundTaskId(_0x588e58, _0x27b0bc = {}) {
-  const _0x46076d = normalizeText(_0x588e58) || 'task',
-    _0x6ac151 = normalizeScope(_0x27b0bc),
-    _0x7e456e = Object['keys'](_0x6ac151)
+export function buildStoryBackgroundTaskId(payload, handle = {}) {
+  const text2 = normalizeText(payload) || 'task',
+    scope = normalizeScope(handle),
+    state = Object['keys'](scope)
       ['sort']()
-      ['map']((_0x61fcf4) => _0x61fcf4 + ':' + _0x6ac151[_0x61fcf4])
+      ['map']((config) => config + ':' + scope[config])
       ['join'](':');
-  return _0x7e456e ? _0x46076d + ':' + _0x7e456e : _0x46076d;
+  return state ? text2 + ':' + state : text2;
 }
-export function normalizeStoryBackgroundTask(_0x345b88 = {}) {
-  const _0x23f769 =
-      _0x345b88 && typeof _0x345b88 === 'object' && !Array['isArray'](_0x345b88) ? _0x345b88 : {},
-    _0x5bba9d = normalizeText(_0x23f769['type']) || 'task',
-    _0x5e7fa9 = normalizeScope(_0x23f769['scope']),
-    _0x467ed7 = normalizeText(_0x23f769['id']) || buildStoryBackgroundTaskId(_0x5bba9d, _0x5e7fa9),
-    _0x190812 = normalizeStatus(_0x23f769['status']),
-    _0x3adb1d = Math['max'](0x0, Number(_0x23f769['startedAt'] || 0x0)) || Date['now'](),
-    _0x4c3665 = Math['max'](_0x3adb1d, Number(_0x23f769['updatedAt'] || 0x0) || _0x3adb1d),
-    _0x346021 = TERMINAL_STATUSES['has'](_0x190812)
-      ? Math['max'](_0x4c3665, Number(_0x23f769['finishedAt'] || 0x0) || _0x4c3665)
+export function normalizeStoryBackgroundTask(options3 = {}) {
+  const resumable = options3 && typeof options3 === 'object' && !Array['isArray'](options3) ? options3 : {},
+    type2 = normalizeText(resumable['type']) || 'task',
+    scope2 = normalizeScope(resumable['scope']),
+    id2 = normalizeText(resumable['id']) || buildStoryBackgroundTaskId(type2, scope2),
+    status2 = normalizeStatus(resumable['status']),
+    startedAt = Math['max'](0x0, Number(resumable['startedAt'] || 0x0)) || Date['now'](),
+    updatedAt = Math['max'](startedAt, Number(resumable['updatedAt'] || 0x0) || startedAt),
+    finishedAt = TERMINAL_STATUSES['has'](status2)
+      ? Math['max'](updatedAt, Number(resumable['finishedAt'] || 0x0) || updatedAt)
       : 0x0;
   return {
-    id: _0x467ed7,
-    type: _0x5bba9d,
-    scope: _0x5e7fa9,
-    label: normalizeText(_0x23f769['label']) || '生成任务',
-    message: normalizeText(_0x23f769['message']),
-    status: _0x190812,
-    resumable: _0x23f769['resumable'] === !![],
-    remoteTaskId: normalizeText(_0x23f769['remoteTaskId'] || _0x23f769['taskId']),
-    modelId: normalizeText(_0x23f769['modelId']),
-    provider: normalizeText(_0x23f769['provider']),
-    providerProfileId: normalizeText(_0x23f769['providerProfileId']),
-    executionId: normalizeText(_0x23f769['executionId']),
-    resumePayload: cloneSerializable(_0x23f769['resumePayload']),
-    batch: normalizeBatch(_0x23f769['batch']),
-    error: normalizeText(_0x23f769['error']),
-    startedAt: _0x3adb1d,
-    updatedAt: _0x4c3665,
-    finishedAt: _0x346021,
+    id: id2,
+    type: type2,
+    scope: scope2,
+    label: normalizeText(resumable['label']) || '生成任务',
+    message: normalizeText(resumable['message']),
+    status: status2,
+    resumable: resumable['resumable'] === !![],
+    remoteTaskId: normalizeText(resumable['remoteTaskId'] || resumable['taskId']),
+    modelId: normalizeText(resumable['modelId']),
+    provider: normalizeText(resumable['provider']),
+    providerProfileId: normalizeText(resumable['providerProfileId']),
+    executionId: normalizeText(resumable['executionId']),
+    resumePayload: cloneSerializable(resumable['resumePayload']),
+    batch: normalizeBatch(resumable['batch']),
+    error: normalizeText(resumable['error']),
+    startedAt: startedAt,
+    updatedAt: updatedAt,
+    finishedAt: finishedAt,
   };
 }
-export function getStoryBackgroundTasks(_0x567c54 = {}) {
-  const _0x142a87 = getProject(_0x567c54);
-  if (!_0x142a87 || !Array['isArray'](_0x142a87['backgroundTasks'])) return [];
-  return _0x142a87['backgroundTasks']
-    ['map']((_0x10453d) => normalizeStoryBackgroundTask(_0x10453d))
-    ['filter']((_0x2b871c) => _0x2b871c['id']);
+export function getStoryBackgroundTasks(options4 = {}) {
+  const project = getProject(options4);
+  if (!project || !Array['isArray'](project['backgroundTasks'])) return [];
+  return project['backgroundTasks']
+    ['map']((input) => normalizeStoryBackgroundTask(input))
+    ['filter']((output) => output['id']);
 }
-export function setStoryBackgroundTasks(_0x16d8de = {}, _0x493dec = []) {
-  const _0x3cc26a = getProject(_0x16d8de);
-  if (!_0x3cc26a) return [];
-  const _0x416c55 = pruneTasks(
-    (Array['isArray'](_0x493dec) ? _0x493dec : [])
-      ['map']((_0x24b144) => normalizeStoryBackgroundTask(_0x24b144))
-      ['filter']((_0x2daed8) => _0x2daed8['id']),
+export function setStoryBackgroundTasks(options5 = {}, value2 = []) {
+  const project2 = getProject(options5);
+  if (!project2) return [];
+  const pruneTasks2 = pruneTasks(
+    (Array['isArray'](value2) ? value2 : [])
+      ['map']((value3) => normalizeStoryBackgroundTask(value3))
+      ['filter']((value4) => value4['id']),
   );
-  return ((_0x3cc26a['backgroundTasks'] = _0x416c55), _0x416c55);
+  return ((project2['backgroundTasks'] = pruneTasks2), pruneTasks2);
 }
-export function startStoryBackgroundTask(_0xe67dc2 = {}, _0x59c7e6 = {}) {
-  const _0x1046ef = Date['now'](),
-    _0x377f7a = normalizeStoryBackgroundTask({
-      ..._0x59c7e6,
-      status: normalizeStatus(_0x59c7e6['status'], 'running'),
-      startedAt: Number(_0x59c7e6['startedAt'] || 0x0) || _0x1046ef,
-      updatedAt: _0x1046ef,
+export function startStoryBackgroundTask(options6 = {}, response3 = {}) {
+  const updatedAt2 = Date['now'](),
+    storyBackgroundTask = normalizeStoryBackgroundTask({
+      ...response3,
+      status: normalizeStatus(response3['status'], 'running'),
+      startedAt: Number(response3['startedAt'] || 0x0) || updatedAt2,
+      updatedAt: updatedAt2,
       finishedAt: 0x0,
       error: '',
     }),
-    _0x28d75d = getStoryBackgroundTasks(_0xe67dc2)['filter'](
-      (_0x2dd821) => _0x2dd821['id'] !== _0x377f7a['id'],
+    args3 = getStoryBackgroundTasks(options6)['filter'](
+      (value5) => value5['id'] !== storyBackgroundTask['id'],
     );
-  return (setStoryBackgroundTasks(_0xe67dc2, [_0x377f7a, ..._0x28d75d]), _0x377f7a);
+  return (setStoryBackgroundTasks(options6, [storyBackgroundTask, ...args3]), storyBackgroundTask);
 }
-export function updateStoryBackgroundTask(_0x49ac62 = {}, _0x206702 = '', _0x55a8f9 = {}) {
-  const _0x1d26df = normalizeText(_0x206702);
-  if (!_0x1d26df) return null;
-  const _0x457570 = getStoryBackgroundTasks(_0x49ac62),
-    _0x510e98 = _0x457570['findIndex']((_0x3716b8) => _0x3716b8['id'] === _0x1d26df);
-  if (_0x510e98 < 0x0) return null;
-  const _0x199dd1 = _0x457570[_0x510e98],
-    _0x271446 = _0x55a8f9['status']
-      ? normalizeStatus(_0x55a8f9['status'], _0x199dd1['status'])
-      : _0x199dd1['status'],
-    _0x407767 = Date['now'](),
-    _0x22058c = TERMINAL_STATUSES['has'](_0x199dd1['status']) && ACTIVE_STATUSES['has'](_0x271446),
-    _0x4233ab = normalizeStoryBackgroundTask({
-      ..._0x199dd1,
-      ...(_0x22058c ? { batch: null, error: '', startedAt: _0x407767, finishedAt: 0x0 } : {}),
-      ..._0x55a8f9,
-      id: _0x1d26df,
-      status: _0x271446,
-      startedAt: _0x22058c ? Number(_0x55a8f9['startedAt'] || 0x0) || _0x407767 : _0x199dd1['startedAt'],
-      updatedAt: _0x407767,
-      finishedAt: TERMINAL_STATUSES['has'](_0x271446)
-        ? Number(_0x55a8f9['finishedAt'] || 0x0) || _0x407767
+export function updateStoryBackgroundTask(options7 = {}, value6 = '', response4 = {}) {
+  const id3 = normalizeText(value6);
+  if (!id3) return null;
+  const list4 = getStoryBackgroundTasks(options7),
+    count = list4['findIndex']((value7) => value7['id'] === id3);
+  if (count < 0x0) return null;
+  const response5 = list4[count],
+    status3 = response4['status']
+      ? normalizeStatus(response4['status'], response5['status'])
+      : response5['status'],
+    startedAt2 = Date['now'](),
+    startedAt3 = TERMINAL_STATUSES['has'](response5['status']) && ACTIVE_STATUSES['has'](status3),
+    storyBackgroundTask2 = normalizeStoryBackgroundTask({
+      ...response5,
+      ...(startedAt3 ? { batch: null, error: '', startedAt: startedAt2, finishedAt: 0x0 } : {}),
+      ...response4,
+      id: id3,
+      status: status3,
+      startedAt: startedAt3 ? Number(response4['startedAt'] || 0x0) || startedAt2 : response5['startedAt'],
+      updatedAt: startedAt2,
+      finishedAt: TERMINAL_STATUSES['has'](status3)
+        ? Number(response4['finishedAt'] || 0x0) || startedAt2
         : 0x0,
     });
-  return ((_0x457570[_0x510e98] = _0x4233ab), setStoryBackgroundTasks(_0x49ac62, _0x457570), _0x4233ab);
+  return (
+    (list4[count] = storyBackgroundTask2),
+    setStoryBackgroundTasks(options7, list4),
+    storyBackgroundTask2
+  );
 }
-export function updateStoryBackgroundTaskBatch(_0xc5e9c4 = {}, _0x578177 = '', _0x1a8da6 = {}) {
-  const _0x3c5cbc = normalizeText(_0x578177),
-    _0x93c61f = cloneSerializable(_0x1a8da6);
-  if (!_0x3c5cbc || !_0x93c61f || Array['isArray'](_0x93c61f)) return 0x0;
-  const _0x1360a3 = getStoryBackgroundTasks(_0xc5e9c4);
-  let _0x52d26a = 0x0;
-  const _0x40c825 = Date['now'](),
-    _0xc9dc22 = _0x1360a3['map']((_0x420606) => {
-      if (!ACTIVE_STATUSES['has'](_0x420606['status']) || _0x420606['batch']?.['id'] !== _0x3c5cbc)
-        return _0x420606;
+export function updateStoryBackgroundTaskBatch(options8 = {}, value8 = '', value9 = {}) {
+  const id4 = normalizeText(value8),
+    args4 = cloneSerializable(value9);
+  if (!id4 || !args4 || Array['isArray'](args4)) return 0x0;
+  const list5 = getStoryBackgroundTasks(options8);
+  let value10 = 0x0;
+  const updatedAt3 = Date['now'](),
+    value11 = list5['map']((response6) => {
+      if (!ACTIVE_STATUSES['has'](response6['status']) || response6['batch']?.['id'] !== id4)
+        return response6;
       return (
-        (_0x52d26a += 0x1),
+        (value10 += 0x1),
         normalizeStoryBackgroundTask({
-          ..._0x420606,
-          batch: { ..._0x420606['batch'], ..._0x93c61f, id: _0x3c5cbc },
-          updatedAt: _0x40c825,
+          ...response6,
+          batch: { ...response6['batch'], ...args4, id: id4 },
+          updatedAt: updatedAt3,
         })
       );
     });
-  if (_0x52d26a) setStoryBackgroundTasks(_0xc5e9c4, _0xc9dc22);
-  return _0x52d26a;
+  if (value10) setStoryBackgroundTasks(options8, value11);
+  return value10;
 }
 export function finishStoryBackgroundTask(
-  _0x25d437 = {},
-  _0x26f98e = '',
-  { status: status = 'succeeded', message: message = '', error: error = '', ..._0x37aed9 } = {},
+  options9 = {},
+  value12 = '',
+  { status: status = 'succeeded', message: message = '', error: error = '', ...args5 } = {},
 ) {
-  const _0x5c8ccc = TERMINAL_STATUSES['has'](normalizeText(status)['toLowerCase']())
+  const status4 = TERMINAL_STATUSES['has'](normalizeText(status)['toLowerCase']())
     ? normalizeText(status)['toLowerCase']()
     : 'succeeded';
-  return updateStoryBackgroundTask(_0x25d437, _0x26f98e, {
-    ..._0x37aed9,
-    status: _0x5c8ccc,
+  return updateStoryBackgroundTask(options9, value12, {
+    ...args5,
+    status: status4,
     message: message,
     error: error,
     finishedAt: Date['now'](),
   });
 }
 export function interruptStoryBackgroundTasks(
-  _0x48ccec = {},
+  options10 = {},
   {
     includeResumable: includeResumable = ![],
     message: message = '应用已关闭或项目上下文已切换，请重新发起任务。',
   } = {},
 ) {
-  const _0xfb6227 = getStoryBackgroundTasks(_0x48ccec);
-  let _0x59a8c5 = 0x0;
-  const _0x17cade = _0xfb6227['map']((_0x3bb777) => {
-    if (!ACTIVE_STATUSES['has'](_0x3bb777['status'])) return _0x3bb777;
-    if (!includeResumable && _0x3bb777['resumable'] && _0x3bb777['remoteTaskId']) return _0x3bb777;
+  const list6 = getStoryBackgroundTasks(options10);
+  let value13 = 0x0;
+  const value14 = list6['map']((response7) => {
+    if (!ACTIVE_STATUSES['has'](response7['status'])) return response7;
+    if (!includeResumable && response7['resumable'] && response7['remoteTaskId']) return response7;
     return (
-      (_0x59a8c5 += 0x1),
+      (value13 += 0x1),
       normalizeStoryBackgroundTask({
-        ..._0x3bb777,
+        ...response7,
         status: 'interrupted',
         message: message,
         error: message,
@@ -233,23 +232,23 @@ export function interruptStoryBackgroundTasks(
       })
     );
   });
-  if (_0x59a8c5) setStoryBackgroundTasks(_0x48ccec, _0x17cade);
-  return _0x59a8c5;
+  if (value13) setStoryBackgroundTasks(options10, value14);
+  return value13;
 }
-export function getStoryBackgroundTaskSummary(_0x31594b = {}) {
-  const _0x46e5f8 = getStoryBackgroundTasks(_0x31594b),
-    _0x388652 = _0x46e5f8['filter']((_0x48d903) => ACTIVE_STATUSES['has'](_0x48d903['status'])),
-    _0x50fece = _0x46e5f8['filter'](
-      (_0x5688ae) => _0x5688ae['status'] === 'failed' || _0x5688ae['status'] === 'interrupted',
+export function getStoryBackgroundTaskSummary(options11 = {}) {
+  const list7 = getStoryBackgroundTasks(options11),
+    activeTasks = list7['filter']((response8) => ACTIVE_STATUSES['has'](response8['status'])),
+    failedTasks = list7['filter'](
+      (response9) => response9['status'] === 'failed' || response9['status'] === 'interrupted',
     ),
-    _0xd5fcdf = countLogicalTasks(_0x388652),
-    _0x36a497 = countLogicalTasks(_0x50fece);
+    activeCount = countLogicalTasks(activeTasks),
+    failedCount = countLogicalTasks(failedTasks);
   return {
-    ...getWorkspaceProjectTaskPresentation({ activeCount: _0xd5fcdf, failedCount: _0x36a497 }),
-    activeTasks: _0x388652,
-    failedTasks: _0x50fece,
+    ...getWorkspaceProjectTaskPresentation({ activeCount: activeCount, failedCount: failedCount }),
+    activeTasks: activeTasks,
+    failedTasks: failedTasks,
   };
 }
-export function isStoryBackgroundTaskActive(_0x781e6c = {}) {
-  return ACTIVE_STATUSES['has'](normalizeStatus(_0x781e6c['status']));
+export function isStoryBackgroundTaskActive(response10 = {}) {
+  return ACTIVE_STATUSES['has'](normalizeStatus(response10['status']));
 }

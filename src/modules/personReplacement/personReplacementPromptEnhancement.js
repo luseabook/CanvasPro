@@ -1,107 +1,104 @@
 import { getModelManifest, resolveModelExecution } from '../../manifests/index.js';
 import { compileSourceDescriptions, usesSourceDescriptions } from './personReplacementSourceDescriptions.js';
-function normalizeText(_0x1c0151) {
-  return String(_0x1c0151 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function normalizeStringList(_0x1f665f, _0x53d08b = 0x8) {
-  return (Array['isArray'](_0x1f665f) ? _0x1f665f : [])
-    ['map'](normalizeText)
-    ['filter'](Boolean)
-    ['slice'](0x0, _0x53d08b);
+function normalizeStringList(item, key = 0x8) {
+  return (Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean)['slice'](0x0, key);
 }
-export function extractJsonObject(_0x4582bc) {
-  if (_0x4582bc && typeof _0x4582bc === 'object' && !Array['isArray'](_0x4582bc)) {
-    const _0x38b338 = _0x4582bc['output'] || _0x4582bc['data'] || _0x4582bc['result'];
-    if (_0x38b338 && typeof _0x38b338 === 'object' && !Array['isArray'](_0x38b338)) return _0x38b338;
+export function extractJsonObject(response) {
+  if (response && typeof response === 'object' && !Array['isArray'](response)) {
+    const index = response['output'] || response['data'] || response['result'];
+    if (index && typeof index === 'object' && !Array['isArray'](index)) return index;
   }
-  const _0x100c9f = normalizeText(
-    _0x4582bc?.['text'] ?? _0x4582bc?.['outputText'] ?? _0x4582bc?.['content'] ?? _0x4582bc,
+  const text = normalizeText(
+    response?.['text'] ?? response?.['outputText'] ?? response?.['content'] ?? response,
   );
-  if (!_0x100c9f) return null;
-  const _0x388f0e = _0x100c9f['match'](/```(?:json)?\s*([\s\S]*?)```/iu)?.[0x1] || _0x100c9f,
-    _0x3c28c0 = _0x388f0e['indexOf']('{'),
-    _0x44b306 = _0x388f0e['lastIndexOf']('}');
-  if (_0x3c28c0 < 0x0 || _0x44b306 <= _0x3c28c0) return null;
+  if (!text) return null;
+  const list = text['match'](/```(?:json)?\s*([\s\S]*?)```/iu)?.[0x1] || text,
+    count = list['indexOf']('{'),
+    result = list['lastIndexOf']('}');
+  if (count < 0x0 || result <= count) return null;
   try {
-    return JSON['parse'](_0x388f0e['slice'](_0x3c28c0, _0x44b306 + 0x1));
+    return JSON['parse'](list['slice'](count, result + 0x1));
   } catch {
     return null;
   }
 }
-export function resolvePersonReplacementPromptEnhancementModel(_0x31e69d = {}) {
-  const _0x1475c5 = normalizeText(_0x31e69d['model']),
-    _0xf2e0f0 = normalizeText(_0x31e69d['provider']),
-    _0x449f35 = normalizeText(
-      _0x31e69d['providerProfileId'] || _0x31e69d['providerProfileIdByModel']?.[_0x1475c5],
+export function resolvePersonReplacementPromptEnhancementModel(options = {}) {
+  const modelId = normalizeText(options['model']),
+    providerHint = normalizeText(options['provider']),
+    providerProfileId = normalizeText(
+      options['providerProfileId'] || options['providerProfileIdByModel']?.[modelId],
     ),
-    _0x331a7c = _0x1475c5
-      ? resolveModelExecution(_0x1475c5, { providerHint: _0xf2e0f0 }) || resolveModelExecution(_0x1475c5)
+    data = modelId
+      ? resolveModelExecution(modelId, { providerHint: providerHint }) || resolveModelExecution(modelId)
       : null,
-    _0x516eb9 = _0x331a7c?.['modelManifest'] || getModelManifest(_0x1475c5),
-    _0xb2c5fb = Array['isArray'](_0x516eb9?.['inputSlots']?.['allowedKinds'])
-      ? _0x516eb9['inputSlots']['allowedKinds']['map'](normalizeText)
+    target = data?.['modelManifest'] || getModelManifest(modelId),
+    list2 = Array['isArray'](target?.['inputSlots']?.['allowedKinds'])
+      ? target['inputSlots']['allowedKinds']['map'](normalizeText)
       : [],
-    _0x4359b8 = Math['max'](
+    maxImages = Math['max'](
       0x0,
-      Math['trunc'](Number(_0x516eb9?.['inputSlots']?.['maxByKind']?.['image']) || 0x0),
+      Math['trunc'](Number(target?.['inputSlots']?.['maxByKind']?.['image']) || 0x0),
     ),
-    _0x5f48e4 = Boolean(_0x1475c5 && _0xf2e0f0 && _0x516eb9);
+    configured = Boolean(modelId && providerHint && target);
   return {
-    configured: _0x5f48e4,
-    displayName: normalizeText(_0x516eb9?.['displayName']) || _0x1475c5 || '未配置',
-    maxImages: _0x4359b8,
-    modelId: _0x1475c5,
-    provider: _0xf2e0f0,
-    providerProfileId: _0x449f35,
+    configured: configured,
+    displayName: normalizeText(target?.['displayName']) || modelId || '未配置',
+    maxImages: maxImages,
+    modelId: modelId,
+    provider: providerHint,
+    providerProfileId: providerProfileId,
     supportsImage: Boolean(
-      _0x5f48e4 && _0x516eb9?.['kind'] === 'text' && _0xb2c5fb['includes']('image') && _0x4359b8 > 0x0,
+      configured && target?.['kind'] === 'text' && list2['includes']('image') && maxImages > 0x0,
     ),
   };
 }
 export function buildPersonReplacementPromptEnhancementInputs({ promptPackage: promptPackage = {} } = {}) {
-  const _0x5318d9 = (
+  const imageRefs = (
       Array['isArray'](promptPackage['referenceImages']) ? promptPackage['referenceImages'] : []
     )
-      ['filter']((_0x364f0c) =>
+      ['filter']((source) =>
         ['source-keyframe', 'target-character', 'target-scene', 'person-location-guide']['includes'](
-          normalizeText(_0x364f0c?.['role']),
+          normalizeText(source?.['role']),
         ),
       )
-      ['map']((_0xb5581f) => ({
-        label: normalizeText(_0xb5581f['label']) || '图' + _0xb5581f['slot'],
-        ref: normalizeText(_0xb5581f['ref']),
-        role: normalizeText(_0xb5581f['role']),
-        slot: Math['max'](0x1, Math['trunc'](Number(_0xb5581f['slot']) || 0x1)),
-        targetCharacterId: normalizeText(_0xb5581f['targetCharacterId']),
+      ['map']((next) => ({
+        label: normalizeText(next['label']) || '图' + next['slot'],
+        ref: normalizeText(next['ref']),
+        role: normalizeText(next['role']),
+        slot: Math['max'](0x1, Math['trunc'](Number(next['slot']) || 0x1)),
+        targetCharacterId: normalizeText(next['targetCharacterId']),
       }))
-      ['filter']((_0x454a90) => _0x454a90['ref']),
-    _0x1633e4 = (Array['isArray'](promptPackage['bindings']) ? promptPackage['bindings'] : [])
-      ['map']((_0xf7caa2) => ({
-        label: _0xf7caa2['markerLabel']
-          ? _0xf7caa2['markerLabel'] + '（' + normalizeText(_0xf7caa2['label']) + '）'
-          : normalizeText(_0xf7caa2['label']),
-        personId: normalizeText(_0xf7caa2['personId']),
-        referenceLabel: normalizeText(_0xf7caa2['referenceLabel']),
-        replacementScope: normalizeText(_0xf7caa2['replacementScope']),
+      ['filter']((current) => current['ref']),
+    bindings = (Array['isArray'](promptPackage['bindings']) ? promptPackage['bindings'] : [])
+      ['map']((label) => ({
+        label: label['markerLabel']
+          ? label['markerLabel'] + '（' + normalizeText(label['label']) + '）'
+          : normalizeText(label['label']),
+        personId: normalizeText(label['personId']),
+        referenceLabel: normalizeText(label['referenceLabel']),
+        replacementScope: normalizeText(label['replacementScope']),
         bbox:
-          _0xf7caa2['bbox'] && typeof _0xf7caa2['bbox'] === 'object'
+          label['bbox'] && typeof label['bbox'] === 'object'
             ? {
-                x: Number(_0xf7caa2['bbox']['x']) || 0x0,
-                y: Number(_0xf7caa2['bbox']['y']) || 0x0,
-                width: Number(_0xf7caa2['bbox']['width']) || 0x0,
-                height: Number(_0xf7caa2['bbox']['height']) || 0x0,
+                x: Number(label['bbox']['x']) || 0x0,
+                y: Number(label['bbox']['y']) || 0x0,
+                width: Number(label['bbox']['width']) || 0x0,
+                height: Number(label['bbox']['height']) || 0x0,
               }
             : null,
       }))
-      ['filter']((_0x39658f) => _0x39658f['label'] && _0x39658f['referenceLabel']);
+      ['filter']((entry) => entry['label'] && entry['referenceLabel']);
   return {
-    bindings: _0x1633e4,
-    imageRefs: _0x5318d9['map']((_0xc0ab50) => _0xc0ab50['ref']),
-    references: _0x5318d9,
+    bindings: bindings,
+    imageRefs: imageRefs['map']((record) => record['ref']),
+    references: imageRefs,
   };
 }
-export function createPersonReplacementPromptEnhancementStructuredOutput(_0x3c56fb = []) {
-  const _0x422c06 = normalizeStringList(_0x3c56fb);
+export function createPersonReplacementPromptEnhancementStructuredOutput(list3 = []) {
+  const minItems = normalizeStringList(list3);
   return {
     name: 'person_replacement_prompt_enhancement',
     strict: !![],
@@ -125,15 +122,15 @@ export function createPersonReplacementPromptEnhancementStructuredOutput(_0x3c56
         },
         people: {
           type: 'array',
-          minItems: _0x422c06['length'],
-          maxItems: _0x422c06['length'],
+          minItems: minItems['length'],
+          maxItems: minItems['length'],
           items: {
             type: 'object',
             additionalProperties: ![],
             required: ['label', 'pose', 'gaze', 'expression', 'visibleRange', 'occlusion', 'adaptation'],
             properties: {
-              label: _0x422c06['length']
-                ? { type: 'string', enum: _0x422c06 }
+              label: minItems['length']
+                ? { type: 'string', enum: minItems }
                 : { type: 'string', maxLength: 0x0 },
               pose: { type: 'string' },
               gaze: { type: 'string' },
@@ -153,16 +150,16 @@ export function buildPersonReplacementPromptEnhancementPrompt({
   promptPackage: promptPackage = {},
   inputs: inputs = buildPersonReplacementPromptEnhancementInputs({ promptPackage: promptPackage }),
 } = {}) {
-  const _0x505a96 = inputs['references']['map']((_0x481d7d) => {
-    if (_0x481d7d['role'] === 'person-location-guide')
-      return _0x481d7d['label'] + '：人物定位引导图，字母框只用于对应图1中的人物，不作为外观或场景参考。';
-    if (_0x481d7d['role'] === 'source-keyframe')
+  const list4 = inputs['references']['map']((payload) => {
+    if (payload['role'] === 'person-location-guide')
+      return payload['label'] + '：人物定位引导图，字母框只用于对应图1中的人物，不作为外观或场景参考。';
+    if (payload['role'] === 'source-keyframe')
       return (
-        _0x481d7d['label'] + '：待修改原图，是构图、人物位置、姿态、动作、裁切、遮挡、光线和背景的唯一基准。'
+        payload['label'] + '：待修改原图，是构图、人物位置、姿态、动作、裁切、遮挡、光线和背景的唯一基准。'
       );
-    if (_0x481d7d['role'] === 'target-scene')
-      return _0x481d7d['label'] + '：目标场景参考图，只分析环境、材质、光线与色调，不引用其中人物。';
-    return _0x481d7d['label'] + '：目标人物外观参考图，只分析该人物的身份外观、脸发、体型和服装。';
+    if (payload['role'] === 'target-scene')
+      return payload['label'] + '：目标场景参考图，只分析环境、材质、光线与色调，不引用其中人物。';
+    return payload['label'] + '：目标人物外观参考图，只分析该人物的身份外观、脸发、体型和服装。';
   });
   return [
     '分析所附图片，为人物替换图像生成补充精确、简洁、可执行的视觉约束。',
@@ -178,7 +175,7 @@ export function buildPersonReplacementPromptEnhancementPrompt({
         : '',
     '不要描述目标参考图自己的动作、背景、构图或身体裁切；不要要求把这些内容复制到结果中。',
     '不要在分析内容中书写人物到图片的对应箭头、图片编号绑定或新的修改范围。',
-    '图片角色：\x0a' + _0x505a96['map']((_0x3031f7) => '-\x20' + _0x3031f7)['join']('\x0a'),
+    '图片角色：\x0a' + list4['map']((handle) => '-\x20' + handle)['join']('\x0a'),
     '应用锁定的绑定事实：\n' + normalizeText(promptPackage['guidedBindingPrompt']),
     '按指定 JSON Schema 返回，不要附加解释。',
   ]
@@ -186,103 +183,106 @@ export function buildPersonReplacementPromptEnhancementPrompt({
     ['join']('\x0a\x0a');
 }
 export function parsePersonReplacementPromptEnhancementResult(
-  _0x1e4402,
+  state,
   { personLabels: personLabels = [] } = {},
 ) {
-  const _0x47693a = extractJsonObject(_0x1e4402);
-  if (!_0x47693a) throw new Error('AI 提示词增强未返回可用的结构化分析');
-  const _0x5475f5 = normalizeStringList(personLabels),
-    _0x54a9e1 = new Set(_0x5475f5),
-    _0x3f4af3 = new Map(
-      (Array['isArray'](_0x47693a['people']) ? _0x47693a['people'] : [])
-        ['map']((_0x5baf91) => [normalizeText(_0x5baf91?.['label']), _0x5baf91])
-        ['filter'](([_0x14b0a2]) => _0x54a9e1['has'](_0x14b0a2)),
+  const extractJsonObject2 = extractJsonObject(state);
+  if (!extractJsonObject2) throw new Error('AI 提示词增强未返回可用的结构化分析');
+  const list5 = normalizeStringList(personLabels),
+    map = new Set(list5),
+    map2 = new Map(
+      (Array['isArray'](extractJsonObject2['people']) ? extractJsonObject2['people'] : [])
+        ['map']((config) => [normalizeText(config?.['label']), config])
+        ['filter'](([scope]) => map['has'](scope)),
     ),
-    _0x2c8b5a = _0x5475f5['map']((_0x50ec8d) => {
-      const _0x1973f1 = _0x3f4af3['get'](_0x50ec8d);
+    people = list5['map']((label2) => {
+      const input = map2['get'](label2);
       return {
-        label: _0x50ec8d,
-        pose: normalizeText(_0x1973f1?.['pose']),
-        gaze: normalizeText(_0x1973f1?.['gaze']),
-        expression: normalizeText(_0x1973f1?.['expression']),
-        visibleRange: normalizeText(_0x1973f1?.['visibleRange']),
-        occlusion: normalizeText(_0x1973f1?.['occlusion']),
-        adaptation: normalizeText(_0x1973f1?.['adaptation']),
+        label: label2,
+        pose: normalizeText(input?.['pose']),
+        gaze: normalizeText(input?.['gaze']),
+        expression: normalizeText(input?.['expression']),
+        visibleRange: normalizeText(input?.['visibleRange']),
+        occlusion: normalizeText(input?.['occlusion']),
+        adaptation: normalizeText(input?.['adaptation']),
       };
     }),
-    _0x2a94a0 = {
-      composition: normalizeText(_0x47693a['scene']?.['composition']),
-      lighting: normalizeText(_0x47693a['scene']?.['lighting']),
-      color: normalizeText(_0x47693a['scene']?.['color']),
-      focus: normalizeText(_0x47693a['scene']?.['focus']),
-      texture: normalizeText(_0x47693a['scene']?.['texture']),
+    scene = {
+      composition: normalizeText(extractJsonObject2['scene']?.['composition']),
+      lighting: normalizeText(extractJsonObject2['scene']?.['lighting']),
+      color: normalizeText(extractJsonObject2['scene']?.['color']),
+      focus: normalizeText(extractJsonObject2['scene']?.['focus']),
+      texture: normalizeText(extractJsonObject2['scene']?.['texture']),
     },
-    _0x185e80 = normalizeStringList(_0x47693a['integration'], 0x6),
-    _0x5462ac = Object['values'](_0x2a94a0)['filter'](Boolean),
-    _0x2c4e1c = _0x2c8b5a['flatMap']((_0x2c4c9f) => Object['values'](_0x2c4c9f)['slice'](0x1))['filter'](
-      Boolean,
-    );
-  if (!_0x5462ac['length'] && !_0x2c4e1c['length'] && !_0x185e80['length'])
+    integration = normalizeStringList(extractJsonObject2['integration'], 0x6),
+    list6 = Object['values'](scene)['filter'](Boolean),
+    list7 = people['flatMap']((output) => Object['values'](output)['slice'](0x1))['filter'](Boolean);
+  if (!list6['length'] && !list7['length'] && !integration['length'])
     throw new Error('AI 提示词增强返回了空分析');
-  return { integration: _0x185e80, people: _0x2c8b5a, scene: _0x2a94a0 };
+  return { integration: integration, people: people, scene: scene };
 }
-export function compilePersonReplacementPromptEnhancement(_0x5e751f = {}) {
-  const _0x146dda = [
-      _0x5e751f['scene']?.['composition'],
-      _0x5e751f['scene']?.['lighting'],
-      _0x5e751f['scene']?.['color'],
-      _0x5e751f['scene']?.['focus'],
-      _0x5e751f['scene']?.['texture'],
+export function compilePersonReplacementPromptEnhancement(options2 = {}) {
+  const list8 = [
+      options2['scene']?.['composition'],
+      options2['scene']?.['lighting'],
+      options2['scene']?.['color'],
+      options2['scene']?.['focus'],
+      options2['scene']?.['texture'],
     ]
       ['map'](normalizeText)
       ['filter'](Boolean),
-    _0x3f497e = (Array['isArray'](_0x5e751f['people']) ? _0x5e751f['people'] : [])
-      ['map']((_0x3b4e3b) => {
-        const _0x3d8b7b = [
-          _0x3b4e3b['pose'],
-          _0x3b4e3b['gaze'],
-          _0x3b4e3b['expression'],
-          _0x3b4e3b['visibleRange'],
-          _0x3b4e3b['occlusion'],
-          _0x3b4e3b['adaptation'],
+    args = (Array['isArray'](options2['people']) ? options2['people'] : [])
+      ['map']((value2) => {
+        const list9 = [
+          value2['pose'],
+          value2['gaze'],
+          value2['expression'],
+          value2['visibleRange'],
+          value2['occlusion'],
+          value2['adaptation'],
         ]
           ['map'](normalizeText)
           ['filter'](Boolean);
-        return normalizeText(_0x3b4e3b['label']) && _0x3d8b7b['length']
-          ? '-\x20' + normalizeText(_0x3b4e3b['label']) + '：' + _0x3d8b7b['join']('；') + '。'
+        return normalizeText(value2['label']) && list9['length']
+          ? '-\x20' + normalizeText(value2['label']) + '：' + list9['join']('；') + '。'
           : '';
       })
       ['filter'](Boolean),
-    _0x3404ac = normalizeStringList(_0x5e751f['integration'], 0x6);
+    list10 = normalizeStringList(options2['integration'], 0x6);
   return [
     'AI\x20提示词增强（只补充视觉约束，不得改变既定人物绑定）：',
-    _0x146dda['length'] ? '- 原图画面：' + _0x146dda['join']('；') + '。' : '',
-    ..._0x3f497e,
-    _0x3404ac['length'] ? '- 融合要求：' + _0x3404ac['join']('；') + '。' : '',
+    list8['length'] ? '- 原图画面：' + list8['join']('；') + '。' : '',
+    ...args,
+    list10['length'] ? '- 融合要求：' + list10['join']('；') + '。' : '',
   ]
     ['filter'](Boolean)
     ['join']('\x0a');
 }
-export function applyPersonReplacementPromptEnhancement(_0x743148 = {}, _0x589512 = {}) {
-  if (_0x743148['promptMode'] === 'manual') return { ..._0x743148 };
-  if (usesSourceDescriptions(_0x743148) && _0x589512['analysis']?.['kind'] === 'source-descriptions-v1') {
-    const _0x496ff7 = compileSourceDescriptions(_0x743148, _0x589512['analysis']);
-    return { ..._0x743148, bindingPrompt: _0x496ff7, guidedBindingPrompt: _0x496ff7, prompt: _0x496ff7 };
+export function applyPersonReplacementPromptEnhancement(args2 = {}, value3 = {}) {
+  if (args2['promptMode'] === 'manual') return { ...args2 };
+  if (usesSourceDescriptions(args2) && value3['analysis']?.['kind'] === 'source-descriptions-v1') {
+    const bindingPrompt = compileSourceDescriptions(args2, value3['analysis']);
+    return {
+      ...args2,
+      bindingPrompt: bindingPrompt,
+      guidedBindingPrompt: bindingPrompt,
+      prompt: bindingPrompt,
+    };
   }
-  const _0x49c2e8 = normalizeText(
-    _0x589512['prompt'] || compilePersonReplacementPromptEnhancement(_0x589512['analysis']),
+  const text2 = normalizeText(
+    value3['prompt'] || compilePersonReplacementPromptEnhancement(value3['analysis']),
   );
-  if (!_0x49c2e8) return { ..._0x743148 };
+  if (!text2) return { ...args2 };
   return {
-    ..._0x743148,
-    bindingPrompt: [_0x743148['bindingPrompt'], _0x49c2e8]
+    ...args2,
+    bindingPrompt: [args2['bindingPrompt'], text2]
       ['map'](normalizeText)
       ['filter'](Boolean)
       ['join']('\x0a\x0a'),
-    guidedBindingPrompt: [_0x743148['guidedBindingPrompt'], _0x49c2e8]
+    guidedBindingPrompt: [args2['guidedBindingPrompt'], text2]
       ['map'](normalizeText)
       ['filter'](Boolean)
       ['join']('\x0a\x0a'),
-    prompt: [_0x743148['prompt'], _0x49c2e8]['map'](normalizeText)['filter'](Boolean)['join']('\x0a\x0a'),
+    prompt: [args2['prompt'], text2]['map'](normalizeText)['filter'](Boolean)['join']('\x0a\x0a'),
   };
 }

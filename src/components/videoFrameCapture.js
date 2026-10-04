@@ -1,290 +1,278 @@
 import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../utils/localMediaPath.js';
 import { resolveNormalizedMediaCrop } from '../core/math.js';
-export function getVideoFrameSource(_0x22c970) {
-  return String(_0x22c970?.currentSrc || _0x22c970?.src || _0x22c970?.getAttribute?.('src') || '').trim();
+export function getVideoFrameSource(value) {
+  return String(value?.currentSrc || value?.src || value?.getAttribute?.('src') || '').trim();
 }
-export function isVideoFrameReady(_0x140b94) {
+export function isVideoFrameReady(item) {
   return (
-    !!getVideoFrameSource(_0x140b94) &&
-    Number(_0x140b94?.readyState || 0) >= 2 &&
-    Number(_0x140b94?.videoWidth || 0) > 0 &&
-    Number(_0x140b94?.videoHeight || 0) > 0
+    !!getVideoFrameSource(item) &&
+    Number(item?.readyState || 0) >= 2 &&
+    Number(item?.videoWidth || 0) > 0 &&
+    Number(item?.videoHeight || 0) > 0
   );
 }
-function drawVideoFrameToCanvas(_0x39949c, _0x477b62) {
-  if (!isVideoFrameReady(_0x39949c)) throw new Error('video frame is not ready');
-  const _0x2f9033 = Math.max(1, Math.trunc(Number(_0x39949c.videoWidth) || 0)),
-    _0x4887a0 = Math.max(1, Math.trunc(Number(_0x39949c.videoHeight) || 0)),
-    _0x1f98a4 = document.createElement('canvas'),
-    _0x1edbd9 = resolveNormalizedMediaCrop(_0x477b62, _0x2f9033, _0x4887a0);
-  ((_0x1f98a4.width = _0x1edbd9.width), (_0x1f98a4.height = _0x1edbd9.height));
-  const _0x346604 = _0x1f98a4.getContext('2d');
-  if (!_0x346604) throw new Error('canvas context is unavailable');
-  if (_0x477b62)
-    _0x346604.drawImage(
-      _0x39949c,
-      _0x1edbd9.x,
-      _0x1edbd9.y,
-      _0x1edbd9.width,
-      _0x1edbd9.height,
-      0,
-      0,
-      _0x1edbd9.width,
-      _0x1edbd9.height,
-    );
-  else _0x346604.drawImage(_0x39949c, 0, 0, _0x2f9033, _0x4887a0);
-  return { canvas: _0x1f98a4, width: _0x1edbd9.width, height: _0x1edbd9.height };
+function drawVideoFrameToCanvas(key, index) {
+  if (!isVideoFrameReady(key)) throw new Error('video frame is not ready');
+  const result = Math.max(1, Math.trunc(Number(key.videoWidth) || 0)),
+    data = Math.max(1, Math.trunc(Number(key.videoHeight) || 0)),
+    canvas = document.createElement('canvas'),
+    width = resolveNormalizedMediaCrop(index, result, data);
+  ((canvas.width = width.width), (canvas.height = width.height));
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('canvas context is unavailable');
+  if (index) ctx.drawImage(key, width.x, width.y, width.width, width.height, 0, 0, width.width, width.height);
+  else ctx.drawImage(key, 0, 0, result, data);
+  return { canvas: canvas, width: width.width, height: width.height };
 }
-function dataUrlToBlob(_0xc4d379) {
-  const _0x225bcd = String(_0xc4d379 || ''),
-    _0x44a365 = _0x225bcd.match(/^data:([^;,]+)?(;base64)?,(.*)$/);
-  if (!_0x44a365) throw new Error('invalid data url');
-  const _0x20adf1 = _0x44a365[1] || 'application/octet-stream',
-    _0x1a06f6 = _0x44a365[3] || '',
-    _0x48d48e = _0x44a365[2] ? atob(_0x1a06f6) : decodeURIComponent(_0x1a06f6),
-    _0x302a2c = new Uint8Array(_0x48d48e.length);
-  for (let _0x427336 = 0; _0x427336 < _0x48d48e.length; _0x427336 += 1) {
-    _0x302a2c[_0x427336] = _0x48d48e.charCodeAt(_0x427336);
+function dataUrlToBlob(options) {
+  const target = String(options || ''),
+    enabled = target.match(/^data:([^;,]+)?(;base64)?,(.*)$/);
+  if (!enabled) throw new Error('invalid data url');
+  const type2 = enabled[1] || 'application/octet-stream',
+    source = enabled[3] || '',
+    list = enabled[2] ? atob(source) : decodeURIComponent(source),
+    uint8Array = new Uint8Array(list.length);
+  for (let next = 0; next < list.length; next += 1) {
+    uint8Array[next] = list.charCodeAt(next);
   }
-  return new Blob([_0x302a2c], { type: _0x20adf1 });
+  return new Blob([uint8Array], { type: type2 });
 }
-function extFromImageType(_0x28a50a) {
-  const _0x21874f = String(_0x28a50a || '').toLowerCase();
-  if (_0x21874f.includes('jpeg') || _0x21874f.includes('jpg')) return 'jpg';
-  if (_0x21874f.includes('webp')) return 'webp';
+function extFromImageType(current) {
+  const list2 = String(current || '').toLowerCase();
+  if (list2.includes('jpeg') || list2.includes('jpg')) return 'jpg';
+  if (list2.includes('webp')) return 'webp';
   return 'png';
 }
-function normalizeFrameIndex(_0x7524b2) {
-  const _0x4b2820 = Number(_0x7524b2);
-  if (!Number.isFinite(_0x4b2820) || _0x4b2820 <= 0) return 1;
-  return Math.max(1, Math.round(_0x4b2820));
+function normalizeFrameIndex(entry) {
+  const count = Number(entry);
+  if (!Number.isFinite(count) || count <= 0) return 1;
+  return Math.max(1, Math.round(count));
 }
 export function resolveVideoFrameCaptureIndex(
-  _0x1be913,
+  record,
   {
     currentTimeSec: currentTimeSec = 0,
     fallbackDurationSec: fallbackDurationSec = 0,
     fallbackFrameRate: fallbackFrameRate = 0,
   } = {},
 ) {
-  const _0x2c961b = Number(_0x1be913?.videoFps),
-    _0x554a3b = Number(_0x1be913?.videoFrameCount),
-    _0x3259d1 = Number(_0x1be913?.videoDuration),
-    _0x4215a5 = Number.isFinite(_0x3259d1) && _0x3259d1 > 0 ? _0x3259d1 : Number(fallbackDurationSec),
-    _0x1aa312 = Number(fallbackFrameRate),
-    _0x3425a7 =
-      Number.isFinite(_0x2c961b) && _0x2c961b > 0
-        ? _0x2c961b
-        : Number.isFinite(_0x554a3b) && _0x554a3b > 0 && Number.isFinite(_0x4215a5) && _0x4215a5 > 0
-          ? _0x554a3b / _0x4215a5
-          : Number.isFinite(_0x1aa312) && _0x1aa312 > 0
-            ? _0x1aa312
+  const count2 = Number(record?.videoFps),
+    count3 = Number(record?.videoFrameCount),
+    count4 = Number(record?.videoDuration),
+    count5 = Number.isFinite(count4) && count4 > 0 ? count4 : Number(fallbackDurationSec),
+    count6 = Number(fallbackFrameRate),
+    count7 =
+      Number.isFinite(count2) && count2 > 0
+        ? count2
+        : Number.isFinite(count3) && count3 > 0 && Number.isFinite(count5) && count5 > 0
+          ? count3 / count5
+          : Number.isFinite(count6) && count6 > 0
+            ? count6
             : 0;
-  if (Number.isFinite(_0x3425a7) && _0x3425a7 > 0) {
-    let _0x5c456c = Math.floor(Math.max(0, Number(currentTimeSec) || 0) * _0x3425a7) + 1;
+  if (Number.isFinite(count7) && count7 > 0) {
+    let frameIndex = Math.floor(Math.max(0, Number(currentTimeSec) || 0) * count7) + 1;
     return (
-      Number.isFinite(_0x554a3b) && _0x554a3b > 0
-        ? (_0x5c456c = Math.max(1, Math.min(Math.round(_0x554a3b), _0x5c456c)))
-        : (_0x5c456c = Math.max(1, _0x5c456c)),
-      { frameIndex: _0x5c456c, nextSnapSeq: null, usedSequence: false }
+      Number.isFinite(count3) && count3 > 0
+        ? (frameIndex = Math.max(1, Math.min(Math.round(count3), frameIndex)))
+        : (frameIndex = Math.max(1, frameIndex)),
+      { frameIndex: frameIndex, nextSnapSeq: null, usedSequence: false }
     );
   }
-  const _0x233361 = Math.max(1, Math.floor(Number(_0x1be913?.snapSeq) || 0) + 1);
-  return { frameIndex: _0x233361, nextSnapSeq: _0x233361, usedSequence: true };
+  const frameIndex2 = Math.max(1, Math.floor(Number(record?.snapSeq) || 0) + 1);
+  return { frameIndex: frameIndex2, nextSnapSeq: frameIndex2, usedSequence: true };
 }
 export function buildVideoFrameCaptureNodeName(
-  _0x589f7e,
-  { frameIndex: _0x5998ea, fallbackName: fallbackName = '', formatSourceFrameName: _0x2de09a } = {},
+  error,
+  {
+    frameIndex: frameIndex3,
+    fallbackName: fallbackName = '',
+    formatSourceFrameName: formatSourceFrameName,
+  } = {},
 ) {
-  const _0x5ab5e6 = normalizeFrameIndex(_0x5998ea),
-    _0x5efe79 = String(fallbackName || '').trim(),
-    _0x4bd32d = String(_0x589f7e?.name || '').trim();
-  if (!_0x4bd32d) return _0x5efe79;
-  if (typeof _0x2de09a === 'function') {
-    const _0x1d9ddd = String(_0x2de09a({ sourceName: _0x4bd32d, frameIndex: _0x5ab5e6 }) || '').trim();
-    if (_0x1d9ddd) return _0x1d9ddd;
+  const frameIndex4 = normalizeFrameIndex(frameIndex3),
+    payload = String(fallbackName || '').trim(),
+    sourceName = String(error?.name || '').trim();
+  if (!sourceName) return payload;
+  if (typeof formatSourceFrameName === 'function') {
+    const handle = String(
+      formatSourceFrameName({ sourceName: sourceName, frameIndex: frameIndex4 }) || '',
+    ).trim();
+    if (handle) return handle;
   }
-  return _0x5efe79 || _0x4bd32d + '.' + _0x5ab5e6;
+  return payload || sourceName + '.' + frameIndex4;
 }
-export function waitForVideoFrame(_0x1acf80, { timeoutMs: timeoutMs = 0x9c4 } = {}) {
-  if (isVideoFrameReady(_0x1acf80)) return Promise.resolve(true);
-  if (!getVideoFrameSource(_0x1acf80)) return Promise.resolve(false);
-  return new Promise((_0x2f44ca) => {
-    let _0x4e10f6 = false;
-    const _0x3c814d = ['loadeddata', 'canplay', 'canplaythrough', 'seeked', 'timeupdate'],
-      _0x4dca29 = (_0x1a00d1) => {
-        if (_0x4e10f6) return;
-        ((_0x4e10f6 = true), clearTimeout(_0x2fde1a));
-        for (const _0xa974c3 of _0x3c814d) {
-          _0x1acf80.removeEventListener?.(_0xa974c3, _0x2c3da6);
+export function waitForVideoFrame(el, { timeoutMs: timeoutMs = 0x9c4 } = {}) {
+  if (isVideoFrameReady(el)) return Promise.resolve(true);
+  if (!getVideoFrameSource(el)) return Promise.resolve(false);
+  return new Promise((handler) => {
+    let state = false;
+    const config = ['loadeddata', 'canplay', 'canplaythrough', 'seeked', 'timeupdate'],
+      handler2 = (scope) => {
+        if (state) return;
+        ((state = true), clearTimeout(setTimeout2));
+        for (const input of config) {
+          el.removeEventListener?.(input, output);
         }
-        (_0x1acf80.removeEventListener?.('error', _0x2530ee),
-          _0x1acf80.removeEventListener?.('abort', _0x2530ee),
-          _0x2f44ca(_0x1a00d1 === true));
+        (el.removeEventListener?.('error', value2),
+          el.removeEventListener?.('abort', value2),
+          handler(scope === true));
       },
-      _0x2c3da6 = () => {
-        if (isVideoFrameReady(_0x1acf80)) _0x4dca29(true);
+      output = () => {
+        if (isVideoFrameReady(el)) handler2(true);
       },
-      _0x2530ee = () => _0x4dca29(false),
-      _0x2fde1a = setTimeout(() => _0x4dca29(isVideoFrameReady(_0x1acf80)), timeoutMs);
-    for (const _0xd81f8c of _0x3c814d) {
-      _0x1acf80.addEventListener?.(_0xd81f8c, _0x2c3da6);
+      value2 = () => handler2(false),
+      setTimeout2 = setTimeout(() => handler2(isVideoFrameReady(el)), timeoutMs);
+    for (const value3 of config) {
+      el.addEventListener?.(value3, output);
     }
-    (_0x1acf80.addEventListener?.('error', _0x2530ee), _0x1acf80.addEventListener?.('abort', _0x2530ee));
-    if (Number(_0x1acf80.readyState || 0) < 1)
+    (el.addEventListener?.('error', value2), el.addEventListener?.('abort', value2));
+    if (Number(el.readyState || 0) < 1)
       try {
-        _0x1acf80.load?.();
+        el.load?.();
       } catch {}
   });
 }
-export function captureVideoFrameDataUrl(_0x2b2206, { type: type = 'image/png', quality: _0x5d5a94 } = {}) {
-  const { canvas: _0x68c303 } = drawVideoFrameToCanvas(_0x2b2206);
-  return _0x68c303.toDataURL(type, _0x5d5a94);
+export function captureVideoFrameDataUrl(value4, { type: type = 'image/png', quality: quality } = {}) {
+  const { canvas: canvas2 } = drawVideoFrameToCanvas(value4);
+  return canvas2.toDataURL(type, quality);
 }
 export async function captureVideoFrameBlob(
-  _0x4e2707,
-  { type: type = 'image/png', quality: _0x35c2ea, crop: _0x5091a7 } = {},
+  value5,
+  { type: type = 'image/png', quality: quality2, crop: crop } = {},
 ) {
-  const { canvas: _0x14d608 } = drawVideoFrameToCanvas(_0x4e2707, _0x5091a7);
-  if (typeof _0x14d608.toBlob === 'function') {
-    const _0x471fe5 = await new Promise((_0x190030) => {
-      _0x14d608.toBlob(_0x190030, type, _0x35c2ea);
+  const { canvas: canvas3 } = drawVideoFrameToCanvas(value5, crop);
+  if (typeof canvas3.toBlob === 'function') {
+    const enabled2 = await new Promise((value6) => {
+      canvas3.toBlob(value6, type, quality2);
     });
-    if (!_0x471fe5) throw new Error('video frame blob export failed');
-    return _0x471fe5;
+    if (!enabled2) throw new Error('video frame blob export failed');
+    return enabled2;
   }
-  return dataUrlToBlob(_0x14d608.toDataURL(type, _0x35c2ea));
+  return dataUrlToBlob(canvas3.toDataURL(type, quality2));
 }
 export async function captureVideoFrameSnapshot(
-  _0x466bba,
+  value7,
   {
     type: type = 'image/png',
-    quality: _0xf017c7,
+    quality: quality3,
     fileNamePrefix: fileNamePrefix = 'video_frame',
-    crop: _0x4fd887,
+    crop: crop2,
   } = {},
 ) {
-  const _0x4c2d25 = Math.max(1, Math.trunc(Number(_0x466bba?.videoWidth) || 0)),
-    _0x317518 = Math.max(1, Math.trunc(Number(_0x466bba?.videoHeight) || 0)),
-    _0x5707d3 = extFromImageType(type),
-    _0xf37d39 = fileNamePrefix + '_' + Date.now() + '.' + _0x5707d3,
-    _0x43feb2 = await captureVideoFrameBlob(_0x466bba, {
+  const value8 = Math.max(1, Math.trunc(Number(value7?.videoWidth) || 0)),
+    value9 = Math.max(1, Math.trunc(Number(value7?.videoHeight) || 0)),
+    ext = extFromImageType(type),
+    fileName = fileNamePrefix + '_' + Date.now() + '.' + ext,
+    blob = await captureVideoFrameBlob(value7, {
       type: type,
-      quality: _0xf017c7,
-      crop: _0x4fd887,
+      quality: quality3,
+      crop: crop2,
     }),
-    _0x362cc0 = resolveNormalizedMediaCrop(_0x4fd887, _0x4c2d25, _0x317518);
+    width2 = resolveNormalizedMediaCrop(crop2, value8, value9);
   return {
-    blob: _0x43feb2,
-    width: _0x362cc0.width,
-    height: _0x362cc0.height,
-    originalWidth: _0x362cc0.width,
-    originalHeight: _0x362cc0.height,
-    type: _0x43feb2.type || type,
-    ext: _0x5707d3,
-    fileName: _0xf37d39,
+    blob: blob,
+    width: width2.width,
+    height: width2.height,
+    originalWidth: width2.width,
+    originalHeight: width2.height,
+    type: blob.type || type,
+    ext: ext,
+    fileName: fileName,
   };
 }
 export async function captureAnnotatedVideoFrameSnapshot(
-  _0x1c1944,
-  _0x1363ad,
+  value10,
+  box,
   {
     type: type = 'image/png',
-    quality: _0x405e55,
+    quality: quality4,
     fileNamePrefix: fileNamePrefix = 'video_annotation',
     strokeStyle: strokeStyle = 'CanvasText',
   } = {},
 ) {
-  const { canvas: _0x3e2513, width: _0x31f67c, height: _0x49151c } = drawVideoFrameToCanvas(_0x1c1944),
-    _0x443c4d = _0x3e2513.getContext('2d');
-  if (!_0x443c4d) throw new Error('canvas context is unavailable');
-  const _0x224b40 = Math.max(0, Number(_0x1363ad?.x) || 0),
-    _0x789b60 = Math.max(0, Number(_0x1363ad?.y) || 0),
-    _0x570a20 = Math.max(1, Number(_0x1363ad?.width) || 1),
-    _0x58067d = Math.max(1, Number(_0x1363ad?.height) || 1);
-  (_0x443c4d.save(),
-    (_0x443c4d.strokeStyle = strokeStyle),
-    (_0x443c4d.lineWidth = Math.max(3, Math.round(Math.min(_0x31f67c, _0x49151c) / 180))),
-    _0x443c4d.setLineDash([
-      Math.max(6, _0x443c4d.lineWidth * 2.5),
-      Math.max(4, _0x443c4d.lineWidth * 1.5),
-    ]),
-    _0x443c4d.strokeRect(_0x224b40, _0x789b60, _0x570a20, _0x58067d),
-    _0x443c4d.restore());
-  const _0x29a7f5 = await new Promise((_0x5e3bd7) => _0x3e2513.toBlob(_0x5e3bd7, type, _0x405e55));
-  if (!_0x29a7f5) throw new Error('annotated video frame blob export failed');
-  const _0x399206 = extFromImageType(type);
+  const { canvas: canvas4, width: width3, height: height } = drawVideoFrameToCanvas(value10),
+    ctx2 = canvas4.getContext('2d');
+  if (!ctx2) throw new Error('canvas context is unavailable');
+  const value11 = Math.max(0, Number(box?.x) || 0),
+    value12 = Math.max(0, Number(box?.y) || 0),
+    value13 = Math.max(1, Number(box?.width) || 1),
+    value14 = Math.max(1, Number(box?.height) || 1);
+  (ctx2.save(),
+    (ctx2.strokeStyle = strokeStyle),
+    (ctx2.lineWidth = Math.max(3, Math.round(Math.min(width3, height) / 180))),
+    ctx2.setLineDash([Math.max(6, ctx2.lineWidth * 2.5), Math.max(4, ctx2.lineWidth * 1.5)]),
+    ctx2.strokeRect(value11, value12, value13, value14),
+    ctx2.restore());
+  const blob2 = await new Promise((value15) => canvas4.toBlob(value15, type, quality4));
+  if (!blob2) throw new Error('annotated video frame blob export failed');
+  const ext2 = extFromImageType(type);
   return {
-    blob: _0x29a7f5,
-    width: _0x31f67c,
-    height: _0x49151c,
-    originalWidth: _0x31f67c,
-    originalHeight: _0x49151c,
-    type: _0x29a7f5.type || type,
-    ext: _0x399206,
-    fileName: fileNamePrefix + '_' + Date.now() + '.' + _0x399206,
+    blob: blob2,
+    width: width3,
+    height: height,
+    originalWidth: width3,
+    originalHeight: height,
+    type: blob2.type || type,
+    ext: ext2,
+    fileName: fileNamePrefix + '_' + Date.now() + '.' + ext2,
   };
 }
-export async function saveVideoFrameSnapshot(_0x410f02, _0x449aef) {
-  if (typeof _0x449aef !== 'function') throw new Error('saveOutputBlob is required');
-  if (!_0x410f02?.blob) throw new Error('video frame snapshot is required');
-  const _0x4e407b = String(_0x410f02.type || _0x410f02.blob.type || 'image/png'),
-    _0x29bdeb = String(_0x410f02.ext || extFromImageType(_0x4e407b)),
-    _0x1650df = String(_0x410f02.fileName || 'video_frame_' + Date.now() + '.' + _0x29bdeb),
-    _0x25019d = Math.max(1, Math.trunc(Number(_0x410f02.width || _0x410f02.originalWidth) || 0)),
-    _0x2557ba = Math.max(1, Math.trunc(Number(_0x410f02.height || _0x410f02.originalHeight) || 0)),
-    _0x551565 =
-      typeof File === 'function'
-        ? new File([_0x410f02.blob], _0x1650df, { type: _0x4e407b })
-        : _0x410f02.blob,
-    _0x36f9b2 = await _0x449aef(_0x551565, { ext: _0x29bdeb }),
-    _0x4b1a54 = pickResultLocalPath(_0x36f9b2),
-    _0x31b0a6 = String(_0x36f9b2?.url || '').trim() || localPathToUrl(_0x4b1a54);
-  if (!_0x31b0a6 || !_0x4b1a54) throw new Error('saved video frame did not return a local image path');
-  const _0x6ccf5b = normalizeLocalPath(_0x36f9b2?.originalLocalPath || _0x4b1a54),
-    _0x2c1c51 = normalizeLocalPath(_0x36f9b2?.displayLocalPath),
-    _0x2b100f = normalizeLocalPath(_0x36f9b2?.thumbLocalPath);
+export async function saveVideoFrameSnapshot(box2, handler3) {
+  if (typeof handler3 !== 'function') throw new Error('saveOutputBlob is required');
+  if (!box2?.blob) throw new Error('video frame snapshot is required');
+  const type3 = String(box2.type || box2.blob.type || 'image/png'),
+    ext3 = String(box2.ext || extFromImageType(type3)),
+    value16 = String(box2.fileName || 'video_frame_' + Date.now() + '.' + ext3),
+    value17 = Math.max(1, Math.trunc(Number(box2.width || box2.originalWidth) || 0)),
+    value18 = Math.max(1, Math.trunc(Number(box2.height || box2.originalHeight) || 0)),
+    value19 = typeof File === 'function' ? new File([box2.blob], value16, { type: type3 }) : box2.blob,
+    fileName2 = await handler3(value19, { ext: ext3 }),
+    localPath = pickResultLocalPath(fileName2),
+    src = String(fileName2?.url || '').trim() || localPathToUrl(localPath);
+  if (!src || !localPath) throw new Error('saved video frame did not return a local image path');
+  const originalLocalPath = normalizeLocalPath(fileName2?.originalLocalPath || localPath),
+    displayLocalPath = normalizeLocalPath(fileName2?.displayLocalPath),
+    thumbLocalPath = normalizeLocalPath(fileName2?.thumbLocalPath);
   return {
-    src: _0x31b0a6,
-    localPath: _0x4b1a54,
-    originalLocalPath: _0x6ccf5b,
-    displayLocalPath: _0x2c1c51,
-    thumbLocalPath: _0x2b100f,
-    originalWidth: Number(_0x36f9b2?.originalWidth || _0x25019d) || _0x25019d,
-    originalHeight: Number(_0x36f9b2?.originalHeight || _0x2557ba) || _0x2557ba,
-    fileName: _0x36f9b2?.filename || _0x1650df,
+    src: src,
+    localPath: localPath,
+    originalLocalPath: originalLocalPath,
+    displayLocalPath: displayLocalPath,
+    thumbLocalPath: thumbLocalPath,
+    originalWidth: Number(fileName2?.originalWidth || value17) || value17,
+    originalHeight: Number(fileName2?.originalHeight || value18) || value18,
+    fileName: fileName2?.filename || value16,
   };
 }
 export function createVideoFrameCapturePreviewUrl(
-  _0x31679e,
+  enabled3,
   { urlApi: urlApi = globalThis.window?.URL || globalThis.URL } = {},
 ) {
-  if (!_0x31679e || typeof urlApi?.createObjectURL !== 'function') return '';
+  if (!enabled3 || typeof urlApi?.createObjectURL !== 'function') return '';
   try {
-    return urlApi.createObjectURL(_0x31679e);
+    return urlApi.createObjectURL(enabled3);
   } catch {
     return '';
   }
 }
-export function startVideoFrameSnapshotPersistence(_0x456832, _0x3591e7, { onPreview: _0x2b205b } = {}) {
-  if (!_0x456832?.blob) throw new Error('video frame snapshot is required');
-  const _0x100cf2 = createVideoFrameCapturePreviewUrl(_0x456832.blob);
-  if (typeof _0x2b205b === 'function')
-    _0x2b205b({ previewUrl: _0x100cf2, snapshot: _0x456832 });
-  const _0xd05b32 = Promise.resolve().then(() => saveVideoFrameSnapshot(_0x456832, _0x3591e7));
-  return { previewUrl: _0x100cf2, savePromise: _0xd05b32 };
+export function startVideoFrameSnapshotPersistence(snapshot, value20, { onPreview: onPreview } = {}) {
+  if (!snapshot?.blob) throw new Error('video frame snapshot is required');
+  const previewUrl = createVideoFrameCapturePreviewUrl(snapshot.blob);
+  if (typeof onPreview === 'function') onPreview({ previewUrl: previewUrl, snapshot: snapshot });
+  const savePromise = Promise.resolve().then(() => saveVideoFrameSnapshot(snapshot, value20));
+  return { previewUrl: previewUrl, savePromise: savePromise };
 }
 export async function saveVideoFrameCapture(
-  _0x481964,
-  _0x2b2811,
-  { type: type = 'image/png', quality: _0x15712f, fileNamePrefix: fileNamePrefix = 'video_frame' } = {},
+  value21,
+  value22,
+  { type: type = 'image/png', quality: quality5, fileNamePrefix: fileNamePrefix = 'video_frame' } = {},
 ) {
-  const _0x10a451 = await captureVideoFrameSnapshot(_0x481964, {
+  const captureVideoFrameSnapshot2 = await captureVideoFrameSnapshot(value21, {
     type: type,
-    quality: _0x15712f,
+    quality: quality5,
     fileNamePrefix: fileNamePrefix,
   });
-  return saveVideoFrameSnapshot(_0x10a451, _0x2b2811);
+  return saveVideoFrameSnapshot(captureVideoFrameSnapshot2, value22);
 }
 
-export const DEFAULT_VIDEO_FRAME_CAPTURE_FPS=0x18;
+export const DEFAULT_VIDEO_FRAME_CAPTURE_FPS = 0x18;

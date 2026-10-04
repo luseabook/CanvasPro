@@ -11,222 +11,217 @@ const _VISIBLE_BACKFILL_GROUP_CONCURRENCY = 1,
   _BACKGROUND_BATCH_GAP_MS = 0x1c2,
   _PLAYBACK_IDLE_POLL_MS = 0x2ee,
   _PLAYBACK_IDLE_MAX_WAIT_MS = 0x2ee0;
-function _resolveLocalVideoPathFromUrl(_0x3a3731) {
-  return localPathToUrl(urlToLocalPath(_0x3a3731));
+function _resolveLocalVideoPathFromUrl(value) {
+  return localPathToUrl(urlToLocalPath(value));
 }
-function _resolveVideoSrcPath(_0x3b2af8, _0x57cfdf) {
-  const _0x2152c8 = localPathToUrl(_0x57cfdf?.localPath || _0x3b2af8?.localPath);
-  if (_0x2152c8) return _0x2152c8;
-  const _0x2229d2 = String(_0x57cfdf?.videoUrl || _0x3b2af8?.videoUrl || _0x3b2af8?.src || '').trim();
-  return _resolveLocalVideoPathFromUrl(_0x2229d2);
+function _resolveVideoSrcPath(item, key) {
+  const url = localPathToUrl(key?.localPath || item?.localPath);
+  if (url) return url;
+  const index = String(key?.videoUrl || item?.videoUrl || item?.src || '').trim();
+  return _resolveLocalVideoPathFromUrl(index);
 }
-function _videoSourceKey(_0x23267b) {
-  if (!_0x23267b || typeof _0x23267b !== 'object') return '';
+function _videoSourceKey(enabled) {
+  if (!enabled || typeof enabled !== 'object') return '';
   return (
-    String(_0x23267b.localPath || '').trim() ||
-    String(_0x23267b.videoUrl || '').trim() ||
-    String(_0x23267b.src || '').trim() ||
-    String(_0x23267b.thumbId || '').trim()
+    String(enabled.localPath || '').trim() ||
+    String(enabled.videoUrl || '').trim() ||
+    String(enabled.src || '').trim() ||
+    String(enabled.thumbId || '').trim()
   );
 }
-function _isUnavailableVideoRecord(_0x1a898c) {
-  const _0x26d32c = _videoSourceKey(_0x1a898c);
-  if (!_0x26d32c) return false;
+function _isUnavailableVideoRecord(result) {
+  const _videoSourceKey2 = _videoSourceKey(result);
+  if (!_videoSourceKey2) return false;
   return (
-    _0x1a898c?.mediaUnavailable === true &&
-    String(_0x1a898c?.mediaUnavailableSource || '').trim() === _0x26d32c
+    result?.mediaUnavailable === true &&
+    String(result?.mediaUnavailableSource || '').trim() === _videoSourceKey2
   );
 }
-function _isAllowedSrcPath(_0x3801d7) {
-  const _0x2985de = String(_0x3801d7 || '');
-  return _0x2985de.startsWith('/output/') || _0x2985de.startsWith('/data/');
+function _isAllowedSrcPath(data) {
+  const options = String(data || '');
+  return options.startsWith('/output/') || options.startsWith('/data/');
 }
-function _isNodeVisible(_0x24d759, _0x69bb8e) {
-  const _0x488e8d = _0x24d759 || {},
-    _0x5baf99 = _0x69bb8e || { x: 0, y: 0, zoom: 1 },
-    _0x130d64 = Number(_0x5baf99.zoom) || 1,
-    _0x3f9846 = (Number(_0x488e8d.x) || 0) * _0x130d64 + (Number(_0x5baf99.x) || 0),
-    _0x3b3c28 = (Number(_0x488e8d.y) || 0) * _0x130d64 + (Number(_0x5baf99.y) || 0),
-    _0x2f5c5f = (Number(_0x488e8d.width) || 0) * _0x130d64,
-    _0x4b9524 = (Number(_0x488e8d.height) || 0) * _0x130d64,
-    _0x57fc96 = 200,
-    _0x434d3c = window.innerWidth,
-    _0x2fd845 = window.innerHeight;
+function _isNodeVisible(target, source) {
+  const box = target || {},
+    box2 = source || { x: 0, y: 0, zoom: 1 },
+    next = Number(box2.zoom) || 1,
+    current = (Number(box.x) || 0) * next + (Number(box2.x) || 0),
+    entry = (Number(box.y) || 0) * next + (Number(box2.y) || 0),
+    record = (Number(box.width) || 0) * next,
+    payload = (Number(box.height) || 0) * next,
+    handle = 200,
+    state = window.innerWidth,
+    config = window.innerHeight;
   return (
-    _0x3f9846 + _0x2f5c5f > -_0x57fc96 &&
-    _0x3f9846 < _0x434d3c + _0x57fc96 &&
-    _0x3b3c28 + _0x4b9524 > -_0x57fc96 &&
-    _0x3b3c28 < _0x2fd845 + _0x57fc96
+    current + record > -handle &&
+    current < state + handle &&
+    entry + payload > -handle &&
+    entry < config + handle
   );
 }
-function _collectJobs(_0x438aae, _0x23683e) {
-  const _0x504b06 = _0x438aae?.nodes || {},
-    _0x31f759 = _0x438aae?.viewport || { x: 0, y: 0, zoom: 1 },
-    _0x4a4acc = [];
-  for (const _0x589c98 of Object.values(_0x504b06)) {
-    if (!_0x589c98 || typeof _0x589c98 !== 'object') continue;
-    if (_0x23683e === 'visible' && !_isNodeVisible(_0x589c98, _0x31f759)) continue;
-    const _0x2404c5 = String(_0x589c98.type || '');
-    if (_0x2404c5 === 'ai-video') {
-      const _0x2081f7 = Array.isArray(_0x589c98.videos) ? _0x589c98.videos : [];
-      if (_0x2081f7.length === 0) continue;
-      const _0x582d96 = Number(_0x589c98.mainVideoIndex),
-        _0x305fd8 = Number.isFinite(_0x582d96) ? Math.max(0, Math.trunc(_0x582d96)) : 0,
-        _0x23f27a = [];
-      if (_0x305fd8 >= 0 && _0x305fd8 < _0x2081f7.length) _0x23f27a.push(_0x305fd8);
-      for (let _0x380819 = 0; _0x380819 < _0x2081f7.length; _0x380819++)
-        if (_0x380819 !== _0x305fd8) _0x23f27a.push(_0x380819);
-      for (const _0x475039 of _0x23f27a) {
-        const _0xe2b8b = _0x2081f7[_0x475039];
-        if (!_0xe2b8b || typeof _0xe2b8b !== 'object') continue;
-        if (_isUnavailableVideoRecord(_0xe2b8b)) continue;
-        if (String(_0xe2b8b.thumbUrl || '').trim()) continue;
-        const _0x14a048 = _resolveVideoSrcPath(_0x589c98, _0xe2b8b);
-        if (!_0x14a048 || !_isAllowedSrcPath(_0x14a048)) continue;
-        _0x4a4acc.push({ nodeId: _0x589c98.id, idx: _0x475039, srcPath: _0x14a048, kind: 'ai-video' });
+function _collectJobs(scope, input) {
+  const output = scope?.nodes || {},
+    value2 = scope?.viewport || { x: 0, y: 0, zoom: 1 },
+    list = [];
+  for (const nodeId of Object.values(output)) {
+    if (!nodeId || typeof nodeId !== 'object') continue;
+    if (input === 'visible' && !_isNodeVisible(nodeId, value2)) continue;
+    const value3 = String(nodeId.type || '');
+    if (value3 === 'ai-video') {
+      const list2 = Array.isArray(nodeId.videos) ? nodeId.videos : [];
+      if (list2.length === 0) continue;
+      const value4 = Number(nodeId.mainVideoIndex),
+        count = Number.isFinite(value4) ? Math.max(0, Math.trunc(value4)) : 0,
+        list3 = [];
+      if (count >= 0 && count < list2.length) list3.push(count);
+      for (let value5 = 0; value5 < list2.length; value5++) if (value5 !== count) list3.push(value5);
+      for (const idx of list3) {
+        const enabled2 = list2[idx];
+        if (!enabled2 || typeof enabled2 !== 'object') continue;
+        if (_isUnavailableVideoRecord(enabled2)) continue;
+        if (String(enabled2.thumbUrl || '').trim()) continue;
+        const srcPath = _resolveVideoSrcPath(nodeId, enabled2);
+        if (!srcPath || !_isAllowedSrcPath(srcPath)) continue;
+        list.push({ nodeId: nodeId.id, idx: idx, srcPath: srcPath, kind: 'ai-video' });
       }
       continue;
     }
-    if (_0x2404c5 === 'source-video') {
-      if (_isUnavailableVideoRecord(_0x589c98)) continue;
-      if (String(_0x589c98.thumbUrl || '').trim()) continue;
-      const _0x5e8fab = _resolveVideoSrcPath(_0x589c98, null);
-      if (!_0x5e8fab || !_isAllowedSrcPath(_0x5e8fab)) continue;
-      _0x4a4acc.push({ nodeId: _0x589c98.id, idx: -1, srcPath: _0x5e8fab, kind: 'source-video' });
+    if (value3 === 'source-video') {
+      if (_isUnavailableVideoRecord(nodeId)) continue;
+      if (String(nodeId.thumbUrl || '').trim()) continue;
+      const srcPath2 = _resolveVideoSrcPath(nodeId, null);
+      if (!srcPath2 || !_isAllowedSrcPath(srcPath2)) continue;
+      list.push({ nodeId: nodeId.id, idx: -1, srcPath: srcPath2, kind: 'source-video' });
     }
   }
-  return _0x4a4acc;
+  return list;
 }
-function _groupJobsBySrcPath(_0x31579e) {
-  const _0x4b761e = [],
-    _0x3a3460 = new Map();
-  for (const _0x176922 of _0x31579e || []) {
-    const _0x4457ef = String(_0x176922?.srcPath || '').trim();
-    if (!_0x4457ef) continue;
-    let _0x440163 = _0x3a3460.get(_0x4457ef);
-    (!_0x440163 &&
-      ((_0x440163 = { srcPath: _0x4457ef, jobs: [] }),
-      _0x3a3460.set(_0x4457ef, _0x440163),
-      _0x4b761e.push(_0x440163)),
-      _0x440163.jobs.push(_0x176922));
+function _groupJobsBySrcPath(value6) {
+  const list4 = [],
+    map = new Map();
+  for (const value7 of value6 || []) {
+    const srcPath3 = String(value7?.srcPath || '').trim();
+    if (!srcPath3) continue;
+    let enabled3 = map.get(srcPath3);
+    (!enabled3 &&
+      ((enabled3 = { srcPath: srcPath3, jobs: [] }), map.set(srcPath3, enabled3), list4.push(enabled3)),
+      enabled3.jobs.push(value7));
   }
-  return _0x4b761e;
+  return list4;
 }
-async function _runWithConcurrency(_0x5ec0d0, _0x5cc858, _0x4b946d) {
-  const _0x1a837e = Array.isArray(_0x5ec0d0) ? _0x5ec0d0 : [],
-    _0x158415 = Math.max(1, Math.trunc(Number(_0x5cc858) || 1));
-  if (_0x1a837e.length === 0) return;
-  let _0x83dda6 = 0;
-  const _0x2446c4 = Math.min(_0x158415, _0x1a837e.length),
-    _0x18779f = Array.from({ length: _0x2446c4 }, async () => {
+async function _runWithConcurrency(value8, value9, handler) {
+  const list5 = Array.isArray(value8) ? value8 : [],
+    value10 = Math.max(1, Math.trunc(Number(value9) || 1));
+  if (list5.length === 0) return;
+  let value11 = 0;
+  const length = Math.min(value10, list5.length),
+    value12 = Array.from({ length: length }, async () => {
       while (true) {
-        const _0x1ede5b = _0x83dda6++;
-        if (_0x1ede5b >= _0x1a837e.length) return;
-        await _0x4b946d(_0x1a837e[_0x1ede5b], _0x1ede5b);
+        const value13 = value11++;
+        if (value13 >= list5.length) return;
+        await handler(list5[value13], value13);
       }
     });
-  await Promise.all(_0x18779f);
+  await Promise.all(value12);
 }
-function _delay(_0x45ad74) {
-  return new Promise((_0x5c59b4) => setTimeout(_0x5c59b4, Math.max(0, Number(_0x45ad74) || 0)));
+function _delay(value14) {
+  return new Promise((value15) => setTimeout(value15, Math.max(0, Number(value14) || 0)));
 }
 function _hasActiveMediaPlayback() {
-  const _0x16493b = typeof document !== 'undefined' ? document : null;
-  if (!_0x16493b || typeof _0x16493b.querySelectorAll !== 'function') return false;
-  const _0x663b45 = _0x16493b.querySelectorAll('video, audio') || [];
-  for (const _0x530d8f of _0x663b45) {
-    if (!_0x530d8f) continue;
-    if (_0x530d8f.paused === false && _0x530d8f.ended !== true) return true;
+  const el = typeof document !== 'undefined' ? document : null;
+  if (!el || typeof el.querySelectorAll !== 'function') return false;
+  const value16 = el.querySelectorAll('video, audio') || [];
+  for (const enabled4 of value16) {
+    if (!enabled4) continue;
+    if (enabled4.paused === false && enabled4.ended !== true) return true;
   }
   return false;
 }
-async function _waitForPlaybackIdle(_0x149512) {
-  let _0x5f4bb5 = 0;
-  while (_0x149512 === _token && _hasActiveMediaPlayback()) {
-    if (_0x5f4bb5 >= _PLAYBACK_IDLE_MAX_WAIT_MS) return false;
-    (await _delay(_PLAYBACK_IDLE_POLL_MS), (_0x5f4bb5 += _PLAYBACK_IDLE_POLL_MS));
+async function _waitForPlaybackIdle(value17) {
+  let value18 = 0;
+  while (value17 === _token && _hasActiveMediaPlayback()) {
+    if (value18 >= _PLAYBACK_IDLE_MAX_WAIT_MS) return false;
+    (await _delay(_PLAYBACK_IDLE_POLL_MS), (value18 += _PLAYBACK_IDLE_POLL_MS));
   }
-  return _0x149512 === _token;
+  return value17 === _token;
 }
-async function _fetchThumbUrl(_0x230b9a, _0x6eed5b, _0xfb3f43 = {}) {
-  if (_0x6eed5b !== _token) return '';
-  const _0x5e9486 = String(_0x230b9a || '').trim();
-  if (!_0x5e9486) return '';
-  let _0x5b75af = null;
+async function _fetchThumbUrl(value19, value20, value21 = {}) {
+  if (value20 !== _token) return '';
+  const enabled5 = String(value19 || '').trim();
+  if (!enabled5) return '';
+  let response = null;
   try {
-    _0x5b75af = await fetchVideoFirstFrameThumbFromServer(_0x5e9486, _0xfb3f43);
+    response = await fetchVideoFirstFrameThumbFromServer(enabled5, value21);
   } catch {
-    _0x5b75af = null;
+    response = null;
   }
-  if (_0x6eed5b !== _token) return '';
-  return String(_0x5b75af?.url || '').trim();
+  if (value20 !== _token) return '';
+  return String(response?.url || '').trim();
 }
-async function _applyJob(_0x3fe9be, _0x2024ac, _0x5461cf, _0x25ba5d) {
-  if (_0x25ba5d !== _token) return false;
-  const _0x205f9c = String(_0x3fe9be?.nodeId || '');
-  if (!_0x205f9c) return false;
-  const _0x1d83fa = String(_0x2024ac || _0x3fe9be?.srcPath || '').trim(),
-    _0x5a7700 = String(_0x5461cf || '').trim();
-  if (!_0x1d83fa || !_0x5a7700) return false;
-  const _0x5a9a9c = appStore.getStateRaw(),
-    _0x1f12f0 = _0x5a9a9c.nodes?.[_0x205f9c];
-  if (!_0x1f12f0) return false;
-  if (_0x3fe9be.kind === 'source-video') {
-    if (String(_0x1f12f0.thumbUrl || '').trim()) return false;
-    return (appStore.updateNodeData(_0x205f9c, { videoThumbSrc: _0x1d83fa, thumbUrl: _0x5a7700 }), true);
+async function _applyJob(value22, value23, value24, value25) {
+  if (value25 !== _token) return false;
+  const enabled6 = String(value22?.nodeId || '');
+  if (!enabled6) return false;
+  const videoThumbSrc = String(value23 || value22?.srcPath || '').trim(),
+    thumbUrl = String(value24 || '').trim();
+  if (!videoThumbSrc || !thumbUrl) return false;
+  const value26 = appStore.getStateRaw(),
+    enabled7 = value26.nodes?.[enabled6];
+  if (!enabled7) return false;
+  if (value22.kind === 'source-video') {
+    if (String(enabled7.thumbUrl || '').trim()) return false;
+    return (appStore.updateNodeData(enabled6, { videoThumbSrc: videoThumbSrc, thumbUrl: thumbUrl }), true);
   }
-  if (_0x3fe9be.kind === 'ai-video') {
-    const _0x4f3918 = Array.isArray(_0x1f12f0.videos) ? _0x1f12f0.videos : [],
-      _0x5c8f70 = Number(_0x3fe9be.idx);
-    if (!(_0x5c8f70 >= 0 && _0x5c8f70 < _0x4f3918.length)) return false;
-    const _0x5741ec = _0x4f3918[_0x5c8f70];
-    if (!_0x5741ec || typeof _0x5741ec !== 'object') return false;
-    if (String(_0x5741ec.thumbUrl || '').trim()) return false;
-    const _0x27273e = { ..._0x5741ec, thumbUrl: _0x5a7700 },
-      _0x9cff59 = _0x4f3918.slice();
-    _0x9cff59[_0x5c8f70] = _0x27273e;
-    const _0x5de0fc = { videos: _0x9cff59 },
-      _0x4288d5 = Number(_0x1f12f0.mainVideoIndex),
-      _0x546e08 = Number.isFinite(_0x4288d5) ? Math.max(0, Math.trunc(_0x4288d5)) : 0;
-    if (_0x5c8f70 === _0x546e08 && !String(_0x1f12f0.thumbUrl || '').trim()) _0x5de0fc.thumbUrl = _0x5a7700;
-    return (appStore.updateNodeData(_0x205f9c, _0x5de0fc), true);
+  if (value22.kind === 'ai-video') {
+    const list6 = Array.isArray(enabled7.videos) ? enabled7.videos : [],
+      count2 = Number(value22.idx);
+    if (!(count2 >= 0 && count2 < list6.length)) return false;
+    const args = list6[count2];
+    if (!args || typeof args !== 'object') return false;
+    if (String(args.thumbUrl || '').trim()) return false;
+    const value27 = { ...args, thumbUrl: thumbUrl },
+      videos = list6.slice();
+    videos[count2] = value27;
+    const value28 = { videos: videos },
+      value29 = Number(enabled7.mainVideoIndex),
+      value30 = Number.isFinite(value29) ? Math.max(0, Math.trunc(value29)) : 0;
+    if (count2 === value30 && !String(enabled7.thumbUrl || '').trim()) value28.thumbUrl = thumbUrl;
+    return (appStore.updateNodeData(enabled6, value28), true);
   }
   return false;
 }
-async function _runPass(_0x4e1966, _0x1df784) {
-  if (_0x1df784 !== _token) return;
-  const _0x5e687f = appStore.getStateRaw(),
-    _0x49c640 = _collectJobs(_0x5e687f, _0x4e1966),
-    _0xbe09b2 = _groupJobsBySrcPath(_0x49c640),
-    _0x274938 =
-      _0x4e1966 === 'visible' ? _VISIBLE_BACKFILL_GROUP_CONCURRENCY : _BACKGROUND_BACKFILL_GROUP_CONCURRENCY,
-    _0x3e658e = _0x4e1966 === 'visible' ? _0xbe09b2.length || 1 : _BACKGROUND_BATCH_SIZE;
-  for (let _0x48a069 = 0; _0x48a069 < _0xbe09b2.length; _0x48a069 += _0x3e658e) {
-    if (_0x1df784 !== _token) return;
-    if (_0x4e1966 !== 'visible' && !(await _waitForPlaybackIdle(_0x1df784))) return;
-    const _0x202197 = _0xbe09b2.slice(_0x48a069, _0x48a069 + _0x3e658e);
-    (await _runWithConcurrency(_0x202197, _0x274938, async (_0x3d43df) => {
-      if (_0x1df784 !== _token) return;
-      const _0x594f2f = Array.isArray(_0x3d43df.jobs) ? _0x3d43df.jobs[0] : null,
-        _0x56f0c8 = await _fetchThumbUrl(_0x3d43df.srcPath, _0x1df784, {
-          nodeId: String(_0x594f2f?.nodeId || ''),
-          assetId: String(_0x594f2f?.idx ?? ''),
+async function _runPass(value31, value32) {
+  if (value32 !== _token) return;
+  const value33 = appStore.getStateRaw(),
+    _collectJobs2 = _collectJobs(value33, value31),
+    list7 = _groupJobsBySrcPath(_collectJobs2),
+    value34 =
+      value31 === 'visible' ? _VISIBLE_BACKFILL_GROUP_CONCURRENCY : _BACKGROUND_BACKFILL_GROUP_CONCURRENCY,
+    value35 = value31 === 'visible' ? list7.length || 1 : _BACKGROUND_BATCH_SIZE;
+  for (let value36 = 0; value36 < list7.length; value36 += value35) {
+    if (value32 !== _token) return;
+    if (value31 !== 'visible' && !(await _waitForPlaybackIdle(value32))) return;
+    const value37 = list7.slice(value36, value36 + value35);
+    (await _runWithConcurrency(value37, value34, async (value38) => {
+      if (value32 !== _token) return;
+      const value39 = Array.isArray(value38.jobs) ? value38.jobs[0] : null,
+        _fetchThumbUrl2 = await _fetchThumbUrl(value38.srcPath, value32, {
+          nodeId: String(value39?.nodeId || ''),
+          assetId: String(value39?.idx ?? ''),
         });
-      if (_0x1df784 !== _token || !_0x56f0c8) return;
-      for (const _0x4eb589 of _0x3d43df.jobs) {
-        if (_0x1df784 !== _token) return;
-        await _applyJob(_0x4eb589, _0x3d43df.srcPath, _0x56f0c8, _0x1df784);
+      if (value32 !== _token || !_fetchThumbUrl2) return;
+      for (const value40 of value38.jobs) {
+        if (value32 !== _token) return;
+        await _applyJob(value40, value38.srcPath, _fetchThumbUrl2, value32);
       }
       await _delay(0);
     }),
-      _0x4e1966 !== 'visible' &&
-        _0x48a069 + _0x3e658e < _0xbe09b2.length &&
-        (await _delay(_BACKGROUND_BATCH_GAP_MS)));
+      value31 !== 'visible' && value36 + value35 < list7.length && (await _delay(_BACKGROUND_BATCH_GAP_MS)));
   }
 }
 export function startVideoThumbBackfill() {
   _token++;
-  const _0x1319a1 = _token;
+  const value41 = _token;
   if (_scheduled) {
     _rerunRequested = true;
     return;
@@ -234,21 +229,21 @@ export function startVideoThumbBackfill() {
   ((_scheduled = true),
     setTimeout(async () => {
       try {
-        await _runPass('visible', _0x1319a1);
-        if (_0x1319a1 !== _token) return;
+        await _runPass('visible', value41);
+        if (value41 !== _token) return;
         await _delay(_BACKGROUND_BACKFILL_DELAY_MS);
-        if (_0x1319a1 !== _token) return;
-        await _runPass('all', _0x1319a1);
+        if (value41 !== _token) return;
+        await _runPass('all', value41);
       } finally {
         ((_scheduled = false), _rerunRequested && ((_rerunRequested = false), startVideoThumbBackfill()));
       }
     }, 60));
 }
-export function __groupBackfillJobsBySrcPathForTest(_0xdd7879) {
-  return _groupJobsBySrcPath(_0xdd7879);
+export function __groupBackfillJobsBySrcPathForTest(value42) {
+  return _groupJobsBySrcPath(value42);
 }
-export async function __runWithConcurrencyForTest(_0x327bdd, _0x36f8ef, _0x50b014) {
-  return _runWithConcurrency(_0x327bdd, _0x36f8ef, _0x50b014);
+export async function __runWithConcurrencyForTest(value43, value44, value45) {
+  return _runWithConcurrency(value43, value44, value45);
 }
 export function __hasActiveMediaPlaybackForTest() {
   return _hasActiveMediaPlayback();

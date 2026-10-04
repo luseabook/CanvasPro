@@ -9,176 +9,164 @@ const PENDING = /^aic-(pending|failed):([\w-]+)$/,
     'originalWidth',
     'originalHeight',
   ];
-function walk(_0x171391, _0x5a67b4, _0x1246c0 = []) {
-  if (typeof _0x171391 === 'string') return _0x5a67b4(_0x171391, _0x1246c0);
-  if (Array['isArray'](_0x171391))
-    return _0x171391['map']((_0x19b366, _0x5afd91) => walk(_0x19b366, _0x5a67b4, [..._0x1246c0, _0x5afd91]));
-  if (_0x171391 && typeof _0x171391 === 'object')
+function walk(list, handler, args = []) {
+  if (typeof list === 'string') return handler(list, args);
+  if (Array['isArray'](list)) return list['map']((value, item) => walk(value, handler, [...args, item]));
+  if (list && typeof list === 'object')
     return Object['fromEntries'](
-      Object['entries'](_0x171391)['map'](([_0x52c9ab, _0xd63173]) => [
-        _0x52c9ab,
-        walk(_0xd63173, _0x5a67b4, [..._0x1246c0, _0x52c9ab]),
-      ]),
+      Object['entries'](list)['map'](([key, index]) => [key, walk(index, handler, [...args, key])]),
     );
-  return _0x171391;
+  return list;
 }
 export function createCollaborationMediaQueue({
   onChange: onChange = () => {},
   onPreview: onPreview = () => {},
-  readGraph: _0x3c44e0,
-  ..._0x56d221
+  readGraph: readGraph,
+  ...args2
 }) {
-  const _0x3b7525 = createCollaborationMedia(_0x56d221),
-    _0x206e3d = new Map(),
-    _0x5477b0 = new Map(),
-    _0x4c00cb = [],
-    _0x251144 = new Set();
-  let _0x2a0266 = ![],
-    _0x2ac1b9 = null,
-    _0x344357 = 0x0,
-    _0x3a1911 = null,
-    _0x1e3b9b = null,
-    _0x537a6a = null,
-    _0x4aa5db = null,
-    _0x399cca = [];
-  const _0x52774b = (_0x7eb7f0) =>
-      Number['isFinite'](_0x7eb7f0['_nodesRev'])
-        ? _0x7eb7f0['_nodesRev'] + ':' + _0x7eb7f0['_edgesRev'] + ':' + _0x344357
+  const collaborationMedia = createCollaborationMedia(args2),
+    map = new Map(),
+    map2 = new Map(),
+    list2 = [],
+    map3 = new Set();
+  let enabled = ![],
+    setTimeout2 = null,
+    result = 0x0,
+    value2 = null,
+    value3 = null,
+    args3 = null,
+    value4 = null,
+    args4 = [];
+  const run = (data) =>
+      Number['isFinite'](data['_nodesRev'])
+        ? data['_nodesRev'] + ':' + data['_edgesRev'] + ':' + result
         : null,
-    _0x3d9ba9 = () => !_0x2a0266 && !_0x56d221['signal']?.['aborted'];
-  function _0xb68fbc(_0xb0385d) {
-    const _0x3b297a = normalizeCollaborationMediaSource(_0xb0385d);
-    if (!_0x206e3d['has'](_0x3b297a)) {
-      const _0x5cfea7 = { source: _0x3b297a, token: crypto['randomUUID'](), phase: 'queued', ref: null };
-      (_0x206e3d['set'](_0x3b297a, _0x5cfea7), _0x5477b0['set'](_0x5cfea7['token'], _0x5cfea7));
+    handler2 = () => !enabled && !args2['signal']?.['aborted'];
+  function run2(options) {
+    const source = normalizeCollaborationMediaSource(options);
+    if (!map['has'](source)) {
+      const target = { source: source, token: crypto['randomUUID'](), phase: 'queued', ref: null };
+      (map['set'](source, target), map2['set'](target['token'], target));
     }
-    return _0x206e3d['get'](_0x3b297a);
+    return map['get'](source);
   }
-  function _0x492b58(_0x5219f8) {
-    const _0x4e7b8b = _0x5219f8['_collaborationPendingMedia'] || [];
-    if (!_0x4e7b8b['length']) return _0x5219f8;
-    return walk(_0x5219f8, (_0x1e2fb0, _0x9c728c) => {
-      if (_0x1e2fb0 !== '') return _0x1e2fb0;
+  function node(next) {
+    const list3 = next['_collaborationPendingMedia'] || [];
+    if (!list3['length']) return next;
+    return walk(next, (current, entry) => {
+      if (current !== '') return current;
       return (
-        _0x4e7b8b['find'](
-          (_0x4cee9b) => JSON['stringify'](_0x4cee9b['path']) === JSON['stringify'](_0x9c728c),
-        )?.['value'] || _0x1e2fb0
+        list3['find']((record) => JSON['stringify'](record['path']) === JSON['stringify'](entry))?.[
+          'value'
+        ] || current
       );
     });
   }
-  function _0x521a8c(_0x3682a1) {
-    const _0x184dac = _0x52774b(_0x3682a1);
-    if (_0x184dac !== null && _0x184dac === _0x1e3b9b)
-      return { nodes: { ..._0x537a6a['nodes'] }, edges: { ..._0x537a6a['edges'] } };
-    const _0x5360e0 = Object['fromEntries'](
-        Object['entries'](_0x3682a1['nodes'] || {})['map'](([_0x282e99, _0x71cb5e]) => [
-          _0x282e99,
-          _0x492b58(_0x71cb5e),
-        ]),
+  function project(edges) {
+    const payload = run(edges);
+    if (payload !== null && payload === value3)
+      return { nodes: { ...args3['nodes'] }, edges: { ...args3['edges'] } };
+    const nodes = Object['fromEntries'](
+        Object['entries'](edges['nodes'] || {})['map'](([handle, state]) => [handle, node(state)]),
       ),
-      _0x4d25f9 = projectGraph({ nodes: _0x5360e0, edges: _0x3682a1['edges'] || {} }, (_0x263607) => {
-        const _0x372a0d = _0x3b7525['resolveSource'](_0x263607);
-        if (_0x372a0d !== _0x263607) return _0x372a0d;
-        const _0x333e3b = _0xb68fbc(_0x263607);
+      projectGraph2 = projectGraph({ nodes: nodes, edges: edges['edges'] || {} }, (config) => {
+        const scope = collaborationMedia['resolveSource'](config);
+        if (scope !== config) return scope;
+        const input = run2(config);
         return (
-          _0x333e3b['ref'] ||
-          'aic-' + (_0x333e3b['phase'] === 'failed' ? 'failed' : 'pending') + ':' + _0x333e3b['token']
+          input['ref'] || 'aic-' + (input['phase'] === 'failed' ? 'failed' : 'pending') + ':' + input['token']
         );
       }),
-      _0x1c5f2b = _0x54fc54(_0x4d25f9);
+      args5 = resolveWire(projectGraph2);
     return (
-      _0x184dac !== null && ((_0x1e3b9b = _0x184dac), (_0x537a6a = _0x1c5f2b)),
-      { nodes: { ..._0x1c5f2b['nodes'] }, edges: { ..._0x1c5f2b['edges'] } }
+      payload !== null && ((value3 = payload), (args3 = args5)),
+      { nodes: { ...args5['nodes'] }, edges: { ...args5['edges'] } }
     );
   }
-  function _0x54fc54(_0x281553) {
-    return walk(_0x281553, (_0x13849d) => {
-      const _0x107c46 = _0x13849d['match'](PENDING),
-        _0x2c400c = _0x107c46 && _0x5477b0['get'](_0x107c46[0x2]);
-      return _0x2c400c
-        ? _0x2c400c['ref'] ||
-            'aic-' + (_0x2c400c['phase'] === 'failed' ? 'failed' : 'pending') + ':' + _0x2c400c['token']
-        : _0x13849d;
+  function resolveWire(output) {
+    return walk(output, (value5) => {
+      const value6 = value5['match'](PENDING),
+        value7 = value6 && map2['get'](value6[0x2]);
+      return value7
+        ? value7['ref'] ||
+            'aic-' + (value7['phase'] === 'failed' ? 'failed' : 'pending') + ':' + value7['token']
+        : value5;
     });
   }
-  function _0x29530a(_0x3b4953) {
-    const _0x2fd7b3 = new Set();
+  function run3(value8) {
+    const args6 = new Set();
     return (
-      projectGraph({ nodes: { node: _0x492b58(_0x3b4953) }, edges: {} }, (_0xa85e84) => {
-        if (_0x3b7525['resolveSource'](_0xa85e84) === _0xa85e84)
-          _0x2fd7b3['add'](normalizeCollaborationMediaSource(_0xa85e84));
-        return _0xa85e84;
+      projectGraph({ nodes: { node: node(value8) }, edges: {} }, (value9) => {
+        if (collaborationMedia['resolveSource'](value9) === value9)
+          args6['add'](normalizeCollaborationMediaSource(value9));
+        return value9;
       }),
-      [..._0x2fd7b3]
+      [...args6]
     );
   }
-  function _0x5f1199(_0x437ada) {
-    if (Number['isFinite'](_0x437ada['_nodesRev']) && _0x437ada['_nodesRev'] === _0x3a1911)
-      return _0x521a8c(_0x437ada);
-    ((_0x3a1911 = Number['isFinite'](_0x437ada['_nodesRev']) ? _0x437ada['_nodesRev'] : null),
-      _0x521a8c(_0x437ada));
-    for (const [_0x748811, _0x341d32] of Object['entries'](_0x437ada['nodes'] || {})) {
-      const _0x473f86 = _0x29530a(_0x341d32)
-        ['map'](_0xb68fbc)
-        ['filter']((_0x24ef5e) => _0x24ef5e['phase'] === 'queued');
-      if (!_0x473f86['length']) continue;
-      for (const _0x4327d6 of _0x473f86) _0x4327d6['phase'] = 'waiting';
-      _0x4c00cb['push']({ id: _0x748811, node: structuredClone(_0x341d32), needed: _0x473f86 });
+  function prepare(state2) {
+    if (Number['isFinite'](state2['_nodesRev']) && state2['_nodesRev'] === value2) return project(state2);
+    ((value2 = Number['isFinite'](state2['_nodesRev']) ? state2['_nodesRev'] : null), project(state2));
+    for (const [id, value10] of Object['entries'](state2['nodes'] || {})) {
+      const needed = run3(value10)
+        ['map'](run2)
+        ['filter']((value11) => value11['phase'] === 'queued');
+      if (!needed['length']) continue;
+      for (const value12 of needed) value12['phase'] = 'waiting';
+      list2['push']({ id: id, node: structuredClone(value10), needed: needed });
     }
-    return (_0x59cd57(), _0x521a8c(_0x437ada));
+    return (run4(), project(state2));
   }
-  function _0x59cd57() {
-    while (_0x3d9ba9() && _0x251144['size'] < 0x1 && _0x4c00cb['length']) {
-      const _0xe906b2 = _0x4c00cb['shift']();
-      (_0x251144['add'](_0xe906b2),
+  function run4() {
+    while (handler2() && map3['size'] < 0x1 && list2['length']) {
+      const enabled2 = list2['shift']();
+      (map3['add'](enabled2),
         void (async () => {
           try {
-            const _0x51146a = _0x3c44e0?.()['nodes'][_0xe906b2['id']];
+            const enabled3 = readGraph?.()['nodes'][enabled2['id']];
             if (
-              _0x3c44e0 &&
-              (!_0x51146a ||
-                !_0xe906b2['needed']['some']((_0x2effdc) =>
-                  _0x29530a(_0x51146a)['includes'](_0x2effdc['source']),
-                ))
+              readGraph &&
+              (!enabled3 ||
+                !enabled2['needed']['some']((value13) => run3(enabled3)['includes'](value13['source'])))
             ) {
-              for (const _0x3604e7 of _0xe906b2['needed']) _0x3604e7['phase'] = 'queued';
-              _0x3a1911 = null;
+              for (const value14 of enabled2['needed']) value14['phase'] = 'queued';
+              value2 = null;
               return;
             }
-            for (const _0x55e854 of _0xe906b2['needed']) _0x55e854['phase'] = 'preparing';
-            const _0x4ed2ba = await _0x3b7525['prepare']({
-              nodes: { [_0xe906b2['id']]: _0xe906b2['node'] },
+            for (const value15 of enabled2['needed']) value15['phase'] = 'preparing';
+            const value16 = await collaborationMedia['prepare']({
+              nodes: { [enabled2['id']]: enabled2['node'] },
               edges: {},
             });
-            if (!_0x3d9ba9()) return;
-            for (const _0x4ffb78 of _0xe906b2['needed']) {
-              ((_0x4ffb78['ref'] = _0x3b7525['project']({ nodes: { source: { src: _0x4ffb78['source'] } } })[
+            if (!handler2()) return;
+            for (const src of enabled2['needed']) {
+              ((src['ref'] = collaborationMedia['project']({ nodes: { source: { src: src['source'] } } })[
                 'nodes'
               ]['source']['src']),
-                (_0x4ffb78['phase'] = 'ready'));
+                (src['phase'] = 'ready'));
             }
-            const _0x6f2527 = await _0x3b7525['materialize'](_0x4ed2ba);
-            if (!_0x3d9ba9()) return;
-            const _0x24f6e2 = Object['fromEntries'](
+            const state3 = await collaborationMedia['materialize'](value16);
+            if (!handler2()) return;
+            const value17 = Object['fromEntries'](
               PREVIEW_FIELDS['filter'](
-                (_0x221e9d) =>
-                  _0x6f2527['nodes'][_0xe906b2['id']][_0x221e9d] !== undefined &&
-                  _0x6f2527['nodes'][_0xe906b2['id']][_0x221e9d] !== _0xe906b2['node'][_0x221e9d],
-              )['map']((_0x314c0a) => [_0x314c0a, _0x6f2527['nodes'][_0xe906b2['id']][_0x314c0a]]),
+                (value18) =>
+                  state3['nodes'][enabled2['id']][value18] !== undefined &&
+                  state3['nodes'][enabled2['id']][value18] !== enabled2['node'][value18],
+              )['map']((value19) => [value19, state3['nodes'][enabled2['id']][value19]]),
             );
-            if (Object['keys'](_0x24f6e2)['length']) onPreview(_0xe906b2['id'], _0xe906b2['node'], _0x24f6e2);
-          } catch (_0x897044) {
-            if (!_0x3d9ba9()) return;
-            for (const _0x2f4d7a of _0xe906b2['needed']) {
-              ((_0x2f4d7a['phase'] = 'failed'), (_0x2f4d7a['message'] = _0x897044['message']));
+            if (Object['keys'](value17)['length']) onPreview(enabled2['id'], enabled2['node'], value17);
+          } catch (error) {
+            if (!handler2()) return;
+            for (const error2 of enabled2['needed']) {
+              ((error2['phase'] = 'failed'), (error2['message'] = error['message']));
             }
           } finally {
-            _0x251144['delete'](_0xe906b2);
-            if (_0x3d9ba9()) {
-              (_0x344357++, onChange());
-              if (_0x4c00cb['length'] && !_0x2ac1b9)
-                _0x2ac1b9 = setTimeout(() => {
-                  ((_0x2ac1b9 = null), _0x59cd57());
+            map3['delete'](enabled2);
+            if (handler2()) {
+              (result++, onChange());
+              if (list2['length'] && !setTimeout2)
+                setTimeout2 = setTimeout(() => {
+                  ((setTimeout2 = null), run4());
                 }, 0x0);
             }
           }
@@ -186,110 +174,107 @@ export function createCollaborationMediaQueue({
     }
   }
   return {
-    project: _0x521a8c,
-    resolveWire: _0x54fc54,
-    snapshotBindings: (_0x49dbc0) => _0x3b7525['snapshotBindings'](_0x49dbc0),
-    restoreBindings(_0x444e48) {
-      (_0x3b7525['restoreBindings'](_0x444e48), (_0x1e3b9b = null), (_0x4aa5db = null), (_0x3a1911 = null));
+    project: project,
+    resolveWire: resolveWire,
+    snapshotBindings: (value20) => collaborationMedia['snapshotBindings'](value20),
+    restoreBindings(value21) {
+      (collaborationMedia['restoreBindings'](value21), (value3 = null), (value4 = null), (value2 = null));
     },
-    afterEdit({ name: _0x5343cb, args: _0x4e697a }, _0x2addf0, _0x3322b9) {
-      const _0x244cb5 =
-        _0x5343cb === 'updateNodeData'
-          ? { [_0x4e697a[0x0]]: _0x4e697a[0x1] }
-          : _0x5343cb === 'updateNodesData'
-            ? _0x4e697a[0x0]
+    afterEdit({ name: name, args: args7 }, state4, handler3) {
+      const value22 =
+        name === 'updateNodeData'
+          ? { [args7[0x0]]: args7[0x1] }
+          : name === 'updateNodesData'
+            ? args7[0x0]
             : {};
-      for (const [_0x13dd64, _0x3a7d0c] of Object['entries'](_0x244cb5 || {})) {
-        const _0x206aa3 = _0x2addf0['nodes'][_0x13dd64]?.['_collaborationPendingMedia'];
-        if (!_0x206aa3 || !_0x3a7d0c || _0x3a7d0c['_collaborationPendingMedia']) continue;
-        const _0x52f3d9 = _0x206aa3['filter'](
-          (_0x4550e2) => !Object['hasOwn'](_0x3a7d0c, _0x4550e2['path'][0x0]),
-        );
-        if (_0x52f3d9['length'] !== _0x206aa3['length']) _0x3322b9(_0x13dd64, _0x52f3d9);
+      for (const [value23, enabled4] of Object['entries'](value22 || {})) {
+        const list4 = state4['nodes'][value23]?.['_collaborationPendingMedia'];
+        if (!list4 || !enabled4 || enabled4['_collaborationPendingMedia']) continue;
+        const list5 = list4['filter']((value24) => !Object['hasOwn'](enabled4, value24['path'][0x0]));
+        if (list5['length'] !== list4['length']) handler3(value23, list5);
       }
     },
-    prepare: _0x5f1199,
-    async materialize(_0x515cb7) {
-      const _0x7a32ec = await _0x3b7525['materialize'](_0x54fc54(_0x515cb7));
-      for (const _0x1779c8 of Object['values'](_0x7a32ec['nodes'] || {})) {
-        const _0x17aa36 = [],
-          _0x292a16 = walk(_0x1779c8, (_0x3b9e83, _0x1fb165) => {
-            const _0x193f81 = _0x3b9e83['match'](PENDING);
-            if (!_0x193f81) return _0x3b9e83;
-            const _0x1f384d = _0x5477b0['get'](_0x193f81[0x2]);
-            return (_0x17aa36['push']({ path: _0x1fb165, value: _0x3b9e83 }), _0x1f384d?.['source'] || '');
+    prepare: prepare,
+    async materialize(value25) {
+      const state5 = await collaborationMedia['materialize'](resolveWire(value25));
+      for (const value26 of Object['values'](state5['nodes'] || {})) {
+        const list6 = [],
+          walk2 = walk(value26, (value27, path) => {
+            const enabled5 = value27['match'](PENDING);
+            if (!enabled5) return value27;
+            const value28 = map2['get'](enabled5[0x2]);
+            return (list6['push']({ path: path, value: value27 }), value28?.['source'] || '');
           });
-        Object['assign'](_0x1779c8, _0x292a16);
-        if (_0x17aa36['length']) _0x1779c8['_collaborationPendingMedia'] = _0x17aa36;
+        Object['assign'](value26, walk2);
+        if (list6['length']) value26['_collaborationPendingMedia'] = list6;
       }
-      return _0x7a32ec;
+      return state5;
     },
-    states(_0x151a60) {
-      const _0x32f854 = _0x52774b(_0x151a60);
-      if (_0x32f854 !== null && _0x32f854 === _0x4aa5db) return [..._0x399cca];
-      const _0x13bff5 = [];
-      for (const [_0x56b04c, _0x2b7260] of Object['entries'](_0x521a8c(_0x151a60)['nodes'])) {
-        let _0x369b25 = ![],
-          _0x106d59 = ![],
-          _0x27f8e1 = ![],
-          _0x2b6bb7 = ![],
-          _0x101306 = '';
-        walk(_0x2b7260, (_0x35e10c) => {
-          const _0x1ca66d = _0x35e10c['match'](PENDING);
-          if (_0x1ca66d) {
-            ((_0x369b25 = !![]),
-              (_0x106d59 ||= _0x1ca66d[0x1] === 'failed'),
-              (_0x2b6bb7 ||= _0x5477b0['has'](_0x1ca66d[0x2])),
-              (_0x27f8e1 ||= _0x5477b0['has'](_0x1ca66d[0x2]) && _0x1ca66d[0x1] === 'failed'));
-            if (_0x1ca66d[0x1] === 'failed')
-              _0x101306 ||= _0x5477b0['get'](_0x1ca66d[0x2])?.['message'] || '';
+    states(value29) {
+      const value30 = run(value29);
+      if (value30 !== null && value30 === value4) return [...args4];
+      const list7 = [];
+      for (const [id2, value31] of Object['entries'](project(value29)['nodes'])) {
+        let value32 = ![],
+          failed = ![],
+          retry2 = ![],
+          owned = ![],
+          message = '';
+        walk(value31, (value33) => {
+          const value34 = value33['match'](PENDING);
+          if (value34) {
+            ((value32 = !![]),
+              (failed ||= value34[0x1] === 'failed'),
+              (owned ||= map2['has'](value34[0x2])),
+              (retry2 ||= map2['has'](value34[0x2]) && value34[0x1] === 'failed'));
+            if (value34[0x1] === 'failed') message ||= map2['get'](value34[0x2])?.['message'] || '';
           }
-          return _0x35e10c;
+          return value33;
         });
-        if (_0x369b25)
-          _0x13bff5['push']({
-            id: _0x56b04c,
-            failed: _0x106d59,
-            retry: _0x27f8e1,
-            owned: _0x2b6bb7,
-            ...(_0x101306 ? { message: _0x101306 } : {}),
+        if (value32)
+          list7['push']({
+            id: id2,
+            failed: failed,
+            retry: retry2,
+            owned: owned,
+            ...(message ? { message: message } : {}),
           });
       }
-      return (_0x32f854 !== null && ((_0x4aa5db = _0x32f854), (_0x399cca = _0x13bff5)), [..._0x13bff5]);
+      return (value30 !== null && ((value4 = value30), (args4 = list7)), [...list7]);
     },
-    retry(_0x5661ca, _0x215f3c) {
-      const _0x56fc1d = _0x215f3c['nodes'][_0x5661ca];
-      if (!_0x56fc1d) return;
-      for (const _0x2336ba of _0x29530a(_0x56fc1d)) {
-        const _0xd38920 = _0xb68fbc(_0x2336ba);
-        if (_0xd38920['phase'] === 'failed') _0xd38920['phase'] = 'queued';
+    retry(value35, state6) {
+      const enabled6 = state6['nodes'][value35];
+      if (!enabled6) return;
+      for (const value36 of run3(enabled6)) {
+        const value37 = run2(value36);
+        if (value37['phase'] === 'failed') value37['phase'] = 'queued';
       }
-      (_0x344357++, (_0x3a1911 = null), _0x5f1199(_0x215f3c), onChange());
+      (result++, (value2 = null), prepare(state6), onChange());
     },
     snapshot() {
-      return [..._0x206e3d['values']()]['map'](({ source: _0x38ed54, token: _0x1461a5, ref: _0x1ea93b }) => ({
-        source: _0x38ed54,
-        token: _0x1461a5,
-        ref: _0x1ea93b,
+      return [...map['values']()]['map'](({ source: source2, token: token, ref: ref }) => ({
+        source: source2,
+        token: token,
+        ref: ref,
       }));
     },
-    restore(_0x41a433) {
-      (_0x344357++, (_0x3a1911 = null));
-      for (const _0x209571 of _0x41a433 || []) {
-        if (typeof _0x209571['source'] !== 'string' || !/^[\w-]+$/['test'](_0x209571['token'])) continue;
-        const _0xe7d87 = { ..._0x209571, phase: 'queued' };
-        (_0x206e3d['set'](_0x209571['source'], _0xe7d87), _0x5477b0['set'](_0x209571['token'], _0xe7d87));
+    restore(value38) {
+      (result++, (value2 = null));
+      for (const args8 of value38 || []) {
+        if (typeof args8['source'] !== 'string' || !/^[\w-]+$/['test'](args8['token'])) continue;
+        const value39 = { ...args8, phase: 'queued' };
+        (map['set'](args8['source'], value39), map2['set'](args8['token'], value39));
       }
     },
     dispose() {
-      ((_0x2a0266 = !![]),
-        clearTimeout(_0x2ac1b9),
-        (_0x4c00cb['length'] = 0x0),
-        (_0x537a6a = null),
-        (_0x399cca = []),
-        _0x3b7525['dispose'](),
-        _0x206e3d['clear'](),
-        _0x5477b0['clear']());
+      ((enabled = !![]),
+        clearTimeout(setTimeout2),
+        (list2['length'] = 0x0),
+        (args3 = null),
+        (args4 = []),
+        collaborationMedia['dispose'](),
+        map['clear'](),
+        map2['clear']());
     },
   };
 }

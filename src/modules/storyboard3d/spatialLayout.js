@@ -1,8 +1,6 @@
 import { STORYBOARD_3D_BODY_PRESETS } from './characterRig.js';
 const SPATIAL_ROLE_SET = new Set(['character', 'floor', 'seat', 'support', 'table', 'tabletop-item', 'wall']),
-  BODY_PRESETS_BY_ID = new Map(
-    STORYBOARD_3D_BODY_PRESETS['map']((_0x2038b7) => [_0x2038b7['id'], _0x2038b7]),
-  ),
+  BODY_PRESETS_BY_ID = new Map(STORYBOARD_3D_BODY_PRESETS['map']((value) => [value['id'], value])),
   DEFAULT_FAMILY_BODY_PRESETS = Object['freeze']([
     'adult-male',
     'adult-female',
@@ -16,97 +14,90 @@ const SPATIAL_ROLE_SET = new Set(['character', 'floor', 'seat', 'support', 'tabl
     supportHeight: 0x0,
     seatHeight: 0x0,
   });
-function finite(_0x5edbf9, _0x41b000, _0x1440eb = 0.01, _0x4b90bc = 0x64) {
-  const _0x4946d7 = Number(_0x5edbf9);
-  return Number['isFinite'](_0x4946d7)
-    ? Math['min'](_0x4b90bc, Math['max'](_0x1440eb, _0x4946d7))
-    : _0x41b000;
+function finite(item, key, index = 0.01, result = 0x64) {
+  const data = Number(item);
+  return Number['isFinite'](data) ? Math['min'](result, Math['max'](index, data)) : key;
 }
-function normalizedText(_0x5a9aff) {
-  return String(_0x5a9aff || '')['toLocaleLowerCase']();
+function normalizedText(options) {
+  return String(options || '')['toLocaleLowerCase']();
 }
-function searchableAssetText(_0x54e428 = {}) {
+function searchableAssetText(error = {}) {
   return [
-    _0x54e428['id'],
-    _0x54e428['familyId'],
-    _0x54e428['name'],
-    _0x54e428['category'],
-    ...(Array['isArray'](_0x54e428['tags']) ? _0x54e428['tags'] : []),
-    ...(Array['isArray'](_0x54e428['keywords']) ? _0x54e428['keywords'] : []),
+    error['id'],
+    error['familyId'],
+    error['name'],
+    error['category'],
+    ...(Array['isArray'](error['tags']) ? error['tags'] : []),
+    ...(Array['isArray'](error['keywords']) ? error['keywords'] : []),
   ]
     ['map'](normalizedText)
     ['join']('\x20');
 }
-function includesAny(_0x1d527f, _0xd6a3c3) {
-  return _0xd6a3c3['some']((_0x3eab69) => {
-    const _0x1c2f21 = normalizedText(_0x3eab69);
-    if (!_0x1c2f21) return ![];
-    if (/^[a-z0-9]+$/['test'](_0x1c2f21))
-      return new RegExp('(^|[^a-z0-9])' + _0x1c2f21 + '(?=$|[^a-z0-9])')['test'](_0x1d527f);
-    return _0x1d527f['includes'](_0x1c2f21);
+function includesAny(list, list2) {
+  return list2['some']((target) => {
+    const dText = normalizedText(target);
+    if (!dText) return ![];
+    if (/^[a-z0-9]+$/['test'](dText))
+      return new RegExp('(^|[^a-z0-9])' + dText + '(?=$|[^a-z0-9])')['test'](list);
+    return list['includes'](dText);
   });
 }
-function dimensionsFrom(_0x146585, _0x109958) {
-  const _0x124871 = _0x146585 && typeof _0x146585 === 'object' ? _0x146585 : {},
-    _0x1962f9 = _0x124871['dimensionsMeters'] || _0x124871['dimensions'] || _0x124871['size'] || _0x124871;
+function dimensionsFrom(source, box) {
+  const next = source && typeof source === 'object' ? source : {},
+    box2 = next['dimensionsMeters'] || next['dimensions'] || next['size'] || next;
   return {
-    width: finite(_0x1962f9?.['width'] ?? _0x1962f9?.['x'], _0x109958['width']),
-    height: finite(_0x1962f9?.['height'] ?? _0x1962f9?.['y'], _0x109958['height']),
-    depth: finite(_0x1962f9?.['depth'] ?? _0x1962f9?.['z'], _0x109958['depth']),
+    width: finite(box2?.['width'] ?? box2?.['x'], box['width']),
+    height: finite(box2?.['height'] ?? box2?.['y'], box['height']),
+    depth: finite(box2?.['depth'] ?? box2?.['z'], box['depth']),
   };
 }
-function hasDimensions(_0x16ff4c) {
-  const _0x508047 = _0x16ff4c && typeof _0x16ff4c === 'object' ? _0x16ff4c : {},
-    _0x5ba318 = _0x508047['dimensionsMeters'] || _0x508047['dimensions'] || _0x508047['size'] || _0x508047;
-  return [
-    _0x5ba318?.['width'] ?? _0x5ba318?.['x'],
-    _0x5ba318?.['height'] ?? _0x5ba318?.['y'],
-    _0x5ba318?.['depth'] ?? _0x5ba318?.['z'],
-  ]['every']((_0x3c7995) => Number['isFinite'](Number(_0x3c7995)) && Number(_0x3c7995) > 0x0);
+function hasDimensions(current) {
+  const entry = current && typeof current === 'object' ? current : {},
+    box3 = entry['dimensionsMeters'] || entry['dimensions'] || entry['size'] || entry;
+  return [box3?.['width'] ?? box3?.['x'], box3?.['height'] ?? box3?.['y'], box3?.['depth'] ?? box3?.['z']][
+    'every'
+  ]((record) => Number['isFinite'](Number(record)) && Number(record) > 0x0);
 }
-function measuredDimensions(_0x50ab02 = {}) {
-  const _0x298423 = _0x50ab02?.['assetRecord']?.['bounds'] || _0x50ab02?.['normalization']?.['sourceBounds'],
-    _0x812edf = _0x298423?.['min'],
-    _0x59f872 = _0x298423?.['max'],
-    _0x324422 = {
-      width: Number(_0x59f872?.['x']) - Number(_0x812edf?.['x']),
-      height: Number(_0x59f872?.['y']) - Number(_0x812edf?.['y']),
-      depth: Number(_0x59f872?.['z']) - Number(_0x812edf?.['z']),
+function measuredDimensions(options2 = {}) {
+  const payload = options2?.['assetRecord']?.['bounds'] || options2?.['normalization']?.['sourceBounds'],
+    box4 = payload?.['min'],
+    box5 = payload?.['max'],
+    box6 = {
+      width: Number(box5?.['x']) - Number(box4?.['x']),
+      height: Number(box5?.['y']) - Number(box4?.['y']),
+      depth: Number(box5?.['z']) - Number(box4?.['z']),
     };
-  if (!Object['values'](_0x324422)['every']((_0x108222) => Number['isFinite'](_0x108222) && _0x108222 > 0x0))
-    return null;
-  const _0xa42ff6 = finite(
-    _0x50ab02?.['assetRecord']?.['defaultScale'] ?? _0x50ab02?.['normalization']?.['uniformScale'],
+  if (!Object['values'](box6)['every']((count) => Number['isFinite'](count) && count > 0x0)) return null;
+  const finite2 = finite(
+    options2?.['assetRecord']?.['defaultScale'] ?? options2?.['normalization']?.['uniformScale'],
     0x1,
     0.000001,
     0x3e8,
   );
   return {
-    width: finite(_0x324422['width'] * _0xa42ff6, 0x1),
-    height: finite(_0x324422['height'] * _0xa42ff6, 0x1),
-    depth: finite(_0x324422['depth'] * _0xa42ff6, 0x1),
+    width: finite(box6['width'] * finite2, 0x1),
+    height: finite(box6['height'] * finite2, 0x1),
+    depth: finite(box6['depth'] * finite2, 0x1),
   };
 }
-function normalizedRoles(_0x3bb586) {
+function normalizedRoles(handle) {
   return [
     ...new Set(
-      (Array['isArray'](_0x3bb586) ? _0x3bb586 : [])
-        ['map']((_0x5398db) => String(_0x5398db || '')['trim']())
-        ['filter']((_0x225010) => SPATIAL_ROLE_SET['has'](_0x225010)),
+      (Array['isArray'](handle) ? handle : [])
+        ['map']((state) => String(state || '')['trim']())
+        ['filter']((config) => SPATIAL_ROLE_SET['has'](config)),
     ),
   ];
 }
-function bodySpatialMetadata(_0x84c34f = {}) {
-  const _0x58d3b7 = String(_0x84c34f['id'] || _0x84c34f['familyId'] || _0x84c34f['bodyPresetId'] || '')[
-      'trim'
-    ](),
-    _0x2e40a8 = BODY_PRESETS_BY_ID['get'](_0x58d3b7);
-  if (!_0x2e40a8) return null;
+function bodySpatialMetadata(options3 = {}) {
+  const scope = String(options3['id'] || options3['familyId'] || options3['bodyPresetId'] || '')['trim'](),
+    height = BODY_PRESETS_BY_ID['get'](scope);
+  if (!height) return null;
   return {
     dimensions: {
-      width: Number((0.5 * _0x2e40a8['shoulderScale'])['toFixed'](0x3)),
-      height: _0x2e40a8['height'],
-      depth: Number((0.38 * _0x2e40a8['depthScale'])['toFixed'](0x3)),
+      width: Number((0.5 * height['shoulderScale'])['toFixed'](0x3)),
+      height: height['height'],
+      depth: Number((0.38 * height['depthScale'])['toFixed'](0x3)),
     },
     anchor: 'ground',
     roles: ['character'],
@@ -114,13 +105,13 @@ function bodySpatialMetadata(_0x84c34f = {}) {
     seatHeight: 0.45,
   };
 }
-function inferredSpatialMetadata(_0x3eeefc = {}) {
-  const _0x5bfe41 = searchableAssetText(_0x3eeefc),
-    _0x43d60e = normalizedText(_0x3eeefc['category']),
-    _0x7fbfcf = bodySpatialMetadata(_0x3eeefc);
-  if (_0x7fbfcf || _0x43d60e === 'character')
+function inferredSpatialMetadata(options4 = {}) {
+  const searchableAssetText2 = searchableAssetText(options4),
+    dText2 = normalizedText(options4['category']),
+    bodySpatialMetadata2 = bodySpatialMetadata(options4);
+  if (bodySpatialMetadata2 || dText2 === 'character')
     return (
-      _0x7fbfcf || {
+      bodySpatialMetadata2 || {
         dimensions: { width: 0.52, height: 1.72, depth: 0.4 },
         anchor: 'ground',
         roles: ['character'],
@@ -129,10 +120,10 @@ function inferredSpatialMetadata(_0x3eeefc = {}) {
       }
     );
   if (
-    _0x43d60e !== 'food' &&
-    _0x43d60e !== 'tableware' &&
-    _0x43d60e !== 'kitchenware' &&
-    includesAny(_0x5bfe41, ['tableround', 'round table', '圆桌'])
+    dText2 !== 'food' &&
+    dText2 !== 'tableware' &&
+    dText2 !== 'kitchenware' &&
+    includesAny(searchableAssetText2, ['tableround', 'round table', '圆桌'])
   )
     return {
       dimensions: { width: 1.2, height: 0.75, depth: 1.2 },
@@ -142,23 +133,23 @@ function inferredSpatialMetadata(_0x3eeefc = {}) {
       seatHeight: 0x0,
     };
   if (
-    _0x43d60e !== 'food' &&
-    _0x43d60e !== 'tableware' &&
-    _0x43d60e !== 'kitchenware' &&
-    includesAny(_0x5bfe41, ['table', 'desk', '餐桌', '书桌', '桌子', '茶几', '吧台'])
+    dText2 !== 'food' &&
+    dText2 !== 'tableware' &&
+    dText2 !== 'kitchenware' &&
+    includesAny(searchableAssetText2, ['table', 'desk', '餐桌', '书桌', '桌子', '茶几', '吧台'])
   ) {
-    const _0x41106e = includesAny(_0x5bfe41, ['coffee', '茶几']);
+    const dimensions2 = includesAny(searchableAssetText2, ['coffee', '茶几']);
     return {
-      dimensions: _0x41106e
+      dimensions: dimensions2
         ? { width: 1.2, height: 0.45, depth: 0.65 }
         : { width: 1.6, height: 0.75, depth: 0.85 },
       anchor: 'ground',
       roles: ['table', 'support'],
-      supportHeight: _0x41106e ? 0.45 : 0.75,
+      supportHeight: dimensions2 ? 0.45 : 0.75,
       seatHeight: 0x0,
     };
   }
-  if (includesAny(_0x5bfe41, ['chair', 'stool', 'seat', '椅', '凳', '座位']))
+  if (includesAny(searchableAssetText2, ['chair', 'stool', 'seat', '椅', '凳', '座位']))
     return {
       dimensions: { width: 0.5, height: 0.9, depth: 0.52 },
       anchor: 'ground',
@@ -166,7 +157,7 @@ function inferredSpatialMetadata(_0x3eeefc = {}) {
       supportHeight: 0x0,
       seatHeight: 0.45,
     };
-  if (_0x43d60e === 'food' || _0x43d60e === 'tableware' || _0x43d60e === 'kitchenware')
+  if (dText2 === 'food' || dText2 === 'tableware' || dText2 === 'kitchenware')
     return {
       dimensions: { width: 0.24, height: 0.12, depth: 0.24 },
       anchor: 'support',
@@ -174,7 +165,7 @@ function inferredSpatialMetadata(_0x3eeefc = {}) {
       supportHeight: 0x0,
       seatHeight: 0x0,
     };
-  if (includesAny(_0x5bfe41, ['floor', '地板', '地面']))
+  if (includesAny(searchableAssetText2, ['floor', '地板', '地面']))
     return {
       dimensions: { width: 0x4, height: 0.1, depth: 0x4 },
       anchor: 'ground',
@@ -182,7 +173,7 @@ function inferredSpatialMetadata(_0x3eeefc = {}) {
       supportHeight: 0.1,
       seatHeight: 0x0,
     };
-  if (includesAny(_0x5bfe41, ['wall', '墙', 'window', '窗', 'door', '门']))
+  if (includesAny(searchableAssetText2, ['wall', '墙', 'window', '窗', 'door', '门']))
     return {
       dimensions: { width: 2.4, height: 2.5, depth: 0.15 },
       anchor: 'ground',
@@ -192,176 +183,184 @@ function inferredSpatialMetadata(_0x3eeefc = {}) {
     };
   return DEFAULT_SPATIAL_METADATA;
 }
-export function resolveStoryboard3DAssetSpatialMetadata(_0x16feb0 = {}) {
-  const _0x310284 = inferredSpatialMetadata(_0x16feb0),
-    _0x422056 =
-      _0x16feb0?.['spatial'] && typeof _0x16feb0['spatial'] === 'object' ? _0x16feb0['spatial'] : {},
-    _0x475ffc = measuredDimensions(_0x16feb0),
-    _0x109774 = dimensionsFrom(_0x422056, _0x475ffc || _0x310284['dimensions']),
-    _0x79bdc8 = normalizedRoles(_0x422056['roles']);
+export function resolveStoryboard3DAssetSpatialMetadata(options5 = {}) {
+  const args = inferredSpatialMetadata(options5),
+    anchor2 = options5?.['spatial'] && typeof options5['spatial'] === 'object' ? options5['spatial'] : {},
+    measuredDimensions2 = measuredDimensions(options5),
+    dimensions3 = dimensionsFrom(anchor2, measuredDimensions2 || args['dimensions']),
+    roles2 = normalizedRoles(anchor2['roles']);
   return {
-    dimensions: _0x109774,
-    source: hasDimensions(_0x422056) ? 'provided' : _0x475ffc ? 'measured' : 'semantic',
-    anchor: _0x422056['anchor'] === 'support' ? 'support' : _0x310284['anchor'],
-    roles: _0x79bdc8['length'] > 0x0 ? _0x79bdc8 : [..._0x310284['roles']],
-    supportHeight: finite(_0x422056['supportHeight'], _0x310284['supportHeight'], 0x0, 0x64),
-    seatHeight: finite(_0x422056['seatHeight'], _0x310284['seatHeight'], 0x0, 0x64),
+    dimensions: dimensions3,
+    source: hasDimensions(anchor2) ? 'provided' : measuredDimensions2 ? 'measured' : 'semantic',
+    anchor: anchor2['anchor'] === 'support' ? 'support' : args['anchor'],
+    roles: roles2['length'] > 0x0 ? roles2 : [...args['roles']],
+    supportHeight: finite(anchor2['supportHeight'], args['supportHeight'], 0x0, 0x64),
+    seatHeight: finite(anchor2['seatHeight'], args['seatHeight'], 0x0, 0x64),
   };
 }
-export function getStoryboard3DAssetSpatialExtent(_0x5892e = {}) {
-  const _0x1d6ac6 = resolveStoryboard3DAssetSpatialMetadata(_0x5892e)['dimensions'];
-  return Math['max'](_0x1d6ac6['width'], _0x1d6ac6['height'], _0x1d6ac6['depth']);
+export function getStoryboard3DAssetSpatialExtent(options6 = {}) {
+  const box7 = resolveStoryboard3DAssetSpatialMetadata(options6)['dimensions'];
+  return Math['max'](box7['width'], box7['height'], box7['depth']);
 }
-export function describeStoryboard3DAssetSpatialMetadata(_0x3e4293 = {}) {
-  const _0x5010db = resolveStoryboard3DAssetSpatialMetadata(_0x3e4293),
-    _0x315ee8 = _0x5010db['dimensions'],
-    _0x432278 = [
+export function describeStoryboard3DAssetSpatialMetadata(options7 = {}) {
+  const storyboard3DAssetSpatialMetadata = resolveStoryboard3DAssetSpatialMetadata(options7),
+    box8 = storyboard3DAssetSpatialMetadata['dimensions'],
+    list3 = [
       'size=' +
-        _0x315ee8['width']['toFixed'](0x2) +
+        box8['width']['toFixed'](0x2) +
         'x' +
-        _0x315ee8['height']['toFixed'](0x2) +
+        box8['height']['toFixed'](0x2) +
         'x' +
-        _0x315ee8['depth']['toFixed'](0x2) +
+        box8['depth']['toFixed'](0x2) +
         'm',
-      'source=' + _0x5010db['source'],
-      'anchor=' + _0x5010db['anchor'],
+      'source=' + storyboard3DAssetSpatialMetadata['source'],
+      'anchor=' + storyboard3DAssetSpatialMetadata['anchor'],
     ];
-  if (_0x5010db['roles']['length'] > 0x0) _0x432278['push']('roles=' + _0x5010db['roles']['join'](','));
-  if (_0x5010db['supportHeight'] > 0x0)
-    _0x432278['push']('supportY=' + _0x5010db['supportHeight']['toFixed'](0x2) + 'm');
-  if (_0x5010db['seatHeight'] > 0x0)
-    _0x432278['push']('seatY=' + _0x5010db['seatHeight']['toFixed'](0x2) + 'm');
-  return _0x432278['join'](';\x20');
+  if (storyboard3DAssetSpatialMetadata['roles']['length'] > 0x0)
+    list3['push']('roles=' + storyboard3DAssetSpatialMetadata['roles']['join'](','));
+  if (storyboard3DAssetSpatialMetadata['supportHeight'] > 0x0)
+    list3['push']('supportY=' + storyboard3DAssetSpatialMetadata['supportHeight']['toFixed'](0x2) + 'm');
+  if (storyboard3DAssetSpatialMetadata['seatHeight'] > 0x0)
+    list3['push']('seatY=' + storyboard3DAssetSpatialMetadata['seatHeight']['toFixed'](0x2) + 'm');
+  return list3['join'](';\x20');
 }
-export function normalizeStoryboard3DGeneratedLayout(_0x5231ac = {}) {
-  const _0x42d871 = _0x5231ac && typeof _0x5231ac === 'object' ? _0x5231ac : {},
-    _0x17fe5f = _0x42d871['kind'] === 'dining' ? 'dining' : 'generic',
-    _0x545c3b = Math['max'](
+export function normalizeStoryboard3DGeneratedLayout(options8 = {}) {
+  const input = options8 && typeof options8 === 'object' ? options8 : {},
+    kind = input['kind'] === 'dining' ? 'dining' : 'generic',
+    participantCount2 = Math['max'](
       0x0,
-      Math['min'](0x8, Math['floor'](Number(_0x42d871['participantCount']) || 0x0)),
+      Math['min'](0x8, Math['floor'](Number(input['participantCount']) || 0x0)),
     );
-  return { kind: _0x17fe5f, participantCount: _0x545c3b };
+  return { kind: kind, participantCount: participantCount2 };
 }
-function cloneObject(_0x136e1a) {
+function cloneObject(args2) {
   return {
-    ..._0x136e1a,
+    ...args2,
     transform: {
-      position: [...(_0x136e1a?.['transform']?.['position'] || [0x0, 0x0, 0x0])],
-      rotation: [...(_0x136e1a?.['transform']?.['rotation'] || [0x0, 0x0, 0x0])],
-      scale: [...(_0x136e1a?.['transform']?.['scale'] || [0x1, 0x1, 0x1])],
+      position: [...(args2?.['transform']?.['position'] || [0x0, 0x0, 0x0])],
+      rotation: [...(args2?.['transform']?.['rotation'] || [0x0, 0x0, 0x0])],
+      scale: [...(args2?.['transform']?.['scale'] || [0x1, 0x1, 0x1])],
     },
   };
 }
-function assetForObject(_0x2cf7fb, _0x101dd1) {
-  if (_0x2cf7fb?.['type'] === 'character') return { id: _0x2cf7fb['bodyPresetId'], category: 'character' };
-  return _0x101dd1['get'](_0x2cf7fb?.['assetId']) || null;
+function assetForObject(id, map) {
+  if (id?.['type'] === 'character') return { id: id['bodyPresetId'], category: 'character' };
+  return map['get'](id?.['assetId']) || null;
 }
-function hasSpatialRole(_0x454439, _0x1ccb0b) {
-  return resolveStoryboard3DAssetSpatialMetadata(_0x454439)['roles']['includes'](_0x1ccb0b);
+function hasSpatialRole(output, value2) {
+  return resolveStoryboard3DAssetSpatialMetadata(output)['roles']['includes'](value2);
 }
-function createGeneratedCharacter(_0x31ba20) {
+function createGeneratedCharacter(value3) {
   return {
     type: 'character',
-    name: 'Dining participant ' + (_0x31ba20 + 0x1),
-    bodyPresetId: DEFAULT_FAMILY_BODY_PRESETS[_0x31ba20 % DEFAULT_FAMILY_BODY_PRESETS['length']],
+    name: 'Dining participant ' + (value3 + 0x1),
+    bodyPresetId: DEFAULT_FAMILY_BODY_PRESETS[value3 % DEFAULT_FAMILY_BODY_PRESETS['length']],
     transform: { position: [0x0, 0x0, 0x0], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
   };
 }
-function createGeneratedProp(_0x244927, _0x585b6e) {
+function createGeneratedProp(assetId, name) {
   return {
     type: 'prop',
-    name: _0x585b6e || _0x244927['name'],
-    assetId: _0x244927['id'],
+    name: name || assetId['name'],
+    assetId: assetId['id'],
     transform: { position: [0x0, 0x0, 0x0], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
     castShadow: !![],
     receiveShadow: !![],
   };
 }
-function firstAssetByRole(_0x3b4dae, _0x2abdcc) {
-  return (
-    (Array['isArray'](_0x3b4dae) ? _0x3b4dae : [])['find']((_0x5289e7) =>
-      hasSpatialRole(_0x5289e7, _0x2abdcc),
-    ) || null
-  );
+function firstAssetByRole(value4, value5) {
+  return (Array['isArray'](value4) ? value4 : [])['find']((value6) => hasSpatialRole(value6, value5)) || null;
 }
-function angleForSlot(_0x95d28, _0x4564de) {
-  return -Math['PI'] / 0x2 + (Math['PI'] * 0x2 * _0x95d28) / Math['max'](0x1, _0x4564de);
+function angleForSlot(value7, value8) {
+  return -Math['PI'] / 0x2 + (Math['PI'] * 0x2 * value7) / Math['max'](0x1, value8);
 }
-function faceTowards(_0x2ba362, _0x3b8079) {
-  return Math['atan2'](_0x2ba362[0x0] - _0x3b8079[0x0], _0x2ba362[0x2] - _0x3b8079[0x2]);
+function faceTowards(value9, value10) {
+  return Math['atan2'](value9[0x0] - value10[0x0], value9[0x2] - value10[0x2]);
 }
 export function applyStoryboard3DDiningLayout(
-  _0x53ee69 = [],
+  list4 = [],
   { assets: assets = [], participantCount: participantCount = 0x0 } = {},
 ) {
-  const _0x41e8d4 = (Array['isArray'](_0x53ee69) ? _0x53ee69 : [])['map'](cloneObject),
-    _0x5f486e = new Map(
+  const objects = (Array['isArray'](list4) ? list4 : [])['map'](cloneObject),
+    value11 = new Map(
       (Array['isArray'](assets) ? assets : [])
-        ['filter']((_0x1aa82b) => _0x1aa82b?.['id'])
-        ['map']((_0x33e55f) => [_0x33e55f['id'], _0x33e55f]),
+        ['filter']((value12) => value12?.['id'])
+        ['map']((value13) => [value13['id'], value13]),
     );
-  let _0xb0a4c2 = _0x41e8d4['find']((_0x5489aa) =>
-    hasSpatialRole(assetForObject(_0x5489aa, _0x5f486e), 'table'),
-  );
-  const _0xa81e79 = Math['max'](0x0, Math['min'](0x8, Math['floor'](Number(participantCount) || 0x0)));
-  let _0x4bd872 = _0x41e8d4['filter']((_0x59b714) => _0x59b714['type'] === 'character');
-  const _0xcf04a7 = Math['max'](_0xa81e79, _0x4bd872['length']);
-  if (!_0xb0a4c2 && _0xcf04a7 > 0x0) {
-    const _0xdf342b = firstAssetByRole(assets, 'table');
-    _0xdf342b &&
-      ((_0xb0a4c2 = createGeneratedProp(_0xdf342b, 'Dining\x20table')), _0x41e8d4['push'](_0xb0a4c2));
+  let generatedProp = objects['find']((value14) => hasSpatialRole(assetForObject(value14, value11), 'table'));
+  const value15 = Math['max'](0x0, Math['min'](0x8, Math['floor'](Number(participantCount) || 0x0)));
+  let participantCount3 = objects['filter']((value16) => value16['type'] === 'character');
+  const participantCount4 = Math['max'](value15, participantCount3['length']);
+  if (!generatedProp && participantCount4 > 0x0) {
+    const assetByRole = firstAssetByRole(assets, 'table');
+    assetByRole &&
+      ((generatedProp = createGeneratedProp(assetByRole, 'Dining\x20table')), objects['push'](generatedProp));
   }
-  if (!_0xb0a4c2 || _0xcf04a7 === 0x0)
-    return { objects: _0x41e8d4, applied: ![], participantCount: _0xcf04a7 };
-  while (_0x4bd872['length'] < _0xcf04a7) {
-    const _0x5c6961 = createGeneratedCharacter(_0x4bd872['length']);
-    (_0x41e8d4['push'](_0x5c6961), _0x4bd872['push'](_0x5c6961));
+  if (!generatedProp || participantCount4 === 0x0)
+    return { objects: objects, applied: ![], participantCount: participantCount4 };
+  while (participantCount3['length'] < participantCount4) {
+    const generatedCharacter = createGeneratedCharacter(participantCount3['length']);
+    (objects['push'](generatedCharacter), participantCount3['push'](generatedCharacter));
   }
-  let _0x1e1df3 = _0x41e8d4['filter']((_0x1bb491) =>
-    hasSpatialRole(assetForObject(_0x1bb491, _0x5f486e), 'seat'),
-  );
-  const _0xbf9996 = firstAssetByRole(assets, 'seat');
-  while (_0x1e1df3['length'] < _0x4bd872['length'] && _0xbf9996) {
-    const _0x1de271 = createGeneratedProp(_0xbf9996, 'Dining chair');
-    (_0x41e8d4['push'](_0x1de271), _0x1e1df3['push'](_0x1de271));
+  let list5 = objects['filter']((value17) => hasSpatialRole(assetForObject(value17, value11), 'seat'));
+  const assetByRole2 = firstAssetByRole(assets, 'seat');
+  while (list5['length'] < participantCount3['length'] && assetByRole2) {
+    const generatedProp2 = createGeneratedProp(assetByRole2, 'Dining chair');
+    (objects['push'](generatedProp2), list5['push'](generatedProp2));
   }
-  const _0x2ef688 = resolveStoryboard3DAssetSpatialMetadata(assetForObject(_0xb0a4c2, _0x5f486e)),
-    _0x533ce2 = _0xb0a4c2['transform']['position'];
-  _0x533ce2[0x1] = 0x0;
-  const _0x25dc3f = _0x2ef688['dimensions']['width'] / 0x2 + 0.6,
-    _0x3f7905 = _0x2ef688['dimensions']['depth'] / 0x2 + 0.6,
-    _0x9edbac = Math['min'](_0x1e1df3['length'], _0x4bd872['length']);
-  for (let _0x34de14 = 0x0; _0x34de14 < _0x9edbac; _0x34de14 += 0x1) {
-    const _0x14c65b = angleForSlot(_0x34de14, _0x9edbac),
-      _0x36ba6a = [
-        _0x533ce2[0x0] + Math['cos'](_0x14c65b) * _0x25dc3f,
+  const storyboard3DAssetSpatialMetadata2 = resolveStoryboard3DAssetSpatialMetadata(
+      assetForObject(generatedProp, value11),
+    ),
+    value18 = generatedProp['transform']['position'];
+  value18[0x1] = 0x0;
+  const value19 = storyboard3DAssetSpatialMetadata2['dimensions']['width'] / 0x2 + 0.6,
+    value20 = storyboard3DAssetSpatialMetadata2['dimensions']['depth'] / 0x2 + 0.6,
+    value21 = Math['min'](list5['length'], participantCount3['length']);
+  for (let value22 = 0x0; value22 < value21; value22 += 0x1) {
+    const angleForSlot2 = angleForSlot(value22, value21),
+      value23 = [
+        value18[0x0] + Math['cos'](angleForSlot2) * value19,
         0x0,
-        _0x533ce2[0x2] + Math['sin'](_0x14c65b) * _0x3f7905,
+        value18[0x2] + Math['sin'](angleForSlot2) * value20,
       ],
-      _0x288b0a = faceTowards(_0x533ce2, _0x36ba6a),
-      _0x1b1de4 = _0x1e1df3[_0x34de14];
-    ((_0x1b1de4['transform']['position'] = _0x36ba6a), (_0x1b1de4['transform']['rotation'][0x1] = _0x288b0a));
-    const _0x1c4911 = _0x4bd872[_0x34de14],
-      _0x20a6fc = resolveStoryboard3DAssetSpatialMetadata(assetForObject(_0x1b1de4, _0x5f486e));
-    ((_0x1c4911['transform']['position'] = [_0x36ba6a[0x0], _0x20a6fc['seatHeight'], _0x36ba6a[0x2]]),
-      (_0x1c4911['transform']['rotation'][0x1] = _0x288b0a),
-      (_0x1c4911['actionId'] = 'seated'),
-      (_0x1c4911['actionPlaying'] = ![]));
+      faceTowards2 = faceTowards(value18, value23),
+      value24 = list5[value22];
+    ((value24['transform']['position'] = value23), (value24['transform']['rotation'][0x1] = faceTowards2));
+    const value25 = participantCount3[value22],
+      storyboard3DAssetSpatialMetadata3 = resolveStoryboard3DAssetSpatialMetadata(
+        assetForObject(value24, value11),
+      );
+    ((value25['transform']['position'] = [
+      value23[0x0],
+      storyboard3DAssetSpatialMetadata3['seatHeight'],
+      value23[0x2],
+    ]),
+      (value25['transform']['rotation'][0x1] = faceTowards2),
+      (value25['actionId'] = 'seated'),
+      (value25['actionPlaying'] = ![]));
   }
-  const _0x2b7e7b = _0x41e8d4['filter']((_0x448b32) =>
-    hasSpatialRole(assetForObject(_0x448b32, _0x5f486e), 'tabletop-item'),
+  const list6 = objects['filter']((value26) =>
+    hasSpatialRole(assetForObject(value26, value11), 'tabletop-item'),
   );
   return (
-    _0x2b7e7b['forEach']((_0x52ee11, _0x446dbc) => {
-      const _0x30ab1b = resolveStoryboard3DAssetSpatialMetadata(assetForObject(_0x52ee11, _0x5f486e)),
-        _0x405551 = angleForSlot(_0x446dbc, Math['max'](0x1, _0x2b7e7b['length'])),
-        _0x72804 = Math['min'](_0x2ef688['dimensions']['width'], _0x2ef688['dimensions']['depth']) * 0.22;
-      _0x52ee11['transform']['position'] = [
-        _0x533ce2[0x0] + Math['cos'](_0x405551) * _0x72804,
-        _0x533ce2[0x1] + _0x2ef688['supportHeight'] + _0x30ab1b['dimensions']['height'] / 0x2,
-        _0x533ce2[0x2] + Math['sin'](_0x405551) * _0x72804,
+    list6['forEach']((value27, value28) => {
+      const storyboard3DAssetSpatialMetadata4 = resolveStoryboard3DAssetSpatialMetadata(
+          assetForObject(value27, value11),
+        ),
+        angleForSlot3 = angleForSlot(value28, Math['max'](0x1, list6['length'])),
+        value29 =
+          Math['min'](
+            storyboard3DAssetSpatialMetadata2['dimensions']['width'],
+            storyboard3DAssetSpatialMetadata2['dimensions']['depth'],
+          ) * 0.22;
+      value27['transform']['position'] = [
+        value18[0x0] + Math['cos'](angleForSlot3) * value29,
+        value18[0x1] +
+          storyboard3DAssetSpatialMetadata2['supportHeight'] +
+          storyboard3DAssetSpatialMetadata4['dimensions']['height'] / 0x2,
+        value18[0x2] + Math['sin'](angleForSlot3) * value29,
       ];
     }),
-    { objects: _0x41e8d4, applied: !![], participantCount: _0x4bd872['length'] }
+    { objects: objects, applied: !![], participantCount: participantCount3['length'] }
   );
 }

@@ -109,84 +109,84 @@ const PP_MEDIA_ERROR_CODES = {
     0x1f6: { type: ErrorType.SERVICE_UNAVAILABLE, message: '网关错误', retryable: true },
     0x1f7: { type: ErrorType.SERVICE_UNAVAILABLE, message: '服务不可用', retryable: true },
   };
-function extractErrorCode(_0x43d557, _0x18cdf7) {
-  const _0x261315 = _0x43d557?.error || _0x43d557,
-    _0x3b4ee5 = _0x261315?.code || _0x261315?.error_code || _0x261315?.error_name || '';
-  if (_0x3b4ee5 && typeof _0x3b4ee5 === 'string') return _0x3b4ee5;
-  const _0x3539a3 = _0x261315?.code || _0x261315?.status || _0x18cdf7;
-  if (_0x3539a3 && typeof _0x3539a3 === 'number') return _0x3539a3;
-  return _0x18cdf7;
+function extractErrorCode(value, item) {
+  const response = value?.error || value,
+    key = response?.code || response?.error_code || response?.error_name || '';
+  if (key && typeof key === 'string') return key;
+  const index = response?.code || response?.status || item;
+  if (index && typeof index === 'number') return index;
+  return item;
 }
-function extractErrorMessage(_0x9ef0b1) {
-  const _0x1c80ca = _0x9ef0b1?.error || _0x9ef0b1;
-  return _0x1c80ca?.message || _0x1c80ca?.error_message || _0x1c80ca?.msg || _0x9ef0b1?.message || '';
+function extractErrorMessage(error) {
+  const error2 = error?.error || error;
+  return error2?.message || error2?.error_message || error2?.msg || error?.message || '';
 }
-export function parseError(_0x1c9643, _0x3aaef4) {
-  if (!_0x1c9643) return null;
-  const _0x24f7d4 = extractErrorCode(_0x1c9643, _0x3aaef4),
-    _0x3f7f3c = extractErrorMessage(_0x1c9643),
-    _0x9661ec = String(_0x24f7d4).toUpperCase(),
-    _0x1edaf5 = String(_0x3f7f3c).toUpperCase();
-  if (PP_ALL_ERROR_CODES[_0x24f7d4]) {
-    const _0x181374 = PP_ALL_ERROR_CODES[_0x24f7d4];
+export function parseError(enabled, status) {
+  if (!enabled) return null;
+  const code = extractErrorCode(enabled, status),
+    message = extractErrorMessage(enabled),
+    result = String(code).toUpperCase(),
+    list = String(message).toUpperCase();
+  if (PP_ALL_ERROR_CODES[code]) {
+    const type = PP_ALL_ERROR_CODES[code];
     return new ApiError({
-      type: _0x181374.type,
+      type: type.type,
       provider: 'ppio',
-      code: _0x24f7d4,
-      message: _0x3f7f3c || _0x181374.message,
-      status: _0x3aaef4,
-      retryable: _0x181374.retryable,
+      code: code,
+      message: message || type.message,
+      status: status,
+      retryable: type.retryable,
     });
   }
-  if (PP_ALL_ERROR_CODES[_0x9661ec]) {
-    const _0x2be519 = PP_ALL_ERROR_CODES[_0x9661ec];
+  if (PP_ALL_ERROR_CODES[result]) {
+    const type2 = PP_ALL_ERROR_CODES[result];
     return new ApiError({
-      type: _0x2be519.type,
+      type: type2.type,
       provider: 'ppio',
-      code: _0x24f7d4,
-      message: _0x3f7f3c || _0x2be519.message,
-      status: _0x3aaef4,
-      retryable: _0x2be519.retryable,
+      code: code,
+      message: message || type2.message,
+      status: status,
+      retryable: type2.retryable,
     });
   }
-  if (PP_HTTP_STATUS_MAP[_0x3aaef4]) {
-    const _0x1e8af3 = PP_HTTP_STATUS_MAP[_0x3aaef4];
+  if (PP_HTTP_STATUS_MAP[status]) {
+    const type3 = PP_HTTP_STATUS_MAP[status];
     return new ApiError({
-      type: _0x1e8af3.type,
+      type: type3.type,
       provider: 'ppio',
-      code: _0x3aaef4,
-      message: _0x3f7f3c || _0x1e8af3.message,
-      status: _0x3aaef4,
-      retryable: _0x1e8af3.retryable,
+      code: status,
+      message: message || type3.message,
+      status: status,
+      retryable: type3.retryable,
     });
   }
-  if (_0x1edaf5.includes('BALANCE') || _0x1edaf5.includes('余额') || _0x1edaf5.includes('QUOTA'))
-    return ApiError.insufficientBalance('ppio', _0x24f7d4);
-  if (_0x1edaf5.includes('RATE') || _0x1edaf5.includes('LIMIT') || _0x1edaf5.includes('频繁'))
-    return ApiError.rateLimit('ppio', _0x24f7d4);
-  if (_0x1edaf5.includes('AUTH') || _0x1edaf5.includes('API_KEY') || _0x1edaf5.includes('认证'))
-    return ApiError.authError('ppio', _0x24f7d4, _0x3f7f3c);
-  if (_0x1edaf5.includes('CONTENT') || _0x1edaf5.includes('PROMPT') || _0x1edaf5.includes('不适宜'))
-    return ApiError.contentFiltered('ppio', _0x3f7f3c);
-  if (_0x3aaef4 >= 0x190) return ApiError.fromHttpStatus(_0x3aaef4, 'ppio', _0x3f7f3c);
+  if (list.includes('BALANCE') || list.includes('余额') || list.includes('QUOTA'))
+    return ApiError.insufficientBalance('ppio', code);
+  if (list.includes('RATE') || list.includes('LIMIT') || list.includes('频繁'))
+    return ApiError.rateLimit('ppio', code);
+  if (list.includes('AUTH') || list.includes('API_KEY') || list.includes('认证'))
+    return ApiError.authError('ppio', code, message);
+  if (list.includes('CONTENT') || list.includes('PROMPT') || list.includes('不适宜'))
+    return ApiError.contentFiltered('ppio', message);
+  if (status >= 0x190) return ApiError.fromHttpStatus(status, 'ppio', message);
   return null;
 }
-export function parseTaskError(_0x57ac54) {
-  if (!_0x57ac54) return null;
-  const _0x4db441 = (_0x57ac54.status || '').toLowerCase();
-  if (_0x4db441 === 'failed' || _0x4db441 === 'error') {
-    const _0x69f3bd = _0x57ac54.error || _0x57ac54.errorMessage || _0x57ac54.message || '未知错误',
-      _0x52d7ad = String(_0x69f3bd).toUpperCase();
-    for (const [_0x147aeb, _0x2b94bf] of Object.entries(PP_ALL_ERROR_CODES)) {
-      if (_0x52d7ad.includes(_0x147aeb))
+export function parseTaskError(error3) {
+  if (!error3) return null;
+  const data = (error3.status || '').toLowerCase();
+  if (data === 'failed' || data === 'error') {
+    const options = error3.error || error3.errorMessage || error3.message || '未知错误',
+      list2 = String(options).toUpperCase();
+    for (const [target, type4] of Object.entries(PP_ALL_ERROR_CODES)) {
+      if (list2.includes(target))
         return new ApiError({
-          type: _0x2b94bf.type,
+          type: type4.type,
           provider: 'ppio',
-          message: _0x2b94bf.message + ': ' + _0x69f3bd,
-          retryable: _0x2b94bf.retryable,
+          message: type4.message + ': ' + options,
+          retryable: type4.retryable,
         });
     }
-    return ApiError.taskFailed('ppio', _0x69f3bd);
+    return ApiError.taskFailed('ppio', options);
   }
   return null;
 }

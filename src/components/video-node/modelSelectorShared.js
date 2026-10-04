@@ -31,8 +31,8 @@ import {
 import { isModelAllowed } from '../../modules/subscriptionAccess.js';
 import { bindNodeModelMenuPrewarm, bindNodeSubmenus } from '../shared/nodeFooterControls.js';
 export const BINGHUO_VIDEO_GATE_MODEL_ID = 'feature/binghuo_video';
-export function isBinghuoVideoChannelVisible(_0x171951 = {}) {
-  return isModelAllowed(BINGHUO_VIDEO_GATE_MODEL_ID, _0x171951, 'binghuo');
+export function isBinghuoVideoChannelVisible(options = {}) {
+  return isModelAllowed(BINGHUO_VIDEO_GATE_MODEL_ID, options, 'binghuo');
 }
 export function buildVideoModelMenuHTML({
   activeModel: activeModel = '',
@@ -41,55 +41,58 @@ export function buildVideoModelMenuHTML({
   allowedModelIds: allowedModelIds = [],
   runningHubWorkflowAllowedModelIds: runningHubWorkflowAllowedModelIds = [],
 } = {}) {
-  const _0x30d671 = [
+  const allowedModelIds2 = [
       ...new Set(
         (Array['isArray'](allowedModelIds) ? allowedModelIds : [])
-          ['map']((_0x2f4e26) => String(_0x2f4e26 || '')['trim']())
+          ['map']((value) => String(value || '')['trim']())
           ['filter'](Boolean),
       ),
     ],
-    _0x2abb9f = _0x30d671['includes'](String(activeModel || '')['trim']())
+    activeModel2 = allowedModelIds2['includes'](String(activeModel || '')['trim']())
       ? String(activeModel || '')['trim']()
-      : _0x30d671[0x0] || String(activeModel || '')['trim']() || getDefaultRunningHubVideoWorkflowModelId(),
-    _0x3bd183 = buildBinghuoVideoMenuItemsHtml(_0x2abb9f);
-  if (_0x30d671['length']) {
-    const _0x19d827 = _0x30d671['map']((_0x40b25b) => getModelManifest(_0x40b25b))['filter'](
-        (_0x3eaa11) => _0x3eaa11?.['kind'] === 'video',
+      : allowedModelIds2[0x0] ||
+        String(activeModel || '')['trim']() ||
+        getDefaultRunningHubVideoWorkflowModelId(),
+    itemsHtml = buildBinghuoVideoMenuItemsHtml(activeModel2);
+  if (allowedModelIds2['length']) {
+    const list = allowedModelIds2['map']((item) => getModelManifest(item))['filter'](
+        (key) => key?.['kind'] === 'video',
       ),
-      _0x349d9d = _0x19d827['every'](
-        (_0x9fd639) => _0x9fd639['provider'] === 'runninghubwf' && _0x9fd639['adapterType'] === 'workflow',
+      label = list['every'](
+        (index) => index['provider'] === 'runninghubwf' && index['adapterType'] === 'workflow',
       ),
-      _0x9df27d = _0x19d827['every'](
-        (_0x497e51) =>
-          (['dreamina', 'volcengine', 'apimart']['includes'](_0x497e51?.['provider']) &&
-            !!_0x497e51?.['extensions']?.['dreaminaStyleVideo']) ||
-          (_0x497e51?.['provider'] === 'runninghub' &&
-            _0x497e51?.['adapterType'] === 'modelApi' &&
-            _0x497e51?.['extensions']?.['videoMenu']?.['role'] === 'runninghubModel'),
+      result = list['every'](
+        (enabled) =>
+          (['dreamina', 'volcengine', 'apimart']['includes'](enabled?.['provider']) &&
+            !!enabled?.['extensions']?.['dreaminaStyleVideo']) ||
+          (enabled?.['provider'] === 'runninghub' &&
+            enabled?.['adapterType'] === 'modelApi' &&
+            enabled?.['extensions']?.['videoMenu']?.['role'] === 'runninghubModel'),
       );
-    if (_0x9df27d) {
-      const _0xe19657 = new Set(_0x19d827['map']((_0x2c0b20) => _0x2c0b20['provider'])),
-        _0x59b8b2 = buildApimartVideoMenuItemsHtml(_0x2abb9f, provider, { allowedModelIds: _0x30d671 }),
-        _0x2a71a7 = buildRunningHubVideoModelApiMenuItems(_0x2abb9f, { allowedModelIds: _0x30d671 }),
-        _0x3020cb = getModelManifest(_0x2abb9f);
+    if (result) {
+      const map = new Set(list['map']((data) => data['provider'])),
+        itemsHtml2 = buildApimartVideoMenuItemsHtml(activeModel2, provider, {
+          allowedModelIds: allowedModelIds2,
+        }),
+        itemsHtml3 = buildRunningHubVideoModelApiMenuItems(activeModel2, {
+          allowedModelIds: allowedModelIds2,
+        }),
+        active = getModelManifest(activeModel2);
       return renderNodeModelMenu({
         kind: 'video',
-        activeModel: _0x2abb9f,
+        activeModel: activeModel2,
         items: [
-          ...(_0xe19657['has']('dreamina')
-            ? buildDreaminaOfficialVideoMenuItems()['map']((_0x34d4fe) => ({
-                ..._0x34d4fe,
+          ...(map['has']('dreamina')
+            ? buildDreaminaOfficialVideoMenuItems()['map']((args) => ({
+                ...args,
                 active:
-                  _0x3020cb?.['provider'] === 'dreamina' &&
-                  !!_0x3020cb?.['extensions']?.['dreaminaStyleVideo'],
+                  active?.['provider'] === 'dreamina' && !!active?.['extensions']?.['dreaminaStyleVideo'],
               }))
             : []),
-          ...(_0xe19657['has']('volcengine')
-            ? buildVolcengineOfficialVideoMenuItems(_0x2abb9f, provider)
-            : []),
+          ...(map['has']('volcengine') ? buildVolcengineOfficialVideoMenuItems(activeModel2, provider) : []),
         ],
         groups: [
-          ...(_0x59b8b2
+          ...(itemsHtml2
             ? [
                 {
                   id: 'apimart-video',
@@ -99,11 +102,11 @@ export function buildVideoModelMenuHTML({
                   label: 'APIMart',
                   subtitle: '视频生成模型',
                   iconHtml: buildApimartVideoLogoHTML(0x14),
-                  itemsHtml: _0x59b8b2,
+                  itemsHtml: itemsHtml2,
                 },
               ]
             : []),
-          ...(_0x2a71a7
+          ...(itemsHtml3
             ? [
                 {
                   id: 'runninghub-model',
@@ -111,49 +114,49 @@ export function buildVideoModelMenuHTML({
                   subtitle: '标准模型 API',
                   icon: 'images/RH.png',
                   iconAlt: 'runninghub',
-                  itemsHtml: _0x2a71a7,
+                  itemsHtml: itemsHtml3,
                 },
               ]
             : []),
         ],
       });
     }
-    const _0x3a2f16 = _0x19d827['map']((_0x2f8449) => ({
-      modelId: _0x2f8449['modelId'],
-      provider: _0x2f8449['provider'] || 'runninghubwf',
-      label: _0x2f8449['displayName'] || _0x2f8449['modelId'],
-      description: _0x2f8449['description'] || '',
-      icon: _0x2f8449['icon'] || (_0x349d9d ? 'images/RH.png' : ''),
-      iconAlt: _0x2f8449['provider'] || 'video',
-      vip: _0x2f8449['vip'] === !![],
+    const items = list['map']((modelId) => ({
+      modelId: modelId['modelId'],
+      provider: modelId['provider'] || 'runninghubwf',
+      label: modelId['displayName'] || modelId['modelId'],
+      description: modelId['description'] || '',
+      icon: modelId['icon'] || (label ? 'images/RH.png' : ''),
+      iconAlt: modelId['provider'] || 'video',
+      vip: modelId['vip'] === !![],
     }));
     return renderNodeModelMenu({
       kind: 'video',
-      activeModel: _0x2abb9f,
+      activeModel: activeModel2,
       groups: [
         {
           id: 'runninghub',
-          label: _0x349d9d ? 'RunningHUB工作流' : '可用视频模型',
+          label: label ? 'RunningHUB工作流' : '可用视频模型',
           subtitle: '当前场景可选',
-          icon: _0x349d9d ? 'images/RH.png' : '',
-          iconAlt: _0x349d9d ? 'runninghub' : 'video',
-          items: _0x3a2f16,
+          icon: label ? 'images/RH.png' : '',
+          iconAlt: label ? 'runninghub' : 'video',
+          items: items,
         },
       ],
     });
   }
-  const _0x28a7ea = buildRhAiAppVideoMenuItems(_0x2abb9f, {
+  const itemsHtml4 = buildRhAiAppVideoMenuItems(activeModel2, {
       allowedModelIds: runningHubWorkflowAllowedModelIds,
     }),
-    _0x3da75d = buildRunningHubVideoWorkflowMenuItems(_0x2abb9f, {
+    itemsHtml5 = buildRunningHubVideoWorkflowMenuItems(activeModel2, {
       allowedModelIds: runningHubWorkflowAllowedModelIds,
     });
   return renderNodeModelMenu({
     kind: 'video',
-    activeModel: _0x2abb9f,
+    activeModel: activeModel2,
     items: [
       ...buildDreaminaOfficialVideoMenuItems(),
-      ...buildVolcengineOfficialVideoMenuItems(_0x2abb9f, provider),
+      ...buildVolcengineOfficialVideoMenuItems(activeModel2, provider),
     ],
     groups: [
       {
@@ -162,13 +165,13 @@ export function buildVideoModelMenuHTML({
         subtitle: '视频生成模型',
         icon: 'images/grsai.png',
         items: getModelsByKind('video')
-          ['filter']((_0x43491f) => _0x43491f['provider'] === 'grsai')
-          ['map']((_0x17f44e) => ({
-            modelId: _0x17f44e['modelId'],
-            provider: _0x17f44e['provider'],
-            label: _0x17f44e['displayName'],
-            description: _0x17f44e['description'],
-            icon: _0x17f44e['icon'],
+          ['filter']((target) => target['provider'] === 'grsai')
+          ['map']((modelId2) => ({
+            modelId: modelId2['modelId'],
+            provider: modelId2['provider'],
+            label: modelId2['displayName'],
+            description: modelId2['description'],
+            icon: modelId2['icon'],
           })),
       },
       {
@@ -177,13 +180,13 @@ export function buildVideoModelMenuHTML({
         subtitle: '官方视频生成',
         icon: 'images/qwen.svg',
         items: getModelsByKind('video')
-          ['filter']((_0x583613) => _0x583613['provider'] === 'bailian')
-          ['map']((_0x2aa0fb) => ({
-            modelId: _0x2aa0fb['modelId'],
-            provider: _0x2aa0fb['provider'],
-            label: _0x2aa0fb['displayName'],
-            description: _0x2aa0fb['description'],
-            icon: _0x2aa0fb['icon'],
+          ['filter']((source) => source['provider'] === 'bailian')
+          ['map']((modelId3) => ({
+            modelId: modelId3['modelId'],
+            provider: modelId3['provider'],
+            label: modelId3['displayName'],
+            description: modelId3['description'],
+            icon: modelId3['icon'],
           })),
       },
       {
@@ -194,7 +197,7 @@ export function buildVideoModelMenuHTML({
         label: 'MiniMAX官方',
         subtitle: '视频生成模型',
         iconHtml: buildMinimaxVideoLogoHTML(0x14),
-        itemsHtml: buildMinimaxVideoMenuItemsHtml(_0x2abb9f),
+        itemsHtml: buildMinimaxVideoMenuItemsHtml(activeModel2),
       },
       {
         id: 'apimart-video',
@@ -204,7 +207,7 @@ export function buildVideoModelMenuHTML({
         label: 'APIMart',
         subtitle: '视频生成模型',
         iconHtml: buildApimartVideoLogoHTML(0x14),
-        itemsHtml: buildApimartVideoMenuItemsHtml(_0x2abb9f, provider),
+        itemsHtml: buildApimartVideoMenuItemsHtml(activeModel2, provider),
       },
       {
         id: 'agnes-video',
@@ -214,9 +217,9 @@ export function buildVideoModelMenuHTML({
         label: 'Agnes\x20AI',
         subtitle: 'Video\x20model\x20API',
         iconHtml: buildAgnesVideoLogoHTML(0x14),
-        itemsHtml: buildAgnesVideoMenuItemsHtml(_0x2abb9f),
+        itemsHtml: buildAgnesVideoMenuItemsHtml(activeModel2),
       },
-      ...(isBinghuoVideoChannelVisible(subscriptionState) && _0x3bd183
+      ...(isBinghuoVideoChannelVisible(subscriptionState) && itemsHtml
         ? [
             {
               id: 'binghuo-video',
@@ -226,11 +229,11 @@ export function buildVideoModelMenuHTML({
               label: '便宜渠道bh',
               subtitle: '授权用户专属视频模型',
               iconHtml: buildBinghuoVideoLogoHTML(0x14),
-              itemsHtml: _0x3bd183,
+              itemsHtml: itemsHtml,
             },
           ]
         : []),
-      ...(_0x28a7ea
+      ...(itemsHtml4
         ? [
             {
               id: 'rh-ai-app',
@@ -238,13 +241,13 @@ export function buildVideoModelMenuHTML({
               subtitle: '自定义\x20RunningHub\x20AI\x20App',
               icon: 'images/RH.png',
               iconAlt: 'runninghub',
-              itemsHtml: _0x28a7ea,
+              itemsHtml: itemsHtml4,
             },
           ]
         : []),
-      ...buildCustomProviderVideoMenuGroups(_0x2abb9f),
-      ...buildComfyUiVideoWorkflowMenuGroups(_0x2abb9f),
-      ...(_0x3da75d
+      ...buildCustomProviderVideoMenuGroups(activeModel2),
+      ...buildComfyUiVideoWorkflowMenuGroups(activeModel2),
+      ...(itemsHtml5
         ? [
             {
               id: 'runninghub',
@@ -252,7 +255,7 @@ export function buildVideoModelMenuHTML({
               subtitle: 'AI 工作流',
               icon: 'images/RH.png',
               iconAlt: 'runninghub',
-              itemsHtml: _0x3da75d,
+              itemsHtml: itemsHtml5,
             },
           ]
         : []),
@@ -262,55 +265,55 @@ export function buildVideoModelMenuHTML({
         subtitle: '标准模型\x20API',
         icon: 'images/RH.png',
         iconAlt: 'runninghub',
-        itemsHtml: buildRunningHubVideoModelApiMenuItems(_0x2abb9f),
+        itemsHtml: buildRunningHubVideoModelApiMenuItems(activeModel2),
       },
     ],
   });
 }
 export function bindLazyVideoModelMenu({
-  trigger: _0x4a2387,
-  menu: _0x1da858,
-  getActiveModel: _0x3f3878,
-  renderMenuHtml: _0x10d361,
-  onPrepared: _0x9c1bb,
+  trigger: trigger,
+  menu: menu,
+  getActiveModel: getActiveModel,
+  renderMenuHtml: renderMenuHtml,
+  onPrepared: onPrepared,
   documentObject: documentObject = globalThis['document'],
 } = {}) {
-  let _0x3f6c1b = null;
-  const _0x19d8e4 = () => {
-      if (!_0x1da858 || typeof _0x10d361 !== 'function') return null;
-      const _0x3ed896 = String(_0x3f3878?.() || '')['trim']();
+  let bindNodeSubmenus2 = null;
+  const run = () => {
+      if (!menu || typeof renderMenuHtml !== 'function') return null;
+      const next = String(getActiveModel?.() || '')['trim']();
       if (
-        _0x1da858['dataset']['lazyMounted'] === '1' &&
-        _0x1da858['dataset']['lazyModelId'] === _0x3ed896 &&
-        _0x1da858['childElementCount'] > 0x0
+        menu['dataset']['lazyMounted'] === '1' &&
+        menu['dataset']['lazyModelId'] === next &&
+        menu['childElementCount'] > 0x0
       )
-        return _0x1da858;
-      const _0x4885a9 = documentObject?.['createElement']?.('template');
-      if (!_0x4885a9) return null;
-      _0x4885a9['innerHTML'] = String(_0x10d361(_0x3ed896) || '')['trim']();
-      const _0x3c3736 = _0x4885a9['content']['firstElementChild'];
+        return menu;
+      const el = documentObject?.['createElement']?.('template');
+      if (!el) return null;
+      el['innerHTML'] = String(renderMenuHtml(next) || '')['trim']();
+      const el2 = el['content']['firstElementChild'];
       return (
-        (_0x1da858['innerHTML'] = _0x3c3736?.['innerHTML'] || ''),
-        (_0x1da858['dataset']['lazyMounted'] = '1'),
-        (_0x1da858['dataset']['lazyModelId'] = _0x3ed896),
-        (_0x1da858['dataset']['nodeMenuKind'] = _0x3c3736?.['dataset']?.['nodeMenuKind'] || 'video'),
-        _0x3f6c1b?.(),
-        (_0x3f6c1b = bindNodeSubmenus(_0x1da858)),
-        _0x1da858
+        (menu['innerHTML'] = el2?.['innerHTML'] || ''),
+        (menu['dataset']['lazyMounted'] = '1'),
+        (menu['dataset']['lazyModelId'] = next),
+        (menu['dataset']['nodeMenuKind'] = el2?.['dataset']?.['nodeMenuKind'] || 'video'),
+        bindNodeSubmenus2?.(),
+        (bindNodeSubmenus2 = bindNodeSubmenus(menu)),
+        menu
       );
     },
-    _0x4e40e9 = bindNodeModelMenuPrewarm({
-      trigger: _0x4a2387,
+    prepareNow = bindNodeModelMenuPrewarm({
+      trigger: trigger,
       prepare: () => {
-        const _0x1c1479 = _0x19d8e4();
-        if (_0x1c1479) _0x9c1bb?.(_0x1c1479);
-        return _0x1c1479;
+        const current = run();
+        if (current) onPrepared?.(current);
+        return current;
       },
     });
   return {
-    prepareNow: _0x4e40e9['prepareNow'],
+    prepareNow: prepareNow['prepareNow'],
     destroy() {
-      (_0x4e40e9['destroy'](), _0x3f6c1b?.(), (_0x3f6c1b = null));
+      (prepareNow['destroy'](), bindNodeSubmenus2?.(), (bindNodeSubmenus2 = null));
     },
   };
 }
@@ -318,35 +321,35 @@ export function renderVideoModelTriggerIconHTML({
   model: model = '',
   provider: provider = '',
   providersMeta: providersMeta = {},
-  resolveExecution: resolveExecution = (_0x4ef6dc, _0x2a1608) =>
-    resolveModelExecution(_0x4ef6dc, { providerHint: _0x2a1608 }) || resolveModelExecution(_0x4ef6dc) || null,
-  resolveProviderId: resolveProviderId = (_0x40543c, _0x2bb699, _0x18410e) =>
-    normalizeProviderId(_0x18410e?.['modelManifest']?.['provider']) ||
-    resolveModelProvider(_0x40543c, _0x2bb699, { allowPrefixInference: ![] }) ||
+  resolveExecution: resolveExecution = (entry, providerHint) =>
+    resolveModelExecution(entry, { providerHint: providerHint }) || resolveModelExecution(entry) || null,
+  resolveProviderId: resolveProviderId = (record, payload, handle) =>
+    normalizeProviderId(handle?.['modelManifest']?.['provider']) ||
+    resolveModelProvider(record, payload, { allowPrefixInference: ![] }) ||
     '',
 } = {}) {
-  const _0x1beb94 = resolveExecution(model, provider),
-    _0x43aad0 = resolveProviderId(model, provider, _0x1beb94);
-  if (_0x43aad0 === 'minimax') return buildMinimaxVideoLogoHTML(0xc);
-  if (_0x43aad0 === 'apimart') return buildApimartVideoLogoHTML(0xc);
-  if (_0x43aad0 === 'binghuo') return buildBinghuoVideoLogoHTML(0xc);
-  if (_0x43aad0 === 'volcengine') return buildVolcengineVideoLogoHTML(0xc);
-  if (_0x43aad0 === 'dreamina' || _0x1beb94?.['modelManifest']?.['extensions']?.['dreaminaStyleVideo'])
+  const execution = resolveExecution(model, provider),
+    providerId = resolveProviderId(model, provider, execution);
+  if (providerId === 'minimax') return buildMinimaxVideoLogoHTML(0xc);
+  if (providerId === 'apimart') return buildApimartVideoLogoHTML(0xc);
+  if (providerId === 'binghuo') return buildBinghuoVideoLogoHTML(0xc);
+  if (providerId === 'volcengine') return buildVolcengineVideoLogoHTML(0xc);
+  if (providerId === 'dreamina' || execution?.['modelManifest']?.['extensions']?.['dreaminaStyleVideo'])
     return buildDreaminaVideoLogoHTML(0xc);
-  if (_0x43aad0 === 'comfyui')
+  if (providerId === 'comfyui')
     return getComfyUiVideoWorkflowIconHtml(
-      _0x1beb94?.['modelManifest']?.['extensions']?.['videoMenu'] || {},
+      execution?.['modelManifest']?.['extensions']?.['videoMenu'] || {},
       0xc,
     );
-  if (_0x43aad0 && /^custom_[a-z0-9_-]+$/i['test'](_0x43aad0))
-    return buildCustomProviderVideoLogoHTML(_0x1beb94?.['modelManifest'] || {}, 0xc);
-  const _0x343afa = _0x43aad0 ? providersMeta?.[_0x43aad0]?.['logoPath'] : null;
-  if (_0x343afa)
+  if (providerId && /^custom_[a-z0-9_-]+$/i['test'](providerId))
+    return buildCustomProviderVideoLogoHTML(execution?.['modelManifest'] || {}, 0xc);
+  const state = providerId ? providersMeta?.[providerId]?.['logoPath'] : null;
+  if (state)
     return (
       '<img src="' +
-      _0x343afa +
+      state +
       '\x22\x20class=\x22node-menu-icon-small\x22\x20alt=\x22' +
-      _0x43aad0 +
+      providerId +
       '" loading="eager" decoding="async" fetchpriority="high" draggable="false">'
     );
   return '<div\x20class=\x22node-menu-icon-small\x20node-menu-icon-badge\x20video-model-fallback-icon\x22>VM</div>';

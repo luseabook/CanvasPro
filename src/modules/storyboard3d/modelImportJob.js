@@ -8,142 +8,138 @@ export const STORYBOARD_3D_MODEL_IMPORT_JOB_STATUSES = Object['freeze']([
   'cancelled',
 ]);
 const TERMINAL_STATUSES = new Set(['completed', 'error', 'cancelled']);
-function text(_0x256bf1) {
-  return String(_0x256bf1 || '')['trim']();
+function text(value) {
+  return String(value || '')['trim']();
 }
-function createJobId(_0x402025) {
-  const _0x24944d =
-    typeof _0x402025 === 'function' ? _0x402025('model-import') : globalThis['crypto']?.['randomUUID']?.();
+function createJobId(handler) {
+  const item =
+    typeof handler === 'function' ? handler('model-import') : globalThis['crypto']?.['randomUUID']?.();
   return (
-    text(_0x24944d) ||
+    text(item) ||
     'model-import-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x9)
   );
 }
-function cancellationError(_0x571c4f, _0xb1109d) {
+function cancellationError(cause, stage2) {
   return new Storyboard3DModelImportJobError(
-    text(_0x571c4f?.['message'] || _0x571c4f) || 'Model import was cancelled',
+    text(cause?.['message'] || cause) || 'Model import was cancelled',
     {
       code: 'MODEL_IMPORT_CANCELLED',
-      stage: _0xb1109d,
+      stage: stage2,
       cancelled: !![],
-      cause: _0x571c4f instanceof Error ? _0x571c4f : undefined,
+      cause: cause instanceof Error ? cause : undefined,
     },
   );
 }
 export class Storyboard3DModelImportJobError extends Error {
   constructor(
-    _0x4c26ae,
+    key,
     {
       code: code = 'MODEL_IMPORT_FAILED',
       stage: stage = 'queued',
       cancelled: cancelled = ![],
-      cause: _0x5c40c1,
+      cause: cause2,
     } = {},
   ) {
-    (super(_0x4c26ae, { cause: _0x5c40c1 }),
+    (super(key, { cause: cause2 }),
       (this['name'] = 'Storyboard3DModelImportJobError'),
       (this['code'] = code),
       (this['stage'] = stage),
       (this['cancelled'] = cancelled));
   }
 }
-export function normalizeStoryboard3DModelImportJobError(_0x30abc1, { stage: stage = 'queued' } = {}) {
-  if (_0x30abc1 instanceof Storyboard3DModelImportJobError) return _0x30abc1;
-  const _0x2d5fc4 = _0x30abc1?.['name'] === 'AbortError' || _0x30abc1?.['code'] === 'ABORT_ERR';
-  if (_0x2d5fc4) return cancellationError(_0x30abc1, stage);
-  return new Storyboard3DModelImportJobError(text(_0x30abc1?.['message']) || 'Model import failed', {
-    code: text(_0x30abc1?.['code']) || 'MODEL_IMPORT_FAILED',
+export function normalizeStoryboard3DModelImportJobError(cause3, { stage: stage = 'queued' } = {}) {
+  if (cause3 instanceof Storyboard3DModelImportJobError) return cause3;
+  const index = cause3?.['name'] === 'AbortError' || cause3?.['code'] === 'ABORT_ERR';
+  if (index) return cancellationError(cause3, stage);
+  return new Storyboard3DModelImportJobError(text(cause3?.['message']) || 'Model import failed', {
+    code: text(cause3?.['code']) || 'MODEL_IMPORT_FAILED',
     stage: stage,
-    cause: _0x30abc1 instanceof Error ? _0x30abc1 : undefined,
+    cause: cause3 instanceof Error ? cause3 : undefined,
   });
 }
 export function yieldStoryboard3DModelImportStart({
   windowObject: windowObject = globalThis['window'],
   setTimeoutFn: setTimeoutFn = globalThis['setTimeout'],
 } = {}) {
-  return new Promise((_0x5c46f7) => {
-    const _0x34e25c = () => setTimeoutFn(_0x5c46f7, 0x0);
+  return new Promise((result) => {
+    const data = () => setTimeoutFn(result, 0x0);
     if (typeof windowObject?.['requestAnimationFrame'] === 'function') {
-      windowObject['requestAnimationFrame'](_0x34e25c);
+      windowObject['requestAnimationFrame'](data);
       return;
     }
-    setTimeoutFn(_0x5c46f7, 0x0);
+    setTimeoutFn(result, 0x0);
   });
 }
-function cachedFileLike(_0x2d58d8, _0x33a1e5) {
+function cachedFileLike(error, size) {
   return {
-    name: text(_0x2d58d8?.['name'] || _0x2d58d8?.['fileName']),
-    fileName: text(_0x2d58d8?.['fileName'] || _0x2d58d8?.['name']),
-    type: text(_0x2d58d8?.['type']),
-    size: _0x33a1e5['byteLength'],
-    lastModified: Math['max'](0x0, Number(_0x2d58d8?.['lastModified']) || 0x0),
-    webkitRelativePath: text(_0x2d58d8?.['webkitRelativePath']),
+    name: text(error?.['name'] || error?.['fileName']),
+    fileName: text(error?.['fileName'] || error?.['name']),
+    type: text(error?.['type']),
+    size: size['byteLength'],
+    lastModified: Math['max'](0x0, Number(error?.['lastModified']) || 0x0),
+    webkitRelativePath: text(error?.['webkitRelativePath']),
     async arrayBuffer() {
-      return _0x33a1e5;
+      return size;
     },
   };
 }
-function eachMaterial(_0x46b421, _0xc518b8) {
-  (Array['isArray'](_0x46b421) ? _0x46b421 : [_0x46b421])['filter'](Boolean)['forEach'](_0xc518b8);
+function eachMaterial(options, target) {
+  (Array['isArray'](options) ? options : [options])['filter'](Boolean)['forEach'](target);
 }
-export function disposeCancelledStoryboard3DModelImportResult(_0x14cb2c) {
-  const _0x157b18 = _0x14cb2c?.['parsed'] || _0x14cb2c;
-  _0x157b18?.['disposeResources']?.();
-  const _0x27d5e4 = new Set(
-      [_0x157b18?.['scene'], ...(Array['isArray'](_0x157b18?.['scenes']) ? _0x157b18['scenes'] : [])][
-        'filter'
-      ](Boolean),
+export function disposeCancelledStoryboard3DModelImportResult(source) {
+  const next = source?.['parsed'] || source;
+  next?.['disposeResources']?.();
+  const list = new Set(
+      [next?.['scene'], ...(Array['isArray'](next?.['scenes']) ? next['scenes'] : [])]['filter'](Boolean),
     ),
-    _0x3c0f46 = new Set();
-  _0x27d5e4['forEach']((_0x1ee08f) =>
-    _0x1ee08f?.['traverse']?.((_0x4e3caf) => {
-      (_0x4e3caf['geometry'] &&
-        !_0x3c0f46['has'](_0x4e3caf['geometry']) &&
-        (_0x3c0f46['add'](_0x4e3caf['geometry']), _0x4e3caf['geometry']['dispose']?.()),
-        eachMaterial(_0x4e3caf['material'], (_0x833826) => {
-          if (_0x3c0f46['has'](_0x833826)) return;
-          _0x3c0f46['add'](_0x833826);
-          for (const _0x5ace82 of Object['values'](_0x833826)) {
-            _0x5ace82?.['isTexture'] &&
-              !_0x3c0f46['has'](_0x5ace82) &&
-              (_0x3c0f46['add'](_0x5ace82), _0x5ace82['dispose']?.());
+    map = new Set();
+  list['forEach']((current) =>
+    current?.['traverse']?.((entry) => {
+      (entry['geometry'] &&
+        !map['has'](entry['geometry']) &&
+        (map['add'](entry['geometry']), entry['geometry']['dispose']?.()),
+        eachMaterial(entry['material'], (record) => {
+          if (map['has'](record)) return;
+          map['add'](record);
+          for (const payload of Object['values'](record)) {
+            payload?.['isTexture'] && !map['has'](payload) && (map['add'](payload), payload['dispose']?.());
           }
-          _0x833826['dispose']?.();
+          record['dispose']?.();
         }));
     }),
   );
 }
 export class Storyboard3DModelImportJob {
   constructor({
-    file: _0x3a1825,
+    file: file,
     relatedFiles: relatedFiles = [],
     importOptions: importOptions = {},
     importModel: importModel = importStoryboard3DModelFile,
-    signal: _0x4c9a09,
+    signal: signal,
     yieldControl: yieldControl = yieldStoryboard3DModelImportStart,
     disposeResult: disposeResult = disposeCancelledStoryboard3DModelImportResult,
-    idFactory: _0xa038c5,
-    onProgress: _0x48a0e5,
-    onStateChange: _0x22599a,
-    onError: _0x480ae0,
+    idFactory: idFactory,
+    onProgress: onProgress,
+    onStateChange: onStateChange,
+    onError: onError,
   } = {}) {
-    if (!_0x3a1825 || typeof _0x3a1825['arrayBuffer'] !== 'function')
+    if (!file || typeof file['arrayBuffer'] !== 'function')
       throw new TypeError('A readable model file is required');
     if (typeof importModel !== 'function') throw new TypeError('importModel\x20must\x20be\x20a\x20function');
     if (typeof yieldControl !== 'function')
       throw new TypeError('yieldControl\x20must\x20be\x20a\x20function');
-    ((this['jobId'] = createJobId(_0xa038c5)),
-      (this['file'] = _0x3a1825),
+    ((this['jobId'] = createJobId(idFactory)),
+      (this['file'] = file),
       (this['relatedFiles'] = Array['isArray'](relatedFiles) ? [...relatedFiles] : []),
       (this['importOptions'] = { ...importOptions }),
       (this['importModel'] = importModel),
-      (this['externalSignal'] = _0x4c9a09 || null),
+      (this['externalSignal'] = signal || null),
       (this['abortController'] = typeof AbortController === 'function' ? new AbortController() : null),
       (this['yieldControl'] = yieldControl),
       (this['disposeResult'] = disposeResult),
-      (this['onProgress'] = _0x48a0e5),
-      (this['onStateChange'] = _0x22599a),
-      (this['onError'] = _0x480ae0),
+      (this['onProgress'] = onProgress),
+      (this['onStateChange'] = onStateChange),
+      (this['onError'] = onError),
       (this['status'] = 'queued'),
       (this['progress'] = 0x0),
       (this['result'] = null),
@@ -167,21 +163,17 @@ export class Storyboard3DModelImportJob {
   ['getSnapshot']() {
     return { ...this['_snapshot']() };
   }
-  ['_transition'](_0x5e4c4c, _0x2fc4b6, _0x35458c = {}) {
-    ((this['status'] = _0x5e4c4c),
+  ['_transition'](reason, handle, args = {}) {
+    ((this['status'] = reason),
       (this['progress'] = Math['max'](
         this['progress'],
-        Math['min'](0x1, Math['max'](0x0, Number(_0x2fc4b6) || 0x0)),
+        Math['min'](0x1, Math['max'](0x0, Number(handle) || 0x0)),
       )));
-    if (_0x35458c['result'] !== undefined) this['result'] = _0x35458c['result'];
-    if (_0x35458c['error'] !== undefined) this['error'] = _0x35458c['error'];
-    const _0x402b21 = this['_snapshot'](),
-      _0x38c8d2 = { ..._0x402b21, ..._0x35458c };
-    return (
-      this['onStateChange']?.(_0x402b21, { reason: _0x5e4c4c }),
-      this['onProgress']?.(_0x38c8d2),
-      _0x402b21
-    );
+    if (args['result'] !== undefined) this['result'] = args['result'];
+    if (args['error'] !== undefined) this['error'] = args['error'];
+    const args2 = this['_snapshot'](),
+      state = { ...args2, ...args };
+    return (this['onStateChange']?.(args2, { reason: reason }), this['onProgress']?.(state), args2);
   }
   ['_isCancelled']() {
     return (
@@ -191,19 +183,19 @@ export class Storyboard3DModelImportJob {
       this['abortController']?.['signal']?.['aborted'] === !![]
     );
   }
-  ['_throwIfCancelled'](_0x206124) {
+  ['_throwIfCancelled'](config) {
     if (!this['_isCancelled']()) return;
     throw cancellationError(
       this['cancelReason'] || this['externalSignal']?.['reason'] || 'Model\x20import\x20was\x20cancelled',
-      _0x206124,
+      config,
     );
   }
-  ['cancel'](_0x3f4eb9 = 'Model import was cancelled') {
+  ['cancel'](scope = 'Model import was cancelled') {
     if (TERMINAL_STATUSES['has'](this['status'])) return ![];
     return (
-      (this['cancelReason'] = _0x3f4eb9),
-      this['abortController']?.['abort']?.(_0x3f4eb9),
-      (this['error'] = cancellationError(_0x3f4eb9, this['status'])),
+      (this['cancelReason'] = scope),
+      this['abortController']?.['abort']?.(scope),
+      (this['error'] = cancellationError(scope, this['status'])),
       this['_transition']('cancelled', this['progress'], { error: this['error'] }),
       !![]
     );
@@ -219,56 +211,56 @@ export class Storyboard3DModelImportJob {
       (this['_externalAbortHandler'] = null));
   }
   async ['_run']() {
-    let _0x3cf041 = 'queued';
+    let stage3 = 'queued';
     if (this['status'] !== 'cancelled') this['_transition']('queued', 0x0);
     try {
-      (this['_throwIfCancelled'](_0x3cf041),
-        await this['yieldControl']({ job: this, stage: _0x3cf041 }),
-        this['_throwIfCancelled'](_0x3cf041),
-        (_0x3cf041 = 'reading'),
+      (this['_throwIfCancelled'](stage3),
+        await this['yieldControl']({ job: this, stage: stage3 }),
+        this['_throwIfCancelled'](stage3),
+        (stage3 = 'reading'),
         this['_transition']('reading', 0.12));
-      const _0x4aa68b = await this['file']['arrayBuffer']();
-      this['_throwIfCancelled'](_0x3cf041);
-      if (!(_0x4aa68b instanceof ArrayBuffer))
+      const byteLength = await this['file']['arrayBuffer']();
+      this['_throwIfCancelled'](stage3);
+      if (!(byteLength instanceof ArrayBuffer))
         throw new Storyboard3DModelImportJobError('Model file did not return an ArrayBuffer', {
           code: 'MODEL_FILE_UNREADABLE',
-          stage: _0x3cf041,
+          stage: stage3,
         });
-      ((_0x3cf041 = 'parsing'),
-        this['_transition']('parsing', 0.55, { byteLength: _0x4aa68b['byteLength'] }),
-        await this['yieldControl']({ job: this, stage: _0x3cf041 }),
-        this['_throwIfCancelled'](_0x3cf041));
-      const _0x2269de = await this['importModel'](cachedFileLike(this['file'], _0x4aa68b), {
+      ((stage3 = 'parsing'),
+        this['_transition']('parsing', 0.55, { byteLength: byteLength['byteLength'] }),
+        await this['yieldControl']({ job: this, stage: stage3 }),
+        this['_throwIfCancelled'](stage3));
+      const result2 = await this['importModel'](cachedFileLike(this['file'], byteLength), {
         ...this['importOptions'],
         relatedFiles: this['relatedFiles'],
         signal: this['abortController']?.['signal'] || this['externalSignal'],
-        onProgress: (_0x281a9e, _0x3a0b2e = {}) => {
+        onProgress: (input, parserDetail = {}) => {
           if (this['_isCancelled']()) return;
-          const _0x3c2c4a = Math['max'](0x0, Math['min'](0x1, Number(_0x281a9e) || 0x0));
-          this['_transition']('parsing', 0.55 + _0x3c2c4a * 0.4, {
-            parserProgress: _0x3c2c4a,
-            parserDetail: _0x3a0b2e,
+          const parserProgress = Math['max'](0x0, Math['min'](0x1, Number(input) || 0x0));
+          this['_transition']('parsing', 0.55 + parserProgress * 0.4, {
+            parserProgress: parserProgress,
+            parserDetail: parserDetail,
           });
         },
       });
       return (
-        this['_isCancelled']() && (this['disposeResult']?.(_0x2269de), this['_throwIfCancelled'](_0x3cf041)),
-        this['_transition']('completed', 0x1, { result: _0x2269de }),
-        _0x2269de
+        this['_isCancelled']() && (this['disposeResult']?.(result2), this['_throwIfCancelled'](stage3)),
+        this['_transition']('completed', 0x1, { result: result2 }),
+        result2
       );
-    } catch (_0x27aaae) {
-      const _0x93b503 = normalizeStoryboard3DModelImportJobError(_0x27aaae, { stage: _0x3cf041 });
-      if (_0x93b503['cancelled'] || this['_isCancelled']())
+    } catch (output) {
+      const error2 = normalizeStoryboard3DModelImportJobError(output, { stage: stage3 });
+      if (error2['cancelled'] || this['_isCancelled']())
         return (
           this['status'] !== 'cancelled' &&
-            ((this['cancelReason'] = _0x93b503),
-            this['_transition']('cancelled', this['progress'], { error: _0x93b503 })),
+            ((this['cancelReason'] = error2),
+            this['_transition']('cancelled', this['progress'], { error: error2 })),
           null
         );
-      ((this['error'] = _0x93b503),
-        this['_transition']('error', this['progress'], { error: _0x93b503 }),
-        this['onError']?.(_0x93b503, this['getSnapshot']()));
-      throw _0x93b503;
+      ((this['error'] = error2),
+        this['_transition']('error', this['progress'], { error: error2 }),
+        this['onError']?.(error2, this['getSnapshot']()));
+      throw error2;
     } finally {
       this['_unbindExternalAbort']();
     }
@@ -280,6 +272,6 @@ export class Storyboard3DModelImportJob {
     return ((this['runPromise'] = this['_run']()), this['runPromise']);
   }
 }
-export function createStoryboard3DModelImportJob(_0x5f3705) {
-  return new Storyboard3DModelImportJob(_0x5f3705);
+export function createStoryboard3DModelImportJob(value2) {
+  return new Storyboard3DModelImportJob(value2);
 }

@@ -17,319 +17,307 @@ import {
   TEXT_CONTROL_SIDE_HANDLE_RADIUS,
 } from './textControls.js';
 import { drawNumberLabelCommand } from './numberLabels.js';
-const getCanvasRenderSize = (_0x308de1) => ({
-    width: Number(_0x308de1?.style?.width?.replace('px', '')) || 1,
-    height: Number(_0x308de1?.style?.height?.replace('px', '')) || 1,
+const getCanvasRenderSize = (el) => ({
+    width: Number(el?.style?.width?.replace('px', '')) || 1,
+    height: Number(el?.style?.height?.replace('px', '')) || 1,
   }),
-  getCommandPoints = (_0x15b145, _0x3dc2fa) => mapBrushPoints(_0x15b145?.points, _0x3dc2fa, _0x3dc2fa),
-  drawTextControlButton = (_0x3133b2, _0x4733fb, _0x5db166, _0x430537) => {
-    (_0x3133b2.save(),
-      _0x3133b2.beginPath(),
-      _0x3133b2.arc(_0x4733fb.x, _0x4733fb.y, TEXT_CONTROL_BUTTON_RADIUS, 0, Math.PI * 2),
-      (_0x3133b2.fillStyle = _0x430537.fill),
-      (_0x3133b2.strokeStyle = _0x430537.stroke),
-      (_0x3133b2.lineWidth = 1.5),
-      _0x3133b2.fill(),
-      _0x3133b2.stroke(),
-      (_0x3133b2.strokeStyle = _0x430537.icon),
-      (_0x3133b2.fillStyle = _0x430537.icon),
-      (_0x3133b2.lineWidth = 1.6),
-      (_0x3133b2.lineCap = 'round'),
-      (_0x3133b2.lineJoin = 'round'),
-      _0x5db166(_0x3133b2, _0x4733fb),
-      _0x3133b2.restore());
+  getCommandPoints = (value, item) => mapBrushPoints(value?.points, item, item),
+  drawTextControlButton = (ctx, box, handler, key) => {
+    (ctx.save(),
+      ctx.beginPath(),
+      ctx.arc(box.x, box.y, TEXT_CONTROL_BUTTON_RADIUS, 0, Math.PI * 2),
+      (ctx.fillStyle = key.fill),
+      (ctx.strokeStyle = key.stroke),
+      (ctx.lineWidth = 1.5),
+      ctx.fill(),
+      ctx.stroke(),
+      (ctx.strokeStyle = key.icon),
+      (ctx.fillStyle = key.icon),
+      (ctx.lineWidth = 1.6),
+      (ctx.lineCap = 'round'),
+      (ctx.lineJoin = 'round'),
+      handler(ctx, box),
+      ctx.restore());
   },
-  getBoundaryCommands = (_0x414f72, _0x12d375) =>
-    _0x414f72
-      .slice(0, _0x12d375)
-      .filter(
-        (_0x5ea160) =>
-          _0x5ea160?.type === 'brush' || _0x5ea160?.type === 'rect' || _0x5ea160?.type === 'eraser',
-      );
-export const drawTextSelectionControls = ({
-  ctx: _0x412ae5,
-  geom: _0x5addf2,
-  resolveCssVar: _0x5cfc1c,
-} = {}) => {
-  if (!_0x412ae5 || !_0x5addf2) return;
-  const _0x114ea4 = _0x5cfc1c('--blue-border-focus') || _0x412ae5.strokeStyle,
-    _0x493e78 = _0x5cfc1c('--canvas-white') || _0x412ae5.fillStyle,
-    _0x13e46c = _0x5cfc1c('--bg') || _0x5cfc1c('--text-primary') || _0x114ea4,
-    _0x3f1e11 = { stroke: _0x114ea4, fill: _0x493e78, icon: _0x13e46c },
-    [_0x15b531, _0x530b17, _0x43d8d3, _0x46ef31] = _0x5addf2.corners;
-  (_0x412ae5.save(),
-    (_0x412ae5.strokeStyle = _0x114ea4),
-    (_0x412ae5.lineWidth = 1.5),
-    _0x412ae5.setLineDash([]),
-    _0x412ae5.beginPath(),
-    _0x412ae5.moveTo(_0x15b531.x, _0x15b531.y),
-    _0x412ae5.lineTo(_0x530b17.x, _0x530b17.y),
-    _0x412ae5.lineTo(_0x43d8d3.x, _0x43d8d3.y),
-    _0x412ae5.lineTo(_0x46ef31.x, _0x46ef31.y),
-    _0x412ae5.closePath(),
-    _0x412ae5.stroke(),
-    Object.values(_0x5addf2.handles || {})
-      .filter((_0x40531c) => _0x40531c && !Array.isArray(_0x40531c))
-      .forEach((_0x511460) => {
-        (_0x412ae5.beginPath(),
-          _0x412ae5.arc(_0x511460.x, _0x511460.y, TEXT_CONTROL_SIDE_HANDLE_RADIUS, 0, Math.PI * 2),
-          (_0x412ae5.fillStyle = _0x493e78),
-          (_0x412ae5.strokeStyle = _0x114ea4),
-          (_0x412ae5.lineWidth = 1.5),
-          _0x412ae5.fill(),
-          _0x412ae5.stroke());
+  getBoundaryCommands = (list, index) =>
+    list
+      .slice(0, index)
+      .filter((item2) => item2?.type === 'brush' || item2?.type === 'rect' || item2?.type === 'eraser');
+export const drawTextSelectionControls = ({ ctx: ctx2, geom: geom, resolveCssVar: resolveCssVar } = {}) => {
+  if (!ctx2 || !geom) return;
+  const stroke = resolveCssVar('--blue-border-focus') || ctx2.strokeStyle,
+    fill = resolveCssVar('--canvas-white') || ctx2.fillStyle,
+    icon = resolveCssVar('--bg') || resolveCssVar('--text-primary') || stroke,
+    result = { stroke: stroke, fill: fill, icon: icon },
+    [box2, box3, box4, box5] = geom.corners;
+  (ctx2.save(),
+    (ctx2.strokeStyle = stroke),
+    (ctx2.lineWidth = 1.5),
+    ctx2.setLineDash([]),
+    ctx2.beginPath(),
+    ctx2.moveTo(box2.x, box2.y),
+    ctx2.lineTo(box3.x, box3.y),
+    ctx2.lineTo(box4.x, box4.y),
+    ctx2.lineTo(box5.x, box5.y),
+    ctx2.closePath(),
+    ctx2.stroke(),
+    Object.values(geom.handles || {})
+      .filter((item3) => item3 && !Array.isArray(item3))
+      .forEach((box6) => {
+        (ctx2.beginPath(),
+          ctx2.arc(box6.x, box6.y, TEXT_CONTROL_SIDE_HANDLE_RADIUS, 0, Math.PI * 2),
+          (ctx2.fillStyle = fill),
+          (ctx2.strokeStyle = stroke),
+          (ctx2.lineWidth = 1.5),
+          ctx2.fill(),
+          ctx2.stroke());
       }),
-    _0x412ae5.restore(),
+    ctx2.restore(),
     drawTextControlButton(
-      _0x412ae5,
-      _0x15b531,
-      (_0x202af1, _0x5bf74b) => {
-        (_0x202af1.beginPath(),
-          _0x202af1.moveTo(_0x5bf74b.x - 3, _0x5bf74b.y - 3),
-          _0x202af1.lineTo(_0x5bf74b.x + 3, _0x5bf74b.y + 3),
-          _0x202af1.moveTo(_0x5bf74b.x + 3, _0x5bf74b.y - 3),
-          _0x202af1.lineTo(_0x5bf74b.x - 3, _0x5bf74b.y + 3),
-          _0x202af1.stroke());
+      ctx2,
+      box2,
+      (ctx3, box7) => {
+        (ctx3.beginPath(),
+          ctx3.moveTo(box7.x - 3, box7.y - 3),
+          ctx3.lineTo(box7.x + 3, box7.y + 3),
+          ctx3.moveTo(box7.x + 3, box7.y - 3),
+          ctx3.lineTo(box7.x - 3, box7.y + 3),
+          ctx3.stroke());
       },
-      _0x3f1e11,
+      result,
     ),
     drawTextControlButton(
-      _0x412ae5,
-      _0x46ef31,
-      (_0x3718ef, _0x11b870) => {
-        (_0x3718ef.strokeRect(_0x11b870.x - 2, _0x11b870.y - 4, 6, 6),
-          _0x3718ef.strokeRect(_0x11b870.x - 5, _0x11b870.y - 1, 6, 6));
+      ctx2,
+      box5,
+      (data, box8) => {
+        (data.strokeRect(box8.x - 2, box8.y - 4, 6, 6), data.strokeRect(box8.x - 5, box8.y - 1, 6, 6));
       },
-      _0x3f1e11,
+      result,
     ),
     drawTextControlButton(
-      _0x412ae5,
-      _0x530b17,
-      (_0x1e0e79, _0x45bdd0) => {
-        (_0x1e0e79.beginPath(),
-          _0x1e0e79.arc(_0x45bdd0.x, _0x45bdd0.y, 4, Math.PI * 0.15, Math.PI * 1.55),
-          _0x1e0e79.stroke(),
-          _0x1e0e79.beginPath(),
-          _0x1e0e79.moveTo(_0x45bdd0.x + 4, _0x45bdd0.y - 3),
-          _0x1e0e79.lineTo(_0x45bdd0.x + 5, _0x45bdd0.y + 2),
-          _0x1e0e79.lineTo(_0x45bdd0.x + 1, _0x45bdd0.y),
-          _0x1e0e79.stroke());
+      ctx2,
+      box3,
+      (ctx4, box9) => {
+        (ctx4.beginPath(),
+          ctx4.arc(box9.x, box9.y, 4, Math.PI * 0.15, Math.PI * 1.55),
+          ctx4.stroke(),
+          ctx4.beginPath(),
+          ctx4.moveTo(box9.x + 4, box9.y - 3),
+          ctx4.lineTo(box9.x + 5, box9.y + 2),
+          ctx4.lineTo(box9.x + 1, box9.y),
+          ctx4.stroke());
       },
-      _0x3f1e11,
+      result,
     ),
     drawTextControlButton(
-      _0x412ae5,
-      _0x43d8d3,
-      (_0x373ff7, _0x28a5b4) => {
-        (_0x373ff7.beginPath(),
-          _0x373ff7.moveTo(_0x28a5b4.x - 4, _0x28a5b4.y + 4),
-          _0x373ff7.lineTo(_0x28a5b4.x + 4, _0x28a5b4.y - 4),
-          _0x373ff7.moveTo(_0x28a5b4.x + 1, _0x28a5b4.y - 4),
-          _0x373ff7.lineTo(_0x28a5b4.x + 4, _0x28a5b4.y - 4),
-          _0x373ff7.lineTo(_0x28a5b4.x + 4, _0x28a5b4.y - 1),
-          _0x373ff7.moveTo(_0x28a5b4.x - 1, _0x28a5b4.y + 4),
-          _0x373ff7.lineTo(_0x28a5b4.x - 4, _0x28a5b4.y + 4),
-          _0x373ff7.lineTo(_0x28a5b4.x - 4, _0x28a5b4.y + 1),
-          _0x373ff7.stroke());
+      ctx2,
+      box4,
+      (ctx5, box10) => {
+        (ctx5.beginPath(),
+          ctx5.moveTo(box10.x - 4, box10.y + 4),
+          ctx5.lineTo(box10.x + 4, box10.y - 4),
+          ctx5.moveTo(box10.x + 1, box10.y - 4),
+          ctx5.lineTo(box10.x + 4, box10.y - 4),
+          ctx5.lineTo(box10.x + 4, box10.y - 1),
+          ctx5.moveTo(box10.x - 1, box10.y + 4),
+          ctx5.lineTo(box10.x - 4, box10.y + 4),
+          ctx5.lineTo(box10.x - 4, box10.y + 1),
+          ctx5.stroke());
       },
-      _0x3f1e11,
+      result,
     ));
 };
 export const renderEraseSceneCommands = ({
   documentRef: documentRef = null,
-  canvasEl: _0xdaad58,
-  ctx: _0x62ce18,
-  viewport: _0x595c10,
+  canvasEl: canvasEl,
+  ctx: ctx6,
+  viewport: viewport,
   commands: commands = [],
   draft: draft = null,
-  checkerPattern: _0x2d5c64,
+  checkerPattern: checkerPattern,
   eraseMaskCanvasEl: eraseMaskCanvasEl = null,
 } = {}) => {
-  if (!_0xdaad58 || !_0x62ce18) return eraseMaskCanvasEl;
-  const _0x3d139e = documentRef || globalThis.document,
-    _0x3fb482 = _0x595c10?.zoom || 1,
-    _0x166562 = getCanvasRenderSize(_0xdaad58),
-    _0x5445b2 = Math.max(1, Math.round(_0x166562.width)),
-    _0x1e9901 = Math.max(1, Math.round(_0x166562.height));
-  let _0x4ca26c = eraseMaskCanvasEl;
-  (!_0x4ca26c || _0x4ca26c.width !== _0x5445b2 || _0x4ca26c.height !== _0x1e9901) &&
-    ((_0x4ca26c = _0x3d139e.createElement('canvas')),
-    (_0x4ca26c.width = _0x5445b2),
-    (_0x4ca26c.height = _0x1e9901));
-  const _0x3960b9 = _0x4ca26c.getContext('2d');
-  if (!_0x3960b9) return _0x4ca26c;
-  (_0x3960b9.clearRect(0, 0, _0x5445b2, _0x1e9901),
-    (_0x3960b9.lineCap = 'round'),
-    (_0x3960b9.lineJoin = 'round'));
-  const _0x244c13 = (_0x2d1e51) => {
-    if (!_0x2d1e51 || (_0x2d1e51.type !== 'brush' && _0x2d1e51.type !== 'eraser')) return;
-    const _0x32480f = getCommandPoints(_0x2d1e51, _0x3fb482);
-    if (!_0x32480f.length) return;
-    drawEraseMaskCommand(_0x3960b9, {
-      type: _0x2d1e51.type,
-      points: _0x32480f,
-      lineWidth: getBrushLineWidth(_0x2d1e51.sizeWorld, _0x3fb482, _0x2d1e51.type),
+  if (!canvasEl || !ctx6) return eraseMaskCanvasEl;
+  const el2 = documentRef || globalThis.document,
+    options = viewport?.zoom || 1,
+    width = getCanvasRenderSize(canvasEl),
+    target = Math.max(1, Math.round(width.width)),
+    source = Math.max(1, Math.round(width.height));
+  let maskCanvas = eraseMaskCanvasEl;
+  (!maskCanvas || maskCanvas.width !== target || maskCanvas.height !== source) &&
+    ((maskCanvas = el2.createElement('canvas')), (maskCanvas.width = target), (maskCanvas.height = source));
+  const ctx7 = maskCanvas.getContext('2d');
+  if (!ctx7) return maskCanvas;
+  (ctx7.clearRect(0, 0, target, source), (ctx7.lineCap = 'round'), (ctx7.lineJoin = 'round'));
+  const run = (type) => {
+    if (!type || (type.type !== 'brush' && type.type !== 'eraser')) return;
+    const points = getCommandPoints(type, options);
+    if (!points.length) return;
+    drawEraseMaskCommand(ctx7, {
+      type: type.type,
+      points: points,
+      lineWidth: getBrushLineWidth(type.sizeWorld, options, type.type),
     });
   };
-  (Array.isArray(commands) ? commands : []).forEach(_0x244c13);
-  if (draft) _0x244c13(draft);
+  (Array.isArray(commands) ? commands : []).forEach(run);
+  if (draft) run(draft);
   return (
-    compositeSolidMaskPreview(_0x62ce18, {
-      maskCanvas: _0x4ca26c,
-      width: _0x166562.width,
-      height: _0x166562.height,
+    compositeSolidMaskPreview(ctx6, {
+      maskCanvas: maskCanvas,
+      width: width.width,
+      height: width.height,
     }),
-    _0x4ca26c
+    maskCanvas
   );
 };
 export const renderCommands = ({
-  ctx: _0x4983fd,
-  viewport: _0x214948,
-  canvasEl: _0x8f4385,
+  ctx: ctx8,
+  viewport: viewport2,
+  canvasEl: canvasEl2,
   commands: commands = [],
   isDraft: isDraft = false,
   isEraseScene: isEraseScene = false,
-  checkerPattern: _0x6caacf,
-  defaultTextColor: _0x5bb4f7,
-  getTextGeometry: _0x3b2bb1,
+  checkerPattern: checkerPattern2,
+  defaultTextColor: defaultTextColor,
+  getTextGeometry: getTextGeometry,
   selectedTextCommandIndex: selectedTextCommandIndex = null,
   selectedCommandsRef: selectedCommandsRef = null,
-  resolveCssVar: _0x476a1e,
+  resolveCssVar: resolveCssVar2,
   fillRegionCache: fillRegionCache = null,
   numberLabelBackgroundColor: numberLabelBackgroundColor = '',
 } = {}) => {
-  if (!_0x4983fd || !_0x8f4385) return;
-  const _0x5f4b93 = _0x214948?.zoom || 1,
-    _0x408e13 = getCanvasRenderSize(_0x8f4385);
-  commands.forEach((_0x33e169, _0x280b17) => {
-    if (_0x33e169.type === 'brush') {
-      _0x4983fd.save();
-      const _0x536b86 = getCommandPoints(_0x33e169, _0x5f4b93);
-      if (!_0x536b86.length) {
-        _0x4983fd.restore();
+  if (!ctx8 || !canvasEl2) return;
+  const checkerZoom = viewport2?.zoom || 1,
+    width2 = getCanvasRenderSize(canvasEl2);
+  commands.forEach((strokeStyle, next) => {
+    if (strokeStyle.type === 'brush') {
+      ctx8.save();
+      const points2 = getCommandPoints(strokeStyle, checkerZoom);
+      if (!points2.length) {
+        ctx8.restore();
         return;
       }
-      const _0x5a9bf2 = getBrushLineWidth(_0x33e169.sizeWorld, _0x5f4b93, 'brush');
+      const lineWidth = getBrushLineWidth(strokeStyle.sizeWorld, checkerZoom, 'brush');
       if (isEraseScene) {
-        const _0x3f7d94 =
-          createEraseCheckerboardPattern(_0x4983fd, _0x5f4b93) ||
-          _0x6caacf ||
-          _0x476a1e?.('--white-20') ||
+        const checkerPattern3 =
+          createEraseCheckerboardPattern(ctx8, checkerZoom) ||
+          checkerPattern2 ||
+          resolveCssVar2?.('--white-20') ||
           'transparent';
-        drawEraseBrushCommand(_0x4983fd, {
+        drawEraseBrushCommand(ctx8, {
           type: 'brush',
-          points: _0x536b86,
-          lineWidth: _0x5a9bf2,
-          checkerPattern: _0x3f7d94,
-          checkerZoom: _0x5f4b93,
+          points: points2,
+          lineWidth: lineWidth,
+          checkerPattern: checkerPattern3,
+          checkerZoom: checkerZoom,
           checkerAlpha: 0.8,
           includeErasePass: false,
         });
       } else
-        drawRoundBrushStroke(_0x4983fd, {
-          points: _0x536b86,
-          lineWidth: _0x5a9bf2,
-          strokeStyle: _0x33e169.color,
-          fillStyle: _0x33e169.color,
+        drawRoundBrushStroke(ctx8, {
+          points: points2,
+          lineWidth: lineWidth,
+          strokeStyle: strokeStyle.color,
+          fillStyle: strokeStyle.color,
           globalCompositeOperation: 'source-over',
         });
-      _0x4983fd.restore();
+      ctx8.restore();
       return;
     }
-    if (_0x33e169.type === 'eraser') {
-      _0x4983fd.save();
-      const _0x1a6491 = getCommandPoints(_0x33e169, _0x5f4b93);
-      if (!_0x1a6491.length) {
-        _0x4983fd.restore();
+    if (strokeStyle.type === 'eraser') {
+      ctx8.save();
+      const points3 = getCommandPoints(strokeStyle, checkerZoom);
+      if (!points3.length) {
+        ctx8.restore();
         return;
       }
-      (drawRoundBrushStroke(_0x4983fd, {
-        points: _0x1a6491,
-        lineWidth: getEraserClearLineWidth(getBrushLineWidth(_0x33e169.sizeWorld, _0x5f4b93, 'eraser')),
+      (drawRoundBrushStroke(ctx8, {
+        points: points3,
+        lineWidth: getEraserClearLineWidth(getBrushLineWidth(strokeStyle.sizeWorld, checkerZoom, 'eraser')),
         strokeStyle: 'black',
         fillStyle: 'black',
         globalCompositeOperation: 'destination-out',
       }),
-        _0x4983fd.restore());
+        ctx8.restore());
       return;
     }
-    if (_0x33e169.type === 'rect') {
-      const _0x358a7b = _0x33e169.x1 * _0x5f4b93,
-        _0x48ee49 = _0x33e169.y1 * _0x5f4b93,
-        _0x3f8ecb = _0x33e169.x2 * _0x5f4b93,
-        _0x15532a = _0x33e169.y2 * _0x5f4b93,
-        _0x296b5e = Math.min(_0x358a7b, _0x3f8ecb),
-        _0x4ee33d = Math.min(_0x48ee49, _0x15532a),
-        _0x4a1dad = Math.abs(_0x3f8ecb - _0x358a7b),
-        _0x1e8d6f = Math.abs(_0x15532a - _0x48ee49);
-      (_0x4983fd.save(),
-        (_0x4983fd.globalCompositeOperation = 'source-over'),
-        (_0x4983fd.strokeStyle = _0x33e169.color),
-        (_0x4983fd.lineWidth = getBrushLineWidth(_0x33e169.sizeWorld, _0x5f4b93, 'brush')));
-      if (isDraft) _0x4983fd.setLineDash([6, 5]);
-      (_0x4983fd.strokeRect(_0x296b5e, _0x4ee33d, _0x4a1dad, _0x1e8d6f), _0x4983fd.restore());
+    if (strokeStyle.type === 'rect') {
+      const current = strokeStyle.x1 * checkerZoom,
+        entry = strokeStyle.y1 * checkerZoom,
+        record = strokeStyle.x2 * checkerZoom,
+        payload = strokeStyle.y2 * checkerZoom,
+        handle = Math.min(current, record),
+        state = Math.min(entry, payload),
+        config = Math.abs(record - current),
+        scope = Math.abs(payload - entry);
+      (ctx8.save(),
+        (ctx8.globalCompositeOperation = 'source-over'),
+        (ctx8.strokeStyle = strokeStyle.color),
+        (ctx8.lineWidth = getBrushLineWidth(strokeStyle.sizeWorld, checkerZoom, 'brush')));
+      if (isDraft) ctx8.setLineDash([6, 5]);
+      (ctx8.strokeRect(handle, state, config, scope), ctx8.restore());
       return;
     }
-    if (_0x33e169.type === 'text') {
-      const _0x3c9536 = _0x33e169.x * _0x5f4b93,
-        _0x2524a1 = _0x33e169.y * _0x5f4b93,
-        _0x6dc5b2 = Math.max(1, _0x33e169.sizeWorld * _0x5f4b93),
-        { scaleX: _0x145e93, scaleY: _0x493f51 } = getTextScalePair(_0x33e169),
-        _0x470a3d = Number(_0x33e169.rotation) || 0;
-      (_0x4983fd.save(),
-        (_0x4983fd.globalCompositeOperation = 'source-over'),
-        (_0x4983fd.fillStyle = _0x33e169.color || _0x5bb4f7),
-        (_0x4983fd.font = _0x6dc5b2 + 'px sans-serif'),
-        (_0x4983fd.textBaseline = 'top'));
-      const _0x30746a = String(_0x33e169.text || '');
-      (_0x4983fd.translate(_0x3c9536, _0x2524a1),
-        _0x4983fd.rotate(_0x470a3d),
-        _0x4983fd.scale(_0x145e93, _0x493f51),
-        _0x4983fd.fillText(_0x30746a, 0, 0),
-        _0x4983fd.restore());
-      if (!isDraft && commands === selectedCommandsRef && selectedTextCommandIndex === _0x280b17) {
-        const _0xf437c2 = _0x3b2bb1?.(_0x33e169, _0x214948);
-        _0xf437c2 && drawTextSelectionControls({ ctx: _0x4983fd, geom: _0xf437c2, resolveCssVar: _0x476a1e });
+    if (strokeStyle.type === 'text') {
+      const input = strokeStyle.x * checkerZoom,
+        output = strokeStyle.y * checkerZoom,
+        value2 = Math.max(1, strokeStyle.sizeWorld * checkerZoom),
+        { scaleX: scaleX, scaleY: scaleY } = getTextScalePair(strokeStyle),
+        value3 = Number(strokeStyle.rotation) || 0;
+      (ctx8.save(),
+        (ctx8.globalCompositeOperation = 'source-over'),
+        (ctx8.fillStyle = strokeStyle.color || defaultTextColor),
+        (ctx8.font = value2 + 'px sans-serif'),
+        (ctx8.textBaseline = 'top'));
+      const value4 = String(strokeStyle.text || '');
+      (ctx8.translate(input, output),
+        ctx8.rotate(value3),
+        ctx8.scale(scaleX, scaleY),
+        ctx8.fillText(value4, 0, 0),
+        ctx8.restore());
+      if (!isDraft && commands === selectedCommandsRef && selectedTextCommandIndex === next) {
+        const geom2 = getTextGeometry?.(strokeStyle, viewport2);
+        geom2 && drawTextSelectionControls({ ctx: ctx8, geom: geom2, resolveCssVar: resolveCssVar2 });
       }
       return;
     }
-    if (_0x33e169.type === 'number-label') {
+    if (strokeStyle.type === 'number-label') {
       drawNumberLabelCommand({
-        ctx: _0x4983fd,
-        cmd: _0x33e169,
-        scaleX: _0x5f4b93,
-        scaleY: _0x5f4b93,
-        defaultColor: _0x5bb4f7,
+        ctx: ctx8,
+        cmd: strokeStyle,
+        scaleX: checkerZoom,
+        scaleY: checkerZoom,
+        defaultColor: defaultTextColor,
         backgroundColor: numberLabelBackgroundColor,
       });
       return;
     }
-    if (_0x33e169.type === 'fill') {
-      const _0x14894d = Math.floor(Number(_0x33e169.x || 0) * _0x5f4b93),
-        _0x1cc391 = Math.floor(Number(_0x33e169.y || 0) * _0x5f4b93),
-        _0x3f02b9 = _0x33e169.color || _0x5bb4f7,
-        _0x26953a = getCachedSealedFillRegion({
+    if (strokeStyle.type === 'fill') {
+      const seedX = Math.floor(Number(strokeStyle.x || 0) * checkerZoom),
+        seedY = Math.floor(Number(strokeStyle.y || 0) * checkerZoom),
+        fillStyle = strokeStyle.color || defaultTextColor,
+        cachedSealedFillRegion = getCachedSealedFillRegion({
           cache: fillRegionCache,
-          width: _0x408e13.width,
-          height: _0x408e13.height,
-          zoom: _0x5f4b93,
-          fillCommand: _0x33e169,
-          boundaryCommands: getBoundaryCommands(commands, _0x280b17),
-          seedX: _0x14894d,
-          seedY: _0x1cc391,
-          extraKey: 'color:' + _0x3f02b9,
-          pointToPixel: (_0x55dc72) => ({
-            x: Number(_0x55dc72?.x || 0) * _0x5f4b93,
-            y: Number(_0x55dc72?.y || 0) * _0x5f4b93,
+          width: width2.width,
+          height: width2.height,
+          zoom: checkerZoom,
+          fillCommand: strokeStyle,
+          boundaryCommands: getBoundaryCommands(commands, next),
+          seedX: seedX,
+          seedY: seedY,
+          extraKey: 'color:' + fillStyle,
+          pointToPixel: (box11) => ({
+            x: Number(box11?.x || 0) * checkerZoom,
+            y: Number(box11?.y || 0) * checkerZoom,
           }),
-          getStrokeWidth: (_0x23c1ee) => getBrushLineWidth(_0x23c1ee?.sizeWorld, _0x5f4b93, _0x23c1ee?.type),
+          getStrokeWidth: (value5) => getBrushLineWidth(value5?.sizeWorld, checkerZoom, value5?.type),
         });
-      (_0x4983fd.save(),
-        paintFilledRegion(_0x4983fd, _0x26953a, _0x408e13.width, _0x408e13.height, {
-          fillStyle: _0x3f02b9,
+      (ctx8.save(),
+        paintFilledRegion(ctx8, cachedSealedFillRegion, width2.width, width2.height, {
+          fillStyle: fillStyle,
           globalCompositeOperation: 'source-over',
         }),
-        _0x4983fd.restore());
+        ctx8.restore());
     }
   });
 };

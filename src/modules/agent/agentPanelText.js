@@ -264,19 +264,19 @@ const PANEL_TEXT = Object['freeze']({
     executionModeSaved: 'Execution mode saved. This turn will keep the current confirmation policy.',
   }),
 });
-function normalizePanelLocale(_0x46419b = getLocale()) {
-  return String(_0x46419b || '')
+function normalizePanelLocale(locale = getLocale()) {
+  return String(locale || '')
     ['toLowerCase']()
     ['startsWith']('en')
     ? 'en-US'
     : 'zh-CN';
 }
-export function agentPanelText(_0x3287f8, _0x5bc9c = getLocale()) {
-  const _0x17c53b = normalizePanelLocale(_0x5bc9c);
-  return PANEL_TEXT[_0x17c53b]?.[_0x3287f8] || PANEL_TEXT['zh-CN'][_0x3287f8] || _0x3287f8;
+export function agentPanelText(value, locale2 = getLocale()) {
+  const panelLocale = normalizePanelLocale(locale2);
+  return PANEL_TEXT[panelLocale]?.[value] || PANEL_TEXT['zh-CN'][value] || value;
 }
-export function formatAgentPanelText(_0x2972be, _0x4c409c = {}, _0xfe1aa1 = getLocale()) {
-  return agentPanelText(_0x2972be, _0xfe1aa1)['replace'](/\{(\w+)\}/g, (_0xa1296d, _0x17adc1) =>
-    _0x4c409c[_0x17adc1] == null ? '' : String(_0x4c409c[_0x17adc1]),
+export function formatAgentPanelText(item, key = {}, locale3 = getLocale()) {
+  return agentPanelText(item, locale3)['replace'](/\{(\w+)\}/g, (index, result) =>
+    key[result] == null ? '' : String(key[result]),
   );
 }

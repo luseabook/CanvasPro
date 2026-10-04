@@ -8,115 +8,113 @@ const TASK_ID_KEYS = new Set([
   'dreaminaSubmitId',
   'submitId',
 ]);
-function getState(_0x180ebc) {
-  return _0x180ebc['store']?.['getStateRaw']?.() || _0x180ebc['store']?.['getState']?.() || {};
+function getState(value) {
+  return value['store']?.['getStateRaw']?.() || value['store']?.['getState']?.() || {};
 }
-function getNode(_0x2ed79d, _0x22759a) {
-  const _0x489745 = String(_0x22759a || '')['trim']();
-  return _0x489745 ? getState(_0x2ed79d)['nodes']?.[_0x489745] || null : null;
+function getNode(item, key) {
+  const index = String(key || '')['trim']();
+  return index ? getState(item)['nodes']?.[index] || null : null;
 }
-function getNodeRuntime(_0x4963d5, _0x54326b) {
-  const _0x3780db = _0x4963d5['nodeRuntimeRegistry'] || nodeRuntimeRegistry;
-  return typeof _0x3780db?.['resolve'] === 'function'
-    ? _0x3780db['resolve'](_0x54326b, { store: _0x4963d5['store'] })
-    : _0x3780db?.['get']?.(_0x54326b) || null;
+function getNodeRuntime(store, result) {
+  const promise = store['nodeRuntimeRegistry'] || nodeRuntimeRegistry;
+  return typeof promise?.['resolve'] === 'function'
+    ? promise['resolve'](result, { store: store['store'] })
+    : promise?.['get']?.(result) || null;
 }
-function trimString(_0x241572) {
-  return typeof _0x241572 === 'string' ? _0x241572['trim']() : '';
+function trimString(data) {
+  return typeof data === 'string' ? data['trim']() : '';
 }
-function positiveNumber(_0x1dec10, _0x32d82e) {
-  const _0x17bb82 = Number(_0x1dec10);
-  return Number['isFinite'](_0x17bb82) && _0x17bb82 >= 0x0 ? _0x17bb82 : _0x32d82e;
+function positiveNumber(options, target) {
+  const count = Number(options);
+  return Number['isFinite'](count) && count >= 0x0 ? count : target;
 }
-function collectTaskIds(_0x5e5441, _0x82ecc2, _0x38e449 = 0x0) {
-  if (!_0x5e5441 || typeof _0x5e5441 !== 'object' || _0x38e449 > 0x4) return;
-  if (Array['isArray'](_0x5e5441)) {
-    for (const _0x376d92 of _0x5e5441) collectTaskIds(_0x376d92, _0x82ecc2, _0x38e449 + 0x1);
+function collectTaskIds(enabled, source, count2 = 0x0) {
+  if (!enabled || typeof enabled !== 'object' || count2 > 0x4) return;
+  if (Array['isArray'](enabled)) {
+    for (const next of enabled) collectTaskIds(next, source, count2 + 0x1);
     return;
   }
-  for (const [_0x6380a2, _0x2b5753] of Object['entries'](_0x5e5441)) {
-    if (TASK_ID_KEYS['has'](_0x6380a2)) {
-      const _0x5e4f02 = trimString(_0x2b5753);
-      if (_0x5e4f02) _0x82ecc2['add'](_0x5e4f02);
+  for (const [current, entry] of Object['entries'](enabled)) {
+    if (TASK_ID_KEYS['has'](current)) {
+      const trimString2 = trimString(entry);
+      if (trimString2) source['add'](trimString2);
     }
-    if (_0x2b5753 && typeof _0x2b5753 === 'object') collectTaskIds(_0x2b5753, _0x82ecc2, _0x38e449 + 0x1);
+    if (entry && typeof entry === 'object') collectTaskIds(entry, source, count2 + 0x1);
   }
 }
-function nodeHasTaskId(_0x180bbd = {}, _0x1b9e26 = '') {
-  const _0x5c6371 = trimString(_0x1b9e26);
-  if (!_0x5c6371) return ![];
-  const _0x1a58ee = new Set();
-  return (collectTaskIds(_0x180bbd, _0x1a58ee), _0x1a58ee['has'](_0x5c6371));
+function nodeHasTaskId(options2 = {}, record = '') {
+  const trimString3 = trimString(record);
+  if (!trimString3) return ![];
+  const map = new Set();
+  return (collectTaskIds(options2, map), map['has'](trimString3));
 }
-function getSelectedNodeIds(_0xb8a823) {
-  const _0x17cfb3 = getState(_0xb8a823)['selectedNodeIds'];
-  return Array['isArray'](_0x17cfb3)
-    ? _0x17cfb3['map']((_0x7a5ba1) => trimString(_0x7a5ba1))['filter'](Boolean)
-    : [];
+function getSelectedNodeIds(payload) {
+  const list = getState(payload)['selectedNodeIds'];
+  return Array['isArray'](list) ? list['map']((handle) => trimString(handle))['filter'](Boolean) : [];
 }
-function pushExistingNodeId(_0x217827, _0x142b5d, _0x8c1099, _0x45f562) {
-  const _0x1737a8 = trimString(_0x45f562);
-  if (!_0x1737a8 || _0x142b5d['has'](_0x1737a8)) return;
-  if (!getNode(_0x8c1099, _0x1737a8))
-    throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas\x20node\x20not\x20found:\x20' + _0x1737a8, {
-      nodeId: _0x1737a8,
+function pushExistingNodeId(list2, map2, state, config) {
+  const nodeId = trimString(config);
+  if (!nodeId || map2['has'](nodeId)) return;
+  if (!getNode(state, nodeId))
+    throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas\x20node\x20not\x20found:\x20' + nodeId, {
+      nodeId: nodeId,
     });
-  (_0x217827['push'](_0x1737a8), _0x142b5d['add'](_0x1737a8));
+  (list2['push'](nodeId), map2['add'](nodeId));
 }
-function resolveTaskTargetNodeIds(_0x34ff9c = {}, _0x4db74b = {}) {
-  const _0x5ceb01 = [],
-    _0x5a946a = new Set();
-  if (Array['isArray'](_0x34ff9c['ids']) && _0x34ff9c['ids']['length'] > 0x0) {
-    for (const _0x28ea88 of _0x34ff9c['ids']) pushExistingNodeId(_0x5ceb01, _0x5a946a, _0x4db74b, _0x28ea88);
+function resolveTaskTargetNodeIds(options3 = {}, scope = {}) {
+  const list3 = [],
+    input = new Set();
+  if (Array['isArray'](options3['ids']) && options3['ids']['length'] > 0x0) {
+    for (const output of options3['ids']) pushExistingNodeId(list3, input, scope, output);
   }
-  (pushExistingNodeId(_0x5ceb01, _0x5a946a, _0x4db74b, _0x34ff9c['nodeId']),
-    pushExistingNodeId(_0x5ceb01, _0x5a946a, _0x4db74b, _0x34ff9c['targetNodeId']),
-    pushExistingNodeId(_0x5ceb01, _0x5a946a, _0x4db74b, _0x34ff9c['resultNodeId']));
-  const _0x2cb63e = trimString(_0x34ff9c['taskId']);
-  if (_0x2cb63e)
-    for (const [_0x4edf34, _0x4a953f] of Object['entries'](getState(_0x4db74b)['nodes'] || {})) {
-      if (nodeHasTaskId(_0x4a953f, _0x2cb63e)) pushExistingNodeId(_0x5ceb01, _0x5a946a, _0x4db74b, _0x4edf34);
+  (pushExistingNodeId(list3, input, scope, options3['nodeId']),
+    pushExistingNodeId(list3, input, scope, options3['targetNodeId']),
+    pushExistingNodeId(list3, input, scope, options3['resultNodeId']));
+  const taskId = trimString(options3['taskId']);
+  if (taskId)
+    for (const [value2, value3] of Object['entries'](getState(scope)['nodes'] || {})) {
+      if (nodeHasTaskId(value3, taskId)) pushExistingNodeId(list3, input, scope, value2);
     }
-  if (_0x5ceb01['length'] === 0x0 && !_0x2cb63e)
-    for (const _0x5a2d3f of getSelectedNodeIds(_0x4db74b)) {
-      pushExistingNodeId(_0x5ceb01, _0x5a946a, _0x4db74b, _0x5a2d3f);
+  if (list3['length'] === 0x0 && !taskId)
+    for (const value4 of getSelectedNodeIds(scope)) {
+      pushExistingNodeId(list3, input, scope, value4);
     }
-  if (_0x5ceb01['length'] === 0x0)
+  if (list3['length'] === 0x0)
     throw createCanvasCommandError(
       'TASK_TARGET_NOT_FOUND',
       'Task target node was not found. Provide nodeId, ids, resultNodeId, or taskId.',
-      { taskId: _0x2cb63e },
+      { taskId: taskId },
     );
-  return _0x5ceb01;
+  return list3;
 }
-function normalizeStatus(_0x492798 = {}, _0x1d6501 = {}) {
-  const _0x2a9c8f =
-      _0x492798?.['status'] ||
-      _0x492798?.['jobStatus'] ||
-      _0x492798?.['result']?.['status'] ||
-      _0x1d6501['jobStatus'] ||
-      _0x1d6501['rhTaskStatus'] ||
-      _0x1d6501['asyncTaskStatus'] ||
+function normalizeStatus(response = {}, value5 = {}) {
+  const value6 =
+      response?.['status'] ||
+      response?.['jobStatus'] ||
+      response?.['result']?.['status'] ||
+      value5['jobStatus'] ||
+      value5['rhTaskStatus'] ||
+      value5['asyncTaskStatus'] ||
       '',
-    _0x3720e9 = trimString(_0x2a9c8f)['toLowerCase']();
-  if (_0x3720e9) return _0x3720e9;
-  if (_0x492798?.['ok'] === ![]) return 'failed';
-  if (_0x492798?.['ok'] === !![]) return 'success';
+    trimString4 = trimString(value6)['toLowerCase']();
+  if (trimString4) return trimString4;
+  if (response?.['ok'] === ![]) return 'failed';
+  if (response?.['ok'] === !![]) return 'success';
   return '';
 }
-function pickTaskId(_0x2e92b6 = {}, _0x427a89 = {}, _0x4ac711 = '') {
+function pickTaskId(options4 = {}, value7 = {}, value8 = '') {
   return trimString(
-    _0x2e92b6?.['taskId'] ||
-      _0x2e92b6?.['targetTaskId'] ||
-      _0x2e92b6?.['result']?.['taskId'] ||
-      _0x427a89['taskId'] ||
-      _0x427a89['rhTaskId'] ||
-      _0x427a89['asyncTaskId'] ||
-      _0x4ac711,
+    options4?.['taskId'] ||
+      options4?.['targetTaskId'] ||
+      options4?.['result']?.['taskId'] ||
+      value7['taskId'] ||
+      value7['rhTaskId'] ||
+      value7['asyncTaskId'] ||
+      value8,
   );
 }
-export function registerTaskCommands(_0x76781f) {
-  (_0x76781f['register']({
+export function registerTaskCommands(value9) {
+  (value9['register']({
     id: 'task.focusResult',
     description: 'Focus\x20the\x20canvas\x20viewport\x20on\x20a\x20task\x20result\x20node.',
     riskLevel: 'safe',
@@ -141,8 +139,8 @@ export function registerTaskCommands(_0x76781f) {
       requiresMountedRuntime: ![],
     },
     returnSchema: { aliasFields: ['taskId', 'nodeIds', 'focused'] },
-    validate(_0x10f8d2 = {}, _0x204bb9 = {}) {
-      if (typeof _0x204bb9['focusNodes'] !== 'function')
+    validate(options5 = {}, value10 = {}) {
+      if (typeof value10['focusNodes'] !== 'function')
         return {
           ok: ![],
           errorCode: 'VIEWPORT_FOCUS_UNAVAILABLE',
@@ -151,39 +149,38 @@ export function registerTaskCommands(_0x76781f) {
       try {
         return {
           args: {
-            ..._0x10f8d2,
-            nodeIds: resolveTaskTargetNodeIds(_0x10f8d2, _0x204bb9),
-            taskId: trimString(_0x10f8d2['taskId']),
-            padding: positiveNumber(_0x10f8d2['padding'], 0x50),
-            durationMs: positiveNumber(_0x10f8d2['durationMs'], 0x320),
+            ...options5,
+            nodeIds: resolveTaskTargetNodeIds(options5, value10),
+            taskId: trimString(options5['taskId']),
+            padding: positiveNumber(options5['padding'], 0x50),
+            durationMs: positiveNumber(options5['durationMs'], 0x320),
             options:
-              _0x10f8d2['options'] &&
-              typeof _0x10f8d2['options'] === 'object' &&
-              !Array['isArray'](_0x10f8d2['options'])
-                ? _0x10f8d2['options']
+              options5['options'] &&
+              typeof options5['options'] === 'object' &&
+              !Array['isArray'](options5['options'])
+                ? options5['options']
                 : {},
           },
         };
-      } catch (_0x74628b) {
+      } catch (errorCode) {
         return {
           ok: ![],
-          errorCode: _0x74628b['errorCode'] || 'TASK_TARGET_NOT_FOUND',
-          message: _0x74628b['message'],
-          details: _0x74628b['details'],
+          errorCode: errorCode['errorCode'] || 'TASK_TARGET_NOT_FOUND',
+          message: errorCode['message'],
+          details: errorCode['details'],
         };
       }
     },
-    execute(_0xb5e71, _0x4662fc) {
-      const _0x45ccf7 = _0x4662fc['focusNodes'](
-        _0xb5e71['nodeIds'],
-        _0xb5e71['padding'],
-        _0xb5e71['durationMs'],
-        { source: 'task.focusResult', taskId: _0xb5e71['taskId'], ..._0xb5e71['options'] },
-      );
-      return { taskId: _0xb5e71['taskId'], nodeIds: _0xb5e71['nodeIds'], focused: _0x45ccf7 !== ![] };
+    execute(taskId2, value11) {
+      const focused = value11['focusNodes'](taskId2['nodeIds'], taskId2['padding'], taskId2['durationMs'], {
+        source: 'task.focusResult',
+        taskId: taskId2['taskId'],
+        ...taskId2['options'],
+      });
+      return { taskId: taskId2['taskId'], nodeIds: taskId2['nodeIds'], focused: focused !== ![] };
     },
   }),
-    _0x76781f['register']({
+    value9['register']({
       id: 'task.retry',
       description: 'Retry generation for a task result node through its mounted runtime.',
       riskLevel: 'confirm',
@@ -204,60 +201,60 @@ export function registerTaskCommands(_0x76781f) {
         requiresMountedRuntime: ![],
       },
       returnSchema: { aliasFields: ['nodeId', 'targetNodeId', 'status', 'taskId', 'value'] },
-      validate(_0x26d128 = {}, _0x1f496a = {}) {
+      validate(options6 = {}, value12 = {}) {
         try {
-          const _0x36c35a = resolveTaskTargetNodeIds(_0x26d128, _0x1f496a);
-          if (_0x36c35a['length'] !== 0x1)
+          const nodeIds = resolveTaskTargetNodeIds(options6, value12);
+          if (nodeIds['length'] !== 0x1)
             return {
               ok: ![],
               errorCode: 'AMBIGUOUS_TASK_TARGET',
               message: 'task.retry requires exactly one target node.',
-              details: { nodeIds: _0x36c35a },
+              details: { nodeIds: nodeIds },
             };
           return {
             args: {
-              ..._0x26d128,
-              nodeId: _0x36c35a[0x0],
-              taskId: trimString(_0x26d128['taskId']),
+              ...options6,
+              nodeId: nodeIds[0x0],
+              taskId: trimString(options6['taskId']),
               options:
-                _0x26d128['options'] &&
-                typeof _0x26d128['options'] === 'object' &&
-                !Array['isArray'](_0x26d128['options'])
-                  ? _0x26d128['options']
+                options6['options'] &&
+                typeof options6['options'] === 'object' &&
+                !Array['isArray'](options6['options'])
+                  ? options6['options']
                   : {},
             },
           };
-        } catch (_0x415c09) {
+        } catch (errorCode2) {
           return {
             ok: ![],
-            errorCode: _0x415c09['errorCode'] || 'TASK_TARGET_NOT_FOUND',
-            message: _0x415c09['message'],
-            details: _0x415c09['details'],
+            errorCode: errorCode2['errorCode'] || 'TASK_TARGET_NOT_FOUND',
+            message: errorCode2['message'],
+            details: errorCode2['details'],
           };
         }
       },
-      async execute(_0x55b702, _0x5b68de) {
-        const _0x2fe421 = getNodeRuntime(_0x5b68de, _0x55b702['nodeId']);
-        if (typeof _0x2fe421?.['runGeneration'] !== 'function')
+      async execute(nodeId2, value13) {
+        const nodeRuntime = getNodeRuntime(value13, nodeId2['nodeId']);
+        if (typeof nodeRuntime?.['runGeneration'] !== 'function')
           throw createCanvasCommandError(
             'TASK_RETRY_UNAVAILABLE',
             'task.retry did not find a registered runGeneration() entry for the node.',
-            { nodeId: _0x55b702['nodeId'] },
+            { nodeId: nodeId2['nodeId'] },
           );
-        const _0x2c0ade = {
-          ..._0x55b702['options'],
-          source: _0x55b702['options']['source'] || 'task.retry',
+        const enabled2 = {
+          ...nodeId2['options'],
+          source: nodeId2['options']['source'] || 'task.retry',
           retry: !![],
         };
-        if (_0x55b702['taskId'] && !_0x2c0ade['taskId']) _0x2c0ade['taskId'] = _0x55b702['taskId'];
-        const _0x32ebab = await _0x2fe421['runGeneration'](_0x2c0ade),
-          _0x2bfccd = getNode(_0x5b68de, _0x55b702['nodeId']) || {};
+        if (nodeId2['taskId'] && !enabled2['taskId']) enabled2['taskId'] = nodeId2['taskId'];
+        const value14 = await nodeRuntime['runGeneration'](enabled2),
+          node = getNode(value13, nodeId2['nodeId']) || {};
         return {
-          nodeId: _0x55b702['nodeId'],
-          targetNodeId: trimString(_0x32ebab?.['targetNodeId']) || _0x55b702['nodeId'],
-          status: normalizeStatus(_0x32ebab, _0x2bfccd),
-          taskId: pickTaskId(_0x32ebab, _0x2bfccd, _0x55b702['taskId']),
-          value: _0x32ebab,
+          nodeId: nodeId2['nodeId'],
+          targetNodeId: trimString(value14?.['targetNodeId']) || nodeId2['nodeId'],
+          status: normalizeStatus(value14, node),
+          taskId: pickTaskId(value14, node, nodeId2['taskId']),
+          value: value14,
         };
       },
     }));

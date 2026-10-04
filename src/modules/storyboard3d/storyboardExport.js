@@ -23,246 +23,215 @@ const DEFAULT_PALETTE = Object['freeze']({
   line: '#42485a',
   guide: 'rgba(255,255,255,0.38)',
 });
-function toPositiveInteger(
-  _0x1925c6,
-  _0x28f329,
-  { min: min = 0x1, max: max = Number['MAX_SAFE_INTEGER'] } = {},
-) {
-  const _0x684f37 = Math['round'](Number(_0x1925c6));
-  if (!Number['isFinite'](_0x684f37)) return _0x28f329;
-  return Math['min'](max, Math['max'](min, _0x684f37));
+function toPositiveInteger(value, item, { min: min = 0x1, max: max = Number['MAX_SAFE_INTEGER'] } = {}) {
+  const key = Math['round'](Number(value));
+  if (!Number['isFinite'](key)) return item;
+  return Math['min'](max, Math['max'](min, key));
 }
-function normalizeAspectRatio(_0x7843cb) {
-  const _0x26c5b1 = String(_0x7843cb || '16:9');
-  if (Object['hasOwn'](STORYBOARD_EXPORT_ASPECT_RATIOS, _0x26c5b1))
-    return { key: _0x26c5b1, value: STORYBOARD_EXPORT_ASPECT_RATIOS[_0x26c5b1] };
-  const _0x57b4cd = Number(_0x7843cb);
-  if (Number['isFinite'](_0x57b4cd) && _0x57b4cd > 0x0) return { key: _0x57b4cd + ':1', value: _0x57b4cd };
+function normalizeAspectRatio(index) {
+  const key2 = String(index || '16:9');
+  if (Object['hasOwn'](STORYBOARD_EXPORT_ASPECT_RATIOS, key2))
+    return { key: key2, value: STORYBOARD_EXPORT_ASPECT_RATIOS[key2] };
+  const key3 = Number(index);
+  if (Number['isFinite'](key3) && key3 > 0x0) return { key: key3 + ':1', value: key3 };
   return { key: '16:9', value: STORYBOARD_EXPORT_ASPECT_RATIOS['16:9'] };
 }
 export function resolveStoryboardExportDimensions({
   aspectRatio: aspectRatio = '16:9',
   resolution: resolution = '1080p',
 } = {}) {
-  const _0x574a95 = normalizeAspectRatio(aspectRatio),
-    _0xa91053 =
+  const aspectRatio2 = normalizeAspectRatio(aspectRatio),
+    result =
       STORYBOARD_EXPORT_RESOLUTIONS[resolution] ||
       toPositiveInteger(resolution, STORYBOARD_EXPORT_RESOLUTIONS['1080p'], { min: 0xf0, max: 0x10e0 }),
-    _0x29e755 = _0x574a95['value'] >= 0x1 ? Math['round'](_0xa91053 * _0x574a95['value']) : _0xa91053,
-    _0x2c9bef = _0x574a95['value'] >= 0x1 ? _0xa91053 : Math['round'](_0xa91053 / _0x574a95['value']);
+    width = aspectRatio2['value'] >= 0x1 ? Math['round'](result * aspectRatio2['value']) : result,
+    height = aspectRatio2['value'] >= 0x1 ? result : Math['round'](result / aspectRatio2['value']);
   return {
-    aspectRatio: _0x574a95['key'],
-    ratio: _0x574a95['value'],
+    aspectRatio: aspectRatio2['key'],
+    ratio: aspectRatio2['value'],
     resolution: String(resolution),
-    width: _0x29e755,
-    height: _0x2c9bef,
+    width: width,
+    height: height,
   };
 }
 export function calculateStoryboardGridLayout({
-  count: _0x2bdf19,
+  count: count,
   columns: columns = 0x3,
-  frameWidth: _0x360ce5,
-  frameHeight: _0xab10f,
+  frameWidth: frameWidth,
+  frameHeight: frameHeight,
   metadataHeight: metadataHeight = 0xa0,
   gap: gap = 0x18,
   padding: padding = 0x20,
   maxSide: maxSide = 0x4000,
   maxPixels: maxPixels = 0x7270e00,
 } = {}) {
-  const _0x29d60b = toPositiveInteger(_0x2bdf19, 0x1, { max: 0x3e8 }),
-    _0x44c622 = toPositiveInteger(columns, 0x3, { max: _0x29d60b }),
-    _0x2b8ccb = Math['ceil'](_0x29d60b / _0x44c622),
-    _0x18b9ee = toPositiveInteger(_0x360ce5, 0x780, { min: 0x40, max: 0x2000 }),
-    _0x295fba = toPositiveInteger(_0xab10f, 0x438, { min: 0x40, max: 0x2000 }),
-    _0x283a43 = toPositiveInteger(metadataHeight, 0xa0, { min: 0x0, max: 0x320 }),
-    _0x12e9ac = toPositiveInteger(gap, 0x18, { min: 0x0, max: 0x100 }),
-    _0x2d13aa = toPositiveInteger(padding, 0x20, { min: 0x0, max: 0x200 }),
-    _0x1b1c33 = _0x295fba + _0x283a43,
-    _0x1f6c90 = _0x2d13aa * 0x2 + _0x44c622 * _0x18b9ee + Math['max'](0x0, _0x44c622 - 0x1) * _0x12e9ac,
-    _0x1c29f5 = _0x2d13aa * 0x2 + _0x2b8ccb * _0x1b1c33 + Math['max'](0x0, _0x2b8ccb - 0x1) * _0x12e9ac;
-  if (_0x1f6c90 > maxSide || _0x1c29f5 > maxSide || _0x1f6c90 * _0x1c29f5 > maxPixels)
+  const max2 = toPositiveInteger(count, 0x1, { max: 0x3e8 }),
+    columns2 = toPositiveInteger(columns, 0x3, { max: max2 }),
+    rows = Math['ceil'](max2 / columns2),
+    cellWidth = toPositiveInteger(frameWidth, 0x780, { min: 0x40, max: 0x2000 }),
+    frameHeight2 = toPositiveInteger(frameHeight, 0x438, { min: 0x40, max: 0x2000 }),
+    metadataHeight2 = toPositiveInteger(metadataHeight, 0xa0, { min: 0x0, max: 0x320 }),
+    gap2 = toPositiveInteger(gap, 0x18, { min: 0x0, max: 0x100 }),
+    padding2 = toPositiveInteger(padding, 0x20, { min: 0x0, max: 0x200 }),
+    cellHeight = frameHeight2 + metadataHeight2,
+    width2 = padding2 * 0x2 + columns2 * cellWidth + Math['max'](0x0, columns2 - 0x1) * gap2,
+    height2 = padding2 * 0x2 + rows * cellHeight + Math['max'](0x0, rows - 0x1) * gap2;
+  if (width2 > maxSide || height2 > maxSide || width2 * height2 > maxPixels)
     throw new RangeError(
-      'Storyboard export is too large (' + _0x1f6c90 + '×' + _0x1c29f5 + '). Reduce resolution or grid size.',
+      'Storyboard export is too large (' + width2 + '×' + height2 + '). Reduce resolution or grid size.',
     );
   return {
-    count: _0x29d60b,
-    columns: _0x44c622,
-    rows: _0x2b8ccb,
-    cellWidth: _0x18b9ee,
-    cellHeight: _0x1b1c33,
-    frameWidth: _0x18b9ee,
-    frameHeight: _0x295fba,
-    metadataHeight: _0x283a43,
-    gap: _0x12e9ac,
-    padding: _0x2d13aa,
-    width: _0x1f6c90,
-    height: _0x1c29f5,
-    getCellRect(_0x71d299) {
-      const _0x2976ce = toPositiveInteger(Number(_0x71d299) + 0x1, 0x1, { max: _0x29d60b }) - 0x1,
-        _0x239e10 = _0x2976ce % _0x44c622,
-        _0x4be85c = Math['floor'](_0x2976ce / _0x44c622);
+    count: max2,
+    columns: columns2,
+    rows: rows,
+    cellWidth: cellWidth,
+    cellHeight: cellHeight,
+    frameWidth: cellWidth,
+    frameHeight: frameHeight2,
+    metadataHeight: metadataHeight2,
+    gap: gap2,
+    padding: padding2,
+    width: width2,
+    height: height2,
+    getCellRect(data) {
+      const toPositiveInteger2 = toPositiveInteger(Number(data) + 0x1, 0x1, { max: max2 }) - 0x1,
+        options = toPositiveInteger2 % columns2,
+        target = Math['floor'](toPositiveInteger2 / columns2);
       return {
-        x: _0x2d13aa + _0x239e10 * (_0x18b9ee + _0x12e9ac),
-        y: _0x2d13aa + _0x4be85c * (_0x1b1c33 + _0x12e9ac),
-        width: _0x18b9ee,
-        height: _0x1b1c33,
-        frameHeight: _0x295fba,
-        metadataHeight: _0x283a43,
+        x: padding2 + options * (cellWidth + gap2),
+        y: padding2 + target * (cellHeight + gap2),
+        width: cellWidth,
+        height: cellHeight,
+        frameHeight: frameHeight2,
+        metadataHeight: metadataHeight2,
       };
     },
   };
 }
-function createDefaultCanvas(
-  _0x16e554,
-  _0x324f75,
-  { documentObject: documentObject = globalThis['document'] } = {},
-) {
-  const _0x389b32 = globalThis['OffscreenCanvas'];
-  if (typeof _0x389b32 === 'function') return new _0x389b32(_0x16e554, _0x324f75);
-  const _0x27ceb4 = documentObject?.['createElement']?.('canvas');
-  if (!_0x27ceb4) throw new Error('Canvas export is unavailable in this runtime.');
-  return ((_0x27ceb4['width'] = _0x16e554), (_0x27ceb4['height'] = _0x324f75), _0x27ceb4);
+function createDefaultCanvas(source, next, { documentObject: documentObject = globalThis['document'] } = {}) {
+  const run = globalThis['OffscreenCanvas'];
+  if (typeof run === 'function') return new run(source, next);
+  const box = documentObject?.['createElement']?.('canvas');
+  if (!box) throw new Error('Canvas export is unavailable in this runtime.');
+  return ((box['width'] = source), (box['height'] = next), box);
 }
-async function canvasToBlob(_0x350aba, { mimeType: mimeType = 'image/png', quality: quality = 0.92 } = {}) {
-  if (typeof _0x350aba?.['convertToBlob'] === 'function')
-    return _0x350aba['convertToBlob']({ type: mimeType, quality: quality });
-  if (typeof _0x350aba?.['toBlob'] === 'function')
-    return new Promise((_0x182831, _0x14bfbf) => {
-      _0x350aba['toBlob'](
-        (_0x28e351) => (_0x28e351 ? _0x182831(_0x28e351) : _0x14bfbf(new Error('Canvas encoding failed.'))),
+async function canvasToBlob(current, { mimeType: mimeType = 'image/png', quality: quality = 0.92 } = {}) {
+  if (typeof current?.['convertToBlob'] === 'function')
+    return current['convertToBlob']({ type: mimeType, quality: quality });
+  if (typeof current?.['toBlob'] === 'function')
+    return new Promise((handler, handler2) => {
+      current['toBlob'](
+        (entry) => (entry ? handler(entry) : handler2(new Error('Canvas encoding failed.'))),
         mimeType,
         quality,
       );
     });
   throw new Error('Canvas blob encoding is unavailable in this runtime.');
 }
-function getFrameSize(_0x4e5a43) {
-  const _0x44ee7e = _0x4e5a43?.['image'] || _0x4e5a43;
+function getFrameSize(box2) {
+  const source2 = box2?.['image'] || box2;
   return {
-    source: _0x44ee7e,
+    source: source2,
     width: Number(
-      _0x4e5a43?.['width'] ||
-        _0x44ee7e?.['videoWidth'] ||
-        _0x44ee7e?.['naturalWidth'] ||
-        _0x44ee7e?.['width'] ||
-        0x0,
+      box2?.['width'] || source2?.['videoWidth'] || source2?.['naturalWidth'] || source2?.['width'] || 0x0,
     ),
     height: Number(
-      _0x4e5a43?.['height'] ||
-        _0x44ee7e?.['videoHeight'] ||
-        _0x44ee7e?.['naturalHeight'] ||
-        _0x44ee7e?.['height'] ||
+      box2?.['height'] ||
+        source2?.['videoHeight'] ||
+        source2?.['naturalHeight'] ||
+        source2?.['height'] ||
         0x0,
     ),
   };
 }
-function drawFrameCover(_0x685840, _0x1c8eee, _0x447d7d, _0x3ed3ef) {
-  ((_0x685840['fillStyle'] = _0x3ed3ef['cellBackground']),
-    _0x685840['fillRect'](_0x447d7d['x'], _0x447d7d['y'], _0x447d7d['width'], _0x447d7d['height']));
-  const { source: _0x17ed78, width: _0x498df0, height: _0x1af91f } = getFrameSize(_0x1c8eee);
-  if (!_0x17ed78 || _0x498df0 <= 0x0 || _0x1af91f <= 0x0) return;
-  const _0x2fe1dd = _0x498df0 / _0x1af91f,
-    _0xcacc28 = _0x447d7d['width'] / _0x447d7d['height'];
-  let _0x253a9f = 0x0,
-    _0xc89bcf = 0x0,
-    _0x299a77 = _0x498df0,
-    _0x12d0b1 = _0x1af91f;
-  if (_0x2fe1dd > _0xcacc28)
-    ((_0x299a77 = _0x1af91f * _0xcacc28), (_0x253a9f = (_0x498df0 - _0x299a77) / 0x2));
-  else
-    _0x2fe1dd < _0xcacc28 &&
-      ((_0x12d0b1 = _0x498df0 / _0xcacc28), (_0xc89bcf = (_0x1af91f - _0x12d0b1) / 0x2));
-  _0x685840['drawImage'](
-    _0x17ed78,
-    _0x253a9f,
-    _0xc89bcf,
-    _0x299a77,
-    _0x12d0b1,
-    _0x447d7d['x'],
-    _0x447d7d['y'],
-    _0x447d7d['width'],
-    _0x447d7d['height'],
+function drawFrameCover(ctx, record, box3, payload) {
+  ((ctx['fillStyle'] = payload['cellBackground']),
+    ctx['fillRect'](box3['x'], box3['y'], box3['width'], box3['height']));
+  const { source: source3, width: width3, height: height3 } = getFrameSize(record);
+  if (!source3 || width3 <= 0x0 || height3 <= 0x0) return;
+  const handle = width3 / height3,
+    state = box3['width'] / box3['height'];
+  let config = 0x0,
+    scope = 0x0,
+    input = width3,
+    output = height3;
+  if (handle > state) ((input = height3 * state), (config = (width3 - input) / 0x2));
+  else handle < state && ((output = width3 / state), (scope = (height3 - output) / 0x2));
+  ctx['drawImage'](
+    source3,
+    config,
+    scope,
+    input,
+    output,
+    box3['x'],
+    box3['y'],
+    box3['width'],
+    box3['height'],
   );
 }
-function drawThirdsGuide(_0x508961, _0x44b1a7, _0x37285a) {
-  (_0x508961['save'](),
-    (_0x508961['strokeStyle'] = _0x37285a['guide']),
-    (_0x508961['lineWidth'] = Math['max'](0x1, Math['round'](_0x44b1a7['width'] / 0x3c0))),
-    _0x508961['beginPath']());
-  for (const _0x9a722f of [0x1 / 0x3, 0x2 / 0x3]) {
-    (_0x508961['moveTo'](_0x44b1a7['x'] + _0x44b1a7['width'] * _0x9a722f, _0x44b1a7['y']),
-      _0x508961['lineTo'](
-        _0x44b1a7['x'] + _0x44b1a7['width'] * _0x9a722f,
-        _0x44b1a7['y'] + _0x44b1a7['height'],
-      ),
-      _0x508961['moveTo'](_0x44b1a7['x'], _0x44b1a7['y'] + _0x44b1a7['height'] * _0x9a722f),
-      _0x508961['lineTo'](
-        _0x44b1a7['x'] + _0x44b1a7['width'],
-        _0x44b1a7['y'] + _0x44b1a7['height'] * _0x9a722f,
-      ));
+function drawThirdsGuide(ctx2, box4, value2) {
+  (ctx2['save'](),
+    (ctx2['strokeStyle'] = value2['guide']),
+    (ctx2['lineWidth'] = Math['max'](0x1, Math['round'](box4['width'] / 0x3c0))),
+    ctx2['beginPath']());
+  for (const value3 of [0x1 / 0x3, 0x2 / 0x3]) {
+    (ctx2['moveTo'](box4['x'] + box4['width'] * value3, box4['y']),
+      ctx2['lineTo'](box4['x'] + box4['width'] * value3, box4['y'] + box4['height']),
+      ctx2['moveTo'](box4['x'], box4['y'] + box4['height'] * value3),
+      ctx2['lineTo'](box4['x'] + box4['width'], box4['y'] + box4['height'] * value3));
   }
-  (_0x508961['stroke'](), _0x508961['restore']());
+  (ctx2['stroke'](), ctx2['restore']());
 }
-function buildShotMetaLines(_0x160e71, _0xbc81, _0x3319c7) {
-  const _0x54c344 = _0x160e71?.['camera'] || {},
-    _0x2fb751 = [];
-  _0x3319c7['includeShotNumber'] !== ![] &&
-    _0x2fb751['push'](
-      'SHOT ' + String(_0xbc81 + 0x1)['padStart'](0x2, '0') + ' · ' + (_0x160e71?.['shotSize'] || 'MED'),
+function buildShotMetaLines(value4, value5, value6) {
+  const value7 = value4?.['camera'] || {},
+    list = [];
+  value6['includeShotNumber'] !== ![] &&
+    list['push'](
+      'SHOT ' + String(value5 + 0x1)['padStart'](0x2, '0') + ' · ' + (value4?.['shotSize'] || 'MED'),
     );
-  const _0x70c842 = [
-    _0x3319c7['includeShotAngle'] !== ![] ? _0x160e71?.['shotAngle'] : '',
-    _0x3319c7['includeFocalLength'] !== ![] && _0x54c344['focalLength']
-      ? _0x54c344['focalLength'] + 'mm'
-      : '',
+  const value8 = [
+    value6['includeShotAngle'] !== ![] ? value4?.['shotAngle'] : '',
+    value6['includeFocalLength'] !== ![] && value7['focalLength'] ? value7['focalLength'] + 'mm' : '',
   ]
     ['filter'](Boolean)
     ['join'](' · ');
-  if (_0x70c842) _0x2fb751['push'](_0x70c842);
+  if (value8) list['push'](value8);
   return (
-    _0x3319c7['includeDescription'] !== ![] &&
-      _0x160e71?.['description'] &&
-      _0x2fb751['push'](String(_0x160e71['description'])),
-    _0x2fb751
+    value6['includeDescription'] !== ![] &&
+      value4?.['description'] &&
+      list['push'](String(value4['description'])),
+    list
   );
 }
-function drawMetadata(_0x3934bf, _0x45999c, _0x1dae44, _0x233f3e, _0x582731, _0x1f5f73) {
-  if (_0x233f3e['metadataHeight'] <= 0x0) return;
-  const _0x33d273 = _0x233f3e['y'] + _0x233f3e['frameHeight'];
-  ((_0x3934bf['fillStyle'] = _0x1f5f73['cellBackground']),
-    _0x3934bf['fillRect'](_0x233f3e['x'], _0x33d273, _0x233f3e['width'], _0x233f3e['metadataHeight']),
-    (_0x3934bf['fillStyle'] = _0x1f5f73['text']));
-  const _0x40ff6c = Math['max'](0x12, Math['round'](_0x233f3e['width'] / 0x2a)),
-    _0x398b0f = Math['round'](_0x40ff6c * 1.35);
-  ((_0x3934bf['font'] = '600\x20' + _0x40ff6c + 'px\x20system-ui,\x20sans-serif'),
-    (_0x3934bf['textBaseline'] = 'top'));
-  const _0x3f0b36 = buildShotMetaLines(_0x45999c, _0x1dae44, _0x582731);
-  _0x3f0b36['slice'](0x0, 0x3)['forEach']((_0x336191, _0x143eaf) => {
-    _0x143eaf > 0x0 &&
-      ((_0x3934bf['fillStyle'] = _0x1f5f73['mutedText']),
-      (_0x3934bf['font'] =
-        '400 ' + Math['max'](0x10, Math['round'](_0x40ff6c * 0.78)) + 'px system-ui, sans-serif'));
-    const _0x3bd754 = Math['max'](
-        0xc,
-        Math['floor'](_0x233f3e['width'] / Math['max'](0xc, _0x40ff6c * 0.55)),
-      ),
-      _0x14a2bb = String(_0x336191)['slice'](0x0, _0x3bd754);
-    _0x3934bf['fillText'](
-      _0x14a2bb,
-      _0x233f3e['x'] + _0x40ff6c,
-      _0x33d273 + _0x40ff6c + _0x143eaf * _0x398b0f,
-    );
+function drawMetadata(ctx3, value9, value10, box5, value11, response) {
+  if (box5['metadataHeight'] <= 0x0) return;
+  const value12 = box5['y'] + box5['frameHeight'];
+  ((ctx3['fillStyle'] = response['cellBackground']),
+    ctx3['fillRect'](box5['x'], value12, box5['width'], box5['metadataHeight']),
+    (ctx3['fillStyle'] = response['text']));
+  const value13 = Math['max'](0x12, Math['round'](box5['width'] / 0x2a)),
+    value14 = Math['round'](value13 * 1.35);
+  ((ctx3['font'] = '600\x20' + value13 + 'px\x20system-ui,\x20sans-serif'), (ctx3['textBaseline'] = 'top'));
+  const list2 = buildShotMetaLines(value9, value10, value11);
+  list2['slice'](0x0, 0x3)['forEach']((value15, count2) => {
+    count2 > 0x0 &&
+      ((ctx3['fillStyle'] = response['mutedText']),
+      (ctx3['font'] =
+        '400 ' + Math['max'](0x10, Math['round'](value13 * 0.78)) + 'px system-ui, sans-serif'));
+    const value16 = Math['max'](0xc, Math['floor'](box5['width'] / Math['max'](0xc, value13 * 0.55))),
+      value17 = String(value15)['slice'](0x0, value16);
+    ctx3['fillText'](value17, box5['x'] + value13, value12 + value13 + count2 * value14);
   });
 }
 export async function renderStoryboardGrid({
   shots: shots = [],
-  renderFrame: _0x1abb67,
+  renderFrame: renderFrame,
   aspectRatio: aspectRatio = '16:9',
   resolution: resolution = '1080p',
   columns: columns = 0x3,
-  metadataHeight: _0x115330,
-  gap: _0x474f1c,
-  padding: _0x45b2fd,
+  metadataHeight: metadataHeight3,
+  gap: gap3,
+  padding: padding3,
   includeThirds: includeThirds = ![],
   includeShotNumber: includeShotNumber = !![],
   includeShotAngle: includeShotAngle = !![],
@@ -272,112 +241,112 @@ export async function renderStoryboardGrid({
   quality: quality = 0.92,
   palette: palette = DEFAULT_PALETTE,
   canvasFactory: canvasFactory = createDefaultCanvas,
-  onProgress: _0x2312c5,
+  onProgress: onProgress,
 } = {}) {
   if (!Array['isArray'](shots) || shots['length'] === 0x0 || !shots['some'](Boolean))
     throw new Error('At least one shot is required for storyboard export.');
-  if (typeof _0x1abb67 !== 'function') throw new TypeError('renderFrame must be a function.');
-  const _0x4aadc1 = resolveStoryboardExportDimensions({ aspectRatio: aspectRatio, resolution: resolution }),
-    _0x2d7baa = calculateStoryboardGridLayout({
+  if (typeof renderFrame !== 'function') throw new TypeError('renderFrame must be a function.');
+  const frameWidth2 = resolveStoryboardExportDimensions({ aspectRatio: aspectRatio, resolution: resolution }),
+    width4 = calculateStoryboardGridLayout({
       count: shots['length'],
       columns: columns,
-      frameWidth: _0x4aadc1['width'],
-      frameHeight: _0x4aadc1['height'],
+      frameWidth: frameWidth2['width'],
+      frameHeight: frameWidth2['height'],
       metadataHeight:
-        _0x115330 ??
-        Math['max'](0x60, Math['round'](Math['min'](_0x4aadc1['width'], _0x4aadc1['height']) * 0.15)),
-      gap: _0x474f1c,
-      padding: _0x45b2fd,
+        metadataHeight3 ??
+        Math['max'](0x60, Math['round'](Math['min'](frameWidth2['width'], frameWidth2['height']) * 0.15)),
+      gap: gap3,
+      padding: padding3,
     }),
-    _0x47b0f6 = canvasFactory(_0x2d7baa['width'], _0x2d7baa['height']),
-    _0x53b676 = _0x47b0f6?.['getContext']?.('2d');
-  if (!_0x53b676) throw new Error('2D\x20canvas\x20context\x20is\x20unavailable.');
-  const _0x4be904 = { ...DEFAULT_PALETTE, ...(palette || {}) };
-  ((_0x53b676['fillStyle'] = _0x4be904['background']),
-    _0x53b676['fillRect'](0x0, 0x0, _0x2d7baa['width'], _0x2d7baa['height']));
-  for (let _0x930404 = 0x0; _0x930404 < shots['length']; _0x930404 += 0x1) {
-    const _0x319eb8 = shots[_0x930404];
-    _0x2312c5?.({
+    el = canvasFactory(width4['width'], width4['height']),
+    ctx4 = el?.['getContext']?.('2d');
+  if (!ctx4) throw new Error('2D\x20canvas\x20context\x20is\x20unavailable.');
+  const value18 = { ...DEFAULT_PALETTE, ...(palette || {}) };
+  ((ctx4['fillStyle'] = value18['background']),
+    ctx4['fillRect'](0x0, 0x0, width4['width'], width4['height']));
+  for (let current2 = 0x0; current2 < shots['length']; current2 += 0x1) {
+    const shotId = shots[current2];
+    onProgress?.({
       stage: 'rendering',
-      current: _0x930404 + 0x1,
+      current: current2 + 0x1,
       total: shots['length'],
-      shotId: _0x319eb8?.['id'],
+      shotId: shotId?.['id'],
     });
-    const _0x5cd642 = _0x2d7baa['getCellRect'](_0x930404),
-      _0x129962 = {
-        x: _0x5cd642['x'],
-        y: _0x5cd642['y'],
-        width: _0x5cd642['width'],
-        height: _0x5cd642['frameHeight'],
+    const x = width4['getCellRect'](current2),
+      value19 = {
+        x: x['x'],
+        y: x['y'],
+        width: x['width'],
+        height: x['frameHeight'],
       };
-    if (!_0x319eb8) {
-      ((_0x53b676['fillStyle'] = _0x4be904['cellBackground']),
-        _0x53b676['fillRect'](_0x5cd642['x'], _0x5cd642['y'], _0x5cd642['width'], _0x5cd642['height']));
+    if (!shotId) {
+      ((ctx4['fillStyle'] = value18['cellBackground']),
+        ctx4['fillRect'](x['x'], x['y'], x['width'], x['height']));
       continue;
     }
-    const _0x49ee82 = await _0x1abb67(_0x319eb8, {
-      width: _0x4aadc1['width'],
-      height: _0x4aadc1['height'],
-      index: _0x930404,
+    const value20 = await renderFrame(shotId, {
+      width: frameWidth2['width'],
+      height: frameWidth2['height'],
+      index: current2,
       total: shots['length'],
     });
-    drawFrameCover(_0x53b676, _0x49ee82, _0x129962, _0x4be904);
-    if (includeThirds) drawThirdsGuide(_0x53b676, _0x129962, _0x4be904);
+    drawFrameCover(ctx4, value20, value19, value18);
+    if (includeThirds) drawThirdsGuide(ctx4, value19, value18);
     (drawMetadata(
-      _0x53b676,
-      _0x319eb8,
-      _0x930404,
-      _0x5cd642,
+      ctx4,
+      shotId,
+      current2,
+      x,
       {
         includeShotNumber: includeShotNumber,
         includeShotAngle: includeShotAngle,
         includeFocalLength: includeFocalLength,
         includeDescription: includeDescription,
       },
-      _0x4be904,
+      value18,
     ),
-      _0x49ee82?.['close']?.(),
-      _0x49ee82?.['image']?.['close']?.());
+      value20?.['close']?.(),
+      value20?.['image']?.['close']?.());
   }
-  _0x2312c5?.({ stage: 'encoding', current: shots['length'], total: shots['length'] });
-  const _0x5d54ad = await canvasToBlob(_0x47b0f6, { mimeType: mimeType, quality: quality });
+  onProgress?.({ stage: 'encoding', current: shots['length'], total: shots['length'] });
+  const blob = await canvasToBlob(el, { mimeType: mimeType, quality: quality });
   return (
-    _0x2312c5?.({ stage: 'complete', current: shots['length'], total: shots['length'] }),
+    onProgress?.({ stage: 'complete', current: shots['length'], total: shots['length'] }),
     {
-      blob: _0x5d54ad,
+      blob: blob,
       mimeType: mimeType,
-      width: _0x2d7baa['width'],
-      height: _0x2d7baa['height'],
-      layout: _0x2d7baa,
-      frame: _0x4aadc1,
+      width: width4['width'],
+      height: width4['height'],
+      layout: width4,
+      frame: frameWidth2,
     }
   );
 }
 export async function renderStoryboardSequence({
   shots: shots = [],
-  renderFrame: _0x18a254,
-  ..._0x4730f7
+  renderFrame: renderFrame2,
+  ...args
 } = {}) {
   if (!Array['isArray'](shots) || shots['length'] === 0x0)
     throw new Error('At\x20least\x20one\x20shot\x20is\x20required\x20for\x20storyboard\x20export.');
-  const _0x9509e3 = [];
-  for (let _0x24788d = 0x0; _0x24788d < shots['length']; _0x24788d += 0x1) {
-    const _0x49c638 = shots[_0x24788d],
-      _0x45b611 = await renderStoryboardGrid({
-        ..._0x4730f7,
-        shots: [_0x49c638],
+  const list3 = [];
+  for (let index2 = 0x0; index2 < shots['length']; index2 += 0x1) {
+    const shotId2 = shots[index2],
+      args2 = await renderStoryboardGrid({
+        ...args,
+        shots: [shotId2],
         columns: 0x1,
-        renderFrame: (_0x47f8bf, _0x3a7ac4) =>
-          _0x18a254(_0x47f8bf, { ..._0x3a7ac4, index: _0x24788d, total: shots['length'] }),
-        onProgress: (_0x2afcaa) =>
-          _0x4730f7['onProgress']?.({
-            ..._0x2afcaa,
-            current: _0x24788d + (_0x2afcaa['stage'] === 'complete' ? 0x1 : 0x0),
+        renderFrame: (value21, args3) =>
+          renderFrame2(value21, { ...args3, index: index2, total: shots['length'] }),
+        onProgress: (args4) =>
+          args['onProgress']?.({
+            ...args4,
+            current: index2 + (args4['stage'] === 'complete' ? 0x1 : 0x0),
             total: shots['length'],
-            shotId: _0x49c638?.['id'],
+            shotId: shotId2?.['id'],
           }),
       });
-    _0x9509e3['push']({ ..._0x45b611, shotId: _0x49c638?.['id'] || '', index: _0x24788d });
+    list3['push']({ ...args2, shotId: shotId2?.['id'] || '', index: index2 });
   }
-  return _0x9509e3;
+  return list3;
 }

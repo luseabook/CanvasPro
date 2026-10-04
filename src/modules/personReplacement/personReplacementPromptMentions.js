@@ -1,1 +1,400 @@
-import{sanitizePromptHtmlForCommit}from'../nodePromptShared.js';import{resolveAssetMentionRef}from'../assetMentionRegistry.js';import{getWorkspaceAssetAppearances}from'../workspaceAssetAppearance.js';import{localPathToUrl}from'../../utils/localMediaPath.js';import{buildPersonReplacementPromptPackage}from'./personReplacementPromptCompiler.js';import{PERSON_REPLACEMENT_PROMPT_MODE_MANUAL}from'./personReplacementPromptMode.js';import{resolvePersonReplacementLocationGuidePreview}from'./personReplacementLocationGuideSvg.js';export const PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX="person-replacement-asset:";function normalizeText(_0x4cc936,_0x290447=''){const _0x46f35b=String(_0x4cc936??'')["trim"]();return _0x46f35b||_0x290447;}function normalizeMediaUrl(_0x47eed9){const _0x2da462=normalizeText(_0x47eed9);if(!_0x2da462)return'';return localPathToUrl(_0x2da462)||_0x2da462;}function escapeHtml(_0x5bb7e5){return String(_0x5bb7e5??'')["replaceAll"]('&',"&amp;")['replaceAll']('<',"&lt;")["replaceAll"]('>','&gt;')["replaceAll"]('\x22',"&quot;")["replaceAll"]('\x27',"&#039;");}function encodeMentionPart(_0x7293bf,_0x3b889b="__asset__"){return encodeURIComponent(normalizeText(_0x7293bf,_0x3b889b));}function buildMentionId(_0x2a8f40,_0x5579ba,_0x5977b0="__asset__"){return''+PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX+encodeURIComponent(_0x2a8f40)+':'+encodeMentionPart(_0x5579ba)+':'+encodeMentionPart(_0x5977b0);}function parseMentionId(_0x4e08c0=''){const _0x3874ed=normalizeText(_0x4e08c0);if(!_0x3874ed["startsWith"](PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX))return null;const _0x1293ca=_0x3874ed['slice'](PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX["length"])["split"](':');if(_0x1293ca['length']!==0x3)return null;try{const [_0x2a3d65,_0x3aed5b,_0xf96768]=_0x1293ca["map"](_0x5e48a9=>decodeURIComponent(_0x5e48a9));return _0x2a3d65&&_0x3aed5b?{'kind':_0x2a3d65,'assetId':_0x3aed5b,'itemId':_0xf96768}:null;}catch{return null;}}function matchesQuery(_0x282b42,_0x3d2b07=''){const _0x3c1598=normalizeText(_0x3d2b07)['replace'](/^@+/,'')['toLowerCase']();if(!_0x3c1598)return!![];return[_0x282b42?.["label"],_0x282b42?.["subtitle"],_0x282b42?.["pillLabel"],_0x282b42?.["assetName"],_0x282b42?.["menuGroup"]]["map"](_0x34add7=>normalizeText(_0x34add7)["toLowerCase"]())["some"](_0xd5c4bf=>_0xd5c4bf["includes"](_0x3c1598));}function createImageMentionCandidate({kind:_0xa5025f,assetId:_0x54f315,itemId:_0x4ae998,label:_0x1b815d,subtitle:_0x4ad87d,assetName:_0xcbcf2d,thumbUrl:_0x20ce88,menuGroup:_0x57d280,menuSection:_0x4d6de6,sourceItemIndex:sourceItemIndex=0x0}={}){const _0x129244=normalizeText(_0x1b815d,"图片素材"),_0x5ac280=normalizeMediaUrl(_0x20ce88);return{'origin':"asset",'menuDirect':!![],'suppressTooltip':!![],'assetId':buildMentionId(_0xa5025f,_0x54f315,_0x4ae998),'assetIndex':0x0,'type':'image','label':_0x129244,'pillLabel':_0x129244,'subtitle':normalizeText(_0x4ad87d),'assetName':normalizeText(_0xcbcf2d,_0x129244),'thumbUrl':_0x5ac280,'iconType':"image",'menuPage':'assets','menuGroup':_0x57d280,'menuSection':_0x4d6de6,'personReplacementAssetKind':_0xa5025f,'personReplacementSourceItemIndex':sourceItemIndex};}function getSelectedShot(_0x42c54d={}){const _0x36dfce=normalizeText(_0x42c54d['workspace']?.["selectedShotId"]),_0x66d907=Array['isArray'](_0x42c54d["shots"])?_0x42c54d['shots']:[];return _0x66d907["find"](_0x3f9d90=>normalizeText(_0x3f9d90?.['id'])===_0x36dfce)||_0x66d907[0x0]||null;}function resolvePromptPackage(_0x2f66ed={},{promptPackage:promptPackage=null,shot:shot=null}={}){if(promptPackage)return promptPackage;const _0x10c667=shot||getSelectedShot(_0x2f66ed);if(!_0x10c667)return null;return buildPersonReplacementPromptPackage({'project':_0x2f66ed,'shot':_0x10c667});}function describePromptReference(_0x2e1bb2={},_0x3b21a7={}){const _0x41ddf5=Math['max'](0x1,Number(_0x2e1bb2["slot"])||0x1),_0x510b57=normalizeText(_0x2e1bb2['label'],'图'+_0x41ddf5);if(_0x2e1bb2['role']==='source-keyframe')return{'slotLabel':_0x510b57,'subtitle':"当前首帧",'assetName':"当前首帧"};if(_0x2e1bb2["role"]==='person-location-guide')return{'slotLabel':_0x510b57,'subtitle':"主体定位图",'assetName':'主体定位图'};const _0x4c2510=(Array['isArray'](_0x3b21a7['characters'])?_0x3b21a7["characters"]:[])["find"](_0x1e8e9c=>normalizeText(_0x1e8e9c?.['id'])===normalizeText(_0x2e1bb2["targetCharacterId"])),_0x49bb29=normalizeText(_0x4c2510?.['name'],'目标形象');return{'slotLabel':_0x510b57,'subtitle':_0x49bb29,'assetName':_0x49bb29};}function buildCurrentReferenceCandidates(_0x3b8ebf={},{query:query='',promptPackage:promptPackage=null,shot:shot=null}={}){const _0x297cfe=resolvePromptPackage(_0x3b8ebf,{'promptPackage':promptPackage,'shot':shot}),_0x194e72=Array["isArray"](_0x297cfe?.["referenceImages"])?_0x297cfe["referenceImages"]:[];return _0x194e72['filter'](_0x209013=>normalizeMediaUrl(_0x209013?.["ref"]))['map']((_0x2ecfa6,_0x1fd7f8)=>{const _0x394856=Math["max"](0x1,Number(_0x2ecfa6["slot"])||_0x1fd7f8+0x1),{slotLabel:_0x40547a,subtitle:_0x5ca32c,assetName:_0x29f5ef}=describePromptReference(_0x2ecfa6,_0x3b8ebf);return createImageMentionCandidate({'kind':"reference",'assetId':String(_0x394856),'itemId':normalizeText([_0x2ecfa6["role"],_0x2ecfa6['targetCharacterId'],_0x2ecfa6["targetAppearanceId"]]['filter'](Boolean)["join"](':'),String(_0x1fd7f8)),'label':_0x40547a,'subtitle':_0x5ca32c,'assetName':_0x29f5ef,'thumbUrl':_0x2ecfa6['role']==="person-location-guide"?resolvePersonReplacementLocationGuidePreview(_0x2ecfa6['ref']):_0x2ecfa6["ref"],'menuGroup':"当前入参",'menuSection':'图像'});})["filter"](_0x33ed2c=>matchesQuery(_0x33ed2c,query));}function buildProjectAssetCandidates(_0x561569={}){return(Array["isArray"](_0x561569["characters"])?_0x561569["characters"]:[])['map'](_0xabbb66=>{const _0x55ddfd=getWorkspaceAssetAppearances(_0xabbb66)['filter'](_0x37e48f=>normalizeText(_0x37e48f?.["imageUrl"]));if(!_0x55ddfd['length'])return null;const _0x737290=Math["max"](0x0,Math["min"](_0x55ddfd["length"]-0x1,Math['trunc'](Number(_0x561569["workspace"]?.["assetAppearanceIndexes"]?.[_0xabbb66['id']])||0x0))),_0x35715b=_0x55ddfd["map"](_0x17a91b=>createImageMentionCandidate({'kind':"character",'assetId':_0xabbb66['id'],'itemId':_0x17a91b['id'],'label':normalizeText(_0xabbb66["name"],"人物素材")+'\x20·\x20'+normalizeText(_0x17a91b["name"],'形象'),'subtitle':'项目素材','assetName':normalizeText(_0xabbb66['name'],"人物素材"),'thumbUrl':_0x17a91b["imageUrl"],'menuGroup':"项目素材",'menuSection':'人物'}));return{..._0x35715b[_0x737290],'mentionVariants':_0x35715b,'mentionVariantIndex':_0x737290};})["filter"](_0xb717bd=>_0xb717bd&&matchesQuery(_0xb717bd));}function buildProjectSceneCandidates(_0x57dd08={},_0x132a33=''){return(Array["isArray"](_0x57dd08["scenes"])?_0x57dd08['scenes']:[])["map"](_0x503caa=>{const _0x954153=getWorkspaceAssetAppearances(_0x503caa)["filter"](_0x45e0d1=>normalizeText(_0x45e0d1?.['imageUrl']));if(!_0x954153["length"])return null;const _0x168eeb=Math["max"](0x0,Math['min'](_0x954153["length"]-0x1,Math["trunc"](Number(_0x57dd08['workspace']?.["assetAppearanceIndexes"]?.[_0x503caa['id']])||0x0))),_0x4ca7d7=_0x954153["map"](_0x299790=>createImageMentionCandidate({'kind':"scene",'assetId':_0x503caa['id'],'itemId':_0x299790['id'],'label':normalizeText(_0x503caa["name"],"场景素材")+" · "+normalizeText(_0x299790["name"],'场景图'),'subtitle':"项目素材",'assetName':normalizeText(_0x503caa["name"],"场景素材"),'thumbUrl':_0x299790['imageUrl'],'menuGroup':"项目素材",'menuSection':'场景'}));return{..._0x4ca7d7[_0x168eeb],'mentionVariants':_0x4ca7d7,'mentionVariantIndex':_0x168eeb};})['filter'](_0x5c6243=>_0x5c6243&&matchesQuery(_0x5c6243,_0x132a33));}function buildLibraryAssetCandidates(_0x195a00={}){return(Array["isArray"](_0x195a00["libraryAssets"])?_0x195a00["libraryAssets"]:[])["filter"](_0x388415=>normalizeText(_0x388415?.['mediaKind']||_0x388415?.["type"])["toLowerCase"]()==="image"&&normalizeText(_0x388415?.['imageUrl']||_0x388415?.["sourceUrl"]))["map"](_0x1c1061=>createImageMentionCandidate({'kind':"library",'assetId':normalizeText(_0x1c1061["sourceAssetId"]||_0x1c1061["assetId"]||_0x1c1061['id']),'itemId':normalizeText(_0x1c1061["sourceItemIndex"]??_0x1c1061["itemIndex"],'0'),'sourceItemIndex':Math["max"](0x0,Math["trunc"](Number(_0x1c1061["sourceItemIndex"]??_0x1c1061['itemIndex'])||0x0)),'label':normalizeText(_0x1c1061["name"],'画布图片'),'subtitle':normalizeText(_0x1c1061["assetName"],"总素材"),'assetName':normalizeText(_0x1c1061["assetName"],'总素材'),'thumbUrl':_0x1c1061["imageUrl"]||_0x1c1061["thumbnailUrl"]||_0x1c1061["sourceUrl"],'menuGroup':"总素材",'menuSection':'图片'}))["filter"](_0xdb29e8=>_0xdb29e8);}export function buildPersonReplacementPromptMentionCandidates(_0x5bbdae={},{query:query='',promptPackage:promptPackage=null,shot:shot=null}={}){const _0x577cfe=(shot||getSelectedShot(_0x5bbdae))?.["replacementPromptMode"]===PERSON_REPLACEMENT_PROMPT_MODE_MANUAL;return[...buildCurrentReferenceCandidates(_0x5bbdae,{'query':query,'promptPackage':promptPackage,'shot':shot}),...buildProjectSceneCandidates(_0x5bbdae,query),..._0x577cfe?[...buildProjectAssetCandidates(_0x5bbdae),...buildLibraryAssetCandidates(_0x5bbdae)]["filter"](_0x391221=>matchesQuery(_0x391221,query)):[]];}export function resolvePersonReplacementPromptMentionRef(_0x204656,{project:project={},promptPackage:promptPackage=null,shot:shot=null,resolveExternalAssetRef:resolveExternalAssetRef=resolveAssetMentionRef}={}){const _0x5c166f=parseMentionId(_0x204656?.["dataset"]?.['assetId']||_0x204656?.["getAttribute"]?.("data-asset-id"));if(!_0x5c166f){if(typeof resolveExternalAssetRef!=="function")return null;return resolveExternalAssetRef({'assetId':_0x204656?.['dataset']?.["assetId"]||_0x204656?.["getAttribute"]?.("data-asset-id"),'itemIndex':Number(_0x204656?.["dataset"]?.['assetIndex']||_0x204656?.["getAttribute"]?.('data-asset-index')||0x0)});}if(_0x5c166f['kind']==="reference"){const _0x1f60f9=resolvePromptPackage(project,{'promptPackage':promptPackage,'shot':shot}),_0x44e7a=Array["isArray"](_0x1f60f9?.["referenceImages"])?_0x1f60f9['referenceImages']:[],_0x38cdd2=_0x44e7a["find"](_0x1d409f=>[_0x1d409f['role'],_0x1d409f["targetCharacterId"],_0x1d409f["targetAppearanceId"]]["filter"](Boolean)["join"](':')===_0x5c166f["itemId"]),_0x36ddf9=normalizeMediaUrl(_0x38cdd2?.["ref"]);if(!_0x38cdd2||!_0x36ddf9)return null;const {slotLabel:_0x5e3431,subtitle:_0x10b1e4}=describePromptReference(_0x38cdd2,project);return{'origin':"asset",'assetId':_0x5c166f["assetId"],'itemIndex':0x0,'type':"image",'name':_0x5e3431+" · "+_0x10b1e4,'label':_0x5e3431,'referenceSlot':_0x38cdd2['slot'],'url':_0x36ddf9,'thumbUrl':_0x36ddf9,'nodeData':{'type':"source-image",'imageUrl':_0x36ddf9}};}if(_0x5c166f["kind"]==='character'){const _0x992127=(Array["isArray"](project['characters'])?project["characters"]:[])["find"](_0x168b24=>normalizeText(_0x168b24?.['id'])===_0x5c166f["assetId"]),_0x147ca9=getWorkspaceAssetAppearances(_0x992127)["find"](_0x5423ee=>normalizeText(_0x5423ee?.['id'])===_0x5c166f["itemId"]),_0x17b63d=normalizeMediaUrl(_0x147ca9?.["imageUrl"]);if(!_0x992127||!_0x147ca9||!_0x17b63d)return null;return{'origin':"asset",'assetId':_0x5c166f['assetId'],'itemIndex':0x0,'type':'image','name':normalizeText(_0x992127["name"],"人物素材")+" · "+normalizeText(_0x147ca9["name"],'形象'),'label':normalizeText(_0x992127["name"],'人物素材')+" · "+normalizeText(_0x147ca9["name"],'形象'),'url':_0x17b63d,'thumbUrl':_0x17b63d,'nodeData':{'type':"source-image",'imageUrl':_0x17b63d}};}if(_0x5c166f["kind"]==="scene"){const _0x17b7bd=(Array['isArray'](project["scenes"])?project['scenes']:[])["find"](_0x182e14=>normalizeText(_0x182e14?.['id'])===_0x5c166f["assetId"]),_0x4407e1=getWorkspaceAssetAppearances(_0x17b7bd)["find"](_0x2352db=>normalizeText(_0x2352db?.['id'])===_0x5c166f['itemId']),_0x3bb6e0=normalizeMediaUrl(_0x4407e1?.["imageUrl"]);if(!_0x17b7bd||!_0x4407e1||!_0x3bb6e0)return null;return{'origin':'asset','assetId':_0x5c166f["assetId"],'itemIndex':0x0,'type':"image",'name':normalizeText(_0x17b7bd["name"],"场景素材")+" · "+normalizeText(_0x4407e1["name"],"场景图"),'label':normalizeText(_0x17b7bd["name"],"场景素材")+'\x20·\x20'+normalizeText(_0x4407e1["name"],'场景图'),'url':_0x3bb6e0,'thumbUrl':_0x3bb6e0,'nodeData':{'type':'source-image','imageUrl':_0x3bb6e0}};}if(_0x5c166f["kind"]==="library"){const _0x5ae4e0=Math["max"](0x0,Math['trunc'](Number(_0x5c166f['itemId'])||0x0)),_0x41f131=(Array["isArray"](project['libraryAssets'])?project["libraryAssets"]:[])["find"](_0x180ef8=>normalizeText(_0x180ef8?.["sourceAssetId"]||_0x180ef8?.["assetId"]||_0x180ef8?.['id'])===_0x5c166f['assetId']&&Math["max"](0x0,Math["trunc"](Number(_0x180ef8?.["sourceItemIndex"]??_0x180ef8?.['itemIndex'])||0x0))===_0x5ae4e0),_0x33458f=normalizeMediaUrl(_0x41f131?.["sourceUrl"]||_0x41f131?.['imageUrl']);if(!_0x41f131||!_0x33458f)return null;return{'origin':'asset','assetId':_0x5c166f["assetId"],'itemIndex':_0x5ae4e0,'type':"image",'name':normalizeText(_0x41f131["name"],'画布图片'),'label':normalizeText(_0x41f131["name"],"画布图片"),'url':_0x33458f,'thumbUrl':normalizeMediaUrl(_0x41f131["imageUrl"]||_0x41f131["thumbnailUrl"]||_0x41f131["sourceUrl"]),'nodeData':{'type':'source-image','imageUrl':_0x33458f}};}return null;}export function renderPersonReplacementPromptHtml(_0x27f7b0=''){const _0x30de06=String(_0x27f7b0??'');if(!_0x30de06)return'';if(/<(?:br\b|span\b[^>]*\bref-pill\b)/iu["test"](_0x30de06))return sanitizePromptHtmlForCommit(_0x30de06);return escapeHtml(_0x30de06)['replace'](/\r\n?|\n/gu,"<br>");}
+import { sanitizePromptHtmlForCommit } from '../nodePromptShared.js';
+import { resolveAssetMentionRef } from '../assetMentionRegistry.js';
+import { getWorkspaceAssetAppearances } from '../workspaceAssetAppearance.js';
+import { localPathToUrl } from '../../utils/localMediaPath.js';
+import { buildPersonReplacementPromptPackage } from './personReplacementPromptCompiler.js';
+import { PERSON_REPLACEMENT_PROMPT_MODE_MANUAL } from './personReplacementPromptMode.js';
+import { resolvePersonReplacementLocationGuidePreview } from './personReplacementLocationGuideSvg.js';
+export const PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX = 'person-replacement-asset:';
+function normalizeText(value, item = '') {
+  const key = String(value ?? '')['trim']();
+  return key || item;
+}
+function normalizeMediaUrl(index) {
+  const text = normalizeText(index);
+  if (!text) return '';
+  return localPathToUrl(text) || text;
+}
+function escapeHtml(result) {
+  return String(result ?? '')
+    ['replaceAll']('&', '&amp;')
+    ['replaceAll']('<', '&lt;')
+    ['replaceAll']('>', '&gt;')
+    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('\x27', '&#039;');
+}
+function encodeMentionPart(data, options = '__asset__') {
+  return encodeURIComponent(normalizeText(data, options));
+}
+function buildMentionId(target, source, next = '__asset__') {
+  return (
+    '' +
+    PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX +
+    encodeURIComponent(target) +
+    ':' +
+    encodeMentionPart(source) +
+    ':' +
+    encodeMentionPart(next)
+  );
+}
+function parseMentionId(current = '') {
+  const list = normalizeText(current);
+  if (!list['startsWith'](PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX)) return null;
+  const list2 = list['slice'](PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX['length'])['split'](':');
+  if (list2['length'] !== 0x3) return null;
+  try {
+    const [entry, record, payload] = list2['map']((handle) => decodeURIComponent(handle));
+    return entry && record ? { kind: entry, assetId: record, itemId: payload } : null;
+  } catch {
+    return null;
+  }
+}
+function matchesQuery(state, config = '') {
+  const text2 = normalizeText(config)['replace'](/^@+/, '')['toLowerCase']();
+  if (!text2) return !![];
+  return [
+    state?.['label'],
+    state?.['subtitle'],
+    state?.['pillLabel'],
+    state?.['assetName'],
+    state?.['menuGroup'],
+  ]
+    ['map']((scope) => normalizeText(scope)['toLowerCase']())
+    ['some']((input) => input['includes'](text2));
+}
+function createImageMentionCandidate({
+  kind: kind,
+  assetId: assetId,
+  itemId: itemId,
+  label: label,
+  subtitle: subtitle,
+  assetName: assetName,
+  thumbUrl: thumbUrl,
+  menuGroup: menuGroup,
+  menuSection: menuSection,
+  sourceItemIndex: sourceItemIndex = 0x0,
+} = {}) {
+  const text3 = normalizeText(label, '图片素材'),
+    mediaUrl = normalizeMediaUrl(thumbUrl);
+  return {
+    origin: 'asset',
+    menuDirect: !![],
+    suppressTooltip: !![],
+    assetId: buildMentionId(kind, assetId, itemId),
+    assetIndex: 0x0,
+    type: 'image',
+    label: text3,
+    pillLabel: text3,
+    subtitle: normalizeText(subtitle),
+    assetName: normalizeText(assetName, text3),
+    thumbUrl: mediaUrl,
+    iconType: 'image',
+    menuPage: 'assets',
+    menuGroup: menuGroup,
+    menuSection: menuSection,
+    personReplacementAssetKind: kind,
+    personReplacementSourceItemIndex: sourceItemIndex,
+  };
+}
+function getSelectedShot(options2 = {}) {
+  const text4 = normalizeText(options2['workspace']?.['selectedShotId']),
+    output = Array['isArray'](options2['shots']) ? options2['shots'] : [];
+  return output['find']((value2) => normalizeText(value2?.['id']) === text4) || output[0x0] || null;
+}
+function resolvePromptPackage(
+  options3 = {},
+  { promptPackage: promptPackage = null, shot: shot = null } = {},
+) {
+  if (promptPackage) return promptPackage;
+  const enabled = shot || getSelectedShot(options3);
+  if (!enabled) return null;
+  return buildPersonReplacementPromptPackage({ project: options3, shot: enabled });
+}
+function describePromptReference(options4 = {}, value3 = {}) {
+  const value4 = Math['max'](0x1, Number(options4['slot']) || 0x1),
+    text5 = normalizeText(options4['label'], '图' + value4);
+  if (options4['role'] === 'source-keyframe')
+    return { slotLabel: text5, subtitle: '当前首帧', assetName: '当前首帧' };
+  if (options4['role'] === 'person-location-guide')
+    return { slotLabel: text5, subtitle: '主体定位图', assetName: '主体定位图' };
+  const error = (Array['isArray'](value3['characters']) ? value3['characters'] : [])['find'](
+      (value5) => normalizeText(value5?.['id']) === normalizeText(options4['targetCharacterId']),
+    ),
+    text6 = normalizeText(error?.['name'], '目标形象');
+  return { slotLabel: text5, subtitle: text6, assetName: text6 };
+}
+function buildCurrentReferenceCandidates(
+  options5 = {},
+  { query: query = '', promptPackage: promptPackage = null, shot: shot = null } = {},
+) {
+  const promptPackage2 = resolvePromptPackage(options5, { promptPackage: promptPackage, shot: shot }),
+    list3 = Array['isArray'](promptPackage2?.['referenceImages']) ? promptPackage2['referenceImages'] : [];
+  return list3['filter']((value6) => normalizeMediaUrl(value6?.['ref']))
+    ['map']((value7, value8) => {
+      const value9 = Math['max'](0x1, Number(value7['slot']) || value8 + 0x1),
+        {
+          slotLabel: slotLabel,
+          subtitle: subtitle2,
+          assetName: assetName2,
+        } = describePromptReference(value7, options5);
+      return createImageMentionCandidate({
+        kind: 'reference',
+        assetId: String(value9),
+        itemId: normalizeText(
+          [value7['role'], value7['targetCharacterId'], value7['targetAppearanceId']]
+            ['filter'](Boolean)
+            ['join'](':'),
+          String(value8),
+        ),
+        label: slotLabel,
+        subtitle: subtitle2,
+        assetName: assetName2,
+        thumbUrl:
+          value7['role'] === 'person-location-guide'
+            ? resolvePersonReplacementLocationGuidePreview(value7['ref'])
+            : value7['ref'],
+        menuGroup: '当前入参',
+        menuSection: '图像',
+      });
+    })
+    ['filter']((value10) => matchesQuery(value10, query));
+}
+function buildProjectAssetCandidates(options6 = {}) {
+  return (Array['isArray'](options6['characters']) ? options6['characters'] : [])
+    ['map']((error2) => {
+      const list4 = getWorkspaceAssetAppearances(error2)['filter']((value11) =>
+        normalizeText(value11?.['imageUrl']),
+      );
+      if (!list4['length']) return null;
+      const value12 = Math['max'](
+          0x0,
+          Math['min'](
+            list4['length'] - 0x1,
+            Math['trunc'](Number(options6['workspace']?.['assetAppearanceIndexes']?.[error2['id']]) || 0x0),
+          ),
+        ),
+        args = list4['map']((value13) =>
+          createImageMentionCandidate({
+            kind: 'character',
+            assetId: error2['id'],
+            itemId: value13['id'],
+            label:
+              normalizeText(error2['name'], '人物素材') +
+              '\x20·\x20' +
+              normalizeText(value13['name'], '形象'),
+            subtitle: '项目素材',
+            assetName: normalizeText(error2['name'], '人物素材'),
+            thumbUrl: value13['imageUrl'],
+            menuGroup: '项目素材',
+            menuSection: '人物',
+          }),
+        );
+      return { ...args[value12], mentionVariants: args, mentionVariantIndex: value12 };
+    })
+    ['filter']((value14) => value14 && matchesQuery(value14));
+}
+function buildProjectSceneCandidates(options7 = {}, value15 = '') {
+  return (Array['isArray'](options7['scenes']) ? options7['scenes'] : [])
+    ['map']((value16) => {
+      const workspaceAssetAppearances = getWorkspaceAssetAppearances(value16)['filter']((value17) =>
+        normalizeText(value17?.['imageUrl']),
+      );
+      if (!workspaceAssetAppearances['length']) return null;
+      const value18 = Math['max'](
+          0x0,
+          Math['min'](
+            workspaceAssetAppearances['length'] - 0x1,
+            Math['trunc'](Number(options7['workspace']?.['assetAppearanceIndexes']?.[value16['id']]) || 0x0),
+          ),
+        ),
+        args2 = workspaceAssetAppearances['map']((value19) =>
+          createImageMentionCandidate({
+            kind: 'scene',
+            assetId: value16['id'],
+            itemId: value19['id'],
+            label:
+              normalizeText(value16['name'], '场景素材') + ' · ' + normalizeText(value19['name'], '场景图'),
+            subtitle: '项目素材',
+            assetName: normalizeText(value16['name'], '场景素材'),
+            thumbUrl: value19['imageUrl'],
+            menuGroup: '项目素材',
+            menuSection: '场景',
+          }),
+        );
+      return { ...args2[value18], mentionVariants: args2, mentionVariantIndex: value18 };
+    })
+    ['filter']((value20) => value20 && matchesQuery(value20, value15));
+}
+function buildLibraryAssetCandidates(options8 = {}) {
+  return (Array['isArray'](options8['libraryAssets']) ? options8['libraryAssets'] : [])
+    ['filter'](
+      (value21) =>
+        normalizeText(value21?.['mediaKind'] || value21?.['type'])['toLowerCase']() === 'image' &&
+        normalizeText(value21?.['imageUrl'] || value21?.['sourceUrl']),
+    )
+    ['map']((value22) =>
+      createImageMentionCandidate({
+        kind: 'library',
+        assetId: normalizeText(value22['sourceAssetId'] || value22['assetId'] || value22['id']),
+        itemId: normalizeText(value22['sourceItemIndex'] ?? value22['itemIndex'], '0'),
+        sourceItemIndex: Math['max'](
+          0x0,
+          Math['trunc'](Number(value22['sourceItemIndex'] ?? value22['itemIndex']) || 0x0),
+        ),
+        label: normalizeText(value22['name'], '画布图片'),
+        subtitle: normalizeText(value22['assetName'], '总素材'),
+        assetName: normalizeText(value22['assetName'], '总素材'),
+        thumbUrl: value22['imageUrl'] || value22['thumbnailUrl'] || value22['sourceUrl'],
+        menuGroup: '总素材',
+        menuSection: '图片',
+      }),
+    )
+    ['filter']((value23) => value23);
+}
+export function buildPersonReplacementPromptMentionCandidates(
+  options9 = {},
+  { query: query = '', promptPackage: promptPackage = null, shot: shot = null } = {},
+) {
+  const args3 =
+    (shot || getSelectedShot(options9))?.['replacementPromptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL;
+  return [
+    ...buildCurrentReferenceCandidates(options9, { query: query, promptPackage: promptPackage, shot: shot }),
+    ...buildProjectSceneCandidates(options9, query),
+    ...(args3
+      ? [...buildProjectAssetCandidates(options9), ...buildLibraryAssetCandidates(options9)]['filter'](
+          (value24) => matchesQuery(value24, query),
+        )
+      : []),
+  ];
+}
+export function resolvePersonReplacementPromptMentionRef(
+  el,
+  {
+    project: project = {},
+    promptPackage: promptPackage = null,
+    shot: shot = null,
+    resolveExternalAssetRef: resolveExternalAssetRef = resolveAssetMentionRef,
+  } = {},
+) {
+  const mentionId = parseMentionId(el?.['dataset']?.['assetId'] || el?.['getAttribute']?.('data-asset-id'));
+  if (!mentionId) {
+    if (typeof resolveExternalAssetRef !== 'function') return null;
+    return resolveExternalAssetRef({
+      assetId: el?.['dataset']?.['assetId'] || el?.['getAttribute']?.('data-asset-id'),
+      itemIndex: Number(el?.['dataset']?.['assetIndex'] || el?.['getAttribute']?.('data-asset-index') || 0x0),
+    });
+  }
+  if (mentionId['kind'] === 'reference') {
+    const promptPackage3 = resolvePromptPackage(project, { promptPackage: promptPackage, shot: shot }),
+      value25 = Array['isArray'](promptPackage3?.['referenceImages'])
+        ? promptPackage3['referenceImages']
+        : [],
+      enabled2 = value25['find'](
+        (value26) =>
+          [value26['role'], value26['targetCharacterId'], value26['targetAppearanceId']]
+            ['filter'](Boolean)
+            ['join'](':') === mentionId['itemId'],
+      ),
+      mediaUrl2 = normalizeMediaUrl(enabled2?.['ref']);
+    if (!enabled2 || !mediaUrl2) return null;
+    const { slotLabel: slotLabel2, subtitle: subtitle3 } = describePromptReference(enabled2, project);
+    return {
+      origin: 'asset',
+      assetId: mentionId['assetId'],
+      itemIndex: 0x0,
+      type: 'image',
+      name: slotLabel2 + ' · ' + subtitle3,
+      label: slotLabel2,
+      referenceSlot: enabled2['slot'],
+      url: mediaUrl2,
+      thumbUrl: mediaUrl2,
+      nodeData: { type: 'source-image', imageUrl: mediaUrl2 },
+    };
+  }
+  if (mentionId['kind'] === 'character') {
+    const enabled3 = (Array['isArray'](project['characters']) ? project['characters'] : [])['find'](
+        (value27) => normalizeText(value27?.['id']) === mentionId['assetId'],
+      ),
+      workspaceAssetAppearances2 = getWorkspaceAssetAppearances(enabled3)['find'](
+        (value28) => normalizeText(value28?.['id']) === mentionId['itemId'],
+      ),
+      mediaUrl3 = normalizeMediaUrl(workspaceAssetAppearances2?.['imageUrl']);
+    if (!enabled3 || !workspaceAssetAppearances2 || !mediaUrl3) return null;
+    return {
+      origin: 'asset',
+      assetId: mentionId['assetId'],
+      itemIndex: 0x0,
+      type: 'image',
+      name:
+        normalizeText(enabled3['name'], '人物素材') +
+        ' · ' +
+        normalizeText(workspaceAssetAppearances2['name'], '形象'),
+      label:
+        normalizeText(enabled3['name'], '人物素材') +
+        ' · ' +
+        normalizeText(workspaceAssetAppearances2['name'], '形象'),
+      url: mediaUrl3,
+      thumbUrl: mediaUrl3,
+      nodeData: { type: 'source-image', imageUrl: mediaUrl3 },
+    };
+  }
+  if (mentionId['kind'] === 'scene') {
+    const enabled4 = (Array['isArray'](project['scenes']) ? project['scenes'] : [])['find'](
+        (value29) => normalizeText(value29?.['id']) === mentionId['assetId'],
+      ),
+      workspaceAssetAppearances3 = getWorkspaceAssetAppearances(enabled4)['find'](
+        (value30) => normalizeText(value30?.['id']) === mentionId['itemId'],
+      ),
+      mediaUrl4 = normalizeMediaUrl(workspaceAssetAppearances3?.['imageUrl']);
+    if (!enabled4 || !workspaceAssetAppearances3 || !mediaUrl4) return null;
+    return {
+      origin: 'asset',
+      assetId: mentionId['assetId'],
+      itemIndex: 0x0,
+      type: 'image',
+      name:
+        normalizeText(enabled4['name'], '场景素材') +
+        ' · ' +
+        normalizeText(workspaceAssetAppearances3['name'], '场景图'),
+      label:
+        normalizeText(enabled4['name'], '场景素材') +
+        '\x20·\x20' +
+        normalizeText(workspaceAssetAppearances3['name'], '场景图'),
+      url: mediaUrl4,
+      thumbUrl: mediaUrl4,
+      nodeData: { type: 'source-image', imageUrl: mediaUrl4 },
+    };
+  }
+  if (mentionId['kind'] === 'library') {
+    const value31 = Math['max'](0x0, Math['trunc'](Number(mentionId['itemId']) || 0x0)),
+      enabled5 = (Array['isArray'](project['libraryAssets']) ? project['libraryAssets'] : [])['find'](
+        (value32) =>
+          normalizeText(value32?.['sourceAssetId'] || value32?.['assetId'] || value32?.['id']) ===
+            mentionId['assetId'] &&
+          Math['max'](
+            0x0,
+            Math['trunc'](Number(value32?.['sourceItemIndex'] ?? value32?.['itemIndex']) || 0x0),
+          ) === value31,
+      ),
+      mediaUrl5 = normalizeMediaUrl(enabled5?.['sourceUrl'] || enabled5?.['imageUrl']);
+    if (!enabled5 || !mediaUrl5) return null;
+    return {
+      origin: 'asset',
+      assetId: mentionId['assetId'],
+      itemIndex: value31,
+      type: 'image',
+      name: normalizeText(enabled5['name'], '画布图片'),
+      label: normalizeText(enabled5['name'], '画布图片'),
+      url: mediaUrl5,
+      thumbUrl: normalizeMediaUrl(enabled5['imageUrl'] || enabled5['thumbnailUrl'] || enabled5['sourceUrl']),
+      nodeData: { type: 'source-image', imageUrl: mediaUrl5 },
+    };
+  }
+  return null;
+}
+export function renderPersonReplacementPromptHtml(value33 = '') {
+  const enabled6 = String(value33 ?? '');
+  if (!enabled6) return '';
+  if (/<(?:br\b|span\b[^>]*\bref-pill\b)/iu['test'](enabled6)) return sanitizePromptHtmlForCommit(enabled6);
+  return escapeHtml(enabled6)['replace'](/\r\n?|\n/gu, '<br>');
+}

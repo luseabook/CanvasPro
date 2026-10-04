@@ -10,15 +10,15 @@ import { renderToolbarUpMenu } from '../imageToolbarUpMenu.js';
 import { shouldDisableImageSizeControl } from '../imageModelCapabilities.js';
 import { DEBUG_WRENCH_ICON_HTML } from '../../utils/debugRequestPreview.js';
 import { t } from '../../i18n/index.js';
-function annotateToolbarText(_0xbe5999, _0x4a691c = {}) {
-  return t('imageAnnotate.toolbar.' + _0xbe5999, _0x4a691c);
+function annotateToolbarText(value, item = {}) {
+  return t('imageAnnotate.toolbar.' + value, item);
 }
 const IMAGE_GENERATION_SIZE_OPTIONS = ['1K', '2K', '4K'],
   ANNOTATE_SCENE_TOOLS = Object.freeze(['brush', 'rect', 'bucket', 'text', 'eraser', 'number-label']),
   GENERATION_SCENE_TOOLS = Object.freeze(['brush', 'eraser']);
-export const getAnnotateToolbarToolsForScene = (_0x5d2d0d = 'annotate') => {
-  const _0x52b2a8 = String(_0x5d2d0d || 'annotate').trim();
-  if (_0x52b2a8 === 'repaint' || _0x52b2a8 === 'erase') return [...GENERATION_SCENE_TOOLS];
+export const getAnnotateToolbarToolsForScene = (key = 'annotate') => {
+  const index = String(key || 'annotate').trim();
+  if (index === 'repaint' || index === 'erase') return [...GENERATION_SCENE_TOOLS];
   return [...ANNOTATE_SCENE_TOOLS];
 };
 const buildGenerationModelMenuHtml = ({
@@ -42,9 +42,9 @@ export const createGenerationToolbarMarkup = ({
   modelCatalog: modelCatalog = IMAGE_MODELS,
   submitTooltip: submitTooltip = annotateToolbarText('generate'),
 } = {}) => {
-  const _0x4aa6b1 = getImageFunctionModelDisplayName(model, modelCatalog),
-    _0x4a9531 = getImageFunctionModelTriggerIconHTML(model, provider),
-    _0x123e6d = shouldDisableImageSizeControl(model, provider);
+  const imageFunctionModelDisplayName = getImageFunctionModelDisplayName(model, modelCatalog),
+    imageFunctionModelTriggerIconHTML = getImageFunctionModelTriggerIconHTML(model, provider),
+    disabled = shouldDisableImageSizeControl(model, provider);
   return (
     '\n    ' +
     (scene === 'repaint'
@@ -58,21 +58,21 @@ export const createGenerationToolbarMarkup = ({
     renderToolbarUpMenu({
       fieldId: 'size',
       value: imageSize,
-      options: IMAGE_GENERATION_SIZE_OPTIONS.map((_0x331fcf) => ({
-        value: _0x331fcf,
-        label: _0x331fcf,
-        disabled: _0x123e6d,
+      options: IMAGE_GENERATION_SIZE_OPTIONS.map((value2) => ({
+        value: value2,
+        label: value2,
+        disabled: disabled,
       })),
       triggerClass: 'size-toggle',
       labelClass: 'size-text',
       menuClass: 'v2-expand-menu size-menu image-editor-size-menu',
       itemClass: 'v2-expand-menu-item image-editor-size-item',
-      disabled: _0x123e6d,
+      disabled: disabled,
     }) +
     '\n    <div class="v2-expand-wrap">\n      <button class="v2-expand-toolbar-btn model-toggle">\n        <span class="image-function-model-trigger-icon-slot">' +
-    _0x4a9531 +
+    imageFunctionModelTriggerIconHTML +
     '</span>\n        <span class="model-text">' +
-    _0x4aa6b1 +
+    imageFunctionModelDisplayName +
     '</span>\n        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;margin-left:2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>\n      </button>\n      <div class="floating-menu img-model-menu model-menu">\n        ' +
     buildGenerationModelMenuHtml({
       activeModel: model,

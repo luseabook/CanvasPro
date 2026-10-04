@@ -5,13 +5,13 @@ export const STORY_STYLE_CATEGORIES = Object['freeze']([
   Object['freeze']({ id: '2d', label: '2D' }),
   Object['freeze']({ id: '3d', label: '3D' }),
 ]);
-function createStoryStylePreset(_0x486d71, _0x320b0d, _0x395f4a) {
+function createStoryStylePreset(id, label, category) {
   return Object['freeze']({
-    id: _0x486d71,
-    label: _0x320b0d,
-    category: _0x395f4a,
-    prompt: _0x320b0d,
-    thumbnail: 'images/story-styles/' + _0x395f4a + '.svg',
+    id: id,
+    label: label,
+    category: category,
+    prompt: label,
+    thumbnail: 'images/story-styles/' + category + '.svg',
   });
 }
 export const STORY_STYLE_PRESETS = Object['freeze']([
@@ -110,31 +110,29 @@ export const STORY_STYLE_PRESETS = Object['freeze']([
   createStoryStylePreset('oriental-ink-wash', '东方水墨画风', '2d'),
   createStoryStylePreset('pixel-art', '像素风', '2d'),
 ]);
-const STORY_STYLE_PRESET_BY_ID = new Map(
-  STORY_STYLE_PRESETS['map']((_0x3124c6) => [_0x3124c6['id'], _0x3124c6]),
-);
-export function getStoryStylePreset(_0x18100d) {
-  return STORY_STYLE_PRESET_BY_ID['get'](String(_0x18100d || '')['trim']()) || null;
+const STORY_STYLE_PRESET_BY_ID = new Map(STORY_STYLE_PRESETS['map']((value) => [value['id'], value]));
+export function getStoryStylePreset(item) {
+  return STORY_STYLE_PRESET_BY_ID['get'](String(item || '')['trim']()) || null;
 }
 export function resolveStoryStyleSelection({
   styleId: styleId = '',
   stylePrompt: stylePrompt = '',
   videoStyle: videoStyle = '',
 } = {}) {
-  const _0x33d666 = getStoryStylePreset(styleId);
-  if (_0x33d666)
+  const styleId2 = getStoryStylePreset(styleId);
+  if (styleId2)
     return Object['freeze']({
-      styleId: _0x33d666['id'],
-      stylePrompt: _0x33d666['prompt'],
-      label: _0x33d666['label'],
-      thumbnail: _0x33d666['thumbnail'],
+      styleId: styleId2['id'],
+      stylePrompt: styleId2['prompt'],
+      label: styleId2['label'],
+      thumbnail: styleId2['thumbnail'],
       isCustom: ![],
     });
-  const _0x25cd22 = String(stylePrompt || videoStyle || '')['trim']();
+  const stylePrompt2 = String(stylePrompt || videoStyle || '')['trim']();
   return Object['freeze']({
     styleId: STORY_STYLE_CUSTOM_ID,
-    stylePrompt: _0x25cd22,
-    label: _0x25cd22 || '自定义风格提示词',
+    stylePrompt: stylePrompt2,
+    label: stylePrompt2 || '自定义风格提示词',
     thumbnail: '',
     isCustom: !![],
   });

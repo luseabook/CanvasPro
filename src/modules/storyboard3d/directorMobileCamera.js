@@ -10,20 +10,20 @@ import {
   upsertStoryboard3DCameraKeyframe,
 } from './shotAnimation.js';
 import { syncStoryboard3DCameraObjectFromShot } from './projectModel.js';
-const escape = (_0x3b2833) =>
-  String(_0x3b2833)['replaceAll']('&', '&amp;')['replaceAll']('\x22', '&quot;')['replaceAll']('<', '&lt;');
+const escape = (value) =>
+  String(value)['replaceAll']('&', '&amp;')['replaceAll']('\x22', '&quot;')['replaceAll']('<', '&lt;');
 export class DirectorMobileCamera {
   constructor(
-    _0x3b6ba0,
-    _0x4f3888 = {
+    item,
+    key = {
       create: createDirectorCameraPairing,
       read: readDirectorCameraPose,
       close: closeDirectorCameraPairing,
     },
   ) {
-    ((this['panel'] = _0x3b6ba0),
-      (this['timeline'] = _0x3b6ba0['timeline']),
-      (this['api'] = _0x4f3888),
+    ((this['panel'] = item),
+      (this['timeline'] = item['timeline']),
+      (this['api'] = key),
       (this['epoch'] = 0x0),
       (this['sequence'] = -0x1));
   }
@@ -46,10 +46,7 @@ export class DirectorMobileCamera {
       (this['pairing']
         ? '<p>手机与电脑连接同一局域网，在手机浏览器打开下方地址。配对\x2015\x20分钟后失效。</p>' +
           this['pairing']['urls']
-            ['map'](
-              (_0x44d22b) =>
-                '<input aria-label="手机连接地址" readonly value="' + escape(_0x44d22b) + '\x22>',
-            )
+            ['map']((index) => '<input aria-label="手机连接地址" readonly value="' + escape(index) + '\x22>')
             ['join']('') +
           (this['pairing']['secure'] ? '' : '<p>当前为触控模式；陀螺仪需要可信\x20HTTPS\x20连接。</p>')
         : '') +
@@ -59,32 +56,32 @@ export class DirectorMobileCamera {
     );
   }
   ['identity']() {
-    const { project: _0x4f0f4b, scene: _0x263c58, shot: _0x5121fd } = this['panel']['context']();
-    return _0x4f0f4b?.['id'] + ':' + _0x263c58?.['id'] + ':' + _0x5121fd?.['id'];
+    const { project: project, scene: scene, shot: shot } = this['panel']['context']();
+    return project?.['id'] + ':' + scene?.['id'] + ':' + shot?.['id'];
   }
-  ['click'](_0x53a10f) {
-    if (!_0x53a10f['startsWith']('timeline-mobile-')) return ![];
-    if (_0x53a10f === 'timeline-mobile-connect') void this['connect']();
-    if (_0x53a10f === 'timeline-mobile-disconnect') this['disconnect']();
-    if (_0x53a10f === 'timeline-mobile-save' && this['camera'])
-      this['panel']['mutate']('保存手机机位', (_0x34e62c) =>
-        upsertStoryboard3DCameraKeyframe(_0x34e62c, {
+  ['click'](enabled) {
+    if (!enabled['startsWith']('timeline-mobile-')) return ![];
+    if (enabled === 'timeline-mobile-connect') void this['connect']();
+    if (enabled === 'timeline-mobile-disconnect') this['disconnect']();
+    if (enabled === 'timeline-mobile-save' && this['camera'])
+      this['panel']['mutate']('保存手机机位', (result) =>
+        upsertStoryboard3DCameraKeyframe(result, {
           time: this['timeline']['_timeForShot'](this['panel']['context']()['shot']),
           camera: this['camera'],
         }),
       );
-    if (_0x53a10f === 'timeline-mobile-record' && this['camera']) {
+    if (enabled === 'timeline-mobile-record' && this['camera']) {
       if (this['recording']) this['finishRecording']();
       else {
-        const { project: _0x52cc78, scene: _0x7ea2ad, shot: _0xfdaadf } = this['panel']['context']();
+        const { project: project2, scene: scene2, shot: shot2 } = this['panel']['context']();
         ((this['recording'] = {
-          projectId: _0x52cc78['id'],
-          sceneId: _0x7ea2ad['id'],
-          shotId: _0xfdaadf['id'],
-          start: this['timeline']['_timeForShot'](_0xfdaadf),
+          projectId: project2['id'],
+          sceneId: scene2['id'],
+          shotId: shot2['id'],
+          start: this['timeline']['_timeForShot'](shot2),
           clock: performance['now'](),
           frames: [
-            { time: this['timeline']['_timeForShot'](_0xfdaadf), camera: structuredClone(this['camera']) },
+            { time: this['timeline']['_timeForShot'](shot2), camera: structuredClone(this['camera']) },
           ],
         }),
           (this['message'] = '正在录制，结束后一次保存为摄像机关键帧。'));
@@ -95,136 +92,133 @@ export class DirectorMobileCamera {
   }
   async ['connect']() {
     if (this['pending'] || this['pairing']) return;
-    const _0x2f401c = ++this['epoch'];
+    const data = ++this['epoch'];
     ((this['pending'] = !![]), (this['message'] = '正在开启配对…'), this['timeline']['requestRender']?.());
     try {
-      const _0x3fcca6 = await this['api']['create']();
-      if (_0x2f401c !== this['epoch']) {
-        await this['api']['close'](_0x3fcca6['readToken']);
+      const options = await this['api']['create']();
+      if (data !== this['epoch']) {
+        await this['api']['close'](options['readToken']);
         return;
       }
       (this['timeline']['stopPlayback']({ render: ![] }),
         this['timeline']['cameraPath']['stop'](),
         this['timeline']['multiView']['destroy'](),
-        (this['pairing'] = _0x3fcca6),
+        (this['pairing'] = options),
         (this['origin'] = this['identity']()),
         (this['base'] = structuredClone(
           this['timeline']['readCurrentCamera']?.() || this['panel']['context']()['shot']['camera'],
         )),
         (this['message'] = '等待手机连接…'),
         (this['sequence'] = -0x1),
-        void this['poll'](_0x2f401c));
-    } catch (_0x5ae7de) {
-      if (_0x2f401c === this['epoch']) this['message'] = _0x5ae7de['message'];
+        void this['poll'](data));
+    } catch (error) {
+      if (data === this['epoch']) this['message'] = error['message'];
     } finally {
-      _0x2f401c === this['epoch'] && ((this['pending'] = ![]), this['timeline']['requestRender']?.());
+      data === this['epoch'] && ((this['pending'] = ![]), this['timeline']['requestRender']?.());
     }
   }
-  async ['poll'](_0x4ece48) {
-    if (_0x4ece48 !== this['epoch'] || !this['pairing']) return;
+  async ['poll'](target) {
+    if (target !== this['epoch'] || !this['pairing']) return;
     if (this['identity']() !== this['origin']) {
       this['disconnect']();
       return;
     }
     try {
-      const _0x5cc17c = await this['api']['read'](this['pairing']['readToken']);
-      if (_0x4ece48 !== this['epoch']) return;
-      if (_0x5cc17c['pose'] && _0x5cc17c['sequence'] > this['sequence']) {
-        const _0x56f094 = !this['camera'];
-        ((this['sequence'] = _0x5cc17c['sequence']),
-          (this['camera'] = applyRelativeCameraPose(this['base'], _0x5cc17c['pose'])));
-        const _0x171092 = this['recording'];
-        if (_0x171092) {
-          const _0x4f468b = Math['min'](
+      const source = await this['api']['read'](this['pairing']['readToken']);
+      if (target !== this['epoch']) return;
+      if (source['pose'] && source['sequence'] > this['sequence']) {
+        const next = !this['camera'];
+        ((this['sequence'] = source['sequence']),
+          (this['camera'] = applyRelativeCameraPose(this['base'], source['pose'])));
+        const current = this['recording'];
+        if (current) {
+          const time = Math['min'](
             0xe10,
-            _0x171092['start'] + (performance['now']() - _0x171092['clock']) / 0x3e8,
+            current['start'] + (performance['now']() - current['clock']) / 0x3e8,
           );
-          _0x171092['frames']['push']({ time: _0x4f468b, camera: structuredClone(this['camera']) });
-          if (_0x171092['frames']['length'] >= 0xe10 || _0x4f468b >= 0xe10) this['finishRecording']();
+          current['frames']['push']({ time: time, camera: structuredClone(this['camera']) });
+          if (current['frames']['length'] >= 0xe10 || time >= 0xe10) this['finishRecording']();
         }
         ((this['message'] = this['recording']
           ? '录制中 · ' + this['recording']['frames']['length'] + '\x20帧'
           : '手机已连接，正在预览机位。'),
           this['preview']());
-        if (_0x56f094) this['timeline']['requestRender']?.();
+        if (next) this['timeline']['requestRender']?.();
       } else {
-        if (_0x5cc17c['pose'] && Date['now']() / 0x3e8 - _0x5cc17c['receivedAt'] > 0xa)
+        if (source['pose'] && Date['now']() / 0x3e8 - source['receivedAt'] > 0xa)
           this['message'] = '等待手机操作；如已离线，请重新连接。';
       }
-      const _0x5d103a = this['timeline']['getRoot']?.()?.['querySelector']('[data-mobile-status]');
-      if (_0x5d103a) _0x5d103a['textContent'] = this['message'];
-    } catch (_0x3195bd) {
-      _0x4ece48 === this['epoch'] && ((this['message'] = _0x3195bd['message']), this['disconnect']());
+      const el = this['timeline']['getRoot']?.()?.['querySelector']('[data-mobile-status]');
+      if (el) el['textContent'] = this['message'];
+    } catch (error2) {
+      target === this['epoch'] && ((this['message'] = error2['message']), this['disconnect']());
       return;
     }
-    if (_0x4ece48 === this['epoch'])
-      this['timer'] = this['timeline']['window']['setTimeout'](() => void this['poll'](_0x4ece48), 0x64);
+    if (target === this['epoch'])
+      this['timer'] = this['timeline']['window']['setTimeout'](() => void this['poll'](target), 0x64);
   }
   ['preview']() {
     if (!this['camera'] || !this['pairing']) return;
-    const { scene: _0x3a4f42, shot: _0x46c7c4 } = this['panel']['context'](),
-      _0x163f31 = sampleStoryboard3DShotAnimation(
-        _0x46c7c4['animation'],
-        this['timeline']['_timeForShot'](_0x46c7c4),
-        {
-          camera: _0x46c7c4['camera'],
-          objectTransforms: Object['fromEntries'](
-            _0x3a4f42['objects']['map']((_0x5b20ec) => [_0x5b20ec['id'], _0x5b20ec['transform']]),
-          ),
-          objects: _0x3a4f42['objects'],
-        },
-      );
-    this['timeline']['previewSample']?.({ ..._0x163f31, camera: this['camera'] });
+    const { scene: scene3, shot: shot3 } = this['panel']['context'](),
+      args = sampleStoryboard3DShotAnimation(shot3['animation'], this['timeline']['_timeForShot'](shot3), {
+        camera: shot3['camera'],
+        objectTransforms: Object['fromEntries'](
+          scene3['objects']['map']((entry) => [entry['id'], entry['transform']]),
+        ),
+        objects: scene3['objects'],
+      });
+    this['timeline']['previewSample']?.({ ...args, camera: this['camera'] });
   }
   ['finishRecording']() {
-    const _0x6ca305 = this['recording'];
+    const start = this['recording'];
     this['recording'] = null;
-    if (!_0x6ca305?.['frames']['length']) return;
-    const _0x2a5948 = Math['min'](
-      0xe10,
-      _0x6ca305['start'] + (performance['now']() - _0x6ca305['clock']) / 0x3e8,
-    );
-    if (_0x2a5948 - _0x6ca305['frames']['at'](-0x1)['time'] > 0.04)
-      _0x6ca305['frames']['push']({
-        time: _0x2a5948,
-        camera: structuredClone(this['camera'] || _0x6ca305['frames']['at'](-0x1)['camera']),
+    if (!start?.['frames']['length']) return;
+    const time2 = Math['min'](0xe10, start['start'] + (performance['now']() - start['clock']) / 0x3e8);
+    if (time2 - start['frames']['at'](-0x1)['time'] > 0.04)
+      start['frames']['push']({
+        time: time2,
+        camera: structuredClone(this['camera'] || start['frames']['at'](-0x1)['camera']),
       });
     (this['timeline']['commitMutation']?.({
       type: 'director-mobile-record',
       label: '录制手机摄像机运镜',
-      mutate: (_0x36187f) => {
-        if (_0x36187f['id'] !== _0x6ca305['projectId']) return _0x36187f;
-        const _0x14faad = _0x36187f['scenes']['find'](
-            (_0x1faa99) => _0x1faa99['id'] === _0x6ca305['sceneId'],
-          ),
-          _0x204b1b = _0x14faad?.['shots']['find']((_0x144899) => _0x144899['id'] === _0x6ca305['shotId']);
-        if (!_0x204b1b) return _0x36187f;
-        const _0x1fda28 = _0x6ca305['frames']['at'](-0x1)['time'];
-        let _0x539556 = normalizeStoryboard3DShotAnimation(_0x204b1b['animation'], {
-          camera: _0x204b1b['camera'],
+      mutate: (record) => {
+        if (record['id'] !== start['projectId']) return record;
+        const payload = record['scenes']['find']((handle) => handle['id'] === start['sceneId']),
+          camera = payload?.['shots']['find']((state) => state['id'] === start['shotId']);
+        if (!camera) return record;
+        const config = start['frames']['at'](-0x1)['time'];
+        let storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(camera['animation'], {
+          camera: camera['camera'],
         });
-        ((_0x539556['cameraKeyframes'] = _0x539556['cameraKeyframes']['filter'](
-          (_0x121d6e) => _0x121d6e['time'] < _0x6ca305['start'] || _0x121d6e['time'] > _0x1fda28,
-        )),
-          (_0x539556['duration'] = Math['max'](_0x539556['duration'], _0x1fda28)));
-        for (const _0xb2906b of _0x6ca305['frames'])
-          _0x539556 = upsertStoryboard3DCameraKeyframe(_0x539556, { ..._0xb2906b, easing: 'linear' });
+        ((storyboard3DShotAnimation['cameraKeyframes'] = storyboard3DShotAnimation['cameraKeyframes'][
+          'filter'
+        ]((scope) => scope['time'] < start['start'] || scope['time'] > config)),
+          (storyboard3DShotAnimation['duration'] = Math['max'](
+            storyboard3DShotAnimation['duration'],
+            config,
+          )));
+        for (const args2 of start['frames'])
+          storyboard3DShotAnimation = upsertStoryboard3DCameraKeyframe(storyboard3DShotAnimation, {
+            ...args2,
+            easing: 'linear',
+          });
         return (
-          _0x539556['cameraConstraintClips']['push']({
+          storyboard3DShotAnimation['cameraConstraintClips']['push']({
             id: 'mobile-' + globalThis['crypto']['randomUUID'](),
-            start: _0x6ca305['start'],
-            end: Math['max'](_0x6ca305['start'] + 0.001, _0x1fda28),
+            start: start['start'],
+            end: Math['max'](start['start'] + 0.001, config),
             followObjectId: '',
             lookAtObjectId: '',
           }),
-          (_0x204b1b['animation'] = normalizeStoryboard3DShotAnimation(_0x539556)),
-          (_0x204b1b['camera'] = structuredClone(_0x204b1b['animation']['cameraKeyframes'][0x0]['camera'])),
-          syncStoryboard3DCameraObjectFromShot(_0x14faad, _0x204b1b),
-          _0x36187f
+          (camera['animation'] = normalizeStoryboard3DShotAnimation(storyboard3DShotAnimation)),
+          (camera['camera'] = structuredClone(camera['animation']['cameraKeyframes'][0x0]['camera'])),
+          syncStoryboard3DCameraObjectFromShot(payload, camera),
+          record
         );
       },
     }),
-      (this['message'] = '已保存 ' + _0x6ca305['frames']['length'] + ' 个运镜采样。'));
+      (this['message'] = '已保存 ' + start['frames']['length'] + ' 个运镜采样。'));
   }
   ['sync']() {
     if (this['pairing'] && this['identity']() !== this['origin']) this['disconnect']();
@@ -234,9 +228,9 @@ export class DirectorMobileCamera {
     ++this['epoch'];
     if (!this['pairing'] && !this['pending'] && !this['recording']) return;
     ((this['timeline']['window'] || globalThis)['clearTimeout'](this['timer']), this['finishRecording']());
-    const _0xe0b5b5 = this['pairing'];
+    const input = this['pairing'];
     ((this['pairing'] = null), (this['pending'] = ![]), (this['camera'] = null));
-    if (_0xe0b5b5) void this['api']['close'](_0xe0b5b5['readToken'])['catch'](() => {});
+    if (input) void this['api']['close'](input['readToken'])['catch'](() => {});
     this['timeline']['clearPreview']?.();
     if (render) this['timeline']['requestRender']?.();
   }

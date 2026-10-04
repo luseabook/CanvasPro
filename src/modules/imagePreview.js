@@ -1,4 +1,7 @@
-import { resolveCanvasImageDisplayUrl, resolveCanvasImageSourceUrl } from '../services/canvasMediaLocalService.js';
+import {
+  resolveCanvasImageDisplayUrl,
+  resolveCanvasImageSourceUrl,
+} from '../services/canvasMediaLocalService.js';
 import { getImage } from './storage.js';
 import { firstNonEmpty } from '../utils/validators.js';
 import {
@@ -6,207 +9,182 @@ import {
   resolveCanvasImageThumbUrl,
 } from '../services/canvasMediaLocalService.js';
 import { attachMediaElementPlaybackSource } from '../services/desktopMediaBlobSource.js';
-export async function resolveNodeImagePreviewSource(_0x5c3d8f) {
-  if (!_0x5c3d8f) return null;
-  const _0x14552f = Array.isArray(_0x5c3d8f.images) ? _0x5c3d8f.images : [],
-    _0x2c51ec = _0x5c3d8f.mainImageIndex || 0,
-    _0x1fcf5f = _0x14552f[_0x2c51ec] || null,
-    _0x13c0a5 = firstNonEmpty(_0x1fcf5f?.sourceId, _0x5c3d8f.sourceId);
-  if (_0x13c0a5)
+export async function resolveNodeImagePreviewSource(enabled) {
+  if (!enabled) return null;
+  const value = Array.isArray(enabled.images) ? enabled.images : [],
+    item = enabled.mainImageIndex || 0,
+    key = value[item] || null,
+    nonEmpty = firstNonEmpty(key?.sourceId, enabled.sourceId);
+  if (nonEmpty)
     try {
-      const _0x707051 = await getImage(_0x13c0a5);
-      if (_0x707051) return { url: URL.createObjectURL(_0x707051), revokeUrlOnClose: true };
-    } catch (_0x1173b2) {}
-  const _0x382e98 = firstNonEmpty(
-    resolveCanvasImagePreviewUrl(_0x1fcf5f),
-    resolveCanvasImagePreviewUrl(_0x5c3d8f),
-  );
-  if (_0x382e98) return { url: _0x382e98, revokeUrlOnClose: false };
-  const _0x308625 = firstNonEmpty(
-    resolveCanvasImageThumbUrl(_0x1fcf5f),
-    resolveCanvasImageThumbUrl(_0x5c3d8f),
-  );
-  if (_0x308625) return { url: _0x308625, revokeUrlOnClose: false };
+      const image = await getImage(nonEmpty);
+      if (image) return { url: URL.createObjectURL(image), revokeUrlOnClose: true };
+    } catch (index) {}
+  const url = firstNonEmpty(resolveCanvasImagePreviewUrl(key), resolveCanvasImagePreviewUrl(enabled));
+  if (url) return { url: url, revokeUrlOnClose: false };
+  const url2 = firstNonEmpty(resolveCanvasImageThumbUrl(key), resolveCanvasImageThumbUrl(enabled));
+  if (url2) return { url: url2, revokeUrlOnClose: false };
   return null;
 }
-function markSidebarSubmenuOwner(_0x29e093, _0x52752d) {
-  const _0x5b1060 = String(_0x52752d || '').trim();
-  if (_0x5b1060) _0x29e093.dataset.sidebarSubmenuOwner = _0x5b1060;
+function markSidebarSubmenuOwner(el, result) {
+  const data = String(result || '').trim();
+  if (data) el.dataset.sidebarSubmenuOwner = data;
 }
 const IMAGE_PREVIEW_MIN_SCALE = 0.25,
   IMAGE_PREVIEW_MAX_SCALE = 6,
   IMAGE_PREVIEW_WHEEL_INTENSITY = 0.0015;
-function clampNumber(_0x53e677, _0x1291b8, _0x4074a1) {
-  const _0x3463e3 = Number(_0x53e677);
-  if (!Number.isFinite(_0x3463e3)) return _0x1291b8;
-  return Math.min(_0x4074a1, Math.max(_0x1291b8, _0x3463e3));
+function clampNumber(options, target, source) {
+  const next = Number(options);
+  if (!Number.isFinite(next)) return target;
+  return Math.min(source, Math.max(target, next));
 }
-function stopPreviewEvent(_0x505afb) {
-  (_0x505afb?.preventDefault?.(), _0x505afb?.stopPropagation?.());
+function stopPreviewEvent(event) {
+  (event?.preventDefault?.(), event?.stopPropagation?.());
 }
-function getOverlayCenterPoint(_0xcc10b3) {
-  const _0x494dfb = _0xcc10b3.getBoundingClientRect?.();
-  if (!_0x494dfb)
+function getOverlayCenterPoint(el2) {
+  const x = el2.getBoundingClientRect?.();
+  if (!x)
     return { x: (globalThis.window?.innerWidth || 0) / 2, y: (globalThis.window?.innerHeight || 0) / 2 };
-  return { x: _0x494dfb.left + _0x494dfb.width / 2, y: _0x494dfb.top + _0x494dfb.height / 2 };
+  return { x: x.left + x.width / 2, y: x.top + x.height / 2 };
 }
-function isPointerInsideElementBounds(_0x182e4a, _0x51d93a) {
-  if (!_0x182e4a || !_0x51d93a) return false;
-  const _0x41bf9b = Number(_0x51d93a.clientX),
-    _0x53f159 = Number(_0x51d93a.clientY);
-  if (!Number.isFinite(_0x41bf9b) || !Number.isFinite(_0x53f159)) return _0x51d93a.target === _0x182e4a;
-  const _0x196a8e = _0x182e4a.getBoundingClientRect?.();
-  if (!_0x196a8e) return _0x51d93a.target === _0x182e4a;
-  const _0x4353ee = Number(_0x196a8e.left),
-    _0x1a3cf5 = Number(_0x196a8e.top),
-    _0x57b86d = Number.isFinite(Number(_0x196a8e.right))
-      ? Number(_0x196a8e.right)
-      : _0x4353ee + Number(_0x196a8e.width || 0),
-    _0xf31097 = Number.isFinite(Number(_0x196a8e.bottom))
-      ? Number(_0x196a8e.bottom)
-      : _0x1a3cf5 + Number(_0x196a8e.height || 0);
+function isPointerInsideElementBounds(el3, event2) {
+  if (!el3 || !event2) return false;
+  const current = Number(event2.clientX),
+    entry = Number(event2.clientY);
+  if (!Number.isFinite(current) || !Number.isFinite(entry)) return event2.target === el3;
+  const box = el3.getBoundingClientRect?.();
+  if (!box) return event2.target === el3;
+  const record = Number(box.left),
+    payload = Number(box.top),
+    handle = Number.isFinite(Number(box.right)) ? Number(box.right) : record + Number(box.width || 0),
+    state = Number.isFinite(Number(box.bottom)) ? Number(box.bottom) : payload + Number(box.height || 0);
   if (
-    !Number.isFinite(_0x4353ee) ||
-    !Number.isFinite(_0x1a3cf5) ||
-    !Number.isFinite(_0x57b86d) ||
-    !Number.isFinite(_0xf31097) ||
-    _0x57b86d <= _0x4353ee ||
-    _0xf31097 <= _0x1a3cf5
+    !Number.isFinite(record) ||
+    !Number.isFinite(payload) ||
+    !Number.isFinite(handle) ||
+    !Number.isFinite(state) ||
+    handle <= record ||
+    state <= payload
   )
-    return _0x51d93a.target === _0x182e4a;
-  return _0x41bf9b >= _0x4353ee && _0x41bf9b <= _0x57b86d && _0x53f159 >= _0x1a3cf5 && _0x53f159 <= _0xf31097;
+    return event2.target === el3;
+  return current >= record && current <= handle && entry >= payload && entry <= state;
 }
-function applyImagePreviewTransform(_0x5c28c4, _0x5aca4a, _0x2fbe84) {
-  (_0x5c28c4.style.setProperty('--image-preview-offset-x', Math.round(_0x2fbe84.offsetX * 100) / 100 + 'px'),
-    _0x5c28c4.style.setProperty('--image-preview-offset-y', Math.round(_0x2fbe84.offsetY * 100) / 100 + 'px'),
-    _0x5aca4a.style.setProperty(
-      '--image-preview-scale',
-      String(Math.round(_0x2fbe84.scale * 0x3e8) / 0x3e8),
-    ));
+function applyImagePreviewTransform(el4, el5, box2) {
+  (el4.style.setProperty('--image-preview-offset-x', Math.round(box2.offsetX * 100) / 100 + 'px'),
+    el4.style.setProperty('--image-preview-offset-y', Math.round(box2.offsetY * 100) / 100 + 'px'),
+    el5.style.setProperty('--image-preview-scale', String(Math.round(box2.scale * 0x3e8) / 0x3e8)));
 }
-export function openImagePreview(_0x3c37f, _0x5362d6 = {}) {
-  if (!_0x3c37f) return () => {};
-  const _0x2c46bf = !!_0x5362d6.revokeUrlOnClose,
-    _0x2bf324 = { scale: 1, offsetX: 0, offsetY: 0 };
-  let _0x35a000 = null,
-    _0x4391e3 = false;
-  const _0x334b04 = document.createElement('div');
-  ((_0x334b04.className = 'v2-image-preview-overlay'),
-    (_0x334b04.style.zIndex = '99999'),
-    markSidebarSubmenuOwner(_0x334b04, _0x5362d6.sidebarSubmenuOwner));
-  const _0x1f9ca1 = document.createElement('div');
-  _0x1f9ca1.className = 'v2-image-preview-stage';
-  const _0x5b83f7 = document.createElement('img');
-  ((_0x5b83f7.className = 'v2-image-preview-media'),
-    (_0x5b83f7.src = _0x3c37f),
-    (_0x5b83f7.alt = _0x5362d6.alt || 'Image preview'),
-    (_0x5b83f7.draggable = false),
-    applyImagePreviewTransform(_0x1f9ca1, _0x5b83f7, _0x2bf324));
-  const _0x4ae2cc = () => {
-      (globalThis.window?.removeEventListener?.('pointermove', _0x5aede4, true),
-        globalThis.window?.removeEventListener?.('pointerup', _0x2ed59a, true),
-        globalThis.window?.removeEventListener?.('pointercancel', _0x2ed59a, true));
+export function openImagePreview(enabled2, enabled3 = {}) {
+  if (!enabled2) return () => {};
+  const config = !!enabled3.revokeUrlOnClose,
+    offsetX = { scale: 1, offsetX: 0, offsetY: 0 };
+  let event3 = null,
+    scope = false;
+  const el6 = document.createElement('div');
+  ((el6.className = 'v2-image-preview-overlay'),
+    (el6.style.zIndex = '99999'),
+    markSidebarSubmenuOwner(el6, enabled3.sidebarSubmenuOwner));
+  const el7 = document.createElement('div');
+  el7.className = 'v2-image-preview-stage';
+  const el8 = document.createElement('img');
+  ((el8.className = 'v2-image-preview-media'),
+    (el8.src = enabled2),
+    (el8.alt = enabled3.alt || 'Image preview'),
+    (el8.draggable = false),
+    applyImagePreviewTransform(el7, el8, offsetX));
+  const run = () => {
+      (globalThis.window?.removeEventListener?.('pointermove', run2, true),
+        globalThis.window?.removeEventListener?.('pointerup', run3, true),
+        globalThis.window?.removeEventListener?.('pointercancel', run3, true));
     },
-    _0x32ae35 = () => {
-      (_0x4ae2cc(), _0x334b04.classList.remove('is-panning'), (_0x35a000 = null));
+    handler = () => {
+      (run(), el6.classList.remove('is-panning'), (event3 = null));
     },
-    _0x4f3003 = () => {
-      if (_0x4391e3) return;
-      ((_0x4391e3 = true),
-        document.removeEventListener('keydown', _0x27e086, true),
-        _0x32ae35(),
-        _0x334b04.remove());
-      if (_0x2c46bf)
+    handler2 = () => {
+      if (scope) return;
+      ((scope = true), document.removeEventListener('keydown', input, true), handler(), el6.remove());
+      if (config)
         try {
-          URL.revokeObjectURL(_0x3c37f);
-        } catch (_0xb69672) {}
+          URL.revokeObjectURL(enabled2);
+        } catch (output) {}
     },
-    _0x27e086 = (_0x6bc085) => {
-      _0x6bc085.key === 'Escape' && (_0x6bc085.preventDefault(), _0x6bc085.stopPropagation(), _0x4f3003());
+    input = (event4) => {
+      event4.key === 'Escape' && (event4.preventDefault(), event4.stopPropagation(), handler2());
     },
-    _0x48f3fd = (_0x2fa321) => {
-      stopPreviewEvent(_0x2fa321);
-      const _0x38f928 = _0x2bf324.scale,
-        _0x271ff3 = Math.exp(-Number(_0x2fa321.deltaY || 0) * IMAGE_PREVIEW_WHEEL_INTENSITY),
-        _0x3c1224 = clampNumber(_0x38f928 * _0x271ff3, IMAGE_PREVIEW_MIN_SCALE, IMAGE_PREVIEW_MAX_SCALE);
-      if (_0x3c1224 === _0x38f928) return;
-      const _0x3fb6df = getOverlayCenterPoint(_0x334b04),
-        _0x24ad5e = Number(_0x2fa321.clientX || 0) - _0x3fb6df.x,
-        _0x2d9294 = Number(_0x2fa321.clientY || 0) - _0x3fb6df.y,
-        _0x566119 = _0x3c1224 / _0x38f928;
-      ((_0x2bf324.offsetX = _0x24ad5e - (_0x24ad5e - _0x2bf324.offsetX) * _0x566119),
-        (_0x2bf324.offsetY = _0x2d9294 - (_0x2d9294 - _0x2bf324.offsetY) * _0x566119),
-        (_0x2bf324.scale = _0x3c1224),
-        applyImagePreviewTransform(_0x1f9ca1, _0x5b83f7, _0x2bf324));
+    value2 = (event5) => {
+      stopPreviewEvent(event5);
+      const value3 = offsetX.scale,
+        value4 = Math.exp(-Number(event5.deltaY || 0) * IMAGE_PREVIEW_WHEEL_INTENSITY),
+        clampNumber2 = clampNumber(value3 * value4, IMAGE_PREVIEW_MIN_SCALE, IMAGE_PREVIEW_MAX_SCALE);
+      if (clampNumber2 === value3) return;
+      const box3 = getOverlayCenterPoint(el6),
+        value5 = Number(event5.clientX || 0) - box3.x,
+        value6 = Number(event5.clientY || 0) - box3.y,
+        value7 = clampNumber2 / value3;
+      ((offsetX.offsetX = value5 - (value5 - offsetX.offsetX) * value7),
+        (offsetX.offsetY = value6 - (value6 - offsetX.offsetY) * value7),
+        (offsetX.scale = clampNumber2),
+        applyImagePreviewTransform(el7, el8, offsetX));
     },
-    _0x334521 = (_0x1c8ffb) => {
-      if (_0x1c8ffb.button != null && _0x1c8ffb.button !== 0) return;
-      if (!isPointerInsideElementBounds(_0x5b83f7, _0x1c8ffb)) return;
-      (stopPreviewEvent(_0x1c8ffb),
-        _0x32ae35(),
-        (_0x35a000 = {
-          pointerId: _0x1c8ffb.pointerId,
-          startX: Number(_0x1c8ffb.clientX || 0),
-          startY: Number(_0x1c8ffb.clientY || 0),
-          offsetX: _0x2bf324.offsetX,
-          offsetY: _0x2bf324.offsetY,
+    value8 = (pointerId) => {
+      if (pointerId.button != null && pointerId.button !== 0) return;
+      if (!isPointerInsideElementBounds(el8, pointerId)) return;
+      (stopPreviewEvent(pointerId),
+        handler(),
+        (event3 = {
+          pointerId: pointerId.pointerId,
+          startX: Number(pointerId.clientX || 0),
+          startY: Number(pointerId.clientY || 0),
+          offsetX: offsetX.offsetX,
+          offsetY: offsetX.offsetY,
         }),
-        _0x334b04.classList.add('is-panning'),
-        _0x1f9ca1.setPointerCapture?.(_0x1c8ffb.pointerId),
-        globalThis.window?.addEventListener?.('pointermove', _0x5aede4, true),
-        globalThis.window?.addEventListener?.('pointerup', _0x2ed59a, true),
-        globalThis.window?.addEventListener?.('pointercancel', _0x2ed59a, true));
+        el6.classList.add('is-panning'),
+        el7.setPointerCapture?.(pointerId.pointerId),
+        globalThis.window?.addEventListener?.('pointermove', run2, true),
+        globalThis.window?.addEventListener?.('pointerup', run3, true),
+        globalThis.window?.addEventListener?.('pointercancel', run3, true));
     };
-  function _0x5aede4(_0x2111ea) {
-    if (!_0x35a000) return;
-    if (
-      _0x35a000.pointerId != null &&
-      _0x2111ea.pointerId != null &&
-      _0x2111ea.pointerId !== _0x35a000.pointerId
-    )
-      return;
-    (stopPreviewEvent(_0x2111ea),
-      (_0x2bf324.offsetX = _0x35a000.offsetX + Number(_0x2111ea.clientX || 0) - _0x35a000.startX),
-      (_0x2bf324.offsetY = _0x35a000.offsetY + Number(_0x2111ea.clientY || 0) - _0x35a000.startY),
-      applyImagePreviewTransform(_0x1f9ca1, _0x5b83f7, _0x2bf324));
+  function run2(event6) {
+    if (!event3) return;
+    if (event3.pointerId != null && event6.pointerId != null && event6.pointerId !== event3.pointerId) return;
+    (stopPreviewEvent(event6),
+      (offsetX.offsetX = event3.offsetX + Number(event6.clientX || 0) - event3.startX),
+      (offsetX.offsetY = event3.offsetY + Number(event6.clientY || 0) - event3.startY),
+      applyImagePreviewTransform(el7, el8, offsetX));
   }
-  function _0x2ed59a(_0x32f896) {
-    if (!_0x35a000) return;
-    if (
-      _0x35a000.pointerId != null &&
-      _0x32f896?.pointerId != null &&
-      _0x32f896.pointerId !== _0x35a000.pointerId
-    )
+  function run3(event7) {
+    if (!event3) return;
+    if (event3.pointerId != null && event7?.pointerId != null && event7.pointerId !== event3.pointerId)
       return;
-    stopPreviewEvent(_0x32f896);
+    stopPreviewEvent(event7);
     try {
-      _0x1f9ca1.releasePointerCapture?.(_0x35a000.pointerId);
-    } catch (_0x489b63) {}
-    _0x32ae35();
+      el7.releasePointerCapture?.(event3.pointerId);
+    } catch (value9) {}
+    handler();
   }
   return (
-    _0x334b04.addEventListener('click', (_0x18cb19) => {
-      if (isPointerInsideElementBounds(_0x5b83f7, _0x18cb19)) {
-        _0x18cb19.stopPropagation();
+    el6.addEventListener('click', (event8) => {
+      if (isPointerInsideElementBounds(el8, event8)) {
+        event8.stopPropagation();
         return;
       }
-      _0x4f3003();
+      handler2();
     }),
-    _0x334b04.addEventListener('wheel', _0x48f3fd, { passive: false }),
-    _0x5b83f7.addEventListener('pointerdown', _0x334521),
-    _0x5b83f7.addEventListener('dragstart', stopPreviewEvent),
-    _0x1f9ca1.appendChild(_0x5b83f7),
-    _0x334b04.appendChild(_0x1f9ca1),
-    document.addEventListener('keydown', _0x27e086, true),
-    document.body.appendChild(_0x334b04),
-    _0x4f3003
+    el6.addEventListener('wheel', value2, { passive: false }),
+    el8.addEventListener('pointerdown', value8),
+    el8.addEventListener('dragstart', stopPreviewEvent),
+    el7.appendChild(el8),
+    el6.appendChild(el7),
+    document.addEventListener('keydown', input, true),
+    document.body.appendChild(el6),
+    handler2
   );
 }
-export function openVideoPreview(_0x505278, _0x521688 = {}) {
-  if (!_0x505278) return () => {};
-  const _0x13004e = document.createElement('div');
-  (markSidebarSubmenuOwner(_0x13004e, _0x521688.sidebarSubmenuOwner),
-    Object.assign(_0x13004e.style, {
+export function openVideoPreview(enabled4, enabled5 = {}) {
+  if (!enabled4) return () => {};
+  const el9 = document.createElement('div');
+  (markSidebarSubmenuOwner(el9, enabled5.sidebarSubmenuOwner),
+    Object.assign(el9.style, {
       position: 'fixed',
       inset: '0',
       background: 'var(--overlay-dim)',
@@ -216,52 +194,100 @@ export function openVideoPreview(_0x505278, _0x521688 = {}) {
       justifyContent: 'center',
       cursor: 'zoom-out',
     }));
-  const _0x19edf1 = document.createElement('video');
-  ((_0x19edf1.controls = true),
-    (_0x19edf1.autoplay = _0x521688.autoplay !== false),
-    (_0x19edf1.loop = _0x521688.loop !== false),
-    (_0x19edf1.muted = !!_0x521688.muted),
-    void attachMediaElementPlaybackSource(_0x19edf1, _0x505278, { preload: 'auto' }).catch(() => {
-      !String(_0x19edf1.getAttribute?.('src') || _0x19edf1.src || '').trim() &&
-        ((_0x19edf1.src = _0x505278), _0x19edf1.load?.());
+  const el10 = document.createElement('video');
+  ((el10.controls = true),
+    (el10.autoplay = enabled5.autoplay !== false),
+    (el10.loop = enabled5.loop !== false),
+    (el10.muted = !!enabled5.muted),
+    void attachMediaElementPlaybackSource(el10, enabled4, { preload: 'auto' }).catch(() => {
+      !String(el10.getAttribute?.('src') || el10.src || '').trim() && ((el10.src = enabled4), el10.load?.());
     }),
-    Object.assign(_0x19edf1.style, { maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }));
-  const _0x4a466f = () => {
-      document.removeEventListener('keydown', _0x101256, true);
+    Object.assign(el10.style, { maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }));
+  const run4 = () => {
+      document.removeEventListener('keydown', value10, true);
       try {
-        _0x19edf1.pause();
-      } catch (_0x484f3e) {}
-      _0x13004e.remove();
+        el10.pause();
+      } catch (value11) {}
+      el9.remove();
     },
-    _0x101256 = (_0x924dc0) => {
-      _0x924dc0.key === 'Escape' && (_0x924dc0.preventDefault(), _0x924dc0.stopPropagation(), _0x4a466f());
+    value10 = (event9) => {
+      event9.key === 'Escape' && (event9.preventDefault(), event9.stopPropagation(), run4());
     };
-  (_0x13004e.addEventListener('click', (_0x122fb9) => {
-    if (_0x122fb9.target === _0x13004e) _0x4a466f();
+  (el9.addEventListener('click', (event10) => {
+    if (event10.target === el9) run4();
   }),
-    _0x13004e.appendChild(_0x19edf1),
-    document.addEventListener('keydown', _0x101256, true),
-    document.body.appendChild(_0x13004e));
+    el9.appendChild(el10),
+    document.addEventListener('keydown', value10, true),
+    document.body.appendChild(el9));
   try {
-    const _0x363d6e = _0x19edf1.play?.();
-    _0x363d6e && typeof _0x363d6e.catch === 'function' && _0x363d6e.catch(() => {});
-  } catch (_0x571a44) {}
-  return _0x4a466f;
+    const promise = el10.play?.();
+    promise && typeof promise.catch === 'function' && promise.catch(() => {});
+  } catch (value12) {}
+  return run4;
 }
-export async function openNodeImagePreview(_0xde6749) {
-  const _0x145251 = await resolveNodeImagePreviewSource(_0xde6749);
-  if (!_0x145251) return () => {};
-  return openImagePreview(_0x145251.url, { revokeUrlOnClose: _0x145251.revokeUrlOnClose });
+export async function openNodeImagePreview(value13) {
+  const revokeUrlOnClose = await resolveNodeImagePreviewSource(value13);
+  if (!revokeUrlOnClose) return () => {};
+  return openImagePreview(revokeUrlOnClose.url, { revokeUrlOnClose: revokeUrlOnClose.revokeUrlOnClose });
 }
 
-export async function resolveNodeImageOriginalSource(_0x21481f){if(!_0x21481f)return null;const _0xeb974b=Array["isArray"](_0x21481f["images"])?_0x21481f["images"]:[],_0x256cb0=_0x21481f["mainImageIndex"]||0x0,_0x56b447=_0xeb974b[_0x256cb0]||null,_0xa05e56=firstNonEmpty(_0x56b447?.["sourceId"],_0x21481f["sourceId"]);if(_0xa05e56)try{const _0x59de22=await getImage(_0xa05e56);if(_0x59de22)return{'url':URL['createObjectURL'](_0x59de22),'revokeUrlOnClose':!![]};}catch(_0x1aa003){}const _0x4b974b=firstNonEmpty(resolveCanvasImageSourceUrl(_0x56b447),resolveCanvasImageSourceUrl(_0x21481f));if(_0x4b974b)return{'url':_0x4b974b,'revokeUrlOnClose':![]};return null;}
+export async function resolveNodeImageOriginalSource(enabled6) {
+  if (!enabled6) return null;
+  const value14 = Array['isArray'](enabled6['images']) ? enabled6['images'] : [],
+    value15 = enabled6['mainImageIndex'] || 0x0,
+    value16 = value14[value15] || null,
+    nonEmpty2 = firstNonEmpty(value16?.['sourceId'], enabled6['sourceId']);
+  if (nonEmpty2)
+    try {
+      const image2 = await getImage(nonEmpty2);
+      if (image2) return { url: URL['createObjectURL'](image2), revokeUrlOnClose: !![] };
+    } catch (value17) {}
+  const nonEmpty3 = firstNonEmpty(
+    resolveCanvasImageSourceUrl(value16),
+    resolveCanvasImageSourceUrl(enabled6),
+  );
+  if (nonEmpty3) return { url: nonEmpty3, revokeUrlOnClose: ![] };
+  return null;
+}
 
-function collectUniquePreviewUrls(_0x4a5544=[]){const _0xc98c05=[],_0x589497=new Set();for(const _0x5d39c4 of _0x4a5544){const _0x40ac91=String(_0x5d39c4||'')["trim"]();if(!_0x40ac91||_0x589497['has'](_0x40ac91))continue;_0x589497["add"](_0x40ac91),_0xc98c05['push'](_0x40ac91);}return _0xc98c05;}
+function collectUniquePreviewUrls(list = []) {
+  const list2 = [],
+    map = new Set();
+  for (const value18 of list) {
+    const enabled7 = String(value18 || '')['trim']();
+    if (!enabled7 || map['has'](enabled7)) continue;
+    (map['add'](enabled7), list2['push'](enabled7));
+  }
+  return list2;
+}
 
-function resolveImmediateNodeImagePreviewUrls(_0x1efe50,_0x2b3596=''){const _0xd98cba=Array["isArray"](_0x1efe50?.["images"])?_0x1efe50['images']:[],_0x23cfa2=Math["max"](0x0,Number(_0x1efe50?.["mainImageIndex"])||0x0),_0x17487b=_0xd98cba[_0x23cfa2]||_0xd98cba[0x0]||null;return collectUniquePreviewUrls([_0x2b3596,resolveCanvasImageDisplayUrl(_0x17487b),resolveCanvasImageDisplayUrl(_0x1efe50),resolveCanvasImagePreviewUrl(_0x17487b),resolveCanvasImagePreviewUrl(_0x1efe50),resolveCanvasImageThumbUrl(_0x17487b),resolveCanvasImageThumbUrl(_0x1efe50)]);}
+function resolveImmediateNodeImagePreviewUrls(value19, value20 = '') {
+  const value21 = Array['isArray'](value19?.['images']) ? value19['images'] : [],
+    value22 = Math['max'](0x0, Number(value19?.['mainImageIndex']) || 0x0),
+    value23 = value21[value22] || value21[0x0] || null;
+  return collectUniquePreviewUrls([
+    value20,
+    resolveCanvasImageDisplayUrl(value23),
+    resolveCanvasImageDisplayUrl(value19),
+    resolveCanvasImagePreviewUrl(value23),
+    resolveCanvasImagePreviewUrl(value19),
+    resolveCanvasImageThumbUrl(value23),
+    resolveCanvasImageThumbUrl(value19),
+  ]);
+}
 
-let activeImagePreviewClose=null,activeVideoPreviewClose=null,videoPreviewOwnerSequence=0x0;
+let activeImagePreviewClose = null,
+  activeVideoPreviewClose = null,
+  videoPreviewOwnerSequence = 0x0;
 
-export function closeActiveImagePreview(){if(typeof activeImagePreviewClose!=="function")return![];const _0x33aa0c=activeImagePreviewClose;return _0x33aa0c(),!![];}
+export function closeActiveImagePreview() {
+  if (typeof activeImagePreviewClose !== 'function') return ![];
+  const run5 = activeImagePreviewClose;
+  return (run5(), !![]);
+}
 
-export function closeActiveVideoPreview(){if(typeof activeVideoPreviewClose!=="function")return![];const _0x186d44=activeVideoPreviewClose;return _0x186d44(),!![];}
+export function closeActiveVideoPreview() {
+  if (typeof activeVideoPreviewClose !== 'function') return ![];
+  const run6 = activeVideoPreviewClose;
+  return (run6(), !![]);
+}

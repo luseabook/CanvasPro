@@ -15,193 +15,187 @@ import { createCollaborationChat } from '../collaboration/collaborationChat.js';
 import { bindCollaborationChatInput } from '../collaboration/collaborationChatInput.js';
 import { resolveShortcutActionForEvent, isRecording } from '../shortcuts.js';
 export function initCanvasCollaboration({
-  store: _0x22ffd1,
-  canvasTabs: _0x17fb7a,
-  ensureInstallId: _0x22d81e,
-  ensureDeviceId: _0x471673,
-  resetHistory: _0x3fe8f7,
-  focusNode: _0xd20415,
+  store: store,
+  canvasTabs: canvasTabs,
+  ensureInstallId: ensureInstallId,
+  ensureDeviceId: ensureDeviceId,
+  resetHistory: resetHistory,
+  focusNode: focusNode,
   windowObject: windowObject = window,
 }) {
-  const _0x4fe8de = document['querySelector']('.header-right');
-  if (!_0x4fe8de) return null;
-  let _0x36b1d2 = ![];
-  const _0x2ff83d = document['createElement']('div');
-  _0x2ff83d['className'] = 'collaboration-controls';
-  const _0x44f1dc = createCollaborationConnectionIndicator(),
-    _0x2052d3 = document['createElement']('span');
-  ((_0x2052d3['className'] = 'collaboration-status'), _0x2052d3['setAttribute']('role', 'status'));
-  const _0x51c14f = document['createElement']('button');
-  ((_0x51c14f['className'] = 'collaboration-button collaboration-people'), (_0x51c14f['type'] = 'button'));
-  const _0x1eb950 = document['createElement']('button');
-  ((_0x1eb950['className'] = 'collaboration-button collaboration-entry'),
-    (_0x1eb950['type'] = 'button'),
-    _0x1eb950['setAttribute']('aria-haspopup', 'dialog'),
-    _0x1eb950['setAttribute']('aria-expanded', 'false'));
-  const _0x27f393 = document['createElement']('span');
-  (_0x1eb950['append'](createSharedProjectIcon(), _0x27f393),
-    _0x2ff83d['append'](_0x2052d3, _0x51c14f, _0x44f1dc['element'], _0x1eb950),
-    _0x4fe8de['insertBefore'](_0x2ff83d, _0x4fe8de['querySelector']('#canvasVersionBadge')));
-  let _0x342460 = '';
-  function _0x273016(_0x496a31) {
-    const _0x81b3ab = onlineCollaborationActors(_0x496a31, _0x514b73['getState']()['actorId']),
-      _0x39d46f = (_0x496a31?.['members'] || [])['filter']((_0x291ddd) => _0x81b3ab['has'](_0x291ddd['id'])),
-      _0x12e765 = JSON['stringify'](
-        _0x39d46f['map']((_0xb0bcfc) => [_0xb0bcfc['id'], _0xb0bcfc['name'], _0xb0bcfc['colorIndex']]),
-      );
-    ((_0x51c14f['hidden'] = !_0x496a31),
-      _0x51c14f['setAttribute']('aria-label', '查看协作成员，' + _0x39d46f['length'] + ' 人在线'));
-    if (_0x12e765 === _0x342460) return;
-    ((_0x342460 = _0x12e765), _0x51c14f['replaceChildren']());
-    for (const _0x361d39 of _0x39d46f['slice'](0x0, 0x3)) {
-      const _0x2d48f7 = document['createElement']('span');
-      ((_0x2d48f7['className'] = 'collaboration-avatar'),
-        (_0x2d48f7['textContent'] = _0x361d39['name']['slice'](0x0, 0x1)),
-        _0x2d48f7['style']['setProperty']('--member-color', collaborationMemberColor(_0x361d39)),
-        (_0x2d48f7['title'] = _0x361d39['name']),
-        _0x51c14f['append'](_0x2d48f7));
+  const el = document['querySelector']('.header-right');
+  if (!el) return null;
+  let enabled = ![];
+  const el2 = document['createElement']('div');
+  el2['className'] = 'collaboration-controls';
+  const collaborationConnectionIndicator = createCollaborationConnectionIndicator(),
+    el3 = document['createElement']('span');
+  ((el3['className'] = 'collaboration-status'), el3['setAttribute']('role', 'status'));
+  const el4 = document['createElement']('button');
+  ((el4['className'] = 'collaboration-button collaboration-people'), (el4['type'] = 'button'));
+  const anchor = document['createElement']('button');
+  ((anchor['className'] = 'collaboration-button collaboration-entry'),
+    (anchor['type'] = 'button'),
+    anchor['setAttribute']('aria-haspopup', 'dialog'),
+    anchor['setAttribute']('aria-expanded', 'false'));
+  const el5 = document['createElement']('span');
+  (anchor['append'](createSharedProjectIcon(), el5),
+    el2['append'](el3, el4, collaborationConnectionIndicator['element'], anchor),
+    el['insertBefore'](el2, el['querySelector']('#canvasVersionBadge')));
+  let value = '';
+  function run(enabled2) {
+    const map = onlineCollaborationActors(enabled2, getSession['getState']()['actorId']),
+      list = (enabled2?.['members'] || [])['filter']((item) => map['has'](item['id'])),
+      key = JSON['stringify'](list['map']((error) => [error['id'], error['name'], error['colorIndex']]));
+    ((el4['hidden'] = !enabled2),
+      el4['setAttribute']('aria-label', '查看协作成员，' + list['length'] + ' 人在线'));
+    if (key === value) return;
+    ((value = key), el4['replaceChildren']());
+    for (const error2 of list['slice'](0x0, 0x3)) {
+      const el6 = document['createElement']('span');
+      ((el6['className'] = 'collaboration-avatar'),
+        (el6['textContent'] = error2['name']['slice'](0x0, 0x1)),
+        el6['style']['setProperty']('--member-color', collaborationMemberColor(error2)),
+        (el6['title'] = error2['name']),
+        el4['append'](el6));
     }
-    if (_0x39d46f['length'] > 0x3 || !_0x39d46f['length']) {
-      const _0x585104 = document['createElement']('span');
-      ((_0x585104['textContent'] = _0x39d46f['length'] ? '+' + (_0x39d46f['length'] - 0x3) : '成员'),
-        _0x51c14f['append'](_0x585104));
+    if (list['length'] > 0x3 || !list['length']) {
+      const el7 = document['createElement']('span');
+      ((el7['textContent'] = list['length'] ? '+' + (list['length'] - 0x3) : '成员'), el4['append'](el7));
     }
   }
-  const _0x514b73 = createCollaborationApplication({
-      store: _0x22ffd1,
-      canvasTabs: _0x17fb7a,
-      ensureInstallId: _0x22d81e,
-      ensureDeviceId: _0x471673,
-      resetHistory: _0x3fe8f7,
+  const getSession = createCollaborationApplication({
+      store: store,
+      canvasTabs: canvasTabs,
+      ensureInstallId: ensureInstallId,
+      ensureDeviceId: ensureDeviceId,
+      resetHistory: resetHistory,
       saveProject: () => windowObject['_v2SaveProjectFromShortcut']?.({ waitForDialog: !![] }),
-      onNotice: (_0x453209) => showToast(_0x453209),
-      onComment: (_0x2c9b83) => _0x271fb5(_0x2c9b83),
-      onChange(_0xb5497a) {
-        _0x437852();
-        if (['blocked', 'offline']['includes'](_0xb5497a['session']?.['status']))
-          _0x2be5ce['feedback'](_0xb5497a['session']['message']);
+      onNotice: (index) => showToast(index),
+      onComment: (result) => run2(result),
+      onChange(data) {
+        run3();
+        if (['blocked', 'offline']['includes'](data['session']?.['status']))
+          collaborationPanel['feedback'](data['session']['message']);
       },
-      onPresence(_0xc9787e) {
-        !_0x36b1d2 &&
-          (_0x44f1dc['update'](_0xc9787e),
-          _0x273016(_0xc9787e),
-          _0x2be5ce['renderPresence'](),
-          _0x4f3a4b['redraw']());
+      onPresence(options) {
+        !enabled &&
+          (collaborationConnectionIndicator['update'](options),
+          run(options),
+          collaborationPanel['renderPresence'](),
+          collaborationPresence['redraw']());
       },
     }),
-    _0x5a3e86 = createCollaborationComments({ store: _0x22ffd1, getSession: _0x514b73['getSession'] });
-  function _0x26c8aa(_0xa6bdf2, _0x349e46) {
-    if (!_0x22ffd1['getStateRaw']()['nodes'][_0xa6bdf2]) return;
-    (_0x514b73['getSession']()?.['follow'](''), _0xd20415?.(_0xa6bdf2, 0x60, 0x1f4));
-    if (_0x349e46) _0x5a3e86['open'](_0xa6bdf2);
+    comments = createCollaborationComments({ store: store, getSession: getSession['getSession'] });
+  function openNode(target, source) {
+    if (!store['getStateRaw']()['nodes'][target]) return;
+    (getSession['getSession']()?.['follow'](''), focusNode?.(target, 0x60, 0x1f4));
+    if (source) comments['open'](target);
   }
-  const _0x271fb5 = createCollaborationCommentNotifications({
-      getSession: _0x514b73['getSession'],
-      hasNode: (_0x1cfab2) => !!_0x22ffd1['getStateRaw']()['nodes'][_0x1cfab2],
-      getNode: (_0x5cb2aa) => _0x22ffd1['getStateRaw']()['nodes'][_0x5cb2aa],
-      openNode: _0x26c8aa,
+  const run2 = createCollaborationCommentNotifications({
+      getSession: getSession['getSession'],
+      hasNode: (next) => !!store['getStateRaw']()['nodes'][next],
+      getNode: (current) => store['getStateRaw']()['nodes'][current],
+      openNode: openNode,
     }),
-    _0x12266d = createCollaborationChat({
-      store: _0x22ffd1,
-      getSession: _0x514b73['getSession'],
-      openNode: (_0x456f4f) => _0x26c8aa(_0x456f4f, ![]),
+    chat = createCollaborationChat({
+      store: store,
+      getSession: getSession['getSession'],
+      openNode: (entry) => openNode(entry, ![]),
     }),
-    _0x4c6ec2 = bindCollaborationChatInput({
-      chat: _0x12266d,
-      store: _0x22ffd1,
+    handler = bindCollaborationChatInput({
+      chat: chat,
+      store: store,
       resolveShortcutActionForEvent: resolveShortcutActionForEvent,
       isRecording: isRecording,
       windowObject: windowObject,
     }),
-    _0x4f3a4b = createCollaborationPresence({
-      store: _0x22ffd1,
-      getSession: _0x514b73['getSession'],
-      drawComments: (_0x141432) =>
-        drawCollaborationCommentMarkers({ ..._0x141432, comments: _0x5a3e86, chat: _0x12266d }),
+    collaborationPresence = createCollaborationPresence({
+      store: store,
+      getSession: getSession['getSession'],
+      drawComments: (args) => drawCollaborationCommentMarkers({ ...args, comments: comments, chat: chat }),
     }),
-    _0x54a267 = bindCollaborationEditors({ store: _0x22ffd1, windowObject: windowObject });
-  function _0x437852() {
-    if (_0x36b1d2) return;
-    const _0x4a969e = _0x514b73['getState']()['session'];
-    (_0x44f1dc['update'](_0x4a969e),
-      (_0x27f393['textContent'] = _0x4a969e
-        ? '协作中\x20·\x20' + (_0x4a969e['hosting'] ? '房主' : '成员')
-        : isSubscriptionActive(_0x22ffd1['getStateRaw']()['subscription'] || {})
+    handler2 = bindCollaborationEditors({ store: store, windowObject: windowObject });
+  function run3() {
+    if (enabled) return;
+    const error3 = getSession['getState']()['session'];
+    (collaborationConnectionIndicator['update'](error3),
+      (el5['textContent'] = error3
+        ? '协作中\x20·\x20' + (error3['hosting'] ? '房主' : '成员')
+        : isSubscriptionActive(store['getStateRaw']()['subscription'] || {})
           ? '开启协作'
           : '协作 · 需激活'),
-      _0x1eb950['classList']['toggle']('is-active', !!_0x4a969e));
-    const _0x28ede4 = _0x4a969e?.['status'] === 'connecting';
-    (_0x1eb950['setAttribute']('aria-busy', String(!!_0x28ede4)),
-      (_0x2052d3['textContent'] = _0x4a969e
-        ? _0x4a969e['status'] === 'online'
+      anchor['classList']['toggle']('is-active', !!error3));
+    const enabled3 = error3?.['status'] === 'connecting';
+    (anchor['setAttribute']('aria-busy', String(!!enabled3)),
+      (el3['textContent'] = error3
+        ? error3['status'] === 'online'
           ? ''
-          : _0x4a969e['status'] === 'offline'
+          : error3['status'] === 'offline'
             ? '连接中断'
-            : _0x4a969e['status'] === 'blocked'
+            : error3['status'] === 'blocked'
               ? '协作已暂停'
               : '连接中'
         : ''),
-      (_0x2052d3['title'] = _0x4a969e?.['status'] === 'online' ? '' : _0x4a969e?.['message'] || ''),
-      (_0x2052d3['hidden'] = !_0x4a969e || _0x4a969e['status'] === 'online'),
-      _0x273016(_0x4a969e),
-      _0x2be5ce['render'](),
-      _0x4f3a4b['redraw'](),
-      _0x5a3e86['update'](),
-      _0x12266d['update']());
+      (el3['title'] = error3?.['status'] === 'online' ? '' : error3?.['message'] || ''),
+      (el3['hidden'] = !error3 || error3['status'] === 'online'),
+      run(error3),
+      collaborationPanel['render'](),
+      collaborationPresence['redraw'](),
+      comments['update'](),
+      chat['update']());
   }
-  const _0x2be5ce = createCollaborationPanel({
+  const collaborationPanel = createCollaborationPanel({
     actions: {
-      ..._0x514b73['actions'],
+      ...getSession['actions'],
       activate: () => windowObject['openSubscriptionDialog']?.(),
-      copy: (_0x13d5e7) => navigator['clipboard']['writeText'](_0x13d5e7),
-      refreshReview: () => _0x514b73['getSession']()?.['review']['refresh'](undefined, !![]),
-      hasReviewNode: (_0x5a0714) => !!_0x22ffd1['getStateRaw']()['nodes'][_0x5a0714],
-      openReviewNode: _0x26c8aa,
+      copy: (record) => navigator['clipboard']['writeText'](record),
+      refreshReview: () => getSession['getSession']()?.['review']['refresh'](undefined, !![]),
+      hasReviewNode: (payload) => !!store['getStateRaw']()['nodes'][payload],
+      openReviewNode: openNode,
     },
-    getState: _0x514b73['getState'],
-    anchor: _0x1eb950,
-    keepOpenOnOutside: (_0x4794de) => !!_0x4794de['closest']?.('#fabBtn,\x20.agent-sidebar'),
+    getState: getSession['getState'],
+    anchor: anchor,
+    keepOpenOnOutside: (el8) => !!el8['closest']?.('#fabBtn,\x20.agent-sidebar'),
   });
-  function _0x1a200b() {
-    (_0x2be5ce['show'](), void _0x514b73['ensureAuthenticated']()['catch'](() => {}));
+  function show() {
+    (collaborationPanel['show'](), void getSession['ensureAuthenticated']()['catch'](() => {}));
   }
-  (_0x1eb950['addEventListener']('click', () => {
-    (_0x2be5ce['toggle'](), void _0x514b73['ensureAuthenticated']()['catch'](() => {}));
+  (anchor['addEventListener']('click', () => {
+    (collaborationPanel['toggle'](), void getSession['ensureAuthenticated']()['catch'](() => {}));
   }),
-    _0x51c14f['addEventListener']('click', _0x1a200b));
-  const _0x380a77 = document['createElement']('button');
-  ((_0x380a77['type'] = 'button'),
-    (_0x380a77['className'] = 'cpd-new-btn'),
-    (_0x380a77['textContent'] = '协作画布'),
-    _0x380a77['addEventListener']('click', _0x1a200b),
-    document['querySelector']('.cpd-footer')?.['append'](_0x380a77));
-  const _0x2bcacd = _0x22ffd1['subscribeSelector']((_0x19f861) => _0x19f861['subscription'], _0x437852);
-  windowObject['addEventListener']('aicanvas:active-canvas-changed', _0x514b73['refreshCanvas']);
-  const _0xc72572 = (_0x4cda08) => {
-    const _0xe4b8e3 = _0x514b73['getSession']();
-    _0xe4b8e3 &&
-      !_0xe4b8e3['canDetach']() &&
-      (_0x4cda08['preventDefault'](), (_0x4cda08['returnValue'] = ''));
+    el4['addEventListener']('click', show));
+  const el9 = document['createElement']('button');
+  ((el9['type'] = 'button'),
+    (el9['className'] = 'cpd-new-btn'),
+    (el9['textContent'] = '协作画布'),
+    el9['addEventListener']('click', show),
+    document['querySelector']('.cpd-footer')?.['append'](el9));
+  const run4 = store['subscribeSelector']((handle) => handle['subscription'], run3);
+  windowObject['addEventListener']('aicanvas:active-canvas-changed', getSession['refreshCanvas']);
+  const state = (event) => {
+    const enabled4 = getSession['getSession']();
+    enabled4 && !enabled4['canDetach']() && (event['preventDefault'](), (event['returnValue'] = ''));
   };
   return (
-    windowObject['addEventListener']('beforeunload', _0xc72572),
-    _0x437852(),
+    windowObject['addEventListener']('beforeunload', state),
+    run3(),
     {
-      show: _0x1a200b,
-      getSession: _0x514b73['getSession'],
+      show: show,
+      getSession: getSession['getSession'],
       destroy() {
-        ((_0x36b1d2 = !![]), _0x54a267(), _0x4c6ec2(), _0x12266d['destroy']());
-        const _0x493a77 = _0x514b73['destroy']();
+        ((enabled = !![]), handler2(), handler(), chat['destroy']());
+        const config = getSession['destroy']();
         return (
-          _0x2bcacd(),
-          _0x2be5ce['destroy'](),
-          _0x4f3a4b['destroy'](),
-          _0x5a3e86['destroy'](),
-          _0x2ff83d['remove'](),
-          _0x380a77['remove'](),
-          windowObject['removeEventListener']('beforeunload', _0xc72572),
-          windowObject['removeEventListener']('aicanvas:active-canvas-changed', _0x514b73['refreshCanvas']),
-          _0x493a77
+          run4(),
+          collaborationPanel['destroy'](),
+          collaborationPresence['destroy'](),
+          comments['destroy'](),
+          el2['remove'](),
+          el9['remove'](),
+          windowObject['removeEventListener']('beforeunload', state),
+          windowObject['removeEventListener']('aicanvas:active-canvas-changed', getSession['refreshCanvas']),
+          config
         );
       },
     }

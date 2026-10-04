@@ -7,198 +7,188 @@ import { getNodeSpawnPrefs } from './nodeSpawn.js';
 import { normalizeGridTileResult, resolveGridCropImageRef, toPositiveInt } from './imageToolbarHelpers.js';
 const getCanvasFillColor = () =>
   getComputedStyle(document.documentElement).getPropertyValue('--canvas-white').trim();
-function imageGridCropText(_0x32401b, _0x1eb7aa = {}) {
-  return t('imageGridCrop.' + _0x32401b, _0x1eb7aa);
+function imageGridCropText(value, item = {}) {
+  return t('imageGridCrop.' + value, item);
 }
 function getStateSnapshot() {
   return typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
 }
-function loadImageForGridCrop(_0x41531a, _0x201df8) {
-  return new Promise((_0x3b0d8a, _0xfcd478) => {
-    const _0x4d750b = new Image();
-    ((_0x4d750b.crossOrigin = 'anonymous'),
-      (_0x4d750b.onload = () => _0x3b0d8a(_0x4d750b)),
-      (_0x4d750b.onerror = () => _0xfcd478(new Error(_0x201df8))),
-      (_0x4d750b.src = _0x41531a));
+function loadImageForGridCrop(key, index) {
+  return new Promise((handler, handler2) => {
+    const image = new Image();
+    ((image.crossOrigin = 'anonymous'),
+      (image.onload = () => handler(image)),
+      (image.onerror = () => handler2(new Error(index))),
+      (image.src = key));
   });
 }
 function cropLoadedImageTile({
-  loadedImg: _0x376fb8,
-  tileW: _0x1a02df,
-  tileH: _0x58beea,
-  col: _0x12d5b1,
-  row: _0x5ad041,
-  quality: _0x5c35c6,
-  idPrefix: _0x43b790,
-  fileNamePrefix: _0x587930,
+  loadedImg: loadedImg,
+  tileW: tileW,
+  tileH: tileH,
+  col: col,
+  row: row,
+  quality: quality,
+  idPrefix: idPrefix,
+  fileNamePrefix: fileNamePrefix,
   oneBasedFileName: oneBasedFileName = true,
-  subDir: _0xa03185,
+  subDir: subDir2,
 }) {
-  return new Promise((_0x2b7a05, _0x4347aa) => {
+  return new Promise((handler3, handler4) => {
     try {
-      const _0xea3986 = document.createElement('canvas');
-      ((_0xea3986.width = _0x1a02df), (_0xea3986.height = _0x58beea));
-      const _0x35c4f3 = _0xea3986.getContext('2d');
-      ((_0x35c4f3.fillStyle = getCanvasFillColor()),
-        _0x35c4f3.fillRect(0, 0, _0x1a02df, _0x58beea),
-        _0x35c4f3.drawImage(
-          _0x376fb8,
-          _0x12d5b1 * _0x1a02df,
-          _0x5ad041 * _0x58beea,
-          _0x1a02df,
-          _0x58beea,
-          0,
-          0,
-          _0x1a02df,
-          _0x58beea,
-        ),
-        _0xea3986.toBlob(
-          async (_0x467a59) => {
-            if (!_0x467a59) {
-              _0x4347aa(new Error(imageGridCropText('errors.canvasBlobFailed')));
+      const box = document.createElement('canvas');
+      ((box.width = tileW), (box.height = tileH));
+      const ctx = box.getContext('2d');
+      ((ctx.fillStyle = getCanvasFillColor()),
+        ctx.fillRect(0, 0, tileW, tileH),
+        ctx.drawImage(loadedImg, col * tileW, row * tileH, tileW, tileH, 0, 0, tileW, tileH),
+        box.toBlob(
+          async (enabled) => {
+            if (!enabled) {
+              handler4(new Error(imageGridCropText('errors.canvasBlobFailed')));
               return;
             }
             try {
-              const _0x1ce8f4 = generateId(_0x43b790),
-                _0x2dc24a = oneBasedFileName ? _0x5ad041 + 1 : _0x5ad041,
-                _0x530c33 = oneBasedFileName ? _0x12d5b1 + 1 : _0x12d5b1,
-                _0x3e305c = new File(
-                  [_0x467a59],
-                  _0x587930 + '_' + _0x1ce8f4 + '_' + _0x2dc24a + '_' + _0x530c33 + '.jpg',
+              const generateId2 = generateId(idPrefix),
+                result = oneBasedFileName ? row + 1 : row,
+                data = oneBasedFileName ? col + 1 : col,
+                fileName = new File(
+                  [enabled],
+                  fileNamePrefix + '_' + generateId2 + '_' + result + '_' + data + '.jpg',
                   { type: 'image/jpeg' },
                 ),
-                _0x242a26 = await saveOutputBlob(_0x3e305c, {
+                saveOutputBlob2 = await saveOutputBlob(fileName, {
                   ext: 'jpg',
-                  ...(_0xa03185 ? { subDir: _0xa03185 } : {}),
+                  ...(subDir2 ? { subDir: subDir2 } : {}),
                 });
-              _0x2b7a05(
-                normalizeGridTileResult(_0x242a26, {
-                  row: _0x5ad041,
-                  col: _0x12d5b1,
-                  fileName: _0x3e305c.name,
-                  w: _0x1a02df,
-                  h: _0x58beea,
+              handler3(
+                normalizeGridTileResult(saveOutputBlob2, {
+                  row: row,
+                  col: col,
+                  fileName: fileName.name,
+                  w: tileW,
+                  h: tileH,
                 }),
               );
-            } catch (_0x18c0a3) {
-              _0x4347aa(_0x18c0a3);
+            } catch (options) {
+              handler4(options);
             }
           },
           'image/jpeg',
-          _0x5c35c6,
+          quality,
         ));
     } catch {
-      _0x4347aa(new Error(imageGridCropText('errors.canvasCorsBlocked')));
+      handler4(new Error(imageGridCropText('errors.canvasCorsBlocked')));
     }
   });
 }
-export async function tryCropGridTilesOnServer(_0x2a3be8, _0x286441, _0xeb0692, _0x11609b = {}) {
-  const { localPath: _0x573698 } = resolveGridCropImageRef(_0x2a3be8);
-  if (!_0x573698) return null;
+export async function tryCropGridTilesOnServer(target, cols, rows, ext = {}) {
+  const { localPath: localPath } = resolveGridCropImageRef(target);
+  if (!localPath) return null;
   try {
-    const _0x4630d5 = await cropGridTiles({
-        localPath: _0x573698,
-        cols: _0x286441,
-        rows: _0xeb0692,
-        ext: _0x11609b.ext || 'jpg',
-        quality: _0x11609b.quality || 85,
-        subDir: _0x11609b.subDir || '',
+    const w = await cropGridTiles({
+        localPath: localPath,
+        cols: cols,
+        rows: rows,
+        ext: ext.ext || 'jpg',
+        quality: ext.quality || 85,
+        subDir: ext.subDir || '',
       }),
-      _0x76b2c = Array.isArray(_0x4630d5?.tiles) ? _0x4630d5.tiles : [];
-    if (_0x76b2c.length !== _0x286441 * _0xeb0692) return null;
+      tiles = Array.isArray(w?.tiles) ? w.tiles : [];
+    if (tiles.length !== cols * rows) return null;
     return {
-      ..._0x4630d5,
-      tiles: _0x76b2c.map((_0x106cc7, _0x8d26d2) =>
-        normalizeGridTileResult(_0x106cc7, {
-          row: Math.floor(_0x8d26d2 / _0x286441),
-          col: _0x8d26d2 % _0x286441,
-          w: _0x4630d5.tileWidth,
-          h: _0x4630d5.tileHeight,
+      ...w,
+      tiles: tiles.map((item2, col2) =>
+        normalizeGridTileResult(item2, {
+          row: Math.floor(col2 / cols),
+          col: col2 % cols,
+          w: w.tileWidth,
+          h: w.tileHeight,
         }),
       ),
     };
-  } catch (_0x4c4dcc) {
-    return (console.warn('[GridCrop] server crop failed, falling back to browser crop:', _0x4c4dcc), null);
+  } catch (source) {
+    return (console.warn('[GridCrop] server crop failed, falling back to browser crop:', source), null);
   }
 }
 async function cropGridTilesInBrowser({
-  nodeData: _0x3066e2,
-  cols: _0x1fcc82,
-  rows: _0x3723ba,
-  quality: _0x477472,
-  idPrefix: _0x24b4e1,
-  fileNamePrefix: _0x30c914,
+  nodeData: nodeData,
+  cols: cols2,
+  rows: rows2,
+  quality: quality2,
+  idPrefix: idPrefix2,
+  fileNamePrefix: fileNamePrefix2,
   oneBasedFileName: oneBasedFileName = true,
   subDir: subDir = '',
-  fallbackTile: _0x2aab03,
+  fallbackTile: fallbackTile,
 }) {
-  const { imgUrl: _0x4abb16 } = resolveGridCropImageRef(_0x3066e2),
-    _0xa2204 = await loadImageForGridCrop(
-      _0x4abb16,
-      _0x2aab03?.loadErrorMessage || imageGridCropText('errors.localImageLoadFailed'),
+  const { imgUrl: imgUrl } = resolveGridCropImageRef(nodeData),
+    loadedImg2 = await loadImageForGridCrop(
+      imgUrl,
+      fallbackTile?.loadErrorMessage || imageGridCropText('errors.localImageLoadFailed'),
     ),
-    _0x37fb95 = Math.floor(_0xa2204.naturalWidth / _0x1fcc82),
-    _0x339973 = Math.floor(_0xa2204.naturalHeight / _0x3723ba),
-    _0x483aba = [];
-  for (let _0x19c493 = 0; _0x19c493 < _0x3723ba; _0x19c493++) {
-    for (let _0x3ab509 = 0; _0x3ab509 < _0x1fcc82; _0x3ab509++) {
-      const _0x5aab0c = cropLoadedImageTile({
-        loadedImg: _0xa2204,
-        tileW: _0x37fb95,
-        tileH: _0x339973,
-        col: _0x3ab509,
-        row: _0x19c493,
-        quality: _0x477472,
-        idPrefix: _0x24b4e1,
-        fileNamePrefix: _0x30c914,
+    tileW2 = Math.floor(loadedImg2.naturalWidth / cols2),
+    tileH2 = Math.floor(loadedImg2.naturalHeight / rows2),
+    list = [];
+  for (let row2 = 0; row2 < rows2; row2++) {
+    for (let col3 = 0; col3 < cols2; col3++) {
+      const promise = cropLoadedImageTile({
+        loadedImg: loadedImg2,
+        tileW: tileW2,
+        tileH: tileH2,
+        col: col3,
+        row: row2,
+        quality: quality2,
+        idPrefix: idPrefix2,
+        fileNamePrefix: fileNamePrefix2,
         oneBasedFileName: oneBasedFileName,
         subDir: subDir,
       });
-      _0x2aab03?.onError
-        ? _0x483aba.push(
-            _0x5aab0c.catch((_0x14c526) =>
-              _0x2aab03.onError({
-                err: _0x14c526,
-                row: _0x19c493,
-                col: _0x3ab509,
-                tileW: _0x37fb95,
-                tileH: _0x339973,
+      fallbackTile?.onError
+        ? list.push(
+            promise.catch((err) =>
+              fallbackTile.onError({
+                err: err,
+                row: row2,
+                col: col3,
+                tileW: tileW2,
+                tileH: tileH2,
               }),
             ),
           )
-        : _0x483aba.push(_0x5aab0c);
+        : list.push(promise);
     }
   }
-  const _0x4497cb = await Promise.all(_0x483aba);
+  const tiles2 = await Promise.all(list);
   return {
-    tiles: _0x4497cb,
-    tileW: _0x37fb95,
-    tileH: _0x339973,
-    sourceWidth: _0xa2204.naturalWidth,
-    sourceHeight: _0xa2204.naturalHeight,
+    tiles: tiles2,
+    tileW: tileW2,
+    tileH: tileH2,
+    sourceWidth: loadedImg2.naturalWidth,
+    sourceHeight: loadedImg2.naturalHeight,
   };
 }
-export async function executeGridCrop({ nodeData: _0x37cdff, cols: _0x4458c3, rows: _0x100946 }) {
-  const { imgUrl: _0x40ce35 } = resolveGridCropImageRef(_0x37cdff);
-  if (!_0x40ce35) throw new Error(imageGridCropText('errors.noImage'));
-  let _0x255cb2 = null,
-    _0x4a3fae = 0,
-    _0x17e39e = 0;
-  const _0x29408c = await tryCropGridTilesOnServer(_0x37cdff, _0x4458c3, _0x100946, {
+export async function executeGridCrop({ nodeData: nodeData2, cols: cols3, rows: rows3 }) {
+  const { imgUrl: imgUrl2 } = resolveGridCropImageRef(nodeData2);
+  if (!imgUrl2) throw new Error(imageGridCropText('errors.noImage'));
+  let list2 = null,
+    toPositiveInt2 = 0,
+    toPositiveInt3 = 0;
+  const tryCropGridTilesOnServer2 = await tryCropGridTilesOnServer(nodeData2, cols3, rows3, {
     ext: 'jpg',
     quality: 88,
     subDir: 'Multiple grids',
   });
-  _0x29408c &&
-    ((_0x255cb2 = _0x29408c.tiles),
-    (_0x4a3fae = toPositiveInt(_0x29408c.tileWidth, _0x255cb2[0]?.w || 0)),
-    (_0x17e39e = toPositiveInt(_0x29408c.tileHeight, _0x255cb2[0]?.h || 0)));
-  if (!_0x255cb2)
+  tryCropGridTilesOnServer2 &&
+    ((list2 = tryCropGridTilesOnServer2.tiles),
+    (toPositiveInt2 = toPositiveInt(tryCropGridTilesOnServer2.tileWidth, list2[0]?.w || 0)),
+    (toPositiveInt3 = toPositiveInt(tryCropGridTilesOnServer2.tileHeight, list2[0]?.h || 0)));
+  if (!list2)
     try {
-      const _0x44b4fb = await cropGridTilesInBrowser({
-        nodeData: _0x37cdff,
-        cols: _0x4458c3,
-        rows: _0x100946,
+      const cropGridTilesInBrowser2 = await cropGridTilesInBrowser({
+        nodeData: nodeData2,
+        cols: cols3,
+        rows: rows3,
         quality: 0.88,
         idPrefix: 'crop',
         fileNamePrefix: 'crop',
@@ -206,163 +196,159 @@ export async function executeGridCrop({ nodeData: _0x37cdff, cols: _0x4458c3, ro
         subDir: 'Multiple grids',
         fallbackTile: {
           loadErrorMessage: imageGridCropText('errors.localFileReadFailed'),
-          onError: ({
-            err: _0x3eb767,
-            row: _0x406248,
-            col: _0x1a1c58,
-            tileW: _0x41e1ec,
-            tileH: _0x1cbb87,
-          }) => {
+          onError: ({ err: err2, row: row3, col: col4, tileW: tileW3, tileH: tileH3 }) => {
             return (
-              console.error('[GridCrop] tile ' + _0x406248 + '-' + _0x1a1c58 + ' failed:', _0x3eb767),
-              { row: _0x406248, col: _0x1a1c58, url: null, localPath: '', w: _0x41e1ec, h: _0x1cbb87 }
+              console.error('[GridCrop] tile ' + row3 + '-' + col4 + ' failed:', err2),
+              { row: row3, col: col4, url: null, localPath: '', w: tileW3, h: tileH3 }
             );
           },
         },
       });
-      ((_0x255cb2 = _0x44b4fb.tiles), (_0x4a3fae = _0x44b4fb.tileW), (_0x17e39e = _0x44b4fb.tileH));
-    } catch (_0x3dc02c) {
-      console.error('[GridCrop] load local image failed:', _0x40ce35, _0x3dc02c);
+      ((list2 = cropGridTilesInBrowser2.tiles),
+        (toPositiveInt2 = cropGridTilesInBrowser2.tileW),
+        (toPositiveInt3 = cropGridTilesInBrowser2.tileH));
+    } catch (next) {
+      console.error('[GridCrop] load local image failed:', imgUrl2, next);
       throw new Error(imageGridCropText('errors.sourceMaybeRemoved'));
     }
-  const { direction: _0x3308dc, spacing: _0x1c32c4, avoidOverlap: _0x1ef8ab } = getNodeSpawnPrefs(),
-    _0x104890 = getStateSnapshot(),
-    _0x3e66a8 = _0x104890.nodes[_0x37cdff.id];
-  if (!_0x3e66a8) throw new Error(imageGridCropText('errors.sourceNodeMissing'));
-  const { width: _0x57464d, height: _0x427155 } = getAutoMediaSizeByShortSide(_0x4a3fae, _0x17e39e),
-    _0x257e6d = 12,
-    _0x1bfa33 = _0x4458c3 * _0x57464d + (_0x4458c3 - 1) * _0x257e6d,
-    _0x32f1b5 = _0x100946 * _0x427155 + (_0x100946 - 1) * _0x257e6d;
-  let _0x13ea9d, _0x493b7f;
-  _0x3308dc === 'right'
-    ? ((_0x13ea9d = _0x3e66a8.x + (_0x3e66a8.width || 0x104) + _0x1c32c4),
-      (_0x493b7f = _0x3e66a8.y + ((_0x3e66a8.height || 0x104) - _0x32f1b5) / 2))
-    : ((_0x13ea9d = _0x3e66a8.x + ((_0x3e66a8.width || 0x104) - _0x1bfa33) / 2),
-      (_0x493b7f = _0x3e66a8.y + (_0x3e66a8.height || 0x104) + _0x1c32c4));
-  if (_0x1ef8ab) {
-    const _0x53a38c = findAvailablePosition(
-      _0x104890.nodes,
-      _0x13ea9d,
-      _0x493b7f,
-      _0x1bfa33,
-      _0x32f1b5,
-      _0x1c32c4,
-      _0x3308dc,
+  const { direction: direction, spacing: spacing, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+    stateSnapshot = getStateSnapshot(),
+    srcNode = stateSnapshot.nodes[nodeData2.id];
+  if (!srcNode) throw new Error(imageGridCropText('errors.sourceNodeMissing'));
+  const { width: width, height: height } = getAutoMediaSizeByShortSide(toPositiveInt2, toPositiveInt3),
+    current = 12,
+    entry = cols3 * width + (cols3 - 1) * current,
+    record = rows3 * height + (rows3 - 1) * current;
+  let payload, handle;
+  direction === 'right'
+    ? ((payload = srcNode.x + (srcNode.width || 0x104) + spacing),
+      (handle = srcNode.y + ((srcNode.height || 0x104) - record) / 2))
+    : ((payload = srcNode.x + ((srcNode.width || 0x104) - entry) / 2),
+      (handle = srcNode.y + (srcNode.height || 0x104) + spacing));
+  if (avoidOverlap) {
+    const box2 = findAvailablePosition(
+      stateSnapshot.nodes,
+      payload,
+      handle,
+      entry,
+      record,
+      spacing,
+      direction,
     );
-    ((_0x13ea9d = _0x53a38c.x), (_0x493b7f = _0x53a38c.y));
+    ((payload = box2.x), (handle = box2.y));
   }
-  const _0x13985a = [];
+  const newIds = [];
   return (
-    _0x255cb2.forEach((_0x26aa19) => {
+    list2.forEach((originalLocalPath) => {
       const {
-        row: _0x3fd420,
-        col: _0x3af300,
-        url: _0x120611,
-        localPath: _0x2da368,
-        fileName: _0x47fa2a,
-      } = _0x26aa19;
-      if (!_0x120611 || !_0x2da368) return;
-      const _0x56392d =
+        row: row4,
+        col: col5,
+        url: url,
+        localPath: localPath2,
+        fileName: fileName2,
+      } = originalLocalPath;
+      if (!url || !localPath2) return;
+      const id =
           'source-image-crop-' +
           Date.now() +
           '-' +
-          _0x3fd420 +
+          row4 +
           '-' +
-          _0x3af300 +
+          col5 +
           '-' +
           Math.random().toString(36).slice(2, 6),
-        _0x5712c7 = _0x13ea9d + _0x3af300 * (_0x57464d + _0x257e6d),
-        _0x1a8f63 = _0x493b7f + _0x3fd420 * (_0x427155 + _0x257e6d),
-        _0x185dc8 = _0x2da368.startsWith('/') ? _0x2da368.slice(1) : _0x2da368;
+        x = payload + col5 * (width + current),
+        y = handle + row4 * (height + current),
+        localPath3 = localPath2.startsWith('/') ? localPath2.slice(1) : localPath2;
       (appStore.addNode(
         buildSourceMediaNodePayload({
-          id: _0x56392d,
+          id: id,
           type: 'source-image',
-          x: _0x5712c7,
-          y: _0x1a8f63,
-          width: _0x57464d,
-          height: _0x427155,
-          name: imageGridCropText('output.nodeName', { row: _0x3fd420 + 1, col: _0x3af300 + 1 }),
+          x: x,
+          y: y,
+          width: width,
+          height: height,
+          name: imageGridCropText('output.nodeName', { row: row4 + 1, col: col5 + 1 }),
           src: '',
-          localPath: _0x185dc8,
-          originalLocalPath: _0x26aa19.originalLocalPath || _0x185dc8,
-          displayLocalPath: _0x26aa19.displayLocalPath || '',
-          thumbLocalPath: _0x26aa19.thumbLocalPath || '',
-          originalWidth: _0x26aa19.originalWidth || _0x26aa19.w || _0x4a3fae,
-          originalHeight: _0x26aa19.originalHeight || _0x26aa19.h || _0x17e39e,
-          fileName: _0x47fa2a || '',
+          localPath: localPath3,
+          originalLocalPath: originalLocalPath.originalLocalPath || localPath3,
+          displayLocalPath: originalLocalPath.displayLocalPath || '',
+          thumbLocalPath: originalLocalPath.thumbLocalPath || '',
+          originalWidth: originalLocalPath.originalWidth || originalLocalPath.w || toPositiveInt2,
+          originalHeight: originalLocalPath.originalHeight || originalLocalPath.h || toPositiveInt3,
+          fileName: fileName2 || '',
           needsAutoResize: false,
         }),
       ),
-        _0x13985a.push(_0x56392d));
+        newIds.push(id));
     }),
-    _0x13985a.length > 0 &&
-      (appStore.setSelectedNodes(_0x13985a),
-      window.v2FocusOnNodes?.([_0x3e66a8.id, ..._0x13985a]),
+    newIds.length > 0 &&
+      (appStore.setSelectedNodes(newIds),
+      window.v2FocusOnNodes?.([srcNode.id, ...newIds]),
       window._triggerLocalCacheSave?.()),
-    { newIds: _0x13985a, srcNode: _0x3e66a8 }
+    { newIds: newIds, srcNode: srcNode }
   );
 }
-export async function prepareGridCells({ nodeData: _0x40ea56, cols: _0x392920, rows: _0x2cd1b4 }) {
-  const { localPath: _0x100c5c, imgUrl: _0x5e719d } = resolveGridCropImageRef(_0x40ea56);
-  if (!_0x5e719d) throw new Error(imageGridCropText('errors.noImage'));
-  const _0x81e18f = await tryCropGridTilesOnServer(_0x40ea56, _0x392920, _0x2cd1b4, {
+export async function prepareGridCells({ nodeData: nodeData3, cols: cols4, rows: rows4 }) {
+  const { localPath: localPath4, imgUrl: imgUrl3 } = resolveGridCropImageRef(nodeData3);
+  if (!imgUrl3) throw new Error(imageGridCropText('errors.noImage'));
+  const sourceWidth = await tryCropGridTilesOnServer(nodeData3, cols4, rows4, {
     ext: 'jpg',
     quality: 85,
   });
-  if (_0x81e18f)
-    return _0x81e18f.tiles.map((_0x413121) => ({
+  if (sourceWidth)
+    return sourceWidth.tiles.map((localPath5) => ({
       id: generateId('cell'),
       url: '',
-      localPath: _0x413121.localPath,
-      originalLocalPath: _0x413121.originalLocalPath || _0x413121.localPath,
-      displayLocalPath: _0x413121.displayLocalPath || '',
-      thumbLocalPath: _0x413121.thumbLocalPath || '',
-      fileName: _0x413121.fileName || '',
-      originalWidth: _0x413121.originalWidth || _0x413121.w || _0x81e18f.tileWidth,
-      originalHeight: _0x413121.originalHeight || _0x413121.h || _0x81e18f.tileHeight,
-      sourceLocalPath: _0x100c5c || '',
-      sourceUrl: _0x100c5c ? '' : _0x5e719d,
-      sourceWidth: _0x81e18f.sourceWidth || _0x81e18f.tileWidth * _0x392920,
-      sourceHeight: _0x81e18f.sourceHeight || _0x81e18f.tileHeight * _0x2cd1b4,
-      w: _0x413121.w || _0x81e18f.tileWidth,
-      h: _0x413121.h || _0x81e18f.tileHeight,
-      row: _0x413121.row,
-      col: _0x413121.col,
+      localPath: localPath5.localPath,
+      originalLocalPath: localPath5.originalLocalPath || localPath5.localPath,
+      displayLocalPath: localPath5.displayLocalPath || '',
+      thumbLocalPath: localPath5.thumbLocalPath || '',
+      fileName: localPath5.fileName || '',
+      originalWidth: localPath5.originalWidth || localPath5.w || sourceWidth.tileWidth,
+      originalHeight: localPath5.originalHeight || localPath5.h || sourceWidth.tileHeight,
+      sourceLocalPath: localPath4 || '',
+      sourceUrl: localPath4 ? '' : imgUrl3,
+      sourceWidth: sourceWidth.sourceWidth || sourceWidth.tileWidth * cols4,
+      sourceHeight: sourceWidth.sourceHeight || sourceWidth.tileHeight * rows4,
+      w: localPath5.w || sourceWidth.tileWidth,
+      h: localPath5.h || sourceWidth.tileHeight,
+      row: localPath5.row,
+      col: localPath5.col,
       isEmpty: false,
     }));
   const {
-    tiles: _0x2fe0c8,
-    sourceWidth: _0x26c431,
-    sourceHeight: _0xdebaf,
+    tiles: tiles3,
+    sourceWidth: sourceWidth2,
+    sourceHeight: sourceHeight,
   } = await cropGridTilesInBrowser({
-    nodeData: _0x40ea56,
-    cols: _0x392920,
-    rows: _0x2cd1b4,
+    nodeData: nodeData3,
+    cols: cols4,
+    rows: rows4,
     quality: 0.85,
     idPrefix: 'tile',
     fileNamePrefix: 'sb',
     oneBasedFileName: false,
     fallbackTile: { loadErrorMessage: imageGridCropText('errors.localImageLoadFailed') },
   });
-  return _0x2fe0c8.map((_0x49d820) => ({
+  return tiles3.map((localPath6) => ({
     id: generateId('cell'),
     url: '',
-    localPath: _0x49d820.localPath,
-    originalLocalPath: _0x49d820.originalLocalPath || _0x49d820.localPath,
-    displayLocalPath: _0x49d820.displayLocalPath || '',
-    thumbLocalPath: _0x49d820.thumbLocalPath || '',
-    fileName: _0x49d820.fileName || '',
-    originalWidth: _0x49d820.originalWidth || _0x49d820.w,
-    originalHeight: _0x49d820.originalHeight || _0x49d820.h,
-    sourceLocalPath: _0x100c5c || '',
-    sourceUrl: _0x100c5c ? '' : _0x5e719d,
-    sourceWidth: _0x26c431 || _0x392920 * _0x49d820.w,
-    sourceHeight: _0xdebaf || _0x2cd1b4 * _0x49d820.h,
-    w: _0x49d820.w,
-    h: _0x49d820.h,
-    row: _0x49d820.row,
-    col: _0x49d820.col,
+    localPath: localPath6.localPath,
+    originalLocalPath: localPath6.originalLocalPath || localPath6.localPath,
+    displayLocalPath: localPath6.displayLocalPath || '',
+    thumbLocalPath: localPath6.thumbLocalPath || '',
+    fileName: localPath6.fileName || '',
+    originalWidth: localPath6.originalWidth || localPath6.w,
+    originalHeight: localPath6.originalHeight || localPath6.h,
+    sourceLocalPath: localPath4 || '',
+    sourceUrl: localPath4 ? '' : imgUrl3,
+    sourceWidth: sourceWidth2 || cols4 * localPath6.w,
+    sourceHeight: sourceHeight || rows4 * localPath6.h,
+    w: localPath6.w,
+    h: localPath6.h,
+    row: localPath6.row,
+    col: localPath6.col,
     isEmpty: false,
   }));
 }

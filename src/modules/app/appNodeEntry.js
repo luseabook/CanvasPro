@@ -8,241 +8,249 @@ import { createStoryWorkspaceNodeData } from '../storyWorkspace/storyWorkspaceMo
 import { t } from '../../i18n/index.js';
 const DEV_ONLY_NODE_TYPES = new Set(['media-clip', 'web-preview']);
 export function createSpecialNodeDataByType({
-  type: _0x5a6b3f,
-  id: _0x4a81e1,
-  x: _0x294dbb,
-  y: _0x39dc89,
-  width: _0x2e16e5,
-  height: _0x1a3e21,
-  name: _0x3f20a9,
+  type: type2,
+  id: id2,
+  x: x2,
+  y: y2,
+  width: width2,
+  height: height2,
+  name: name,
 }) {
-  if (_0x5a6b3f === 'panorama-scene')
+  if (type2 === 'panorama-scene')
     return createPanoramaSceneNodeData({
-      id: _0x4a81e1,
-      x: _0x294dbb,
-      y: _0x39dc89,
-      width: _0x2e16e5,
-      height: _0x1a3e21,
-      name: _0x3f20a9,
+      id: id2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name,
     });
-  if (_0x5a6b3f === 'panorama-360')
+  if (type2 === 'panorama-360')
     return createPanorama360NodeData({
-      id: _0x4a81e1,
-      x: _0x294dbb,
-      y: _0x39dc89,
-      width: _0x2e16e5,
-      height: _0x1a3e21,
-      name: _0x3f20a9,
+      id: id2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name,
     });
-  if (_0x5a6b3f === 'storyboard-script')
+  if (type2 === 'storyboard-script')
     return createStoryboardScriptNodeData({
-      id: _0x4a81e1,
-      x: _0x294dbb,
-      y: _0x39dc89,
-      width: _0x2e16e5,
-      height: _0x1a3e21,
-      name: _0x3f20a9,
+      id: id2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name,
     });
-  if (_0x5a6b3f === 'collage')
+  if (type2 === 'collage')
     return createEmptyCollageNodeData({
-      id: _0x4a81e1,
-      x: _0x294dbb,
-      y: _0x39dc89,
-      width: _0x2e16e5,
-      height: _0x1a3e21,
-      name: _0x3f20a9 || t('nodeCreation.items.collage.defaultName'),
+      id: id2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name || t('nodeCreation.items.collage.defaultName'),
     });
-  if (_0x5a6b3f === 'story-workspace')
+  if (type2 === 'story-workspace')
     return createStoryWorkspaceNodeData({
-      id: _0x4a81e1, x: _0x294dbb, y: _0x39dc89,
-      width: _0x2e16e5, height: _0x1a3e21,
-      name: _0x3f20a9 || t('nodeCreation.items.storyWorkspace.defaultName'),
+      id: id2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name || t('nodeCreation.items.storyWorkspace.defaultName'),
     });
-  if (_0x5a6b3f === 'comfyui-workflow')
+  if (type2 === 'comfyui-workflow')
     return createComfyWorkflowNodeData({
-      id: _0x4a81e1, x: _0x294dbb, y: _0x39dc89,
-      width: _0x2e16e5, height: _0x1a3e21,
-      name: _0x3f20a9 || t('nodeCreation.items.comfyWorkflow.defaultName'),
+      id: id2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name || t('nodeCreation.items.comfyWorkflow.defaultName'),
     });
-  if (_0x5a6b3f === 'whiteboard')
+  if (type2 === 'whiteboard')
     return createWhiteboardNodeData({
-      id: _0x4a81e1, x: _0x294dbb, y: _0x39dc89,
-      width: _0x2e16e5, height: _0x1a3e21,
-      name: _0x3f20a9 || t('nodeCreation.items.whiteboard.defaultName'),
+      id: id2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name || t('nodeCreation.items.whiteboard.defaultName'),
     });
-  if (_0x5a6b3f === 'web-preview')
+  if (type2 === 'web-preview')
     return {
-      id: _0x4a81e1,
-      type: _0x5a6b3f,
-      x: _0x294dbb,
-      y: _0x39dc89,
-      width: _0x2e16e5,
-      height: _0x1a3e21,
-      name: _0x3f20a9 || t('nodeCreation.items.webPreview.defaultName'),
+      id: id2,
+      type: type2,
+      x: x2,
+      y: y2,
+      width: width2,
+      height: height2,
+      name: name || t('nodeCreation.items.webPreview.defaultName'),
     };
   return null;
 }
 function isDevModeOn() {
   return window.DEV_MODE === true || document.body.classList.contains('dev-mode');
 }
-function isDevOnlyNodeType(_0x2467da) {
-  return DEV_ONLY_NODE_TYPES.has(String(_0x2467da || ''));
+function isDevOnlyNodeType(value) {
+  return DEV_ONLY_NODE_TYPES.has(String(value || ''));
 }
-function resolveNodeSize(_0x49b59c, _0xb12b5e, { forDrop: forDrop = false } = {}) {
-  let { width: _0x350f3e, height: _0x4a4ca8 } = _0xb12b5e(_0x49b59c);
+function resolveNodeSize(item, handler, { forDrop: forDrop = false } = {}) {
+  let { width: width3, height: height3 } = handler(item);
   return (
-    forDrop && _0x49b59c === 'test-video' && ((_0x350f3e = 0x12c), (_0x4a4ca8 = 0x12c)),
-    forDrop && _0x49b59c === 'scene-detection' && ((_0x350f3e = 0x190), (_0x4a4ca8 = 0x1f4)),
-    { width: _0x350f3e, height: _0x4a4ca8 }
+    forDrop && item === 'test-video' && ((width3 = 0x12c), (height3 = 0x12c)),
+    forDrop && item === 'scene-detection' && ((width3 = 0x190), (height3 = 0x1f4)),
+    { width: width3, height: height3 }
   );
 }
 export function initAppNodeEntry({
-  graphStore: _0x1b5384,
-  wrap: _0x164fa1,
-  btnAddEl: _0xa5d54a,
-  nodeMenuEl: _0x14d599,
-  initCanvasContextMenu: _0xfa20a7,
-  getNodeDefaultSize: _0x4a1461,
-  commit: _0x2655a9,
+  graphStore: graphStore,
+  wrap: wrap,
+  btnAddEl: btnAddEl,
+  nodeMenuEl: nodeMenuEl,
+  initCanvasContextMenu: initCanvasContextMenu,
+  getNodeDefaultSize: getNodeDefaultSize,
+  commit: commit,
 } = {}) {
-  const _0x548b01 = () => {
-      const _0x199636 = isDevModeOn();
-      document.querySelectorAll('.nam-item[data-type]').forEach((_0x45400d) => {
-        const _0x513fa5 = isDevOnlyNodeType(_0x45400d.dataset.type);
-        ((_0x45400d.hidden = _0x513fa5 && !_0x199636),
-          _0x45400d.setAttribute('aria-hidden', _0x513fa5 && !_0x199636 ? 'true' : 'false'));
+  const run = () => {
+      const isDevModeOn2 = isDevModeOn();
+      document.querySelectorAll('.nam-item[data-type]').forEach((el) => {
+        const isDevOnlyNodeType2 = isDevOnlyNodeType(el.dataset.type);
+        ((el.hidden = isDevOnlyNodeType2 && !isDevModeOn2),
+          el.setAttribute('aria-hidden', isDevOnlyNodeType2 && !isDevModeOn2 ? 'true' : 'false'));
       });
     },
-    _0x2b2ffb = (_0x4458dc, _0x238157, _0x556969, _0x357389 = {}) => {
-      const { width: _0x48096b, height: _0x56161b } = resolveNodeSize(_0x4458dc, _0x4a1461, _0x357389),
-        _0x2465a7 = generateId(_0x4458dc),
-        _0xb04a36 = createSpecialNodeDataByType({
-          type: _0x4458dc,
-          id: _0x2465a7,
-          x: _0x238157 - _0x48096b / 2,
-          y: _0x556969 - _0x56161b / 2,
-          width: _0x48096b,
-          height: _0x56161b,
+    handler2 = (type3, x3, y3, key = {}) => {
+      const { width: width4, height: height4 } = resolveNodeSize(type3, getNodeDefaultSize, key),
+        id3 = generateId(type3),
+        error = createSpecialNodeDataByType({
+          type: type3,
+          id: id3,
+          x: x3 - width4 / 2,
+          y: y3 - height4 / 2,
+          width: width4,
+          height: height4,
         }) || {
-          id: _0x2465a7,
-          type: _0x4458dc,
-          x: _0x238157 - _0x48096b / 2,
-          y: _0x556969 - _0x56161b / 2,
-          width: _0x48096b,
-          height: _0x56161b,
+          id: id3,
+          type: type3,
+          x: x3 - width4 / 2,
+          y: y3 - height4 / 2,
+          width: width4,
+          height: height4,
         };
-      (_0x4458dc === 'media-clip' && (_0xb04a36.name = t('nodeCreation.items.mediaClip.defaultName')),
-        _0x1b5384.addNode(_0xb04a36),
-        _0x1b5384.setSelectedNodes([_0x2465a7]),
-        _0x2655a9?.());
+      (type3 === 'media-clip' && (error.name = t('nodeCreation.items.mediaClip.defaultName')),
+        graphStore.addNode(error),
+        graphStore.setSelectedNodes([id3]),
+        commit?.());
     },
-    _0x4f29b4 = (_0x24f626) => {
-      const { viewport: _0x6a9010 } = _0x1b5384.getState(),
-        _0x4bfcdb = (window.innerWidth / 2 - _0x6a9010.x) / _0x6a9010.zoom,
-        _0xc466f1 = (window.innerHeight / 2 - _0x6a9010.y) / _0x6a9010.zoom;
-      _0x2b2ffb(_0x24f626, _0x4bfcdb, _0xc466f1);
+    handler3 = (index) => {
+      const { viewport: viewport } = graphStore.getState(),
+        result = (window.innerWidth / 2 - viewport.x) / viewport.zoom,
+        data = (window.innerHeight / 2 - viewport.y) / viewport.zoom;
+      handler2(index, result, data);
     };
-  if (_0xa5d54a) {
-    let _0x415de8 = null,
-      _0x339b3f = '',
-      _0x34de9c = null;
-    const _0x4b6a35 = () => {
-        (clearTimeout(_0x415de8), (_0x415de8 = null));
+  if (btnAddEl) {
+    let setTimeout2 = null,
+      options = '',
+      value2 = null;
+    const run2 = () => {
+        (clearTimeout(setTimeout2), (setTimeout2 = null));
       },
-      _0x5b7991 = () => {
-        (_0x4b6a35(),
-          (_0x339b3f = ''),
-          _0x34de9c && (document.removeEventListener('pointerdown', _0x34de9c, true), (_0x34de9c = null)),
+      handler4 = () => {
+        (run2(),
+          (options = ''),
+          value2 && (document.removeEventListener('pointerdown', value2, true), (value2 = null)),
           document.querySelector('#v2PickerOverlay')?.remove());
       },
-      _0x2b8b33 = () => {
-        if (_0x339b3f === 'pinned') return;
-        (_0x4b6a35(), (_0x415de8 = setTimeout(_0x5b7991, 200)));
+      target = () => {
+        if (options === 'pinned') return;
+        (run2(), (setTimeout2 = setTimeout(handler4, 200)));
       },
-      _0x5f56ce = (_0x6de3e9) => {
-        const _0x52eaab = document.querySelector('#v2PickerOverlay');
-        if (!_0x52eaab) return;
-        (_0x4b6a35(), (_0x339b3f = _0x6de3e9), (_0x52eaab.style.pointerEvents = 'none'));
-        const _0x411623 = _0x52eaab.querySelector('.v2-node-picker');
-        _0x411623 &&
-          ((_0x411623.style.pointerEvents = 'auto'),
-          _0x411623.addEventListener('mouseenter', _0x4b6a35),
-          _0x411623.addEventListener('mouseleave', _0x2b8b33));
-        _0x34de9c && document.removeEventListener('pointerdown', _0x34de9c, true);
-        _0x34de9c = (_0x3d1c31) => {
-          if (_0x411623?.contains(_0x3d1c31.target) || _0xa5d54a.contains(_0x3d1c31.target)) {
-            _0x4b6a35();
+      handler5 = (source) => {
+        const el2 = document.querySelector('#v2PickerOverlay');
+        if (!el2) return;
+        (run2(), (options = source), (el2.style.pointerEvents = 'none'));
+        const el3 = el2.querySelector('.v2-node-picker');
+        el3 &&
+          ((el3.style.pointerEvents = 'auto'),
+          el3.addEventListener('mouseenter', run2),
+          el3.addEventListener('mouseleave', target));
+        value2 && document.removeEventListener('pointerdown', value2, true);
+        value2 = (event) => {
+          if (el3?.contains(event.target) || btnAddEl.contains(event.target)) {
+            run2();
             return;
           }
-          _0x5b7991();
+          handler4();
         };
-        const _0x583edd = _0x34de9c;
+        const next = value2;
         requestAnimationFrame(
-          () =>
-            _0x34de9c === _0x583edd && _0x583edd && document.addEventListener('pointerdown', _0x583edd, true),
+          () => value2 === next && next && document.addEventListener('pointerdown', next, true),
         );
       },
-      _0x3a00e8 = (_0x167b42) => {
-        (_0x4b6a35(), (_0x339b3f = _0x167b42));
-        const _0x4eccd1 = _0xa5d54a.getBoundingClientRect();
-        (_0xfa20a7._showPicker?.(_0x4eccd1.right + 12, _0x4eccd1.top, true),
-          requestAnimationFrame(() => _0x5f56ce(_0x167b42)));
+      handler6 = (current) => {
+        (run2(), (options = current));
+        const box = btnAddEl.getBoundingClientRect();
+        (initCanvasContextMenu._showPicker?.(box.right + 12, box.top, true),
+          requestAnimationFrame(() => handler5(current)));
       };
-    (_0xa5d54a.addEventListener('click', (_0x285514) => {
-      (_0x285514.preventDefault(), _0x285514.stopPropagation(), _0x3a00e8('pinned'));
+    (btnAddEl.addEventListener('click', (event2) => {
+      (event2.preventDefault(), event2.stopPropagation(), handler6('pinned'));
     }),
-      _0xa5d54a.addEventListener('mouseenter', () => {
-        _0x4b6a35();
+      btnAddEl.addEventListener('mouseenter', () => {
+        run2();
         if (document.querySelector('#v2PickerOverlay')) return;
-        _0x3a00e8('hover');
+        handler6('hover');
       }),
-      _0xa5d54a.addEventListener('mouseleave', _0x2b8b33));
+      btnAddEl.addEventListener('mouseleave', target));
   }
-  (document.addEventListener('click', (_0x156dc1) => {
-    _0x14d599 &&
-      _0x14d599.style.display !== 'none' &&
-      !_0x156dc1.target.closest('#nodeMenu') &&
-      !_0x156dc1.target.closest('#btnAdd') &&
-      (_0x14d599.style.display = 'none');
+  (document.addEventListener('click', (event3) => {
+    nodeMenuEl &&
+      nodeMenuEl.style.display !== 'none' &&
+      !event3.target.closest('#nodeMenu') &&
+      !event3.target.closest('#btnAdd') &&
+      (nodeMenuEl.style.display = 'none');
   }),
-    _0x548b01());
+    run());
   if (document.body) {
-    const _0x8f1dd9 = new MutationObserver(() => {
-      _0x548b01();
+    const mutationObserver = new MutationObserver(() => {
+      run();
     });
-    _0x8f1dd9.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    mutationObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
-  (document.querySelectorAll('.nam-item').forEach((_0x37cfde) => {
-    (_0x37cfde.setAttribute('draggable', 'true'),
-      _0x37cfde.addEventListener('dragstart', (_0x316a86) => {
-        const _0xec0dea = _0x316a86.currentTarget.dataset.type;
-        if (isDevOnlyNodeType(_0xec0dea) && !isDevModeOn()) {
-          _0x316a86.preventDefault();
+  (document.querySelectorAll('.nam-item').forEach((el4) => {
+    (el4.setAttribute('draggable', 'true'),
+      el4.addEventListener('dragstart', (event4) => {
+        const entry = event4.currentTarget.dataset.type;
+        if (isDevOnlyNodeType(entry) && !isDevModeOn()) {
+          event4.preventDefault();
           return;
         }
-        (_0x316a86.dataTransfer.setData('application/v2-node-type', _0xec0dea),
-          (_0x316a86.dataTransfer.effectAllowed = 'copy'));
+        (event4.dataTransfer.setData('application/v2-node-type', entry),
+          (event4.dataTransfer.effectAllowed = 'copy'));
       }),
-      _0x37cfde.addEventListener('click', (_0x375a91) => {
-        _0x375a91.stopPropagation();
-        const _0x46575d = _0x37cfde.dataset.type;
-        if (!_0x46575d || _0x46575d === 'resource') return;
-        if (isDevOnlyNodeType(_0x46575d) && !isDevModeOn()) return;
-        _0x4f29b4(_0x46575d);
-        if (_0x14d599) _0x14d599.style.display = 'none';
+      el4.addEventListener('click', (event5) => {
+        event5.stopPropagation();
+        const enabled = el4.dataset.type;
+        if (!enabled || enabled === 'resource') return;
+        if (isDevOnlyNodeType(enabled) && !isDevModeOn()) return;
+        handler3(enabled);
+        if (nodeMenuEl) nodeMenuEl.style.display = 'none';
       }));
   }),
-    _0x164fa1.addEventListener('dragover', (_0x1be674) => {
-      _0x1be674.dataTransfer.types.includes('application/v2-node-type') &&
-        (_0x1be674.preventDefault(), (_0x1be674.dataTransfer.dropEffect = 'copy'));
+    wrap.addEventListener('dragover', (event6) => {
+      event6.dataTransfer.types.includes('application/v2-node-type') &&
+        (event6.preventDefault(), (event6.dataTransfer.dropEffect = 'copy'));
     }),
-    _0x164fa1.addEventListener('drop', (_0x344c81) => {
-      const _0x2db376 = _0x344c81.dataTransfer.getData('application/v2-node-type');
-      if (!_0x2db376) return;
-      if (isDevOnlyNodeType(_0x2db376) && !isDevModeOn()) return;
-      _0x344c81.preventDefault();
-      const { viewport: _0x5159c5 } = _0x1b5384.getState(),
-        _0x5c823d = screenToWorld(_0x344c81.clientX, _0x344c81.clientY, _0x5159c5);
-      _0x2b2ffb(_0x2db376, _0x5c823d.x, _0x5c823d.y, { forDrop: true });
+    wrap.addEventListener('drop', (event7) => {
+      const enabled2 = event7.dataTransfer.getData('application/v2-node-type');
+      if (!enabled2) return;
+      if (isDevOnlyNodeType(enabled2) && !isDevModeOn()) return;
+      event7.preventDefault();
+      const { viewport: viewport2 } = graphStore.getState(),
+        box2 = screenToWorld(event7.clientX, event7.clientY, viewport2);
+      handler2(enabled2, box2.x, box2.y, { forDrop: true });
     }));
 }

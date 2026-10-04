@@ -1,1 +1,349 @@
-import{cloneStoryboard3DProject,createDefaultStoryboard3DTransform}from'./projectModel.js';function normalizeId(_0x2d29f4){return String(_0x2d29f4||'')["trim"]();}function normalizeName(_0x1e02e8){return String(_0x1e02e8||'')["trim"]();}function finite(_0x2a635e,_0x4c400=0x0){const _0x36769d=Number(_0x2a635e);return Number["isFinite"](_0x36769d)?_0x36769d:_0x4c400;}function normalizeVector3(_0x3c86fe,_0x41f99d){const _0x5e699d=Array["isArray"](_0x3c86fe)?_0x3c86fe:[];return[finite(_0x5e699d[0x0],_0x41f99d[0x0]),finite(_0x5e699d[0x1],_0x41f99d[0x1]),finite(_0x5e699d[0x2],_0x41f99d[0x2])];}function normalizeTransform(_0x4500e7){return{'position':normalizeVector3(_0x4500e7?.["position"],[0x0,0x0,0x0]),'rotation':normalizeVector3(_0x4500e7?.["rotation"],[0x0,0x0,0x0]),'scale':normalizeVector3(_0x4500e7?.["scale"],[0x1,0x1,0x1])['map'](_0x3cd085=>Math["max"](0.001,_0x3cd085))};}function cloneScene(_0x324d6e){return cloneStoryboard3DProject(_0x324d6e);}function objectMap(_0x1377f0){return new Map((Array['isArray'](_0x1377f0?.["objects"])?_0x1377f0["objects"]:[])["map"](_0x1e1997=>[normalizeId(_0x1e1997?.['id']),_0x1e1997]));}function requireObject(_0x2d7383,_0x2ff422){const _0x25fac9=objectMap(_0x2d7383)["get"](normalizeId(_0x2ff422));if(!_0x25fac9)throw new Error('Storyboard\x20object\x20does\x20not\x20exist:\x20'+_0x2ff422);return _0x25fac9;}function requireGroup(_0x4c749e,_0x722e9e){const _0x5ed655=requireObject(_0x4c749e,_0x722e9e);if(_0x5ed655["type"]!=='group')throw new Error("Storyboard parent must be a group: "+_0x722e9e);return _0x5ed655;}function createGroupId(_0x1d8619,_0x119648){const _0x3f5bed=new Set((_0x1d8619["objects"]||[])['map'](_0x226277=>normalizeId(_0x226277['id'])));if(typeof _0x119648==="function"){for(let _0x218c0e=0x0;_0x218c0e<0x3e8;_0x218c0e+=0x1){const _0x4d9064=normalizeId(_0x119648('group'));if(_0x4d9064&&!_0x3f5bed['has'](_0x4d9064))return _0x4d9064;}throw new Error("Unable to create a unique storyboard group id");}let _0x35fdfa=0x1,_0x191635='group-'+_0x35fdfa;while(_0x3f5bed['has'](_0x191635)){_0x35fdfa+=0x1,_0x191635='group-'+_0x35fdfa;}return _0x191635;}function assertValidHierarchy(_0x5d90a2){const _0x1272de=validateStoryboard3DSceneHierarchy(_0x5d90a2);if(!_0x1272de['ok']){const _0x2ff091=new Error(_0x1272de["errors"]["map"](_0x5f541e=>_0x5f541e["message"])["join"]('\x20'));_0x2ff091["code"]="STORYBOARD_3D_HIERARCHY_INVALID",_0x2ff091['details']=_0x1272de;throw _0x2ff091;}return _0x5d90a2;}function assignParent(_0x38f200,_0x43d3f6){const _0x35bc93=normalizeId(_0x43d3f6);if(_0x35bc93)_0x38f200["parentId"]=_0x35bc93;else delete _0x38f200['parentId'];}function collectDescendantIds(_0x11060d,_0x54bcc6){const _0x289c06=new Map();(_0x11060d["objects"]||[])["forEach"](_0x10a6b6=>{const _0x237977=normalizeId(_0x10a6b6["parentId"]);if(!_0x237977)return;if(!_0x289c06["has"](_0x237977))_0x289c06['set'](_0x237977,[]);_0x289c06["get"](_0x237977)["push"](normalizeId(_0x10a6b6['id']));});const _0x2bb13f=new Set(),_0x3dcaf1=[..._0x289c06["get"](normalizeId(_0x54bcc6))||[]];while(_0x3dcaf1["length"]>0x0){const _0x1f27aa=_0x3dcaf1["pop"]();if(!_0x1f27aa||_0x2bb13f["has"](_0x1f27aa))continue;_0x2bb13f['add'](_0x1f27aa),_0x3dcaf1["push"](..._0x289c06["get"](_0x1f27aa)||[]);}return _0x2bb13f;}export function validateStoryboard3DSceneHierarchy(_0x10fa02){const _0x48ce4a=[],_0x73163a=Array["isArray"](_0x10fa02?.["objects"])?_0x10fa02['objects']:[],_0x2b5fe7=new Map();_0x73163a["forEach"]((_0xeaa785,_0x5c5337)=>{const _0x30548a=normalizeId(_0xeaa785?.['id']);if(!_0x30548a){_0x48ce4a['push']({'code':'HIERARCHY_OBJECT_ID_REQUIRED','objectId':'','message':"Scene object at index "+_0x5c5337+" has no id."});return;}if(_0x2b5fe7['has'](_0x30548a)){_0x48ce4a['push']({'code':"HIERARCHY_DUPLICATE_OBJECT_ID",'objectId':_0x30548a,'message':"Duplicate storyboard object id: "+_0x30548a+'.'});return;}_0x2b5fe7["set"](_0x30548a,_0xeaa785);}),_0x2b5fe7["forEach"]((_0x115432,_0x1fc928)=>{const _0x1b78d4=normalizeId(_0x115432["parentId"]);if(!_0x1b78d4)return;if(_0x1b78d4===_0x1fc928){_0x48ce4a["push"]({'code':"HIERARCHY_SELF_PARENT",'objectId':_0x1fc928,'parentId':_0x1b78d4,'message':"Storyboard object cannot parent itself: "+_0x1fc928+'.'});return;}const _0x3c97e2=_0x2b5fe7["get"](_0x1b78d4);if(!_0x3c97e2){_0x48ce4a["push"]({'code':"HIERARCHY_PARENT_NOT_FOUND",'objectId':_0x1fc928,'parentId':_0x1b78d4,'message':'Storyboard\x20parent\x20does\x20not\x20exist:\x20'+_0x1b78d4+'.'});return;}_0x3c97e2["type"]!=='group'&&_0x48ce4a["push"]({'code':"HIERARCHY_PARENT_NOT_GROUP",'objectId':_0x1fc928,'parentId':_0x1b78d4,'message':"Storyboard parent must be a group: "+_0x1b78d4+'.'});});const _0x537c0b=new Map();function _0x47b9c0(_0x2080fc,_0x1239b1=[]){const _0x2865cf=_0x537c0b["get"](_0x2080fc);if(_0x2865cf==="visited")return;if(_0x2865cf==='visiting'){const _0x59ee57=_0x1239b1['indexOf'](_0x2080fc),_0x390692=[..._0x1239b1["slice"](Math['max'](0x0,_0x59ee57)),_0x2080fc];_0x48ce4a["push"]({'code':"HIERARCHY_CYCLE",'objectId':_0x2080fc,'cycle':_0x390692,'message':"Storyboard hierarchy contains a cycle: "+_0x390692["join"](" -> ")+'.'});return;}_0x537c0b["set"](_0x2080fc,"visiting");const _0x45a0c2=normalizeId(_0x2b5fe7["get"](_0x2080fc)?.["parentId"]);if(_0x45a0c2&&_0x2b5fe7["has"](_0x45a0c2))_0x47b9c0(_0x45a0c2,[..._0x1239b1,_0x2080fc]);_0x537c0b["set"](_0x2080fc,"visited");}return _0x2b5fe7["forEach"]((_0x6f7290,_0x294e62)=>_0x47b9c0(_0x294e62)),{'ok':_0x48ce4a["length"]===0x0,'errors':_0x48ce4a,'objectCount':_0x73163a['length'],'groupCount':_0x73163a["filter"](_0x31d8a3=>_0x31d8a3?.['type']==="group")["length"]};}export function createStoryboard3DSceneGroup(_0x3ab949,{id:_0x4a5216,name:name="Group",transform:transform=createDefaultStoryboard3DTransform(),parentId:_0x54c48c,childIds:childIds=[],idFactory:_0xa77f4}={}){const _0x179c57=cloneScene(_0x3ab949),_0x57b345=normalizeId(_0x4a5216);if(_0x57b345&&objectMap(_0x179c57)['has'](_0x57b345))throw new Error("Storyboard object id already exists: "+_0x57b345);if(_0x54c48c)requireGroup(_0x179c57,_0x54c48c);const _0x5714b9=_0x57b345||createGroupId(_0x179c57,_0xa77f4);_0x179c57["objects"]=Array["isArray"](_0x179c57['objects'])?_0x179c57["objects"]:[],_0x179c57["objects"]["push"]({'id':_0x5714b9,'type':"group",'name':normalizeName(name)||"Group",'visible':!![],'locked':![],'transform':normalizeTransform(transform),...normalizeId(_0x54c48c)?{'parentId':normalizeId(_0x54c48c)}:{}});const _0x2204f9=[...new Set(childIds["map"](normalizeId)["filter"](Boolean))];return _0x2204f9["forEach"](_0xdb3067=>{const _0x3baa74=requireObject(_0x179c57,_0xdb3067);assignParent(_0x3baa74,_0x5714b9);}),assertValidHierarchy(_0x179c57);}export function setStoryboard3DObjectParent(_0x2e643e,_0x11fc02,_0x47175b=null){const _0x160439=cloneScene(_0x2e643e),_0x39cd6a=requireObject(_0x160439,_0x11fc02);if(_0x47175b)requireGroup(_0x160439,_0x47175b);return assignParent(_0x39cd6a,_0x47175b),assertValidHierarchy(_0x160439);}export function addStoryboard3DObjectsToGroup(_0x1f28c3,_0x4c499a,_0x427092){const _0x2ef135=cloneScene(_0x1f28c3);requireGroup(_0x2ef135,_0x427092);const _0x34093f=[...new Set((Array["isArray"](_0x4c499a)?_0x4c499a:[])["map"](normalizeId)["filter"](Boolean))];return _0x34093f['forEach'](_0x5e31d3=>{const _0x4147e6=requireObject(_0x2ef135,_0x5e31d3);assignParent(_0x4147e6,_0x427092);}),assertValidHierarchy(_0x2ef135);}export function groupStoryboard3DSceneObjects(_0x40d4b6,_0x16e915,_0x4d7ec0={}){return createStoryboard3DSceneGroup(_0x40d4b6,{..._0x4d7ec0,'childIds':Array["isArray"](_0x16e915)?_0x16e915:[]});}export function renameStoryboard3DSceneGroup(_0x447c63,_0x8e0579,_0x5b94de){const _0x3686b8=cloneScene(_0x447c63),_0x373186=requireGroup(_0x3686b8,_0x8e0579),_0x1177f6=normalizeName(_0x5b94de);if(_0x1177f6)_0x373186["name"]=_0x1177f6;return _0x3686b8;}export function ungroupStoryboard3DSceneGroup(_0x4e0066,_0x5c7f9b){return deleteStoryboard3DSceneGroup(_0x4e0066,_0x5c7f9b,{'deleteChildren':![]});}export function deleteStoryboard3DSceneGroup(_0x188e6a,_0x427cdc,{deleteChildren:deleteChildren=![]}={}){const _0x591d6e=cloneScene(_0x188e6a),_0x460028=requireGroup(_0x591d6e,_0x427cdc),_0x4b20d9=normalizeId(_0x427cdc),_0x332092=normalizeId(_0x460028["parentId"]);if(deleteChildren){const _0x3e86d5=collectDescendantIds(_0x591d6e,_0x4b20d9);_0x3e86d5["add"](_0x4b20d9),_0x591d6e['objects']=_0x591d6e['objects']["filter"](_0xb58a2=>!_0x3e86d5["has"](normalizeId(_0xb58a2['id'])));}else _0x591d6e["objects"]["forEach"](_0x3fab59=>{normalizeId(_0x3fab59["parentId"])===_0x4b20d9&&assignParent(_0x3fab59,_0x332092);}),_0x591d6e["objects"]=_0x591d6e["objects"]['filter'](_0xdad431=>normalizeId(_0xdad431['id'])!==_0x4b20d9);return assertValidHierarchy(_0x591d6e);}export function applyStoryboard3DHierarchyOperation(_0x8181fe,_0x50d973,_0xed4d7f,{now:_0x3929fe,idFactory:_0x3056f6}={}){const _0x38cf08=cloneStoryboard3DProject(_0x8181fe),_0x7400e4=(Array["isArray"](_0x38cf08['scenes'])?_0x38cf08['scenes']:[])["findIndex"](_0x3224a6=>_0x3224a6['id']===_0x50d973);if(_0x7400e4<0x0)throw new Error('Storyboard\x20scene\x20does\x20not\x20exist:\x20'+_0x50d973);const _0x2e07d4=normalizeId(_0xed4d7f?.['type']),_0x191421=_0xed4d7f?.["args"]&&typeof _0xed4d7f["args"]==="object"?_0xed4d7f["args"]:{},_0x5e7947=_0x38cf08["scenes"][_0x7400e4];if(_0x2e07d4==="create-group")_0x38cf08["scenes"][_0x7400e4]=createStoryboard3DSceneGroup(_0x5e7947,{..._0x191421,'idFactory':_0x3056f6});else{if(_0x2e07d4==="group-objects")_0x38cf08["scenes"][_0x7400e4]=groupStoryboard3DSceneObjects(_0x5e7947,_0x191421['objectIds'],{..._0x191421,'idFactory':_0x3056f6});else{if(_0x2e07d4==='add-to-group')_0x38cf08["scenes"][_0x7400e4]=addStoryboard3DObjectsToGroup(_0x5e7947,_0x191421['objectIds'],_0x191421['groupId']);else{if(_0x2e07d4==="set-parent")_0x38cf08["scenes"][_0x7400e4]=setStoryboard3DObjectParent(_0x5e7947,_0x191421["objectId"],_0x191421["parentId"]);else{if(_0x2e07d4==="rename-group")_0x38cf08['scenes'][_0x7400e4]=renameStoryboard3DSceneGroup(_0x5e7947,_0x191421['groupId'],_0x191421["name"]);else{if(_0x2e07d4==="ungroup")_0x38cf08["scenes"][_0x7400e4]=ungroupStoryboard3DSceneGroup(_0x5e7947,_0x191421['groupId']);else{if(_0x2e07d4==="delete-group")_0x38cf08["scenes"][_0x7400e4]=deleteStoryboard3DSceneGroup(_0x5e7947,_0x191421["groupId"],{'deleteChildren':_0x191421["deleteChildren"]===!![]});else throw new Error('Unsupported\x20storyboard\x20hierarchy\x20operation:\x20'+_0x2e07d4);}}}}}}return _0x38cf08["updatedAt"]=Math["max"](0x0,finite(_0x3929fe,finite(_0x38cf08["updatedAt"],0x0))),_0x38cf08;}
+import { cloneStoryboard3DProject, createDefaultStoryboard3DTransform } from './projectModel.js';
+function normalizeId(value) {
+  return String(value || '')['trim']();
+}
+function normalizeName(item) {
+  return String(item || '')['trim']();
+}
+function finite(key, index = 0x0) {
+  const result = Number(key);
+  return Number['isFinite'](result) ? result : index;
+}
+function normalizeVector3(data, options) {
+  const target = Array['isArray'](data) ? data : [];
+  return [
+    finite(target[0x0], options[0x0]),
+    finite(target[0x1], options[0x1]),
+    finite(target[0x2], options[0x2]),
+  ];
+}
+function normalizeTransform(source) {
+  return {
+    position: normalizeVector3(source?.['position'], [0x0, 0x0, 0x0]),
+    rotation: normalizeVector3(source?.['rotation'], [0x0, 0x0, 0x0]),
+    scale: normalizeVector3(source?.['scale'], [0x1, 0x1, 0x1])['map']((next) => Math['max'](0.001, next)),
+  };
+}
+function cloneScene(current) {
+  return cloneStoryboard3DProject(current);
+}
+function objectMap(entry) {
+  return new Map(
+    (Array['isArray'](entry?.['objects']) ? entry['objects'] : [])['map']((record) => [
+      normalizeId(record?.['id']),
+      record,
+    ]),
+  );
+}
+function requireObject(payload, handle) {
+  const objectMap2 = objectMap(payload)['get'](normalizeId(handle));
+  if (!objectMap2) throw new Error('Storyboard\x20object\x20does\x20not\x20exist:\x20' + handle);
+  return objectMap2;
+}
+function requireGroup(state, config) {
+  const requireObject2 = requireObject(state, config);
+  if (requireObject2['type'] !== 'group') throw new Error('Storyboard parent must be a group: ' + config);
+  return requireObject2;
+}
+function createGroupId(scope, handler) {
+  const map = new Set((scope['objects'] || [])['map']((input) => normalizeId(input['id'])));
+  if (typeof handler === 'function') {
+    for (let count = 0x0; count < 0x3e8; count += 0x1) {
+      const id = normalizeId(handler('group'));
+      if (id && !map['has'](id)) return id;
+    }
+    throw new Error('Unable to create a unique storyboard group id');
+  }
+  let output = 0x1,
+    value2 = 'group-' + output;
+  while (map['has'](value2)) {
+    ((output += 0x1), (value2 = 'group-' + output));
+  }
+  return value2;
+}
+function assertValidHierarchy(value3) {
+  const response = validateStoryboard3DSceneHierarchy(value3);
+  if (!response['ok']) {
+    const error = new Error(response['errors']['map']((value4) => value4['message'])['join']('\x20'));
+    ((error['code'] = 'STORYBOARD_3D_HIERARCHY_INVALID'), (error['details'] = response));
+    throw error;
+  }
+  return value3;
+}
+function assignParent(value5, value6) {
+  const id2 = normalizeId(value6);
+  if (id2) value5['parentId'] = id2;
+  else delete value5['parentId'];
+}
+function collectDescendantIds(value7, value8) {
+  const map2 = new Map();
+  (value7['objects'] || [])['forEach']((value9) => {
+    const id3 = normalizeId(value9['parentId']);
+    if (!id3) return;
+    if (!map2['has'](id3)) map2['set'](id3, []);
+    map2['get'](id3)['push'](normalizeId(value9['id']));
+  });
+  const value10 = new Set(),
+    value11 = [...(map2['get'](normalizeId(value8)) || [])];
+  while (value11['length'] > 0x0) {
+    const enabled = value11['pop']();
+    if (!enabled || value10['has'](enabled)) continue;
+    (value10['add'](enabled), value11['push'](...(map2['get'](enabled) || [])));
+  }
+  return value10;
+}
+export function validateStoryboard3DSceneHierarchy(value12) {
+  const list = [],
+    list2 = Array['isArray'](value12?.['objects']) ? value12['objects'] : [],
+    map3 = new Map();
+  (list2['forEach']((value13, value14) => {
+    const id4 = normalizeId(value13?.['id']);
+    if (!id4) {
+      list['push']({
+        code: 'HIERARCHY_OBJECT_ID_REQUIRED',
+        objectId: '',
+        message: 'Scene object at index ' + value14 + ' has no id.',
+      });
+      return;
+    }
+    if (map3['has'](id4)) {
+      list['push']({
+        code: 'HIERARCHY_DUPLICATE_OBJECT_ID',
+        objectId: id4,
+        message: 'Duplicate storyboard object id: ' + id4 + '.',
+      });
+      return;
+    }
+    map3['set'](id4, value13);
+  }),
+    map3['forEach']((value15, value16) => {
+      const id5 = normalizeId(value15['parentId']);
+      if (!id5) return;
+      if (id5 === value16) {
+        list['push']({
+          code: 'HIERARCHY_SELF_PARENT',
+          objectId: value16,
+          parentId: id5,
+          message: 'Storyboard object cannot parent itself: ' + value16 + '.',
+        });
+        return;
+      }
+      const enabled2 = map3['get'](id5);
+      if (!enabled2) {
+        list['push']({
+          code: 'HIERARCHY_PARENT_NOT_FOUND',
+          objectId: value16,
+          parentId: id5,
+          message: 'Storyboard\x20parent\x20does\x20not\x20exist:\x20' + id5 + '.',
+        });
+        return;
+      }
+      enabled2['type'] !== 'group' &&
+        list['push']({
+          code: 'HIERARCHY_PARENT_NOT_GROUP',
+          objectId: value16,
+          parentId: id5,
+          message: 'Storyboard parent must be a group: ' + id5 + '.',
+        });
+    }));
+  const value17 = new Map();
+  function run(value18, list3 = []) {
+    const value19 = value17['get'](value18);
+    if (value19 === 'visited') return;
+    if (value19 === 'visiting') {
+      const value20 = list3['indexOf'](value18),
+        value21 = [...list3['slice'](Math['max'](0x0, value20)), value18];
+      list['push']({
+        code: 'HIERARCHY_CYCLE',
+        objectId: value18,
+        cycle: value21,
+        message: 'Storyboard hierarchy contains a cycle: ' + value21['join'](' -> ') + '.',
+      });
+      return;
+    }
+    value17['set'](value18, 'visiting');
+    const id6 = normalizeId(map3['get'](value18)?.['parentId']);
+    if (id6 && map3['has'](id6)) run(id6, [...list3, value18]);
+    value17['set'](value18, 'visited');
+  }
+  return (
+    map3['forEach']((value22, value23) => run(value23)),
+    {
+      ok: list['length'] === 0x0,
+      errors: list,
+      objectCount: list2['length'],
+      groupCount: list2['filter']((value24) => value24?.['type'] === 'group')['length'],
+    }
+  );
+}
+export function createStoryboard3DSceneGroup(
+  value25,
+  {
+    id: id7,
+    name: name = 'Group',
+    transform: transform = createDefaultStoryboard3DTransform(),
+    parentId: parentId,
+    childIds: childIds = [],
+    idFactory: idFactory,
+  } = {},
+) {
+  const cloneScene2 = cloneScene(value25),
+    id8 = normalizeId(id7);
+  if (id8 && objectMap(cloneScene2)['has'](id8))
+    throw new Error('Storyboard object id already exists: ' + id8);
+  if (parentId) requireGroup(cloneScene2, parentId);
+  const value26 = id8 || createGroupId(cloneScene2, idFactory);
+  ((cloneScene2['objects'] = Array['isArray'](cloneScene2['objects']) ? cloneScene2['objects'] : []),
+    cloneScene2['objects']['push']({
+      id: value26,
+      type: 'group',
+      name: normalizeName(name) || 'Group',
+      visible: !![],
+      locked: ![],
+      transform: normalizeTransform(transform),
+      ...(normalizeId(parentId) ? { parentId: normalizeId(parentId) } : {}),
+    }));
+  const value27 = [...new Set(childIds['map'](normalizeId)['filter'](Boolean))];
+  return (
+    value27['forEach']((value28) => {
+      const requireObject3 = requireObject(cloneScene2, value28);
+      assignParent(requireObject3, value26);
+    }),
+    assertValidHierarchy(cloneScene2)
+  );
+}
+export function setStoryboard3DObjectParent(value29, value30, value31 = null) {
+  const cloneScene3 = cloneScene(value29),
+    requireObject4 = requireObject(cloneScene3, value30);
+  if (value31) requireGroup(cloneScene3, value31);
+  return (assignParent(requireObject4, value31), assertValidHierarchy(cloneScene3));
+}
+export function addStoryboard3DObjectsToGroup(value32, value33, value34) {
+  const cloneScene4 = cloneScene(value32);
+  requireGroup(cloneScene4, value34);
+  const list4 = [
+    ...new Set((Array['isArray'](value33) ? value33 : [])['map'](normalizeId)['filter'](Boolean)),
+  ];
+  return (
+    list4['forEach']((value35) => {
+      const requireObject5 = requireObject(cloneScene4, value35);
+      assignParent(requireObject5, value34);
+    }),
+    assertValidHierarchy(cloneScene4)
+  );
+}
+export function groupStoryboard3DSceneObjects(value36, value37, args = {}) {
+  return createStoryboard3DSceneGroup(value36, {
+    ...args,
+    childIds: Array['isArray'](value37) ? value37 : [],
+  });
+}
+export function renameStoryboard3DSceneGroup(value38, value39, value40) {
+  const cloneScene5 = cloneScene(value38),
+    requireGroup2 = requireGroup(cloneScene5, value39),
+    name2 = normalizeName(value40);
+  if (name2) requireGroup2['name'] = name2;
+  return cloneScene5;
+}
+export function ungroupStoryboard3DSceneGroup(value41, value42) {
+  return deleteStoryboard3DSceneGroup(value41, value42, { deleteChildren: ![] });
+}
+export function deleteStoryboard3DSceneGroup(
+  value43,
+  value44,
+  { deleteChildren: deleteChildren = ![] } = {},
+) {
+  const cloneScene6 = cloneScene(value43),
+    requireGroup3 = requireGroup(cloneScene6, value44),
+    id9 = normalizeId(value44),
+    id10 = normalizeId(requireGroup3['parentId']);
+  if (deleteChildren) {
+    const descendantIds = collectDescendantIds(cloneScene6, id9);
+    (descendantIds['add'](id9),
+      (cloneScene6['objects'] = cloneScene6['objects']['filter'](
+        (value45) => !descendantIds['has'](normalizeId(value45['id'])),
+      )));
+  } else
+    (cloneScene6['objects']['forEach']((value46) => {
+      normalizeId(value46['parentId']) === id9 && assignParent(value46, id10);
+    }),
+      (cloneScene6['objects'] = cloneScene6['objects']['filter'](
+        (value47) => normalizeId(value47['id']) !== id9,
+      )));
+  return assertValidHierarchy(cloneScene6);
+}
+export function applyStoryboard3DHierarchyOperation(
+  value48,
+  value49,
+  value50,
+  { now: now, idFactory: idFactory2 } = {},
+) {
+  const cloneStoryboard3DProject2 = cloneStoryboard3DProject(value48),
+    count2 = (
+      Array['isArray'](cloneStoryboard3DProject2['scenes']) ? cloneStoryboard3DProject2['scenes'] : []
+    )['findIndex']((value51) => value51['id'] === value49);
+  if (count2 < 0x0) throw new Error('Storyboard\x20scene\x20does\x20not\x20exist:\x20' + value49);
+  const id11 = normalizeId(value50?.['type']),
+    args2 = value50?.['args'] && typeof value50['args'] === 'object' ? value50['args'] : {},
+    value52 = cloneStoryboard3DProject2['scenes'][count2];
+  if (id11 === 'create-group')
+    cloneStoryboard3DProject2['scenes'][count2] = createStoryboard3DSceneGroup(value52, {
+      ...args2,
+      idFactory: idFactory2,
+    });
+  else {
+    if (id11 === 'group-objects')
+      cloneStoryboard3DProject2['scenes'][count2] = groupStoryboard3DSceneObjects(
+        value52,
+        args2['objectIds'],
+        { ...args2, idFactory: idFactory2 },
+      );
+    else {
+      if (id11 === 'add-to-group')
+        cloneStoryboard3DProject2['scenes'][count2] = addStoryboard3DObjectsToGroup(
+          value52,
+          args2['objectIds'],
+          args2['groupId'],
+        );
+      else {
+        if (id11 === 'set-parent')
+          cloneStoryboard3DProject2['scenes'][count2] = setStoryboard3DObjectParent(
+            value52,
+            args2['objectId'],
+            args2['parentId'],
+          );
+        else {
+          if (id11 === 'rename-group')
+            cloneStoryboard3DProject2['scenes'][count2] = renameStoryboard3DSceneGroup(
+              value52,
+              args2['groupId'],
+              args2['name'],
+            );
+          else {
+            if (id11 === 'ungroup')
+              cloneStoryboard3DProject2['scenes'][count2] = ungroupStoryboard3DSceneGroup(
+                value52,
+                args2['groupId'],
+              );
+            else {
+              if (id11 === 'delete-group')
+                cloneStoryboard3DProject2['scenes'][count2] = deleteStoryboard3DSceneGroup(
+                  value52,
+                  args2['groupId'],
+                  { deleteChildren: args2['deleteChildren'] === !![] },
+                );
+              else throw new Error('Unsupported\x20storyboard\x20hierarchy\x20operation:\x20' + id11);
+            }
+          }
+        }
+      }
+    }
+  }
+  return (
+    (cloneStoryboard3DProject2['updatedAt'] = Math['max'](
+      0x0,
+      finite(now, finite(cloneStoryboard3DProject2['updatedAt'], 0x0)),
+    )),
+    cloneStoryboard3DProject2
+  );
+}

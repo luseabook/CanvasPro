@@ -1,235 +1,228 @@
 import { buildFixedInputAssetSlotMap } from '../../modules/fixedInputAssetRefs.js';
 import { bindRefThumbFixedSlotDrag } from '../../modules/refThumbDragController.js';
 import { t } from '../../i18n/index.js';
-function escapeRefBarHtml(_0x42b031) {
-  return String(_0x42b031 ?? '')
+function escapeRefBarHtml(value) {
+  return String(value ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-function getFixedImageSlotLabelHtml(_0x115f6c, _0x2fa13c) {
-  const _0xd6d68e = String(_0x2fa13c || '').trim(),
-    _0x194ade = _0x115f6c?.slotById?.[_0xd6d68e] || {},
-    _0x3a7833 = String(_0x194ade.label || _0xd6d68e).trim() || _0xd6d68e;
-  return escapeRefBarHtml(_0x3a7833).replace(/\s+/g, '<br>');
+function getFixedImageSlotLabelHtml(item, key) {
+  const index = String(key || '').trim(),
+    result = item?.slotById?.[index] || {},
+    data = String(result.label || index).trim() || index;
+  return escapeRefBarHtml(data).replace(/\s+/g, '<br>');
 }
-function getFixedImageSlotTitle(_0x234cba, _0x8744b0) {
-  const _0x21d235 = String(_0x8744b0 || '').trim(),
-    _0x495245 = _0x234cba?.slotById?.[_0x21d235] || {};
-  return String(_0x495245.description || _0x495245.label || _0x21d235).trim() || _0x21d235;
+function getFixedImageSlotTitle(options, target) {
+  const source = String(target || '').trim(),
+    next = options?.slotById?.[source] || {};
+  return String(next.description || next.label || source).trim() || source;
 }
-function getFixedImageSlotAcceptMap(_0xc87acf) {
-  const _0x353030 = {};
+function getFixedImageSlotAcceptMap(current) {
+  const entry = {};
   return (
-    (_0xc87acf?.visibleSlots || []).forEach((_0x58390c) => {
-      const _0x242179 = String(_0xc87acf?.slotKindById?.[_0x58390c] || '').trim();
-      if (_0x58390c && _0x242179) _0x353030[_0x58390c] = _0x242179;
+    (current?.visibleSlots || []).forEach((item2) => {
+      const record = String(current?.slotKindById?.[item2] || '').trim();
+      if (item2 && record) entry[item2] = record;
     }),
-    _0x353030
+    entry
   );
 }
-function getItemKey(_0x191f21) {
-  return String(_0x191f21?.key || _0x191f21?.edgeId || '');
+function getItemKey(event) {
+  return String(event?.key || event?.edgeId || '');
 }
 function createAssetSlotItem({
-  ref: _0x9cee20,
-  slot: _0x1dec0c,
-  fixedInputConfig: _0x2e93cd,
-  ensureThumbDecoded: _0x10a410,
+  ref: ref,
+  slot: slot,
+  fixedInputConfig: fixedInputConfig,
+  ensureThumbDecoded: ensureThumbDecoded,
 }) {
-  if (!_0x9cee20?.url) return null;
-  const _0x281a71 = String(_0x9cee20.thumbUrl || _0x9cee20.url || '').trim();
-  if (!_0x281a71) return null;
-  _0x10a410(_0x281a71);
-  const _0x60978c = String(_0x9cee20.assetId || ''),
-    _0x423fde = String(_0x9cee20.itemIndex ?? ''),
-    _0x9f0384 = String(_0x9cee20.assetMentionOccurrence ?? ''),
-    _0x4ee1f0 = String(_0x9cee20.assetRefSource || 'prompt');
+  if (!ref?.url) return null;
+  const thumbSrc = String(ref.thumbUrl || ref.url || '').trim();
+  if (!thumbSrc) return null;
+  ensureThumbDecoded(thumbSrc);
+  const assetId = String(ref.assetId || ''),
+    assetIndex = String(ref.itemIndex ?? ''),
+    assetOccurrence = String(ref.assetMentionOccurrence ?? ''),
+    assetRefSource = String(ref.assetRefSource || 'prompt');
   return {
-    key: 'asset:' + _0x4ee1f0 + ':' + _0x60978c + ':' + _0x423fde + ':image:' + _0x1dec0c,
+    key: 'asset:' + assetRefSource + ':' + assetId + ':' + assetIndex + ':image:' + slot,
     edgeId: '',
-    sourceId: 'asset:' + _0x60978c + ':' + _0x423fde,
-    refSlot: _0x1dec0c,
+    sourceId: 'asset:' + assetId + ':' + assetIndex,
+    refSlot: slot,
     type: 'image',
-    label: _0x9cee20.label || _0x9cee20.name || getFixedImageSlotTitle(_0x2e93cd, _0x1dec0c),
-    sig: 'asset:' + _0x1dec0c + '|' + String(_0x9cee20.url || '') + '|' + _0x281a71,
-    thumbHTML: '<img src="' + _0x281a71 + '" class="ref-thumb-media is-pending" draggable="false">',
-    thumbSrc: _0x281a71,
-    previewSrc: String(_0x9cee20.url || _0x281a71),
+    label: ref.label || ref.name || getFixedImageSlotTitle(fixedInputConfig, slot),
+    sig: 'asset:' + slot + '|' + String(ref.url || '') + '|' + thumbSrc,
+    thumbHTML: '<img src="' + thumbSrc + '" class="ref-thumb-media is-pending" draggable="false">',
+    thumbSrc: thumbSrc,
+    previewSrc: String(ref.url || thumbSrc),
     virtual: true,
-    assetId: _0x60978c,
-    assetIndex: _0x423fde,
-    assetOccurrence: _0x9f0384,
-    assetRefSource: _0x4ee1f0,
+    assetId: assetId,
+    assetIndex: assetIndex,
+    assetOccurrence: assetOccurrence,
+    assetRefSource: assetRefSource,
     refType: 'image',
   };
 }
-function hasAssignedVirtualAsset(_0xd6b805, _0x7ae717) {
-  if (!_0x7ae717?.virtual) return false;
-  return Array.from(_0xd6b805.values()).some(
-    (_0x3cc99f) =>
-      _0x3cc99f?.virtual &&
-      String(_0x3cc99f.assetId || '') === String(_0x7ae717.assetId || '') &&
-      String(_0x3cc99f.assetIndex || '') === String(_0x7ae717.assetIndex || '') &&
-      String(_0x3cc99f.assetOccurrence || '') === String(_0x7ae717.assetOccurrence || '') &&
-      String(_0x3cc99f.assetRefSource || 'prompt') === String(_0x7ae717.assetRefSource || 'prompt'),
+function hasAssignedVirtualAsset(map, enabled) {
+  if (!enabled?.virtual) return false;
+  return Array.from(map.values()).some(
+    (item3) =>
+      item3?.virtual &&
+      String(item3.assetId || '') === String(enabled.assetId || '') &&
+      String(item3.assetIndex || '') === String(enabled.assetIndex || '') &&
+      String(item3.assetOccurrence || '') === String(enabled.assetOccurrence || '') &&
+      String(item3.assetRefSource || 'prompt') === String(enabled.assetRefSource || 'prompt'),
   );
 }
 function ensureFixedImageSkeleton({
-  refBarEl: _0x3b22c7,
-  attachBtnHTML: _0x4d86ea,
-  slotOrder: _0x35a46e,
-  fixedInputConfig: _0x221043,
-  owner: _0x306783,
+  refBarEl: refBarEl,
+  attachBtnHTML: attachBtnHTML,
+  slotOrder: slotOrder,
+  fixedInputConfig: fixedInputConfig2,
+  owner: owner,
 }) {
-  let _0xf834a9 = _0x3b22c7.querySelector('.prompt-attachment-btn'),
-    _0xc3499c =
-      _0x3b22c7.querySelector('.rh-v5-ref-container') || _0x3b22c7.querySelector('.ref-thumb-container');
-  const _0x874822 = _0x35a46e.every((_0xdb1ca6) =>
-    _0xc3499c?.querySelector?.('[data-slot="' + _0xdb1ca6 + '"]'),
-  );
-  if (!_0xf834a9 || !_0xc3499c || !_0x874822) {
-    const _0xc7c883 = _0x35a46e
-      .map((_0x5df5d5) => {
-        const _0x420f58 = escapeRefBarHtml(getFixedImageSlotTitle(_0x221043, _0x5df5d5));
+  let el = refBarEl.querySelector('.prompt-attachment-btn'),
+    el2 = refBarEl.querySelector('.rh-v5-ref-container') || refBarEl.querySelector('.ref-thumb-container');
+  const enabled2 = slotOrder.every((item4) => el2?.querySelector?.('[data-slot="' + item4 + '"]'));
+  if (!el || !el2 || !enabled2) {
+    const payload = slotOrder
+      .map((item5) => {
+        const escapeRefBarHtml2 = escapeRefBarHtml(getFixedImageSlotTitle(fixedInputConfig2, item5));
         return (
           '<button type="button" class="ref-thumb-wrap ref-upload-slot rh-v5-ref-box" data-ref-slot="' +
-          escapeRefBarHtml(_0x5df5d5) +
+          escapeRefBarHtml(item5) +
           '" data-slot="' +
-          escapeRefBarHtml(_0x5df5d5) +
+          escapeRefBarHtml(item5) +
           '" data-kind="image" draggable="false" title="' +
-          _0x420f58 +
+          escapeRefBarHtml2 +
           '"><span class="ref-upload-label">' +
-          getFixedImageSlotLabelHtml(_0x221043, _0x5df5d5) +
+          getFixedImageSlotLabelHtml(fixedInputConfig2, item5) +
           '</span></button>'
         );
       })
       .join('');
-    ((_0x3b22c7.innerHTML =
-      _0x4d86ea + ' <div class="ref-thumb-container rh-v5-ref-container">' + _0xc7c883 + '</div>'),
-      (_0xf834a9 = _0x3b22c7.querySelector('.prompt-attachment-btn')),
-      (_0xc3499c =
-        _0x3b22c7.querySelector('.rh-v5-ref-container') || _0x3b22c7.querySelector('.ref-thumb-container')),
-      (_0x306783._attachBtnIcon = _0xf834a9 ? _0xf834a9.querySelector('.btn-icon') : null));
+    ((refBarEl.innerHTML =
+      attachBtnHTML + ' <div class="ref-thumb-container rh-v5-ref-container">' + payload + '</div>'),
+      (el = refBarEl.querySelector('.prompt-attachment-btn')),
+      (el2 =
+        refBarEl.querySelector('.rh-v5-ref-container') || refBarEl.querySelector('.ref-thumb-container')),
+      (owner._attachBtnIcon = el ? el.querySelector('.btn-icon') : null));
   }
-  return _0xc3499c;
+  return el2;
 }
 function collectFixedSlotItems({
-  slotOrder: _0x1e036c,
-  items: _0x62bec8,
-  fixedInputConfig: _0x5f5be2,
-  promptEl: _0x1bce4b,
-  targetNodeData: _0x15ae0b,
-  ensureThumbDecoded: _0x5cd7b9,
+  slotOrder: slotOrder2,
+  items: items,
+  fixedInputConfig: fixedInputConfig3,
+  promptEl: promptEl,
+  targetNodeData: targetNodeData,
+  ensureThumbDecoded: ensureThumbDecoded2,
 }) {
-  const _0x4b78e1 = new Map(),
-    _0x5bbf53 = new Set(),
-    _0x51ef8c = new Set(_0x1e036c);
-  for (const _0x598cc4 of _0x62bec8) {
-    if (_0x598cc4.type !== 'image') continue;
-    const _0x2ca1b5 = getItemKey(_0x598cc4),
-      _0x2f69c3 = String(_0x598cc4.refSlot || '').trim();
-    if (!_0x2ca1b5 || _0x5bbf53.has(_0x2ca1b5) || !_0x51ef8c.has(_0x2f69c3)) continue;
-    if (_0x4b78e1.has(_0x2f69c3)) continue;
-    (_0x4b78e1.set(_0x2f69c3, _0x598cc4), _0x5bbf53.add(_0x2ca1b5));
+  const map2 = new Map(),
+    map3 = new Set(),
+    map4 = new Set(slotOrder2);
+  for (const handle of items) {
+    if (handle.type !== 'image') continue;
+    const itemKey = getItemKey(handle),
+      state = String(handle.refSlot || '').trim();
+    if (!itemKey || map3.has(itemKey) || !map4.has(state)) continue;
+    if (map2.has(state)) continue;
+    (map2.set(state, handle), map3.add(itemKey));
   }
-  const _0x168dcf = buildFixedInputAssetSlotMap(_0x1bce4b, {
-    slotOrderByType: _0x5f5be2.slotOrderByType || {},
-    visibleSlots: _0x1e036c,
-    exclusiveGroups: _0x5f5be2.exclusiveGroups || [],
-    occupiedSlots: new Set(_0x4b78e1.keys()),
-    nodeData: _0x15ae0b,
+  const ref2 = buildFixedInputAssetSlotMap(promptEl, {
+    slotOrderByType: fixedInputConfig3.slotOrderByType || {},
+    visibleSlots: slotOrder2,
+    exclusiveGroups: fixedInputConfig3.exclusiveGroups || [],
+    occupiedSlots: new Set(map2.keys()),
+    nodeData: targetNodeData,
   });
-  _0x1e036c.forEach((_0x326d26) => {
-    if (_0x4b78e1.has(_0x326d26)) return;
-    const _0x1b5e76 = createAssetSlotItem({
-      ref: _0x168dcf[_0x326d26],
-      slot: _0x326d26,
-      fixedInputConfig: _0x5f5be2,
-      ensureThumbDecoded: _0x5cd7b9,
+  slotOrder2.forEach((slot2) => {
+    if (map2.has(slot2)) return;
+    const assetSlotItem = createAssetSlotItem({
+      ref: ref2[slot2],
+      slot: slot2,
+      fixedInputConfig: fixedInputConfig3,
+      ensureThumbDecoded: ensureThumbDecoded2,
     });
-    if (_0x1b5e76) _0x4b78e1.set(_0x326d26, _0x1b5e76);
+    if (assetSlotItem) map2.set(slot2, assetSlotItem);
   });
-  for (const _0x251e8c of _0x62bec8) {
-    if (_0x251e8c.type !== 'image') continue;
-    const _0x4faa62 = getItemKey(_0x251e8c);
-    if (!_0x4faa62 || _0x5bbf53.has(_0x4faa62)) continue;
-    if (hasAssignedVirtualAsset(_0x4b78e1, _0x251e8c)) continue;
-    const _0x4c6bd2 = _0x1e036c.find((_0x1311d1) => !_0x4b78e1.has(_0x1311d1));
-    if (!_0x4c6bd2) break;
-    (_0x4b78e1.set(_0x4c6bd2, _0x251e8c), _0x5bbf53.add(_0x4faa62));
+  for (const config of items) {
+    if (config.type !== 'image') continue;
+    const itemKey2 = getItemKey(config);
+    if (!itemKey2 || map3.has(itemKey2)) continue;
+    if (hasAssignedVirtualAsset(map2, config)) continue;
+    const enabled3 = slotOrder2.find((item6) => !map2.has(item6));
+    if (!enabled3) break;
+    (map2.set(enabled3, config), map3.add(itemKey2));
   }
-  return _0x4b78e1;
+  return map2;
 }
 function syncFixedSlotElement({
-  container: _0x18b4a7,
-  slot: _0x232ee0,
-  item: _0x589b13,
-  fixedInputConfig: _0x1fd222,
-  revealRefThumbMedia: _0x4fc3c1,
+  container: container,
+  slot: slot3,
+  item: item7,
+  fixedInputConfig: fixedInputConfig4,
+  revealRefThumbMedia: revealRefThumbMedia,
 }) {
-  const _0x135dca = getFixedImageSlotTitle(_0x1fd222, _0x232ee0);
-  let _0xba816 = _0x18b4a7?.querySelector?.('[data-slot="' + _0x232ee0 + '"]');
-  if (_0x589b13 && _0xba816?.classList?.contains?.('ref-upload-slot')) {
-    const _0x446f1b = document.createElement('div');
-    ((_0x446f1b.className =
-      'ref-thumb-wrap rh-v5-ref-box' + (_0x589b13.virtual ? ' ref-thumb-wrap--asset' : '')),
-      _0xba816.replaceWith(_0x446f1b),
-      (_0xba816 = _0x446f1b));
+  const fixedImageSlotTitle = getFixedImageSlotTitle(fixedInputConfig4, slot3);
+  let el3 = container?.querySelector?.('[data-slot="' + slot3 + '"]');
+  if (item7 && el3?.classList?.contains?.('ref-upload-slot')) {
+    const scope = document.createElement('div');
+    ((scope.className = 'ref-thumb-wrap rh-v5-ref-box' + (item7.virtual ? ' ref-thumb-wrap--asset' : '')),
+      el3.replaceWith(scope),
+      (el3 = scope));
   } else {
-    if (!_0x589b13 && _0xba816 && !_0xba816.classList?.contains?.('ref-upload-slot')) {
-      const _0x2861af = document.createElement('button');
-      ((_0x2861af.type = 'button'),
-        (_0x2861af.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
-        _0xba816.replaceWith(_0x2861af),
-        (_0xba816 = _0x2861af));
-    } else
-      !_0xba816 &&
-        ((_0xba816 = document.createElement(_0x589b13 ? 'div' : 'button')), _0x18b4a7?.appendChild(_0xba816));
+    if (!item7 && el3 && !el3.classList?.contains?.('ref-upload-slot')) {
+      const input = document.createElement('button');
+      ((input.type = 'button'),
+        (input.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
+        el3.replaceWith(input),
+        (el3 = input));
+    } else !el3 && ((el3 = document.createElement(item7 ? 'div' : 'button')), container?.appendChild(el3));
   }
-  if (!_0xba816) return;
-  ((_0xba816.dataset.refSlot = _0x232ee0),
-    (_0xba816.dataset.slot = _0x232ee0),
-    (_0xba816.dataset.kind = 'image'),
-    (_0xba816.title = _0x135dca));
-  if (_0x589b13) {
-    ((_0xba816.className =
-      'ref-thumb-wrap rh-v5-ref-box' + (_0x589b13.virtual ? ' ref-thumb-wrap--asset' : '')),
-      _0xba816.classList.remove('ref-upload-slot'),
-      _0xba816.setAttribute('draggable', _0x589b13.virtual ? 'false' : 'true'),
-      (_0xba816.dataset.refKey = getItemKey(_0x589b13)),
-      (_0xba816.dataset.edgeId = _0x589b13.edgeId || ''),
-      (_0xba816.dataset.sourceId = _0x589b13.sourceId || ''),
-      (_0xba816.dataset.refOrigin = _0x589b13.virtual ? 'asset' : 'node'));
-    _0x589b13.virtual
-      ? ((_0xba816.dataset.assetId = _0x589b13.assetId || ''),
-        (_0xba816.dataset.assetIndex = _0x589b13.assetIndex || ''),
-        (_0xba816.dataset.assetOccurrence = _0x589b13.assetOccurrence || ''),
-        (_0xba816.dataset.assetRefSource = _0x589b13.assetRefSource || 'prompt'),
-        (_0xba816.dataset.refType = _0x589b13.refType || _0x589b13.type || ''))
-      : (delete _0xba816.dataset.assetId,
-        delete _0xba816.dataset.assetIndex,
-        delete _0xba816.dataset.assetOccurrence,
-        delete _0xba816.dataset.assetRefSource,
-        delete _0xba816.dataset.refType);
-    _0xba816.dataset.sig !== _0x589b13.sig &&
-      ((_0xba816.innerHTML =
-        _0x589b13.thumbHTML +
+  if (!el3) return;
+  ((el3.dataset.refSlot = slot3),
+    (el3.dataset.slot = slot3),
+    (el3.dataset.kind = 'image'),
+    (el3.title = fixedImageSlotTitle));
+  if (item7) {
+    ((el3.className = 'ref-thumb-wrap rh-v5-ref-box' + (item7.virtual ? ' ref-thumb-wrap--asset' : '')),
+      el3.classList.remove('ref-upload-slot'),
+      el3.setAttribute('draggable', item7.virtual ? 'false' : 'true'),
+      (el3.dataset.refKey = getItemKey(item7)),
+      (el3.dataset.edgeId = item7.edgeId || ''),
+      (el3.dataset.sourceId = item7.sourceId || ''),
+      (el3.dataset.refOrigin = item7.virtual ? 'asset' : 'node'));
+    item7.virtual
+      ? ((el3.dataset.assetId = item7.assetId || ''),
+        (el3.dataset.assetIndex = item7.assetIndex || ''),
+        (el3.dataset.assetOccurrence = item7.assetOccurrence || ''),
+        (el3.dataset.assetRefSource = item7.assetRefSource || 'prompt'),
+        (el3.dataset.refType = item7.refType || item7.type || ''))
+      : (delete el3.dataset.assetId,
+        delete el3.dataset.assetIndex,
+        delete el3.dataset.assetOccurrence,
+        delete el3.dataset.assetRefSource,
+        delete el3.dataset.refType);
+    el3.dataset.sig !== item7.sig &&
+      ((el3.innerHTML =
+        item7.thumbHTML +
         '<button type="button" class="ref-thumb-delete" title="' +
         t('aigenImage.refs.removeReference') +
         '">&times;</button>'),
-      (_0xba816.dataset.sig = _0x589b13.sig),
-      _0x4fc3c1(_0xba816, _0x589b13.sig));
-    if (_0x589b13.thumbSrc) _0xba816.dataset.thumbSrc = _0x589b13.thumbSrc;
-    else delete _0xba816.dataset.thumbSrc;
-    if (_0x589b13.previewSrc) _0xba816.dataset.previewSrc = _0x589b13.previewSrc;
-    else delete _0xba816.dataset.previewSrc;
+      (el3.dataset.sig = item7.sig),
+      revealRefThumbMedia(el3, item7.sig));
+    if (item7.thumbSrc) el3.dataset.thumbSrc = item7.thumbSrc;
+    else delete el3.dataset.thumbSrc;
+    if (item7.previewSrc) el3.dataset.previewSrc = item7.previewSrc;
+    else delete el3.dataset.previewSrc;
     return;
   }
-  ((_0xba816.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
-    _0xba816.setAttribute('draggable', 'false'),
+  ((el3.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
+    el3.setAttribute('draggable', 'false'),
     [
       'refKey',
       'edgeId',
@@ -243,72 +236,72 @@ function syncFixedSlotElement({
       'sig',
       'thumbSrc',
       'previewSrc',
-    ].forEach((_0x33d5b3) => {
-      if (_0xba816.dataset[_0x33d5b3]) delete _0xba816.dataset[_0x33d5b3];
+    ].forEach((item8) => {
+      if (el3.dataset[item8]) delete el3.dataset[item8];
     }));
-  const _0x53cb0d =
-    '<span class="ref-upload-label">' + getFixedImageSlotLabelHtml(_0x1fd222, _0x232ee0) + '</span>';
-  if (_0xba816.innerHTML !== _0x53cb0d) _0xba816.innerHTML = _0x53cb0d;
+  const output =
+    '<span class="ref-upload-label">' + getFixedImageSlotLabelHtml(fixedInputConfig4, slot3) + '</span>';
+  if (el3.innerHTML !== output) el3.innerHTML = output;
 }
 export function renderManifestFixedImageRefBar({
-  owner: _0x533ea5,
-  refBarEl: _0x97a838,
-  promptEl: _0x58c835,
-  attachBtnHTML: _0x48fd41,
-  fixedInputConfig: _0x47a8b5,
-  items: _0x55b31c,
-  targetNodeData: _0x5be973,
-  sourceIdToLabel: _0x30d0b8,
-  store: _0x1819dc,
-  nodeId: _0x3f450c,
-  ensureThumbDecoded: _0x416692,
-  revealRefThumbMedia: _0x232d77,
-  syncPillLabels: _0x14734f,
+  owner: owner2,
+  refBarEl: refBarEl2,
+  promptEl: promptEl2,
+  attachBtnHTML: attachBtnHTML2,
+  fixedInputConfig: fixedInputConfig5,
+  items: items2,
+  targetNodeData: targetNodeData2,
+  sourceIdToLabel: sourceIdToLabel,
+  store: store,
+  nodeId: nodeId,
+  ensureThumbDecoded: ensureThumbDecoded3,
+  revealRefThumbMedia: revealRefThumbMedia2,
+  syncPillLabels: syncPillLabels,
 }) {
-  const _0x49000b = (_0x47a8b5?.visibleSlots || [])
-    .map((_0x2c879c) => String(_0x2c879c || '').trim())
-    .filter((_0x5519ba) => _0x5519ba && String(_0x47a8b5?.slotKindById?.[_0x5519ba] || '') === 'image');
-  if (_0x49000b.length === 0) return false;
-  (_0x97a838.classList.add('active', 'rh-v5-refbar'),
-    (_0x533ea5._lastRefHTML = '__rh-manifest-fixed-image__:' + _0x49000b.join(',')));
-  const _0x4b5cef = ensureFixedImageSkeleton({
-      refBarEl: _0x97a838,
-      attachBtnHTML: _0x48fd41,
-      slotOrder: _0x49000b,
-      fixedInputConfig: _0x47a8b5,
-      owner: _0x533ea5,
+  const slotOrder3 = (fixedInputConfig5?.visibleSlots || [])
+    .map((item9) => String(item9 || '').trim())
+    .filter((item10) => item10 && String(fixedInputConfig5?.slotKindById?.[item10] || '') === 'image');
+  if (slotOrder3.length === 0) return false;
+  (refBarEl2.classList.add('active', 'rh-v5-refbar'),
+    (owner2._lastRefHTML = '__rh-manifest-fixed-image__:' + slotOrder3.join(',')));
+  const container2 = ensureFixedImageSkeleton({
+      refBarEl: refBarEl2,
+      attachBtnHTML: attachBtnHTML2,
+      slotOrder: slotOrder3,
+      fixedInputConfig: fixedInputConfig5,
+      owner: owner2,
     }),
-    _0x358ff6 = collectFixedSlotItems({
-      slotOrder: _0x49000b,
-      items: _0x55b31c,
-      fixedInputConfig: _0x47a8b5,
-      promptEl: _0x58c835,
-      targetNodeData: _0x5be973,
-      ensureThumbDecoded: _0x416692,
+    item11 = collectFixedSlotItems({
+      slotOrder: slotOrder3,
+      items: items2,
+      fixedInputConfig: fixedInputConfig5,
+      promptEl: promptEl2,
+      targetNodeData: targetNodeData2,
+      ensureThumbDecoded: ensureThumbDecoded3,
     }),
-    _0x21a5a4 = new Set(_0x49000b);
+    map5 = new Set(slotOrder3);
   return (
-    Array.from(_0x4b5cef?.querySelectorAll?.('[data-slot]') || [])
-      .filter((_0x26952d) => !_0x21a5a4.has(String(_0x26952d?.dataset?.slot || '')))
-      .forEach((_0x416dab) => _0x416dab.remove()),
-    _0x49000b.forEach((_0x3114af) => {
+    Array.from(container2?.querySelectorAll?.('[data-slot]') || [])
+      .filter((el4) => !map5.has(String(el4?.dataset?.slot || '')))
+      .forEach((el5) => el5.remove()),
+    slotOrder3.forEach((slot4) => {
       syncFixedSlotElement({
-        container: _0x4b5cef,
-        slot: _0x3114af,
-        item: _0x358ff6.get(_0x3114af) || null,
-        fixedInputConfig: _0x47a8b5,
-        revealRefThumbMedia: _0x232d77,
+        container: container2,
+        slot: slot4,
+        item: item11.get(slot4) || null,
+        fixedInputConfig: fixedInputConfig5,
+        revealRefThumbMedia: revealRefThumbMedia2,
       });
     }),
     bindRefThumbFixedSlotDrag({
-      owner: _0x533ea5,
-      container: _0x4b5cef,
-      store: _0x1819dc,
-      nodeId: _0x3f450c,
-      acceptMap: getFixedImageSlotAcceptMap(_0x47a8b5),
+      owner: owner2,
+      container: container2,
+      store: store,
+      nodeId: nodeId,
+      acceptMap: getFixedImageSlotAcceptMap(fixedInputConfig5),
     }),
-    _0x533ea5._syncBtnIconState(),
-    _0x14734f(_0x533ea5, _0x30d0b8),
+    owner2._syncBtnIconState(),
+    syncPillLabels(owner2, sourceIdToLabel),
     true
   );
 }

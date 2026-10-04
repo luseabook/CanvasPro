@@ -4,168 +4,167 @@ import { onLocaleChange, t } from '../i18n/index.js';
 import { startNodeResizePreview } from '../modules/interaction/nodeResizePreview.js';
 import { bindTextToolbarEvents } from './NodeToolbarConfig.js';
 import { sanitizeRichTextHtml, setStaticInnerHTML } from '../utils/dom.js';
-function sourceTextText(_0x2d89d3, _0xaad379 = {}) {
-  return t('sourceTextNode.' + _0x2d89d3, _0xaad379);
+function sourceTextText(value, item = {}) {
+  return t('sourceTextNode.' + value, item);
 }
 export class SourceTextNode {
-  constructor(_0x213552) {
-    ((this._data = _0x213552),
+  constructor(key) {
+    ((this._data = key),
       (this.el = document.createElement('div')),
-      (this.id = _0x213552.id),
+      (this.id = key.id),
       (this.el.className = 'v2-node-component'),
-      (this._lastScrollTop = Number.isFinite(_0x213552?.contentScrollTop)
-        ? Math.max(0, _0x213552.contentScrollTop)
-        : 0),
+      (this._lastScrollTop = Number.isFinite(key?.contentScrollTop) ? Math.max(0, key.contentScrollTop) : 0),
       (this._unsubscribeLocale = null));
   }
   ['mount']() {
     this._subscribeLocaleChanges();
-    const _0x4de87b = this.el;
-    setStaticInnerHTML(_0x4de87b, 'toolbar:text');
-    const _0x26046f = document.createElement('div');
-    _0x26046f.className = 'node-card source-text-card';
-    const _0x5c4384 = document.createElement('div');
-    ((_0x5c4384.className = 'source-text-content'),
-      _0x5c4384.setAttribute('contenteditable', 'false'),
-      (_0x5c4384.spellcheck = false),
-      (_0x5c4384.dataset.placeholder = sourceTextText('placeholder.initial')));
-    const _0x2a77c5 = document.createElement('div');
-    _0x2a77c5.className = 'source-text-footer';
-    const _0x2bef40 = document.createElement('div');
-    _0x2bef40.className = 'source-text-info';
-    const _0x1f6b91 = 'http://www.w3.org/2000/svg',
-      _0x46d7bb = document.createElementNS(_0x1f6b91, 'svg');
-    (_0x46d7bb.setAttribute('width', '12'),
-      _0x46d7bb.setAttribute('height', '12'),
-      _0x46d7bb.setAttribute('viewBox', '0 0 24 24'),
-      _0x46d7bb.setAttribute('fill', 'none'),
-      _0x46d7bb.setAttribute('stroke', 'currentColor'),
-      _0x46d7bb.setAttribute('stroke-width', '2'),
-      (_0x46d7bb.style.opacity = '0.4'));
-    const _0x18cf8b = document.createElementNS(_0x1f6b91, 'path');
-    _0x18cf8b.setAttribute('d', 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z');
-    const _0x5936a9 = document.createElementNS(_0x1f6b91, 'polyline');
-    _0x5936a9.setAttribute('points', '14 2 14 8 20 8');
-    const _0x927197 = document.createElementNS(_0x1f6b91, 'line');
-    (_0x927197.setAttribute('x1', '16'),
-      _0x927197.setAttribute('y1', '13'),
-      _0x927197.setAttribute('x2', '8'),
-      _0x927197.setAttribute('y2', '13'));
-    const _0x1ce8e9 = document.createElementNS(_0x1f6b91, 'line');
-    (_0x1ce8e9.setAttribute('x1', '16'),
-      _0x1ce8e9.setAttribute('y1', '17'),
-      _0x1ce8e9.setAttribute('x2', '8'),
-      _0x1ce8e9.setAttribute('y2', '17'),
-      _0x46d7bb.appendChild(_0x18cf8b),
-      _0x46d7bb.appendChild(_0x5936a9),
-      _0x46d7bb.appendChild(_0x927197),
-      _0x46d7bb.appendChild(_0x1ce8e9));
-    const _0x40ca96 = document.createElement('span');
-    ((_0x40ca96.className = 'source-text-char-count'),
-      (_0x40ca96.textContent = sourceTextText('charCount', { count: 0 })),
-      _0x2bef40.appendChild(_0x46d7bb),
-      _0x2bef40.appendChild(_0x40ca96),
-      _0x2a77c5.appendChild(_0x2bef40));
-    const _0x14937d = document.createElement('div');
-    _0x14937d.className = 'node-port out-port';
-    const _0x1a9cec = document.createElement('div');
-    ((_0x1a9cec.className = 'group-resizer'),
-      _0x1a9cec.classList.add('v2-resize-move'),
-      _0x26046f.appendChild(_0x5c4384),
-      _0x26046f.appendChild(_0x2a77c5),
-      _0x26046f.appendChild(_0x14937d),
-      _0x26046f.appendChild(_0x1a9cec),
-      _0x4de87b.appendChild(_0x26046f),
-      (this._card = _0x26046f),
-      (this._content = _0x5c4384),
-      (this._countEl = _0x40ca96),
-      this._card.addEventListener('dblclick', (_0x51ef14) => {
-        _0x51ef14.stopPropagation();
+    const el = this.el;
+    setStaticInnerHTML(el, 'toolbar:text');
+    const el2 = document.createElement('div');
+    el2.className = 'node-card source-text-card';
+    const el3 = document.createElement('div');
+    ((el3.className = 'source-text-content'),
+      el3.setAttribute('contenteditable', 'false'),
+      (el3.spellcheck = false),
+      (el3.dataset.placeholder = sourceTextText('placeholder.initial')));
+    const el4 = document.createElement('div');
+    el4.className = 'source-text-footer';
+    const el5 = document.createElement('div');
+    el5.className = 'source-text-info';
+    const index = 'http://www.w3.org/2000/svg',
+      el6 = document.createElementNS(index, 'svg');
+    (el6.setAttribute('width', '12'),
+      el6.setAttribute('height', '12'),
+      el6.setAttribute('viewBox', '0 0 24 24'),
+      el6.setAttribute('fill', 'none'),
+      el6.setAttribute('stroke', 'currentColor'),
+      el6.setAttribute('stroke-width', '2'),
+      (el6.style.opacity = '0.4'));
+    const el7 = document.createElementNS(index, 'path');
+    el7.setAttribute('d', 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z');
+    const el8 = document.createElementNS(index, 'polyline');
+    el8.setAttribute('points', '14 2 14 8 20 8');
+    const el9 = document.createElementNS(index, 'line');
+    (el9.setAttribute('x1', '16'),
+      el9.setAttribute('y1', '13'),
+      el9.setAttribute('x2', '8'),
+      el9.setAttribute('y2', '13'));
+    const el10 = document.createElementNS(index, 'line');
+    (el10.setAttribute('x1', '16'),
+      el10.setAttribute('y1', '17'),
+      el10.setAttribute('x2', '8'),
+      el10.setAttribute('y2', '17'),
+      el6.appendChild(el7),
+      el6.appendChild(el8),
+      el6.appendChild(el9),
+      el6.appendChild(el10));
+    const el11 = document.createElement('span');
+    ((el11.className = 'source-text-char-count'),
+      (el11.textContent = sourceTextText('charCount', { count: 0 })),
+      el5.appendChild(el6),
+      el5.appendChild(el11),
+      el4.appendChild(el5));
+    const result = document.createElement('div');
+    result.className = 'node-port out-port';
+    const el12 = document.createElement('div');
+    ((el12.className = 'group-resizer'),
+      el12.classList.add('v2-resize-move'),
+      el2.appendChild(el3),
+      el2.appendChild(el4),
+      el2.appendChild(result),
+      el2.appendChild(el12),
+      el.appendChild(el2),
+      (this._card = el2),
+      (this._content = el3),
+      (this._countEl = el11),
+      this._card.addEventListener('dblclick', (event) => {
+        event.stopPropagation();
       }));
-    const _0xbbfbb7 = typeof this._data.content === 'string' ? this._data.content : '',
-      _0x49c46a = typeof this._data.contentHtml === 'string' ? this._data.contentHtml : '',
-      _0x535bf2 = sanitizeRichTextHtml(_0x49c46a);
-    _0x535bf2.trim() ? (this._content.innerHTML = _0x535bf2) : (this._content.innerText = _0xbbfbb7);
-    const _0x87357d = this._content.innerText || '';
-    !_0x87357d
+    const data = typeof this._data.content === 'string' ? this._data.content : '',
+      options = typeof this._data.contentHtml === 'string' ? this._data.contentHtml : '',
+      sanitizeRichTextHtml2 = sanitizeRichTextHtml(options);
+    sanitizeRichTextHtml2.trim()
+      ? (this._content.innerHTML = sanitizeRichTextHtml2)
+      : (this._content.innerText = data);
+    const count = this._content.innerText || '';
+    !count
       ? (this._content.dataset.placeholder = sourceTextText('placeholder.initial'))
       : delete this._content.dataset.placeholder;
-    ((this._countEl.textContent = sourceTextText('charCount', { count: _0x87357d.length })),
+    ((this._countEl.textContent = sourceTextText('charCount', { count: count.length })),
       (this._content.scrollTop = this._lastScrollTop),
       this._content.addEventListener('blur', () => {
         ((this._lastScrollTop = Math.max(0, this._content.scrollTop || 0)),
           this._content.setAttribute('contenteditable', 'false'),
           this.el.classList.remove('source-text-editing'));
-        const _0x477a0e = this._content.innerText || '',
-          _0x17e3af = _0x477a0e.trim().length > 0 ? sanitizeRichTextHtml(this._content.innerHTML || '') : '';
-        if (_0x17e3af.trim()) this._content.innerHTML = _0x17e3af;
-        else _0x477a0e && (this._content.innerText = _0x477a0e);
+        const content = this._content.innerText || '',
+          contentHtml = content.trim().length > 0 ? sanitizeRichTextHtml(this._content.innerHTML || '') : '';
+        if (contentHtml.trim()) this._content.innerHTML = contentHtml;
+        else content && (this._content.innerText = content);
         (appStore.updateNodeData(this.id, {
-          content: _0x477a0e,
-          contentHtml: _0x17e3af,
+          content: content,
+          contentHtml: contentHtml,
           contentScrollTop: this._lastScrollTop,
         }),
-          this._updateSizeByLength(_0x477a0e.length, true));
+          this._updateSizeByLength(content.length, true));
       }),
       this._content.addEventListener('input', () => {
-        const _0x886af9 = this._content.innerText || '';
-        ((this._countEl.textContent = sourceTextText('charCount', { count: _0x886af9.length })),
-          _0x886af9.length > 0
+        const count2 = this._content.innerText || '';
+        ((this._countEl.textContent = sourceTextText('charCount', { count: count2.length })),
+          count2.length > 0
             ? delete this._content.dataset.placeholder
             : (this._content.dataset.placeholder = sourceTextText('placeholder.edit')));
       }));
-    let _0x4b3143 = 0,
-      _0x5bff30 = 0;
-    (this._content.addEventListener('pointerdown', (_0x40450b) => {
+    let target = 0,
+      source = 0;
+    (this._content.addEventListener('pointerdown', (event2) => {
       if (this._content.getAttribute('contenteditable') === 'true') {
-        _0x40450b.stopPropagation();
+        event2.stopPropagation();
         return;
       }
-      ((_0x4b3143 = _0x40450b.clientX), (_0x5bff30 = _0x40450b.clientY));
+      ((target = event2.clientX), (source = event2.clientY));
     }),
-      this._content.addEventListener('pointerup', (_0x339307) => {
+      this._content.addEventListener('pointerup', (event3) => {
         if (this._content.getAttribute('contenteditable') === 'true') return;
-        const _0x20a6f4 = Math.hypot(_0x339307.clientX - _0x4b3143, _0x339307.clientY - _0x5bff30);
-        if (_0x20a6f4 < 5) {
-          const _0xfa06a2 = this._content.innerText.trim();
-          if (_0xfa06a2.length === 0) {
+        const count3 = Math.hypot(event3.clientX - target, event3.clientY - source);
+        if (count3 < 5) {
+          const list = this._content.innerText.trim();
+          if (list.length === 0) {
             this._enterEditMode();
             return;
           }
-          const _0x50357d = document.caretRangeFromPoint(_0x339307.clientX, _0x339307.clientY);
-          if (_0x50357d && this._content.contains(_0x50357d.startContainer)) {
-            const _0x32c022 =
-              _0x50357d.startContainer.nodeType === Node.TEXT_NODE ? _0x50357d.startContainer : null;
-            _0x32c022 && this._enterEditMode();
+          const next = document.caretRangeFromPoint(event3.clientX, event3.clientY);
+          if (next && this._content.contains(next.startContainer)) {
+            const current = next.startContainer.nodeType === Node.TEXT_NODE ? next.startContainer : null;
+            current && this._enterEditMode();
           }
         }
       }),
-      this._content.addEventListener('wheel', (_0x53f9e8) => {
-        this._content.scrollHeight > this._content.clientHeight && _0x53f9e8.stopPropagation();
+      this._content.addEventListener('wheel', (event4) => {
+        this._content.scrollHeight > this._content.clientHeight && event4.stopPropagation();
       }),
       this._content.addEventListener('scroll', () => {
         this._lastScrollTop = Math.max(0, this._content.scrollTop || 0);
       }));
-    _0x1a9cec &&
-      _0x1a9cec.addEventListener('pointerdown', (_0x3216b3) => {
+    el12 &&
+      el12.addEventListener('pointerdown', (event5) => {
         startNodeResizePreview({
-          event: _0x3216b3,
+          event: event5,
           nodeId: this.id,
           getNode: () => appStore.getStateRaw().nodes?.[this.id] || this._data,
           getViewport: () => appStore.getStateRaw().viewport,
-          resolveSize: ({ startWidth: _0x5325b6, startHeight: _0x5dd735, dx: _0x3e78af, dy: _0x1a7b3d }) => ({
-            width: Math.max(150, _0x5325b6 + _0x3e78af),
-            height: Math.max(150, _0x5dd735 + _0x1a7b3d),
+          resolveSize: ({ startWidth: startWidth, startHeight: startHeight, dx: dx, dy: dy }) => ({
+            width: Math.max(150, startWidth + dx),
+            height: Math.max(150, startHeight + dy),
           }),
-          applyPatch: (_0x4d74db) => appStore.updateNodeData(this.id, _0x4d74db),
+          applyPatch: (entry) => appStore.updateNodeData(this.id, entry),
           commit: commit,
         });
       });
-    const _0x5a73a7 = _0x4de87b.querySelector('.node-floating-toolbar');
+    const record = el.querySelector('.node-floating-toolbar');
     return (
-      bindTextToolbarEvents(_0x5a73a7, this._data, () => this._content.innerText),
-      this._updateSizeByLength(_0x87357d.length, false),
-      _0x4de87b
+      bindTextToolbarEvents(record, this._data, () => this._content.innerText),
+      this._updateSizeByLength(count.length, false),
+      el
     );
   }
   ['_enterEditMode']() {
@@ -176,36 +175,36 @@ export class SourceTextNode {
       requestAnimationFrame(() => {
         this._content.scrollTop = this._lastScrollTop;
       }));
-    const _0x29079d = appStore.getState().selectedNodeIds;
-    if (!_0x29079d.includes(this.id)) appStore.setSelectedNodes([this.id]);
+    const list2 = appStore.getState().selectedNodeIds;
+    if (!list2.includes(this.id)) appStore.setSelectedNodes([this.id]);
   }
-  ['_updateSizeByLength'](_0xa6a8e9, _0x6353ca = false) {
+  ['_updateSizeByLength'](count4, payload = false) {
     if (!this._data.width || this._data.width < 100) {
-      let _0x2b0560 = 0x104;
-      if (_0xa6a8e9 > 0x12c) _0x2b0560 = 0x208;
-      _0x6353ca
-        ? appStore.updateNodeData(this.id, { width: _0x2b0560, height: _0x2b0560 })
-        : ((this._data.width = _0x2b0560), (this._data.height = _0x2b0560));
+      let width = 0x104;
+      if (count4 > 0x12c) width = 0x208;
+      payload
+        ? appStore.updateNodeData(this.id, { width: width, height: width })
+        : ((this._data.width = width), (this._data.height = width));
     }
   }
-  ['update'](_0x2c6ccf) {
-    this._data = _0x2c6ccf;
+  ['update'](handle) {
+    this._data = handle;
     if (!this._content) return;
-    Number.isFinite(_0x2c6ccf.contentScrollTop) &&
-      (this._lastScrollTop = Math.max(0, _0x2c6ccf.contentScrollTop));
-    const _0x3c212b = _0x2c6ccf.content !== undefined || _0x2c6ccf.contentHtml !== undefined;
-    if (_0x3c212b && document.activeElement !== this._content) {
-      const _0x21c45a = sanitizeRichTextHtml(
-          typeof _0x2c6ccf.contentHtml === 'string' ? _0x2c6ccf.contentHtml : '',
+    Number.isFinite(handle.contentScrollTop) && (this._lastScrollTop = Math.max(0, handle.contentScrollTop));
+    const state = handle.content !== undefined || handle.contentHtml !== undefined;
+    if (state && document.activeElement !== this._content) {
+      const sanitizeRichTextHtml3 = sanitizeRichTextHtml(
+          typeof handle.contentHtml === 'string' ? handle.contentHtml : '',
         ),
-        _0x2ed89a = typeof _0x2c6ccf.content === 'string' ? _0x2c6ccf.content : '';
-      _0x21c45a.trim() ? (this._content.innerHTML = _0x21c45a) : (this._content.innerText = _0x2ed89a);
-      const _0x4bc2c0 = this._content.innerText || '';
-      (!_0x4bc2c0
+        config = typeof handle.content === 'string' ? handle.content : '';
+      sanitizeRichTextHtml3.trim()
+        ? (this._content.innerHTML = sanitizeRichTextHtml3)
+        : (this._content.innerText = config);
+      const count5 = this._content.innerText || '';
+      (!count5
         ? (this._content.dataset.placeholder = sourceTextText('placeholder.edit'))
         : delete this._content.dataset.placeholder,
-        this._countEl &&
-          (this._countEl.textContent = sourceTextText('charCount', { count: _0x4bc2c0.length })),
+        this._countEl && (this._countEl.textContent = sourceTextText('charCount', { count: count5.length })),
         (this._content.scrollTop = this._lastScrollTop));
     }
   }
@@ -215,14 +214,13 @@ export class SourceTextNode {
   }
   ['_syncLocaleTexts']() {
     if (!this._content) return;
-    const _0x42c064 = this._content.innerText || '';
-    (!_0x42c064 &&
+    const count6 = this._content.innerText || '';
+    (!count6 &&
       (this._content.dataset.placeholder =
         this._content.getAttribute('contenteditable') === 'true'
           ? sourceTextText('placeholder.edit')
           : sourceTextText('placeholder.initial')),
-      this._countEl &&
-        (this._countEl.textContent = sourceTextText('charCount', { count: _0x42c064.length })));
+      this._countEl && (this._countEl.textContent = sourceTextText('charCount', { count: count6.length })));
   }
   ['unmount']() {
     (this._unsubscribeLocale?.(), (this._unsubscribeLocale = null));

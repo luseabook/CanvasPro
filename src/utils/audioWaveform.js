@@ -3,241 +3,369 @@ let _ctx = null;
 const _cache = new Map(),
   _bufferCache = new Map(),
   _bufferInflight = new Map();
-function _queueDeferredTask(_0x1d171e) {
-  if (typeof _0x1d171e !== 'function') return () => {};
-  let _0x276b14 = false;
+function _queueDeferredTask(handler) {
+  if (typeof handler !== 'function') return () => {};
+  let enabled = false;
   if (typeof queueMicrotask === 'function')
     return (
       queueMicrotask(() => {
-        if (!_0x276b14) _0x1d171e();
+        if (!enabled) handler();
       }),
       () => {
-        _0x276b14 = true;
+        enabled = true;
       }
     );
-  const _0x3dd379 = setTimeout(() => {
-    if (!_0x276b14) _0x1d171e();
+  const setTimeout2 = setTimeout(() => {
+    if (!enabled) handler();
   }, 0);
   return () => {
-    ((_0x276b14 = true), clearTimeout(_0x3dd379));
+    ((enabled = true), clearTimeout(setTimeout2));
   };
 }
-export function deferWaveformPathUntilAudioReady(_0x5002ab, _0x2e631a) {
-  if (typeof _0x2e631a !== 'function') return () => {};
-  if (!_0x5002ab || typeof _0x5002ab.addEventListener !== 'function') return _queueDeferredTask(_0x2e631a);
-  let _0x37cf02 = null,
-    _0x26f5ae = false;
-  const _0x2b13ec = () => {
-      (_0x5002ab.removeEventListener('loadeddata', _0x461cc1),
-        _0x5002ab.removeEventListener('error', _0x17fc06));
+export function deferWaveformPathUntilAudioReady(el, handler2) {
+  if (typeof handler2 !== 'function') return () => {};
+  if (!el || typeof el.addEventListener !== 'function') return _queueDeferredTask(handler2);
+  let run = null,
+    enabled2 = false;
+  const run2 = () => {
+      (el.removeEventListener('loadeddata', value), el.removeEventListener('error', item));
     },
-    _0x461cc1 = () => {
-      _0x2b13ec();
-      if (_0x26f5ae) return;
-      _0x37cf02 = _queueDeferredTask(() => {
-        _0x37cf02 = null;
-        if (!_0x26f5ae) _0x2e631a();
+    value = () => {
+      run2();
+      if (enabled2) return;
+      run = _queueDeferredTask(() => {
+        run = null;
+        if (!enabled2) handler2();
       });
     },
-    _0x17fc06 = () => {
-      _0x2b13ec();
+    item = () => {
+      run2();
     };
   return (
-    Number(_0x5002ab.readyState || 0) >= 2
-      ? (_0x37cf02 = _queueDeferredTask(() => {
-          _0x37cf02 = null;
-          if (!_0x26f5ae) _0x2e631a();
+    Number(el.readyState || 0) >= 2
+      ? (run = _queueDeferredTask(() => {
+          run = null;
+          if (!enabled2) handler2();
         }))
-      : (_0x5002ab.addEventListener('loadeddata', _0x461cc1, { once: true }),
-        _0x5002ab.addEventListener('error', _0x17fc06, { once: true })),
+      : (el.addEventListener('loadeddata', value, { once: true }),
+        el.addEventListener('error', item, { once: true })),
     () => {
-      ((_0x26f5ae = true), _0x2b13ec(), typeof _0x37cf02 === 'function' && (_0x37cf02(), (_0x37cf02 = null)));
+      ((enabled2 = true), run2(), typeof run === 'function' && (run(), (run = null)));
     }
   );
 }
 function _getAudioContext() {
   if (_ctx) return _ctx;
-  const _0x20491c = window.AudioContext || window.webkitAudioContext;
-  if (!_0x20491c) return null;
-  return ((_ctx = new _0x20491c()), _ctx);
+  const run3 = window.AudioContext || window.webkitAudioContext;
+  if (!run3) return null;
+  return ((_ctx = new run3()), _ctx);
 }
-function _decodeAudioData(_0x564c24, _0x5360ba) {
-  return new Promise((_0x13e81a, _0x5a751d) => {
-    const _0x2f20e7 = _0x564c24.decodeAudioData(_0x5360ba, _0x13e81a, _0x5a751d);
-    if (_0x2f20e7 && typeof _0x2f20e7.then === 'function') _0x2f20e7.then(_0x13e81a).catch(_0x5a751d);
+function _decodeAudioData(key, index) {
+  return new Promise((result, data) => {
+    const promise = key.decodeAudioData(index, result, data);
+    if (promise && typeof promise.then === 'function') promise.then(result).catch(data);
   });
 }
-function _buildMinMaxBarsPath(_0x1f02c9, { width: _0x18fdca, height: _0x359f86, samples: _0x273d5a }) {
-  const _0x3b52d7 = Number(_0x18fdca) || 200,
-    _0x465dcc = Number(_0x359f86) || 80,
-    _0x5a3403 = Math.max(40, Math.min(0x190, Math.round(Number(_0x273d5a) || 180))),
-    _0x57f31a = _0x465dcc / 2,
-    _0xcf5d90 = Math.max(1, Math.round(_0x465dcc * 0.08)),
-    _0xd11af0 = Math.max(1, _0x57f31a - _0xcf5d90),
-    _0x10fbf9 = Math.max(1, Number(_0x1f02c9?.numberOfChannels) || 1),
-    _0x1cc109 = Number(_0x1f02c9?.length) || 0;
-  if (!_0x1cc109) return '';
-  const _0x5b065a = [];
-  for (let _0x2f1461 = 0; _0x2f1461 < _0x10fbf9; _0x2f1461++) {
+function _buildMinMaxBarsPath(list, { width: width2, height: height2, samples: samples2 }) {
+  const options = Number(width2) || 200,
+    target = Number(height2) || 80,
+    source = Math.max(40, Math.min(0x190, Math.round(Number(samples2) || 180))),
+    next = target / 2,
+    current = Math.max(1, Math.round(target * 0.08)),
+    entry = Math.max(1, next - current),
+    record = Math.max(1, Number(list?.numberOfChannels) || 1),
+    enabled3 = Number(list?.length) || 0;
+  if (!enabled3) return '';
+  const list2 = [];
+  for (let payload = 0; payload < record; payload++) {
     try {
-      _0x5b065a.push(_0x1f02c9.getChannelData(_0x2f1461));
-    } catch (_0x1131a4) {}
+      list2.push(list.getChannelData(payload));
+    } catch (handle) {}
   }
-  if (!_0x5b065a.length) return '';
-  const _0x1e2955 = Math.max(1, Math.floor(_0x1cc109 / _0x5a3403));
-  let _0x4e3538 = '';
-  for (let _0x49fdc6 = 0; _0x49fdc6 < _0x5a3403; _0x49fdc6++) {
-    const _0x36ba2c = _0x49fdc6 * _0x1e2955,
-      _0x57625c = Math.min(_0x1cc109, _0x36ba2c + _0x1e2955);
-    let _0x2ee7e0 = 1,
-      _0x643227 = -1;
-    for (let _0x1806de = 0; _0x1806de < _0x5b065a.length; _0x1806de++) {
-      const _0x4e930b = _0x5b065a[_0x1806de];
-      for (let _0x413bb8 = _0x36ba2c; _0x413bb8 < _0x57625c; _0x413bb8++) {
-        const _0x36c64c = _0x4e930b[_0x413bb8] || 0;
-        if (_0x36c64c < _0x2ee7e0) _0x2ee7e0 = _0x36c64c;
-        if (_0x36c64c > _0x643227) _0x643227 = _0x36c64c;
+  if (!list2.length) return '';
+  const state = Math.max(1, Math.floor(enabled3 / source));
+  let config = '';
+  for (let scope = 0; scope < source; scope++) {
+    const input = scope * state,
+      output = Math.min(enabled3, input + state);
+    let value2 = 1,
+      value3 = -1;
+    for (let value4 = 0; value4 < list2.length; value4++) {
+      const value5 = list2[value4];
+      for (let value6 = input; value6 < output; value6++) {
+        const value7 = value5[value6] || 0;
+        if (value7 < value2) value2 = value7;
+        if (value7 > value3) value3 = value7;
       }
     }
-    const _0x4d48ce = Math.min(1, Math.max(Math.abs(_0x2ee7e0), Math.abs(_0x643227))),
-      _0x2d8048 = _0x57f31a - _0x4d48ce * _0xd11af0,
-      _0x4e829e = _0x57f31a + _0x4d48ce * _0xd11af0,
-      _0x164cda = ((_0x49fdc6 + 0.5) / _0x5a3403) * _0x3b52d7;
-    _0x4e3538 +=
+    const value8 = Math.min(1, Math.max(Math.abs(value2), Math.abs(value3))),
+      value9 = next - value8 * entry,
+      value10 = next + value8 * entry,
+      value11 = ((scope + 0.5) / source) * options;
+    config +=
       'M' +
-      _0x164cda.toFixed(2) +
+      value11.toFixed(2) +
       ',' +
-      _0x2d8048.toFixed(2) +
+      value9.toFixed(2) +
       ' L' +
-      _0x164cda.toFixed(2) +
+      value11.toFixed(2) +
       ',' +
-      _0x4e829e.toFixed(2) +
+      value10.toFixed(2) +
       ' ';
   }
-  return _0x4e3538.trim();
+  return config.trim();
 }
-function _buildBarsPathFromPeaks(_0x4a9fce, { width: _0x4c9592, height: _0x569fd0, samples: _0x39aa4e }) {
-  const _0x52347e = Array.isArray(_0x4a9fce) ? _0x4a9fce : [];
-  if (!_0x52347e.length) return '';
-  const _0xdfcae3 = Number(_0x4c9592) || 200,
-    _0x3e90cb = Number(_0x569fd0) || 80,
-    _0xaa3adb = Math.max(1, Math.min(_0x52347e.length, Math.round(Number(_0x39aa4e) || _0x52347e.length))),
-    _0x8f4bb0 = _0x3e90cb / 2,
-    _0x305dd7 = Math.max(1, Math.round(_0x3e90cb * 0.08)),
-    _0x2e6783 = Math.max(1, _0x8f4bb0 - _0x305dd7);
-  let _0x433032 = '';
-  for (let _0x36d8d8 = 0; _0x36d8d8 < _0xaa3adb; _0x36d8d8++) {
-    const _0x3a4ce0 = Math.min(_0x52347e.length - 1, Math.floor((_0x36d8d8 / _0xaa3adb) * _0x52347e.length)),
-      _0x49e585 = Math.min(1, Math.max(0, Number(_0x52347e[_0x3a4ce0]) || 0)),
-      _0x4dcdfc = _0x8f4bb0 - _0x49e585 * _0x2e6783,
-      _0x1d97e6 = _0x8f4bb0 + _0x49e585 * _0x2e6783,
-      _0x42bb56 = ((_0x36d8d8 + 0.5) / _0xaa3adb) * _0xdfcae3;
-    _0x433032 +=
+function _buildBarsPathFromPeaks(value12, { width: width3, height: height3, samples: samples3 }) {
+  const list3 = Array.isArray(value12) ? value12 : [];
+  if (!list3.length) return '';
+  const value13 = Number(width3) || 200,
+    value14 = Number(height3) || 80,
+    value15 = Math.max(1, Math.min(list3.length, Math.round(Number(samples3) || list3.length))),
+    value16 = value14 / 2,
+    value17 = Math.max(1, Math.round(value14 * 0.08)),
+    value18 = Math.max(1, value16 - value17);
+  let value19 = '';
+  for (let value20 = 0; value20 < value15; value20++) {
+    const value21 = Math.min(list3.length - 1, Math.floor((value20 / value15) * list3.length)),
+      value22 = Math.min(1, Math.max(0, Number(list3[value21]) || 0)),
+      value23 = value16 - value22 * value18,
+      value24 = value16 + value22 * value18,
+      value25 = ((value20 + 0.5) / value15) * value13;
+    value19 +=
       'M' +
-      _0x42bb56.toFixed(2) +
+      value25.toFixed(2) +
       ',' +
-      _0x4dcdfc.toFixed(2) +
+      value23.toFixed(2) +
       ' L' +
-      _0x42bb56.toFixed(2) +
+      value25.toFixed(2) +
       ',' +
-      _0x1d97e6.toFixed(2) +
+      value24.toFixed(2) +
       ' ';
   }
-  return _0x433032.trim();
+  return value19.trim();
 }
 export async function getWaveformBarsPathFromPersistedUrl(
-  _0x32f52b,
+  value26,
   { width: width = 200, height: height = 80, samples: samples = 180 } = {},
 ) {
-  const _0x5eec07 = String(_0x32f52b || '').trim();
-  if (!_0x5eec07) return '';
-  const _0x37b6e7 = 'persisted:' + _0x5eec07 + '|' + width + '|' + height + '|' + samples,
-    _0x256af0 = _cache.get(_0x37b6e7);
-  if (_0x256af0) return _0x256af0;
+  const enabled4 = String(value26 || '').trim();
+  if (!enabled4) return '';
+  const value27 = 'persisted:' + enabled4 + '|' + width + '|' + height + '|' + samples,
+    value28 = _cache.get(value27);
+  if (value28) return value28;
   try {
-    const _0x566576 = await fetchRemoteBlob(_0x5eec07),
-      _0x9a1276 = JSON.parse(await _0x566576.text()),
-      _0x588276 = _buildBarsPathFromPeaks(_0x9a1276?.peaks, {
+    const response = await fetchRemoteBlob(enabled4),
+      value29 = JSON.parse(await response.text()),
+      _buildBarsPathFromPeaks2 = _buildBarsPathFromPeaks(value29?.peaks, {
         width: width,
         height: height,
         samples: samples,
       });
-    if (_0x588276) _cache.set(_0x37b6e7, _0x588276);
-    return _0x588276;
+    if (_buildBarsPathFromPeaks2) _cache.set(value27, _buildBarsPathFromPeaks2);
+    return _buildBarsPathFromPeaks2;
   } catch {
     return '';
   }
 }
-async function _getDecodedAudioBufferFromUrl(_0x231938) {
-  const _0x399797 = String(_0x231938 || '').trim();
-  if (!_0x399797) return null;
-  const _0x3d178d = _getAudioContext();
-  if (!_0x3d178d) return null;
-  let _0x4b216c = _bufferCache.get(_0x399797);
-  if (!_0x4b216c) {
-    let _0x3b4ab2 = _bufferInflight.get(_0x399797);
-    !_0x3b4ab2 &&
-      ((_0x3b4ab2 = (async () => {
-        let _0xac6e25;
+async function _getDecodedAudioBufferFromUrl(value30) {
+  const enabled5 = String(value30 || '').trim();
+  if (!enabled5) return null;
+  const _getAudioContext2 = _getAudioContext();
+  if (!_getAudioContext2) return null;
+  let enabled6 = _bufferCache.get(enabled5);
+  if (!enabled6) {
+    let enabled7 = _bufferInflight.get(enabled5);
+    !enabled7 &&
+      ((enabled7 = (async () => {
+        let enabled8;
         try {
-          const _0x4d8b74 = await fetchRemoteBlob(_0x399797);
-          _0xac6e25 = await _0x4d8b74.arrayBuffer();
-        } catch (_0x378942) {
+          const fetchRemoteBlob2 = await fetchRemoteBlob(enabled5);
+          enabled8 = await fetchRemoteBlob2.arrayBuffer();
+        } catch (value31) {
           return null;
         }
-        if (!_0xac6e25) return null;
+        if (!enabled8) return null;
         try {
-          const _0x181c34 = await _decodeAudioData(_0x3d178d, _0xac6e25);
-          return _0x181c34 || null;
-        } catch (_0xf35ef0) {
+          const _decodeAudioData2 = await _decodeAudioData(_getAudioContext2, enabled8);
+          return _decodeAudioData2 || null;
+        } catch (value32) {
           return null;
         }
       })()),
-      _bufferInflight.set(_0x399797, _0x3b4ab2));
+      _bufferInflight.set(enabled5, enabled7));
     try {
-      _0x4b216c = await _0x3b4ab2;
+      enabled6 = await enabled7;
     } finally {
-      if (_bufferInflight.get(_0x399797) === _0x3b4ab2) _bufferInflight.delete(_0x399797);
+      if (_bufferInflight.get(enabled5) === enabled7) _bufferInflight.delete(enabled5);
     }
-    if (_0x4b216c) _bufferCache.set(_0x399797, _0x4b216c);
+    if (enabled6) _bufferCache.set(enabled5, enabled6);
   }
-  return _0x4b216c || null;
+  return enabled6 || null;
 }
-export async function getAudioDurationFromUrl(_0x55786d) {
-  const _0x232cf1 = await _getDecodedAudioBufferFromUrl(_0x55786d),
-    _0x52c32f = Number(_0x232cf1?.duration || 0);
-  return Number.isFinite(_0x52c32f) && _0x52c32f > 0 ? _0x52c32f : 0;
+export async function getAudioDurationFromUrl(value33) {
+  const _getDecodedAudioBufferFromUrl2 = await _getDecodedAudioBufferFromUrl(value33),
+    count = Number(_getDecodedAudioBufferFromUrl2?.duration || 0);
+  return Number.isFinite(count) && count > 0 ? count : 0;
 }
 export async function getWaveformBarsPathFromUrl(
-  _0x5aa3da,
+  value34,
   { width: width = 200, height: height = 80, samples: samples = 180 } = {},
 ) {
-  const _0x56377d = String(_0x5aa3da || '').trim();
-  if (!_0x56377d) return '';
-  const _0x24fa58 = _0x56377d + '|' + width + '|' + height + '|' + samples,
-    _0x496962 = _cache.get(_0x24fa58);
-  if (_0x496962) return _0x496962;
-  const _0x38bbdc = await _getDecodedAudioBufferFromUrl(_0x56377d);
-  if (!_0x38bbdc) return '';
-  const _0x4a2e06 = _buildMinMaxBarsPath(_0x38bbdc, { width: width, height: height, samples: samples });
-  if (_0x4a2e06) _cache.set(_0x24fa58, _0x4a2e06);
-  return _0x4a2e06;
+  const enabled9 = String(value34 || '').trim();
+  if (!enabled9) return '';
+  const value35 = enabled9 + '|' + width + '|' + height + '|' + samples,
+    value36 = _cache.get(value35);
+  if (value36) return value36;
+  const _getDecodedAudioBufferFromUrl3 = await _getDecodedAudioBufferFromUrl(enabled9);
+  if (!_getDecodedAudioBufferFromUrl3) return '';
+  const _buildMinMaxBarsPath2 = _buildMinMaxBarsPath(_getDecodedAudioBufferFromUrl3, {
+    width: width,
+    height: height,
+    samples: samples,
+  });
+  if (_buildMinMaxBarsPath2) _cache.set(value35, _buildMinMaxBarsPath2);
+  return _buildMinMaxBarsPath2;
 }
 
 const _decodeQueue = [];
 
-let _activeDecodes=0x0;
+let _activeDecodes = 0x0;
 
-const MAX_CONCURRENT_AUDIO_DECODES=0x2,MAX_WAVEFORM_PATHS=0x100;
+const MAX_CONCURRENT_AUDIO_DECODES = 0x2,
+  MAX_WAVEFORM_PATHS = 0x100;
 
-function _cachePath(_0x344f86,_0x5bd645,_0x604d2b=0x0){if(!_0x5bd645)return;_cache["delete"](_0x344f86),_cache['set'](_0x344f86,{'path':_0x5bd645,'duration':Number["isFinite"](_0x604d2b)&&_0x604d2b>0x0?_0x604d2b:0x0});while(_cache["size"]>MAX_WAVEFORM_PATHS)_cache["delete"](_cache["keys"]()["next"]()['value']);}
+function _cachePath(value37, enabled10, count2 = 0x0) {
+  if (!enabled10) return;
+  (_cache['delete'](value37),
+    _cache['set'](value37, {
+      path: enabled10,
+      duration: Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x0,
+    }));
+  while (_cache['size'] > MAX_WAVEFORM_PATHS) _cache['delete'](_cache['keys']()['next']()['value']);
+}
 
-function _readWaveformResult(_0x19e66d,_0x542670){const _0x25ada0=Number(_0x19e66d?.["duration"]);if(Number['isFinite'](_0x25ada0)&&_0x25ada0>0x0)_0x542670?.(_0x25ada0);return _0x19e66d?.['path']||'';}
+function _readWaveformResult(value38, value39) {
+  const count3 = Number(value38?.['duration']);
+  if (Number['isFinite'](count3) && count3 > 0x0) value39?.(count3);
+  return value38?.['path'] || '';
+}
 
-function _queueAudioDecode(_0xd3d906,_0x3bce7e){return new Promise(_0x5c1029=>{const _0x1a520e=()=>{const _0x322b42=_decodeQueue["indexOf"](_0x4f84f2);_0x322b42>=0x0&&(_decodeQueue['splice'](_0x322b42,0x1),_0x5c1029(null));},_0x4f84f2=async()=>{_0x3bce7e?.["removeEventListener"]("abort",_0x1a520e),_activeDecodes+=0x1;try{_0x5c1029(_0x3bce7e?.['aborted']?null:await _0xd3d906());}catch{_0x5c1029(null);}finally{_activeDecodes-=0x1;while(_activeDecodes<MAX_CONCURRENT_AUDIO_DECODES&&_decodeQueue['length']){void _decodeQueue['shift']()();}}};if(_0x3bce7e?.["aborted"])return _0x5c1029(null);if(_activeDecodes<MAX_CONCURRENT_AUDIO_DECODES)void _0x4f84f2();else _decodeQueue["push"](_0x4f84f2),_0x3bce7e?.["addEventListener"]("abort",_0x1a520e,{'once':!![]});});}
+function _queueAudioDecode(handler3, value40) {
+  return new Promise((handler4) => {
+    const value41 = () => {
+        const count4 = _decodeQueue['indexOf'](handler5);
+        count4 >= 0x0 && (_decodeQueue['splice'](count4, 0x1), handler4(null));
+      },
+      handler5 = async () => {
+        (value40?.['removeEventListener']('abort', value41), (_activeDecodes += 0x1));
+        try {
+          handler4(value40?.['aborted'] ? null : await handler3());
+        } catch {
+          handler4(null);
+        } finally {
+          _activeDecodes -= 0x1;
+          while (_activeDecodes < MAX_CONCURRENT_AUDIO_DECODES && _decodeQueue['length']) {
+            void _decodeQueue['shift']()();
+          }
+        }
+      };
+    if (value40?.['aborted']) return handler4(null);
+    if (_activeDecodes < MAX_CONCURRENT_AUDIO_DECODES) void handler5();
+    else (_decodeQueue['push'](handler5), value40?.['addEventListener']('abort', value41, { once: !![] }));
+  });
+}
 
-function _createDecodedAudioBufferJob(_0x5e28fd,_0xebc4b2){const _0x47bfc4=typeof AbortController==="function"?new AbortController():null,_0x4e349c={'consumers':0x0,'controller':_0x47bfc4,'settled':![],'promise':null};return _0x4e349c["promise"]=_queueAudioDecode(async()=>{let _0x37d8de;try{const _0x3600e8=await fetchRemoteBlob(_0x5e28fd,{'signal':_0x47bfc4?.["signal"]});_0x37d8de=await _0x3600e8['arrayBuffer']();}catch{return null;}if(!_0x37d8de||_0x47bfc4?.['signal']?.["aborted"])return null;try{const _0x13a3c7=await _decodeAudioData(_0xebc4b2,_0x37d8de);return _0x47bfc4?.["signal"]?.["aborted"]?null:_0x13a3c7||null;}catch{return null;}},_0x47bfc4?.["signal"])['finally'](()=>{_0x4e349c['settled']=!![];if(_bufferInflight['get'](_0x5e28fd)===_0x4e349c)_bufferInflight['delete'](_0x5e28fd);}),_bufferInflight["set"](_0x5e28fd,_0x4e349c),_0x4e349c;}
+function _createDecodedAudioBufferJob(value42, value43) {
+  const value44 = typeof AbortController === 'function' ? new AbortController() : null,
+    value45 = { consumers: 0x0, controller: value44, settled: ![], promise: null };
+  return (
+    (value45['promise'] = _queueAudioDecode(async () => {
+      let enabled11;
+      try {
+        const fetchRemoteBlob3 = await fetchRemoteBlob(value42, { signal: value44?.['signal'] });
+        enabled11 = await fetchRemoteBlob3['arrayBuffer']();
+      } catch {
+        return null;
+      }
+      if (!enabled11 || value44?.['signal']?.['aborted']) return null;
+      try {
+        const _decodeAudioData3 = await _decodeAudioData(value43, enabled11);
+        return value44?.['signal']?.['aborted'] ? null : _decodeAudioData3 || null;
+      } catch {
+        return null;
+      }
+    }, value44?.['signal'])['finally'](() => {
+      value45['settled'] = !![];
+      if (_bufferInflight['get'](value42) === value45) _bufferInflight['delete'](value42);
+    })),
+    _bufferInflight['set'](value42, value45),
+    value45
+  );
+}
 
-async function _waitForDecodedAudioBufferJob(_0x204d39,_0x2ea34e){if(!_0x204d39||_0x2ea34e?.["aborted"])return null;_0x204d39["consumers"]+=0x1;let _0x208543=![],_0x357c4d=null;const _0x4463ff=_0x2ea34e?new Promise(_0x1877d4=>{_0x357c4d=()=>{_0x208543=!![],_0x1877d4(null);},_0x2ea34e["addEventListener"]('abort',_0x357c4d,{'once':!![]});}):null;try{return await(_0x4463ff?Promise['race']([_0x204d39["promise"],_0x4463ff]):_0x204d39["promise"]);}finally{if(_0x2ea34e&&_0x357c4d)_0x2ea34e["removeEventListener"]("abort",_0x357c4d);_0x204d39["consumers"]=Math["max"](0x0,_0x204d39["consumers"]-0x1),_0x208543&&!_0x204d39['settled']&&_0x204d39['consumers']===0x0&&_0x204d39["controller"]?.["abort"]();}}
+async function _waitForDecodedAudioBufferJob(enabled12, value46) {
+  if (!enabled12 || value46?.['aborted']) return null;
+  enabled12['consumers'] += 0x1;
+  let value47 = ![],
+    value48 = null;
+  const value49 = value46
+    ? new Promise((handler6) => {
+        ((value48 = () => {
+          ((value47 = !![]), handler6(null));
+        }),
+          value46['addEventListener']('abort', value48, { once: !![] }));
+      })
+    : null;
+  try {
+    return await (value49 ? Promise['race']([enabled12['promise'], value49]) : enabled12['promise']);
+  } finally {
+    if (value46 && value48) value46['removeEventListener']('abort', value48);
+    ((enabled12['consumers'] = Math['max'](0x0, enabled12['consumers'] - 0x1)),
+      value47 &&
+        !enabled12['settled'] &&
+        enabled12['consumers'] === 0x0 &&
+        enabled12['controller']?.['abort']());
+  }
+}
 
-export async function getAudioNodeWaveformPath(_0x70e66f,_0x599619,_0x9fc9d={}){if(_0x9fc9d["signal"]?.["aborted"])return'';const _0x3db722=JSON["stringify"](['audio-node',_0x70e66f,_0x599619,_0x9fc9d["width"],_0x9fc9d["height"],_0x9fc9d["samples"]]),_0x19a0e0=_cache["get"](_0x3db722);if(_0x19a0e0&&(_0x19a0e0['duration']>0x0||!_0x9fc9d["onDuration"]))return _readWaveformResult(_0x19a0e0,_0x9fc9d["onDuration"]);const _0x486963=_0x599619?await getWaveformBarsPathFromPersistedUrl(_0x599619,_0x9fc9d):'';if(_0x9fc9d["signal"]?.['aborted'])return'';let _0x9be4bb=0x0;if(_0x486963){_0x9fc9d['onDuration']&&(_0x9be4bb=await getAudioDurationFromUrl(_0x70e66f,{'signal':_0x9fc9d['signal'],'cacheBuffer':![]}));if(_0x9fc9d["signal"]?.["aborted"])return'';return _cachePath(_0x3db722,_0x486963,_0x9be4bb),_readWaveformResult({'path':_0x486963,'duration':_0x9be4bb},_0x9fc9d["onDuration"]);}const _0x3a1074=await getWaveformBarsPathFromUrl(_0x70e66f,{..._0x9fc9d,'cacheBuffer':![],'onDuration':_0x4d839d=>{_0x9be4bb=_0x4d839d;}});if(_0x9fc9d['signal']?.["aborted"])return'';return _cachePath(_0x3db722,_0x3a1074,_0x9be4bb),_readWaveformResult({'path':_0x3a1074,'duration':_0x9be4bb},_0x9fc9d["onDuration"]);}
+export async function getAudioNodeWaveformPath(value50, value51, args = {}) {
+  if (args['signal']?.['aborted']) return '';
+  const value52 = JSON['stringify']([
+      'audio-node',
+      value50,
+      value51,
+      args['width'],
+      args['height'],
+      args['samples'],
+    ]),
+    value53 = _cache['get'](value52);
+  if (value53 && (value53['duration'] > 0x0 || !args['onDuration']))
+    return _readWaveformResult(value53, args['onDuration']);
+  const value54 = value51 ? await getWaveformBarsPathFromPersistedUrl(value51, args) : '';
+  if (args['signal']?.['aborted']) return '';
+  let audioDurationFromUrl = 0x0;
+  if (value54) {
+    args['onDuration'] &&
+      (audioDurationFromUrl = await getAudioDurationFromUrl(value50, {
+        signal: args['signal'],
+        cacheBuffer: ![],
+      }));
+    if (args['signal']?.['aborted']) return '';
+    return (
+      _cachePath(value52, value54, audioDurationFromUrl),
+      _readWaveformResult({ path: value54, duration: audioDurationFromUrl }, args['onDuration'])
+    );
+  }
+  const waveformBarsPathFromUrl = await getWaveformBarsPathFromUrl(value50, {
+    ...args,
+    cacheBuffer: ![],
+    onDuration: (value55) => {
+      audioDurationFromUrl = value55;
+    },
+  });
+  if (args['signal']?.['aborted']) return '';
+  return (
+    _cachePath(value52, waveformBarsPathFromUrl, audioDurationFromUrl),
+    _readWaveformResult({ path: waveformBarsPathFromUrl, duration: audioDurationFromUrl }, args['onDuration'])
+  );
+}

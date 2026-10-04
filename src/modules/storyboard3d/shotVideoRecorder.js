@@ -3,264 +3,263 @@ import { normalizeStoryboard3DShotAnimation, sampleStoryboard3DShotAnimation } f
 import { resolveStoryboardExportDimensions } from './storyboardExport.js';
 import { createDirectorVideoPlan, sampleDirectorVideoPlan } from './directorVideoPlan.js';
 export function recordDirectorCanvas({
-  canvas: _0x1b8f8c,
-  drawFrame: _0x338042,
-  duration: _0x120dd3,
-  fps: _0x59922b,
-  signal: _0x43b033,
-  onProgress: _0x121d6a,
+  canvas: canvas,
+  drawFrame: drawFrame,
+  duration: duration,
+  fps: fps,
+  signal: signal,
+  onProgress: onProgress,
   windowObject: windowObject = globalThis['window'],
 } = {}) {
-  const _0x574ea6 = windowObject?.['MediaRecorder'],
-    _0x357a5b = ['video/mp4;codecs=avc1.42001E', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8']['find'](
-      (_0x480377) => _0x574ea6?.['isTypeSupported']?.(_0x480377),
+  const run = windowObject?.['MediaRecorder'],
+    type = ['video/mp4;codecs=avc1.42001E', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8']['find'](
+      (value) => run?.['isTypeSupported']?.(value),
     );
-  if (!_0x357a5b || !_0x1b8f8c?.['captureStream'])
+  if (!type || !canvas?.['captureStream'])
     return Promise['reject'](new Error('当前浏览器不支持画面录制，请使用 Chrome 或 Edge。'));
-  if (_0x43b033?.['aborted']) return Promise['reject'](new DOMException('已取消录制', 'AbortError'));
-  return new Promise((_0x4151a7, _0x598e56) => {
-    let _0x2abc8e,
-      _0x4c5d7d,
-      _0x3d23fe,
-      _0x17a59d,
-      _0x4f98f0 = ![],
-      _0x5d5374 = 0x0,
-      _0xb9dc = null;
-    const _0x229566 = [],
-      _0x2a2868 = () => {
-        windowObject['clearTimeout'](_0x3d23fe);
-        if (_0x17a59d != null) windowObject['cancelAnimationFrame']?.(_0x17a59d);
-        (_0x43b033?.['removeEventListener']('abort', _0x460331),
-          _0x2abc8e?.['getTracks']()['forEach']((_0x4f69bc) => _0x4f69bc['stop']()));
+  if (signal?.['aborted']) return Promise['reject'](new DOMException('已取消录制', 'AbortError'));
+  return new Promise((handler, handler2) => {
+    let item,
+      key,
+      index,
+      result,
+      data = ![],
+      enabled = 0x0,
+      options = null;
+    const list = [],
+      handler3 = () => {
+        windowObject['clearTimeout'](index);
+        if (result != null) windowObject['cancelAnimationFrame']?.(result);
+        (signal?.['removeEventListener']('abort', target),
+          item?.['getTracks']()['forEach']((source) => source['stop']()));
       },
-      _0x216b53 = (_0x45c562) => {
-        if (_0x4f98f0) return;
-        ((_0x4f98f0 = !![]), _0x2a2868());
-        if (_0x45c562) _0x598e56(_0x45c562);
+      handler4 = (next) => {
+        if (data) return;
+        ((data = !![]), handler3());
+        if (next) handler2(next);
         else {
-          if (!_0x5d5374) _0x598e56(new Error('录制没有产生视频数据。'));
+          if (!enabled) handler2(new Error('录制没有产生视频数据。'));
           else
-            _0x4151a7({
-              blob: new Blob(_0x229566, { type: _0x357a5b['split'](';')[0x0] }),
-              duration: _0x120dd3,
-              fps: _0x59922b,
+            handler({
+              blob: new Blob(list, { type: type['split'](';')[0x0] }),
+              duration: duration,
+              fps: fps,
             });
         }
       },
-      _0x3f3e36 = (_0x11b545) => {
-        ((_0xb9dc ||= _0x11b545), windowObject['clearTimeout'](_0x3d23fe));
-        if (_0x4c5d7d?.['state'] && _0x4c5d7d['state'] !== 'inactive') _0x4c5d7d['stop']();
-        else _0x216b53(_0xb9dc);
+      handler5 = (current) => {
+        ((options ||= current), windowObject['clearTimeout'](index));
+        if (key?.['state'] && key['state'] !== 'inactive') key['stop']();
+        else handler4(options);
       },
-      _0x460331 = () => _0x3f3e36(new DOMException('已取消录制', 'AbortError'));
+      target = () => handler5(new DOMException('已取消录制', 'AbortError'));
     try {
-      (_0x338042(0x0),
-        (_0x2abc8e = _0x1b8f8c['captureStream'](_0x59922b)),
-        (_0x4c5d7d = new _0x574ea6(_0x2abc8e, {
-          mimeType: _0x357a5b,
+      (drawFrame(0x0),
+        (item = canvas['captureStream'](fps)),
+        (key = new run(item, {
+          mimeType: type,
           videoBitsPerSecond: Math['min'](
             0x1e84800,
-            Math['max'](0x3d0900, _0x1b8f8c['width'] * _0x1b8f8c['height'] * _0x59922b * 0.12),
+            Math['max'](0x3d0900, canvas['width'] * canvas['height'] * fps * 0.12),
           ),
         })),
-        (_0x4c5d7d['ondataavailable'] = (_0x57f4b2) => {
-          if (!_0x57f4b2['data']?.['size']) return;
-          (_0x229566['push'](_0x57f4b2['data']), (_0x5d5374 += _0x57f4b2['data']['size']));
-          if (_0x5d5374 > 0x200 * 0x400 * 0x400)
-            _0x3f3e36(new Error('视频超过\x20512\x20MB，请分镜头录制或降低分辨率。'));
+        (key['ondataavailable'] = (enabled2) => {
+          if (!enabled2['data']?.['size']) return;
+          (list['push'](enabled2['data']), (enabled += enabled2['data']['size']));
+          if (enabled > 0x200 * 0x400 * 0x400)
+            handler5(new Error('视频超过\x20512\x20MB，请分镜头录制或降低分辨率。'));
         }),
-        (_0x4c5d7d['onerror'] = (_0x45f1d6) => _0x3f3e36(_0x45f1d6['error'] || new Error('视频编码失败。'))),
-        (_0x4c5d7d['onstop'] = () => _0x216b53(_0xb9dc)),
-        _0x43b033?.['addEventListener']('abort', _0x460331, { once: !![] }));
-      const _0x560647 = (_0x25aeba) => {
-        if (windowObject['requestAnimationFrame'])
-          _0x17a59d = windowObject['requestAnimationFrame'](_0x25aeba);
-        else _0x3d23fe = windowObject['setTimeout'](_0x25aeba, 0x3e8 / _0x59922b);
+        (key['onerror'] = (entry) => handler5(entry['error'] || new Error('视频编码失败。'))),
+        (key['onstop'] = () => handler4(options)),
+        signal?.['addEventListener']('abort', target, { once: !![] }));
+      const run2 = (record) => {
+        if (windowObject['requestAnimationFrame']) result = windowObject['requestAnimationFrame'](record);
+        else index = windowObject['setTimeout'](record, 0x3e8 / fps);
       };
-      let _0x5070e0 = 0x0;
-      const _0x38f8cd = () => _0x2abc8e['getVideoTracks']?.()[0x0]?.['requestFrame']?.(),
-        _0x5a10e0 = () => {
-          if (_0x4f98f0 || _0xb9dc) return;
-          const _0x5cd70f = Math['min'](
-            _0x120dd3,
-            (windowObject['performance']['now']() - _0x5070e0) / 0x3e8,
-          );
+      let payload = 0x0;
+      const run3 = () => item['getVideoTracks']?.()[0x0]?.['requestFrame']?.(),
+        handler6 = () => {
+          if (data || options) return;
+          const current2 = Math['min'](duration, (windowObject['performance']['now']() - payload) / 0x3e8);
           try {
-            (_0x338042(_0x5cd70f),
-              _0x38f8cd(),
-              _0x121d6a?.({ stage: 'recording', current: _0x5cd70f, total: _0x120dd3 }));
-            if (_0x5cd70f >= _0x120dd3)
-              _0x560647(() => {
-                _0x3d23fe = windowObject['setTimeout'](() => _0x3f3e36(), 0x3e8 / _0x59922b);
+            (drawFrame(current2),
+              run3(),
+              onProgress?.({ stage: 'recording', current: current2, total: duration }));
+            if (current2 >= duration)
+              run2(() => {
+                index = windowObject['setTimeout'](() => handler5(), 0x3e8 / fps);
               });
-            else _0x3d23fe = windowObject['setTimeout'](_0x5a10e0, 0x3e8 / _0x59922b);
-          } catch (_0x3ddaaa) {
-            _0x3f3e36(_0x3ddaaa);
+            else index = windowObject['setTimeout'](handler6, 0x3e8 / fps);
+          } catch (handle) {
+            handler5(handle);
           }
         };
-      ((_0x4c5d7d['onstart'] = () => {
-        if (_0x4f98f0 || _0xb9dc) return;
+      ((key['onstart'] = () => {
+        if (data || options) return;
         try {
-          (_0x338042(0x0), _0x38f8cd());
-        } catch (_0x803e36) {
-          _0x3f3e36(_0x803e36);
+          (drawFrame(0x0), run3());
+        } catch (state) {
+          handler5(state);
           return;
         }
-        _0x560647(() => {
-          ((_0x5070e0 = windowObject['performance']['now']()), _0x5a10e0());
+        run2(() => {
+          ((payload = windowObject['performance']['now']()), handler6());
         });
       }),
-        _0x4c5d7d['start'](0x3e8));
-    } catch (_0x244525) {
-      _0x3f3e36(_0x244525);
+        key['start'](0x3e8));
+    } catch (config) {
+      handler5(config);
     }
   });
 }
 export async function renderStoryboard3DShotVideo({
-  project: _0x1499d4,
-  shot: _0x3cd90f,
-  importedModelResolver: _0x19e439,
-  signal: _0x34a714,
-  onProgress: _0x18057a,
+  project: project,
+  shot: shot,
+  importedModelResolver: importedModelResolver,
+  signal: signal2,
+  onProgress: onProgress2,
   windowObject: windowObject = globalThis['window'],
-  ..._0x12d0d7
+  ...args
 } = {}) {
-  const _0x1c6567 = structuredClone(_0x1499d4),
-    _0x67b0af =
-      _0x1c6567['scenes']['find']((_0x39e108) => _0x39e108['id'] === _0x3cd90f['sceneId']) ||
-      _0x1c6567['scenes']['find']((_0x1d9161) => _0x1d9161['id'] === _0x1c6567['activeSceneId']),
-    _0x4eaa6b = _0x67b0af?.['shots']['find']((_0x5a1a0e) => _0x5a1a0e['id'] === _0x3cd90f['id']);
-  if (!_0x67b0af || !_0x4eaa6b) throw new Error('找不到需要录制的镜头。');
-  ((_0x1c6567['activeSceneId'] = _0x67b0af['id']), (_0x67b0af['activeShotId'] = _0x3cd90f['id']));
-  const _0x5b7bb1 = resolveStoryboardExportDimensions(_0x12d0d7);
-  ((_0x4eaa6b['camera']['aspectRatio'] = _0x5b7bb1['aspectRatio']),
-    (_0x4eaa6b['animation'] = normalizeStoryboard3DShotAnimation({ ..._0x4eaa6b['animation'], loop: ![] })),
-    _0x4eaa6b['animation']['cameraKeyframes']['forEach']((_0x31c4c5) => {
-      _0x31c4c5['camera']['aspectRatio'] = _0x5b7bb1['aspectRatio'];
+  const scenes = structuredClone(project),
+    sceneId =
+      scenes['scenes']['find']((scope) => scope['id'] === shot['sceneId']) ||
+      scenes['scenes']['find']((input) => input['id'] === scenes['activeSceneId']),
+    args2 = sceneId?.['shots']['find']((output) => output['id'] === shot['id']);
+  if (!sceneId || !args2) throw new Error('找不到需要录制的镜头。');
+  ((scenes['activeSceneId'] = sceneId['id']), (sceneId['activeShotId'] = shot['id']));
+  const aspectRatio = resolveStoryboardExportDimensions(args);
+  ((args2['camera']['aspectRatio'] = aspectRatio['aspectRatio']),
+    (args2['animation'] = normalizeStoryboard3DShotAnimation({ ...args2['animation'], loop: ![] })),
+    args2['animation']['cameraKeyframes']['forEach']((value2) => {
+      value2['camera']['aspectRatio'] = aspectRatio['aspectRatio'];
     }));
-  const _0x3827d4 =
-      _0x12d0d7['mode'] === 'sequence-video'
-        ? new Set((_0x12d0d7['shots'] || [])['map']((_0x425db5) => _0x425db5['id']))
-        : new Set([_0x3cd90f['id']]),
-    _0x19eec2 = _0x1c6567['scenes']
-      ['flatMap']((_0x1693d4) => _0x1693d4['shots'])
-      ['filter']((_0xa295f0) => _0x3827d4['has'](_0xa295f0['id'])),
-    _0x16aa69 = createDirectorVideoPlan(_0x67b0af, _0x19eec2, {
-      ..._0x12d0d7,
-      scenes: _0x1c6567['scenes'],
-      aspectRatio: _0x5b7bb1['aspectRatio'],
+  const map =
+      args['mode'] === 'sequence-video'
+        ? new Set((args['shots'] || [])['map']((value3) => value3['id']))
+        : new Set([shot['id']]),
+    value4 = scenes['scenes']
+      ['flatMap']((value5) => value5['shots'])
+      ['filter']((value6) => map['has'](value6['id'])),
+    plan = createDirectorVideoPlan(sceneId, value4, {
+      ...args,
+      scenes: scenes['scenes'],
+      aspectRatio: aspectRatio['aspectRatio'],
     });
-  if (new Set(_0x16aa69['segments']['map']((_0xd71454) => _0xd71454['scene']['id']))['size'] > 0x1)
+  if (new Set(plan['segments']['map']((value7) => value7['scene']['id']))['size'] > 0x1)
     return recordDirectorSceneSequence({
-      snapshot: _0x1c6567,
-      plan: _0x16aa69,
-      dimensions: _0x5b7bb1,
-      importedModelResolver: _0x19e439,
-      signal: _0x34a714,
-      onProgress: _0x18057a,
+      snapshot: scenes,
+      plan: plan,
+      dimensions: aspectRatio,
+      importedModelResolver: importedModelResolver,
+      signal: signal2,
+      onProgress: onProgress2,
       windowObject: windowObject,
     });
-  const _0x17243a = windowObject['document']['createElement']('div'),
-    _0x2fd136 = new Storyboard3DSceneRuntime({ container: _0x17243a, importedModelResolver: _0x19e439 });
+  const container = windowObject['document']['createElement']('div'),
+    storyboard3DSceneRuntime = new Storyboard3DSceneRuntime({
+      container: container,
+      importedModelResolver: importedModelResolver,
+    });
   try {
-    ((_0x2fd136['timelinePreviewActive'] = !![]),
-      _0x2fd136['sync']({
-        project: _0x1c6567,
-        sceneId: _0x67b0af['id'],
+    ((storyboard3DSceneRuntime['timelinePreviewActive'] = !![]),
+      storyboard3DSceneRuntime['sync']({
+        project: scenes,
+        sceneId: sceneId['id'],
         selectedObjectIds: [],
         activeTool: 'select',
       }),
-      _0x2fd136['resize'](_0x5b7bb1['width'], _0x5b7bb1['height']),
-      await _0x2fd136['waitForCaptureReady']({ signal: _0x34a714 }));
-    const { duration: _0x342f05, fps: _0x1792fd } = _0x16aa69,
-      _0x3b2146 = await _0x2fd136['withCleanCaptureCanvas']((_0x558706) =>
+      storyboard3DSceneRuntime['resize'](aspectRatio['width'], aspectRatio['height']),
+      await storyboard3DSceneRuntime['waitForCaptureReady']({ signal: signal2 }));
+    const { duration: duration2, fps: fps2 } = plan,
+      args3 = await storyboard3DSceneRuntime['withCleanCaptureCanvas']((canvas2) =>
         recordDirectorCanvas({
-          canvas: _0x558706,
-          duration: _0x342f05,
-          fps: _0x1792fd,
-          signal: _0x34a714,
-          onProgress: _0x18057a,
+          canvas: canvas2,
+          duration: duration2,
+          fps: fps2,
+          signal: signal2,
+          onProgress: onProgress2,
           windowObject: windowObject,
-          drawFrame: (_0x5b9124) => {
-            (_0x2fd136['previewTimelineSample'](sampleDirectorVideoPlan(_0x16aa69, _0x5b9124, _0x67b0af)),
-              _0x2fd136['renderNow']());
+          drawFrame: (value8) => {
+            (storyboard3DSceneRuntime['previewTimelineSample'](
+              sampleDirectorVideoPlan(plan, value8, sceneId),
+            ),
+              storyboard3DSceneRuntime['renderNow']());
           },
         }),
       );
-    return { ..._0x3b2146, width: _0x5b7bb1['width'], height: _0x5b7bb1['height'] };
+    return { ...args3, width: aspectRatio['width'], height: aspectRatio['height'] };
   } finally {
-    _0x2fd136['dispose']();
+    storyboard3DSceneRuntime['dispose']();
   }
 }
 async function recordDirectorSceneSequence({
-  snapshot: _0x1198ad,
-  plan: _0x1b59a1,
-  dimensions: _0x1620a4,
-  importedModelResolver: _0x40a780,
-  signal: _0x4176b3,
-  onProgress: _0x36cadc,
-  windowObject: _0x189174,
+  snapshot: snapshot,
+  plan: plan2,
+  dimensions: dimensions,
+  importedModelResolver: importedModelResolver2,
+  signal: signal3,
+  onProgress: onProgress3,
+  windowObject: windowObject2,
 }) {
-  const _0x490317 = new Map(),
-    _0xebbad0 = new Map(),
-    _0x133cc6 = _0x189174['document']['createElement']('canvas');
-  ((_0x133cc6['width'] = _0x1620a4['width']), (_0x133cc6['height'] = _0x1620a4['height']));
-  const _0x3abead = _0x133cc6['getContext']('2d');
-  if (!_0x3abead) throw new Error('无法创建多场景录制画布。');
+  const map2 = new Map(),
+    map3 = new Map(),
+    canvas3 = windowObject2['document']['createElement']('canvas');
+  ((canvas3['width'] = dimensions['width']), (canvas3['height'] = dimensions['height']));
+  const ctx = canvas3['getContext']('2d');
+  if (!ctx) throw new Error('无法创建多场景录制画布。');
   try {
-    for (const _0x16f396 of _0x1b59a1['segments']) {
-      if (_0x490317['has'](_0x16f396['scene']['id'])) continue;
-      if (_0x4176b3?.['aborted']) throw new DOMException('已取消录制', 'AbortError');
-      const _0x3f762b = new Storyboard3DSceneRuntime({
-        container: _0x189174['document']['createElement']('div'),
-        importedModelResolver: _0x40a780,
+    for (const sceneId2 of plan2['segments']) {
+      if (map2['has'](sceneId2['scene']['id'])) continue;
+      if (signal3?.['aborted']) throw new DOMException('已取消录制', 'AbortError');
+      const storyboard3DSceneRuntime2 = new Storyboard3DSceneRuntime({
+        container: windowObject2['document']['createElement']('div'),
+        importedModelResolver: importedModelResolver2,
       });
-      (_0x490317['set'](_0x16f396['scene']['id'], _0x3f762b),
-        (_0x3f762b['timelinePreviewActive'] = !![]),
-        _0x3f762b['sync']({
-          project: _0x1198ad,
-          sceneId: _0x16f396['scene']['id'],
+      (map2['set'](sceneId2['scene']['id'], storyboard3DSceneRuntime2),
+        (storyboard3DSceneRuntime2['timelinePreviewActive'] = !![]),
+        storyboard3DSceneRuntime2['sync']({
+          project: snapshot,
+          sceneId: sceneId2['scene']['id'],
           selectedObjectIds: [],
           activeTool: 'select',
         }),
-        _0x3f762b['resize'](_0x1620a4['width'], _0x1620a4['height']),
-        await _0x3f762b['waitForCaptureReady']({ signal: _0x4176b3 }),
-        _0x36cadc?.({ stage: 'preparing', current: 0x0, total: _0x1b59a1['duration'] }));
+        storyboard3DSceneRuntime2['resize'](dimensions['width'], dimensions['height']),
+        await storyboard3DSceneRuntime2['waitForCaptureReady']({ signal: signal3 }),
+        onProgress3?.({ stage: 'preparing', current: 0x0, total: plan2['duration'] }));
     }
-    const _0x10c9e9 = [..._0x490317],
-      _0x2ff382 = (_0x29f075) =>
-        _0x29f075 < _0x10c9e9['length']
-          ? _0x10c9e9[_0x29f075][0x1]['withCleanCaptureCanvas']((_0x4239b9) => {
-              return (_0xebbad0['set'](_0x10c9e9[_0x29f075][0x0], _0x4239b9), _0x2ff382(_0x29f075 + 0x1));
+    const list2 = [...map2],
+      handler7 = (value9) =>
+        value9 < list2['length']
+          ? list2[value9][0x1]['withCleanCaptureCanvas']((value10) => {
+              return (map3['set'](list2[value9][0x0], value10), handler7(value9 + 0x1));
             })
           : recordDirectorCanvas({
-              canvas: _0x133cc6,
-              duration: _0x1b59a1['duration'],
-              fps: _0x1b59a1['fps'],
-              signal: _0x4176b3,
-              onProgress: _0x36cadc,
-              windowObject: _0x189174,
-              drawFrame: (_0x129983) => {
-                const _0x3f5363 =
-                    _0x1b59a1['segments']['find']((_0x450a45) => _0x129983 < _0x450a45['end']) ||
-                    _0x1b59a1['segments']['at'](-0x1),
-                  _0x145e10 = _0x490317['get'](_0x3f5363['scene']['id']);
-                (_0x145e10['previewTimelineSample'](
-                  sampleDirectorVideoPlan(_0x1b59a1, _0x129983, _0x3f5363['scene']),
-                ),
-                  _0x145e10['renderNow'](),
-                  _0x3abead['clearRect'](0x0, 0x0, _0x133cc6['width'], _0x133cc6['height']),
-                  _0x3abead['drawImage'](
-                    _0xebbad0['get'](_0x3f5363['scene']['id']),
+              canvas: canvas3,
+              duration: plan2['duration'],
+              fps: plan2['fps'],
+              signal: signal3,
+              onProgress: onProgress3,
+              windowObject: windowObject2,
+              drawFrame: (value11) => {
+                const value12 =
+                    plan2['segments']['find']((value13) => value11 < value13['end']) ||
+                    plan2['segments']['at'](-0x1),
+                  value14 = map2['get'](value12['scene']['id']);
+                (value14['previewTimelineSample'](sampleDirectorVideoPlan(plan2, value11, value12['scene'])),
+                  value14['renderNow'](),
+                  ctx['clearRect'](0x0, 0x0, canvas3['width'], canvas3['height']),
+                  ctx['drawImage'](
+                    map3['get'](value12['scene']['id']),
                     0x0,
                     0x0,
-                    _0x133cc6['width'],
-                    _0x133cc6['height'],
+                    canvas3['width'],
+                    canvas3['height'],
                   ));
               },
             });
-    return { ...(await _0x2ff382(0x0)), width: _0x1620a4['width'], height: _0x1620a4['height'] };
+    return { ...(await handler7(0x0)), width: dimensions['width'], height: dimensions['height'] };
   } finally {
-    for (const _0x3fdcc4 of _0x490317['values']()) _0x3fdcc4['dispose']();
+    for (const value15 of map2['values']()) value15['dispose']();
   }
 }

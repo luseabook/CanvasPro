@@ -208,26 +208,26 @@ const SMALL_REGISTRY_FULL_DISCLOSURE_LIMIT = 0xc,
       patterns: Object['freeze']([/\b(?:export|download|zip)\b/i, /(?:导出|下载|打包)/]),
     }),
   ]);
-function normalizeCommands(_0xe9befb = []) {
-  return Array['isArray'](_0xe9befb) ? _0xe9befb['filter']((_0x323152) => _0x323152?.['id']) : [];
+function normalizeCommands(list = []) {
+  return Array['isArray'](list) ? list['filter']((value) => value?.['id']) : [];
 }
-function matchesAny(_0x4c9f3a, _0x16e218 = []) {
-  return _0x16e218['some']((_0x537cc8) => _0x537cc8['test'](_0x4c9f3a));
+function matchesAny(item, list2 = []) {
+  return list2['some']((key) => key['test'](item));
 }
-function addCommandPriority(_0x2a36aa, _0x3fbfce = [], _0x186f89 = 0x0) {
-  for (const _0x446577 of _0x3fbfce) {
-    const _0x53e1c4 = String(_0x446577 || '')['trim']();
-    if (!_0x53e1c4) continue;
-    _0x2a36aa['set'](_0x53e1c4, Math['max'](_0x2a36aa['get'](_0x53e1c4) || 0x0, _0x186f89));
+function addCommandPriority(map, index = [], result = 0x0) {
+  for (const data of index) {
+    const enabled = String(data || '')['trim']();
+    if (!enabled) continue;
+    map['set'](enabled, Math['max'](map['get'](enabled) || 0x0, result));
   }
 }
-function findExplicitCommandIds(_0x2310b7, _0x47a1c0 = []) {
-  const _0x16489b = String(_0x2310b7 || '')['toLowerCase']();
-  return _0x47a1c0['filter']((_0x238536) => _0x16489b['includes'](String(_0x238536)['toLowerCase']()));
+function findExplicitCommandIds(options, list3 = []) {
+  const list4 = String(options || '')['toLowerCase']();
+  return list3['filter']((target) => list4['includes'](String(target)['toLowerCase']()));
 }
-function findIntentCommandIds(_0x153f59 = '') {
-  return COMMAND_INTENT_PATTERNS['flatMap']((_0x3cd5ef) =>
-    matchesAny(_0x153f59, _0x3cd5ef['patterns']) ? _0x3cd5ef['commandIds'] : [],
+function findIntentCommandIds(source = '') {
+  return COMMAND_INTENT_PATTERNS['flatMap']((next) =>
+    matchesAny(source, next['patterns']) ? next['commandIds'] : [],
   );
 }
 function inferNamespaces({
@@ -235,7 +235,7 @@ function inferNamespaces({
   intent: intent = null,
   targetKind: targetKind = '',
 } = {}) {
-  const _0x1cc9d2 = [
+  const list5 = [
       intent?.['namespace'],
       intent?.['route'],
       intent?.['capability'],
@@ -243,30 +243,28 @@ function inferNamespaces({
       intent?.['operation'],
       ...(Array['isArray'](intent?.['namespaces']) ? intent['namespaces'] : []),
     ]
-      ['map']((_0x32edeb) =>
-        String(_0x32edeb || '')
+      ['map']((current) =>
+        String(current || '')
           ['trim']()
           ['toLowerCase'](),
       )
       ['filter'](Boolean),
-    _0x23379b = [String(userMessage || '')['trim'](), ..._0x1cc9d2]['join']('\x20'),
-    _0x17ae91 = [];
-  for (const [_0x39300e, _0x2590e8] of Object['entries'](NAMESPACE_PATTERNS)) {
-    (_0x1cc9d2['includes'](_0x39300e) || matchesAny(_0x23379b, _0x2590e8)) && _0x17ae91['push'](_0x39300e);
+    entry = [String(userMessage || '')['trim'](), ...list5]['join']('\x20'),
+    list6 = [];
+  for (const [record, payload] of Object['entries'](NAMESPACE_PATTERNS)) {
+    (list5['includes'](record) || matchesAny(entry, payload)) && list6['push'](record);
   }
   return (
     targetKind &&
       (intent?.['canvasAction'] === !![] || intent?.['mutatesCanvas'] === !![]) &&
-      !_0x17ae91['includes']('generation') &&
-      _0x17ae91['push']('generation'),
-    _0x17ae91
+      !list6['includes']('generation') &&
+      list6['push']('generation'),
+    list6
   );
 }
-function summarizeNamespace(_0x2ade02, _0x25db6b) {
-  const _0x145df8 = (COMMAND_NAMESPACES[_0x2ade02] || [])['filter']((_0x3e6237) =>
-    _0x25db6b['has'](_0x3e6237),
-  );
-  return { id: _0x2ade02, commandIds: _0x145df8 };
+function summarizeNamespace(id, map2) {
+  const commandIds = (COMMAND_NAMESPACES[id] || [])['filter']((handle) => map2['has'](handle));
+  return { id: id, commandIds: commandIds };
 }
 export function routeAgentCapabilities({
   commands: commands = [],
@@ -277,62 +275,66 @@ export function routeAgentCapabilities({
   maxCommands: maxCommands = DEFAULT_COMMAND_LIMIT,
   requiredCommandIds: requiredCommandIds = [],
 } = {}) {
-  const _0x219b75 = normalizeCommands(commands),
-    _0x2dff5a = new Set(_0x219b75['map']((_0xd357f7) => _0xd357f7['id'])),
-    _0x1c2e0f = _0x219b75['map']((_0x2fd2c3) => _0x2fd2c3['id']),
-    _0x509bcb = inferNamespaces({ userMessage: userMessage, intent: intent, targetKind: targetKind });
-  if (_0x219b75['length'] <= SMALL_REGISTRY_FULL_DISCLOSURE_LIMIT)
+  const commands2 = normalizeCommands(commands),
+    map3 = new Set(commands2['map']((state) => state['id'])),
+    includedCommandIds = commands2['map']((config) => config['id']),
+    selectedNamespaces = inferNamespaces({
+      userMessage: userMessage,
+      intent: intent,
+      targetKind: targetKind,
+    });
+  if (commands2['length'] <= SMALL_REGISTRY_FULL_DISCLOSURE_LIMIT)
     return {
-      commands: _0x219b75,
+      commands: commands2,
       catalog: {
         mode: 'full',
-        selectedNamespaces: _0x509bcb,
-        includedCommandIds: _0x1c2e0f,
+        selectedNamespaces: selectedNamespaces,
+        includedCommandIds: includedCommandIds,
         deferredCommandIds: [],
         namespaces: Object['keys'](COMMAND_NAMESPACES)
-          ['map']((_0x404be3) => summarizeNamespace(_0x404be3, _0x2dff5a))
-          ['filter']((_0x3abe7c) => _0x3abe7c['commandIds']['length'] > 0x0),
-        totalAvailable: _0x219b75['length'],
+          ['map']((scope) => summarizeNamespace(scope, map3))
+          ['filter']((input) => input['commandIds']['length'] > 0x0),
+        totalAvailable: commands2['length'],
       },
     };
-  const _0xe0c03e = new Map();
-  (addCommandPriority(_0xe0c03e, ALWAYS_AVAILABLE_COMMANDS, 0x15e),
-    addCommandPriority(_0xe0c03e, requiredCommandIds, 0x2bc),
-    _0x509bcb['forEach']((_0x2f1784, _0x3540ca) => {
-      addCommandPriority(_0xe0c03e, COMMAND_NAMESPACES[_0x2f1784], 0xc8 - _0x3540ca);
+  const map4 = new Map();
+  (addCommandPriority(map4, ALWAYS_AVAILABLE_COMMANDS, 0x15e),
+    addCommandPriority(map4, requiredCommandIds, 0x2bc),
+    selectedNamespaces['forEach']((output, value2) => {
+      addCommandPriority(map4, COMMAND_NAMESPACES[output], 0xc8 - value2);
     }));
-  for (const _0x6e56dd of Array['isArray'](skills) ? skills : []) {
-    addCommandPriority(_0xe0c03e, _0x6e56dd?.['commands'], 0x190);
+  for (const value3 of Array['isArray'](skills) ? skills : []) {
+    addCommandPriority(map4, value3?.['commands'], 0x190);
   }
-  (addCommandPriority(_0xe0c03e, findIntentCommandIds(userMessage), 0x1f4),
-    addCommandPriority(_0xe0c03e, findExplicitCommandIds(userMessage, _0x1c2e0f), 0x258));
-  const _0x167e43 = Number(maxCommands),
-    _0x1a6332 = Math['max'](
+  (addCommandPriority(map4, findIntentCommandIds(userMessage), 0x1f4),
+    addCommandPriority(map4, findExplicitCommandIds(userMessage, includedCommandIds), 0x258));
+  const value4 = Number(maxCommands),
+    value5 = Math['max'](
       ALWAYS_AVAILABLE_COMMANDS['length'],
-      Number['isFinite'](_0x167e43) ? Math['trunc'](_0x167e43) : DEFAULT_COMMAND_LIMIT,
+      Number['isFinite'](value4) ? Math['trunc'](value4) : DEFAULT_COMMAND_LIMIT,
     ),
-    _0x5b67b6 = new Map(_0x1c2e0f['map']((_0x146bc8, _0x31254c) => [_0x146bc8, _0x31254c])),
-    _0x5e1189 = Array['from'](_0xe0c03e['entries']())
-      ['filter'](([_0x140239]) => _0x2dff5a['has'](_0x140239))
-      ['sort']((_0xe3f0f2, _0x4982d3) => {
-        if (_0x4982d3[0x1] !== _0xe3f0f2[0x1]) return _0x4982d3[0x1] - _0xe3f0f2[0x1];
-        return _0x5b67b6['get'](_0xe3f0f2[0x0]) - _0x5b67b6['get'](_0x4982d3[0x0]);
+    map5 = new Map(includedCommandIds['map']((value6, value7) => [value6, value7])),
+    value8 = Array['from'](map4['entries']())
+      ['filter'](([value9]) => map3['has'](value9))
+      ['sort']((value10, value11) => {
+        if (value11[0x1] !== value10[0x1]) return value11[0x1] - value10[0x1];
+        return map5['get'](value10[0x0]) - map5['get'](value11[0x0]);
       })
-      ['slice'](0x0, _0x1a6332)
-      ['map'](([_0x112913]) => _0x112913),
-    _0x25174d = new Set(_0x5e1189),
-    _0x4f0076 = _0x219b75['filter']((_0x41437b) => _0x25174d['has'](_0x41437b['id']));
+      ['slice'](0x0, value5)
+      ['map'](([value12]) => value12),
+    map6 = new Set(value8),
+    commands3 = commands2['filter']((value13) => map6['has'](value13['id']));
   return {
-    commands: _0x4f0076,
+    commands: commands3,
     catalog: {
       mode: 'progressive',
-      selectedNamespaces: _0x509bcb,
-      includedCommandIds: _0x4f0076['map']((_0x31aa2e) => _0x31aa2e['id']),
-      deferredCommandIds: _0x1c2e0f['filter']((_0x90bc98) => !_0x25174d['has'](_0x90bc98)),
+      selectedNamespaces: selectedNamespaces,
+      includedCommandIds: commands3['map']((value14) => value14['id']),
+      deferredCommandIds: includedCommandIds['filter']((value15) => !map6['has'](value15)),
       namespaces: Object['keys'](COMMAND_NAMESPACES)
-        ['map']((_0x322809) => summarizeNamespace(_0x322809, _0x2dff5a))
-        ['filter']((_0x419235) => _0x419235['commandIds']['length'] > 0x0),
-      totalAvailable: _0x219b75['length'],
+        ['map']((value16) => summarizeNamespace(value16, map3))
+        ['filter']((value17) => value17['commandIds']['length'] > 0x0),
+      totalAvailable: commands2['length'],
     },
   };
 }

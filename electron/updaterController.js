@@ -8,267 +8,273 @@ export const UPDATER_STATES = Object.freeze({
   ERROR: 'error',
 });
 const DEFAULT_DOWNLOAD_RETRY_DELAYS_MS = [0xbb8, 0x2710];
-function normalizeRetryDelays(_0x5dfc3d) {
-  return (Array.isArray(_0x5dfc3d) ? _0x5dfc3d : DEFAULT_DOWNLOAD_RETRY_DELAYS_MS)
-    .map((_0x16f427) => Number(_0x16f427))
-    .filter((_0x4632f2) => Number.isFinite(_0x4632f2) && _0x4632f2 >= 0);
+function normalizeRetryDelays(value) {
+  return (Array.isArray(value) ? value : DEFAULT_DOWNLOAD_RETRY_DELAYS_MS)
+    .map((item) => Number(item))
+    .filter((count) => Number.isFinite(count) && count >= 0);
 }
-function getErrorMessage(_0x53d0f6, _0x20ce65) {
+function getErrorMessage(key, index) {
   // Raw updater exceptions may contain entire HTTP responses and request URLs.
   // Keep technical details in diagnostics, not in renderer notifications.
-  return _0x20ce65 || '应用更新失败，请稍后重试。';
+  return index || '应用更新失败，请稍后重试。';
 }
-function waitForRetry(_0x1bb0a9, _0x16ce19) {
-  return new Promise((_0x16f97a) => {
-    _0x1bb0a9(_0x16f97a, _0x16ce19);
+function waitForRetry(handler, result) {
+  return new Promise((data) => {
+    handler(data, result);
   });
 }
-export function createUpdaterController(_0xfc6c5e = {}) {
-  const _0x5775d8 = _0xfc6c5e.autoUpdater;
-  if (!_0x5775d8) throw new Error('autoUpdater is required');
-  const _0x49c840 =
-      typeof _0xfc6c5e.normalizeInfo === 'function'
-        ? _0xfc6c5e.normalizeInfo
-        : (_0x120636) => _0x120636 || null,
-    _0x3dbc79 = typeof _0xfc6c5e.logEvent === 'function' ? _0xfc6c5e.logEvent : () => {},
-    _0x59037f = typeof _0xfc6c5e.sendEvent === 'function' ? _0xfc6c5e.sendEvent : () => {},
-    _0x25fdd2 = typeof _0xfc6c5e.setProgressBar === 'function' ? _0xfc6c5e.setProgressBar : () => {},
-    _0x41b952 =
-      typeof _0xfc6c5e.prepareBeforeInstall === 'function'
-        ? _0xfc6c5e.prepareBeforeInstall
-        : typeof _0xfc6c5e.stopBeforeInstall === 'function'
-          ? _0xfc6c5e.stopBeforeInstall
+export function createUpdaterController(options2 = {}) {
+  const enabled = options2.autoUpdater;
+  if (!enabled) throw new Error('autoUpdater is required');
+  const run =
+      typeof options2.normalizeInfo === 'function' ? options2.normalizeInfo : (target) => target || null,
+    handler2 = typeof options2.logEvent === 'function' ? options2.logEvent : () => {},
+    handler3 = typeof options2.sendEvent === 'function' ? options2.sendEvent : () => {},
+    handler4 = typeof options2.setProgressBar === 'function' ? options2.setProgressBar : () => {},
+    handler5 =
+      typeof options2.prepareBeforeInstall === 'function'
+        ? options2.prepareBeforeInstall
+        : typeof options2.stopBeforeInstall === 'function'
+          ? options2.stopBeforeInstall
           : () => {},
-    _0x4226d8 = typeof _0xfc6c5e.setTimeoutFn === 'function' ? _0xfc6c5e.setTimeoutFn : setTimeout,
-    _0x3ddc17 = normalizeRetryDelays(_0xfc6c5e.retryDelaysMs),
-    _0x283e82 = () => {
-      if (typeof _0xfc6c5e.isPackaged === 'function') return Boolean(_0xfc6c5e.isPackaged());
-      return Boolean(_0xfc6c5e.isPackaged);
+    source = typeof options2.setTimeoutFn === 'function' ? options2.setTimeoutFn : setTimeout,
+    maxRetries = normalizeRetryDelays(options2.retryDelaysMs),
+    handler6 = () => {
+      if (typeof options2.isPackaged === 'function') return Boolean(options2.isPackaged());
+      return Boolean(options2.isPackaged);
     };
-  let _0x509440 = false,
-    _0x283bb9 = UPDATER_STATES.IDLE,
-    _0x3adb5b = null,
-    _0x2ee29f = null,
-    _0x37cc95 = null,
-    _0x4a1cb0 = 0,
-    _0x348df0 = false;
+  let next = false,
+    state = UPDATER_STATES.IDLE,
+    latestInfo = null,
+    latestEvent = null,
+    current = null,
+    retryCount = 0,
+    manual2 = false;
   let checkPromise = null;
   let checkErrorReported = false;
   let updaterEventSequence = 0;
-  function _0x72ba3c() {
+  function getState() {
     return {
-      state: _0x283bb9,
-      latestEvent: _0x2ee29f,
-      latestInfo: _0x3adb5b,
-      retryCount: _0x4a1cb0,
-      maxRetries: _0x3ddc17.length,
+      state: state,
+      latestEvent: latestEvent,
+      latestInfo: latestInfo,
+      retryCount: retryCount,
+      maxRetries: maxRetries.length,
       canCheck: true,
-      canDownload: _0x283bb9 === UPDATER_STATES.AVAILABLE || _0x283bb9 === UPDATER_STATES.ERROR,
-      canInstall: _0x283bb9 === UPDATER_STATES.DOWNLOADED,
+      canDownload: state === UPDATER_STATES.AVAILABLE || state === UPDATER_STATES.ERROR,
+      canInstall: state === UPDATER_STATES.DOWNLOADED,
     };
   }
-  function _0x52daf2(_0x5f3e34) {
-    _0x283bb9 = _0x5f3e34;
+  function run2(entry) {
+    state = entry;
   }
-  function _0x5042cb(_0x32f792, _0x509cdf = {}) {
-    const _0x3bee79 = { type: _0x32f792, state: _0x283bb9, eventId: ++updaterEventSequence, ..._0x509cdf };
-    _0x2ee29f = _0x3bee79;
-    if (_0x3bee79.info) _0x3adb5b = _0x3bee79.info;
-    return (_0x59037f(_0x3bee79), _0x3bee79);
+  function run3(type, args = {}) {
+    const record = { type: type, state: state, eventId: ++updaterEventSequence, ...args };
+    latestEvent = record;
+    if (record.info) latestInfo = record.info;
+    return (handler3(record), record);
   }
-  function _0x273cb5(_0x36abd3, _0x2f8fde, _0x3bef38, _0x59a46 = {}, _0x3cf9f6 = null) {
-    _0x3dbc79({
-      type: _0x36abd3,
-      level: _0x2f8fde,
+  function run4(type2, level, message, context = {}, error2 = null) {
+    handler2({
+      type: type2,
+      level: level,
       source: 'main',
-      message: _0x3bef38,
-      context: _0x59a46,
-      ...(_0x3cf9f6 ? { error: _0x3cf9f6 } : {}),
+      message: message,
+      context: context,
+      ...(error2 ? { error: error2 } : {}),
     });
   }
-  function _0x2581ff(_0x80ed80, _0x14ad70, _0x54deb9, _0x3179cf = {}) {
-    (_0x52daf2(UPDATER_STATES.ERROR),
-      _0x25fdd2(-1),
-      _0x273cb5(_0x80ed80, 'error', _0x14ad70, _0x3179cf, _0x54deb9));
+  function run5(payload, handle, config, scope = {}) {
+    (run2(UPDATER_STATES.ERROR), handler4(-1), run4(payload, 'error', handle, scope, config));
   }
   function reportCheckError(error, manual) {
     if (checkErrorReported) return;
     checkErrorReported = true;
-    _0x2581ff('updater.check_failed', 'Application update check failed', error, { manual });
-    _0x5042cb('error', { info: _0x3adb5b, message: getErrorMessage(error, '暂时无法检查更新，请稍后重试。'), manual });
+    run5('updater.check_failed', 'Application update check failed', error, { manual });
+    run3('error', {
+      info: latestInfo,
+      message: getErrorMessage(error, '暂时无法检查更新，请稍后重试。'),
+      manual,
+    });
   }
-  function _0x5000be() {
-    if (_0x509440) return;
-    ((_0x509440 = true),
-      (_0x5775d8.autoDownload = false),
-      (_0x5775d8.autoInstallOnAppQuit = false),
-      _0x5775d8.on('error', (_0x572908) => {
-        if (_0x283bb9 === UPDATER_STATES.DOWNLOADING) {
-          _0x273cb5(
+  function installHandlers() {
+    if (next) return;
+    ((next = true),
+      (enabled.autoDownload = false),
+      (enabled.autoInstallOnAppQuit = false),
+      enabled.on('error', (input) => {
+        if (state === UPDATER_STATES.DOWNLOADING) {
+          run4(
             'updater.download_error_event',
             'error',
             'Application updater emitted an error while downloading',
-            { retryCount: _0x4a1cb0 },
-            _0x572908,
+            { retryCount: retryCount },
+            input,
           );
           return;
         }
-        reportCheckError(_0x572908, _0x348df0);
+        reportCheckError(input, manual2);
       }),
-      _0x5775d8.on('checking-for-update', () => {
-        (_0x52daf2(UPDATER_STATES.CHECKING),
-          _0x273cb5('updater.checking', 'info', 'Checking for application update'),
-          _0x5042cb('checking', { info: _0x3adb5b, manual: _0x348df0 }));
+      enabled.on('checking-for-update', () => {
+        (run2(UPDATER_STATES.CHECKING),
+          run4('updater.checking', 'info', 'Checking for application update'),
+          run3('checking', { info: latestInfo, manual: manual2 }));
       }),
-      _0x5775d8.on('update-available', (_0xc4e999) => {
-        ((_0x3adb5b = _0x49c840(_0xc4e999)),
-          (_0x4a1cb0 = 0),
-          _0x52daf2(UPDATER_STATES.AVAILABLE),
-          _0x273cb5('updater.available', 'info', 'Application update available', {
-            version: _0xc4e999?.version || '',
+      enabled.on('update-available', (version) => {
+        ((latestInfo = run(version)),
+          (retryCount = 0),
+          run2(UPDATER_STATES.AVAILABLE),
+          run4('updater.available', 'info', 'Application update available', {
+            version: version?.version || '',
           }),
-          _0x5042cb('available', { info: _0x3adb5b, manual: _0x348df0 }),
-          (_0x348df0 = false));
+          run3('available', { info: latestInfo, manual: manual2 }),
+          (manual2 = false));
       }),
-      _0x5775d8.on('update-not-available', (_0x3774d4) => {
-        ((_0x3adb5b = _0x49c840(_0x3774d4)),
-          (_0x4a1cb0 = 0),
-          _0x52daf2(UPDATER_STATES.IDLE),
-          _0x25fdd2(-1),
-          _0x273cb5('updater.not_available', 'info', 'Application update not available', {
-            version: _0x3774d4?.version || '',
+      enabled.on('update-not-available', (version2) => {
+        ((latestInfo = run(version2)),
+          (retryCount = 0),
+          run2(UPDATER_STATES.IDLE),
+          handler4(-1),
+          run4('updater.not_available', 'info', 'Application update not available', {
+            version: version2?.version || '',
           }),
-          _0x5042cb('not-available', { info: _0x3adb5b, manual: _0x348df0 }),
-          (_0x348df0 = false));
+          run3('not-available', { info: latestInfo, manual: manual2 }),
+          (manual2 = false));
       }),
-      _0x5775d8.on('download-progress', (_0x5ee9b2) => {
-        const _0x3ceb47 = Math.max(0, Math.min(100, Number(_0x5ee9b2?.percent || 0)));
-        (_0x52daf2(UPDATER_STATES.DOWNLOADING),
-          _0x25fdd2(_0x3ceb47 / 100),
-          _0x5042cb('download-progress', {
-            info: _0x3adb5b,
-            percent: _0x3ceb47,
-            transferred: Number(_0x5ee9b2?.transferred || 0),
-            total: Number(_0x5ee9b2?.total || 0),
-            bytesPerSecond: Number(_0x5ee9b2?.bytesPerSecond || 0),
-            retryCount: _0x4a1cb0,
-            maxRetries: _0x3ddc17.length,
+      enabled.on('download-progress', (output) => {
+        const percent = Math.max(0, Math.min(100, Number(output?.percent || 0)));
+        (run2(UPDATER_STATES.DOWNLOADING),
+          handler4(percent / 100),
+          run3('download-progress', {
+            info: latestInfo,
+            percent: percent,
+            transferred: Number(output?.transferred || 0),
+            total: Number(output?.total || 0),
+            bytesPerSecond: Number(output?.bytesPerSecond || 0),
+            retryCount: retryCount,
+            maxRetries: maxRetries.length,
           }));
       }),
-      _0x5775d8.on('update-downloaded', (_0x34c289) => {
-        ((_0x3adb5b = _0x49c840(_0x34c289)),
-          (_0x4a1cb0 = 0),
-          _0x52daf2(UPDATER_STATES.DOWNLOADED),
-          _0x25fdd2(-1),
-          _0x273cb5('updater.downloaded', 'info', 'Application update downloaded', {
-            version: _0x34c289?.version || '',
+      enabled.on('update-downloaded', (version3) => {
+        ((latestInfo = run(version3)),
+          (retryCount = 0),
+          run2(UPDATER_STATES.DOWNLOADED),
+          handler4(-1),
+          run4('updater.downloaded', 'info', 'Application update downloaded', {
+            version: version3?.version || '',
           }),
-          _0x5042cb('downloaded', { info: _0x3adb5b }));
+          run3('downloaded', { info: latestInfo }));
       }));
   }
-  function _0x4b95e7(options = {}) {
-    _0x5000be();
-    if (!_0x283e82()) return Promise.resolve({ ok: false, skipped: true, reason: 'not-packaged', state: _0x283bb9 });
+  function checkForUpdates(options = {}) {
+    installHandlers();
+    if (!handler6())
+      return Promise.resolve({ ok: false, skipped: true, reason: 'not-packaged', state: state });
     if (checkPromise) {
-      _0x348df0 = _0x348df0 || options.manual === true;
+      manual2 = manual2 || options.manual === true;
       return checkPromise;
     }
     checkErrorReported = false;
-    _0x348df0 = options.manual === true;
-    _0x52daf2(UPDATER_STATES.CHECKING);
-    checkPromise = Promise.resolve().then(() => _0x5775d8.checkForUpdates())
-      .then(() => ({ ok: !checkErrorReported, state: _0x283bb9 }))
-      .catch(error => {
-        reportCheckError(error, _0x348df0);
+    manual2 = options.manual === true;
+    run2(UPDATER_STATES.CHECKING);
+    checkPromise = Promise.resolve()
+      .then(() => enabled.checkForUpdates())
+      .then(() => ({ ok: !checkErrorReported, state: state }))
+      .catch((error) => {
+        reportCheckError(error, manual2);
         throw error;
-      }).finally(() => { checkPromise = null; _0x348df0 = false; });
+      })
+      .finally(() => {
+        checkPromise = null;
+        manual2 = false;
+      });
     return checkPromise;
   }
-  async function _0x3c9917(_0x4f3a95) {
-    ((_0x4a1cb0 = _0x4f3a95),
-      _0x52daf2(UPDATER_STATES.DOWNLOADING),
-      _0x5042cb(_0x4f3a95 === 0 ? 'download-started' : 'download-retry', {
-        info: _0x3adb5b,
-        retryCount: _0x4f3a95,
-        maxRetries: _0x3ddc17.length,
-        retryDelayMs: _0x4f3a95 > 0 ? _0x3ddc17[_0x4f3a95 - 1] || 0 : 0,
+  async function run6(retryCount2) {
+    ((retryCount = retryCount2),
+      run2(UPDATER_STATES.DOWNLOADING),
+      run3(retryCount2 === 0 ? 'download-started' : 'download-retry', {
+        info: latestInfo,
+        retryCount: retryCount2,
+        maxRetries: maxRetries.length,
+        retryDelayMs: retryCount2 > 0 ? maxRetries[retryCount2 - 1] || 0 : 0,
       }));
     try {
-      return (await _0x5775d8.downloadUpdate(), { ok: true, state: _0x283bb9 });
-    } catch (_0x34a05b) {
-      const _0xde2101 = _0x3ddc17[_0x4f3a95];
-      _0x273cb5(
+      return (await enabled.downloadUpdate(), { ok: true, state: state });
+    } catch (value2) {
+      const retryDelayMs = maxRetries[retryCount2];
+      run4(
         'updater.download_failed',
         'error',
         'Application update download failed',
-        { attempt: _0x4f3a95 + 1, maxAttempts: _0x3ddc17.length + 1, version: _0x3adb5b?.version || '' },
-        _0x34a05b,
+        { attempt: retryCount2 + 1, maxAttempts: maxRetries.length + 1, version: latestInfo?.version || '' },
+        value2,
       );
-      if (Number.isFinite(_0xde2101))
+      if (Number.isFinite(retryDelayMs))
         return (
-          _0x273cb5('updater.download_retry', 'warn', 'Retrying application update download', {
-            retryCount: _0x4f3a95 + 1,
-            retryDelayMs: _0xde2101,
-            version: _0x3adb5b?.version || '',
+          run4('updater.download_retry', 'warn', 'Retrying application update download', {
+            retryCount: retryCount2 + 1,
+            retryDelayMs: retryDelayMs,
+            version: latestInfo?.version || '',
           }),
-          await waitForRetry(_0x4226d8, _0xde2101),
-          _0x3c9917(_0x4f3a95 + 1)
+          await waitForRetry(source, retryDelayMs),
+          run6(retryCount2 + 1)
         );
-      ((_0x4a1cb0 = _0x3ddc17.length),
-        _0x2581ff('updater.download_exhausted', 'Application update download retries exhausted', _0x34a05b, {
-          retryCount: _0x4a1cb0,
-          version: _0x3adb5b?.version || '',
+      ((retryCount = maxRetries.length),
+        run5('updater.download_exhausted', 'Application update download retries exhausted', value2, {
+          retryCount: retryCount,
+          version: latestInfo?.version || '',
         }),
-        _0x5042cb('download-failed', {
-          info: _0x3adb5b,
-          retryCount: _0x4a1cb0,
-          maxRetries: _0x3ddc17.length,
-          message: getErrorMessage(_0x34a05b, '下载更新失败，请稍后再试'),
+        run3('download-failed', {
+          info: latestInfo,
+          retryCount: retryCount,
+          maxRetries: maxRetries.length,
+          message: getErrorMessage(value2, '下载更新失败，请稍后再试'),
         }));
-      throw _0x34a05b;
+      throw value2;
     }
   }
-  async function _0x458029() {
-    _0x5000be();
-    if (_0x37cc95) return _0x37cc95;
+  async function downloadUpdate() {
+    installHandlers();
+    if (current) return current;
     return (
-      (_0x37cc95 = _0x3c9917(0).finally(() => {
-        _0x37cc95 = null;
+      (current = run6(0).finally(() => {
+        current = null;
       })),
-      _0x37cc95
+      current
     );
   }
-  async function _0xa2e7d4() {
-    (_0x5000be(),
-      _0x52daf2(UPDATER_STATES.INSTALLING),
-      _0x273cb5('updater.install_requested', 'info', 'Application update install requested', {
-        version: _0x3adb5b?.version || '',
+  async function installDownloadedUpdate() {
+    (installHandlers(),
+      run2(UPDATER_STATES.INSTALLING),
+      run4('updater.install_requested', 'info', 'Application update install requested', {
+        version: latestInfo?.version || '',
       }),
-      _0x5042cb('installing', { info: _0x3adb5b }));
+      run3('installing', { info: latestInfo }));
     try {
       return (
-        await Promise.resolve(_0x41b952()),
-        _0x5775d8.quitAndInstall(false, true),
-        { ok: true, state: _0x283bb9 }
+        await Promise.resolve(handler5()),
+        enabled.quitAndInstall(false, true),
+        { ok: true, state: state }
       );
-    } catch (_0x3760a7) {
-      (_0x2581ff('updater.install_failed', 'Application update install failed', _0x3760a7, {
-        version: _0x3adb5b?.version || '',
+    } catch (value3) {
+      (run5('updater.install_failed', 'Application update install failed', value3, {
+        version: latestInfo?.version || '',
       }),
-        _0x5042cb('error', {
-          info: _0x3adb5b,
-          message: getErrorMessage(_0x3760a7, '保存或重启安装未完成，请保存工程后重试。'),
+        run3('error', {
+          info: latestInfo,
+          message: getErrorMessage(value3, '保存或重启安装未完成，请保存工程后重试。'),
           manual: true,
         }));
-      throw _0x3760a7;
+      throw value3;
     }
   }
   return {
-    installHandlers: _0x5000be,
-    checkForUpdates: _0x4b95e7,
-    downloadUpdate: _0x458029,
-    installDownloadedUpdate: _0xa2e7d4,
-    getState: _0x72ba3c,
-    getLatestEvent: () => _0x2ee29f,
+    installHandlers: installHandlers,
+    checkForUpdates: checkForUpdates,
+    downloadUpdate: downloadUpdate,
+    installDownloadedUpdate: installDownloadedUpdate,
+    getState: getState,
+    getLatestEvent: () => latestEvent,
   };
 }

@@ -1,1 +1,368 @@
-import{cloneStoryboard3DProject,syncStoryboard3DShotFromCameraObject}from'./projectModel.js';import{recordDirectorDeletions}from'./directorRecovery.js';function isPromise(_0x3f39a){return _0x3f39a&&typeof _0x3f39a["then"]==="function";}function commandMethod(_0x4aed8f,_0x2968d6){if(_0x2968d6==="execute")return _0x4aed8f?.["execute"]||_0x4aed8f?.['do'];if(_0x2968d6==='redo')return _0x4aed8f?.["redo"]||_0x4aed8f?.["execute"]||_0x4aed8f?.['do'];return _0x4aed8f?.["undo"];}function invoke(_0x3f78ad,_0x30451c,_0xe714d6){const _0x183639=commandMethod(_0x3f78ad,_0x30451c);if(typeof _0x183639!=="function")throw new TypeError("Command "+(_0x3f78ad?.["type"]||"unknown")+" has no "+_0x30451c+" handler");return _0x183639["call"](_0x3f78ad,_0xe714d6);}function createCompositeCommand(_0x12bec4,_0x22cf3b){const _0x4b3094=[..._0x22cf3b];return{'type':"transaction",'label':_0x12bec4,'commands':_0x4b3094,'execute'(_0x11b44e){let _0x28a568=null;return _0x4b3094['forEach'](_0x3f163a=>{if(_0x28a568){_0x28a568=_0x28a568['then'](()=>invoke(_0x3f163a,"redo",_0x11b44e));return;}const _0x2d3c8f=invoke(_0x3f163a,"redo",_0x11b44e);if(isPromise(_0x2d3c8f))_0x28a568=Promise['resolve'](_0x2d3c8f);}),_0x28a568;},'undo'(_0x6f8e00){let _0x31f03c=null;return[..._0x4b3094]["reverse"]()["forEach"](_0x4ad43a=>{if(_0x31f03c){_0x31f03c=_0x31f03c['then'](()=>invoke(_0x4ad43a,"undo",_0x6f8e00));return;}const _0x4f4036=invoke(_0x4ad43a,'undo',_0x6f8e00);if(isPromise(_0x4f4036))_0x31f03c=Promise["resolve"](_0x4f4036);}),_0x31f03c;}};}export class CommandHistory{constructor({context:_0x7abce2,limit:limit=0x64,onChange:_0x44874c}={}){this["context"]=_0x7abce2,this["limit"]=Math["max"](0x1,Math["round"](Number(limit)||0x64)),this["onChange"]=typeof _0x44874c==="function"?_0x44874c:null,this["undoStack"]=[],this["redoStack"]=[],this["transaction"]=null,this['busy']=![];}["_notify"](_0x55b892,_0x212bbf=null){this["onChange"]?.(this["getSnapshot"](),{'reason':_0x55b892,'command':_0x212bbf});}['_record'](_0x689f17){if(this["transaction"]){this["transaction"]["commands"]["push"](_0x689f17),this["_notify"]('execute-in-transaction',_0x689f17);return;}const _0x4176dd=this['undoStack'][this['undoStack']["length"]-0x1],_0x5d0463=_0x4176dd&&_0x4176dd["mergeKey"]&&_0x4176dd["mergeKey"]===_0x689f17["mergeKey"]&&typeof _0x4176dd['mergeWith']==="function"&&_0x4176dd["mergeWith"](_0x689f17)===!![];if(!_0x5d0463)this['undoStack']['push'](_0x689f17);if(this["undoStack"]["length"]>this["limit"])this['undoStack']['splice'](0x0,this["undoStack"]['length']-this['limit']);this["redoStack"]=[],this["_notify"](_0x5d0463?"merge":"execute",_0x5d0463?_0x4176dd:_0x689f17);}["_run"](_0x3cf301,_0x415f93,_0x5588fd,_0x33d213){if(this["busy"])throw new Error('Command\x20history\x20is\x20busy');let _0x304cae;try{_0x304cae=invoke(_0x3cf301,_0x415f93,this["context"]);}catch(_0x185451){_0x33d213?.(_0x185451);throw _0x185451;}if(!isPromise(_0x304cae))return _0x5588fd?.(_0x304cae),_0x304cae;return this["busy"]=!![],this["_notify"]("busy",_0x3cf301),Promise['resolve'](_0x304cae)["then"](_0x443c20=>{return this["busy"]=![],_0x5588fd?.(_0x443c20),_0x443c20;},_0x530067=>{this['busy']=![],_0x33d213?.(_0x530067),this["_notify"]('error',_0x3cf301);throw _0x530067;});}["execute"](_0x4250f5){if(!_0x4250f5||typeof _0x4250f5!=="object")throw new TypeError("A command is required");return this["_run"](_0x4250f5,"execute",_0x2e4df6=>{if(_0x2e4df6!==![])this["_record"](_0x4250f5);});}["undo"](){if(this["transaction"])throw new Error("Cannot undo during a transaction");if(this["busy"]||this['undoStack']["length"]===0x0)return![];const _0x1f04cf=this['undoStack']["pop"]();return this["_run"](_0x1f04cf,"undo",()=>{this["redoStack"]['push'](_0x1f04cf),this["_notify"]("undo",_0x1f04cf);},()=>this['undoStack']["push"](_0x1f04cf));}["redo"](){if(this["transaction"])throw new Error('Cannot\x20redo\x20during\x20a\x20transaction');if(this["busy"]||this["redoStack"]["length"]===0x0)return![];const _0x761633=this['redoStack']["pop"]();return this['_run'](_0x761633,'redo',()=>{this["undoStack"]["push"](_0x761633),this['_notify']('redo',_0x761633);},()=>this["redoStack"]["push"](_0x761633));}["beginTransaction"](_0x59ff1d="Transaction"){if(this["busy"])throw new Error("Command history is busy");if(this["transaction"])throw new Error("Nested command transactions are not supported");this["transaction"]={'label':String(_0x59ff1d||"Transaction"),'commands':[]},this["_notify"]("begin-transaction");}["commitTransaction"](){if(!this['transaction'])return![];const _0x34a09c=this["transaction"];this["transaction"]=null;if(_0x34a09c['commands']['length']===0x0)return this["_notify"]('empty-transaction'),![];const _0x57b41f=createCompositeCommand(_0x34a09c["label"],_0x34a09c["commands"]);this["undoStack"]["push"](_0x57b41f);if(this["undoStack"]["length"]>this["limit"])this['undoStack']["splice"](0x0,this["undoStack"]['length']-this["limit"]);return this["redoStack"]=[],this["_notify"]("commit-transaction",_0x57b41f),_0x57b41f;}["cancelTransaction"](){if(!this["transaction"])return![];const _0x51e97b=this["transaction"];this['transaction']=null;const _0x2c2dce=createCompositeCommand(_0x51e97b['label'],_0x51e97b["commands"]);if(_0x51e97b["commands"]['length']===0x0)return this['_notify']("cancel-transaction",_0x2c2dce),!![];return this["_run"](_0x2c2dce,"undo",()=>this["_notify"]('cancel-transaction',_0x2c2dce));}["runTransaction"](_0x1831df,_0x4f0899){this["beginTransaction"](_0x1831df);let _0xcfd36e;try{_0xcfd36e=_0x4f0899(this);}catch(_0xb39c61){const _0x247959=this["cancelTransaction"]();if(isPromise(_0x247959))return _0x247959["then"](()=>{throw _0xb39c61;});throw _0xb39c61;}if(!isPromise(_0xcfd36e))return this["commitTransaction"](),_0xcfd36e;return Promise['resolve'](_0xcfd36e)["then"](_0x274783=>{return this['commitTransaction'](),_0x274783;},_0x163b7a=>Promise['resolve'](this["cancelTransaction"]())["then"](()=>{throw _0x163b7a;}));}["clear"](){if(this['busy'])throw new Error("Command history is busy");this["undoStack"]=[],this["redoStack"]=[],this["transaction"]=null,this['_notify']("clear");}["getSnapshot"](){return{'canUndo':!this["busy"]&&!this["transaction"]&&this["undoStack"]['length']>0x0,'canRedo':!this["busy"]&&!this["transaction"]&&this['redoStack']['length']>0x0,'undoCount':this['undoStack']["length"],'redoCount':this["redoStack"]["length"],'busy':this['busy'],'transactionActive':this["transaction"]!==null,'transactionSize':this['transaction']?.['commands']['length']||0x0,'nextUndoLabel':this['undoStack'][this["undoStack"]["length"]-0x1]?.["label"]||null,'nextRedoLabel':this["redoStack"][this["redoStack"]['length']-0x1]?.["label"]||null};}}export function createCommandHistory(_0x2497bf){return new CommandHistory(_0x2497bf);}function normalizeVector(_0x3cf451,_0x3b3942,_0x1c85ef=-Infinity){const _0x2cb34a=Array["isArray"](_0x3cf451)?_0x3cf451:[];return _0x3b3942['map']((_0x318ada,_0x4e3b91)=>Math["max"](_0x1c85ef,Number["isFinite"](Number(_0x2cb34a[_0x4e3b91]))?Number(_0x2cb34a[_0x4e3b91]):_0x318ada));}function normalizeTransform(_0x7c3ca7,_0x29228e){return{'position':normalizeVector(_0x7c3ca7?.['position'],_0x29228e["position"]),'rotation':normalizeVector(_0x7c3ca7?.['rotation'],_0x29228e["rotation"]),'scale':normalizeVector(_0x7c3ca7?.["scale"],_0x29228e["scale"],0.001)};}function getScene(_0x12b004,_0x4ba546){return _0x12b004?.["scenes"]?.['find'](_0x2b934e=>_0x2b934e['id']===_0x4ba546)||null;}export function applyStoryboard3DObjectTransforms(_0x236c6c,{sceneId:_0x2c75b3,transforms:_0x3c1335,respectLocks:respectLocks=!![]}={}){const _0x1f735f=_0x3c1335&&typeof _0x3c1335==='object'?_0x3c1335:{},_0x4b6585=cloneStoryboard3DProject(_0x236c6c),_0x850f33=getScene(_0x4b6585,_0x2c75b3);if(!_0x850f33)return{'project':_0x4b6585,'changedObjectIds':[]};const _0x442e9e=[];_0x850f33["objects"]["forEach"](_0x2f61f3=>{if(!Object['prototype']["hasOwnProperty"]['call'](_0x1f735f,_0x2f61f3['id']))return;if(respectLocks&&_0x2f61f3['locked']===!![])return;const _0x25fde1=normalizeTransform(_0x1f735f[_0x2f61f3['id']],_0x2f61f3['transform']);if(JSON['stringify'](_0x25fde1)===JSON["stringify"](_0x2f61f3['transform']))return;const _0x41847e=cloneStoryboard3DProject(_0x2f61f3['transform']);_0x2f61f3['transform']=_0x25fde1,_0x2f61f3["type"]==="camera"&&syncStoryboard3DShotFromCameraObject(_0x850f33,_0x2f61f3['id'],{'previousTransform':_0x41847e}),_0x442e9e["push"](_0x2f61f3['id']);});if(_0x442e9e["length"]>0x0)_0x4b6585['updatedAt']=Date["now"]();return{'project':_0x4b6585,'changedObjectIds':_0x442e9e};}function readTransforms(_0x56665a,_0x306e6a,_0x39d89e){const _0x2ab339=new Set(_0x39d89e),_0x64cdaf=getScene(_0x56665a,_0x306e6a),_0x20da52={};return(_0x64cdaf?.['objects']||[])["forEach"](_0x64997a=>{if(_0x2ab339["has"](_0x64997a['id']))_0x20da52[_0x64997a['id']]=cloneStoryboard3DProject(_0x64997a['transform']);}),_0x20da52;}export function createStoryboard3DTransformCommand({sceneId:_0x1373a5,transforms:_0x3d9907,label:label="Transform objects",mergeKey:_0x1ac10f}={}){const _0x31599b=cloneStoryboard3DProject(_0x3d9907||{}),_0x329bd0=Object["keys"](_0x31599b)['sort']();let _0x5069a3=null,_0x1480d5=_0x31599b;const _0x44f646=_0x1373a5+':'+_0x329bd0["join"](','),_0x1990df={'type':"transform-objects",'label':label,'mergeKey':_0x1ac10f===![]?null:String(_0x1ac10f||"transform:"+_0x44f646),'execute'(_0x2ad5b9){const _0x51e485=_0x2ad5b9["getProject"]();if(!_0x5069a3)_0x5069a3=readTransforms(_0x51e485,_0x1373a5,_0x329bd0);const _0x4986a7=applyStoryboard3DObjectTransforms(_0x51e485,{'sceneId':_0x1373a5,'transforms':_0x1480d5});if(_0x4986a7["changedObjectIds"]["length"]===0x0)return![];return _0x2ad5b9["replaceProject"](_0x4986a7["project"],{'reason':"transform-objects"});},'undo'(_0x55abd3){if(!_0x5069a3)return![];const _0x4996a7=applyStoryboard3DObjectTransforms(_0x55abd3["getProject"](),{'sceneId':_0x1373a5,'transforms':_0x5069a3,'respectLocks':![]});return _0x55abd3["replaceProject"](_0x4996a7["project"],{'reason':"undo-transform-objects"});},'redo'(_0x84893f){const _0x4dbdce=applyStoryboard3DObjectTransforms(_0x84893f['getProject'](),{'sceneId':_0x1373a5,'transforms':_0x1480d5,'respectLocks':![]});return _0x84893f["replaceProject"](_0x4dbdce["project"],{'reason':"redo-transform-objects"});},'mergeWith'(_0x3760ca){if(_0x3760ca?.['type']!=="transform-objects")return![];if(_0x3760ca['_signature']!==_0x44f646)return![];return _0x1480d5=cloneStoryboard3DProject(_0x3760ca["_afterTransforms"]),!![];},'_signature':_0x44f646,'_afterTransforms':_0x1480d5};return _0x1990df;}export function createStoryboard3DProjectMutationCommand({type:type='update-project',label:label='Update\x20project',mutate:_0x2f6b6d}={}){if(typeof _0x2f6b6d!=='function')throw new TypeError('A\x20project\x20mutation\x20function\x20is\x20required');let _0x5617ce=null,_0x5e4807=null;return{'type':String(type||"update-project"),'label':String(label||"Update project"),'execute'(_0x46fe01){_0x5617ce=cloneStoryboard3DProject(_0x46fe01["getProject"]());const _0x30cc6b=cloneStoryboard3DProject(_0x5617ce),_0xc1f299=_0x2f6b6d(_0x30cc6b);_0x5e4807=recordDirectorDeletions(_0x5617ce,cloneStoryboard3DProject(_0xc1f299||_0x30cc6b),label);if(JSON['stringify'](_0x5617ce)===JSON["stringify"](_0x5e4807))return![];return _0x46fe01['replaceProject'](_0x5e4807,{'reason':type});},'undo'(_0x19e39f){if(!_0x5617ce)return![];return _0x19e39f["replaceProject"](cloneStoryboard3DProject(_0x5617ce),{'reason':"undo-"+type});},'redo'(_0x304863){if(!_0x5e4807)return![];return _0x304863["replaceProject"](cloneStoryboard3DProject(_0x5e4807),{'reason':"redo-"+type});}};}
+import { cloneStoryboard3DProject, syncStoryboard3DShotFromCameraObject } from './projectModel.js';
+import { recordDirectorDeletions } from './directorRecovery.js';
+function isPromise(value) {
+  return value && typeof value['then'] === 'function';
+}
+function commandMethod(item, key) {
+  if (key === 'execute') return item?.['execute'] || item?.['do'];
+  if (key === 'redo') return item?.['redo'] || item?.['execute'] || item?.['do'];
+  return item?.['undo'];
+}
+function invoke(index, result, data) {
+  const commandMethod2 = commandMethod(index, result);
+  if (typeof commandMethod2 !== 'function')
+    throw new TypeError('Command ' + (index?.['type'] || 'unknown') + ' has no ' + result + ' handler');
+  return commandMethod2['call'](index, data);
+}
+function createCompositeCommand(options, args) {
+  const list = [...args];
+  return {
+    type: 'transaction',
+    label: options,
+    commands: list,
+    execute(target) {
+      let promise = null;
+      return (
+        list['forEach']((source) => {
+          if (promise) {
+            promise = promise['then'](() => invoke(source, 'redo', target));
+            return;
+          }
+          const invoke2 = invoke(source, 'redo', target);
+          if (isPromise(invoke2)) promise = Promise['resolve'](invoke2);
+        }),
+        promise
+      );
+    },
+    undo(next) {
+      let promise2 = null;
+      return (
+        [...list]['reverse']()['forEach']((current) => {
+          if (promise2) {
+            promise2 = promise2['then'](() => invoke(current, 'undo', next));
+            return;
+          }
+          const invoke3 = invoke(current, 'undo', next);
+          if (isPromise(invoke3)) promise2 = Promise['resolve'](invoke3);
+        }),
+        promise2
+      );
+    },
+  };
+}
+export class CommandHistory {
+  constructor({ context: context, limit: limit = 0x64, onChange: onChange } = {}) {
+    ((this['context'] = context),
+      (this['limit'] = Math['max'](0x1, Math['round'](Number(limit) || 0x64))),
+      (this['onChange'] = typeof onChange === 'function' ? onChange : null),
+      (this['undoStack'] = []),
+      (this['redoStack'] = []),
+      (this['transaction'] = null),
+      (this['busy'] = ![]));
+  }
+  ['_notify'](entry, record = null) {
+    this['onChange']?.(this['getSnapshot'](), { reason: entry, command: record });
+  }
+  ['_record'](payload) {
+    if (this['transaction']) {
+      (this['transaction']['commands']['push'](payload), this['_notify']('execute-in-transaction', payload));
+      return;
+    }
+    const handle = this['undoStack'][this['undoStack']['length'] - 0x1],
+      enabled =
+        handle &&
+        handle['mergeKey'] &&
+        handle['mergeKey'] === payload['mergeKey'] &&
+        typeof handle['mergeWith'] === 'function' &&
+        handle['mergeWith'](payload) === !![];
+    if (!enabled) this['undoStack']['push'](payload);
+    if (this['undoStack']['length'] > this['limit'])
+      this['undoStack']['splice'](0x0, this['undoStack']['length'] - this['limit']);
+    ((this['redoStack'] = []), this['_notify'](enabled ? 'merge' : 'execute', enabled ? handle : payload));
+  }
+  ['_run'](state, config, scope, input) {
+    if (this['busy']) throw new Error('Command\x20history\x20is\x20busy');
+    let invoke4;
+    try {
+      invoke4 = invoke(state, config, this['context']);
+    } catch (output) {
+      input?.(output);
+      throw output;
+    }
+    if (!isPromise(invoke4)) return (scope?.(invoke4), invoke4);
+    return (
+      (this['busy'] = !![]),
+      this['_notify']('busy', state),
+      Promise['resolve'](invoke4)['then'](
+        (value2) => {
+          return ((this['busy'] = ![]), scope?.(value2), value2);
+        },
+        (value3) => {
+          ((this['busy'] = ![]), input?.(value3), this['_notify']('error', state));
+          throw value3;
+        },
+      )
+    );
+  }
+  ['execute'](enabled2) {
+    if (!enabled2 || typeof enabled2 !== 'object') throw new TypeError('A command is required');
+    return this['_run'](enabled2, 'execute', (value4) => {
+      if (value4 !== ![]) this['_record'](enabled2);
+    });
+  }
+  ['undo']() {
+    if (this['transaction']) throw new Error('Cannot undo during a transaction');
+    if (this['busy'] || this['undoStack']['length'] === 0x0) return ![];
+    const value5 = this['undoStack']['pop']();
+    return this['_run'](
+      value5,
+      'undo',
+      () => {
+        (this['redoStack']['push'](value5), this['_notify']('undo', value5));
+      },
+      () => this['undoStack']['push'](value5),
+    );
+  }
+  ['redo']() {
+    if (this['transaction']) throw new Error('Cannot\x20redo\x20during\x20a\x20transaction');
+    if (this['busy'] || this['redoStack']['length'] === 0x0) return ![];
+    const value6 = this['redoStack']['pop']();
+    return this['_run'](
+      value6,
+      'redo',
+      () => {
+        (this['undoStack']['push'](value6), this['_notify']('redo', value6));
+      },
+      () => this['redoStack']['push'](value6),
+    );
+  }
+  ['beginTransaction'](value7 = 'Transaction') {
+    if (this['busy']) throw new Error('Command history is busy');
+    if (this['transaction']) throw new Error('Nested command transactions are not supported');
+    ((this['transaction'] = { label: String(value7 || 'Transaction'), commands: [] }),
+      this['_notify']('begin-transaction'));
+  }
+  ['commitTransaction']() {
+    if (!this['transaction']) return ![];
+    const value8 = this['transaction'];
+    this['transaction'] = null;
+    if (value8['commands']['length'] === 0x0) return (this['_notify']('empty-transaction'), ![]);
+    const compositeCommand = createCompositeCommand(value8['label'], value8['commands']);
+    this['undoStack']['push'](compositeCommand);
+    if (this['undoStack']['length'] > this['limit'])
+      this['undoStack']['splice'](0x0, this['undoStack']['length'] - this['limit']);
+    return (
+      (this['redoStack'] = []),
+      this['_notify']('commit-transaction', compositeCommand),
+      compositeCommand
+    );
+  }
+  ['cancelTransaction']() {
+    if (!this['transaction']) return ![];
+    const value9 = this['transaction'];
+    this['transaction'] = null;
+    const compositeCommand2 = createCompositeCommand(value9['label'], value9['commands']);
+    if (value9['commands']['length'] === 0x0)
+      return (this['_notify']('cancel-transaction', compositeCommand2), !![]);
+    return this['_run'](compositeCommand2, 'undo', () =>
+      this['_notify']('cancel-transaction', compositeCommand2),
+    );
+  }
+  ['runTransaction'](value10, handler) {
+    this['beginTransaction'](value10);
+    let value11;
+    try {
+      value11 = handler(this);
+    } catch (value12) {
+      const value13 = this['cancelTransaction']();
+      if (isPromise(value13))
+        return value13['then'](() => {
+          throw value12;
+        });
+      throw value12;
+    }
+    if (!isPromise(value11)) return (this['commitTransaction'](), value11);
+    return Promise['resolve'](value11)['then'](
+      (value14) => {
+        return (this['commitTransaction'](), value14);
+      },
+      (value15) =>
+        Promise['resolve'](this['cancelTransaction']())['then'](() => {
+          throw value15;
+        }),
+    );
+  }
+  ['clear']() {
+    if (this['busy']) throw new Error('Command history is busy');
+    ((this['undoStack'] = []),
+      (this['redoStack'] = []),
+      (this['transaction'] = null),
+      this['_notify']('clear'));
+  }
+  ['getSnapshot']() {
+    return {
+      canUndo: !this['busy'] && !this['transaction'] && this['undoStack']['length'] > 0x0,
+      canRedo: !this['busy'] && !this['transaction'] && this['redoStack']['length'] > 0x0,
+      undoCount: this['undoStack']['length'],
+      redoCount: this['redoStack']['length'],
+      busy: this['busy'],
+      transactionActive: this['transaction'] !== null,
+      transactionSize: this['transaction']?.['commands']['length'] || 0x0,
+      nextUndoLabel: this['undoStack'][this['undoStack']['length'] - 0x1]?.['label'] || null,
+      nextRedoLabel: this['redoStack'][this['redoStack']['length'] - 0x1]?.['label'] || null,
+    };
+  }
+}
+export function createCommandHistory(value16) {
+  return new CommandHistory(value16);
+}
+function normalizeVector(value17, list2, value18 = -Infinity) {
+  const value19 = Array['isArray'](value17) ? value17 : [];
+  return list2['map']((value20, value21) =>
+    Math['max'](value18, Number['isFinite'](Number(value19[value21])) ? Number(value19[value21]) : value20),
+  );
+}
+function normalizeTransform(value22, value23) {
+  return {
+    position: normalizeVector(value22?.['position'], value23['position']),
+    rotation: normalizeVector(value22?.['rotation'], value23['rotation']),
+    scale: normalizeVector(value22?.['scale'], value23['scale'], 0.001),
+  };
+}
+function getScene(value24, value25) {
+  return value24?.['scenes']?.['find']((value26) => value26['id'] === value25) || null;
+}
+export function applyStoryboard3DObjectTransforms(
+  value27,
+  { sceneId: sceneId, transforms: transforms, respectLocks: respectLocks = !![] } = {},
+) {
+  const value28 = transforms && typeof transforms === 'object' ? transforms : {},
+    cloneStoryboard3DProject2 = cloneStoryboard3DProject(value27),
+    scene = getScene(cloneStoryboard3DProject2, sceneId);
+  if (!scene) return { project: cloneStoryboard3DProject2, changedObjectIds: [] };
+  const value29 = [];
+  scene['objects']['forEach']((value30) => {
+    if (!Object['prototype']['hasOwnProperty']['call'](value28, value30['id'])) return;
+    if (respectLocks && value30['locked'] === !![]) return;
+    const transform = normalizeTransform(value28[value30['id']], value30['transform']);
+    if (JSON['stringify'](transform) === JSON['stringify'](value30['transform'])) return;
+    const cloneStoryboard3DProject3 = cloneStoryboard3DProject(value30['transform']);
+    ((value30['transform'] = transform),
+      value30['type'] === 'camera' &&
+        syncStoryboard3DShotFromCameraObject(scene, value30['id'], {
+          previousTransform: cloneStoryboard3DProject3,
+        }),
+      value29['push'](value30['id']));
+  });
+  if (value29['length'] > 0x0) cloneStoryboard3DProject2['updatedAt'] = Date['now']();
+  return { project: cloneStoryboard3DProject2, changedObjectIds: value29 };
+}
+function readTransforms(value31, value32, value33) {
+  const value34 = new Set(value33),
+    scene2 = getScene(value31, value32),
+    value35 = {};
+  return (
+    (scene2?.['objects'] || [])['forEach']((value36) => {
+      if (value34['has'](value36['id']))
+        value35[value36['id']] = cloneStoryboard3DProject(value36['transform']);
+    }),
+    value35
+  );
+}
+export function createStoryboard3DTransformCommand({
+  sceneId: sceneId2,
+  transforms: transforms2,
+  label: label = 'Transform objects',
+  mergeKey: mergeKey,
+} = {}) {
+  const cloneStoryboard3DProject4 = cloneStoryboard3DProject(transforms2 || {}),
+    value37 = Object['keys'](cloneStoryboard3DProject4)['sort']();
+  let transforms3 = null,
+    cloneStoryboard3DProject5 = cloneStoryboard3DProject4;
+  const value38 = sceneId2 + ':' + value37['join'](','),
+    value39 = {
+      type: 'transform-objects',
+      label: label,
+      mergeKey: mergeKey === ![] ? null : String(mergeKey || 'transform:' + value38),
+      execute(value40) {
+        const value41 = value40['getProject']();
+        if (!transforms3) transforms3 = readTransforms(value41, sceneId2, value37);
+        const storyboard3DObjectTransforms = applyStoryboard3DObjectTransforms(value41, {
+          sceneId: sceneId2,
+          transforms: cloneStoryboard3DProject5,
+        });
+        if (storyboard3DObjectTransforms['changedObjectIds']['length'] === 0x0) return ![];
+        return value40['replaceProject'](storyboard3DObjectTransforms['project'], {
+          reason: 'transform-objects',
+        });
+      },
+      undo(value42) {
+        if (!transforms3) return ![];
+        const storyboard3DObjectTransforms2 = applyStoryboard3DObjectTransforms(value42['getProject'](), {
+          sceneId: sceneId2,
+          transforms: transforms3,
+          respectLocks: ![],
+        });
+        return value42['replaceProject'](storyboard3DObjectTransforms2['project'], {
+          reason: 'undo-transform-objects',
+        });
+      },
+      redo(value43) {
+        const storyboard3DObjectTransforms3 = applyStoryboard3DObjectTransforms(value43['getProject'](), {
+          sceneId: sceneId2,
+          transforms: cloneStoryboard3DProject5,
+          respectLocks: ![],
+        });
+        return value43['replaceProject'](storyboard3DObjectTransforms3['project'], {
+          reason: 'redo-transform-objects',
+        });
+      },
+      mergeWith(value44) {
+        if (value44?.['type'] !== 'transform-objects') return ![];
+        if (value44['_signature'] !== value38) return ![];
+        return ((cloneStoryboard3DProject5 = cloneStoryboard3DProject(value44['_afterTransforms'])), !![]);
+      },
+      _signature: value38,
+      _afterTransforms: cloneStoryboard3DProject5,
+    };
+  return value39;
+}
+export function createStoryboard3DProjectMutationCommand({
+  type: type = 'update-project',
+  label: label = 'Update\x20project',
+  mutate: mutate,
+} = {}) {
+  if (typeof mutate !== 'function')
+    throw new TypeError('A\x20project\x20mutation\x20function\x20is\x20required');
+  let cloneStoryboard3DProject6 = null,
+    recordDirectorDeletions2 = null;
+  return {
+    type: String(type || 'update-project'),
+    label: String(label || 'Update project'),
+    execute(value45) {
+      cloneStoryboard3DProject6 = cloneStoryboard3DProject(value45['getProject']());
+      const cloneStoryboard3DProject7 = cloneStoryboard3DProject(cloneStoryboard3DProject6),
+        value46 = mutate(cloneStoryboard3DProject7);
+      recordDirectorDeletions2 = recordDirectorDeletions(
+        cloneStoryboard3DProject6,
+        cloneStoryboard3DProject(value46 || cloneStoryboard3DProject7),
+        label,
+      );
+      if (JSON['stringify'](cloneStoryboard3DProject6) === JSON['stringify'](recordDirectorDeletions2))
+        return ![];
+      return value45['replaceProject'](recordDirectorDeletions2, { reason: type });
+    },
+    undo(value47) {
+      if (!cloneStoryboard3DProject6) return ![];
+      return value47['replaceProject'](cloneStoryboard3DProject(cloneStoryboard3DProject6), {
+        reason: 'undo-' + type,
+      });
+    },
+    redo(value48) {
+      if (!recordDirectorDeletions2) return ![];
+      return value48['replaceProject'](cloneStoryboard3DProject(recordDirectorDeletions2), {
+        reason: 'redo-' + type,
+      });
+    },
+  };
+}

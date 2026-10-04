@@ -3,65 +3,65 @@ import { post, get } from './requester.js';
 import { resolveImageInputUploadQualityOptions } from '../src/services/imageInputUploadQualityService.js';
 import { isApimartReusableUrl, uploadImageToApimart } from './apimartUploadApi.js';
 import { uploadToFreeImageHost } from './freeImageHostApi.js';
-function _createLimiter(_0x4e43ba) {
-  let _0x5c8ae9 = 0;
-  const _0x5e217c = [];
-  return function _0x4e2a90(_0x56d6dd) {
-    return new Promise((_0x2570a9, _0x44b090) => {
-      const _0x4174bc = () => {
-        (_0x5c8ae9++,
+function _createLimiter(value) {
+  let item = 0;
+  const list = [];
+  return function run(key) {
+    return new Promise((handler, handler2) => {
+      const run2 = () => {
+        (item++,
           Promise.resolve()
-            .then(_0x56d6dd)
+            .then(key)
             .then(
-              (_0x246343) => {
-                _0x5c8ae9--;
-                if (_0x5e217c.length && _0x5c8ae9 < _0x4e43ba) _0x5e217c.shift()();
-                _0x2570a9(_0x246343);
+              (index) => {
+                item--;
+                if (list.length && item < value) list.shift()();
+                handler(index);
               },
-              (_0x14d2b9) => {
-                _0x5c8ae9--;
-                if (_0x5e217c.length && _0x5c8ae9 < _0x4e43ba) _0x5e217c.shift()();
-                _0x44b090(_0x14d2b9);
+              (result) => {
+                item--;
+                if (list.length && item < value) list.shift()();
+                handler2(result);
               },
             ));
       };
-      if (_0x5c8ae9 < _0x4e43ba) _0x4174bc();
-      else _0x5e217c.push(_0x4174bc);
+      if (item < value) run2();
+      else list.push(run2);
     });
   };
 }
 const _runLimited = _createLimiter(3),
   _inflight = new Map();
-function _buildKey(_0x3ba636, _0x245d55, _0x1a6396) {
+function _buildKey(data, options, target) {
   const {
       compress: compress = true,
       maxDim: maxDim = 0x800,
       quality: quality = 0.9,
       provider: provider = 'grsai',
       preferFree: preferFree = false,
-    } = _0x1a6396 || {},
-    _0x22b139 = Math.round(quality * 0x3e8),
-    _0xa3282a = _0x245d55 ? 1 : 0,
-    _0x1bf96c = compress ? 1 : 0,
-    _0x739135 = preferFree ? 1 : 0;
-  return [_0x3ba636, provider, _0x1bf96c, maxDim, _0x22b139, _0xa3282a, _0x739135].join('|');
+    } = target || {},
+    source = Math.round(quality * 0x3e8),
+    next = options ? 1 : 0,
+    current = compress ? 1 : 0,
+    entry = preferFree ? 1 : 0;
+  return [data, provider, current, maxDim, source, next, entry].join('|');
 }
-function _getUploadPromise(_0x50ffb9, _0x33cd2e, _0x109a8e) {
-  const _0x2ee251 = _buildKey(_0x50ffb9, _0x33cd2e, _0x109a8e);
-  let _0x33afa6 = _inflight.get(_0x2ee251);
+function _getUploadPromise(record, payload, handle) {
+  const _buildKey2 = _buildKey(record, payload, handle);
+  let promise = _inflight.get(_buildKey2);
   return (
-    !_0x33afa6 &&
-      ((_0x33afa6 = _runLimited(() => _processSingle(_0x50ffb9, _0x33cd2e, _0x109a8e))),
-      _inflight.set(_0x2ee251, _0x33afa6),
-      _0x33afa6
+    !promise &&
+      ((promise = _runLimited(() => _processSingle(record, payload, handle))),
+      _inflight.set(_buildKey2, promise),
+      promise
         .finally(() => {
-          _inflight.delete(_0x2ee251);
+          _inflight.delete(_buildKey2);
         })
         .catch(() => {})),
-    _0x33afa6
+    promise
   );
 }
-async function _processSingle(_0x55ab98, _0x38bbf7, _0x404e92) {
+async function _processSingle(list2, apiKey, state) {
   const {
     compress: compress = true,
     maxDim: maxDim = 0x800,
@@ -70,202 +70,202 @@ async function _processSingle(_0x55ab98, _0x38bbf7, _0x404e92) {
     fallbackCompressOnError: fallbackCompressOnError = false,
     fallbackMaxDim: fallbackMaxDim = 0x800,
     fallbackQuality: fallbackQuality = 0.9,
-  } = _0x404e92 || {};
-  if (provider === 'runninghub' && _0x55ab98.includes('runninghub.cn')) return _0x55ab98;
-  if (provider === 'apimart' && isApimartReusableUrl(_0x55ab98)) return _0x55ab98;
-  const _0x4074de = async (_0xf1c50a) => {
-    if (provider === 'runninghub') return await uploadToRunningHub(_0xf1c50a, _0x38bbf7);
+  } = state || {};
+  if (provider === 'runninghub' && list2.includes('runninghub.cn')) return list2;
+  if (provider === 'apimart' && isApimartReusableUrl(list2)) return list2;
+  const run3 = async (config) => {
+    if (provider === 'runninghub') return await uploadToRunningHub(config, apiKey);
     if (provider === 'apimart')
-      return await uploadImageToApimart(_0xf1c50a, { ...(_0x404e92 || {}), apiKey: _0x38bbf7 });
-    if (isFreeImageHostProvider(provider)) return await uploadToFreeImageHost(_0xf1c50a, _0x404e92 || {});
-    return await uploadImageToBed(_0xf1c50a, _0x38bbf7, _0x404e92 || {});
+      return await uploadImageToApimart(config, { ...(state || {}), apiKey: apiKey });
+    if (isFreeImageHostProvider(provider)) return await uploadToFreeImageHost(config, state || {});
+    return await uploadImageToBed(config, apiKey, state || {});
   };
   if (compress) {
-    let _0x34ac1c;
+    let compressImage2;
     try {
-      _0x34ac1c = await compressImage(_0x55ab98, maxDim, quality);
-    } catch (_0x538007) {
-      _0x34ac1c = await get(_0x55ab98, { provider: 'remote', buildUrl: false, responseType: 'blob' });
+      compressImage2 = await compressImage(list2, maxDim, quality);
+    } catch (scope) {
+      compressImage2 = await get(list2, { provider: 'remote', buildUrl: false, responseType: 'blob' });
     }
-    return await _0x4074de(_0x34ac1c);
+    return await run3(compressImage2);
   }
   if (fallbackCompressOnError)
     try {
-      const _0x407d20 = await get(_0x55ab98, { provider: 'remote', buildUrl: false, responseType: 'blob' });
-      return await _0x4074de(_0x407d20);
-    } catch (_0x4fe94a) {
-      const _0x343c87 = await compressImage(_0x55ab98, fallbackMaxDim, fallbackQuality);
-      return await _0x4074de(_0x343c87);
+      const get2 = await get(list2, { provider: 'remote', buildUrl: false, responseType: 'blob' });
+      return await run3(get2);
+    } catch (input) {
+      const compressImage3 = await compressImage(list2, fallbackMaxDim, fallbackQuality);
+      return await run3(compressImage3);
     }
-  const _0x5414ff = await get(_0x55ab98, { provider: 'remote', buildUrl: false, responseType: 'blob' });
-  return await _0x4074de(_0x5414ff);
+  const get3 = await get(list2, { provider: 'remote', buildUrl: false, responseType: 'blob' });
+  return await run3(get3);
 }
-async function uploadToTelegraph(_0x219dde) {
-  const _0x44315b = new FormData();
-  _0x44315b.append('file', _0x219dde, 'image.png');
-  const _0x4f1ae1 = 'https://telegra.ph/upload',
-    _0x113f8c = '/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(_0x4f1ae1),
-    _0x557af5 = await post(_0x113f8c, _0x44315b, { provider: 'telegraph' });
-  if (Array.isArray(_0x557af5) && _0x557af5[0]?.src) return 'https://telegra.ph' + _0x557af5[0].src;
+async function uploadToTelegraph(output) {
+  const formData = new FormData();
+  formData.append('file', output, 'image.png');
+  const value2 = 'https://telegra.ph/upload',
+    value3 = '/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(value2),
+    post2 = await post(value3, formData, { provider: 'telegraph' });
+  if (Array.isArray(post2) && post2[0]?.src) return 'https://telegra.ph' + post2[0].src;
   throw new Error('Telegraph 返回格式异常');
 }
-function isFreeImageHostProvider(_0x13867b) {
-  const _0x39c230 = String(_0x13867b || '').trim(),
-    _0xb83990 = _0x39c230.toLowerCase().replace(/[\s_-]+/g, '');
-  return _0x39c230 === '免费图床' || _0xb83990 === 'freeimagehost';
+function isFreeImageHostProvider(value4) {
+  const value5 = String(value4 || '').trim(),
+    value6 = value5.toLowerCase().replace(/[\s_-]+/g, '');
+  return value5 === '免费图床' || value6 === 'freeimagehost';
 }
-async function uploadToQiniu(_0x136293, _0x314422) {
-  const _0x2171f7 = { 'Content-Type': 'application/json' };
-  if (_0x314422) _0x2171f7.Authorization = 'Bearer ' + _0x314422;
-  const _0x4f1070 = await post(
+async function uploadToQiniu(value7, value8) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (value8) headers.Authorization = 'Bearer ' + value8;
+  const post3 = await post(
     'https://grsai.dakka.com.cn/client/resource/newUploadTokenZH',
     { sux: 'png' },
-    { provider: 'grsai', buildUrl: false, headers: _0x2171f7 },
+    { provider: 'grsai', buildUrl: false, headers: headers },
   );
-  if (!_0x4f1070.data) throw new Error('GRSAI 返回了无效的上传凭证');
-  const { token: _0x666c1d, key: _0x140277, url: _0x12c1d8, domain: _0x454986 } = _0x4f1070.data,
-    _0x1d2da8 = new FormData();
+  if (!post3.data) throw new Error('GRSAI 返回了无效的上传凭证');
+  const { token: token, key: key2, url: url, domain: domain } = post3.data,
+    formData2 = new FormData();
   return (
-    _0x1d2da8.append('token', _0x666c1d),
-    _0x1d2da8.append('key', _0x140277),
-    _0x1d2da8.append('file', _0x136293, 'image.png'),
-    await post(_0x12c1d8, _0x1d2da8, { provider: 'qiniu', buildUrl: false }),
-    _0x454986 + '/' + _0x140277
+    formData2.append('token', token),
+    formData2.append('key', key2),
+    formData2.append('file', value7, 'image.png'),
+    await post(url, formData2, { provider: 'qiniu', buildUrl: false }),
+    domain + '/' + key2
   );
 }
-export async function uploadImageToBed(_0x517d56, _0x4ea588, _0x2fd16b = {}) {
-  const { preferFree: preferFree = false } = _0x2fd16b;
+export async function uploadImageToBed(value9, enabled, value10 = {}) {
+  const { preferFree: preferFree = false } = value10;
   if (preferFree)
     try {
-      return await uploadToFreeImageHost(_0x517d56, _0x2fd16b);
-    } catch (_0xe2a863) {
+      return await uploadToFreeImageHost(value9, value10);
+    } catch (error) {
       try {
-        return await uploadToTelegraph(_0x517d56);
-      } catch (_0x91abef) {
-        if (!_0x4ea588)
+        return await uploadToTelegraph(value9);
+      } catch (error2) {
+        if (!enabled)
           throw new Error(
-            '免费图床上传失败，且无 GRSAI API Key 备用：' +
-              (_0x91abef?.message || _0xe2a863?.message || '未知错误'),
+            '免费图床上传失败，且无 GRSAI API Key 备用：' + (error2?.message || error?.message || '未知错误'),
           );
       }
     }
-  if (_0x4ea588)
+  if (enabled)
     try {
-      return await uploadToQiniu(_0x517d56, _0x4ea588);
-    } catch (_0x16e6c8) {
-      if (!preferFree) return await uploadToTelegraph(_0x517d56);
-      throw _0x16e6c8;
+      return await uploadToQiniu(value9, enabled);
+    } catch (value11) {
+      if (!preferFree) return await uploadToTelegraph(value9);
+      throw value11;
     }
-  return await uploadToTelegraph(_0x517d56);
+  return await uploadToTelegraph(value9);
 }
-export async function uploadToRunningHub(_0x40d68a, _0x20f256) {
-  if (!_0x20f256) throw new Error('RunningHUB API Key 未配置，无法上传图片');
-  const _0x447c86 = 'https://www.runninghub.cn/openapi/v2/media/upload/binary',
-    _0x53cd63 = '/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(_0x447c86),
-    _0xe23df4 = new FormData();
-  _0xe23df4.append('file', _0x40d68a, 'image.png');
-  const _0x3760f7 = await post(_0x53cd63, _0xe23df4, {
-      headers: { Authorization: 'Bearer ' + _0x20f256 },
+export async function uploadToRunningHub(value12, enabled2) {
+  if (!enabled2) throw new Error('RunningHUB API Key 未配置，无法上传图片');
+  const value13 = 'https://www.runninghub.cn/openapi/v2/media/upload/binary',
+    value14 = '/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(value13),
+    formData3 = new FormData();
+  formData3.append('file', value12, 'image.png');
+  const post4 = await post(value14, formData3, {
+      headers: { Authorization: 'Bearer ' + enabled2 },
       provider: 'runninghub',
     }),
-    _0x7d303d = Number(_0x3760f7?.code);
-  if (Number.isFinite(_0x7d303d) && _0x7d303d !== 0)
-    throw new Error('RunningHUB 上传失败: ' + getRunningHubUploadErrorMessage(_0x3760f7));
-  const _0x491d3a = getRunningHubUploadUrl(_0x3760f7);
-  if (!_0x491d3a) throw new Error('RunningHUB 上传失败: 未返回可用文件 URL');
-  return _0x491d3a;
+    count = Number(post4?.code);
+  if (Number.isFinite(count) && count !== 0)
+    throw new Error('RunningHUB 上传失败: ' + getRunningHubUploadErrorMessage(post4));
+  const runningHubUploadUrl = getRunningHubUploadUrl(post4);
+  if (!runningHubUploadUrl) throw new Error('RunningHUB 上传失败: 未返回可用文件 URL');
+  return runningHubUploadUrl;
 }
-function pickFirstUploadMessage(_0x2c856d) {
-  for (const _0x5c8ccf of _0x2c856d) {
-    if (typeof _0x5c8ccf === 'string' && _0x5c8ccf.trim()) return _0x5c8ccf.trim();
+function pickFirstUploadMessage(value15) {
+  for (const value16 of value15) {
+    if (typeof value16 === 'string' && value16.trim()) return value16.trim();
   }
   return '';
 }
-function getRunningHubUploadErrorMessage(_0x2f2338) {
-  const _0x4194dd = _0x2f2338?.code,
-    _0x1f423b = pickFirstUploadMessage([
-      _0x2f2338?.message,
-      _0x2f2338?.msg,
-      _0x2f2338?.errorMessage,
-      _0x2f2338?.error,
-      _0x2f2338?.data?.message,
-      _0x2f2338?.data?.msg,
-      _0x2f2338?.data?.errorMessage,
-      _0x2f2338?.data?.error,
+function getRunningHubUploadErrorMessage(error3) {
+  const value17 = error3?.code,
+    firstUploadMessage = pickFirstUploadMessage([
+      error3?.message,
+      error3?.msg,
+      error3?.errorMessage,
+      error3?.error,
+      error3?.data?.message,
+      error3?.data?.msg,
+      error3?.data?.errorMessage,
+      error3?.data?.error,
     ]);
-  if (_0x1f423b) return _0x4194dd === undefined ? _0x1f423b : _0x1f423b + ' (code: ' + _0x4194dd + ')';
-  return _0x4194dd === undefined ? '未知错误' : '未知错误 (code: ' + _0x4194dd + ')';
+  if (firstUploadMessage)
+    return value17 === undefined ? firstUploadMessage : firstUploadMessage + ' (code: ' + value17 + ')';
+  return value17 === undefined ? '未知错误' : '未知错误 (code: ' + value17 + ')';
 }
-function getRunningHubUploadUrl(_0x3f8b32) {
+function getRunningHubUploadUrl(response) {
   return String(
-    _0x3f8b32?.data?.download_url ||
-      _0x3f8b32?.data?.downloadUrl ||
-      _0x3f8b32?.data?.fileUrl ||
-      _0x3f8b32?.data?.file_url ||
-      _0x3f8b32?.data?.url ||
-      _0x3f8b32?.download_url ||
-      _0x3f8b32?.downloadUrl ||
-      _0x3f8b32?.fileUrl ||
-      _0x3f8b32?.file_url ||
-      _0x3f8b32?.url ||
+    response?.data?.download_url ||
+      response?.data?.downloadUrl ||
+      response?.data?.fileUrl ||
+      response?.data?.file_url ||
+      response?.data?.url ||
+      response?.download_url ||
+      response?.downloadUrl ||
+      response?.fileUrl ||
+      response?.file_url ||
+      response?.url ||
       '',
   ).trim();
 }
-async function _processInputImagesOrdered(_0x69093, _0x214fbd, _0x290ac6 = {}) {
-  const _0x2192c7 =
-      _0x290ac6?.applyInputQualityProfile === true
-        ? resolveImageInputUploadQualityOptions(_0x290ac6)
-        : _0x290ac6 || {},
+async function _processInputImagesOrdered(list3, value18, value19 = {}) {
+  const args =
+      value19?.applyInputQualityProfile === true
+        ? resolveImageInputUploadQualityOptions(value19)
+        : value19 || {},
     {
       compress: compress = true,
       maxDim: maxDim = 0x800,
       quality: quality = 0.9,
       provider: provider = 'grsai',
-    } = _0x2192c7;
-  if (!_0x69093 || _0x69093.length === 0) return [];
-  const _0x2678b8 = {
-      ..._0x2192c7,
+    } = args;
+  if (!list3 || list3.length === 0) return [];
+  const value20 = {
+      ...args,
       compress: compress,
       maxDim: maxDim,
       quality: quality,
       provider: provider,
     },
-    _0x3510d0 = _0x2678b8.strictUpload === true,
-    _0x4ff35c = new Array(_0x69093.length).fill(''),
-    _0x3e009d = [];
-  for (let _0x34f1e0 = 0; _0x34f1e0 < _0x69093.length; _0x34f1e0++) {
-    const _0x17c25e = String(_0x69093[_0x34f1e0] || '').trim();
-    if (!_0x17c25e) continue;
-    if (provider === 'runninghub' && _0x17c25e.includes('runninghub.cn')) {
-      _0x4ff35c[_0x34f1e0] = _0x17c25e;
+    value21 = value20.strictUpload === true,
+    value22 = new Array(list3.length).fill(''),
+    list4 = [];
+  for (let value23 = 0; value23 < list3.length; value23++) {
+    const list5 = String(list3[value23] || '').trim();
+    if (!list5) continue;
+    if (provider === 'runninghub' && list5.includes('runninghub.cn')) {
+      value22[value23] = list5;
       continue;
     }
-    if (provider === 'apimart' && isApimartReusableUrl(_0x17c25e)) {
-      _0x4ff35c[_0x34f1e0] = _0x17c25e;
+    if (provider === 'apimart' && isApimartReusableUrl(list5)) {
+      value22[value23] = list5;
       continue;
     }
-    const _0x535844 = _getUploadPromise(_0x17c25e, _0x214fbd, _0x2678b8),
-      _0x3cde6d = _0x535844.then((_0x3d0f8c) => {
-        _0x4ff35c[_0x34f1e0] = String(_0x3d0f8c || '').trim();
+    const promise2 = _getUploadPromise(list5, value18, value20),
+      promise3 = promise2.then((value24) => {
+        value22[value23] = String(value24 || '').trim();
       });
-    _0x3e009d.push(
-      _0x3510d0
-        ? _0x3cde6d
-        : _0x3cde6d.catch(() => {
-            _0x4ff35c[_0x34f1e0] = '';
+    list4.push(
+      value21
+        ? promise3
+        : promise3.catch(() => {
+            value22[value23] = '';
           }),
     );
   }
-  if (_0x3e009d.length > 0) {
-    if (_0x3510d0) await Promise.all(_0x3e009d);
-    else await Promise.allSettled(_0x3e009d);
+  if (list4.length > 0) {
+    if (value21) await Promise.all(list4);
+    else await Promise.allSettled(list4);
   }
-  return _0x4ff35c;
+  return value22;
 }
-export async function processInputImages(_0x485d12, _0xdee43, _0xd4fc0c = {}) {
-  const _0x1ec344 = await _processInputImagesOrdered(_0x485d12, _0xdee43, _0xd4fc0c);
-  return _0x1ec344.filter(Boolean);
+export async function processInputImages(value25, value26, value27 = {}) {
+  const list6 = await _processInputImagesOrdered(value25, value26, value27);
+  return list6.filter(Boolean);
 }
-export async function processInputImagesPreserveOrder(_0x213b15, _0x87b0c6, _0x31fe1c = {}) {
-  return await _processInputImagesOrdered(_0x213b15, _0x87b0c6, _0x31fe1c);
+export async function processInputImagesPreserveOrder(value28, value29, value30 = {}) {
+  return await _processInputImagesOrdered(value28, value29, value30);
 }

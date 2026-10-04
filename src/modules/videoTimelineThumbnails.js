@@ -4,269 +4,261 @@ import { attachMediaElementPlaybackSource } from '../services/desktopMediaBlobSo
 import { localPathToUrl } from '../utils/localMediaPath.js';
 const THUMB_METADATA_TIMEOUT_MS = 0x1f40,
   THUMB_SEEK_TIMEOUT_MS = 0x640;
-function normalizeText(_0x4f49cc) {
-  return String(_0x4f49cc || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function getVideoSource(_0x343dcf) {
-  return normalizeText(
-    _0x343dcf?.['getAttribute']?.('src') || _0x343dcf?.['currentSrc'] || _0x343dcf?.['src'],
-  );
+function getVideoSource(item) {
+  return normalizeText(item?.['getAttribute']?.('src') || item?.['currentSrc'] || item?.['src']);
 }
-function resolveFrameUrl(_0x33bf6f) {
+function resolveFrameUrl(response) {
   return (
-    normalizeText(_0x33bf6f?.['url'] || _0x33bf6f?.['localUrl']) ||
-    localPathToUrl(_0x33bf6f?.['localPath'] || _0x33bf6f?.['path'])
+    normalizeText(response?.['url'] || response?.['localUrl']) ||
+    localPathToUrl(response?.['localPath'] || response?.['path'])
   );
 }
-function setThumbState(_0x17f1e9, _0x5a8aca) {
-  for (const _0x80ab57 of Array['isArray'](_0x17f1e9) ? _0x17f1e9 : []) {
-    if (_0x80ab57?.['dataset']) _0x80ab57['dataset']['thumbnailState'] = _0x5a8aca;
-    (_0x80ab57?.['classList']?.['add']('video-timeline-thumbnail'),
-      _0x80ab57?.['setAttribute']?.('aria-busy', 'false'));
+function setThumbState(key, index) {
+  for (const el of Array['isArray'](key) ? key : []) {
+    if (el?.['dataset']) el['dataset']['thumbnailState'] = index;
+    (el?.['classList']?.['add']('video-timeline-thumbnail'), el?.['setAttribute']?.('aria-busy', 'false'));
   }
 }
-function setThumbBackground(_0x198180, _0x54dd3a, _0x4e01f4 = '') {
-  const _0x306e5e = normalizeText(_0x54dd3a);
-  if (!_0x198180?.['style'] || !_0x306e5e) return ![];
-  const _0x26a26e = [_0x306e5e, normalizeText(_0x4e01f4)]
+function setThumbBackground(el2, result, data = '') {
+  const text = normalizeText(result);
+  if (!el2?.['style'] || !text) return ![];
+  const list = [text, normalizeText(data)]
     ['filter'](Boolean)
-    ['filter']((_0x106f05, _0x587b9a, _0x2420e3) => _0x2420e3['indexOf'](_0x106f05) === _0x587b9a);
+    ['filter']((options, target, list2) => list2['indexOf'](options) === target);
   return (
-    (_0x198180['style']['backgroundImage'] = _0x26a26e['map'](
-      (_0x538863) => 'url(' + JSON['stringify'](_0x538863) + ')',
-    )['join'](',\x20')),
+    (el2['style']['backgroundImage'] = list['map']((source) => 'url(' + JSON['stringify'](source) + ')')[
+      'join'
+    ](',\x20')),
     !![]
   );
 }
-export function paintVideoTimelineThumbnailUrls(_0x19b03e, _0x3d1e4c, _0xc604e8 = 'ready') {
-  const _0x25412a = Array['isArray'](_0x19b03e) ? _0x19b03e : [],
-    _0x447c42 = (Array['isArray'](_0x3d1e4c) ? _0x3d1e4c : [_0x3d1e4c])
-      ['map'](normalizeText)
-      ['filter'](Boolean);
-  if (!_0x25412a['length'] || !_0x447c42['length']) return 0x0;
-  for (let _0x5b0897 = 0x0; _0x5b0897 < _0x25412a['length']; _0x5b0897 += 0x1) {
-    const _0x507f05 = Math['min'](
-      _0x447c42['length'] - 0x1,
-      Math['floor'](((_0x5b0897 + 0.5) * _0x447c42['length']) / _0x25412a['length']),
+export function paintVideoTimelineThumbnailUrls(next, current, entry = 'ready') {
+  const list3 = Array['isArray'](next) ? next : [],
+    list4 = (Array['isArray'](current) ? current : [current])['map'](normalizeText)['filter'](Boolean);
+  if (!list3['length'] || !list4['length']) return 0x0;
+  for (let record = 0x0; record < list3['length']; record += 0x1) {
+    const payload = Math['min'](
+      list4['length'] - 0x1,
+      Math['floor'](((record + 0.5) * list4['length']) / list3['length']),
     );
-    setThumbBackground(_0x25412a[_0x5b0897], _0x447c42[_0x507f05], _0x447c42[0x0]);
+    setThumbBackground(list3[record], list4[payload], list4[0x0]);
   }
-  return (setThumbState(_0x25412a, _0xc604e8), _0x25412a['length']);
+  return (setThumbState(list3, entry), list3['length']);
 }
-function waitForLoadedMetadata(_0x2d6a73, _0x15e4b7) {
-  if (Number(_0x2d6a73?.['readyState'] || 0x0) >= 0x1) return Promise['resolve'](!![]);
-  return new Promise((_0x321536, _0x2f63d8) => {
-    let _0xe42065 = ![],
-      _0x1d87d8 = null;
-    const _0x46c873 = () => {
-        (_0x2d6a73['removeEventListener']?.('loadedmetadata', _0x36987b),
-          _0x2d6a73['removeEventListener']?.('durationchange', _0x36987b),
-          _0x2d6a73['removeEventListener']?.('error', _0xa75dde),
-          _0x2d6a73['removeEventListener']?.('abort', _0xa75dde));
-        if (_0x1d87d8) globalThis['clearTimeout'](_0x1d87d8);
+function waitForLoadedMetadata(el3, handle) {
+  if (Number(el3?.['readyState'] || 0x0) >= 0x1) return Promise['resolve'](!![]);
+  return new Promise((handler, handler2) => {
+    let state = ![],
+      config = null;
+    const run = () => {
+        (el3['removeEventListener']?.('loadedmetadata', scope),
+          el3['removeEventListener']?.('durationchange', scope),
+          el3['removeEventListener']?.('error', input),
+          el3['removeEventListener']?.('abort', input));
+        if (config) globalThis['clearTimeout'](config);
       },
-      _0x29daad = (_0x599360) => {
-        if (_0xe42065) return;
-        ((_0xe42065 = !![]), _0x46c873());
-        if (_0x599360) _0x2f63d8(_0x599360);
-        else _0x321536(!![]);
+      handler3 = (output) => {
+        if (state) return;
+        ((state = !![]), run());
+        if (output) handler2(output);
+        else handler(!![]);
       },
-      _0x36987b = () => _0x29daad(),
-      _0xa75dde = () => _0x29daad(new Error('video thumbnail source failed to load'));
-    (_0x2d6a73['addEventListener']?.('loadedmetadata', _0x36987b),
-      _0x2d6a73['addEventListener']?.('durationchange', _0x36987b),
-      _0x2d6a73['addEventListener']?.('error', _0xa75dde),
-      _0x2d6a73['addEventListener']?.('abort', _0xa75dde),
-      (_0x1d87d8 = globalThis['setTimeout'](
-        () => _0x29daad(new Error('video thumbnail metadata timed out')),
-        _0x15e4b7,
+      scope = () => handler3(),
+      input = () => handler3(new Error('video thumbnail source failed to load'));
+    (el3['addEventListener']?.('loadedmetadata', scope),
+      el3['addEventListener']?.('durationchange', scope),
+      el3['addEventListener']?.('error', input),
+      el3['addEventListener']?.('abort', input),
+      (config = globalThis['setTimeout'](
+        () => handler3(new Error('video thumbnail metadata timed out')),
+        handle,
       )));
   });
 }
-function seekVideo(_0x5919cb, _0x3ffd34, _0x3ba5b3) {
-  const _0x183ece = Math['max'](0x0, Number(_0x3ffd34) || 0x0);
+function seekVideo(el4, value2, value3) {
+  const value4 = Math['max'](0x0, Number(value2) || 0x0);
   if (
-    Math['abs']((Number(_0x5919cb?.['currentTime']) || 0x0) - _0x183ece) <= 0.02 &&
-    Number(_0x5919cb?.['readyState'] || 0x0) >= 0x2 &&
-    _0x5919cb?.['seeking'] !== !![]
+    Math['abs']((Number(el4?.['currentTime']) || 0x0) - value4) <= 0.02 &&
+    Number(el4?.['readyState'] || 0x0) >= 0x2 &&
+    el4?.['seeking'] !== !![]
   )
     return Promise['resolve'](!![]);
-  return new Promise((_0x1e93bb, _0x424668) => {
-    let _0x529f3b = ![],
-      _0x1ecc8f = null;
-    const _0x4f7935 = () => {
-        (_0x5919cb['removeEventListener']?.('seeked', _0xeaaee8),
-          _0x5919cb['removeEventListener']?.('timeupdate', _0xeaaee8),
-          _0x5919cb['removeEventListener']?.('error', _0x322974),
-          _0x5919cb['removeEventListener']?.('abort', _0x322974));
-        if (_0x1ecc8f) globalThis['clearTimeout'](_0x1ecc8f);
+  return new Promise((handler4, handler5) => {
+    let value5 = ![],
+      value6 = null;
+    const run2 = () => {
+        (el4['removeEventListener']?.('seeked', value7),
+          el4['removeEventListener']?.('timeupdate', value7),
+          el4['removeEventListener']?.('error', value8),
+          el4['removeEventListener']?.('abort', value8));
+        if (value6) globalThis['clearTimeout'](value6);
       },
-      _0x93e120 = (_0x2a95a0) => {
-        if (_0x529f3b) return;
-        ((_0x529f3b = !![]), _0x4f7935());
-        if (_0x2a95a0) _0x424668(_0x2a95a0);
-        else _0x1e93bb(!![]);
+      handler6 = (value9) => {
+        if (value5) return;
+        ((value5 = !![]), run2());
+        if (value9) handler5(value9);
+        else handler4(!![]);
       },
-      _0xeaaee8 = () => {
-        if (_0x5919cb?.['seeking'] !== !![]) _0x93e120();
+      value7 = () => {
+        if (el4?.['seeking'] !== !![]) handler6();
       },
-      _0x322974 = () => _0x93e120(new Error('video\x20thumbnail\x20seek\x20failed'));
-    (_0x5919cb['addEventListener']?.('seeked', _0xeaaee8),
-      _0x5919cb['addEventListener']?.('timeupdate', _0xeaaee8),
-      _0x5919cb['addEventListener']?.('error', _0x322974),
-      _0x5919cb['addEventListener']?.('abort', _0x322974),
-      (_0x1ecc8f = globalThis['setTimeout'](
-        () => _0x93e120(new Error('video thumbnail seek timed out')),
-        _0x3ba5b3,
+      value8 = () => handler6(new Error('video\x20thumbnail\x20seek\x20failed'));
+    (el4['addEventListener']?.('seeked', value7),
+      el4['addEventListener']?.('timeupdate', value7),
+      el4['addEventListener']?.('error', value8),
+      el4['addEventListener']?.('abort', value8),
+      (value6 = globalThis['setTimeout'](
+        () => handler6(new Error('video thumbnail seek timed out')),
+        value3,
       )));
     try {
-      _0x5919cb['currentTime'] = _0x183ece;
-    } catch (_0x1186b0) {
-      _0x93e120(_0x1186b0 instanceof Error ? _0x1186b0 : new Error(String(_0x1186b0)));
+      el4['currentTime'] = value4;
+    } catch (value10) {
+      handler6(value10 instanceof Error ? value10 : new Error(String(value10)));
     }
   });
 }
 export async function extractClientVideoTimelineFrameUrls({
-  src: _0x18f833,
-  count: _0x2a24f0,
-  sampleTimes: _0x11cc19,
+  src: src,
+  count: count,
+  sampleTimes: sampleTimes,
   isCurrent: isCurrent = () => !![],
   documentRef: documentRef = globalThis['document'],
   attachMediaSource: attachMediaSource = attachMediaElementPlaybackSource,
   waitForFrame: waitForFrame = waitForVideoFrame,
-  onDuration: _0x5427b9,
+  onDuration: onDuration,
 } = {}) {
-  const _0x4dfb07 = normalizeText(_0x18f833),
-    _0x22db05 = Array['isArray'](_0x11cc19) ? _0x11cc19['filter'](Number['isFinite']) : null,
-    _0xb28c1f = _0x22db05 ? _0x22db05['length'] : Math['max'](0x1, Math['trunc'](Number(_0x2a24f0) || 0x0));
-  if (!_0x4dfb07 || !documentRef?.['createElement']) return [];
-  const _0x2785df = documentRef['createElement']('video');
-  ((_0x2785df['muted'] = !![]),
-    (_0x2785df['playsInline'] = !![]),
-    (_0x2785df['preload'] = 'auto'),
-    (_0x2785df['crossOrigin'] = 'anonymous'),
-    _0x2785df['setAttribute']?.('aria-hidden', 'true'));
-  _0x2785df['style'] &&
-    ((_0x2785df['style']['position'] = 'fixed'),
-    (_0x2785df['style']['left'] = '-10000px'),
-    (_0x2785df['style']['top'] = '-10000px'),
-    (_0x2785df['style']['width'] = '1px'),
-    (_0x2785df['style']['height'] = '1px'),
-    (_0x2785df['style']['opacity'] = '0'),
-    (_0x2785df['style']['pointerEvents'] = 'none'));
-  documentRef['body']?.['appendChild']?.(_0x2785df);
-  let _0x35fdf0 = null;
+  const text2 = normalizeText(src),
+    list5 = Array['isArray'](sampleTimes) ? sampleTimes['filter'](Number['isFinite']) : null,
+    value11 = list5 ? list5['length'] : Math['max'](0x1, Math['trunc'](Number(count) || 0x0));
+  if (!text2 || !documentRef?.['createElement']) return [];
+  const el5 = documentRef['createElement']('video');
+  ((el5['muted'] = !![]),
+    (el5['playsInline'] = !![]),
+    (el5['preload'] = 'auto'),
+    (el5['crossOrigin'] = 'anonymous'),
+    el5['setAttribute']?.('aria-hidden', 'true'));
+  el5['style'] &&
+    ((el5['style']['position'] = 'fixed'),
+    (el5['style']['left'] = '-10000px'),
+    (el5['style']['top'] = '-10000px'),
+    (el5['style']['width'] = '1px'),
+    (el5['style']['height'] = '1px'),
+    (el5['style']['opacity'] = '0'),
+    (el5['style']['pointerEvents'] = 'none'));
+  documentRef['body']?.['appendChild']?.(el5);
+  let box = null;
   try {
-    await attachMediaSource(_0x2785df, _0x4dfb07, { preload: 'auto' });
-    if (!getVideoSource(_0x2785df)) throw new Error('video\x20thumbnail\x20source\x20is\x20empty');
-    await waitForLoadedMetadata(_0x2785df, THUMB_METADATA_TIMEOUT_MS);
+    await attachMediaSource(el5, text2, { preload: 'auto' });
+    if (!getVideoSource(el5)) throw new Error('video\x20thumbnail\x20source\x20is\x20empty');
+    await waitForLoadedMetadata(el5, THUMB_METADATA_TIMEOUT_MS);
     if (!isCurrent()) return [];
-    const _0xdc0040 = await waitForFrame(_0x2785df, { timeoutMs: 0x1388 });
-    if (!_0xdc0040) throw new Error('video thumbnail frame timed out');
-    const _0x3dd582 = Number(_0x2785df['duration']);
-    if (!Number['isFinite'](_0x3dd582) || _0x3dd582 <= 0x0)
+    const waitForFrame2 = await waitForFrame(el5, { timeoutMs: 0x1388 });
+    if (!waitForFrame2) throw new Error('video thumbnail frame timed out');
+    const count2 = Number(el5['duration']);
+    if (!Number['isFinite'](count2) || count2 <= 0x0)
       throw new Error('video thumbnail duration is unavailable');
     if (!isCurrent()) return [];
-    _0x5427b9?.(_0x3dd582);
-    const _0x200cb0 = Math['max'](0x1, Number(_0x2785df['videoWidth']) || 0x1),
-      _0x314df0 = Math['max'](0x1, Number(_0x2785df['videoHeight']) || 0x1),
-      _0x1ae759 = 0x2c,
-      _0x4caa06 = Math['max'](0x1, Math['min'](0xf0, Math['round']((_0x200cb0 / _0x314df0) * _0x1ae759)));
-    ((_0x35fdf0 = documentRef['createElement']('canvas')),
-      (_0x35fdf0['width'] = _0x4caa06),
-      (_0x35fdf0['height'] = _0x1ae759));
-    const _0x235825 = _0x35fdf0['getContext']?.('2d', { willReadFrequently: ![] });
-    if (!_0x235825) throw new Error('video thumbnail canvas is unavailable');
-    const _0x22b422 = [];
-    for (let _0x2be2c8 = 0x0; _0x2be2c8 < _0xb28c1f; _0x2be2c8 += 0x1) {
+    onDuration?.(count2);
+    const value12 = Math['max'](0x1, Number(el5['videoWidth']) || 0x1),
+      value13 = Math['max'](0x1, Number(el5['videoHeight']) || 0x1),
+      value14 = 0x2c,
+      value15 = Math['max'](0x1, Math['min'](0xf0, Math['round']((value12 / value13) * value14)));
+    ((box = documentRef['createElement']('canvas')), (box['width'] = value15), (box['height'] = value14));
+    const ctx = box['getContext']?.('2d', { willReadFrequently: ![] });
+    if (!ctx) throw new Error('video thumbnail canvas is unavailable');
+    const list6 = [];
+    for (let value16 = 0x0; value16 < value11; value16 += 0x1) {
       if (!isCurrent()) return [];
-      const _0x1e5e50 = Math['min'](
-        Math['max'](0x0, _0x3dd582 - 0.05),
-        _0x22db05 ? Math['max'](0x0, _0x22db05[_0x2be2c8]) : ((_0x2be2c8 + 0.5) / _0xb28c1f) * _0x3dd582,
+      const value17 = Math['min'](
+        Math['max'](0x0, count2 - 0.05),
+        list5 ? Math['max'](0x0, list5[value16]) : ((value16 + 0.5) / value11) * count2,
       );
-      await seekVideo(_0x2785df, _0x1e5e50, THUMB_SEEK_TIMEOUT_MS);
-      const _0x4c979e = await waitForFrame(_0x2785df, { timeoutMs: 0x708 });
-      if (!_0x4c979e) throw new Error('video thumbnail frame timed out after seek');
-      (_0x235825['clearRect'](0x0, 0x0, _0x4caa06, _0x1ae759),
-        _0x235825['drawImage'](_0x2785df, 0x0, 0x0, _0x4caa06, _0x1ae759));
-      const _0x1b46d2 = _0x35fdf0['toDataURL']('image/jpeg', 0.72);
-      if (!_0x1b46d2) throw new Error('video\x20thumbnail\x20export\x20returned\x20no\x20data');
-      _0x22b422['push'](_0x1b46d2);
+      await seekVideo(el5, value17, THUMB_SEEK_TIMEOUT_MS);
+      const waitForFrame3 = await waitForFrame(el5, { timeoutMs: 0x708 });
+      if (!waitForFrame3) throw new Error('video thumbnail frame timed out after seek');
+      (ctx['clearRect'](0x0, 0x0, value15, value14), ctx['drawImage'](el5, 0x0, 0x0, value15, value14));
+      const enabled = box['toDataURL']('image/jpeg', 0.72);
+      if (!enabled) throw new Error('video\x20thumbnail\x20export\x20returned\x20no\x20data');
+      list6['push'](enabled);
     }
-    return _0x22b422;
+    return list6;
   } finally {
     try {
-      (_0x2785df['pause']?.(), _0x2785df['removeAttribute']?.('src'), _0x2785df['load']?.());
+      (el5['pause']?.(), el5['removeAttribute']?.('src'), el5['load']?.());
     } catch {}
-    _0x2785df['remove']?.();
-    if (_0x35fdf0) _0x35fdf0['width'] = _0x35fdf0['height'] = 0x0;
+    el5['remove']?.();
+    if (box) box['width'] = box['height'] = 0x0;
   }
 }
 export async function renderVideoTimelineThumbnails({
-  src: _0x22ba51,
-  posterUrl: _0x390199,
-  thumbs: _0x26e489,
+  src: src2,
+  posterUrl: posterUrl,
+  thumbs: thumbs,
   isCurrent: isCurrent = () => !![],
   extractServerFrames: extractServerFrames = extractStoryboardVideoFramesFromServer,
   extractClientFrames: extractClientFrames = extractClientVideoTimelineFrameUrls,
-  onDuration: _0x9a1344,
+  onDuration: onDuration2,
 } = {}) {
-  const _0x18ec40 = Array['isArray'](_0x26e489) ? _0x26e489 : [],
-    _0x512e61 = normalizeText(_0x22ba51),
-    _0x2b64d4 = normalizeText(_0x390199),
-    _0x3dcea4 = [];
-  if (!_0x18ec40['length']) return { source: 'empty', errors: _0x3dcea4 };
-  if (!isCurrent()) return { source: 'cancelled', errors: _0x3dcea4 };
-  if (_0x2b64d4) paintVideoTimelineThumbnailUrls(_0x18ec40, [_0x2b64d4], 'poster');
-  else setThumbState(_0x18ec40, 'loading');
-  if (!_0x512e61)
+  const maxFrames = Array['isArray'](thumbs) ? thumbs : [],
+    src3 = normalizeText(src2),
+    source2 = normalizeText(posterUrl),
+    errors = [];
+  if (!maxFrames['length']) return { source: 'empty', errors: errors };
+  if (!isCurrent()) return { source: 'cancelled', errors: errors };
+  if (source2) paintVideoTimelineThumbnailUrls(maxFrames, [source2], 'poster');
+  else setThumbState(maxFrames, 'loading');
+  if (!src3)
     return (
-      setThumbState(_0x18ec40, _0x2b64d4 ? 'poster' : 'failed'),
-      { source: _0x2b64d4 ? 'poster' : 'empty', errors: _0x3dcea4 }
+      setThumbState(maxFrames, source2 ? 'poster' : 'failed'),
+      { source: source2 ? 'poster' : 'empty', errors: errors }
     );
-  for (const _0x1143f of _0x18ec40) _0x1143f?.['setAttribute']?.('aria-busy', 'true');
+  for (const el6 of maxFrames) el6?.['setAttribute']?.('aria-busy', 'true');
   try {
-    const _0x42dadb = await extractServerFrames(_0x512e61, {
-      maxFrames: _0x18ec40['length'],
+    const extractServerFrames2 = await extractServerFrames(src3, {
+      maxFrames: maxFrames['length'],
       exactCount: !![],
     });
-    if (!isCurrent()) return { source: 'cancelled', errors: _0x3dcea4 };
-    const _0x3c07b5 = (Array['isArray'](_0x42dadb?.['frames']) ? _0x42dadb['frames'] : [])
+    if (!isCurrent()) return { source: 'cancelled', errors: errors };
+    const list7 = (Array['isArray'](extractServerFrames2?.['frames']) ? extractServerFrames2['frames'] : [])
       ['map'](resolveFrameUrl)
       ['filter'](Boolean);
-    if (!_0x3c07b5['length']) throw new Error('server returned no video thumbnails');
-    const _0x3ce842 = Number(_0x42dadb?.['duration']);
-    if (Number['isFinite'](_0x3ce842) && _0x3ce842 > 0x0) _0x9a1344?.(_0x3ce842);
+    if (!list7['length']) throw new Error('server returned no video thumbnails');
+    const count3 = Number(extractServerFrames2?.['duration']);
+    if (Number['isFinite'](count3) && count3 > 0x0) onDuration2?.(count3);
     return (
-      paintVideoTimelineThumbnailUrls(_0x18ec40, _0x3c07b5, 'server'),
-      { source: 'server', errors: _0x3dcea4 }
+      paintVideoTimelineThumbnailUrls(maxFrames, list7, 'server'),
+      { source: 'server', errors: errors }
     );
-  } catch (_0x27bf60) {
-    _0x3dcea4['push'](_0x27bf60 instanceof Error ? _0x27bf60 : new Error(String(_0x27bf60)));
+  } catch (value18) {
+    errors['push'](value18 instanceof Error ? value18 : new Error(String(value18)));
   }
-  if (!isCurrent()) return { source: 'cancelled', errors: _0x3dcea4 };
+  if (!isCurrent()) return { source: 'cancelled', errors: errors };
   try {
-    const _0x3bf90e = await extractClientFrames({
-      src: _0x512e61,
-      count: _0x18ec40['length'],
+    const list8 = await extractClientFrames({
+      src: src3,
+      count: maxFrames['length'],
       isCurrent: isCurrent,
-      onDuration: (_0x327b03) => {
-        if (isCurrent()) _0x9a1344?.(_0x327b03);
+      onDuration: (value19) => {
+        if (isCurrent()) onDuration2?.(value19);
       },
     });
-    if (!isCurrent()) return { source: 'cancelled', errors: _0x3dcea4 };
-    if (!Array['isArray'](_0x3bf90e) || !_0x3bf90e['some'](Boolean))
+    if (!isCurrent()) return { source: 'cancelled', errors: errors };
+    if (!Array['isArray'](list8) || !list8['some'](Boolean))
       throw new Error('browser\x20returned\x20no\x20video\x20thumbnails');
     return (
-      paintVideoTimelineThumbnailUrls(_0x18ec40, _0x3bf90e, 'client'),
-      { source: 'client', errors: _0x3dcea4 }
+      paintVideoTimelineThumbnailUrls(maxFrames, list8, 'client'),
+      { source: 'client', errors: errors }
     );
-  } catch (_0x4775cd) {
-    _0x3dcea4['push'](_0x4775cd instanceof Error ? _0x4775cd : new Error(String(_0x4775cd)));
+  } catch (value20) {
+    errors['push'](value20 instanceof Error ? value20 : new Error(String(value20)));
   }
-  if (!isCurrent()) return { source: 'cancelled', errors: _0x3dcea4 };
+  if (!isCurrent()) return { source: 'cancelled', errors: errors };
   return (
-    setThumbState(_0x18ec40, _0x2b64d4 ? 'poster' : 'failed'),
-    { source: _0x2b64d4 ? 'poster' : 'empty', errors: _0x3dcea4 }
+    setThumbState(maxFrames, source2 ? 'poster' : 'failed'),
+    { source: source2 ? 'poster' : 'empty', errors: errors }
   );
 }

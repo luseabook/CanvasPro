@@ -82,288 +82,288 @@ const WHITEBOARD_TOOL_SET = new Set([
   WHITEBOARD_POINT_LIMIT = 0x1388,
   WHITEBOARD_MIN_ZOOM = 0.1,
   WHITEBOARD_MAX_ZOOM = 0x8,
-  finiteNumberOr = (_0x1b0f99, _0x3bd761 = 0x0) => {
-    const _0x167bd8 = Number(_0x1b0f99);
-    return Number['isFinite'](_0x167bd8) ? _0x167bd8 : _0x3bd761;
+  finiteNumberOr = (value, item = 0x0) => {
+    const key = Number(value);
+    return Number['isFinite'](key) ? key : item;
   },
-  normalizeColorName = (_0x2fad46, _0x59a35f = WHITEBOARD_DEFAULT_COLOR) => {
-    const _0x436cf9 = String(_0x2fad46 || '')['trim']();
-    return WHITEBOARD_COLOR_SET['has'](_0x436cf9) ? _0x436cf9 : _0x59a35f;
+  normalizeColorName = (index, result = WHITEBOARD_DEFAULT_COLOR) => {
+    const data = String(index || '')['trim']();
+    return WHITEBOARD_COLOR_SET['has'](data) ? data : result;
   },
-  normalizeTool = (_0x354021, _0x29a41c = WHITEBOARD_DEFAULT_TOOL) => {
-    const _0x3422bd = String(_0x354021 || '')['trim']();
-    return WHITEBOARD_TOOL_SET['has'](_0x3422bd) ? _0x3422bd : _0x29a41c;
+  normalizeTool = (options, target = WHITEBOARD_DEFAULT_TOOL) => {
+    const source = String(options || '')['trim']();
+    return WHITEBOARD_TOOL_SET['has'](source) ? source : target;
   },
-  normalizeShapeType = (_0x284474, _0x1cabe1 = WHITEBOARD_DEFAULT_SHAPE_TYPE) => {
-    const _0x1ae727 = String(_0x284474 || '')['trim']();
-    return WHITEBOARD_SHAPE_TYPE_SET['has'](_0x1ae727) ? _0x1ae727 : _0x1cabe1;
+  normalizeShapeType = (next, current = WHITEBOARD_DEFAULT_SHAPE_TYPE) => {
+    const entry = String(next || '')['trim']();
+    return WHITEBOARD_SHAPE_TYPE_SET['has'](entry) ? entry : current;
   },
-  normalizeBrushSize = (_0x2aa115, _0x158423 = WHITEBOARD_DEFAULT_BRUSH_SIZE_PX) => {
-    const _0x2e4347 = finiteNumberOr(_0x2aa115, _0x158423);
-    return Math['max'](0x1, Math['min'](0x78, _0x2e4347));
+  normalizeBrushSize = (record, payload = WHITEBOARD_DEFAULT_BRUSH_SIZE_PX) => {
+    const finiteNumberOr2 = finiteNumberOr(record, payload);
+    return Math['max'](0x1, Math['min'](0x78, finiteNumberOr2));
   },
-  normalizeOpacity = (_0x41cb9e, _0x39b905 = WHITEBOARD_DEFAULT_STYLE['opacity']) => {
-    const _0x1bdcbc = finiteNumberOr(_0x41cb9e, _0x39b905);
-    return Math['max'](0.1, Math['min'](0x1, _0x1bdcbc));
+  normalizeOpacity = (handle, state = WHITEBOARD_DEFAULT_STYLE['opacity']) => {
+    const finiteNumberOr3 = finiteNumberOr(handle, state);
+    return Math['max'](0.1, Math['min'](0x1, finiteNumberOr3));
   },
-  normalizeEnum = (_0x3a2a21, _0x247dd0, _0x4852c8) => {
-    const _0x1bcaa7 = String(_0x3a2a21 || '')['trim']();
-    return _0x247dd0['has'](_0x1bcaa7) ? _0x1bcaa7 : _0x4852c8;
+  normalizeEnum = (config, map, scope) => {
+    const input = String(config || '')['trim']();
+    return map['has'](input) ? input : scope;
   },
-  normalizeView = (_0x275d5c) => {
-    const _0x292c1e = _0x275d5c && typeof _0x275d5c === 'object' ? _0x275d5c : {},
-      _0x392961 = finiteNumberOr(_0x292c1e['zoom'], WHITEBOARD_DEFAULT_VIEW['zoom']);
+  normalizeView = (output) => {
+    const box = output && typeof output === 'object' ? output : {},
+      finiteNumberOr4 = finiteNumberOr(box['zoom'], WHITEBOARD_DEFAULT_VIEW['zoom']);
     return {
-      x: finiteNumberOr(_0x292c1e['x'], WHITEBOARD_DEFAULT_VIEW['x']),
-      y: finiteNumberOr(_0x292c1e['y'], WHITEBOARD_DEFAULT_VIEW['y']),
-      zoom: Math['max'](WHITEBOARD_MIN_ZOOM, Math['min'](WHITEBOARD_MAX_ZOOM, _0x392961)),
+      x: finiteNumberOr(box['x'], WHITEBOARD_DEFAULT_VIEW['x']),
+      y: finiteNumberOr(box['y'], WHITEBOARD_DEFAULT_VIEW['y']),
+      zoom: Math['max'](WHITEBOARD_MIN_ZOOM, Math['min'](WHITEBOARD_MAX_ZOOM, finiteNumberOr4)),
     };
   },
-  normalizeStyle = (_0x225ce4 = {}, _0x2fcf11 = {}) => {
-    const _0x5768cd = _0x225ce4 && typeof _0x225ce4 === 'object' ? _0x225ce4 : {};
+  normalizeStyle = (options2 = {}, value2 = {}) => {
+    const value3 = options2 && typeof options2 === 'object' ? options2 : {};
     return {
-      color: normalizeColorName(_0x5768cd['color'], normalizeColorName(_0x2fcf11['color'])),
-      size: normalizeBrushSize(_0x5768cd['size'] ?? _0x2fcf11['brushSizePx']),
-      opacity: normalizeOpacity(_0x5768cd['opacity']),
-      fill: normalizeEnum(_0x5768cd['fill'], WHITEBOARD_FILL_SET, WHITEBOARD_DEFAULT_STYLE['fill']),
-      dash: normalizeEnum(_0x5768cd['dash'], WHITEBOARD_DASH_SET, WHITEBOARD_DEFAULT_STYLE['dash']),
-      font: normalizeEnum(_0x5768cd['font'], WHITEBOARD_FONT_SET, WHITEBOARD_DEFAULT_STYLE['font']),
+      color: normalizeColorName(value3['color'], normalizeColorName(value2['color'])),
+      size: normalizeBrushSize(value3['size'] ?? value2['brushSizePx']),
+      opacity: normalizeOpacity(value3['opacity']),
+      fill: normalizeEnum(value3['fill'], WHITEBOARD_FILL_SET, WHITEBOARD_DEFAULT_STYLE['fill']),
+      dash: normalizeEnum(value3['dash'], WHITEBOARD_DASH_SET, WHITEBOARD_DEFAULT_STYLE['dash']),
+      font: normalizeEnum(value3['font'], WHITEBOARD_FONT_SET, WHITEBOARD_DEFAULT_STYLE['font']),
       textAlign: normalizeEnum(
-        _0x5768cd['textAlign'],
+        value3['textAlign'],
         WHITEBOARD_TEXT_ALIGN_SET,
         WHITEBOARD_DEFAULT_STYLE['textAlign'],
       ),
       arrowKind: normalizeEnum(
-        _0x5768cd['arrowKind'],
+        value3['arrowKind'],
         WHITEBOARD_ARROW_KIND_SET,
         WHITEBOARD_DEFAULT_STYLE['arrowKind'],
       ),
       arrowStart: normalizeEnum(
-        _0x5768cd['arrowStart'],
+        value3['arrowStart'],
         WHITEBOARD_ARROWHEAD_SET,
         WHITEBOARD_DEFAULT_STYLE['arrowStart'],
       ),
       arrowEnd: normalizeEnum(
-        _0x5768cd['arrowEnd'],
+        value3['arrowEnd'],
         WHITEBOARD_ARROWHEAD_SET,
         WHITEBOARD_DEFAULT_STYLE['arrowEnd'],
       ),
     };
   },
-  applyCommandStyle = (_0x5e9d29, _0x1adbd4 = {}) => {
-    const _0x39a5c3 = { ..._0x5e9d29 },
-      _0xf513eb = normalizeColorName(_0x1adbd4['colorName'], '');
-    if (_0xf513eb) _0x39a5c3['colorName'] = _0xf513eb;
-    if ('opacity' in _0x1adbd4) _0x39a5c3['opacity'] = normalizeOpacity(_0x1adbd4['opacity']);
+  applyCommandStyle = (args, value4 = {}) => {
+    const value5 = { ...args },
+      colorName = normalizeColorName(value4['colorName'], '');
+    if (colorName) value5['colorName'] = colorName;
+    if ('opacity' in value4) value5['opacity'] = normalizeOpacity(value4['opacity']);
     return (
-      'dash' in _0x1adbd4 &&
-        (_0x39a5c3['dash'] = normalizeEnum(
-          _0x1adbd4['dash'],
+      'dash' in value4 &&
+        (value5['dash'] = normalizeEnum(
+          value4['dash'],
           WHITEBOARD_DASH_SET,
           WHITEBOARD_DEFAULT_STYLE['dash'],
         )),
-      'fill' in _0x1adbd4 &&
-        (_0x39a5c3['fill'] = normalizeEnum(
-          _0x1adbd4['fill'],
+      'fill' in value4 &&
+        (value5['fill'] = normalizeEnum(
+          value4['fill'],
           WHITEBOARD_FILL_SET,
           WHITEBOARD_DEFAULT_STYLE['fill'],
         )),
-      'font' in _0x1adbd4 &&
-        (_0x39a5c3['font'] = normalizeEnum(
-          _0x1adbd4['font'],
+      'font' in value4 &&
+        (value5['font'] = normalizeEnum(
+          value4['font'],
           WHITEBOARD_FONT_SET,
           WHITEBOARD_DEFAULT_STYLE['font'],
         )),
-      'textAlign' in _0x1adbd4 &&
-        (_0x39a5c3['textAlign'] = normalizeEnum(
-          _0x1adbd4['textAlign'],
+      'textAlign' in value4 &&
+        (value5['textAlign'] = normalizeEnum(
+          value4['textAlign'],
           WHITEBOARD_TEXT_ALIGN_SET,
           WHITEBOARD_DEFAULT_STYLE['textAlign'],
         )),
-      'arrowStart' in _0x1adbd4 &&
-        (_0x39a5c3['arrowStart'] = normalizeEnum(
-          _0x1adbd4['arrowStart'],
+      'arrowStart' in value4 &&
+        (value5['arrowStart'] = normalizeEnum(
+          value4['arrowStart'],
           WHITEBOARD_ARROWHEAD_SET,
           WHITEBOARD_DEFAULT_STYLE['arrowStart'],
         )),
-      'arrowKind' in _0x1adbd4 &&
-        (_0x39a5c3['arrowKind'] = normalizeEnum(
-          _0x1adbd4['arrowKind'],
+      'arrowKind' in value4 &&
+        (value5['arrowKind'] = normalizeEnum(
+          value4['arrowKind'],
           WHITEBOARD_ARROW_KIND_SET,
           WHITEBOARD_DEFAULT_STYLE['arrowKind'],
         )),
-      'arrowEnd' in _0x1adbd4 &&
-        (_0x39a5c3['arrowEnd'] = normalizeEnum(
-          _0x1adbd4['arrowEnd'],
+      'arrowEnd' in value4 &&
+        (value5['arrowEnd'] = normalizeEnum(
+          value4['arrowEnd'],
           WHITEBOARD_ARROWHEAD_SET,
           WHITEBOARD_DEFAULT_STYLE['arrowEnd'],
         )),
-      _0x39a5c3
+      value5
     );
   },
-  normalizePointList = (_0x11a120) =>
-    (Array['isArray'](_0x11a120) ? _0x11a120 : [])
+  normalizePointList = (value6) =>
+    (Array['isArray'](value6) ? value6 : [])
       ['slice'](0x0, WHITEBOARD_POINT_LIMIT)
-      ['map']((_0x1a86d8) => {
-        const _0x5593e6 = Number(_0x1a86d8?.['x']),
-          _0xb0746f = Number(_0x1a86d8?.['y']);
-        if (!Number['isFinite'](_0x5593e6) || !Number['isFinite'](_0xb0746f)) return null;
-        return { x: _0x5593e6, y: _0xb0746f };
+      ['map']((box2) => {
+        const x2 = Number(box2?.['x']),
+          y2 = Number(box2?.['y']);
+        if (!Number['isFinite'](x2) || !Number['isFinite'](y2)) return null;
+        return { x: x2, y: y2 };
       })
       ['filter'](Boolean);
-export function normalizeWhiteboardCommand(_0x32eef1) {
-  if (!_0x32eef1 || typeof _0x32eef1 !== 'object') return null;
-  const _0x5d8d9f = String(_0x32eef1['type'] || '')['trim']();
-  if (_0x5d8d9f === 'brush')
+export function normalizeWhiteboardCommand(arrowEnd) {
+  if (!arrowEnd || typeof arrowEnd !== 'object') return null;
+  const type = String(arrowEnd['type'] || '')['trim']();
+  if (type === 'brush')
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        color: String(_0x32eef1['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(_0x32eef1['sizeWorld'], 0x1)),
-        points: normalizePointList(_0x32eef1['points']),
+        type: type,
+        color: String(arrowEnd['color'] || ''),
+        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        points: normalizePointList(arrowEnd['points']),
       },
-      _0x32eef1,
+      arrowEnd,
     );
-  if (_0x5d8d9f === 'eraser')
+  if (type === 'eraser')
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        sizeWorld: Math['max'](0x1, finiteNumberOr(_0x32eef1['sizeWorld'], 0x1)),
-        points: normalizePointList(_0x32eef1['points']),
+        type: type,
+        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        points: normalizePointList(arrowEnd['points']),
       },
-      _0x32eef1,
+      arrowEnd,
     );
-  if (_0x5d8d9f === 'rect')
+  if (type === 'rect')
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        color: String(_0x32eef1['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(_0x32eef1['sizeWorld'], 0x1)),
-        x1: finiteNumberOr(_0x32eef1['x1']),
-        y1: finiteNumberOr(_0x32eef1['y1']),
-        x2: finiteNumberOr(_0x32eef1['x2']),
-        y2: finiteNumberOr(_0x32eef1['y2']),
-        rotation: finiteNumberOr(_0x32eef1['rotation']),
+        type: type,
+        color: String(arrowEnd['color'] || ''),
+        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        x1: finiteNumberOr(arrowEnd['x1']),
+        y1: finiteNumberOr(arrowEnd['y1']),
+        x2: finiteNumberOr(arrowEnd['x2']),
+        y2: finiteNumberOr(arrowEnd['y2']),
+        rotation: finiteNumberOr(arrowEnd['rotation']),
       },
-      _0x32eef1,
+      arrowEnd,
     );
-  if (_0x5d8d9f === 'arrow') {
-    const _0x2329ed = finiteNumberOr(_0x32eef1['bend']);
+  if (type === 'arrow') {
+    const bend = finiteNumberOr(arrowEnd['bend']);
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        color: String(_0x32eef1['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(_0x32eef1['sizeWorld'], 0x1)),
-        x1: finiteNumberOr(_0x32eef1['x1']),
-        y1: finiteNumberOr(_0x32eef1['y1']),
-        x2: finiteNumberOr(_0x32eef1['x2']),
-        y2: finiteNumberOr(_0x32eef1['y2']),
-        bend: _0x2329ed,
-        elbowOffset: finiteNumberOr(_0x32eef1['elbowOffset']),
+        type: type,
+        color: String(arrowEnd['color'] || ''),
+        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        x1: finiteNumberOr(arrowEnd['x1']),
+        y1: finiteNumberOr(arrowEnd['y1']),
+        x2: finiteNumberOr(arrowEnd['x2']),
+        y2: finiteNumberOr(arrowEnd['y2']),
+        bend: bend,
+        elbowOffset: finiteNumberOr(arrowEnd['elbowOffset']),
         arrowKind: normalizeEnum(
-          _0x32eef1['arrowKind'],
+          arrowEnd['arrowKind'],
           WHITEBOARD_ARROW_KIND_SET,
-          Math['abs'](_0x2329ed) > 0x0 ? 'arc' : WHITEBOARD_DEFAULT_STYLE['arrowKind'],
+          Math['abs'](bend) > 0x0 ? 'arc' : WHITEBOARD_DEFAULT_STYLE['arrowKind'],
         ),
-        arrowEnd: _0x32eef1['arrowEnd'] ?? WHITEBOARD_DEFAULT_STYLE['arrowEnd'],
+        arrowEnd: arrowEnd['arrowEnd'] ?? WHITEBOARD_DEFAULT_STYLE['arrowEnd'],
       },
-      _0x32eef1,
+      arrowEnd,
     );
   }
-  if (_0x5d8d9f === 'shape')
+  if (type === 'shape')
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        shapeType: normalizeShapeType(_0x32eef1['shapeType']),
-        color: String(_0x32eef1['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(_0x32eef1['sizeWorld'], 0x1)),
-        x1: finiteNumberOr(_0x32eef1['x1']),
-        y1: finiteNumberOr(_0x32eef1['y1']),
-        x2: finiteNumberOr(_0x32eef1['x2']),
-        y2: finiteNumberOr(_0x32eef1['y2']),
-        rotation: finiteNumberOr(_0x32eef1['rotation']),
+        type: type,
+        shapeType: normalizeShapeType(arrowEnd['shapeType']),
+        color: String(arrowEnd['color'] || ''),
+        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        x1: finiteNumberOr(arrowEnd['x1']),
+        y1: finiteNumberOr(arrowEnd['y1']),
+        x2: finiteNumberOr(arrowEnd['x2']),
+        y2: finiteNumberOr(arrowEnd['y2']),
+        rotation: finiteNumberOr(arrowEnd['rotation']),
       },
-      _0x32eef1,
+      arrowEnd,
     );
-  if (_0x5d8d9f === 'fill')
+  if (type === 'fill')
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        color: String(_0x32eef1['color'] || ''),
-        x: finiteNumberOr(_0x32eef1['x']),
-        y: finiteNumberOr(_0x32eef1['y']),
+        type: type,
+        color: String(arrowEnd['color'] || ''),
+        x: finiteNumberOr(arrowEnd['x']),
+        y: finiteNumberOr(arrowEnd['y']),
       },
-      _0x32eef1,
+      arrowEnd,
     );
-  if (_0x5d8d9f === 'text')
+  if (type === 'text')
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        text: String(_0x32eef1['text'] || '')['slice'](0x0, 0xc8),
-        color: String(_0x32eef1['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(_0x32eef1['sizeWorld'], 0x10)),
-        x: finiteNumberOr(_0x32eef1['x']),
-        y: finiteNumberOr(_0x32eef1['y']),
-        scale: finiteNumberOr(_0x32eef1['scale'], 0x1),
-        scaleX: finiteNumberOr(_0x32eef1['scaleX'], 0x1),
-        scaleY: finiteNumberOr(_0x32eef1['scaleY'], 0x1),
-        rotation: finiteNumberOr(_0x32eef1['rotation']),
+        type: type,
+        text: String(arrowEnd['text'] || '')['slice'](0x0, 0xc8),
+        color: String(arrowEnd['color'] || ''),
+        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x10)),
+        x: finiteNumberOr(arrowEnd['x']),
+        y: finiteNumberOr(arrowEnd['y']),
+        scale: finiteNumberOr(arrowEnd['scale'], 0x1),
+        scaleX: finiteNumberOr(arrowEnd['scaleX'], 0x1),
+        scaleY: finiteNumberOr(arrowEnd['scaleY'], 0x1),
+        rotation: finiteNumberOr(arrowEnd['rotation']),
       },
-      _0x32eef1,
+      arrowEnd,
     );
-  if (_0x5d8d9f === 'number-label')
+  if (type === 'number-label')
     return applyCommandStyle(
       {
-        type: _0x5d8d9f,
-        number: Math['max'](0x1, Math['floor'](finiteNumberOr(_0x32eef1['number'], 0x1))),
-        color: String(_0x32eef1['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(_0x32eef1['sizeWorld'], 0x12)),
-        x: finiteNumberOr(_0x32eef1['x']),
-        y: finiteNumberOr(_0x32eef1['y']),
+        type: type,
+        number: Math['max'](0x1, Math['floor'](finiteNumberOr(arrowEnd['number'], 0x1))),
+        color: String(arrowEnd['color'] || ''),
+        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x12)),
+        x: finiteNumberOr(arrowEnd['x']),
+        y: finiteNumberOr(arrowEnd['y']),
       },
-      _0x32eef1,
+      arrowEnd,
     );
   return null;
 }
-export function normalizeWhiteboardCommands(_0x32cd0f) {
-  return (Array['isArray'](_0x32cd0f) ? _0x32cd0f : [])
+export function normalizeWhiteboardCommands(value7) {
+  return (Array['isArray'](value7) ? value7 : [])
     ['slice'](0x0, WHITEBOARD_COMMAND_LIMIT)
     ['map'](normalizeWhiteboardCommand)
     ['filter'](Boolean);
 }
-export function createDefaultWhiteboardState(_0x20b8b4 = {}) {
-  const _0x334601 = normalizeStyle(_0x20b8b4['style'], _0x20b8b4);
+export function createDefaultWhiteboardState(el = {}) {
+  const style = normalizeStyle(el['style'], el);
   return {
     version: WHITEBOARD_DATA_VERSION,
-    commands: normalizeWhiteboardCommands(_0x20b8b4['commands']),
-    tool: normalizeTool(_0x20b8b4['tool']),
-    shapeType: normalizeShapeType(_0x20b8b4['shapeType']),
-    view: normalizeView(_0x20b8b4['view']),
-    style: _0x334601,
-    color: _0x334601['color'],
-    brushSizePx: _0x334601['size'],
-    updatedAt: Number['isFinite'](Number(_0x20b8b4['updatedAt'])) ? Number(_0x20b8b4['updatedAt']) : 0x0,
+    commands: normalizeWhiteboardCommands(el['commands']),
+    tool: normalizeTool(el['tool']),
+    shapeType: normalizeShapeType(el['shapeType']),
+    view: normalizeView(el['view']),
+    style: style,
+    color: style['color'],
+    brushSizePx: style['size'],
+    updatedAt: Number['isFinite'](Number(el['updatedAt'])) ? Number(el['updatedAt']) : 0x0,
   };
 }
-export function normalizeWhiteboardState(_0x3713bb) {
-  if (!_0x3713bb || typeof _0x3713bb !== 'object') return createDefaultWhiteboardState();
-  return createDefaultWhiteboardState(_0x3713bb);
+export function normalizeWhiteboardState(enabled) {
+  if (!enabled || typeof enabled !== 'object') return createDefaultWhiteboardState();
+  return createDefaultWhiteboardState(enabled);
 }
-export function getRelevantWhiteboardStyleControls(_0x40ccd0, _0x5cb474 = null) {
-  const _0x3518bd = normalizeTool(_0x40ccd0, 'select');
-  if (_0x3518bd === 'hand') return [];
-  const _0x4aae0b = _0x5cb474?.['type'] || _0x3518bd;
-  if (_0x4aae0b === 'eraser') return ['size'];
-  if (_0x4aae0b === 'brush') return ['color', 'size', 'opacity'];
-  if (_0x4aae0b === 'arrow') return ['color', 'size', 'opacity', 'dash', 'arrow-kind', 'arrowheads'];
-  if (_0x4aae0b === 'rect' || _0x4aae0b === 'shape') return ['color', 'fill', 'size', 'opacity', 'dash'];
-  if (_0x4aae0b === 'text') return ['color', 'size', 'opacity', 'font'];
-  if (_0x4aae0b === 'number-label') return ['color', 'size', 'opacity'];
-  if (_0x4aae0b === 'select') return [];
+export function getRelevantWhiteboardStyleControls(value8, value9 = null) {
+  const tool = normalizeTool(value8, 'select');
+  if (tool === 'hand') return [];
+  const value10 = value9?.['type'] || tool;
+  if (value10 === 'eraser') return ['size'];
+  if (value10 === 'brush') return ['color', 'size', 'opacity'];
+  if (value10 === 'arrow') return ['color', 'size', 'opacity', 'dash', 'arrow-kind', 'arrowheads'];
+  if (value10 === 'rect' || value10 === 'shape') return ['color', 'fill', 'size', 'opacity', 'dash'];
+  if (value10 === 'text') return ['color', 'size', 'opacity', 'font'];
+  if (value10 === 'number-label') return ['color', 'size', 'opacity'];
+  if (value10 === 'select') return [];
   return [];
 }
 export function createWhiteboardNodeData({
-  id: _0x894d6f,
+  id: id,
   x: x = 0x0,
   y: y = 0x0,
   width: width = WHITEBOARD_DEFAULT_SIZE['width'],
@@ -372,7 +372,7 @@ export function createWhiteboardNodeData({
   whiteboard: whiteboard = null,
 } = {}) {
   return {
-    id: _0x894d6f,
+    id: id,
     type: WHITEBOARD_NODE_TYPE,
     x: x,
     y: y,

@@ -3,28 +3,25 @@ export const WEB_PREVIEW_START_PAGE_STORAGE_KEY = 'ai_canvas_web_preview_start_p
 export const WEB_PREVIEW_START_PAGE_SCHEMA_VERSION = 1;
 export const WEB_PREVIEW_START_PAGE_MAX_HISTORY = 50;
 export const WEB_PREVIEW_START_PAGE_MAX_TILES = 8;
-function getStorage(_0x35a79a) {
-  if (_0x35a79a) return _0x35a79a;
+function getStorage(value) {
+  if (value) return value;
   return globalThis.localStorage || globalThis.window?.localStorage || null;
 }
-function nowMs(_0x2d6af5 = Date.now()) {
-  const _0x1e0e28 = Number(_0x2d6af5);
-  return Number.isFinite(_0x1e0e28) && _0x1e0e28 > 0 ? _0x1e0e28 : Date.now();
+function nowMs(item = Date.now()) {
+  const count = Number(item);
+  return Number.isFinite(count) && count > 0 ? count : Date.now();
 }
-function readRawState(_0x1f0f08) {
+function readRawState(key) {
   try {
-    const _0x386712 = getStorage(_0x1f0f08)?.getItem?.(WEB_PREVIEW_START_PAGE_STORAGE_KEY);
-    return _0x386712 ? JSON.parse(_0x386712) : null;
+    const storage = getStorage(key)?.getItem?.(WEB_PREVIEW_START_PAGE_STORAGE_KEY);
+    return storage ? JSON.parse(storage) : null;
   } catch {
     return null;
   }
 }
-function writeRawState(_0x4ab8a8, _0x43acc1) {
+function writeRawState(index, result) {
   try {
-    return (
-      getStorage(_0x43acc1)?.setItem?.(WEB_PREVIEW_START_PAGE_STORAGE_KEY, JSON.stringify(_0x4ab8a8)),
-      true
-    );
+    return (getStorage(result)?.setItem?.(WEB_PREVIEW_START_PAGE_STORAGE_KEY, JSON.stringify(index)), true);
   } catch {
     return false;
   }
@@ -37,286 +34,268 @@ function createEmptyState() {
     hiddenHistoryUrls: [],
   };
 }
-function normalizeTitle(_0x456184, _0x2a0558 = '') {
-  const _0x33fd8e = String(_0x456184 || '')
+function normalizeTitle(data, options = '') {
+  const target = String(data || '')
     .replace(/\s+/g, ' ')
     .trim();
-  return (_0x33fd8e || _0x2a0558 || '').slice(0, 80);
+  return (target || options || '').slice(0, 80);
 }
-function getHostLabel(_0x211b12) {
+function getHostLabel(source) {
   try {
-    const _0x5d9c5f = new URL(_0x211b12).hostname.replace(/^www\./i, '');
-    return _0x5d9c5f || _0x211b12;
+    const uRL = new URL(source).hostname.replace(/^www\./i, '');
+    return uRL || source;
   } catch {
-    return _0x211b12;
+    return source;
   }
 }
-export function getWebPreviewDisplayTitle({ title: _0x4a9f69, url: _0x5d73ab } = {}) {
-  const _0x71683e = normalizeWebPreviewUrl(_0x5d73ab),
-    _0x179bf5 = _0x71683e ? getHostLabel(_0x71683e) : '';
-  return normalizeTitle(_0x4a9f69, _0x179bf5);
+export function getWebPreviewDisplayTitle({ title: title, url: url } = {}) {
+  const webPreviewUrl = normalizeWebPreviewUrl(url),
+    next = webPreviewUrl ? getHostLabel(webPreviewUrl) : '';
+  return normalizeTitle(title, next);
 }
-export function getWebPreviewTileIconLabel({ title: _0x5a5f1c, url: _0x3b4329 } = {}) {
-  const _0x156464 = getWebPreviewDisplayTitle({ title: _0x5a5f1c, url: _0x3b4329 }),
-    _0x4674c8 = [..._0x156464].find((_0x16a00e) => /[\p{L}\p{N}]/u.test(_0x16a00e));
-  return (_0x4674c8 || '+').toUpperCase();
+export function getWebPreviewTileIconLabel({ title: title2, url: url2 } = {}) {
+  const args = getWebPreviewDisplayTitle({ title: title2, url: url2 }),
+    current = [...args].find((item2) => /[\p{L}\p{N}]/u.test(item2));
+  return (current || '+').toUpperCase();
 }
-function normalizeHiddenUrls(_0x54fced) {
-  const _0x2ac223 = Array.isArray(_0x54fced) ? _0x54fced : [],
-    _0xb5d4b0 = new Set(),
-    _0x169129 = [];
-  for (const _0x1e91fd of _0x2ac223) {
-    const _0xf273ab = normalizeWebPreviewUrl(_0x1e91fd);
-    if (!_0xf273ab || _0xb5d4b0.has(_0xf273ab)) continue;
-    (_0xb5d4b0.add(_0xf273ab), _0x169129.push(_0xf273ab));
+function normalizeHiddenUrls(entry) {
+  const record = Array.isArray(entry) ? entry : [],
+    map = new Set(),
+    list = [];
+  for (const payload of record) {
+    const webPreviewUrl2 = normalizeWebPreviewUrl(payload);
+    if (!webPreviewUrl2 || map.has(webPreviewUrl2)) continue;
+    (map.add(webPreviewUrl2), list.push(webPreviewUrl2));
   }
-  return _0x169129;
+  return list;
 }
-function normalizeShortcut(_0x3eaceb, _0x193401) {
-  const _0x5e599e = normalizeWebPreviewUrl(_0x3eaceb?.url);
-  if (!_0x5e599e) return null;
-  const _0x383479 = nowMs(_0x3eaceb?.createdAt || _0x3eaceb?.updatedAt || _0x3eaceb?.lastOpenedAt);
+function normalizeShortcut(title3, handle) {
+  const url3 = normalizeWebPreviewUrl(title3?.url);
+  if (!url3) return null;
+  const createdAt = nowMs(title3?.createdAt || title3?.updatedAt || title3?.lastOpenedAt);
   return {
-    id: normalizeTitle(_0x3eaceb?.id, 'shortcut-' + _0x383479 + '-' + _0x193401).slice(0, 120),
-    title: getWebPreviewDisplayTitle({ title: _0x3eaceb?.title, url: _0x5e599e }),
-    url: _0x5e599e,
-    pinned: _0x3eaceb?.pinned !== false,
-    createdAt: _0x383479,
-    updatedAt: nowMs(_0x3eaceb?.updatedAt || _0x383479),
-    lastOpenedAt: Number(_0x3eaceb?.lastOpenedAt || 0) || 0,
-    order: Number.isFinite(Number(_0x3eaceb?.order)) ? Number(_0x3eaceb.order) : _0x193401,
+    id: normalizeTitle(title3?.id, 'shortcut-' + createdAt + '-' + handle).slice(0, 120),
+    title: getWebPreviewDisplayTitle({ title: title3?.title, url: url3 }),
+    url: url3,
+    pinned: title3?.pinned !== false,
+    createdAt: createdAt,
+    updatedAt: nowMs(title3?.updatedAt || createdAt),
+    lastOpenedAt: Number(title3?.lastOpenedAt || 0) || 0,
+    order: Number.isFinite(Number(title3?.order)) ? Number(title3.order) : handle,
   };
 }
-function normalizeHistoryItem(_0x3387aa) {
-  const _0x5c58b = normalizeWebPreviewUrl(_0x3387aa?.url);
-  if (!_0x5c58b) return null;
+function normalizeHistoryItem(title4) {
+  const url4 = normalizeWebPreviewUrl(title4?.url);
+  if (!url4) return null;
   return {
-    url: _0x5c58b,
-    title: getWebPreviewDisplayTitle({ title: _0x3387aa?.title, url: _0x5c58b }),
-    lastVisitedAt: nowMs(_0x3387aa?.lastVisitedAt),
-    visitCount: Math.max(1, Number.parseInt(_0x3387aa?.visitCount, 10) || 1),
+    url: url4,
+    title: getWebPreviewDisplayTitle({ title: title4?.title, url: url4 }),
+    lastVisitedAt: nowMs(title4?.lastVisitedAt),
+    visitCount: Math.max(1, Number.parseInt(title4?.visitCount, 10) || 1),
   };
 }
-function normalizeState(_0xf225dd) {
-  const _0x53ccb4 = _0xf225dd && typeof _0xf225dd === 'object' ? _0xf225dd : createEmptyState(),
-    _0xd68f04 = new Map(),
-    _0x333e16 = [];
-  for (const [_0x3e75c5, _0x461895] of (Array.isArray(_0x53ccb4.shortcuts)
-    ? _0x53ccb4.shortcuts
-    : []
-  ).entries()) {
-    const _0x1427cb = normalizeShortcut(_0x461895, _0x3e75c5);
-    if (!_0x1427cb) continue;
-    const _0x2cfb4e = _0xd68f04.get(_0x1427cb.url);
-    if (_0x2cfb4e) {
-      ((_0x2cfb4e.title = _0x1427cb.title || _0x2cfb4e.title),
-        (_0x2cfb4e.pinned = _0x2cfb4e.pinned || _0x1427cb.pinned),
-        (_0x2cfb4e.updatedAt = Math.max(_0x2cfb4e.updatedAt, _0x1427cb.updatedAt)),
-        (_0x2cfb4e.lastOpenedAt = Math.max(_0x2cfb4e.lastOpenedAt, _0x1427cb.lastOpenedAt)),
-        (_0x2cfb4e.order = Math.min(_0x2cfb4e.order, _0x1427cb.order)));
+function normalizeState(state) {
+  const config = state && typeof state === 'object' ? state : createEmptyState(),
+    map2 = new Map(),
+    shortcuts = [];
+  for (const [scope, input] of (Array.isArray(config.shortcuts) ? config.shortcuts : []).entries()) {
+    const response = normalizeShortcut(input, scope);
+    if (!response) continue;
+    const output = map2.get(response.url);
+    if (output) {
+      ((output.title = response.title || output.title),
+        (output.pinned = output.pinned || response.pinned),
+        (output.updatedAt = Math.max(output.updatedAt, response.updatedAt)),
+        (output.lastOpenedAt = Math.max(output.lastOpenedAt, response.lastOpenedAt)),
+        (output.order = Math.min(output.order, response.order)));
       continue;
     }
-    (_0xd68f04.set(_0x1427cb.url, _0x1427cb), _0x333e16.push(_0x1427cb));
+    (map2.set(response.url, response), shortcuts.push(response));
   }
-  const _0x2add3c = new Map();
-  for (const _0x58571b of Array.isArray(_0x53ccb4.history) ? _0x53ccb4.history : []) {
-    const _0x3b250a = normalizeHistoryItem(_0x58571b);
-    if (!_0x3b250a) continue;
-    const _0x207ef8 = _0x2add3c.get(_0x3b250a.url);
-    _0x207ef8
-      ? ((_0x207ef8.title = _0x3b250a.title || _0x207ef8.title),
-        (_0x207ef8.lastVisitedAt = Math.max(_0x207ef8.lastVisitedAt, _0x3b250a.lastVisitedAt)),
-        (_0x207ef8.visitCount += _0x3b250a.visitCount))
-      : _0x2add3c.set(_0x3b250a.url, _0x3b250a);
+  const map3 = new Map();
+  for (const value2 of Array.isArray(config.history) ? config.history : []) {
+    const response2 = normalizeHistoryItem(value2);
+    if (!response2) continue;
+    const value3 = map3.get(response2.url);
+    value3
+      ? ((value3.title = response2.title || value3.title),
+        (value3.lastVisitedAt = Math.max(value3.lastVisitedAt, response2.lastVisitedAt)),
+        (value3.visitCount += response2.visitCount))
+      : map3.set(response2.url, response2);
   }
-  const _0x15f0f7 = [..._0x2add3c.values()]
-    .sort((_0x229df2, _0x4b2aae) => _0x4b2aae.lastVisitedAt - _0x229df2.lastVisitedAt)
+  const history = [...map3.values()]
+    .sort((item3, value4) => value4.lastVisitedAt - item3.lastVisitedAt)
     .slice(0, WEB_PREVIEW_START_PAGE_MAX_HISTORY);
   return {
     schemaVersion: WEB_PREVIEW_START_PAGE_SCHEMA_VERSION,
-    shortcuts: _0x333e16,
-    history: _0x15f0f7,
-    hiddenHistoryUrls: normalizeHiddenUrls(_0x53ccb4.hiddenHistoryUrls),
+    shortcuts: shortcuts,
+    history: history,
+    hiddenHistoryUrls: normalizeHiddenUrls(config.hiddenHistoryUrls),
   };
 }
-function readState(_0xf4c40e) {
-  return normalizeState(readRawState(_0xf4c40e));
+function readState(value5) {
+  return normalizeState(readRawState(value5));
 }
-function persistState(_0x11625e, _0x8a6282) {
-  const _0x20b5ae = normalizeState(_0x11625e);
-  return (writeRawState(_0x20b5ae, _0x8a6282), _0x20b5ae);
+function persistState(value6, value7) {
+  const state2 = normalizeState(value6);
+  return (writeRawState(state2, value7), state2);
 }
-function getNextOrder(_0x365409) {
-  return _0x365409.reduce((_0x266187, _0x31eb1c) => Math.max(_0x266187, _0x31eb1c.order || 0), 0) + 1;
+function getNextOrder(list2) {
+  return list2.reduce((item4, value8) => Math.max(item4, value8.order || 0), 0) + 1;
 }
-function createShortcutId(_0x13db20, _0x30d930) {
-  const _0x669343 = getHostLabel(_0x13db20)
+function createShortcutId(value9, value10) {
+  const hostLabel = getHostLabel(value9)
     .replace(/[^a-zA-Z0-9_-]/g, '-')
     .slice(0, 40);
-  return 'web-' + (_0x669343 || 'site') + '-' + _0x30d930;
+  return 'web-' + (hostLabel || 'site') + '-' + value10;
 }
-function removeHiddenUrl(_0xac9a15, _0x2919e2) {
-  _0xac9a15.hiddenHistoryUrls = _0xac9a15.hiddenHistoryUrls.filter((_0x2ad2e9) => _0x2ad2e9 !== _0x2919e2);
+function removeHiddenUrl(value11, value12) {
+  value11.hiddenHistoryUrls = value11.hiddenHistoryUrls.filter((item5) => item5 !== value12);
 }
-function addHiddenUrl(_0x310ae9, _0x3842b5) {
-  if (!_0x310ae9.hiddenHistoryUrls.includes(_0x3842b5)) _0x310ae9.hiddenHistoryUrls.push(_0x3842b5);
+function addHiddenUrl(enabled, value13) {
+  if (!enabled.hiddenHistoryUrls.includes(value13)) enabled.hiddenHistoryUrls.push(value13);
 }
-export function getWebPreviewStartPageState({ storage: _0x1d0418 } = {}) {
-  return readState(_0x1d0418);
+export function getWebPreviewStartPageState({ storage: storage2 } = {}) {
+  return readState(storage2);
 }
 export function getWebPreviewStartPageTiles({
-  storage: _0x3f7fb2,
+  storage: storage3,
   limit: limit = WEB_PREVIEW_START_PAGE_MAX_TILES,
 } = {}) {
-  const _0x1f04e6 = readState(_0x3f7fb2),
-    _0x4a60e9 = Math.max(0, Number.parseInt(limit, 10) || WEB_PREVIEW_START_PAGE_MAX_TILES),
-    _0x130624 = _0x1f04e6.shortcuts
-      .filter((_0x828d74) => _0x828d74.pinned === true)
+  const state3 = readState(storage3),
+    value14 = Math.max(0, Number.parseInt(limit, 10) || WEB_PREVIEW_START_PAGE_MAX_TILES),
+    list3 = state3.shortcuts
+      .filter((item6) => item6.pinned === true)
       .sort(
-        (_0x554880, _0x29d88e) =>
-          (_0x554880.order || 0) - (_0x29d88e.order || 0) || _0x554880.createdAt - _0x29d88e.createdAt,
+        (item7, value15) => (item7.order || 0) - (value15.order || 0) || item7.createdAt - value15.createdAt,
       ),
-    _0x2beef3 = new Set(_0x130624.map((_0x3b144b) => _0x3b144b.url)),
-    _0x1980f9 = new Set(_0x1f04e6.hiddenHistoryUrls),
-    _0x22c8c1 = _0x130624.map((_0x499eea) => ({
+    map4 = new Set(list3.map((response3) => response3.url)),
+    map5 = new Set(state3.hiddenHistoryUrls),
+    args2 = list3.map((id) => ({
       kind: 'shortcut',
-      id: _0x499eea.id,
-      title: _0x499eea.title,
-      url: _0x499eea.url,
+      id: id.id,
+      title: id.title,
+      url: id.url,
       pinned: true,
-      iconLabel: getWebPreviewTileIconLabel(_0x499eea),
+      iconLabel: getWebPreviewTileIconLabel(id),
     })),
-    _0x317817 = _0x1f04e6.history
-      .filter((_0x361176) => !_0x2beef3.has(_0x361176.url) && !_0x1980f9.has(_0x361176.url))
-      .map((_0x3811de) => ({
+    args3 = state3.history
+      .filter((response4) => !map4.has(response4.url) && !map5.has(response4.url))
+      .map((title5) => ({
         kind: 'history',
-        title: _0x3811de.title,
-        url: _0x3811de.url,
+        title: title5.title,
+        url: title5.url,
         pinned: false,
-        iconLabel: getWebPreviewTileIconLabel(_0x3811de),
+        iconLabel: getWebPreviewTileIconLabel(title5),
       }));
-  return [..._0x22c8c1, ..._0x317817].slice(0, _0x4a60e9);
+  return [...args2, ...args3].slice(0, value14);
 }
-export function recordWebPreviewVisit({
-  url: _0x16f51b,
-  title: _0x11b329,
-  now: _0x141ee0,
-  storage: _0x992c4,
-} = {}) {
-  const _0x2120e9 = normalizeWebPreviewUrl(_0x16f51b);
-  if (!_0x2120e9) return { ok: false, error: 'invalid-url', state: readState(_0x992c4) };
-  const _0x5c523c = readState(_0x992c4),
-    _0x14032b = nowMs(_0x141ee0),
-    _0x359620 = getWebPreviewDisplayTitle({ title: _0x11b329, url: _0x2120e9 }),
-    _0x274e8d = _0x5c523c.history.find((_0x8247d3) => _0x8247d3.url === _0x2120e9);
-  _0x274e8d
-    ? ((_0x274e8d.title = _0x359620 || _0x274e8d.title),
-      (_0x274e8d.lastVisitedAt = _0x14032b),
-      (_0x274e8d.visitCount += 1))
-    : _0x5c523c.history.push({ url: _0x2120e9, title: _0x359620, lastVisitedAt: _0x14032b, visitCount: 1 });
-  for (const _0x17a543 of _0x5c523c.shortcuts) {
-    if (_0x17a543.url === _0x2120e9) {
-      ((_0x17a543.lastOpenedAt = _0x14032b),
-        (_0x17a543.updatedAt = Math.max(_0x17a543.updatedAt, _0x14032b)));
-      if (!_0x17a543.title && _0x359620) _0x17a543.title = _0x359620;
+export function recordWebPreviewVisit({ url: url5, title: title6, now: now, storage: storage4 } = {}) {
+  const url6 = normalizeWebPreviewUrl(url5);
+  if (!url6) return { ok: false, error: 'invalid-url', state: readState(storage4) };
+  const state4 = readState(storage4),
+    lastVisitedAt = nowMs(now),
+    title7 = getWebPreviewDisplayTitle({ title: title6, url: url6 }),
+    value16 = state4.history.find((response5) => response5.url === url6);
+  value16
+    ? ((value16.title = title7 || value16.title),
+      (value16.lastVisitedAt = lastVisitedAt),
+      (value16.visitCount += 1))
+    : state4.history.push({ url: url6, title: title7, lastVisitedAt: lastVisitedAt, visitCount: 1 });
+  for (const response6 of state4.shortcuts) {
+    if (response6.url === url6) {
+      ((response6.lastOpenedAt = lastVisitedAt),
+        (response6.updatedAt = Math.max(response6.updatedAt, lastVisitedAt)));
+      if (!response6.title && title7) response6.title = title7;
     }
   }
   return (
-    removeHiddenUrl(_0x5c523c, _0x2120e9),
-    _0x5c523c.history.sort((_0x3912ef, _0x860a6a) => _0x860a6a.lastVisitedAt - _0x3912ef.lastVisitedAt),
-    (_0x5c523c.history = _0x5c523c.history.slice(0, WEB_PREVIEW_START_PAGE_MAX_HISTORY)),
-    { ok: true, state: persistState(_0x5c523c, _0x992c4), url: _0x2120e9 }
+    removeHiddenUrl(state4, url6),
+    state4.history.sort((item8, value17) => value17.lastVisitedAt - item8.lastVisitedAt),
+    (state4.history = state4.history.slice(0, WEB_PREVIEW_START_PAGE_MAX_HISTORY)),
+    { ok: true, state: persistState(state4, storage4), url: url6 }
   );
 }
 export function addWebPreviewShortcut({
-  title: _0x4a10da,
-  url: _0x527cb2,
-  now: _0x3d19c7,
-  storage: _0x3e7679,
-  id: _0x302966,
+  title: title8,
+  url: url7,
+  now: now2,
+  storage: storage5,
+  id: id2,
 } = {}) {
-  const _0x23a6e9 = normalizeWebPreviewUrl(_0x527cb2);
-  if (!_0x23a6e9) return { ok: false, error: 'invalid-url', state: readState(_0x3e7679) };
-  const _0x2a4b8f = readState(_0x3e7679),
-    _0x52ff5a = nowMs(_0x3d19c7),
-    _0x198f26 = getWebPreviewDisplayTitle({ title: _0x4a10da, url: _0x23a6e9 });
-  let _0x3df9e4 = _0x2a4b8f.shortcuts.find((_0xc484c8) => _0xc484c8.url === _0x23a6e9);
+  const url8 = normalizeWebPreviewUrl(url7);
+  if (!url8) return { ok: false, error: 'invalid-url', state: readState(storage5) };
+  const state5 = readState(storage5),
+    createdAt2 = nowMs(now2),
+    title9 = getWebPreviewDisplayTitle({ title: title8, url: url8 });
+  let shortcut = state5.shortcuts.find((response7) => response7.url === url8);
   return (
-    _0x3df9e4
-      ? ((_0x3df9e4.title = _0x198f26),
-        (_0x3df9e4.pinned = true),
-        (_0x3df9e4.updatedAt = _0x52ff5a),
-        (_0x3df9e4.order = Number.isFinite(Number(_0x3df9e4.order))
-          ? _0x3df9e4.order
-          : getNextOrder(_0x2a4b8f.shortcuts)))
-      : ((_0x3df9e4 = {
-          id: normalizeTitle(_0x302966, createShortcutId(_0x23a6e9, _0x52ff5a)).slice(0, 120),
-          title: _0x198f26,
-          url: _0x23a6e9,
+    shortcut
+      ? ((shortcut.title = title9),
+        (shortcut.pinned = true),
+        (shortcut.updatedAt = createdAt2),
+        (shortcut.order = Number.isFinite(Number(shortcut.order))
+          ? shortcut.order
+          : getNextOrder(state5.shortcuts)))
+      : ((shortcut = {
+          id: normalizeTitle(id2, createShortcutId(url8, createdAt2)).slice(0, 120),
+          title: title9,
+          url: url8,
           pinned: true,
-          createdAt: _0x52ff5a,
-          updatedAt: _0x52ff5a,
+          createdAt: createdAt2,
+          updatedAt: createdAt2,
           lastOpenedAt: 0,
-          order: getNextOrder(_0x2a4b8f.shortcuts),
+          order: getNextOrder(state5.shortcuts),
         }),
-        _0x2a4b8f.shortcuts.push(_0x3df9e4)),
-    removeHiddenUrl(_0x2a4b8f, _0x23a6e9),
-    { ok: true, shortcut: _0x3df9e4, state: persistState(_0x2a4b8f, _0x3e7679) }
+        state5.shortcuts.push(shortcut)),
+    removeHiddenUrl(state5, url8),
+    { ok: true, shortcut: shortcut, state: persistState(state5, storage5) }
   );
 }
-export function renameWebPreviewShortcut({
-  id: _0x4c7402,
-  title: _0x4d9f30,
-  now: _0x54dc10,
-  storage: _0x2e3edb,
-} = {}) {
-  const _0x321c0e = readState(_0x2e3edb),
-    _0x3ea185 = _0x321c0e.shortcuts.find((_0x5e95ac) => _0x5e95ac.id === String(_0x4c7402 || ''));
-  if (!_0x3ea185) return { ok: false, error: 'missing-shortcut', state: _0x321c0e };
+export function renameWebPreviewShortcut({ id: id3, title: title10, now: now3, storage: storage6 } = {}) {
+  const state6 = readState(storage6),
+    url9 = state6.shortcuts.find((item9) => item9.id === String(id3 || ''));
+  if (!url9) return { ok: false, error: 'missing-shortcut', state: state6 };
   return (
-    (_0x3ea185.title = getWebPreviewDisplayTitle({ title: _0x4d9f30, url: _0x3ea185.url })),
-    (_0x3ea185.updatedAt = nowMs(_0x54dc10)),
-    { ok: true, shortcut: _0x3ea185, state: persistState(_0x321c0e, _0x2e3edb) }
+    (url9.title = getWebPreviewDisplayTitle({ title: title10, url: url9.url })),
+    (url9.updatedAt = nowMs(now3)),
+    { ok: true, shortcut: url9, state: persistState(state6, storage6) }
   );
 }
-export function deleteWebPreviewShortcut({ id: _0x18cdcd, url: _0x7c18ae, storage: _0x1599f4 } = {}) {
-  const _0x2ea4ed = readState(_0x1599f4),
-    _0x440d53 = normalizeWebPreviewUrl(_0x7c18ae),
-    _0xe239e9 = _0x2ea4ed.shortcuts.findIndex(
-      (_0x4fd4ef) => _0x4fd4ef.id === String(_0x18cdcd || '') || (_0x440d53 && _0x4fd4ef.url === _0x440d53),
+export function deleteWebPreviewShortcut({ id: id4, url: url10, storage: storage7 } = {}) {
+  const state7 = readState(storage7),
+    webPreviewUrl3 = normalizeWebPreviewUrl(url10),
+    count2 = state7.shortcuts.findIndex(
+      (response8) =>
+        response8.id === String(id4 || '') || (webPreviewUrl3 && response8.url === webPreviewUrl3),
     );
-  if (_0xe239e9 < 0) return { ok: false, error: 'missing-shortcut', state: _0x2ea4ed };
-  const [_0x43cac1] = _0x2ea4ed.shortcuts.splice(_0xe239e9, 1);
+  if (count2 < 0) return { ok: false, error: 'missing-shortcut', state: state7 };
+  const [shortcut2] = state7.shortcuts.splice(count2, 1);
   return (
-    addHiddenUrl(_0x2ea4ed, _0x43cac1.url),
-    { ok: true, shortcut: _0x43cac1, state: persistState(_0x2ea4ed, _0x1599f4) }
+    addHiddenUrl(state7, shortcut2.url),
+    { ok: true, shortcut: shortcut2, state: persistState(state7, storage7) }
   );
 }
-export function unpinWebPreviewShortcut({ id: _0x3f5468, storage: _0x2889a5, now: _0x52e83a } = {}) {
-  const _0x23b824 = readState(_0x2889a5),
-    _0x5b8d68 = _0x23b824.shortcuts.find((_0x5c64cd) => _0x5c64cd.id === String(_0x3f5468 || ''));
-  if (!_0x5b8d68) return { ok: false, error: 'missing-shortcut', state: _0x23b824 };
+export function unpinWebPreviewShortcut({ id: id5, storage: storage8, now: now4 } = {}) {
+  const state8 = readState(storage8),
+    shortcut3 = state8.shortcuts.find((item10) => item10.id === String(id5 || ''));
+  if (!shortcut3) return { ok: false, error: 'missing-shortcut', state: state8 };
   return (
-    (_0x5b8d68.pinned = false),
-    (_0x5b8d68.updatedAt = nowMs(_0x52e83a)),
-    { ok: true, shortcut: _0x5b8d68, state: persistState(_0x23b824, _0x2889a5) }
+    (shortcut3.pinned = false),
+    (shortcut3.updatedAt = nowMs(now4)),
+    { ok: true, shortcut: shortcut3, state: persistState(state8, storage8) }
   );
 }
-export function pinWebPreviewUrl({
-  url: _0x2f8aff,
-  title: _0x1c2942,
-  now: _0x53e099,
-  storage: _0x2a3def,
-} = {}) {
-  return addWebPreviewShortcut({ url: _0x2f8aff, title: _0x1c2942, now: _0x53e099, storage: _0x2a3def });
+export function pinWebPreviewUrl({ url: url11, title: title11, now: now5, storage: storage9 } = {}) {
+  return addWebPreviewShortcut({ url: url11, title: title11, now: now5, storage: storage9 });
 }
-export function deleteWebPreviewHistoryUrl({ url: _0x46fe61, storage: _0x373853 } = {}) {
-  const _0x1b8b2d = normalizeWebPreviewUrl(_0x46fe61),
-    _0x150717 = readState(_0x373853);
-  if (!_0x1b8b2d) return { ok: false, error: 'invalid-url', state: _0x150717 };
+export function deleteWebPreviewHistoryUrl({ url: url12, storage: storage10 } = {}) {
+  const url13 = normalizeWebPreviewUrl(url12),
+    state9 = readState(storage10);
+  if (!url13) return { ok: false, error: 'invalid-url', state: state9 };
   return (
-    (_0x150717.history = _0x150717.history.filter((_0x5509f9) => _0x5509f9.url !== _0x1b8b2d)),
-    addHiddenUrl(_0x150717, _0x1b8b2d),
-    { ok: true, state: persistState(_0x150717, _0x373853), url: _0x1b8b2d }
+    (state9.history = state9.history.filter((response9) => response9.url !== url13)),
+    addHiddenUrl(state9, url13),
+    { ok: true, state: persistState(state9, storage10), url: url13 }
   );
 }

@@ -1,1 +1,365 @@
-import{generateText}from'../../../api/aiTextApi.js';import{DIRECTOR_AI_TOOLS,normalizeDirectorAIArgs}from'./directorAICommands.js';import{STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT,selectRelevantStoryboard3DAssets}from'./assetCatalogSelection.js';import{describeStoryboard3DAssetSpatialMetadata,resolveStoryboard3DAssetSpatialMetadata}from'./spatialLayout.js';export const STORYBOARD_3D_AI_COMMAND_TOOLS=Object["freeze"]([...DIRECTOR_AI_TOOLS,"createScene",'getSceneLayout',"addProp","addCharacter","addLight","updateObject","deleteObject",'setCharacterAction','setHandPose','adjustCamera',"checkComposition","addShot","updateShot","listShots"]);const TOOL_SET=new Set(STORYBOARD_3D_AI_COMMAND_TOOLS),READ_ONLY_TOOL_SET=new Set(['getSceneLayout','checkComposition','listShots']);export const STORYBOARD_3D_AI_COMMAND_SYSTEM_PROMPT=["你是 3D 场景预演编辑 Agent。","只能返回受控 JSON 命令，不得返回 JavaScript、HTML、Markdown 或解释文字。","只能使用 outputSchema 中列出的 tool。","引用已有对象时必须使用上下文里真实存在的 sceneId、objectId、shotId。","availableAssets.rows 每行按 availableAssets.columns 排列；添加道具时，assetId 必须逐字使用第一列的真实 id。",'不要搜索、猜测或编造资产\x20ID；availableAssets\x20已经是完整可用清单。',"position、rotation、scale、target 都是长度为 3 的有限数字数组，rotation 使用弧度。","availableAssets 的 spatial 列描述资产尺寸、锚点和语义角色；摆放时必须据此避免悬空、穿插或错误高度。","不要直接操作 Three.js；所有修改必须表示为命令。","同一次用户请求的全部修改使用同一个 transactionId，失败时由执行器整体回滚。"]["join"]('\x0a');function normalizeText(_0x11cb9d){return String(_0x11cb9d||'')['trim']();}function resultText(_0x14e198){if(typeof _0x14e198==="string")return _0x14e198;return _0x14e198?.["text"]||_0x14e198?.["outputText"]||_0x14e198?.['content']||'';}function finiteNumber(_0x5f4fb,_0x6737a0,{min:min=-0x186a0,max:max=0x186a0}={}){const _0x4ea6a0=Number(_0x5f4fb);if(!Number["isFinite"](_0x4ea6a0)||_0x4ea6a0<min||_0x4ea6a0>max)throw new TypeError(_0x6737a0+'\x20must\x20be\x20a\x20finite\x20number\x20between\x20'+min+" and "+max+'.');return _0x4ea6a0;}function vector3(_0x46e39d,_0xf67a36,_0x383d6f=null){if(_0x46e39d==null&&_0x383d6f)return[..._0x383d6f];if(!Array["isArray"](_0x46e39d)||_0x46e39d["length"]!==0x3)throw new TypeError(_0xf67a36+'\x20must\x20contain\x20exactly\x20three\x20numbers.');return _0x46e39d["map"]((_0x481754,_0x39ee07)=>finiteNumber(_0x481754,_0xf67a36+'['+_0x39ee07+']'));}function requiredId(_0x29956c,_0x593672){const _0x48f357=normalizeText(_0x29956c);if(!_0x48f357)throw new TypeError(_0x593672+" is required.");return _0x48f357;}function optionalText(_0x55bcd9,_0x1ed160=0x1f4){return normalizeText(_0x55bcd9)['slice'](0x0,_0x1ed160);}function normalizeTransformArgs(_0x48d050,{partial:partial=![]}={}){const _0x3bfd54={};return(!partial||_0x48d050["position"]!=null)&&(_0x3bfd54['position']=vector3(_0x48d050['position'],'args.position',[0x0,0x0,0x0])),(!partial||_0x48d050["rotation"]!=null)&&(_0x3bfd54["rotation"]=vector3(_0x48d050["rotation"],"args.rotation",[0x0,0x0,0x0])),(!partial||_0x48d050["scale"]!=null)&&(_0x3bfd54['scale']=vector3(_0x48d050["scale"],"args.scale",[0x1,0x1,0x1])['map']((_0x8f38c4,_0x381865)=>finiteNumber(_0x8f38c4,'args.scale['+_0x381865+']',{'min':0.001,'max':0x3e8}))),_0x3bfd54;}function normalizeCommandArgs(_0x5dfd2e,_0x383546={}){const _0x2616ce=_0x383546&&typeof _0x383546==='object'&&!Array["isArray"](_0x383546)?_0x383546:{},_0x175494=normalizeDirectorAIArgs(_0x5dfd2e,_0x2616ce,{'requiredId':requiredId,'vector3':vector3,'finiteNumber':finiteNumber});if(_0x175494)return _0x175494;switch(_0x5dfd2e){case "createScene":return{'name':optionalText(_0x2616ce["name"],0x78)||"新场景"};case'getSceneLayout':case "listShots":case'checkComposition':return{};case "addProp":return{'assetId':requiredId(_0x2616ce["assetId"],"args.assetId"),'name':optionalText(_0x2616ce["name"],0x78),...normalizeTransformArgs(_0x2616ce)};case "addCharacter":return{'assetId':requiredId(_0x2616ce["assetId"],"args.assetId"),'name':optionalText(_0x2616ce["name"],0x78),'bodyPreset':optionalText(_0x2616ce["bodyPreset"],0x50),'actionId':optionalText(_0x2616ce["actionId"],0x78),...normalizeTransformArgs(_0x2616ce)};case'addLight':return{'lightType':["directional",'point','spot',"ambient"]["includes"](_0x2616ce["lightType"])?_0x2616ce["lightType"]:"directional",'intensity':finiteNumber(_0x2616ce["intensity"]??0x1,"args.intensity",{'min':0x0,'max':0x64}),'color':optionalText(_0x2616ce["color"],0x20),'position':vector3(_0x2616ce["position"],"args.position",[0x3,0x5,0x3]),'target':vector3(_0x2616ce["target"],"args.target",[0x0,0x0,0x0])};case'updateObject':return{'objectId':requiredId(_0x2616ce["objectId"],"args.objectId"),'name':optionalText(_0x2616ce["name"],0x78),'visible':typeof _0x2616ce["visible"]==="boolean"?_0x2616ce["visible"]:undefined,'locked':typeof _0x2616ce["locked"]==="boolean"?_0x2616ce["locked"]:undefined,...normalizeTransformArgs(_0x2616ce,{'partial':!![]})};case'deleteObject':return{'objectId':requiredId(_0x2616ce['objectId'],'args.objectId')};case "setCharacterAction":return{'objectId':requiredId(_0x2616ce["objectId"],"args.objectId"),'actionId':requiredId(_0x2616ce["actionId"],"args.actionId")};case'setHandPose':return{'objectId':requiredId(_0x2616ce["objectId"],'args.objectId'),'hand':_0x2616ce['hand']==="right"?"right":'left','poseId':requiredId(_0x2616ce["poseId"],"args.poseId")};case "adjustCamera":return{'position':vector3(_0x2616ce["position"],'args.position',[0x0,1.6,0x5]),'target':vector3(_0x2616ce["target"],'args.target',[0x0,0x1,0x0]),'focalLength':finiteNumber(_0x2616ce["focalLength"]??0x32,"args.focalLength",{'min':0x8,'max':0x12c})};case "addShot":return{'name':optionalText(_0x2616ce['name'],0x78)||"新镜头",'description':optionalText(_0x2616ce["description"],0x3e8)};case "updateShot":return{'shotId':requiredId(_0x2616ce["shotId"],'args.shotId'),'name':optionalText(_0x2616ce["name"],0x78),'description':optionalText(_0x2616ce["description"],0x3e8),'focalLength':_0x2616ce['focalLength']==null?undefined:finiteNumber(_0x2616ce["focalLength"],"args.focalLength",{'min':0x8,'max':0x12c})};default:throw new TypeError("Unsupported storyboard AI tool: "+_0x5dfd2e);}}export function validateStoryboard3DAICommandPlan(_0x5d236d,{sceneIds:sceneIds=[],maximumCommands:maximumCommands=0x32}={}){if(!_0x5d236d||typeof _0x5d236d!=="object"||Array['isArray'](_0x5d236d))throw new TypeError('AI\x20command\x20plan\x20must\x20be\x20an\x20object.');const _0x52daa7=requiredId(_0x5d236d['transactionId'],"transactionId"),_0x48ab6c=Array['isArray'](_0x5d236d['commands'])?_0x5d236d["commands"]:[];if(_0x48ab6c["length"]===0x0||_0x48ab6c["length"]>maximumCommands)throw new RangeError("commands must contain between 1 and "+maximumCommands+" items.");const _0x564570=new Set(sceneIds["map"](normalizeText)["filter"](Boolean)),_0x1bbf48=_0x48ab6c["map"]((_0x22285f,_0x1a1772)=>{if(!_0x22285f||typeof _0x22285f!=="object"||Array["isArray"](_0x22285f))throw new TypeError('commands['+_0x1a1772+"] must be an object.");const _0x1ab0a5=normalizeText(_0x22285f['tool']);if(!TOOL_SET["has"](_0x1ab0a5))throw new TypeError("commands["+_0x1a1772+"].tool is not allowed.");const _0x3f680d=normalizeText(_0x22285f["sceneId"]);if(_0x1ab0a5!=="createScene"){if(!_0x3f680d)throw new TypeError("commands["+_0x1a1772+'].sceneId\x20is\x20required.');if(_0x564570["size"]>0x0&&!_0x564570["has"](_0x3f680d))throw new TypeError('commands['+_0x1a1772+"].sceneId does not exist.");}return{'commandId':normalizeText(_0x22285f["commandId"])||_0x52daa7+':'+(_0x1a1772+0x1),'transactionId':_0x52daa7,'tool':_0x1ab0a5,'sceneId':_0x3f680d,'source':'ai','args':normalizeCommandArgs(_0x1ab0a5,_0x22285f["args"])};});return{'transactionId':_0x52daa7,'summary':optionalText(_0x5d236d['summary'],0x3e8),'commands':_0x1bbf48,'readOnly':_0x1bbf48["every"](_0x38f210=>READ_ONLY_TOOL_SET["has"](_0x38f210["tool"]))};}function buildProjectContext(_0x3fb574,_0x313323=[]){const _0x286bb7=Array["isArray"](_0x3fb574?.["scenes"])?_0x3fb574["scenes"]:[],_0x5a5b44=new Map((Array["isArray"](_0x313323)?_0x313323:[])['filter'](_0x558df2=>_0x558df2?.['id'])['map'](_0x14b860=>[_0x14b860['id'],_0x14b860]));return{'projectId':normalizeText(_0x3fb574?.['id']),'projectName':normalizeText(_0x3fb574?.["name"]),'activeSceneId':normalizeText(_0x3fb574?.["activeSceneId"]),'scenes':_0x286bb7['map'](_0x37a480=>({'sceneId':normalizeText(_0x37a480?.['id']),'name':normalizeText(_0x37a480?.['name']),'objects':(Array["isArray"](_0x37a480?.['objects'])?_0x37a480["objects"]:[])['map'](_0x57c9dc=>({'objectId':normalizeText(_0x57c9dc?.['id']),'type':normalizeText(_0x57c9dc?.["type"]),'name':normalizeText(_0x57c9dc?.["name"]),'assetId':normalizeText(_0x57c9dc?.["assetId"]),'bodyPresetId':normalizeText(_0x57c9dc?.["bodyPresetId"]),'spatial':resolveStoryboard3DAssetSpatialMetadata(_0x57c9dc?.["type"]==="character"?{'id':_0x57c9dc?.["bodyPresetId"],'category':"character"}:_0x5a5b44["get"](_0x57c9dc?.["assetId"])),'transform':_0x57c9dc?.["transform"]})),'shots':(Array["isArray"](_0x37a480?.["shots"])?_0x37a480["shots"]:[])['map'](_0x1a5104=>({'shotId':normalizeText(_0x1a5104?.['id']),'name':normalizeText(_0x1a5104?.["name"]),'description':normalizeText(_0x1a5104?.["description"]),'camera':_0x1a5104?.["camera"]}))}))};}function buildAvailableAssetContext(_0x4be101=[]){const _0x9c874a=(Array["isArray"](_0x4be101)?_0x4be101:[])['filter'](_0xaa2b32=>["builtin","pack"]["includes"](_0xaa2b32?.["source"]?.['kind']))["map"](_0x167253=>[normalizeText(_0x167253?.['id']),normalizeText(_0x167253?.["name"])['slice'](0x0,0x50),normalizeText(_0x167253?.["category"])["slice"](0x0,0x50),(Array["isArray"](_0x167253?.["tags"])?_0x167253["tags"]:[])["map"](normalizeText)["filter"](Boolean)["slice"](0x0,0x4)["map"](_0xeb47c6=>_0xeb47c6["slice"](0x0,0x50))["join"](','),describeStoryboard3DAssetSpatialMetadata(_0x167253)])["filter"](_0x3bd1ed=>_0x3bd1ed[0x0]);return{'columns':['id',"name","category","tags","spatial"],'rows':_0x9c874a};}export function buildStoryboard3DAICommandPrompt({instruction:_0x2c254f,project:_0x190b36,assets:assets=[]}={}){const _0x218193=normalizeText(_0x2c254f)["slice"](0x0,0x1388);if(!_0x218193)throw new Error("请输入要执行的 3D 场景指令。");const _0x5286ea=(Array["isArray"](assets)?assets:[])["filter"](_0x3e2a38=>["builtin","pack"]["includes"](_0x3e2a38?.["source"]?.["kind"]));return JSON["stringify"]({'task':"plan_storyboard_3d_commands",'instruction':_0x218193,'context':buildProjectContext(_0x190b36,_0x5286ea),'availableAssets':buildAvailableAssetContext(selectRelevantStoryboard3DAssets(_0x5286ea,_0x218193,{'limit':STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT})),'allowedTools':STORYBOARD_3D_AI_COMMAND_TOOLS,'directorTools':{'setCameraPath':"shotId, points:[[x,y,z],...], start, duration, smooth",'setObjectPath':"shotId, objectId, points, start, duration, smooth",'setCameraMotion':"shotId, preset:orbit/arc/push/pull/crane/slide/spiral, start, duration, amount",'setCameraFollow':'shotId,\x20mode:relative/path/fixed,\x20followObjectId,\x20lookAtObjectId,\x20followOffset,\x20lookAtOffset,\x20start,\x20duration','addActionClip':"shotId, objectId, actionId, start, duration, speed"},'outputSchema':{'transactionId':'非空字符串','summary':"执行摘要",'commands':[{'commandId':"可选；事务内唯一",'tool':'allowedTools\x20中的一项','sceneId':"真实场景 ID；仅 createScene 可为空",'args':'与\x20tool\x20对应的参数对象'}]}});}function parseCommandPlanResult(_0x384fce){const _0x21ba2f=normalizeText(resultText(_0x384fce));if(!_0x21ba2f)throw new Error("3D Agent 未返回命令计划。");try{return JSON["parse"](_0x21ba2f);}catch{throw new Error('3D\x20Agent\x20未返回有效的严格\x20JSON。');}}export async function generateStoryboard3DAICommandPlan({instruction:_0x58e7a6,project:_0xa6cb2a,model:_0xbd125b,provider:_0x1d1a5e,request:request=generateText,assetLibrary:_0x2ad94b,onProgress:_0x4fdcca}={}){const _0x4a7062=requiredId(_0xbd125b,"model"),_0x151263=requiredId(_0x1d1a5e,"provider"),_0x5178f1=buildStoryboard3DAICommandPrompt({'instruction':_0x58e7a6,'project':_0xa6cb2a,'assets':_0x2ad94b?.["list"]?.({'limit':0x640})||[]}),_0x10baa0=(_0xa6cb2a?.["scenes"]||[])['map'](_0x4b474c=>_0x4b474c?.['id'])["filter"](Boolean),_0x4424d4={'model':_0x4a7062,'provider':_0x151263,'prompt':_0x5178f1,'systemPrompt':STORYBOARD_3D_AI_COMMAND_SYSTEM_PROMPT,'temperature':0.15,'timeoutMs':0x3a980};_0x4fdcca?.({'stage':"planning",'message':"正在规划受控场景命令"});const _0x38a8f7=await request(_0x4424d4);try{return validateStoryboard3DAICommandPlan(parseCommandPlanResult(_0x38a8f7),{'sceneIds':_0x10baa0});}catch(_0x5609f8){_0x4fdcca?.({'stage':"repairing",'message':"正在校正命令参数"});const _0x441b76=await request({..._0x4424d4,'prompt':JSON["stringify"]({'originalTask':JSON['parse'](_0x5178f1),'rejectionReason':_0x5609f8?.["message"]||String(_0x5609f8),'instruction':"重新执行原任务，只返回符合 outputSchema 的严格 JSON。"}),'temperature':0.05});return validateStoryboard3DAICommandPlan(parseCommandPlanResult(_0x441b76),{'sceneIds':_0x10baa0});}}export async function executeStoryboard3DAICommandPlan(_0x2fbdf6,{executeTransaction:_0x34d5ec}={}){if(typeof _0x34d5ec!=="function")throw new TypeError("executeTransaction must be provided.");const _0x3f5983=validateStoryboard3DAICommandPlan(_0x2fbdf6),_0x3d3530=await _0x34d5ec(_0x3f5983["commands"],{'transactionId':_0x3f5983["transactionId"],'source':'ai'});return{..._0x3f5983,'execution':_0x3d3530};}
+import { generateText } from '../../../api/aiTextApi.js';
+import { DIRECTOR_AI_TOOLS, normalizeDirectorAIArgs } from './directorAICommands.js';
+import {
+  STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT,
+  selectRelevantStoryboard3DAssets,
+} from './assetCatalogSelection.js';
+import {
+  describeStoryboard3DAssetSpatialMetadata,
+  resolveStoryboard3DAssetSpatialMetadata,
+} from './spatialLayout.js';
+export const STORYBOARD_3D_AI_COMMAND_TOOLS = Object['freeze']([
+  ...DIRECTOR_AI_TOOLS,
+  'createScene',
+  'getSceneLayout',
+  'addProp',
+  'addCharacter',
+  'addLight',
+  'updateObject',
+  'deleteObject',
+  'setCharacterAction',
+  'setHandPose',
+  'adjustCamera',
+  'checkComposition',
+  'addShot',
+  'updateShot',
+  'listShots',
+]);
+const TOOL_SET = new Set(STORYBOARD_3D_AI_COMMAND_TOOLS),
+  READ_ONLY_TOOL_SET = new Set(['getSceneLayout', 'checkComposition', 'listShots']);
+export const STORYBOARD_3D_AI_COMMAND_SYSTEM_PROMPT = [
+  '你是 3D 场景预演编辑 Agent。',
+  '只能返回受控 JSON 命令，不得返回 JavaScript、HTML、Markdown 或解释文字。',
+  '只能使用 outputSchema 中列出的 tool。',
+  '引用已有对象时必须使用上下文里真实存在的 sceneId、objectId、shotId。',
+  'availableAssets.rows 每行按 availableAssets.columns 排列；添加道具时，assetId 必须逐字使用第一列的真实 id。',
+  '不要搜索、猜测或编造资产\x20ID；availableAssets\x20已经是完整可用清单。',
+  'position、rotation、scale、target 都是长度为 3 的有限数字数组，rotation 使用弧度。',
+  'availableAssets 的 spatial 列描述资产尺寸、锚点和语义角色；摆放时必须据此避免悬空、穿插或错误高度。',
+  '不要直接操作 Three.js；所有修改必须表示为命令。',
+  '同一次用户请求的全部修改使用同一个 transactionId，失败时由执行器整体回滚。',
+]['join']('\x0a');
+function normalizeText(value) {
+  return String(value || '')['trim']();
+}
+function resultText(item) {
+  if (typeof item === 'string') return item;
+  return item?.['text'] || item?.['outputText'] || item?.['content'] || '';
+}
+function finiteNumber(key, index, { min: min = -0x186a0, max: max = 0x186a0 } = {}) {
+  const result = Number(key);
+  if (!Number['isFinite'](result) || result < min || result > max)
+    throw new TypeError(
+      index + '\x20must\x20be\x20a\x20finite\x20number\x20between\x20' + min + ' and ' + max + '.',
+    );
+  return result;
+}
+function vector3(data, options, args = null) {
+  if (data == null && args) return [...args];
+  if (!Array['isArray'](data) || data['length'] !== 0x3)
+    throw new TypeError(options + '\x20must\x20contain\x20exactly\x20three\x20numbers.');
+  return data['map']((target, source) => finiteNumber(target, options + '[' + source + ']'));
+}
+function requiredId(next, current) {
+  const text = normalizeText(next);
+  if (!text) throw new TypeError(current + ' is required.');
+  return text;
+}
+function optionalText(entry, record = 0x1f4) {
+  return normalizeText(entry)['slice'](0x0, record);
+}
+function normalizeTransformArgs(payload, { partial: partial = ![] } = {}) {
+  const box = {};
+  return (
+    (!partial || payload['position'] != null) &&
+      (box['position'] = vector3(payload['position'], 'args.position', [0x0, 0x0, 0x0])),
+    (!partial || payload['rotation'] != null) &&
+      (box['rotation'] = vector3(payload['rotation'], 'args.rotation', [0x0, 0x0, 0x0])),
+    (!partial || payload['scale'] != null) &&
+      (box['scale'] = vector3(payload['scale'], 'args.scale', [0x1, 0x1, 0x1])['map']((handle, state) =>
+        finiteNumber(handle, 'args.scale[' + state + ']', { min: 0.001, max: 0x3e8 }),
+      )),
+    box
+  );
+}
+function normalizeCommandArgs(config, scope = {}) {
+  const error = scope && typeof scope === 'object' && !Array['isArray'](scope) ? scope : {},
+    directorAIArgs = normalizeDirectorAIArgs(config, error, {
+      requiredId: requiredId,
+      vector3: vector3,
+      finiteNumber: finiteNumber,
+    });
+  if (directorAIArgs) return directorAIArgs;
+  switch (config) {
+    case 'createScene':
+      return { name: optionalText(error['name'], 0x78) || '新场景' };
+    case 'getSceneLayout':
+    case 'listShots':
+    case 'checkComposition':
+      return {};
+    case 'addProp':
+      return {
+        assetId: requiredId(error['assetId'], 'args.assetId'),
+        name: optionalText(error['name'], 0x78),
+        ...normalizeTransformArgs(error),
+      };
+    case 'addCharacter':
+      return {
+        assetId: requiredId(error['assetId'], 'args.assetId'),
+        name: optionalText(error['name'], 0x78),
+        bodyPreset: optionalText(error['bodyPreset'], 0x50),
+        actionId: optionalText(error['actionId'], 0x78),
+        ...normalizeTransformArgs(error),
+      };
+    case 'addLight':
+      return {
+        lightType: ['directional', 'point', 'spot', 'ambient']['includes'](error['lightType'])
+          ? error['lightType']
+          : 'directional',
+        intensity: finiteNumber(error['intensity'] ?? 0x1, 'args.intensity', { min: 0x0, max: 0x64 }),
+        color: optionalText(error['color'], 0x20),
+        position: vector3(error['position'], 'args.position', [0x3, 0x5, 0x3]),
+        target: vector3(error['target'], 'args.target', [0x0, 0x0, 0x0]),
+      };
+    case 'updateObject':
+      return {
+        objectId: requiredId(error['objectId'], 'args.objectId'),
+        name: optionalText(error['name'], 0x78),
+        visible: typeof error['visible'] === 'boolean' ? error['visible'] : undefined,
+        locked: typeof error['locked'] === 'boolean' ? error['locked'] : undefined,
+        ...normalizeTransformArgs(error, { partial: !![] }),
+      };
+    case 'deleteObject':
+      return { objectId: requiredId(error['objectId'], 'args.objectId') };
+    case 'setCharacterAction':
+      return {
+        objectId: requiredId(error['objectId'], 'args.objectId'),
+        actionId: requiredId(error['actionId'], 'args.actionId'),
+      };
+    case 'setHandPose':
+      return {
+        objectId: requiredId(error['objectId'], 'args.objectId'),
+        hand: error['hand'] === 'right' ? 'right' : 'left',
+        poseId: requiredId(error['poseId'], 'args.poseId'),
+      };
+    case 'adjustCamera':
+      return {
+        position: vector3(error['position'], 'args.position', [0x0, 1.6, 0x5]),
+        target: vector3(error['target'], 'args.target', [0x0, 0x1, 0x0]),
+        focalLength: finiteNumber(error['focalLength'] ?? 0x32, 'args.focalLength', { min: 0x8, max: 0x12c }),
+      };
+    case 'addShot':
+      return {
+        name: optionalText(error['name'], 0x78) || '新镜头',
+        description: optionalText(error['description'], 0x3e8),
+      };
+    case 'updateShot':
+      return {
+        shotId: requiredId(error['shotId'], 'args.shotId'),
+        name: optionalText(error['name'], 0x78),
+        description: optionalText(error['description'], 0x3e8),
+        focalLength:
+          error['focalLength'] == null
+            ? undefined
+            : finiteNumber(error['focalLength'], 'args.focalLength', { min: 0x8, max: 0x12c }),
+      };
+    default:
+      throw new TypeError('Unsupported storyboard AI tool: ' + config);
+  }
+}
+export function validateStoryboard3DAICommandPlan(
+  enabled,
+  { sceneIds: sceneIds = [], maximumCommands: maximumCommands = 0x32 } = {},
+) {
+  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled))
+    throw new TypeError('AI\x20command\x20plan\x20must\x20be\x20an\x20object.');
+  const requiredId2 = requiredId(enabled['transactionId'], 'transactionId'),
+    input = Array['isArray'](enabled['commands']) ? enabled['commands'] : [];
+  if (input['length'] === 0x0 || input['length'] > maximumCommands)
+    throw new RangeError('commands must contain between 1 and ' + maximumCommands + ' items.');
+  const enabled2 = new Set(sceneIds['map'](normalizeText)['filter'](Boolean)),
+    output = input['map']((enabled3, value2) => {
+      if (!enabled3 || typeof enabled3 !== 'object' || Array['isArray'](enabled3))
+        throw new TypeError('commands[' + value2 + '] must be an object.');
+      const text2 = normalizeText(enabled3['tool']);
+      if (!TOOL_SET['has'](text2)) throw new TypeError('commands[' + value2 + '].tool is not allowed.');
+      const text3 = normalizeText(enabled3['sceneId']);
+      if (text2 !== 'createScene') {
+        if (!text3) throw new TypeError('commands[' + value2 + '].sceneId\x20is\x20required.');
+        if (enabled2['size'] > 0x0 && !enabled2['has'](text3))
+          throw new TypeError('commands[' + value2 + '].sceneId does not exist.');
+      }
+      return {
+        commandId: normalizeText(enabled3['commandId']) || requiredId2 + ':' + (value2 + 0x1),
+        transactionId: requiredId2,
+        tool: text2,
+        sceneId: text3,
+        source: 'ai',
+        args: normalizeCommandArgs(text2, enabled3['args']),
+      };
+    });
+  return {
+    transactionId: requiredId2,
+    summary: optionalText(enabled['summary'], 0x3e8),
+    commands: output,
+    readOnly: output['every']((value3) => READ_ONLY_TOOL_SET['has'](value3['tool'])),
+  };
+}
+function buildProjectContext(value4, value5 = []) {
+  const list = Array['isArray'](value4?.['scenes']) ? value4['scenes'] : [],
+    value6 = new Map(
+      (Array['isArray'](value5) ? value5 : [])
+        ['filter']((value7) => value7?.['id'])
+        ['map']((value8) => [value8['id'], value8]),
+    );
+  return {
+    projectId: normalizeText(value4?.['id']),
+    projectName: normalizeText(value4?.['name']),
+    activeSceneId: normalizeText(value4?.['activeSceneId']),
+    scenes: list['map']((error2) => ({
+      sceneId: normalizeText(error2?.['id']),
+      name: normalizeText(error2?.['name']),
+      objects: (Array['isArray'](error2?.['objects']) ? error2['objects'] : [])['map']((value9) => ({
+        objectId: normalizeText(value9?.['id']),
+        type: normalizeText(value9?.['type']),
+        name: normalizeText(value9?.['name']),
+        assetId: normalizeText(value9?.['assetId']),
+        bodyPresetId: normalizeText(value9?.['bodyPresetId']),
+        spatial: resolveStoryboard3DAssetSpatialMetadata(
+          value9?.['type'] === 'character'
+            ? { id: value9?.['bodyPresetId'], category: 'character' }
+            : value6['get'](value9?.['assetId']),
+        ),
+        transform: value9?.['transform'],
+      })),
+      shots: (Array['isArray'](error2?.['shots']) ? error2['shots'] : [])['map']((value10) => ({
+        shotId: normalizeText(value10?.['id']),
+        name: normalizeText(value10?.['name']),
+        description: normalizeText(value10?.['description']),
+        camera: value10?.['camera'],
+      })),
+    })),
+  };
+}
+function buildAvailableAssetContext(list2 = []) {
+  const value11 = (Array['isArray'](list2) ? list2 : [])
+    ['filter']((value12) => ['builtin', 'pack']['includes'](value12?.['source']?.['kind']))
+    ['map']((value13) => [
+      normalizeText(value13?.['id']),
+      normalizeText(value13?.['name'])['slice'](0x0, 0x50),
+      normalizeText(value13?.['category'])['slice'](0x0, 0x50),
+      (Array['isArray'](value13?.['tags']) ? value13['tags'] : [])
+        ['map'](normalizeText)
+        ['filter'](Boolean)
+        ['slice'](0x0, 0x4)
+        ['map']((value14) => value14['slice'](0x0, 0x50))
+        ['join'](','),
+      describeStoryboard3DAssetSpatialMetadata(value13),
+    ])
+    ['filter']((value15) => value15[0x0]);
+  return { columns: ['id', 'name', 'category', 'tags', 'spatial'], rows: value11 };
+}
+export function buildStoryboard3DAICommandPrompt({
+  instruction: instruction,
+  project: project,
+  assets: assets = [],
+} = {}) {
+  const text4 = normalizeText(instruction)['slice'](0x0, 0x1388);
+  if (!text4) throw new Error('请输入要执行的 3D 场景指令。');
+  const value16 = (Array['isArray'](assets) ? assets : [])['filter']((value17) =>
+    ['builtin', 'pack']['includes'](value17?.['source']?.['kind']),
+  );
+  return JSON['stringify']({
+    task: 'plan_storyboard_3d_commands',
+    instruction: text4,
+    context: buildProjectContext(project, value16),
+    availableAssets: buildAvailableAssetContext(
+      selectRelevantStoryboard3DAssets(value16, text4, { limit: STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT }),
+    ),
+    allowedTools: STORYBOARD_3D_AI_COMMAND_TOOLS,
+    directorTools: {
+      setCameraPath: 'shotId, points:[[x,y,z],...], start, duration, smooth',
+      setObjectPath: 'shotId, objectId, points, start, duration, smooth',
+      setCameraMotion: 'shotId, preset:orbit/arc/push/pull/crane/slide/spiral, start, duration, amount',
+      setCameraFollow:
+        'shotId,\x20mode:relative/path/fixed,\x20followObjectId,\x20lookAtObjectId,\x20followOffset,\x20lookAtOffset,\x20start,\x20duration',
+      addActionClip: 'shotId, objectId, actionId, start, duration, speed',
+    },
+    outputSchema: {
+      transactionId: '非空字符串',
+      summary: '执行摘要',
+      commands: [
+        {
+          commandId: '可选；事务内唯一',
+          tool: 'allowedTools\x20中的一项',
+          sceneId: '真实场景 ID；仅 createScene 可为空',
+          args: '与\x20tool\x20对应的参数对象',
+        },
+      ],
+    },
+  });
+}
+function parseCommandPlanResult(value18) {
+  const text5 = normalizeText(resultText(value18));
+  if (!text5) throw new Error('3D Agent 未返回命令计划。');
+  try {
+    return JSON['parse'](text5);
+  } catch {
+    throw new Error('3D\x20Agent\x20未返回有效的严格\x20JSON。');
+  }
+}
+export async function generateStoryboard3DAICommandPlan({
+  instruction: instruction2,
+  project: project2,
+  model: model,
+  provider: provider,
+  request: request = generateText,
+  assetLibrary: assetLibrary,
+  onProgress: onProgress,
+} = {}) {
+  const requiredId3 = requiredId(model, 'model'),
+    requiredId4 = requiredId(provider, 'provider'),
+    storyboard3DAICommandPrompt = buildStoryboard3DAICommandPrompt({
+      instruction: instruction2,
+      project: project2,
+      assets: assetLibrary?.['list']?.({ limit: 0x640 }) || [],
+    }),
+    value19 = (project2?.['scenes'] || [])['map']((value20) => value20?.['id'])['filter'](Boolean),
+    args2 = {
+      model: requiredId3,
+      provider: requiredId4,
+      prompt: storyboard3DAICommandPrompt,
+      systemPrompt: STORYBOARD_3D_AI_COMMAND_SYSTEM_PROMPT,
+      temperature: 0.15,
+      timeoutMs: 0x3a980,
+    };
+  onProgress?.({ stage: 'planning', message: '正在规划受控场景命令' });
+  const request2 = await request(args2);
+  try {
+    return validateStoryboard3DAICommandPlan(parseCommandPlanResult(request2), { sceneIds: value19 });
+  } catch (value21) {
+    onProgress?.({ stage: 'repairing', message: '正在校正命令参数' });
+    const request3 = await request({
+      ...args2,
+      prompt: JSON['stringify']({
+        originalTask: JSON['parse'](storyboard3DAICommandPrompt),
+        rejectionReason: value21?.['message'] || String(value21),
+        instruction: '重新执行原任务，只返回符合 outputSchema 的严格 JSON。',
+      }),
+      temperature: 0.05,
+    });
+    return validateStoryboard3DAICommandPlan(parseCommandPlanResult(request3), { sceneIds: value19 });
+  }
+}
+export async function executeStoryboard3DAICommandPlan(
+  value22,
+  { executeTransaction: executeTransaction } = {},
+) {
+  if (typeof executeTransaction !== 'function') throw new TypeError('executeTransaction must be provided.');
+  const args3 = validateStoryboard3DAICommandPlan(value22),
+    value23 = await executeTransaction(args3['commands'], {
+      transactionId: args3['transactionId'],
+      source: 'ai',
+    });
+  return { ...args3, execution: value23 };
+}

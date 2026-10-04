@@ -12,333 +12,315 @@ const TOOLTIP_ATTRS = ['data-tooltip', 'data-tooltip-right'],
   TOOLTIP_ARROW_PADDING_PX = 12,
   GLOBAL_TOOLTIP_EXCLUDE_SELECTOR = '.generation-node-help-tip';
 let installed = null;
-function isElementNode(_0x14573d) {
-  return _0x14573d && _0x14573d.nodeType === 1;
+function isElementNode(value) {
+  return value && value.nodeType === 1;
 }
-function clamp(_0x5578e4, _0x1ff251, _0x40cf03) {
-  const _0x292dff = Number.isFinite(_0x1ff251) ? _0x1ff251 : 0,
-    _0x57c313 = Number.isFinite(_0x40cf03) ? Math.max(_0x292dff, _0x40cf03) : _0x292dff;
-  return Math.min(Math.max(_0x5578e4, _0x292dff), _0x57c313);
+function clamp(item, key, index) {
+  const result = Number.isFinite(key) ? key : 0,
+    data = Number.isFinite(index) ? Math.max(result, index) : result;
+  return Math.min(Math.max(item, result), data);
 }
-function normalizeRect(_0x815e0c = {}) {
-  const _0x2c8851 = Number(_0x815e0c.left) || 0,
-    _0x273c67 = Number(_0x815e0c.top) || 0,
-    _0xbcda29 = Number(_0x815e0c.width) || Math.max(0, (Number(_0x815e0c.right) || _0x2c8851) - _0x2c8851),
-    _0x37b2a0 = Number(_0x815e0c.height) || Math.max(0, (Number(_0x815e0c.bottom) || _0x273c67) - _0x273c67);
+function normalizeRect(box = {}) {
+  const left = Number(box.left) || 0,
+    top = Number(box.top) || 0,
+    width = Number(box.width) || Math.max(0, (Number(box.right) || left) - left),
+    height = Number(box.height) || Math.max(0, (Number(box.bottom) || top) - top);
   return {
-    left: _0x2c8851,
-    top: _0x273c67,
-    right: Number(_0x815e0c.right) || _0x2c8851 + _0xbcda29,
-    bottom: Number(_0x815e0c.bottom) || _0x273c67 + _0x37b2a0,
-    width: _0xbcda29,
-    height: _0x37b2a0,
+    left: left,
+    top: top,
+    right: Number(box.right) || left + width,
+    bottom: Number(box.bottom) || top + height,
+    width: width,
+    height: height,
   };
 }
-function normalizeViewport(_0x35da55 = {}) {
+function normalizeViewport(box2 = {}) {
   return {
-    width: Number(_0x35da55.width) || Number(_0x35da55.innerWidth) || Number(globalThis.innerWidth) || 0,
-    height: Number(_0x35da55.height) || Number(_0x35da55.innerHeight) || Number(globalThis.innerHeight) || 0,
-    padding: Number(_0x35da55.padding) >= 0 ? Number(_0x35da55.padding) : TOOLTIP_VIEWPORT_PADDING_PX,
-    gap: Number(_0x35da55.gap) >= 0 ? Number(_0x35da55.gap) : TOOLTIP_GAP_PX,
-    arrowPadding:
-      Number(_0x35da55.arrowPadding) >= 0 ? Number(_0x35da55.arrowPadding) : TOOLTIP_ARROW_PADDING_PX,
+    width: Number(box2.width) || Number(box2.innerWidth) || Number(globalThis.innerWidth) || 0,
+    height: Number(box2.height) || Number(box2.innerHeight) || Number(globalThis.innerHeight) || 0,
+    padding: Number(box2.padding) >= 0 ? Number(box2.padding) : TOOLTIP_VIEWPORT_PADDING_PX,
+    gap: Number(box2.gap) >= 0 ? Number(box2.gap) : TOOLTIP_GAP_PX,
+    arrowPadding: Number(box2.arrowPadding) >= 0 ? Number(box2.arrowPadding) : TOOLTIP_ARROW_PADDING_PX,
   };
 }
-export function computeTooltipPosition(
-  _0x28431a,
-  _0x131f32,
-  _0xb8d793,
-  _0x5052fa = DEFAULT_TOOLTIP_PLACEMENT,
-) {
-  const _0x55b0d1 = normalizeRect(_0x28431a),
-    _0x2f73d9 = normalizeRect(_0x131f32),
-    _0x438440 = normalizeViewport(_0xb8d793),
-    _0x3617f5 = _0x438440.width - _0x438440.padding - _0x2f73d9.width,
-    _0x75afdd = _0x438440.height - _0x438440.padding - _0x2f73d9.height,
-    _0x2978f7 = _0x55b0d1.left + _0x55b0d1.width / 2,
-    _0x30092e = _0x55b0d1.top + _0x55b0d1.height / 2;
-  let _0x574750 = _0x5052fa === RIGHT_TOOLTIP_PLACEMENT ? RIGHT_TOOLTIP_PLACEMENT : 'top',
-    _0x406789 = _0x2978f7 - _0x2f73d9.width / 2,
-    _0x4b01c5 = _0x55b0d1.top - _0x2f73d9.height - _0x438440.gap;
-  if (_0x574750 === 'top') {
-    const _0xa71eb4 = _0x55b0d1.bottom + _0x438440.gap;
+export function computeTooltipPosition(options, target, source, next = DEFAULT_TOOLTIP_PLACEMENT) {
+  const box3 = normalizeRect(options),
+    box4 = normalizeRect(target),
+    box5 = normalizeViewport(source),
+    current = box5.width - box5.padding - box4.width,
+    entry = box5.height - box5.padding - box4.height,
+    record = box3.left + box3.width / 2,
+    payload = box3.top + box3.height / 2;
+  let placement = next === RIGHT_TOOLTIP_PLACEMENT ? RIGHT_TOOLTIP_PLACEMENT : 'top',
+    left2 = record - box4.width / 2,
+    top2 = box3.top - box4.height - box5.gap;
+  if (placement === 'top') {
+    const handle = box3.bottom + box5.gap;
     return (
-      _0x4b01c5 < _0x438440.padding &&
-        _0xa71eb4 + _0x2f73d9.height <= _0x438440.height - _0x438440.padding &&
-        ((_0x574750 = 'bottom'), (_0x4b01c5 = _0xa71eb4)),
-      (_0x406789 = clamp(_0x406789, _0x438440.padding, _0x3617f5)),
-      (_0x4b01c5 = clamp(_0x4b01c5, _0x438440.padding, _0x75afdd)),
+      top2 < box5.padding &&
+        handle + box4.height <= box5.height - box5.padding &&
+        ((placement = 'bottom'), (top2 = handle)),
+      (left2 = clamp(left2, box5.padding, current)),
+      (top2 = clamp(top2, box5.padding, entry)),
       {
-        left: _0x406789,
-        top: _0x4b01c5,
-        placement: _0x574750,
-        arrowLeft: clamp(
-          _0x2978f7 - _0x406789,
-          _0x438440.arrowPadding,
-          _0x2f73d9.width - _0x438440.arrowPadding,
-        ),
+        left: left2,
+        top: top2,
+        placement: placement,
+        arrowLeft: clamp(record - left2, box5.arrowPadding, box4.width - box5.arrowPadding),
         arrowTop: null,
       }
     );
   }
   return (
-    (_0x406789 = _0x55b0d1.right + _0x438440.gap),
-    (_0x4b01c5 = _0x30092e - _0x2f73d9.height / 2),
-    _0x406789 + _0x2f73d9.width > _0x438440.width - _0x438440.padding &&
-      _0x55b0d1.left - _0x438440.gap - _0x2f73d9.width >= _0x438440.padding &&
-      ((_0x574750 = 'left'), (_0x406789 = _0x55b0d1.left - _0x438440.gap - _0x2f73d9.width)),
-    (_0x406789 = clamp(_0x406789, _0x438440.padding, _0x3617f5)),
-    (_0x4b01c5 = clamp(_0x4b01c5, _0x438440.padding, _0x75afdd)),
+    (left2 = box3.right + box5.gap),
+    (top2 = payload - box4.height / 2),
+    left2 + box4.width > box5.width - box5.padding &&
+      box3.left - box5.gap - box4.width >= box5.padding &&
+      ((placement = 'left'), (left2 = box3.left - box5.gap - box4.width)),
+    (left2 = clamp(left2, box5.padding, current)),
+    (top2 = clamp(top2, box5.padding, entry)),
     {
-      left: _0x406789,
-      top: _0x4b01c5,
-      placement: _0x574750,
+      left: left2,
+      top: top2,
+      placement: placement,
       arrowLeft: null,
-      arrowTop: clamp(
-        _0x30092e - _0x4b01c5,
-        _0x438440.arrowPadding,
-        _0x2f73d9.height - _0x438440.arrowPadding,
-      ),
+      arrowTop: clamp(payload - top2, box5.arrowPadding, box4.height - box5.arrowPadding),
     }
   );
 }
-function hasUnifiedTooltip(_0xbbac3e) {
-  return TOOLTIP_ATTRS.some((_0x1da90a) => {
-    const _0x458fb2 = _0xbbac3e.getAttribute(_0x1da90a);
-    return typeof _0x458fb2 === 'string' && _0x458fb2.trim();
+function hasUnifiedTooltip(state) {
+  return TOOLTIP_ATTRS.some((item2) => {
+    const config = state.getAttribute(item2);
+    return typeof config === 'string' && config.trim();
   });
 }
-function shouldMirrorToAriaLabel(_0x5dc23e) {
-  if (_0x5dc23e.hasAttribute('aria-label')) return false;
-  const _0x4825d8 = String(_0x5dc23e.tagName || '').toLowerCase();
-  if (_0x4825d8 === 'button' || _0x4825d8 === 'input' || _0x4825d8 === 'select') return true;
-  return _0x5dc23e.hasAttribute('role') || _0x5dc23e.hasAttribute('tabindex');
+function shouldMirrorToAriaLabel(scope) {
+  if (scope.hasAttribute('aria-label')) return false;
+  const input = String(scope.tagName || '').toLowerCase();
+  if (input === 'button' || input === 'input' || input === 'select') return true;
+  return scope.hasAttribute('role') || scope.hasAttribute('tabindex');
 }
-export function unifyNativeTooltipElement(_0x174ce1) {
-  if (!isElementNode(_0x174ce1) || !_0x174ce1.hasAttribute('title')) return false;
-  const _0x516d36 = String(_0x174ce1.getAttribute('title') || '').trim(),
-    _0x45799e = _0x174ce1.getAttribute(GENERATED_TOOLTIP_ATTR) === GENERATED_TOOLTIP_VALUE;
-  if (_0x516d36)
-    ((_0x45799e || !hasUnifiedTooltip(_0x174ce1)) &&
-      (_0x174ce1.setAttribute('data-tooltip', _0x516d36),
-      _0x174ce1.setAttribute(GENERATED_TOOLTIP_ATTR, GENERATED_TOOLTIP_VALUE)),
-      _0x174ce1.setAttribute(NATIVE_TITLE_BACKUP_ATTR, _0x516d36),
-      shouldMirrorToAriaLabel(_0x174ce1) && _0x174ce1.setAttribute('aria-label', _0x516d36));
+export function unifyNativeTooltipElement(el) {
+  if (!isElementNode(el) || !el.hasAttribute('title')) return false;
+  const output = String(el.getAttribute('title') || '').trim(),
+    value2 = el.getAttribute(GENERATED_TOOLTIP_ATTR) === GENERATED_TOOLTIP_VALUE;
+  if (output)
+    ((value2 || !hasUnifiedTooltip(el)) &&
+      (el.setAttribute('data-tooltip', output),
+      el.setAttribute(GENERATED_TOOLTIP_ATTR, GENERATED_TOOLTIP_VALUE)),
+      el.setAttribute(NATIVE_TITLE_BACKUP_ATTR, output),
+      shouldMirrorToAriaLabel(el) && el.setAttribute('aria-label', output));
   else
-    _0x45799e &&
-      (_0x174ce1.removeAttribute('data-tooltip'),
-      _0x174ce1.removeAttribute(GENERATED_TOOLTIP_ATTR),
-      _0x174ce1.removeAttribute(NATIVE_TITLE_BACKUP_ATTR));
-  return (_0x174ce1.removeAttribute('title'), true);
+    value2 &&
+      (el.removeAttribute('data-tooltip'),
+      el.removeAttribute(GENERATED_TOOLTIP_ATTR),
+      el.removeAttribute(NATIVE_TITLE_BACKUP_ATTR));
+  return (el.removeAttribute('title'), true);
 }
-export function unifyNativeTooltips(_0x273e85 = globalThis.document) {
-  if (!_0x273e85) return 0;
-  let _0xf6d7d4 = 0;
-  if (isElementNode(_0x273e85) && unifyNativeTooltipElement(_0x273e85)) _0xf6d7d4 += 1;
-  const _0x1dcac9 = _0x273e85.querySelectorAll?.('[title]');
-  if (!_0x1dcac9) return _0xf6d7d4;
+export function unifyNativeTooltips(el2 = globalThis.document) {
+  if (!el2) return 0;
+  let value3 = 0;
+  if (isElementNode(el2) && unifyNativeTooltipElement(el2)) value3 += 1;
+  const list = el2.querySelectorAll?.('[title]');
+  if (!list) return value3;
   return (
-    _0x1dcac9.forEach((_0x3f83c0) => {
-      if (unifyNativeTooltipElement(_0x3f83c0)) _0xf6d7d4 += 1;
+    list.forEach((item3) => {
+      if (unifyNativeTooltipElement(item3)) value3 += 1;
     }),
-    _0xf6d7d4
+    value3
   );
 }
-function normalizeMutationRecord(_0x516559) {
-  if (_0x516559.type === 'attributes') {
-    unifyNativeTooltipElement(_0x516559.target);
+function normalizeMutationRecord(event) {
+  if (event.type === 'attributes') {
+    unifyNativeTooltipElement(event.target);
     return;
   }
-  _0x516559.addedNodes.forEach((_0x1dfb72) => {
-    unifyNativeTooltips(_0x1dfb72);
+  event.addedNodes.forEach((item4) => {
+    unifyNativeTooltips(item4);
   });
 }
-function getTooltipDescriptor(_0x49be0a) {
-  if (!isElementNode(_0x49be0a)) return null;
-  if (_0x49be0a.closest?.(GLOBAL_TOOLTIP_EXCLUDE_SELECTOR)) return null;
-  const _0x145002 = String(_0x49be0a.getAttribute('data-tooltip-right') || '').trim();
-  if (_0x145002) {
-    if (_0x49be0a.getAttribute('aria-expanded') === 'true') return null;
-    return { text: _0x145002, placement: RIGHT_TOOLTIP_PLACEMENT };
+function getTooltipDescriptor(el3) {
+  if (!isElementNode(el3)) return null;
+  if (el3.closest?.(GLOBAL_TOOLTIP_EXCLUDE_SELECTOR)) return null;
+  const text = String(el3.getAttribute('data-tooltip-right') || '').trim();
+  if (text) {
+    if (el3.getAttribute('aria-expanded') === 'true') return null;
+    return { text: text, placement: RIGHT_TOOLTIP_PLACEMENT };
   }
-  const _0x3c0ec8 = String(_0x49be0a.getAttribute('data-tooltip') || '').trim();
-  if (_0x3c0ec8) return { text: _0x3c0ec8, placement: DEFAULT_TOOLTIP_PLACEMENT };
+  const text2 = String(el3.getAttribute('data-tooltip') || '').trim();
+  if (text2) return { text: text2, placement: DEFAULT_TOOLTIP_PLACEMENT };
   return null;
 }
-function findTooltipTarget(_0x59db54) {
-  let _0x4303e0 = isElementNode(_0x59db54) ? _0x59db54 : _0x59db54?.parentElement;
-  while (isElementNode(_0x4303e0)) {
-    if (getTooltipDescriptor(_0x4303e0)) return _0x4303e0;
-    _0x4303e0 = _0x4303e0.parentElement;
+function findTooltipTarget(value4) {
+  let isElementNode2 = isElementNode(value4) ? value4 : value4?.parentElement;
+  while (isElementNode(isElementNode2)) {
+    if (getTooltipDescriptor(isElementNode2)) return isElementNode2;
+    isElementNode2 = isElementNode2.parentElement;
   }
   return null;
 }
-function createTooltipPortal(_0x3c2512) {
-  const _0x50d4ea = _0x3c2512.createElement('div');
-  ((_0x50d4ea.className = TOOLTIP_PORTAL_CLASS),
-    _0x50d4ea.setAttribute('role', 'tooltip'),
-    (_0x50d4ea.hidden = true));
-  const _0x4ed6ef = _0x3c2512.createElement('div');
+function createTooltipPortal(el4) {
+  const portal = el4.createElement('div');
+  ((portal.className = TOOLTIP_PORTAL_CLASS), portal.setAttribute('role', 'tooltip'), (portal.hidden = true));
+  const arrow = el4.createElement('div');
   return (
-    (_0x4ed6ef.className = TOOLTIP_ARROW_CLASS),
-    _0x50d4ea.appendChild(_0x4ed6ef),
-    _0x3c2512.body?.appendChild(_0x50d4ea),
-    { portal: _0x50d4ea, arrow: _0x4ed6ef }
+    (arrow.className = TOOLTIP_ARROW_CLASS),
+    portal.appendChild(arrow),
+    el4.body?.appendChild(portal),
+    { portal: portal, arrow: arrow }
   );
 }
-export function installTooltipUnifier(_0x13fba = globalThis.document) {
-  if (!_0x13fba?.documentElement) return () => {};
+export function installTooltipUnifier(el5 = globalThis.document) {
+  if (!el5?.documentElement) return () => {};
   if (installed) return installed.cleanup;
-  (unifyNativeTooltips(_0x13fba), _0x13fba.documentElement.classList?.add(TOOLTIP_PORTAL_READY_CLASS));
-  let _0x4c3538 = null,
-    _0x5c9581 = null,
-    _0x3aacf7 = null;
-  const _0x44607a = () => {
-      if (_0x5c9581 && _0x5c9581.isConnected !== false) return _0x5c9581;
-      if (!_0x13fba.body || typeof _0x13fba.createElement !== 'function') return null;
-      const _0x9ddf77 = createTooltipPortal(_0x13fba);
-      return ((_0x5c9581 = _0x9ddf77.portal), (_0x3aacf7 = _0x9ddf77.arrow), _0x5c9581);
+  (unifyNativeTooltips(el5), el5.documentElement.classList?.add(TOOLTIP_PORTAL_READY_CLASS));
+  let el6 = null,
+    el7 = null,
+    el8 = null;
+  const run = () => {
+      if (el7 && el7.isConnected !== false) return el7;
+      if (!el5.body || typeof el5.createElement !== 'function') return null;
+      const tooltipPortal = createTooltipPortal(el5);
+      return ((el7 = tooltipPortal.portal), (el8 = tooltipPortal.arrow), el7);
     },
-    _0x3ac2fd = (_0x27654a = null) => {
-      if (_0x27654a && _0x4c3538 !== _0x27654a) return;
-      _0x4c3538 = null;
-      if (!_0x5c9581) return;
-      (_0x5c9581.classList?.remove('is-visible'), (_0x5c9581.hidden = true));
+    handler = (value5 = null) => {
+      if (value5 && el6 !== value5) return;
+      el6 = null;
+      if (!el7) return;
+      (el7.classList?.remove('is-visible'), (el7.hidden = true));
     },
-    _0x3620e9 = () => {
-      if (!_0x4c3538 || !_0x5c9581 || _0x5c9581.hidden) return;
-      if (!_0x13fba.documentElement.contains?.(_0x4c3538)) {
-        _0x3ac2fd();
+    handler2 = () => {
+      if (!el6 || !el7 || el7.hidden) return;
+      if (!el5.documentElement.contains?.(el6)) {
+        handler();
         return;
       }
-      const _0x2da786 = getTooltipDescriptor(_0x4c3538);
-      if (!_0x2da786) {
-        _0x3ac2fd();
+      const tooltipDescriptor = getTooltipDescriptor(el6);
+      if (!tooltipDescriptor) {
+        handler();
         return;
       }
-      const _0x44838e = _0x4c3538.getBoundingClientRect?.(),
-        _0x21d1c = _0x5c9581.getBoundingClientRect?.();
-      if (!_0x44838e || !_0x21d1c) return;
-      const _0xa6ac87 = _0x13fba.defaultView || globalThis,
-        _0x342d63 = computeTooltipPosition(
-          _0x44838e,
-          _0x21d1c,
-          { width: _0xa6ac87.innerWidth, height: _0xa6ac87.innerHeight },
-          _0x2da786.placement,
+      const enabled = el6.getBoundingClientRect?.(),
+        enabled2 = el7.getBoundingClientRect?.();
+      if (!enabled || !enabled2) return;
+      const width2 = el5.defaultView || globalThis,
+        box6 = computeTooltipPosition(
+          enabled,
+          enabled2,
+          { width: width2.innerWidth, height: width2.innerHeight },
+          tooltipDescriptor.placement,
         );
-      ((_0x5c9581.style.left = _0x342d63.left + 'px'),
-        (_0x5c9581.style.top = _0x342d63.top + 'px'),
-        (_0x5c9581.dataset.placement = _0x342d63.placement),
-        _0x5c9581.classList?.toggle('is-placement-right', _0x342d63.placement === 'right'),
-        _0x5c9581.classList?.toggle('is-placement-left', _0x342d63.placement === 'left'),
-        _0x5c9581.classList?.toggle('is-placement-bottom', _0x342d63.placement === 'bottom'),
-        _0x5c9581.classList?.toggle('is-placement-top', _0x342d63.placement === 'top'),
-        _0x3aacf7 &&
-          (_0x342d63.arrowLeft != null &&
-            ((_0x3aacf7.style.left = _0x342d63.arrowLeft + 'px'), (_0x3aacf7.style.top = '')),
-          _0x342d63.arrowTop != null &&
-            ((_0x3aacf7.style.top = _0x342d63.arrowTop + 'px'), (_0x3aacf7.style.left = ''))));
+      ((el7.style.left = box6.left + 'px'),
+        (el7.style.top = box6.top + 'px'),
+        (el7.dataset.placement = box6.placement),
+        el7.classList?.toggle('is-placement-right', box6.placement === 'right'),
+        el7.classList?.toggle('is-placement-left', box6.placement === 'left'),
+        el7.classList?.toggle('is-placement-bottom', box6.placement === 'bottom'),
+        el7.classList?.toggle('is-placement-top', box6.placement === 'top'),
+        el8 &&
+          (box6.arrowLeft != null && ((el8.style.left = box6.arrowLeft + 'px'), (el8.style.top = '')),
+          box6.arrowTop != null && ((el8.style.top = box6.arrowTop + 'px'), (el8.style.left = ''))));
     },
-    _0x2587fb = (_0x1d8f91) => {
-      const _0x6f28c3 = getTooltipDescriptor(_0x1d8f91);
-      if (!_0x6f28c3) {
-        _0x3ac2fd(_0x1d8f91);
+    handler3 = (value6) => {
+      const response = getTooltipDescriptor(value6);
+      if (!response) {
+        handler(value6);
         return;
       }
-      const _0x9dc56c = _0x44607a();
-      if (!_0x9dc56c) return;
-      ((_0x4c3538 = _0x1d8f91), (_0x9dc56c.textContent = _0x6f28c3.text));
-      if (_0x3aacf7) _0x9dc56c.appendChild(_0x3aacf7);
-      ((_0x9dc56c.hidden = false),
-        _0x9dc56c.classList?.remove('is-visible'),
-        (_0x9dc56c.style.left = '0px'),
-        (_0x9dc56c.style.top = '0px'),
-        _0x3620e9(),
-        _0x9dc56c.classList?.add('is-visible'));
+      const el9 = run();
+      if (!el9) return;
+      ((el6 = value6), (el9.textContent = response.text));
+      if (el8) el9.appendChild(el8);
+      ((el9.hidden = false),
+        el9.classList?.remove('is-visible'),
+        (el9.style.left = '0px'),
+        (el9.style.top = '0px'),
+        handler2(),
+        el9.classList?.add('is-visible'));
     },
-    _0x35ffce = (_0x3ef643) => {
-      if (!isElementNode(_0x3ef643)) return;
-      const _0x36f0ef = _0x3ef643.classList?.contains('is-tooltip-pinned');
-      if (_0x36f0ef && getTooltipDescriptor(_0x3ef643)) {
-        _0x2587fb(_0x3ef643);
+    handler4 = (el10) => {
+      if (!isElementNode(el10)) return;
+      const value7 = el10.classList?.contains('is-tooltip-pinned');
+      if (value7 && getTooltipDescriptor(el10)) {
+        handler3(el10);
         return;
       }
-      if (_0x4c3538 === _0x3ef643) {
-        const _0x2a304f = getTooltipDescriptor(_0x3ef643);
-        if (_0x2a304f) _0x2587fb(_0x3ef643);
-        else _0x3ac2fd(_0x3ef643);
+      if (el6 === el10) {
+        const tooltipDescriptor2 = getTooltipDescriptor(el10);
+        if (tooltipDescriptor2) handler3(el10);
+        else handler(el10);
       }
     },
-    _0x26974a = _0x13fba.defaultView?.MutationObserver || globalThis.MutationObserver,
-    _0x5fb8ee = _0x26974a
-      ? new _0x26974a((_0x5b1d25) => {
-          (_0x5b1d25.forEach((_0x45dde8) => {
-            (normalizeMutationRecord(_0x45dde8),
-              _0x45dde8.type === 'attributes' &&
+    handler5 = el5.defaultView?.MutationObserver || globalThis.MutationObserver,
+    value8 = handler5
+      ? new handler5((list2) => {
+          (list2.forEach((event2) => {
+            (normalizeMutationRecord(event2),
+              event2.type === 'attributes' &&
                 ['class', 'data-tooltip', 'data-tooltip-right', 'aria-expanded'].includes(
-                  _0x45dde8.attributeName,
+                  event2.attributeName,
                 ) &&
-                _0x35ffce(_0x45dde8.target));
+                handler4(event2.target));
           }),
-            _0x4c3538 && !_0x13fba.documentElement.contains?.(_0x4c3538) && _0x3ac2fd());
+            el6 && !el5.documentElement.contains?.(el6) && handler());
         })
       : null;
-  _0x5fb8ee?.observe(_0x13fba.documentElement, {
+  value8?.observe(el5.documentElement, {
     subtree: true,
     childList: true,
     attributes: true,
     attributeFilter: ['title', 'class', 'data-tooltip', 'data-tooltip-right', 'aria-expanded'],
   });
-  const _0x40e86c = (_0x46d808) => {
-      const _0xe12929 = _0x46d808.target?.closest?.('[title]') || _0x46d808.target;
-      unifyNativeTooltipElement(_0xe12929);
-      const _0x3b7ab0 = findTooltipTarget(_0x46d808.target);
-      if (_0x3b7ab0) _0x2587fb(_0x3b7ab0);
+  const value9 = (event3) => {
+      const value10 = event3.target?.closest?.('[title]') || event3.target;
+      unifyNativeTooltipElement(value10);
+      const tooltipTarget = findTooltipTarget(event3.target);
+      if (tooltipTarget) handler3(tooltipTarget);
     },
-    _0x5177af = (_0x43b1ba) => {
-      if (!_0x4c3538) return;
-      if (_0x4c3538.contains?.(_0x43b1ba.relatedTarget)) return;
-      _0x3ac2fd(_0x4c3538);
+    value11 = (value12) => {
+      if (!el6) return;
+      if (el6.contains?.(value12.relatedTarget)) return;
+      handler(el6);
     },
-    _0x503ae0 = (_0x1ec95d) => {
-      const _0x5bd198 = _0x1ec95d.target?.closest?.('[title]') || _0x1ec95d.target;
-      unifyNativeTooltipElement(_0x5bd198);
-      const _0x43f2f1 = findTooltipTarget(_0x1ec95d.target);
-      if (_0x43f2f1) _0x2587fb(_0x43f2f1);
+    value13 = (event4) => {
+      const value14 = event4.target?.closest?.('[title]') || event4.target;
+      unifyNativeTooltipElement(value14);
+      const tooltipTarget2 = findTooltipTarget(event4.target);
+      if (tooltipTarget2) handler3(tooltipTarget2);
     },
-    _0x25335a = (_0x612365) => {
-      if (!_0x4c3538) return;
-      if (_0x4c3538.contains?.(_0x612365.relatedTarget)) return;
-      _0x3ac2fd(_0x4c3538);
+    value15 = (value16) => {
+      if (!el6) return;
+      if (el6.contains?.(value16.relatedTarget)) return;
+      handler(el6);
     },
-    _0x432d96 = () => {
-      _0x3ac2fd();
+    value17 = () => {
+      handler();
     },
-    _0x4f3dbd = () => _0x3ac2fd();
-  (_0x13fba.addEventListener?.('pointerover', _0x40e86c, true),
-    _0x13fba.addEventListener?.('pointerout', _0x5177af, true),
-    _0x13fba.addEventListener?.('focusin', _0x503ae0, true),
-    _0x13fba.addEventListener?.('focusout', _0x25335a, true),
-    _0x13fba.addEventListener?.('pointerdown', _0x4f3dbd, true),
-    _0x13fba.addEventListener?.('scroll', _0x432d96, true),
-    _0x13fba.defaultView?.addEventListener?.('scroll', _0x432d96, true),
-    _0x13fba.defaultView?.addEventListener?.('resize', _0x432d96));
-  const _0x54ef4e = () => {
-    (_0x5fb8ee?.disconnect(),
-      _0x13fba.removeEventListener?.('pointerover', _0x40e86c, true),
-      _0x13fba.removeEventListener?.('pointerout', _0x5177af, true),
-      _0x13fba.removeEventListener?.('focusin', _0x503ae0, true),
-      _0x13fba.removeEventListener?.('focusout', _0x25335a, true),
-      _0x13fba.removeEventListener?.('pointerdown', _0x4f3dbd, true),
-      _0x13fba.removeEventListener?.('scroll', _0x432d96, true),
-      _0x13fba.defaultView?.removeEventListener?.('scroll', _0x432d96, true),
-      _0x13fba.defaultView?.removeEventListener?.('resize', _0x432d96),
-      _0x13fba.documentElement.classList?.remove(TOOLTIP_PORTAL_READY_CLASS),
-      _0x5c9581?.remove?.(),
-      (_0x4c3538 = null),
-      (_0x5c9581 = null),
-      (_0x3aacf7 = null),
+    value18 = () => handler();
+  (el5.addEventListener?.('pointerover', value9, true),
+    el5.addEventListener?.('pointerout', value11, true),
+    el5.addEventListener?.('focusin', value13, true),
+    el5.addEventListener?.('focusout', value15, true),
+    el5.addEventListener?.('pointerdown', value18, true),
+    el5.addEventListener?.('scroll', value17, true),
+    el5.defaultView?.addEventListener?.('scroll', value17, true),
+    el5.defaultView?.addEventListener?.('resize', value17));
+  const cleanup = () => {
+    (value8?.disconnect(),
+      el5.removeEventListener?.('pointerover', value9, true),
+      el5.removeEventListener?.('pointerout', value11, true),
+      el5.removeEventListener?.('focusin', value13, true),
+      el5.removeEventListener?.('focusout', value15, true),
+      el5.removeEventListener?.('pointerdown', value18, true),
+      el5.removeEventListener?.('scroll', value17, true),
+      el5.defaultView?.removeEventListener?.('scroll', value17, true),
+      el5.defaultView?.removeEventListener?.('resize', value17),
+      el5.documentElement.classList?.remove(TOOLTIP_PORTAL_READY_CLASS),
+      el7?.remove?.(),
+      (el6 = null),
+      (el7 = null),
+      (el8 = null),
       (installed = null));
   };
-  return ((installed = { cleanup: _0x54ef4e }), _0x54ef4e);
+  return ((installed = { cleanup: cleanup }), cleanup);
 }

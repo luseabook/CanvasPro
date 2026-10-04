@@ -18,85 +18,85 @@ const PANEL_KIND_KEYS = Object['freeze'](['image', 'video', 'audio']),
   SAVED_APPS_STORAGE_KEY = 'aiCanvas.runningHubAiApp.savedApps.v1',
   PANEL_DRAFT_STORAGE_KEY = 'aiCanvas.runningHubAiApp.panelDraft.v1',
   CUSTOM_AI_APP_STORAGE_SAVE_DELAY_MS = 0xfa;
-function normalizeKind(_0x2125ae) {
-  return PANEL_KIND_KEYS['includes'](_0x2125ae) ? _0x2125ae : 'image';
+function normalizeKind(value) {
+  return PANEL_KIND_KEYS['includes'](value) ? value : 'image';
 }
-function cloneComponentDrafts(_0x297516 = []) {
-  return Array['isArray'](_0x297516) ? _0x297516['map']((_0x1e3211) => ({ ..._0x1e3211 })) : [];
+function cloneComponentDrafts(list = []) {
+  return Array['isArray'](list) ? list['map']((args) => ({ ...args })) : [];
 }
-function normalizeAppName(_0x4c83e3) {
-  const _0x50801b = String(_0x4c83e3 || '')['trim']();
-  return _0x50801b || DEFAULT_AI_APP_NAME;
+function normalizeAppName(item) {
+  const key = String(item || '')['trim']();
+  return key || DEFAULT_AI_APP_NAME;
 }
-function normalizeAppDescription(_0xc134a5) {
-  return String(_0xc134a5 || '')['trim']();
+function normalizeAppDescription(index) {
+  return String(index || '')['trim']();
 }
-function normalizePromptHelpTooltip(_0x1203b3) {
-  return String(_0x1203b3 || '')['trim']();
+function normalizePromptHelpTooltip(result) {
+  return String(result || '')['trim']();
 }
-function buildKindStateKey(_0x3b7a04, _0x52f12e) {
-  const _0x50a0b8 = normalizeKind(_0x52f12e),
-    _0x27bd5d = normalizeSourceType(_0x3b7a04),
-    _0x3bc330 = isComfyUiSource(_0x27bd5d)
+function buildKindStateKey(data, options) {
+  const kind2 = normalizeKind(options),
+    sourceType2 = normalizeSourceType(data),
+    isComfyUiSource2 = isComfyUiSource(sourceType2)
       ? COMFYUI_WORKFLOW_STATE_SCOPE
-      : isRunningHubSource(_0x27bd5d)
+      : isRunningHubSource(sourceType2)
         ? SOURCE_TYPES['runninghub']
-        : _0x27bd5d;
-  return _0x3bc330 ? _0x3bc330 + ':' + _0x50a0b8 : _0x50a0b8;
+        : sourceType2;
+  return isComfyUiSource2 ? isComfyUiSource2 + ':' + kind2 : kind2;
 }
-function buildLegacyKindStateKey(_0xa38102, _0x1ce5cd) {
-  const _0x4e7185 = normalizeKind(_0x1ce5cd),
-    _0x5c5482 = normalizeSourceType(_0xa38102);
-  return _0x5c5482 ? _0x5c5482 + ':' + _0x4e7185 : _0x4e7185;
+function buildLegacyKindStateKey(target, source) {
+  const kind3 = normalizeKind(source),
+    sourceType3 = normalizeSourceType(target);
+  return sourceType3 ? sourceType3 + ':' + kind3 : kind3;
 }
 function createSavedAppId() {
-  const _0x4cf720 =
+  const next =
     typeof globalThis['crypto']?.['randomUUID'] === 'function'
       ? globalThis['crypto']['randomUUID']()
       : Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0xa);
-  return 'rh-ai-app-' + _0x4cf720;
+  return 'rh-ai-app-' + next;
 }
-function serializeSavedAppRecord(_0x58a2bf = {}) {
+function serializeSavedAppRecord(error = {}) {
   return {
-    id: String(_0x58a2bf['id'] || '')['trim'](),
-    sourceType: normalizeSourceType(_0x58a2bf['sourceType']) || SOURCE_TYPES['runninghub'],
-    kind: normalizeKind(_0x58a2bf['kind']),
+    id: String(error['id'] || '')['trim'](),
+    sourceType: normalizeSourceType(error['sourceType']) || SOURCE_TYPES['runninghub'],
+    kind: normalizeKind(error['kind']),
     runningHubProfileId: normalizeRunningHubModelApiProfileId(
-      _0x58a2bf['runningHubProfileId'] ||
-        resolveRunningHubSiteProfileIdFromUrl(_0x58a2bf['input']) ||
+      error['runningHubProfileId'] ||
+        resolveRunningHubSiteProfileIdFromUrl(error['input']) ||
         RUNNINGHUB_DOMESTIC_PROFILE_ID,
     ),
-    name: normalizeAppName(_0x58a2bf['name']),
-    description: normalizeAppDescription(_0x58a2bf['description']),
-    promptHelpTooltip: normalizePromptHelpTooltip(_0x58a2bf['promptHelpTooltip']),
-    input: String(_0x58a2bf['input'] || ''),
-    componentDraftKey: String(_0x58a2bf['componentDraftKey'] || ''),
-    componentDrafts: cloneComponentDrafts(_0x58a2bf['componentDrafts']),
-    createdAt: String(_0x58a2bf['createdAt'] || ''),
-    updatedAt: String(_0x58a2bf['updatedAt'] || ''),
+    name: normalizeAppName(error['name']),
+    description: normalizeAppDescription(error['description']),
+    promptHelpTooltip: normalizePromptHelpTooltip(error['promptHelpTooltip']),
+    input: String(error['input'] || ''),
+    componentDraftKey: String(error['componentDraftKey'] || ''),
+    componentDrafts: cloneComponentDrafts(error['componentDrafts']),
+    createdAt: String(error['createdAt'] || ''),
+    updatedAt: String(error['updatedAt'] || ''),
   };
 }
-function normalizeSavedAppRecord(_0x31395f = {}) {
-  const _0x3eda2a = serializeSavedAppRecord(_0x31395f);
-  if (!_0x3eda2a['id'] || !_0x3eda2a['input']['trim']()) return null;
-  return _0x3eda2a;
+function normalizeSavedAppRecord(options2 = {}) {
+  const serializeSavedAppRecord2 = serializeSavedAppRecord(options2);
+  if (!serializeSavedAppRecord2['id'] || !serializeSavedAppRecord2['input']['trim']()) return null;
+  return serializeSavedAppRecord2;
 }
-function loadSavedAppsFromStorage(_0x3f62ab, _0x5e9a15) {
+function loadSavedAppsFromStorage(current, handler) {
   try {
-    const _0x40257b = _0x3f62ab?.['getItem']?.(SAVED_APPS_STORAGE_KEY),
-      _0x5227d9 = _0x40257b ? JSON['parse'](_0x40257b) : [];
-    if (!Array['isArray'](_0x5227d9)) return [];
-    return _0x5227d9['map'](normalizeSavedAppRecord)['filter'](Boolean);
-  } catch (_0x76ac8b) {
-    return (_0x5e9a15('[RH AI App] load saved apps failed:', _0x76ac8b), []);
+    const entry = current?.['getItem']?.(SAVED_APPS_STORAGE_KEY),
+      list2 = entry ? JSON['parse'](entry) : [];
+    if (!Array['isArray'](list2)) return [];
+    return list2['map'](normalizeSavedAppRecord)['filter'](Boolean);
+  } catch (record) {
+    return (handler('[RH AI App] load saved apps failed:', record), []);
   }
 }
-function saveSavedAppsToStorage(_0x1bc67c, _0x478116 = [], _0x366718) {
+function saveSavedAppsToStorage(payload, list3 = [], handler2) {
   try {
-    const _0x6ac9ad = _0x478116['map'](serializeSavedAppRecord);
-    _0x1bc67c?.['setItem']?.(SAVED_APPS_STORAGE_KEY, JSON['stringify'](_0x6ac9ad));
-  } catch (_0x226aa2) {
-    _0x366718('[RH AI App] save saved apps failed:', _0x226aa2);
+    const handle = list3['map'](serializeSavedAppRecord);
+    payload?.['setItem']?.(SAVED_APPS_STORAGE_KEY, JSON['stringify'](handle));
+  } catch (state) {
+    handler2('[RH AI App] save saved apps failed:', state);
   }
 }
 function createEmptyKindState() {
@@ -115,65 +115,65 @@ function createEmptyKindState() {
   };
 }
 function createInitialKindStates() {
-  const _0x36bc8b = PANEL_KIND_KEYS['reduce']((_0x2c52b2, _0x70a1b1) => {
-    return ((_0x2c52b2[_0x70a1b1] = createEmptyKindState()), _0x2c52b2);
+  const config = PANEL_KIND_KEYS['reduce']((scope, input) => {
+    return ((scope[input] = createEmptyKindState()), scope);
   }, {});
   return (
-    SOURCE_TYPE_KEYS['forEach']((_0xbef130) => {
-      PANEL_KIND_KEYS['forEach']((_0x526c44) => {
-        _0x36bc8b[buildKindStateKey(_0xbef130, _0x526c44)] = createEmptyKindState();
+    SOURCE_TYPE_KEYS['forEach']((output) => {
+      PANEL_KIND_KEYS['forEach']((value2) => {
+        config[buildKindStateKey(output, value2)] = createEmptyKindState();
       });
     }),
-    _0x36bc8b
+    config
   );
 }
-function serializeKindStateForStorage(_0x1c37e6 = {}) {
+function serializeKindStateForStorage(options3 = {}) {
   return {
-    sourceType: normalizeSourceType(_0x1c37e6['sourceType']),
-    definitionReference: String(_0x1c37e6['definitionReference'] || ''),
-    input: String(_0x1c37e6['input'] || ''),
-    appName: normalizeAppName(_0x1c37e6['appName']),
-    appDescription: normalizeAppDescription(_0x1c37e6['appDescription']),
-    promptHelpTooltip: normalizePromptHelpTooltip(_0x1c37e6['promptHelpTooltip']),
-    runningHubProfileId: String(_0x1c37e6['runningHubProfileId'] || '')['trim']()
-      ? normalizeRunningHubModelApiProfileId(_0x1c37e6['runningHubProfileId'])
+    sourceType: normalizeSourceType(options3['sourceType']),
+    definitionReference: String(options3['definitionReference'] || ''),
+    input: String(options3['input'] || ''),
+    appName: normalizeAppName(options3['appName']),
+    appDescription: normalizeAppDescription(options3['appDescription']),
+    promptHelpTooltip: normalizePromptHelpTooltip(options3['promptHelpTooltip']),
+    runningHubProfileId: String(options3['runningHubProfileId'] || '')['trim']()
+      ? normalizeRunningHubModelApiProfileId(options3['runningHubProfileId'])
       : '',
-    savedAppId: String(_0x1c37e6['savedAppId'] || ''),
-    componentDraftKey: String(_0x1c37e6['componentDraftKey'] || ''),
-    componentDrafts: cloneComponentDrafts(_0x1c37e6['componentDrafts']),
-    componentCandidates: cloneComponentDrafts(_0x1c37e6['componentCandidates']),
-    errorMessage: String(_0x1c37e6['errorMessage'] || ''),
+    savedAppId: String(options3['savedAppId'] || ''),
+    componentDraftKey: String(options3['componentDraftKey'] || ''),
+    componentDrafts: cloneComponentDrafts(options3['componentDrafts']),
+    componentCandidates: cloneComponentDrafts(options3['componentCandidates']),
+    errorMessage: String(options3['errorMessage'] || ''),
   };
 }
-function normalizeStoredKindState(_0x2c2135 = {}) {
-  return { ...createEmptyKindState(), ...serializeKindStateForStorage(_0x2c2135), currentBundle: null };
+function normalizeStoredKindState(options4 = {}) {
+  return { ...createEmptyKindState(), ...serializeKindStateForStorage(options4), currentBundle: null };
 }
-function normalizeKindStates(_0xc0568f = {}) {
-  const _0x10f17f = createInitialKindStates();
+function normalizeKindStates(options5 = {}) {
+  const initialKindStates = createInitialKindStates();
   return (
-    Object['entries'](_0xc0568f || {})['forEach'](([_0x3ea98f, _0x2e4e88]) => {
-      if (!_0x3ea98f) return;
-      _0x10f17f[_0x3ea98f] = normalizeStoredKindState(_0x2e4e88);
+    Object['entries'](options5 || {})['forEach'](([enabled, value3]) => {
+      if (!enabled) return;
+      initialKindStates[enabled] = normalizeStoredKindState(value3);
     }),
-    _0x10f17f
+    initialKindStates
   );
 }
-function loadPanelDraftFromStorage(_0x3efe8c, _0x4dbb93) {
+function loadPanelDraftFromStorage(value4, handler3) {
   try {
-    const _0x3f490e = _0x3efe8c?.['getItem']?.(PANEL_DRAFT_STORAGE_KEY),
-      _0x3842cf = _0x3f490e ? JSON['parse'](_0x3f490e) : null;
-    if (!_0x3842cf || typeof _0x3842cf !== 'object') return null;
-    return normalizePanelDraftPayload(_0x3842cf);
-  } catch (_0x3e5b7f) {
-    return (_0x4dbb93('[RH AI App] load panel draft failed:', _0x3e5b7f), null);
+    const value5 = value4?.['getItem']?.(PANEL_DRAFT_STORAGE_KEY),
+      enabled2 = value5 ? JSON['parse'](value5) : null;
+    if (!enabled2 || typeof enabled2 !== 'object') return null;
+    return normalizePanelDraftPayload(enabled2);
+  } catch (value6) {
+    return (handler3('[RH AI App] load panel draft failed:', value6), null);
   }
 }
-function savePanelDraftToStorage(_0x28a17e, _0x5bc2fb, _0x49aeff) {
+function savePanelDraftToStorage(value7, value8, handler4) {
   try {
-    const _0x1fd841 = serializePanelDraftForStorage(_0x5bc2fb);
-    _0x28a17e?.['setItem']?.(PANEL_DRAFT_STORAGE_KEY, JSON['stringify'](_0x1fd841));
-  } catch (_0xb70d42) {
-    _0x49aeff('[RH\x20AI\x20App]\x20save\x20panel\x20draft\x20failed:', _0xb70d42);
+    const serializePanelDraftForStorage2 = serializePanelDraftForStorage(value8);
+    value7?.['setItem']?.(PANEL_DRAFT_STORAGE_KEY, JSON['stringify'](serializePanelDraftForStorage2));
+  } catch (value9) {
+    handler4('[RH\x20AI\x20App]\x20save\x20panel\x20draft\x20failed:', value9);
   }
 }
 function serializePanelDraftForStorage({
@@ -184,31 +184,31 @@ function serializePanelDraftForStorage({
   return {
     sourceType: normalizeSourceType(sourceType),
     kind: normalizeKind(kind),
-    kindStates: Object['keys'](kindStates || {})['reduce']((_0x56eb96, _0xa86d68) => {
-      return ((_0x56eb96[_0xa86d68] = serializeKindStateForStorage(kindStates[_0xa86d68])), _0x56eb96);
+    kindStates: Object['keys'](kindStates || {})['reduce']((value10, value11) => {
+      return ((value10[value11] = serializeKindStateForStorage(kindStates[value11])), value10);
     }, {}),
   };
 }
-function normalizePanelDraftPayload(_0xf8d2b9 = {}) {
-  if (!_0xf8d2b9 || typeof _0xf8d2b9 !== 'object') return null;
-  const _0x289be1 =
-    _0xf8d2b9['kindStates'] && typeof _0xf8d2b9['kindStates'] === 'object' ? _0xf8d2b9['kindStates'] : {};
+function normalizePanelDraftPayload(enabled3 = {}) {
+  if (!enabled3 || typeof enabled3 !== 'object') return null;
+  const value12 =
+    enabled3['kindStates'] && typeof enabled3['kindStates'] === 'object' ? enabled3['kindStates'] : {};
   return {
-    sourceType: normalizeSourceType(_0xf8d2b9['sourceType']),
-    kind: normalizeKind(_0xf8d2b9['kind']),
-    kindStates: normalizeKindStates(_0x289be1),
+    sourceType: normalizeSourceType(enabled3['sourceType']),
+    kind: normalizeKind(enabled3['kind']),
+    kindStates: normalizeKindStates(value12),
   };
 }
-function normalizeCustomAiAppStoragePayload(_0x545e24 = {}) {
-  const _0x180e3c = Array['isArray'](_0x545e24?.['savedApps'])
-    ? _0x545e24['savedApps']['map'](normalizeSavedAppRecord)['filter'](Boolean)
+function normalizeCustomAiAppStoragePayload(ok = {}) {
+  const savedApps2 = Array['isArray'](ok?.['savedApps'])
+    ? ok['savedApps']['map'](normalizeSavedAppRecord)['filter'](Boolean)
     : [];
   return {
-    ok: _0x545e24?.['ok'] !== ![],
-    hasData: _0x545e24?.['hasData'] === !![],
-    storageRoot: String(_0x545e24?.['storageRoot'] || ''),
-    savedApps: _0x180e3c,
-    panelDraft: normalizePanelDraftPayload(_0x545e24?.['panelDraft']),
+    ok: ok?.['ok'] !== ![],
+    hasData: ok?.['hasData'] === !![],
+    storageRoot: String(ok?.['storageRoot'] || ''),
+    savedApps: savedApps2,
+    panelDraft: normalizePanelDraftPayload(ok?.['panelDraft']),
   };
 }
 function buildCustomAiAppStoragePayload({
@@ -222,14 +222,14 @@ function buildCustomAiAppStoragePayload({
     panelDraft: serializePanelDraftForStorage({ sourceType: sourceType, kind: kind, kindStates: kindStates }),
   };
 }
-function getCustomAiAppStorageBridge(_0x3d0cf8) {
-  return _0x3d0cf8?.['isAvailable']?.() === !![] ? _0x3d0cf8 : null;
+function getCustomAiAppStorageBridge(value13) {
+  return value13?.['isAvailable']?.() === !![] ? value13 : null;
 }
-async function readCustomAiAppsFromFileStorage(_0x4a4ff8) {
-  const _0x522d1f = getCustomAiAppStorageBridge(_0x4a4ff8);
-  if (!_0x522d1f) return null;
-  const _0x26372c = await _0x522d1f['read']();
-  return normalizeCustomAiAppStoragePayload(_0x26372c);
+async function readCustomAiAppsFromFileStorage(value14) {
+  const customAiAppStorageBridge = getCustomAiAppStorageBridge(value14);
+  if (!customAiAppStorageBridge) return null;
+  const value15 = await customAiAppStorageBridge['read']();
+  return normalizeCustomAiAppStoragePayload(value15);
 }
 export function createRhAiAppConfigRepository({
   storage: storage = globalThis['window']?.['localStorage'] || globalThis['localStorage'],
@@ -237,90 +237,90 @@ export function createRhAiAppConfigRepository({
   windowObject: windowObject = globalThis['window'] || globalThis,
   getSnapshot: getSnapshot = () => ({}),
   applyExternalSnapshot: applyExternalSnapshot = () => {},
-  onWarning: onWarning = (..._0x56b87f) => console['warn'](..._0x56b87f),
+  onWarning: onWarning = (...args2) => console['warn'](...args2),
 } = {}) {
-  let _0x25535d = ![],
-    _0x206553 = ![],
-    _0x1cc11f = ![],
-    _0xe06afb = 0x0;
-  const _0x47a9e5 = createRhAiAppPersistence({
+  let enabled4 = ![],
+    enabled5 = ![],
+    enabled6 = ![],
+    enabled7 = 0x0;
+  const run = createRhAiAppPersistence({
       externalBridge: externalBridge,
       storage: storage,
       onWarning: onWarning,
     }),
-    _0x28be78 = () => {
-      if (!_0xe06afb) return;
-      (windowObject?.['clearTimeout']?.(_0xe06afb), (_0xe06afb = 0x0));
+    handler5 = () => {
+      if (!enabled7) return;
+      (windowObject?.['clearTimeout']?.(enabled7), (enabled7 = 0x0));
     },
-    _0x414c75 = {
+    value16 = {
       loadLocalSeed() {
-        const _0x37640f = loadPanelDraftFromStorage(storage, onWarning),
-          _0xcc3b34 = loadSavedAppsFromStorage(storage, onWarning);
+        const panelDraft = loadPanelDraftFromStorage(storage, onWarning),
+          savedApps3 = loadSavedAppsFromStorage(storage, onWarning);
         return {
-          panelDraft: _0x37640f,
-          savedApps: _0xcc3b34,
-          hasData: Boolean(_0x37640f) || _0xcc3b34['length'] > 0x0,
+          panelDraft: panelDraft,
+          savedApps: savedApps3,
+          hasData: Boolean(panelDraft) || savedApps3['length'] > 0x0,
         };
       },
-      saveSavedApps(_0x53a58d = []) {
-        (saveSavedAppsToStorage(storage, _0x53a58d, onWarning), _0x414c75['scheduleExternalPersist']());
+      saveSavedApps(list4 = []) {
+        (saveSavedAppsToStorage(storage, list4, onWarning), value16['scheduleExternalPersist']());
       },
-      commitSavedApps(_0x46797f, _0x11562d) {
-        _0x28be78();
-        const _0x171518 = structuredClone(_0x46797f['map'](serializeSavedAppRecord));
+      commitSavedApps(list5, onCommitted) {
+        handler5();
+        const savedApps4 = structuredClone(list5['map'](serializeSavedAppRecord));
         return (
-          (_0x1cc11f = !![]),
-          _0x47a9e5(() => buildCustomAiAppStoragePayload({ ...getSnapshot(), savedApps: _0x171518 }), {
+          (enabled6 = !![]),
+          run(() => buildCustomAiAppStoragePayload({ ...getSnapshot(), savedApps: savedApps4 }), {
             saveApps: !![],
-            onCommitted: _0x11562d,
+            onCommitted: onCommitted,
           })
         );
       },
-      savePanelDraft(_0x1e508b = {}) {
-        (savePanelDraftToStorage(storage, _0x1e508b, onWarning), _0x414c75['scheduleExternalPersist']());
+      savePanelDraft(options6 = {}) {
+        (savePanelDraftToStorage(storage, options6, onWarning), value16['scheduleExternalPersist']());
       },
       createInitialKindStates: createInitialKindStates,
       createEmptyKindState: createEmptyKindState,
       getKindStateKey: buildKindStateKey,
       getLegacyKindStateKey: buildLegacyKindStateKey,
-      buildSavedAppRecord(_0x1b277a = {}, _0x25ae0a = null) {
-        const _0x5cfba5 = new Date()['toISOString']();
+      buildSavedAppRecord(args3 = {}, createdAt = null) {
+        const updatedAt = new Date()['toISOString']();
         return serializeSavedAppRecord({
-          ..._0x25ae0a,
-          ..._0x1b277a,
-          id: String(_0x25ae0a?.['id'] || _0x1b277a?.['id'] || '')['trim']() || createSavedAppId(),
-          createdAt: _0x25ae0a?.['createdAt'] || _0x1b277a?.['createdAt'] || _0x5cfba5,
-          updatedAt: _0x5cfba5,
+          ...createdAt,
+          ...args3,
+          id: String(createdAt?.['id'] || args3?.['id'] || '')['trim']() || createSavedAppId(),
+          createdAt: createdAt?.['createdAt'] || args3?.['createdAt'] || updatedAt,
+          updatedAt: updatedAt,
         });
       },
       async hydrateExternalStorage({ hasLocalSeed: hasLocalSeed = ![] } = {}) {
         try {
-          const _0x584301 = await readCustomAiAppsFromFileStorage(externalBridge);
-          if (!_0x584301) return null;
-          _0x25535d = !![];
-          if (_0x1cc11f) return (await _0x414c75['flushExternalPersist'](), _0x584301);
-          if (_0x584301['hasData']) {
-            _0x206553 = !![];
+          const customAiAppsFromFileStorage = await readCustomAiAppsFromFileStorage(externalBridge);
+          if (!customAiAppsFromFileStorage) return null;
+          enabled4 = !![];
+          if (enabled6) return (await value16['flushExternalPersist'](), customAiAppsFromFileStorage);
+          if (customAiAppsFromFileStorage['hasData']) {
+            enabled5 = !![];
             try {
-              await applyExternalSnapshot(_0x584301);
+              await applyExternalSnapshot(customAiAppsFromFileStorage);
             } finally {
-              ((_0x206553 = ![]), (_0x1cc11f = ![]));
+              ((enabled5 = ![]), (enabled6 = ![]));
             }
-            return _0x584301;
+            return customAiAppsFromFileStorage;
           }
-          return (hasLocalSeed && (await _0x414c75['flushExternalPersist']()), _0x584301);
-        } catch (_0x35b87b) {
-          return (onWarning('[RH AI App] hydrate file storage failed:', _0x35b87b), null);
+          return (hasLocalSeed && (await value16['flushExternalPersist']()), customAiAppsFromFileStorage);
+        } catch (value17) {
+          return (onWarning('[RH AI App] hydrate file storage failed:', value17), null);
         }
       },
       scheduleExternalPersist() {
-        if (_0x206553 || !getCustomAiAppStorageBridge(externalBridge)) return ![];
-        if (!_0x25535d) return ((_0x1cc11f = !![]), ![]);
+        if (enabled5 || !getCustomAiAppStorageBridge(externalBridge)) return ![];
+        if (!enabled4) return ((enabled6 = !![]), ![]);
         return (
-          (_0x1cc11f = ![]),
-          _0x28be78(),
-          (_0xe06afb = windowObject?.['setTimeout']?.(
-            () => void _0x414c75['flushExternalPersist'](),
+          (enabled6 = ![]),
+          handler5(),
+          (enabled7 = windowObject?.['setTimeout']?.(
+            () => void value16['flushExternalPersist'](),
             CUSTOM_AI_APP_STORAGE_SAVE_DELAY_MS,
           )),
           !![]
@@ -328,17 +328,17 @@ export function createRhAiAppConfigRepository({
       },
       async flushExternalPersist() {
         if (!getCustomAiAppStorageBridge(externalBridge)) return null;
-        _0x28be78();
+        handler5();
         try {
-          const _0x4734eb = await _0x47a9e5(() => buildCustomAiAppStoragePayload(getSnapshot()));
-          return ((_0x1cc11f = ![]), _0x4734eb);
-        } catch (_0x43ac3f) {
-          return (onWarning('[RH AI App] persist file storage failed:', _0x43ac3f), null);
+          const value18 = await run(() => buildCustomAiAppStoragePayload(getSnapshot()));
+          return ((enabled6 = ![]), value18);
+        } catch (value19) {
+          return (onWarning('[RH AI App] persist file storage failed:', value19), null);
         }
       },
       dispose() {
-        _0x28be78();
+        handler5();
       },
     };
-  return Object['freeze'](_0x414c75);
+  return Object['freeze'](value16);
 }

@@ -1,270 +1,267 @@
-function hasOwnManifestValue(_0x374b8e, _0x4299af) {
-  return Object['prototype']['hasOwnProperty']['call'](_0x374b8e || {}, _0x4299af);
+function hasOwnManifestValue(value, item) {
+  return Object['prototype']['hasOwnProperty']['call'](value || {}, item);
 }
-function isPresentManifestValue(_0x4d5c42) {
-  if (_0x4d5c42 === undefined || _0x4d5c42 === null) return ![];
-  if (typeof _0x4d5c42 === 'string') return _0x4d5c42['trim']() !== '';
-  if (Array['isArray'](_0x4d5c42)) return _0x4d5c42['length'] > 0x0;
+function isPresentManifestValue(list) {
+  if (list === undefined || list === null) return ![];
+  if (typeof list === 'string') return list['trim']() !== '';
+  if (Array['isArray'](list)) return list['length'] > 0x0;
   return !![];
 }
-export function getComfyUiPayloadPathValue(_0x36a5bc = {}, _0x401a98 = '') {
-  const _0x3ff83d = String(_0x401a98 || '')['trim']();
-  if (!_0x3ff83d) return undefined;
-  return _0x3ff83d['split']('.')['reduce']((_0x179d80, _0x3c4d7e) => {
-    if (_0x179d80 === undefined || _0x179d80 === null) return undefined;
-    return _0x179d80[_0x3c4d7e];
-  }, _0x36a5bc);
+export function getComfyUiPayloadPathValue(options = {}, key = '') {
+  const enabled = String(key || '')['trim']();
+  if (!enabled) return undefined;
+  return enabled['split']('.')['reduce']((index, result) => {
+    if (index === undefined || index === null) return undefined;
+    return index[result];
+  }, options);
 }
 function resolveManifestPayloadValue(
-  _0x174148,
-  _0x2c664a = [],
-  _0x3ef627 = undefined,
+  data,
+  target = [],
+  source = undefined,
   { allowEmpty: allowEmpty = ![] } = {},
 ) {
-  const _0x3b596f = Array['isArray'](_0x2c664a) ? _0x2c664a : [_0x2c664a];
-  for (const _0x18d041 of _0x3b596f['filter'](Boolean)) {
-    const _0x269d9d = getComfyUiPayloadPathValue(_0x174148, _0x18d041);
-    if (allowEmpty && _0x269d9d !== undefined && _0x269d9d !== null) return _0x269d9d;
-    if (isPresentManifestValue(_0x269d9d)) return _0x269d9d;
+  const list2 = Array['isArray'](target) ? target : [target];
+  for (const next of list2['filter'](Boolean)) {
+    const comfyUiPayloadPathValue = getComfyUiPayloadPathValue(data, next);
+    if (allowEmpty && comfyUiPayloadPathValue !== undefined && comfyUiPayloadPathValue !== null)
+      return comfyUiPayloadPathValue;
+    if (isPresentManifestValue(comfyUiPayloadPathValue)) return comfyUiPayloadPathValue;
   }
-  return _0x3ef627;
+  return source;
 }
-function normalizeManifestFieldList(_0x527d24, _0x2fe1a5 = '') {
-  const _0xab6d91 = _0x527d24?.['fields'] !== undefined ? _0x527d24['fields'] : _0x527d24?.['field'],
-    _0xc0e7d = Array['isArray'](_0xab6d91) ? _0xab6d91 : [_0xab6d91 || _0x2fe1a5];
-  return _0xc0e7d['map']((_0x524eca) => String(_0x524eca || '')['trim']())['filter'](Boolean);
+function normalizeManifestFieldList(current, entry = '') {
+  const record = current?.['fields'] !== undefined ? current['fields'] : current?.['field'],
+    list3 = Array['isArray'](record) ? record : [record || entry];
+  return list3['map']((handle) => String(handle || '')['trim']())['filter'](Boolean);
 }
-function manifestValuesEqual(_0x3b91e0, _0x1e4201) {
-  if (typeof _0x1e4201 === 'boolean') {
-    const _0x5f0286 = String(_0x3b91e0 ?? '')
+function manifestValuesEqual(state, config) {
+  if (typeof config === 'boolean') {
+    const scope = String(state ?? '')
       ['trim']()
       ['toLowerCase']();
-    return _0x3b91e0 === _0x1e4201 || _0x5f0286 === String(_0x1e4201);
+    return state === config || scope === String(config);
   }
-  if (typeof _0x1e4201 === 'number') return Number(_0x3b91e0) === _0x1e4201;
-  return String(_0x3b91e0 ?? '')['trim']() === String(_0x1e4201 ?? '')['trim']();
+  if (typeof config === 'number') return Number(state) === config;
+  return String(state ?? '')['trim']() === String(config ?? '')['trim']();
 }
-function evaluateManifestWhenRule(_0x21bd19, _0x22a53d) {
-  if (!_0x21bd19 || typeof _0x21bd19 !== 'object') return !![];
-  const _0x5bdf63 = _0x21bd19['field']
-      ? getComfyUiPayloadPathValue(_0x22a53d, _0x21bd19['field'])
-      : undefined,
-    _0x4786e3 = isPresentManifestValue(_0x5bdf63);
-  if (hasOwnManifestValue(_0x21bd19, 'exists') && Boolean(_0x21bd19['exists']) !== _0x4786e3) return ![];
-  if (_0x21bd19['truthy'] === !![] && !Boolean(_0x5bdf63)) return ![];
-  if (_0x21bd19['falsy'] === !![] && Boolean(_0x5bdf63)) return ![];
-  if (hasOwnManifestValue(_0x21bd19, 'equals') && !manifestValuesEqual(_0x5bdf63, _0x21bd19['equals']))
+function evaluateManifestWhenRule(enabled2, input) {
+  if (!enabled2 || typeof enabled2 !== 'object') return !![];
+  const output = enabled2['field'] ? getComfyUiPayloadPathValue(input, enabled2['field']) : undefined,
+    isPresentManifestValue2 = isPresentManifestValue(output);
+  if (hasOwnManifestValue(enabled2, 'exists') && Boolean(enabled2['exists']) !== isPresentManifestValue2)
     return ![];
-  if (hasOwnManifestValue(_0x21bd19, 'notEquals') && manifestValuesEqual(_0x5bdf63, _0x21bd19['notEquals']))
+  if (enabled2['truthy'] === !![] && !Boolean(output)) return ![];
+  if (enabled2['falsy'] === !![] && Boolean(output)) return ![];
+  if (hasOwnManifestValue(enabled2, 'equals') && !manifestValuesEqual(output, enabled2['equals'])) return ![];
+  if (hasOwnManifestValue(enabled2, 'notEquals') && manifestValuesEqual(output, enabled2['notEquals']))
     return ![];
   if (
-    Array['isArray'](_0x21bd19['in']) &&
-    !_0x21bd19['in']['some']((_0x689dd1) => manifestValuesEqual(_0x5bdf63, _0x689dd1))
+    Array['isArray'](enabled2['in']) &&
+    !enabled2['in']['some']((value2) => manifestValuesEqual(output, value2))
   )
     return ![];
   if (
-    Array['isArray'](_0x21bd19['notIn']) &&
-    _0x21bd19['notIn']['some']((_0x474bb1) => manifestValuesEqual(_0x5bdf63, _0x474bb1))
+    Array['isArray'](enabled2['notIn']) &&
+    enabled2['notIn']['some']((value3) => manifestValuesEqual(output, value3))
   )
     return ![];
   return !![];
 }
-function shouldUseManifestInputMapping(_0x4e004c, _0x394ff3) {
-  const _0x522497 = _0x4e004c?.['when'];
-  if (_0x522497 === undefined || _0x522497 === null) return !![];
-  if (Array['isArray'](_0x522497))
-    return _0x522497['every']((_0x3a6860) => evaluateManifestWhenRule(_0x3a6860, _0x394ff3));
-  return evaluateManifestWhenRule(_0x522497, _0x394ff3);
+function shouldUseManifestInputMapping(value4, value5) {
+  const list4 = value4?.['when'];
+  if (list4 === undefined || list4 === null) return !![];
+  if (Array['isArray'](list4)) return list4['every']((value6) => evaluateManifestWhenRule(value6, value5));
+  return evaluateManifestWhenRule(list4, value5);
 }
-function applyManifestInputValueMap(_0x22b8b9, _0x3fe024 = {}) {
-  const _0x4e0b7b = _0x3fe024['valueMap'] || _0x3fe024['values'] || {},
-    _0x346409 = String(_0x22b8b9 ?? '')['trim']();
-  if (_0x346409 && _0x4e0b7b[_0x346409] !== undefined) return _0x4e0b7b[_0x346409];
-  const _0x34cf18 = _0x346409['toLowerCase']();
-  if (_0x346409 && _0x4e0b7b[_0x34cf18] !== undefined) return _0x4e0b7b[_0x34cf18];
-  return _0x22b8b9;
+function applyManifestInputValueMap(value7, map = {}) {
+  const value8 = map['valueMap'] || map['values'] || {},
+    value9 = String(value7 ?? '')['trim']();
+  if (value9 && value8[value9] !== undefined) return value8[value9];
+  const value10 = value9['toLowerCase']();
+  if (value9 && value8[value10] !== undefined) return value8[value10];
+  return value7;
 }
-function normalizeManifestTransformSpec(_0x19e468) {
-  if (!_0x19e468) return { name: '' };
-  if (typeof _0x19e468 === 'string') return { name: _0x19e468 };
-  if (typeof _0x19e468 === 'object' && !Array['isArray'](_0x19e468))
-    return { ..._0x19e468, name: String(_0x19e468['name'] || '')['trim']() };
+function normalizeManifestTransformSpec(name) {
+  if (!name) return { name: '' };
+  if (typeof name === 'string') return { name: name };
+  if (typeof name === 'object' && !Array['isArray'](name))
+    return { ...name, name: String(name['name'] || '')['trim']() };
   return { name: '' };
 }
-function clampManifestNumber(_0x5d1a16, _0x180fa2) {
-  let _0x4da624 = _0x5d1a16;
-  if (Number['isFinite'](Number(_0x180fa2['min'])))
-    _0x4da624 = Math['max'](Number(_0x180fa2['min']), _0x4da624);
-  if (Number['isFinite'](Number(_0x180fa2['max'])))
-    _0x4da624 = Math['min'](Number(_0x180fa2['max']), _0x4da624);
-  return _0x4da624;
+function clampManifestNumber(value11, value12) {
+  let value13 = value11;
+  if (Number['isFinite'](Number(value12['min']))) value13 = Math['max'](Number(value12['min']), value13);
+  if (Number['isFinite'](Number(value12['max']))) value13 = Math['min'](Number(value12['max']), value13);
+  return value13;
 }
-function applyManifestInputTransform(_0x112b6e, _0x22a992 = {}, _0x452fe3 = {}) {
-  const _0x5f49a7 = normalizeManifestTransformSpec(_0x22a992['transform']),
-    _0x1790fa = _0x452fe3[_0x5f49a7['name']];
-  if (typeof _0x1790fa === 'function') return _0x1790fa(_0x112b6e, _0x5f49a7, _0x22a992);
-  switch (_0x5f49a7['name']) {
+function applyManifestInputTransform(value14, value15 = {}, value16 = {}) {
+  const error = normalizeManifestTransformSpec(value15['transform']),
+    handler = value16[error['name']];
+  if (typeof handler === 'function') return handler(value14, error, value15);
+  switch (error['name']) {
     case '':
-      return _0x112b6e;
+      return value14;
     case 'trim':
-      return String(_0x112b6e ?? '')['trim']();
+      return String(value14 ?? '')['trim']();
     case 'string':
-      return String(_0x112b6e ?? '');
+      return String(value14 ?? '');
     case 'boolean':
       return (
-        _0x112b6e === !![] ||
+        value14 === !![] ||
         ['true', '1', 'yes', 'on']['includes'](
-          String(_0x112b6e ?? '')
+          String(value14 ?? '')
             ['trim']()
             ['toLowerCase'](),
         )
       );
     case 'booleanString':
-      return _0x112b6e === !![] ||
+      return value14 === !![] ||
         ['true', '1', 'yes', 'on']['includes'](
-          String(_0x112b6e ?? '')
+          String(value14 ?? '')
             ['trim']()
             ['toLowerCase'](),
         )
         ? 'true'
         : 'false';
     case 'integer': {
-      const _0x30bdcc = Number(_0x112b6e),
-        _0x58fe23 = Number(_0x5f49a7['defaultValue'] ?? _0x22a992['defaultValue'] ?? 0x0),
-        _0x2ab40c = Number['isFinite'](_0x30bdcc)
-          ? Math['trunc'](_0x30bdcc)
-          : Number['isFinite'](_0x58fe23)
-            ? Math['trunc'](_0x58fe23)
+      const value17 = Number(value14),
+        value18 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
+        value19 = Number['isFinite'](value17)
+          ? Math['trunc'](value17)
+          : Number['isFinite'](value18)
+            ? Math['trunc'](value18)
             : 0x0;
-      return clampManifestNumber(_0x2ab40c, _0x5f49a7);
+      return clampManifestNumber(value19, error);
     }
     case 'number': {
-      const _0x188de0 = Number(_0x112b6e),
-        _0x16ca62 = Number(_0x5f49a7['defaultValue'] ?? _0x22a992['defaultValue'] ?? 0x0),
-        _0x2e4011 = Number['isFinite'](_0x188de0)
-          ? _0x188de0
-          : Number['isFinite'](_0x16ca62)
-            ? _0x16ca62
-            : 0x0;
-      return clampManifestNumber(_0x2e4011, _0x5f49a7);
+      const value20 = Number(value14),
+        value21 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
+        value22 = Number['isFinite'](value20) ? value20 : Number['isFinite'](value21) ? value21 : 0x0;
+      return clampManifestNumber(value22, error);
     }
     default:
-      throw new Error('Unsupported ComfyUI workflow transform: ' + _0x5f49a7['name']);
+      throw new Error('Unsupported ComfyUI workflow transform: ' + error['name']);
   }
 }
 async function resolveComfyUiManifestInputValue({
-  item: _0xae8a3b,
-  payload: _0x1a4ca7,
-  finalPrompt: _0x4c1b97,
+  item: item2,
+  payload: payload2,
+  finalPrompt: finalPrompt2,
   sourceResolvers: sourceResolvers = {},
 }) {
-  const _0x5e52bc = String(_0xae8a3b?.['source'] || 'param')['trim']();
-  if (_0x5e52bc === 'constant')
-    return hasOwnManifestValue(_0xae8a3b, 'value') ? _0xae8a3b['value'] : _0xae8a3b['defaultValue'];
-  if (_0x5e52bc === 'prompt') {
-    const _0x42dbd6 = resolveManifestPayloadValue(_0x1a4ca7, normalizeManifestFieldList(_0xae8a3b), '', {
-      allowEmpty: _0xae8a3b?.['allowEmpty'] === !![],
-    });
-    return isPresentManifestValue(_0x42dbd6) || _0xae8a3b?.['allowEmpty'] === !![] ? _0x42dbd6 : _0x4c1b97;
+  const value23 = String(item2?.['source'] || 'param')['trim']();
+  if (value23 === 'constant')
+    return hasOwnManifestValue(item2, 'value') ? item2['value'] : item2['defaultValue'];
+  if (value23 === 'prompt') {
+    const manifestPayloadValue = resolveManifestPayloadValue(
+      payload2,
+      normalizeManifestFieldList(item2),
+      '',
+      {
+        allowEmpty: item2?.['allowEmpty'] === !![],
+      },
+    );
+    return isPresentManifestValue(manifestPayloadValue) || item2?.['allowEmpty'] === !![]
+      ? manifestPayloadValue
+      : finalPrompt2;
   }
-  if (_0x5e52bc === 'param') {
-    const _0x57d2f6 = normalizeManifestFieldList(_0xae8a3b),
-      _0x3a705c = resolveManifestPayloadValue(_0x1a4ca7, _0x57d2f6, undefined, {
-        allowEmpty: _0xae8a3b?.['allowEmpty'] === !![],
+  if (value23 === 'param') {
+    const list5 = normalizeManifestFieldList(item2),
+      manifestPayloadValue2 = resolveManifestPayloadValue(payload2, list5, undefined, {
+        allowEmpty: item2?.['allowEmpty'] === !![],
       });
-    if (isPresentManifestValue(_0x3a705c) || _0xae8a3b?.['allowEmpty'] === !![]) return _0x3a705c;
-    const _0x4bdbe4 = _0x57d2f6['filter']((_0x46eacf) => !_0x46eacf['startsWith']('generationParams.'))[
-      'map'
-    ]((_0xec0764) => 'generationParams.' + _0xec0764);
-    return resolveManifestPayloadValue(_0x1a4ca7, _0x4bdbe4, undefined, {
-      allowEmpty: _0xae8a3b?.['allowEmpty'] === !![],
+    if (isPresentManifestValue(manifestPayloadValue2) || item2?.['allowEmpty'] === !![])
+      return manifestPayloadValue2;
+    const value24 = list5['filter']((enabled3) => !enabled3['startsWith']('generationParams.'))['map'](
+      (value25) => 'generationParams.' + value25,
+    );
+    return resolveManifestPayloadValue(payload2, value24, undefined, {
+      allowEmpty: item2?.['allowEmpty'] === !![],
     });
   }
-  const _0x3c5bf5 = sourceResolvers[_0x5e52bc];
-  if (typeof _0x3c5bf5 === 'function')
-    return _0x3c5bf5({ item: _0xae8a3b, payload: _0x1a4ca7, finalPrompt: _0x4c1b97 });
-  throw new Error('Unsupported ComfyUI workflow mapping source: ' + _0x5e52bc);
+  const run = sourceResolvers[value23];
+  if (typeof run === 'function') return run({ item: item2, payload: payload2, finalPrompt: finalPrompt2 });
+  throw new Error('Unsupported ComfyUI workflow mapping source: ' + value23);
 }
-function cloneWorkflowGraph(_0x5cf894) {
-  if (!_0x5cf894 || typeof _0x5cf894 !== 'object' || Array['isArray'](_0x5cf894))
+function cloneWorkflowGraph(enabled4) {
+  if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4))
     throw new Error('ComfyUI workflow mapping missing workflow graph');
-  return JSON['parse'](JSON['stringify'](_0x5cf894));
+  return JSON['parse'](JSON['stringify'](enabled4));
 }
-function setComfyUiNodeInput(_0x19396c, _0x31feb5, _0x490263) {
-  const _0x554b91 = String(_0x31feb5?.['nodeId'] || '')['trim'](),
-    _0xeabfc1 = String(_0x31feb5?.['inputName'] || _0x31feb5?.['fieldName'] || '')['trim']();
-  if (!_0x554b91 || !_0xeabfc1) return ![];
-  const _0x1c1228 = _0x19396c[_0x554b91];
-  if (!_0x1c1228 || typeof _0x1c1228 !== 'object' || Array['isArray'](_0x1c1228)) {
-    if (_0x31feb5?.['required'])
-      throw new Error(_0x31feb5['missingMessage'] || 'Missing ComfyUI workflow node: ' + _0x554b91);
+function setComfyUiNodeInput(value26, value27, value28) {
+  const enabled5 = String(value27?.['nodeId'] || '')['trim'](),
+    enabled6 = String(value27?.['inputName'] || value27?.['fieldName'] || '')['trim']();
+  if (!enabled5 || !enabled6) return ![];
+  const enabled7 = value26[enabled5];
+  if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) {
+    if (value27?.['required'])
+      throw new Error(value27['missingMessage'] || 'Missing ComfyUI workflow node: ' + enabled5);
     return ![];
   }
   return (
-    (!_0x1c1228['inputs'] ||
-      typeof _0x1c1228['inputs'] !== 'object' ||
-      Array['isArray'](_0x1c1228['inputs'])) &&
-      (_0x1c1228['inputs'] = {}),
-    (_0x1c1228['inputs'][_0xeabfc1] = _0x490263),
+    (!enabled7['inputs'] || typeof enabled7['inputs'] !== 'object' || Array['isArray'](enabled7['inputs'])) &&
+      (enabled7['inputs'] = {}),
+    (enabled7['inputs'][enabled6] = value28),
     !![]
   );
 }
 export async function buildComfyUiPromptFromManifest({
-  mapping: _0x2ae5c1,
+  mapping: mapping,
   payload: payload = {},
   finalPrompt: finalPrompt = '',
   sourceResolvers: sourceResolvers = {},
   transforms: transforms = {},
 } = {}) {
-  const _0x5758da = cloneWorkflowGraph(_0x2ae5c1?.['workflow'] || _0x2ae5c1?.['prompt']),
-    _0x41d1c4 = Array['isArray'](_0x2ae5c1?.['inputs'])
-      ? _0x2ae5c1['inputs']
-      : Array['isArray'](_0x2ae5c1?.['nodeInputs'])
-        ? _0x2ae5c1['nodeInputs']
+  const cloneWorkflowGraph2 = cloneWorkflowGraph(mapping?.['workflow'] || mapping?.['prompt']),
+    value29 = Array['isArray'](mapping?.['inputs'])
+      ? mapping['inputs']
+      : Array['isArray'](mapping?.['nodeInputs'])
+        ? mapping['nodeInputs']
         : [];
-  for (const _0x42be0b of _0x41d1c4) {
-    if (!_0x42be0b?.['nodeId'] || !(_0x42be0b?.['inputName'] || _0x42be0b?.['fieldName'])) continue;
-    if (!shouldUseManifestInputMapping(_0x42be0b, payload)) continue;
-    const _0x3d08e3 = await resolveComfyUiManifestInputValue({
-        item: _0x42be0b,
+  for (const item3 of value29) {
+    if (!item3?.['nodeId'] || !(item3?.['inputName'] || item3?.['fieldName'])) continue;
+    if (!shouldUseManifestInputMapping(item3, payload)) continue;
+    const comfyUiManifestInputValue = await resolveComfyUiManifestInputValue({
+        item: item3,
         payload: payload,
         finalPrompt: finalPrompt,
         sourceResolvers: sourceResolvers,
       }),
-      _0x28da34 = _0x42be0b?.['allowEmpty'] === !![],
-      _0x3aafbd = _0x42be0b?.['includeEmpty'] === !![] || _0x28da34,
-      _0x4c55f4 = hasOwnManifestValue(_0x42be0b, 'defaultValue');
-    let _0x3b97a7 = _0x3d08e3;
-    !isPresentManifestValue(_0x3b97a7) &&
-      _0x4c55f4 &&
-      !(_0x28da34 && _0x3b97a7 !== undefined && _0x3b97a7 !== null) &&
-      (_0x3b97a7 = _0x42be0b['defaultValue']);
-    if (!isPresentManifestValue(_0x3b97a7)) {
-      if (_0x3aafbd) _0x3b97a7 = '';
+      value30 = item3?.['allowEmpty'] === !![],
+      enabled8 = item3?.['includeEmpty'] === !![] || value30,
+      hasOwnManifestValue2 = hasOwnManifestValue(item3, 'defaultValue');
+    let manifestInputValueMap = comfyUiManifestInputValue;
+    !isPresentManifestValue(manifestInputValueMap) &&
+      hasOwnManifestValue2 &&
+      !(value30 && manifestInputValueMap !== undefined && manifestInputValueMap !== null) &&
+      (manifestInputValueMap = item3['defaultValue']);
+    if (!isPresentManifestValue(manifestInputValueMap)) {
+      if (enabled8) manifestInputValueMap = '';
       else {
-        if (_0x42be0b['required'])
+        if (item3['required'])
           throw new Error(
-            _0x42be0b['missingMessage'] ||
+            item3['missingMessage'] ||
               'Missing ComfyUI workflow input: ' +
-                _0x42be0b['nodeId'] +
+                item3['nodeId'] +
                 '.' +
-                (_0x42be0b['inputName'] || _0x42be0b['fieldName']),
+                (item3['inputName'] || item3['fieldName']),
           );
         else continue;
       }
     }
-    ((_0x3b97a7 = applyManifestInputValueMap(_0x3b97a7, _0x42be0b)),
-      (_0x3b97a7 = applyManifestInputTransform(_0x3b97a7, _0x42be0b, transforms)));
-    if (!isPresentManifestValue(_0x3b97a7) && _0x42be0b['required'] && !_0x3aafbd)
+    ((manifestInputValueMap = applyManifestInputValueMap(manifestInputValueMap, item3)),
+      (manifestInputValueMap = applyManifestInputTransform(manifestInputValueMap, item3, transforms)));
+    if (!isPresentManifestValue(manifestInputValueMap) && item3['required'] && !enabled8)
       throw new Error(
-        _0x42be0b['missingMessage'] ||
+        item3['missingMessage'] ||
           'Missing ComfyUI workflow input: ' +
-            _0x42be0b['nodeId'] +
+            item3['nodeId'] +
             '.' +
-            (_0x42be0b['inputName'] || _0x42be0b['fieldName']),
+            (item3['inputName'] || item3['fieldName']),
       );
-    if (!isPresentManifestValue(_0x3b97a7) && !_0x3aafbd) continue;
-    setComfyUiNodeInput(_0x5758da, _0x42be0b, _0x3b97a7);
+    if (!isPresentManifestValue(manifestInputValueMap) && !enabled8) continue;
+    setComfyUiNodeInput(cloneWorkflowGraph2, item3, manifestInputValueMap);
   }
-  return _0x5758da;
+  return cloneWorkflowGraph2;
 }

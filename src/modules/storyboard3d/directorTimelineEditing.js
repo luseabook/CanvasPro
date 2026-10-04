@@ -1,1 +1,433 @@
-import{collectDirectorKeys,directorKeyIdentity,copyDirectorKeys,pasteDirectorKeys,deleteDirectorKeys,shiftDirectorKeys,directorSnapTime}from'./directorTimelineOperations.js';import{normalizeStoryboard3DShotAnimation}from'./shotAnimation.js';import{DirectorNumericDrag}from'./directorNumericDrag.js';const selectOptions=(_0x5762c7,_0x1086cd)=>_0x5762c7['map'](([_0x27d5c5,_0x3b29cc])=>'<option\x20value=\x22'+_0x27d5c5+'\x22\x20'+(_0x27d5c5===_0x1086cd?"selected":'')+'>'+_0x3b29cc+"</option>")["join"]('');export class DirectorTimelineEditing{constructor(_0x55e7ce){this["timeline"]=_0x55e7ce,this["selected"]=new Set(),this["clipboard"]=[],this["zoom"]=0x1,this["unit"]='seconds',this["snap"]=!![],this["numeric"]=new DirectorNumericDrag(_0x55e7ce),this["onDown"]=_0xe54197=>this["pointerDown"](_0xe54197),this['onWheel']=_0x12b708=>{const _0x57ca60=_0x12b708["target"]["closest"]?.('.storyboard-3d-timeline-tracks');if(!_0x57ca60||!_0x12b708['ctrlKey'])return;_0x12b708['preventDefault'](),_0x12b708['stopPropagation']();const _0x50f1d4=(_0x12b708["clientX"]-_0x57ca60["getBoundingClientRect"]()['left']+_0x57ca60["scrollLeft"])/this["zoom"];this['zoom']=Math['max'](0x1,Math['min'](0x20,this["zoom"]*(_0x12b708["deltaY"]>0x0?0.8:1.25))),this["applyZoom"](),_0x57ca60["scrollLeft"]=_0x50f1d4*this["zoom"]-(_0x12b708["clientX"]-_0x57ca60["getBoundingClientRect"]()['left']);};}["context"](){return this['timeline']["_context"]();}["render"](){const _0x672d40=this["timeline"]["playbackRate"]||0x1;return "<div class=\"storyboard-3d-director-fields storyboard-3d-timeline-editing\" data-timeline-editing>\n      <label>倍速<select data-timeline-rate>"+selectOptions([0.25,0.5,0x1,1.5,0x2,0x4]["map"](_0x11ec88=>[_0x11ec88,_0x11ec88+'×']),_0x672d40)+"</select></label>\n      <label>单位<select data-timeline-unit>"+selectOptions([["seconds",'秒'],["frames",'帧'],["milliseconds",'毫秒']],this['unit'])+"</select></label>\n      <button data-storyboard-3d-action=\"timeline-edit-prev\">−1 帧</button><button data-storyboard-3d-action=\"timeline-edit-next\">＋1 帧</button>\n      <button data-storyboard-3d-action=\"timeline-edit-zoom-out\">缩小</button><button data-storyboard-3d-action=\"timeline-edit-zoom-in\">放大</button><button data-storyboard-3d-action=\"timeline-edit-fit\">适配全部</button>\n      <label><input type=\"checkbox\" data-timeline-snap "+(this["snap"]?'checked':'')+">端点吸附</label>\n      <button data-storyboard-3d-action=\"timeline-edit-select-all\">全选帧</button><button data-storyboard-3d-action=\"timeline-edit-copy\">复制</button><button data-storyboard-3d-action=\"timeline-edit-paste\" "+(this["clipboard"]["length"]?'':"disabled")+">粘贴</button><button data-storyboard-3d-action=\"timeline-edit-delete\">删除选中</button>\n      <label>批量偏移 / 秒<input type=\"number\" step=\"0.1\" value=\"0\" data-timeline-shift></label>\n      <label>批量看向<select data-timeline-batch-target><option value=\"\">选择目标</option>"+(this['context']()["scene"]?.["objects"]["filter"](_0x1e01ef=>_0x1e01ef["type"]==="character"||_0x1e01ef['type']==="prop")["map"]((_0x1c4f1f,_0x58bf08)=>"<option value=\""+_0x58bf08+'\x22>'+String(_0x1c4f1f["name"])["replaceAll"]('&','&amp;')["replaceAll"]('<','&lt;')+"</option>")["join"]('')||'')+"</select></label>\n      <output data-timeline-selected-count>"+this["selected"]["size"]+'\x20项选中</output></div>';}['identity'](_0xd75262){return directorKeyIdentity({'type':_0xd75262["dataset"]['keyframeType'],'objectId':_0xd75262["dataset"]["objectId"],'property':_0xd75262['dataset']["property"],'keyframeId':_0xd75262["dataset"]['keyframeId']});}["mutate"](_0x3e3508,_0x906c6){try{this["timeline"]["stopPlayback"]({'render':![]}),this["timeline"]['_mutateAnimation']("timeline-edit",_0x3e3508,_0x445a45=>normalizeStoryboard3DShotAnimation(_0x906c6(_0x445a45))),this["timeline"]['syncPreview']();}catch(_0x23f08f){this['timeline']["setMessage"]?.(_0x23f08f['message']);}}["handleClick"](_0x5b51d8,_0x238db1,_0x1ff35e){if(_0x5b51d8==='timeline-select-keyframe'){const _0x912e88=this["identity"](_0x238db1);if(_0x1ff35e?.["shiftKey"]||_0x1ff35e?.["ctrlKey"]||_0x1ff35e?.['metaKey']){if(this["selected"]["has"](_0x912e88))this['selected']["delete"](_0x912e88);else this['selected']['add'](_0x912e88);return this["sync"](),!![];}return!this["selected"]["has"](_0x912e88)&&(this["selected"]["clear"](),this['selected']['add'](_0x912e88)),![];}if(!_0x5b51d8["startsWith"]("timeline-edit-"))return![];const {shot:_0x3cd074}=this["context"]();if(!_0x3cd074)return!![];const _0x42f743=normalizeStoryboard3DShotAnimation(_0x3cd074['animation']),_0x22e99a=this["timeline"]['_timeForShot'](_0x3cd074);switch(_0x5b51d8["slice"](0xe)){case'prev':this["timeline"]["_sampleAt"](_0x22e99a-0x1/_0x42f743["fps"]);break;case'next':this["timeline"]["_sampleAt"](_0x22e99a+0x1/_0x42f743["fps"]);break;case "zoom-in":this["zoom"]=Math["min"](0x20,this["zoom"]*1.5);break;case "zoom-out":this["zoom"]=Math["max"](0x1,this['zoom']/1.5);break;case "fit":this["zoom"]=0x1;break;case "select-all":this["selected"]=new Set(collectDirectorKeys(_0x42f743)['map'](directorKeyIdentity));break;case'copy':this["clipboard"]=copyDirectorKeys(_0x42f743,this["selected"]);break;case "paste":this["mutate"]("粘贴关键帧",_0x44d3b5=>pasteDirectorKeys(_0x44d3b5,this["clipboard"],_0x22e99a));break;case "delete":this["mutate"]("删除选中关键帧",_0x4da7bf=>deleteDirectorKeys(_0x4da7bf,this["selected"]));break;}return this["timeline"]["requestRender"]?.(),!![];}["handleChange"](_0x16d7d8){const _0x145733=_0x16d7d8["target"];if(_0x145733["matches"]?.('[data-director-camera-key],\x20[data-director-camera-key-easing]')){const _0x37eb09=this["timeline"]["selectedKeyframe"];if(_0x37eb09?.["type"]!=="camera")return!![];return this['mutate']('编辑摄像机关键帧',_0x2d7210=>{const _0x44abc4=_0x2d7210['cameraKeyframes']["find"](_0x1cbdba=>_0x1cbdba['id']===_0x37eb09['keyframeId']);if(!_0x44abc4)return _0x2d7210;if(_0x145733["matches"]("[data-director-camera-key-easing]"))_0x44abc4["easing"]=_0x145733["value"],delete _0x44abc4['easingCurve'];else{const [_0x216078,_0x2b4c5]=_0x145733['dataset']["directorCameraKey"]["split"]('-'),_0x4f6c5f=Number(_0x145733["value"]);if(!Number["isFinite"](_0x4f6c5f))return _0x2d7210;if(_0x2b4c5!=null)_0x44abc4["camera"][_0x216078][Number(_0x2b4c5)]=_0x4f6c5f;else _0x44abc4["camera"][_0x216078]=_0x216078==="roll"?_0x4f6c5f*Math['PI']/0xb4:_0x4f6c5f;if(_0x216078==="focalLength")delete _0x44abc4["camera"]['fov'];}return _0x2d7210;}),!![];}if(_0x145733["matches"]?.('[data-timeline-rate]'))return this['timeline']['stopPlayback']({'render':![]}),this["timeline"]['playbackRate']=Number(_0x145733['value']),!![];if(_0x145733["matches"]?.("[data-timeline-unit]"))return this["unit"]=_0x145733["value"],this["sync"](),!![];if(_0x145733['matches']?.("[data-timeline-snap]"))return this["snap"]=_0x145733['checked'],!![];if(_0x145733["matches"]?.("[data-timeline-shift]"))return this["mutate"]("批量移动关键帧",_0x12c13f=>shiftDirectorKeys(_0x12c13f,this["selected"],Number(_0x145733['value']))),!![];if(_0x145733["matches"]?.('[data-timeline-batch-target]')&&_0x145733["value"]!==''){const _0x56ec20=this['context']()["scene"]["objects"]["filter"](_0x2f58cf=>_0x2f58cf['type']==="character"||_0x2f58cf['type']==='prop')[Number(_0x145733["value"])];if(_0x56ec20)this["mutate"]("批量调整看向",_0x1ead6f=>{return collectDirectorKeys(_0x1ead6f)['forEach'](_0x8aad7a=>{if(!this['selected']["has"](directorKeyIdentity(_0x8aad7a)))return;if(_0x8aad7a["type"]==="camera")_0x8aad7a["key"]["camera"]["target"]=_0x56ec20["transform"]['position']["map"]((_0x5ec3ee,_0x4b8967)=>_0x5ec3ee+(_0x4b8967===0x1?1.2:0x0));else{if(_0x8aad7a["property"]==="rotation"){const _0x3e5df0=this["context"]()["scene"]['objects']["find"](_0x599fc4=>_0x599fc4['id']===_0x8aad7a['objectId']);if(_0x3e5df0)_0x8aad7a["key"]["value"][0x1]=Math["atan2"](_0x56ec20['transform']["position"][0x0]-_0x3e5df0["transform"]['position'][0x0],_0x56ec20["transform"]["position"][0x2]-_0x3e5df0["transform"]["position"][0x2]);}}}),_0x1ead6f;});return!![];}return![];}['handleKey'](_0x9d553b){if(_0x9d553b["key"]==="Escape"&&this["numeric"]["cancel"])return this["numeric"]["cancel"](),_0x9d553b['preventDefault'](),_0x9d553b["stopImmediatePropagation"](),!![];if(_0x9d553b["key"]==="Escape"&&this["timeline"]['multiView']['layer']){if(this["timeline"]["multiView"]["cancel"])this["timeline"]['multiView']["cancel"]();else this["timeline"]["multiView"]["destroy"]();return _0x9d553b['preventDefault'](),_0x9d553b["stopImmediatePropagation"](),!![];}if(_0x9d553b['key']==='Escape'&&this["timeline"]['clips']['cancel'])return this['timeline']["clips"]['cancel'](),_0x9d553b["preventDefault"](),_0x9d553b["stopImmediatePropagation"](),!![];if(this['timeline']["clips"]['handleKey'](_0x9d553b))return!![];if(_0x9d553b["key"]==="Escape"&&this["cancelMarquee"])return this["cancelMarquee"](),_0x9d553b["preventDefault"](),_0x9d553b["stopImmediatePropagation"](),!![];if(!this['timeline']["isDrawerOpen"]()||_0x9d553b["target"]?.["closest"]?.("input,textarea,select,[contenteditable=true]"))return![];const _0x4fe58c=_0x9d553b['key']['toLowerCase'](),_0x33fd89=_0x9d553b["ctrlKey"]||_0x9d553b['metaKey'];if(_0x33fd89&&['a','c','v']["includes"](_0x4fe58c)&&_0x9d553b['target']["closest"]?.("[data-storyboard-3d-shot-timeline]"))this['handleClick']("timeline-edit-"+{'a':"select-all",'c':"copy",'v':"paste"}[_0x4fe58c]);else{if(['arrowleft','arrowright',"arrowup",'arrowdown',"home","end"]["includes"](_0x4fe58c)&&_0x9d553b["target"]['closest']?.("[data-storyboard-3d-shot-timeline]")){const {shot:_0xbbdc09}=this["context"]();if(!_0xbbdc09)return![];const _0x493ba4=normalizeStoryboard3DShotAnimation(_0xbbdc09["animation"]),_0x465db3=this["timeline"]["_timeForShot"](_0xbbdc09),_0x309693=[...new Set([0x0,_0x493ba4["duration"],...collectDirectorKeys(_0x493ba4)["map"](({key:_0x27dbe1})=>_0x27dbe1["time"]),..._0x493ba4["actionClips"]['flatMap'](_0x5d134c=>[_0x5d134c['start'],_0x5d134c['end']])])]["sort"]((_0x60af19,_0x33cc5b)=>_0x60af19-_0x33cc5b),_0x5e9378=_0x4fe58c==="home"?0x0:_0x4fe58c==="end"?_0x493ba4["duration"]:_0x4fe58c==='arrowup'?_0x309693["filter"](_0x442ec8=>_0x442ec8<_0x465db3-0.00001)['at'](-0x1)??0x0:_0x4fe58c==='arrowdown'?_0x309693['find'](_0x467c9a=>_0x467c9a>_0x465db3+0.00001)??_0x493ba4['duration']:_0x465db3+(_0x4fe58c==="arrowleft"?-0x1:0x1)*(_0x9d553b["shiftKey"]?0xa:0x1)/_0x493ba4['fps'];this["timeline"]['stopPlayback']({'render':![]}),this["timeline"]["_sampleAt"](_0x5e9378);}else{if((_0x4fe58c==='delete'||_0x4fe58c==='backspace')&&this["selected"]["size"]&&_0x9d553b["target"]['closest']?.("[data-storyboard-3d-shot-timeline]"))this['handleClick']("timeline-edit-delete");else return![];}}return _0x9d553b['preventDefault'](),_0x9d553b["stopImmediatePropagation"](),!![];}['snapTime'](_0x28e246,_0x47fc94,_0x2ffda4,_0x4c7b37,_0x22c3ba=[]){return directorSnapTime(_0x28e246,_0x47fc94,this['snap']&&!_0x4c7b37?_0x47fc94['duration']/_0x2ffda4*0x8:0x0,_0x22c3ba);}["applyZoom"](){const _0x1b7017=this["timeline"]['getRoot']?.()?.["querySelector"]('.storyboard-3d-timeline-tracks');if(_0x1b7017)_0x1b7017["style"]["setProperty"]("--director-timeline-zoom",this["zoom"]);}['sync'](){const _0x2eb5ff=this["timeline"]["getRoot"]?.();if(!_0x2eb5ff)return;this["numeric"]["bind"](_0x2eb5ff);_0x2eb5ff!==this["root"]&&(this["root"]?.["removeEventListener"]("pointerdown",this['onDown'],!![]),this["root"]?.["removeEventListener"]("wheel",this["onWheel"],!![]),this["root"]=_0x2eb5ff,_0x2eb5ff["addEventListener"]("pointerdown",this["onDown"],!![]),_0x2eb5ff["addEventListener"]('wheel',this["onWheel"],{'capture':!![],'passive':![]}));const {shot:_0x1f00f8}=this['context']();if(!_0x1f00f8)return;const _0x3781fd=new Set(collectDirectorKeys(_0x1f00f8["animation"])["map"](directorKeyIdentity));this["selected"]=new Set([...this["selected"]]["filter"](_0x1bbe2a=>_0x3781fd["has"](_0x1bbe2a))),_0x2eb5ff["querySelectorAll"]("[data-keyframe-id]")["forEach"](_0x177a4e=>_0x177a4e["classList"]["toggle"]('is-selected',this["selected"]['has'](this["identity"](_0x177a4e))||_0x177a4e["dataset"]["keyframeId"]===this["timeline"]["selectedKeyframe"]?.['keyframeId']));const _0x32e184=_0x2eb5ff["querySelector"]("[data-timeline-selected-count]");if(_0x32e184)_0x32e184["textContent"]=this['selected']['size']+" 项选中";this['applyZoom'](),_0x2eb5ff["querySelectorAll"]('.storyboard-3d-timeline-ruler\x20>\x20span')["forEach"](_0x2c5abe=>{const _0x3f1f19=parseFloat(_0x2c5abe["style"]["getPropertyValue"]('--storyboard-3d-tick-position'))/0x64*_0x1f00f8["animation"]["duration"];_0x2c5abe['querySelector']("strong")['textContent']=this["unit"]==='frames'?Math['round'](_0x3f1f19*_0x1f00f8["animation"]["fps"])+'f':this["unit"]==='milliseconds'?Math["round"](_0x3f1f19*0x3e8)+'ms':Number(_0x3f1f19["toFixed"](0x2))+'s';});}["pointerDown"](_0x3077de){const _0x2d86dd=_0x3077de["target"]["closest"]?.('.storyboard-3d-timeline-lane');if(!_0x2d86dd||_0x3077de['target']['closest']("button,.storyboard-3d-motion-clip")||_0x3077de["button"]!==0x0)return;_0x3077de["preventDefault"](),_0x3077de["stopImmediatePropagation"]();const _0x3bbe69=this['root'],_0x978ad7=_0x3bbe69['ownerDocument']['defaultView'],_0x23ae15=_0x3bbe69["getBoundingClientRect"](),_0x214bd7=_0x3bbe69['ownerDocument']["createElement"]("div");_0x214bd7['className']="storyboard-3d-timeline-marquee",_0x3bbe69["append"](_0x214bd7);const _0x5e3be8={'x':_0x3077de['clientX'],'y':_0x3077de["clientY"]},_0x478ad1=new Set(this["selected"]),_0x3495c2=new Set(_0x3077de["shiftKey"]?this["selected"]:[]),_0x1161d3=new _0x978ad7[("AbortController")]();this["cancelMarquee"]?.();const _0x8c0a8=()=>{_0x1161d3["abort"](),_0x214bd7["remove"](),this["cancelMarquee"]=null;};this["cancelMarquee"]=()=>{this["selected"]=_0x478ad1,_0x8c0a8(),this["sync"]();};const _0x49a5a2=_0x125a54=>{const _0x1b9dd0=Math["min"](_0x5e3be8['x'],_0x125a54["clientX"]),_0x3a6caa=Math['min'](_0x5e3be8['y'],_0x125a54["clientY"]),_0x58462c=Math["max"](_0x5e3be8['x'],_0x125a54["clientX"]),_0x55ae6c=Math["max"](_0x5e3be8['y'],_0x125a54["clientY"]);Object["entries"]({'left':_0x1b9dd0-_0x23ae15["left"],'top':_0x3a6caa-_0x23ae15['top'],'width':_0x58462c-_0x1b9dd0,'height':_0x55ae6c-_0x3a6caa})["forEach"](([_0x107f24,_0x16e118])=>{_0x214bd7["style"][_0x107f24]=_0x16e118+'px';}),this['selected']=new Set(_0x3495c2),_0x3bbe69["querySelectorAll"]("[data-keyframe-id]")["forEach"](_0x233b9a=>{const _0x42cf1d=_0x233b9a['getBoundingClientRect']();if(_0x42cf1d["right"]>=_0x1b9dd0&&_0x42cf1d["left"]<=_0x58462c&&_0x42cf1d["bottom"]>=_0x3a6caa&&_0x42cf1d["top"]<=_0x55ae6c)this["selected"]["add"](this["identity"](_0x233b9a));}),this["sync"]();};_0x978ad7['addEventListener']('pointermove',_0x49a5a2,{'signal':_0x1161d3["signal"]}),_0x978ad7["addEventListener"]("pointerup",_0x8c0a8,{'once':!![],'signal':_0x1161d3["signal"]}),_0x978ad7["addEventListener"]('pointercancel',()=>this['cancelMarquee']?.(),{'once':!![],'signal':_0x1161d3["signal"]});}['destroy'](){this["cancelMarquee"]?.(),this['numeric']["destroy"](),this["root"]?.["removeEventListener"]("pointerdown",this['onDown'],!![]),this["root"]?.["removeEventListener"]("wheel",this["onWheel"],!![]),this["root"]=null;}}
+import {
+  collectDirectorKeys,
+  directorKeyIdentity,
+  copyDirectorKeys,
+  pasteDirectorKeys,
+  deleteDirectorKeys,
+  shiftDirectorKeys,
+  directorSnapTime,
+} from './directorTimelineOperations.js';
+import { normalizeStoryboard3DShotAnimation } from './shotAnimation.js';
+import { DirectorNumericDrag } from './directorNumericDrag.js';
+const selectOptions = (list, value) =>
+  list['map'](
+    ([item, key]) =>
+      '<option\x20value=\x22' +
+      item +
+      '\x22\x20' +
+      (item === value ? 'selected' : '') +
+      '>' +
+      key +
+      '</option>',
+  )['join']('');
+export class DirectorTimelineEditing {
+  constructor(index) {
+    ((this['timeline'] = index),
+      (this['selected'] = new Set()),
+      (this['clipboard'] = []),
+      (this['zoom'] = 0x1),
+      (this['unit'] = 'seconds'),
+      (this['snap'] = !![]),
+      (this['numeric'] = new DirectorNumericDrag(index)),
+      (this['onDown'] = (result) => this['pointerDown'](result)),
+      (this['onWheel'] = (event) => {
+        const enabled = event['target']['closest']?.('.storyboard-3d-timeline-tracks');
+        if (!enabled || !event['ctrlKey']) return;
+        (event['preventDefault'](), event['stopPropagation']());
+        const data =
+          (event['clientX'] - enabled['getBoundingClientRect']()['left'] + enabled['scrollLeft']) /
+          this['zoom'];
+        ((this['zoom'] = Math['max'](
+          0x1,
+          Math['min'](0x20, this['zoom'] * (event['deltaY'] > 0x0 ? 0.8 : 1.25)),
+        )),
+          this['applyZoom'](),
+          (enabled['scrollLeft'] =
+            data * this['zoom'] - (event['clientX'] - enabled['getBoundingClientRect']()['left'])));
+      }));
+  }
+  ['context']() {
+    return this['timeline']['_context']();
+  }
+  ['render']() {
+    const options = this['timeline']['playbackRate'] || 0x1;
+    return (
+      '<div class="storyboard-3d-director-fields storyboard-3d-timeline-editing" data-timeline-editing>\n      <label>倍速<select data-timeline-rate>' +
+      selectOptions(
+        [0.25, 0.5, 0x1, 1.5, 0x2, 0x4]['map']((target) => [target, target + '×']),
+        options,
+      ) +
+      '</select></label>\n      <label>单位<select data-timeline-unit>' +
+      selectOptions(
+        [
+          ['seconds', '秒'],
+          ['frames', '帧'],
+          ['milliseconds', '毫秒'],
+        ],
+        this['unit'],
+      ) +
+      '</select></label>\n      <button data-storyboard-3d-action="timeline-edit-prev">−1 帧</button><button data-storyboard-3d-action="timeline-edit-next">＋1 帧</button>\n      <button data-storyboard-3d-action="timeline-edit-zoom-out">缩小</button><button data-storyboard-3d-action="timeline-edit-zoom-in">放大</button><button data-storyboard-3d-action="timeline-edit-fit">适配全部</button>\n      <label><input type="checkbox" data-timeline-snap ' +
+      (this['snap'] ? 'checked' : '') +
+      '>端点吸附</label>\n      <button data-storyboard-3d-action="timeline-edit-select-all">全选帧</button><button data-storyboard-3d-action="timeline-edit-copy">复制</button><button data-storyboard-3d-action="timeline-edit-paste" ' +
+      (this['clipboard']['length'] ? '' : 'disabled') +
+      '>粘贴</button><button data-storyboard-3d-action="timeline-edit-delete">删除选中</button>\n      <label>批量偏移 / 秒<input type="number" step="0.1" value="0" data-timeline-shift></label>\n      <label>批量看向<select data-timeline-batch-target><option value="">选择目标</option>' +
+      (this['context']()
+        ['scene']?.['objects']['filter'](
+          (source) => source['type'] === 'character' || source['type'] === 'prop',
+        )
+        ['map'](
+          (next, current) =>
+            '<option value="' +
+            current +
+            '\x22>' +
+            String(next['name'])['replaceAll']('&', '&amp;')['replaceAll']('<', '&lt;') +
+            '</option>',
+        )
+        ['join']('') || '') +
+      '</select></label>\n      <output data-timeline-selected-count>' +
+      this['selected']['size'] +
+      '\x20项选中</output></div>'
+    );
+  }
+  ['identity'](el) {
+    return directorKeyIdentity({
+      type: el['dataset']['keyframeType'],
+      objectId: el['dataset']['objectId'],
+      property: el['dataset']['property'],
+      keyframeId: el['dataset']['keyframeId'],
+    });
+  }
+  ['mutate'](entry, handler) {
+    try {
+      (this['timeline']['stopPlayback']({ render: ![] }),
+        this['timeline']['_mutateAnimation']('timeline-edit', entry, (record) =>
+          normalizeStoryboard3DShotAnimation(handler(record)),
+        ),
+        this['timeline']['syncPreview']());
+    } catch (error) {
+      this['timeline']['setMessage']?.(error['message']);
+    }
+  }
+  ['handleClick'](enabled2, payload, handle) {
+    if (enabled2 === 'timeline-select-keyframe') {
+      const state = this['identity'](payload);
+      if (handle?.['shiftKey'] || handle?.['ctrlKey'] || handle?.['metaKey']) {
+        if (this['selected']['has'](state)) this['selected']['delete'](state);
+        else this['selected']['add'](state);
+        return (this['sync'](), !![]);
+      }
+      return (
+        !this['selected']['has'](state) && (this['selected']['clear'](), this['selected']['add'](state)),
+        ![]
+      );
+    }
+    if (!enabled2['startsWith']('timeline-edit-')) return ![];
+    const { shot: shot } = this['context']();
+    if (!shot) return !![];
+    const storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(shot['animation']),
+      config = this['timeline']['_timeForShot'](shot);
+    switch (enabled2['slice'](0xe)) {
+      case 'prev':
+        this['timeline']['_sampleAt'](config - 0x1 / storyboard3DShotAnimation['fps']);
+        break;
+      case 'next':
+        this['timeline']['_sampleAt'](config + 0x1 / storyboard3DShotAnimation['fps']);
+        break;
+      case 'zoom-in':
+        this['zoom'] = Math['min'](0x20, this['zoom'] * 1.5);
+        break;
+      case 'zoom-out':
+        this['zoom'] = Math['max'](0x1, this['zoom'] / 1.5);
+        break;
+      case 'fit':
+        this['zoom'] = 0x1;
+        break;
+      case 'select-all':
+        this['selected'] = new Set(
+          collectDirectorKeys(storyboard3DShotAnimation)['map'](directorKeyIdentity),
+        );
+        break;
+      case 'copy':
+        this['clipboard'] = copyDirectorKeys(storyboard3DShotAnimation, this['selected']);
+        break;
+      case 'paste':
+        this['mutate']('粘贴关键帧', (scope) => pasteDirectorKeys(scope, this['clipboard'], config));
+        break;
+      case 'delete':
+        this['mutate']('删除选中关键帧', (input) => deleteDirectorKeys(input, this['selected']));
+        break;
+    }
+    return (this['timeline']['requestRender']?.(), !![]);
+  }
+  ['handleChange'](output) {
+    const el2 = output['target'];
+    if (el2['matches']?.('[data-director-camera-key],\x20[data-director-camera-key-easing]')) {
+      const value2 = this['timeline']['selectedKeyframe'];
+      if (value2?.['type'] !== 'camera') return !![];
+      return (
+        this['mutate']('编辑摄像机关键帧', (value3) => {
+          const enabled3 = value3['cameraKeyframes']['find'](
+            (value4) => value4['id'] === value2['keyframeId'],
+          );
+          if (!enabled3) return value3;
+          if (el2['matches']('[data-director-camera-key-easing]'))
+            ((enabled3['easing'] = el2['value']), delete enabled3['easingCurve']);
+          else {
+            const [value5, value6] = el2['dataset']['directorCameraKey']['split']('-'),
+              value7 = Number(el2['value']);
+            if (!Number['isFinite'](value7)) return value3;
+            if (value6 != null) enabled3['camera'][value5][Number(value6)] = value7;
+            else enabled3['camera'][value5] = value5 === 'roll' ? (value7 * Math['PI']) / 0xb4 : value7;
+            if (value5 === 'focalLength') delete enabled3['camera']['fov'];
+          }
+          return value3;
+        }),
+        !![]
+      );
+    }
+    if (el2['matches']?.('[data-timeline-rate]'))
+      return (
+        this['timeline']['stopPlayback']({ render: ![] }),
+        (this['timeline']['playbackRate'] = Number(el2['value'])),
+        !![]
+      );
+    if (el2['matches']?.('[data-timeline-unit]'))
+      return ((this['unit'] = el2['value']), this['sync'](), !![]);
+    if (el2['matches']?.('[data-timeline-snap]')) return ((this['snap'] = el2['checked']), !![]);
+    if (el2['matches']?.('[data-timeline-shift]'))
+      return (
+        this['mutate']('批量移动关键帧', (value8) =>
+          shiftDirectorKeys(value8, this['selected'], Number(el2['value'])),
+        ),
+        !![]
+      );
+    if (el2['matches']?.('[data-timeline-batch-target]') && el2['value'] !== '') {
+      const value9 = this['context']()['scene']['objects']['filter'](
+        (value10) => value10['type'] === 'character' || value10['type'] === 'prop',
+      )[Number(el2['value'])];
+      if (value9)
+        this['mutate']('批量调整看向', (value11) => {
+          return (
+            collectDirectorKeys(value11)['forEach']((value12) => {
+              if (!this['selected']['has'](directorKeyIdentity(value12))) return;
+              if (value12['type'] === 'camera')
+                value12['key']['camera']['target'] = value9['transform']['position']['map'](
+                  (value13, count) => value13 + (count === 0x1 ? 1.2 : 0x0),
+                );
+              else {
+                if (value12['property'] === 'rotation') {
+                  const value14 = this['context']()['scene']['objects']['find'](
+                    (value15) => value15['id'] === value12['objectId'],
+                  );
+                  if (value14)
+                    value12['key']['value'][0x1] = Math['atan2'](
+                      value9['transform']['position'][0x0] - value14['transform']['position'][0x0],
+                      value9['transform']['position'][0x2] - value14['transform']['position'][0x2],
+                    );
+                }
+              }
+            }),
+            value11
+          );
+        });
+      return !![];
+    }
+    return ![];
+  }
+  ['handleKey'](event2) {
+    if (event2['key'] === 'Escape' && this['numeric']['cancel'])
+      return (
+        this['numeric']['cancel'](),
+        event2['preventDefault'](),
+        event2['stopImmediatePropagation'](),
+        !![]
+      );
+    if (event2['key'] === 'Escape' && this['timeline']['multiView']['layer']) {
+      if (this['timeline']['multiView']['cancel']) this['timeline']['multiView']['cancel']();
+      else this['timeline']['multiView']['destroy']();
+      return (event2['preventDefault'](), event2['stopImmediatePropagation'](), !![]);
+    }
+    if (event2['key'] === 'Escape' && this['timeline']['clips']['cancel'])
+      return (
+        this['timeline']['clips']['cancel'](),
+        event2['preventDefault'](),
+        event2['stopImmediatePropagation'](),
+        !![]
+      );
+    if (this['timeline']['clips']['handleKey'](event2)) return !![];
+    if (event2['key'] === 'Escape' && this['cancelMarquee'])
+      return (
+        this['cancelMarquee'](),
+        event2['preventDefault'](),
+        event2['stopImmediatePropagation'](),
+        !![]
+      );
+    if (
+      !this['timeline']['isDrawerOpen']() ||
+      event2['target']?.['closest']?.('input,textarea,select,[contenteditable=true]')
+    )
+      return ![];
+    const value16 = event2['key']['toLowerCase'](),
+      value17 = event2['ctrlKey'] || event2['metaKey'];
+    if (
+      value17 &&
+      ['a', 'c', 'v']['includes'](value16) &&
+      event2['target']['closest']?.('[data-storyboard-3d-shot-timeline]')
+    )
+      this['handleClick']('timeline-edit-' + { a: 'select-all', c: 'copy', v: 'paste' }[value16]);
+    else {
+      if (
+        ['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'home', 'end']['includes'](value16) &&
+        event2['target']['closest']?.('[data-storyboard-3d-shot-timeline]')
+      ) {
+        const { shot: shot2 } = this['context']();
+        if (!shot2) return ![];
+        const args = normalizeStoryboard3DShotAnimation(shot2['animation']),
+          value18 = this['timeline']['_timeForShot'](shot2),
+          list2 = [
+            ...new Set([
+              0x0,
+              args['duration'],
+              ...collectDirectorKeys(args)['map'](({ key: key2 }) => key2['time']),
+              ...args['actionClips']['flatMap']((value19) => [value19['start'], value19['end']]),
+            ]),
+          ]['sort']((value20, value21) => value20 - value21),
+          value22 =
+            value16 === 'home'
+              ? 0x0
+              : value16 === 'end'
+                ? args['duration']
+                : value16 === 'arrowup'
+                  ? (list2['filter']((value23) => value23 < value18 - 0.00001)['at'](-0x1) ?? 0x0)
+                  : value16 === 'arrowdown'
+                    ? (list2['find']((value24) => value24 > value18 + 0.00001) ?? args['duration'])
+                    : value18 +
+                      ((value16 === 'arrowleft' ? -0x1 : 0x1) * (event2['shiftKey'] ? 0xa : 0x1)) /
+                        args['fps'];
+        (this['timeline']['stopPlayback']({ render: ![] }), this['timeline']['_sampleAt'](value22));
+      } else {
+        if (
+          (value16 === 'delete' || value16 === 'backspace') &&
+          this['selected']['size'] &&
+          event2['target']['closest']?.('[data-storyboard-3d-shot-timeline]')
+        )
+          this['handleClick']('timeline-edit-delete');
+        else return ![];
+      }
+    }
+    return (event2['preventDefault'](), event2['stopImmediatePropagation'](), !![]);
+  }
+  ['snapTime'](value25, value26, value27, enabled4, value28 = []) {
+    return directorSnapTime(
+      value25,
+      value26,
+      this['snap'] && !enabled4 ? (value26['duration'] / value27) * 0x8 : 0x0,
+      value28,
+    );
+  }
+  ['applyZoom']() {
+    const value29 = this['timeline']['getRoot']?.()?.['querySelector']('.storyboard-3d-timeline-tracks');
+    if (value29) value29['style']['setProperty']('--director-timeline-zoom', this['zoom']);
+  }
+  ['sync']() {
+    const enabled5 = this['timeline']['getRoot']?.();
+    if (!enabled5) return;
+    this['numeric']['bind'](enabled5);
+    enabled5 !== this['root'] &&
+      (this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
+      this['root']?.['removeEventListener']('wheel', this['onWheel'], !![]),
+      (this['root'] = enabled5),
+      enabled5['addEventListener']('pointerdown', this['onDown'], !![]),
+      enabled5['addEventListener']('wheel', this['onWheel'], { capture: !![], passive: ![] }));
+    const { shot: shot3 } = this['context']();
+    if (!shot3) return;
+    const value30 = new Set(collectDirectorKeys(shot3['animation'])['map'](directorKeyIdentity));
+    ((this['selected'] = new Set([...this['selected']]['filter']((value31) => value30['has'](value31)))),
+      enabled5['querySelectorAll']('[data-keyframe-id]')['forEach']((value32) =>
+        value32['classList']['toggle'](
+          'is-selected',
+          this['selected']['has'](this['identity'](value32)) ||
+            value32['dataset']['keyframeId'] === this['timeline']['selectedKeyframe']?.['keyframeId'],
+        ),
+      ));
+    const value33 = enabled5['querySelector']('[data-timeline-selected-count]');
+    if (value33) value33['textContent'] = this['selected']['size'] + ' 项选中';
+    (this['applyZoom'](),
+      enabled5['querySelectorAll']('.storyboard-3d-timeline-ruler\x20>\x20span')['forEach']((el3) => {
+        const value34 =
+          (parseFloat(el3['style']['getPropertyValue']('--storyboard-3d-tick-position')) / 0x64) *
+          shot3['animation']['duration'];
+        el3['querySelector']('strong')['textContent'] =
+          this['unit'] === 'frames'
+            ? Math['round'](value34 * shot3['animation']['fps']) + 'f'
+            : this['unit'] === 'milliseconds'
+              ? Math['round'](value34 * 0x3e8) + 'ms'
+              : Number(value34['toFixed'](0x2)) + 's';
+      }));
+  }
+  ['pointerDown'](event3) {
+    const enabled6 = event3['target']['closest']?.('.storyboard-3d-timeline-lane');
+    if (
+      !enabled6 ||
+      event3['target']['closest']('button,.storyboard-3d-motion-clip') ||
+      event3['button'] !== 0x0
+    )
+      return;
+    (event3['preventDefault'](), event3['stopImmediatePropagation']());
+    const value35 = this['root'],
+      el4 = value35['ownerDocument']['defaultView'],
+      box = value35['getBoundingClientRect'](),
+      value36 = value35['ownerDocument']['createElement']('div');
+    ((value36['className'] = 'storyboard-3d-timeline-marquee'), value35['append'](value36));
+    const box2 = { x: event3['clientX'], y: event3['clientY'] },
+      value37 = new Set(this['selected']),
+      value38 = new Set(event3['shiftKey'] ? this['selected'] : []),
+      value39 = new el4['AbortController']();
+    this['cancelMarquee']?.();
+    const run = () => {
+      (value39['abort'](), value36['remove'](), (this['cancelMarquee'] = null));
+    };
+    this['cancelMarquee'] = () => {
+      ((this['selected'] = value37), run(), this['sync']());
+    };
+    const value40 = (value41) => {
+      const value42 = Math['min'](box2['x'], value41['clientX']),
+        value43 = Math['min'](box2['y'], value41['clientY']),
+        value44 = Math['max'](box2['x'], value41['clientX']),
+        value45 = Math['max'](box2['y'], value41['clientY']);
+      (Object['entries']({
+        left: value42 - box['left'],
+        top: value43 - box['top'],
+        width: value44 - value42,
+        height: value45 - value43,
+      })['forEach'](([value46, value47]) => {
+        value36['style'][value46] = value47 + 'px';
+      }),
+        (this['selected'] = new Set(value38)),
+        value35['querySelectorAll']('[data-keyframe-id]')['forEach']((el5) => {
+          const value48 = el5['getBoundingClientRect']();
+          if (
+            value48['right'] >= value42 &&
+            value48['left'] <= value44 &&
+            value48['bottom'] >= value43 &&
+            value48['top'] <= value45
+          )
+            this['selected']['add'](this['identity'](el5));
+        }),
+        this['sync']());
+    };
+    (el4['addEventListener']('pointermove', value40, { signal: value39['signal'] }),
+      el4['addEventListener']('pointerup', run, { once: !![], signal: value39['signal'] }),
+      el4['addEventListener']('pointercancel', () => this['cancelMarquee']?.(), {
+        once: !![],
+        signal: value39['signal'],
+      }));
+  }
+  ['destroy']() {
+    (this['cancelMarquee']?.(),
+      this['numeric']['destroy'](),
+      this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
+      this['root']?.['removeEventListener']('wheel', this['onWheel'], !![]),
+      (this['root'] = null));
+  }
+}

@@ -5,151 +5,135 @@ export const MEDIA_CLIP_TIMELINE_VISUAL_TRACK_ID = 'visual:0';
 const EPSILON_SEC = 0.001,
   VISUAL_KINDS = new Set(['video', 'image']),
   CLIP_KINDS = new Set(['video', 'image', 'audio']);
-function roundSec(_0x380c68) {
-  return Math.round(toNumber(_0x380c68, 0) * 0x3e8) / 0x3e8;
+function roundSec(value) {
+  return Math.round(toNumber(value, 0) * 0x3e8) / 0x3e8;
 }
-function roundNonNegativeSec(_0x5bb6db) {
-  return Math.max(0, roundSec(_0x5bb6db));
+function roundNonNegativeSec(item) {
+  return Math.max(0, roundSec(item));
 }
-function firstFiniteNumber(..._0x48b60d) {
-  for (const _0x3e702d of _0x48b60d) {
-    const _0x18ea85 = Number(_0x3e702d);
-    if (Number.isFinite(_0x18ea85)) return _0x18ea85;
+function firstFiniteNumber(...args) {
+  for (const key of args) {
+    const index = Number(key);
+    if (Number.isFinite(index)) return index;
   }
   return NaN;
 }
-function resolveSourceKey(_0x135383 = {}) {
+function resolveSourceKey(response = {}) {
   return normalizeText(
-    _0x135383.sourceKey || _0x135383.src || _0x135383.localPath || _0x135383.path || _0x135383.url,
+    response.sourceKey || response.src || response.localPath || response.path || response.url,
   );
 }
-function resolveClipKind(_0x4684c0 = {}, _0x3aba72 = 'video') {
-  const _0x1108d6 = normalizeText(_0x4684c0.kind);
-  if (CLIP_KINDS.has(_0x1108d6)) return _0x1108d6;
-  return _0x3aba72 === 'audio' ? 'audio' : 'video';
+function resolveClipKind(options = {}, result = 'video') {
+  const text = normalizeText(options.kind);
+  if (CLIP_KINDS.has(text)) return text;
+  return result === 'audio' ? 'audio' : 'video';
 }
-function resolveSourceDurationSec(_0x404f26 = {}) {
-  const _0x53399f = firstFiniteNumber(
-    _0x404f26.sourceDurationSec,
-    _0x404f26.mediaDurationSec,
-    _0x404f26.sourceDuration,
-    _0x404f26.mediaDuration,
+function resolveSourceDurationSec(options2 = {}) {
+  const finiteNumber = firstFiniteNumber(
+    options2.sourceDurationSec,
+    options2.mediaDurationSec,
+    options2.sourceDuration,
+    options2.mediaDuration,
   );
-  return Number.isFinite(_0x53399f) ? roundNonNegativeSec(_0x53399f) : 0;
+  return Number.isFinite(finiteNumber) ? roundNonNegativeSec(finiteNumber) : 0;
 }
-function resolveLaneIndex(_0x1f46ed = {}) {
-  const _0x1c8603 = Number(_0x1f46ed.laneIndex);
-  return Number.isFinite(_0x1c8603) ? Math.trunc(_0x1c8603) : 0;
+function resolveLaneIndex(options3 = {}) {
+  const data = Number(options3.laneIndex);
+  return Number.isFinite(data) ? Math.trunc(data) : 0;
 }
-function normalizeTimelineClip(_0x488ae3 = {}, _0x2f7959 = 0, _0x2b2491 = {}) {
-  const _0x2d6aa1 = resolveClipKind(_0x488ae3, _0x2b2491.kind),
-    _0x14a85c = resolveSourceKey(_0x488ae3),
-    _0x42b74 = resolveSourceDurationSec(_0x488ae3),
-    _0x16df54 = roundNonNegativeSec(
+function normalizeTimelineClip(muted = {}, target = 0, source = {}) {
+  const kind = resolveClipKind(muted, source.kind),
+    sourceKey = resolveSourceKey(muted),
+    sourceDurationSec = resolveSourceDurationSec(muted),
+    mediaStartSec = roundNonNegativeSec(
+      firstFiniteNumber(muted.mediaStartSec, muted.mediaStart, muted.startSec, muted.start, 0),
+    ),
+    finiteNumber2 = firstFiniteNumber(
+      muted.clipDurationSec,
+      muted.timelineDurationSec,
+      muted.durationSec,
+      muted.duration,
+    ),
+    mediaEndSec = roundNonNegativeSec(
       firstFiniteNumber(
-        _0x488ae3.mediaStartSec,
-        _0x488ae3.mediaStart,
-        _0x488ae3.startSec,
-        _0x488ae3.start,
-        0,
+        muted.mediaEndSec,
+        muted.mediaEnd,
+        muted.endSec,
+        muted.end,
+        Number.isFinite(finiteNumber2) ? mediaStartSec + finiteNumber2 : mediaStartSec,
       ),
     ),
-    _0x13b9f3 = firstFiniteNumber(
-      _0x488ae3.clipDurationSec,
-      _0x488ae3.timelineDurationSec,
-      _0x488ae3.durationSec,
-      _0x488ae3.duration,
+    timelineStartSec = roundSec(
+      firstFiniteNumber(muted.timelineStartSec, muted.timelineStart, source.defaultTimelineStartSec, 0),
     ),
-    _0x1c3bee = roundNonNegativeSec(
-      firstFiniteNumber(
-        _0x488ae3.mediaEndSec,
-        _0x488ae3.mediaEnd,
-        _0x488ae3.endSec,
-        _0x488ae3.end,
-        Number.isFinite(_0x13b9f3) ? _0x16df54 + _0x13b9f3 : _0x16df54,
-      ),
+    next = Math.max(0, mediaEndSec - mediaStartSec),
+    timelineEndSec = roundSec(
+      firstFiniteNumber(muted.timelineEndSec, muted.timelineEnd, timelineStartSec + next),
     ),
-    _0xe75f7e = roundSec(
-      firstFiniteNumber(
-        _0x488ae3.timelineStartSec,
-        _0x488ae3.timelineStart,
-        _0x2b2491.defaultTimelineStartSec,
-        0,
-      ),
-    ),
-    _0x2730bf = Math.max(0, _0x1c3bee - _0x16df54),
-    _0x2a1cd5 = roundSec(
-      firstFiniteNumber(_0x488ae3.timelineEndSec, _0x488ae3.timelineEnd, _0xe75f7e + _0x2730bf),
-    ),
-    _0x840c49 = _0x2d6aa1 === 'audio' ? resolveLaneIndex(_0x488ae3) : 0,
-    _0x4428c4 =
-      normalizeText(_0x488ae3.trackId) ||
-      (_0x2d6aa1 === 'audio' ? 'audio:' + _0x840c49 : MEDIA_CLIP_TIMELINE_VISUAL_TRACK_ID),
-    _0x4b4293 =
-      normalizeText(_0x488ae3.id) ||
-      (_0x14a85c ? _0x2d6aa1 + ':' + _0x14a85c + ':' + _0x2f7959 : _0x2d6aa1 + ':' + _0x2f7959);
+    laneIndex = kind === 'audio' ? resolveLaneIndex(muted) : 0,
+    trackId =
+      normalizeText(muted.trackId) ||
+      (kind === 'audio' ? 'audio:' + laneIndex : MEDIA_CLIP_TIMELINE_VISUAL_TRACK_ID),
+    id = normalizeText(muted.id) || (sourceKey ? kind + ':' + sourceKey + ':' + target : kind + ':' + target);
   return {
-    id: _0x4b4293,
-    kind: _0x2d6aa1,
-    trackId: _0x4428c4,
-    laneIndex: _0x840c49,
-    sourceId: normalizeText(_0x488ae3.sourceId),
-    sourceKey: _0x14a85c,
-    mediaStartSec: _0x16df54,
-    mediaEndSec: _0x1c3bee,
-    sourceDurationSec: _0x42b74,
-    timelineStartSec: _0xe75f7e,
-    timelineEndSec: _0x2a1cd5,
-    durationSec: roundNonNegativeSec(_0x2a1cd5 - _0xe75f7e),
-    muted: _0x488ae3.muted === true,
-    disabled: _0x488ae3.disabled === true,
-    volume: Math.max(0, Math.min(1, toNumber(_0x488ae3.volume, 1))),
+    id: id,
+    kind: kind,
+    trackId: trackId,
+    laneIndex: laneIndex,
+    sourceId: normalizeText(muted.sourceId),
+    sourceKey: sourceKey,
+    mediaStartSec: mediaStartSec,
+    mediaEndSec: mediaEndSec,
+    sourceDurationSec: sourceDurationSec,
+    timelineStartSec: timelineStartSec,
+    timelineEndSec: timelineEndSec,
+    durationSec: roundNonNegativeSec(timelineEndSec - timelineStartSec),
+    muted: muted.muted === true,
+    disabled: muted.disabled === true,
+    volume: Math.max(0, Math.min(1, toNumber(muted.volume, 1))),
   };
 }
-function normalizeVisualTimelineClips(_0x4aad2c = []) {
-  let _0x4e70cb = 0;
-  return _0x4aad2c
-    .filter((_0x34a309) => _0x34a309 && typeof _0x34a309 === 'object')
-    .map((_0x5db97c, _0x18d922) => {
-      const _0x26bb1b = normalizeTimelineClip(_0x5db97c, _0x18d922, {
-        kind: resolveClipKind(_0x5db97c, 'video'),
-        defaultTimelineStartSec: _0x4e70cb,
+function normalizeVisualTimelineClips(list = []) {
+  let defaultTimelineStartSec = 0;
+  return list
+    .filter((item2) => item2 && typeof item2 === 'object')
+    .map((item3, current) => {
+      const timelineClip = normalizeTimelineClip(item3, current, {
+        kind: resolveClipKind(item3, 'video'),
+        defaultTimelineStartSec: defaultTimelineStartSec,
       });
       return (
-        !Number.isFinite(Number(_0x5db97c.timelineStartSec)) &&
-        !Number.isFinite(Number(_0x5db97c.timelineStart))
-          ? (_0x4e70cb = _0x26bb1b.timelineEndSec)
-          : (_0x4e70cb = Math.max(_0x4e70cb, _0x26bb1b.timelineEndSec)),
-        _0x26bb1b
+        !Number.isFinite(Number(item3.timelineStartSec)) && !Number.isFinite(Number(item3.timelineStart))
+          ? (defaultTimelineStartSec = timelineClip.timelineEndSec)
+          : (defaultTimelineStartSec = Math.max(defaultTimelineStartSec, timelineClip.timelineEndSec)),
+        timelineClip
       );
     });
 }
-function normalizeAudioTimelineClips(_0xbf1294 = []) {
-  return _0xbf1294
-    .filter((_0x33c62c) => _0x33c62c && typeof _0x33c62c === 'object')
-    .map((_0x169702, _0x423bd4) =>
-      normalizeTimelineClip(_0x169702, _0x423bd4, { kind: 'audio', defaultTimelineStartSec: 0 }),
+function normalizeAudioTimelineClips(list2 = []) {
+  return list2
+    .filter((item4) => item4 && typeof item4 === 'object')
+    .map((item5, entry) =>
+      normalizeTimelineClip(item5, entry, { kind: 'audio', defaultTimelineStartSec: 0 }),
     );
 }
-function buildTracks(_0x3bd5db = []) {
-  const _0x5a8350 = [];
-  _0x3bd5db.some((_0x52066d) => VISUAL_KINDS.has(_0x52066d.kind)) &&
-    _0x5a8350.push({
+function buildTracks(list3 = []) {
+  const list4 = [];
+  list3.some((item6) => VISUAL_KINDS.has(item6.kind)) &&
+    list4.push({
       id: MEDIA_CLIP_TIMELINE_VISUAL_TRACK_ID,
       kind: 'visual',
       laneIndex: 0,
       overlapPolicy: 'sequence',
     });
-  const _0x4e0e39 = Array.from(
-    new Set(
-      _0x3bd5db.filter((_0x54894d) => _0x54894d.kind === 'audio').map((_0x302256) => _0x302256.laneIndex),
-    ),
-  ).sort((_0x4884b1, _0x1b8fe5) => _0x4884b1 - _0x1b8fe5);
+  const list5 = Array.from(
+    new Set(list3.filter((item7) => item7.kind === 'audio').map((item8) => item8.laneIndex)),
+  ).sort((item9, record) => item9 - record);
   return (
-    _0x4e0e39.forEach((_0x607978) => {
-      _0x5a8350.push({ id: 'audio:' + _0x607978, kind: 'audio', laneIndex: _0x607978, overlapPolicy: 'mix' });
+    list5.forEach((laneIndex2) => {
+      list4.push({ id: 'audio:' + laneIndex2, kind: 'audio', laneIndex: laneIndex2, overlapPolicy: 'mix' });
     }),
-    _0x5a8350
+    list4
   );
 }
 export function buildMediaClipTimelineManifest({
@@ -159,171 +143,153 @@ export function buildMediaClipTimelineManifest({
   videoTrack: videoTrack = null,
   audioTrack: audioTrack = null,
 } = {}) {
-  const _0x3d5345 = mediaClip && typeof mediaClip === 'object' ? mediaClip : {},
-    _0x3f55aa = Array.isArray(videoClips)
+  const payload = mediaClip && typeof mediaClip === 'object' ? mediaClip : {},
+    handle = Array.isArray(videoClips)
       ? videoClips
-      : Array.isArray(_0x3d5345.clips)
-        ? _0x3d5345.clips
+      : Array.isArray(payload.clips)
+        ? payload.clips
         : videoTrack
           ? [{ ...videoTrack, kind: 'video' }]
           : [],
-    _0x41d167 = Array.isArray(audioClips)
+    state = Array.isArray(audioClips)
       ? audioClips
-      : Array.isArray(_0x3d5345.audioClips)
-        ? _0x3d5345.audioClips
+      : Array.isArray(payload.audioClips)
+        ? payload.audioClips
         : audioTrack
           ? [{ ...audioTrack, kind: 'audio' }]
           : [],
-    _0x435904 = [...normalizeVisualTimelineClips(_0x3f55aa), ...normalizeAudioTimelineClips(_0x41d167)],
-    _0x5842a1 = buildTracks(_0x435904),
-    _0x55e9e1 = roundNonNegativeSec(
-      _0x435904.reduce(
-        (_0xe6e142, _0x91ff72) => Math.max(_0xe6e142, toNumber(_0x91ff72.timelineEndSec, 0)),
-        0,
-      ),
+    clips = [...normalizeVisualTimelineClips(handle), ...normalizeAudioTimelineClips(state)],
+    tracks = buildTracks(clips),
+    durationSec = roundNonNegativeSec(
+      clips.reduce((item10, config) => Math.max(item10, toNumber(config.timelineEndSec, 0)), 0),
     );
   return {
     schemaVersion: MEDIA_CLIP_TIMELINE_SCHEMA_VERSION,
-    durationSec: _0x55e9e1,
-    tracks: _0x5842a1,
-    clips: _0x435904,
+    durationSec: durationSec,
+    tracks: tracks,
+    clips: clips,
   };
 }
-function makeIssue(_0x25bde8, _0x6eab64, _0x500d72, _0x201020 = {}) {
-  return { severity: _0x25bde8, code: _0x6eab64, message: _0x500d72, ..._0x201020 };
+function makeIssue(severity, code, message, args2 = {}) {
+  return { severity: severity, code: code, message: message, ...args2 };
 }
-export function validateMediaClipTimelineManifest(_0x278bfa = {}, _0x495d37 = {}) {
-  const _0x5058a9 = [],
-    _0x32d809 = [],
-    _0x13ef3c = Array.isArray(_0x278bfa.tracks) ? _0x278bfa.tracks : [],
-    _0x3e5ede = Array.isArray(_0x278bfa.clips) ? _0x278bfa.clips : [],
-    _0x7c6507 = new Map(_0x13ef3c.map((_0x58673e) => [normalizeText(_0x58673e.id), _0x58673e])),
-    _0x57dc6f = Math.max(
+export function validateMediaClipTimelineManifest(options4 = {}, scope = {}) {
+  const ok = [],
+    warnings = [],
+    list6 = Array.isArray(options4.tracks) ? options4.tracks : [],
+    list7 = Array.isArray(options4.clips) ? options4.clips : [],
+    map = new Map(list6.map((item11) => [normalizeText(item11.id), item11])),
+    input = Math.max(
       1,
-      Math.trunc(toNumber(_0x495d37.maxAudioLaneCount, MEDIA_CLIP_TIMELINE_AUDIO_LANE_COUNT_MAX)),
+      Math.trunc(toNumber(scope.maxAudioLaneCount, MEDIA_CLIP_TIMELINE_AUDIO_LANE_COUNT_MAX)),
     );
-  _0x278bfa.schemaVersion !== MEDIA_CLIP_TIMELINE_SCHEMA_VERSION &&
-    _0x5058a9.push(
-      makeIssue('error', 'schema_version_mismatch', 'Timeline schema version is not supported.'),
-    );
-  !_0x13ef3c.length &&
-    _0x3e5ede.length &&
-    _0x5058a9.push(makeIssue('error', 'missing_tracks', 'Timeline clips require tracks.'));
-  _0x3e5ede.forEach((_0x52e401, _0x57ea78) => {
-    const _0xb45eee = { clipId: normalizeText(_0x52e401.id), clipIndex: _0x57ea78 },
-      _0x5073ec = normalizeText(_0x52e401.kind);
-    !CLIP_KINDS.has(_0x5073ec) &&
-      _0x5058a9.push(makeIssue('error', 'invalid_clip_kind', 'Timeline clip kind is invalid.', _0xb45eee));
-    !normalizeText(_0x52e401.sourceKey) &&
-      _0x5058a9.push(makeIssue('error', 'missing_source', 'Timeline clip is missing sourceKey.', _0xb45eee));
-    const _0xae4a8 = _0x7c6507.get(normalizeText(_0x52e401.trackId));
-    if (!_0xae4a8)
-      _0x5058a9.push(
-        makeIssue('error', 'missing_track', 'Timeline clip references a missing track.', _0xb45eee),
-      );
+  options4.schemaVersion !== MEDIA_CLIP_TIMELINE_SCHEMA_VERSION &&
+    ok.push(makeIssue('error', 'schema_version_mismatch', 'Timeline schema version is not supported.'));
+  !list6.length &&
+    list7.length &&
+    ok.push(makeIssue('error', 'missing_tracks', 'Timeline clips require tracks.'));
+  list7.forEach((item12, clipIndex) => {
+    const output = { clipId: normalizeText(item12.id), clipIndex: clipIndex },
+      text2 = normalizeText(item12.kind);
+    !CLIP_KINDS.has(text2) &&
+      ok.push(makeIssue('error', 'invalid_clip_kind', 'Timeline clip kind is invalid.', output));
+    !normalizeText(item12.sourceKey) &&
+      ok.push(makeIssue('error', 'missing_source', 'Timeline clip is missing sourceKey.', output));
+    const enabled = map.get(normalizeText(item12.trackId));
+    if (!enabled)
+      ok.push(makeIssue('error', 'missing_track', 'Timeline clip references a missing track.', output));
     else {
-      if (_0x5073ec === 'audio' && _0xae4a8.kind !== 'audio')
-        _0x5058a9.push(
-          makeIssue('error', 'track_kind_mismatch', 'Audio clip is not on an audio track.', _0xb45eee),
-        );
+      if (text2 === 'audio' && enabled.kind !== 'audio')
+        ok.push(makeIssue('error', 'track_kind_mismatch', 'Audio clip is not on an audio track.', output));
       else
-        VISUAL_KINDS.has(_0x5073ec) &&
-          _0xae4a8.kind !== 'visual' &&
-          _0x5058a9.push(
-            makeIssue('error', 'track_kind_mismatch', 'Visual clip is not on a visual track.', _0xb45eee),
-          );
+        VISUAL_KINDS.has(text2) &&
+          enabled.kind !== 'visual' &&
+          ok.push(makeIssue('error', 'track_kind_mismatch', 'Visual clip is not on a visual track.', output));
     }
-    const _0x1afc86 = Number(_0x52e401.mediaStartSec),
-      _0x5d08df = Number(_0x52e401.mediaEndSec),
-      _0x47fd5c = Number(_0x52e401.timelineStartSec),
-      _0x2df3fd = Number(_0x52e401.timelineEndSec);
-    (!Number.isFinite(_0x1afc86) || !Number.isFinite(_0x5d08df) || _0x5d08df <= _0x1afc86) &&
-      _0x5058a9.push(
-        makeIssue('error', 'invalid_media_range', 'Timeline clip media range is invalid.', _0xb45eee),
+    const value2 = Number(item12.mediaStartSec),
+      value3 = Number(item12.mediaEndSec),
+      value4 = Number(item12.timelineStartSec),
+      value5 = Number(item12.timelineEndSec);
+    (!Number.isFinite(value2) || !Number.isFinite(value3) || value3 <= value2) &&
+      ok.push(makeIssue('error', 'invalid_media_range', 'Timeline clip media range is invalid.', output));
+    (!Number.isFinite(value4) || !Number.isFinite(value5) || value5 <= value4) &&
+      ok.push(makeIssue('error', 'invalid_timeline_range', 'Timeline clip range is invalid.', output));
+    value4 < -EPSILON_SEC &&
+      warnings.push(
+        makeIssue('warning', 'negative_timeline_start', 'Timeline clip starts before zero.', output),
       );
-    (!Number.isFinite(_0x47fd5c) || !Number.isFinite(_0x2df3fd) || _0x2df3fd <= _0x47fd5c) &&
-      _0x5058a9.push(
-        makeIssue('error', 'invalid_timeline_range', 'Timeline clip range is invalid.', _0xb45eee),
-      );
-    _0x47fd5c < -EPSILON_SEC &&
-      _0x32d809.push(
-        makeIssue('warning', 'negative_timeline_start', 'Timeline clip starts before zero.', _0xb45eee),
-      );
-    const _0x1788fb = Number(_0x52e401.sourceDurationSec);
-    Number.isFinite(_0x1788fb) &&
-      _0x1788fb > 0 &&
-      _0x5d08df > _0x1788fb + EPSILON_SEC &&
-      _0x5058a9.push(
+    const count = Number(item12.sourceDurationSec);
+    Number.isFinite(count) &&
+      count > 0 &&
+      value3 > count + EPSILON_SEC &&
+      ok.push(
         makeIssue(
           'error',
           'media_range_outside_source',
           'Timeline clip media range exceeds source duration.',
-          _0xb45eee,
+          output,
         ),
       );
-    if (_0x5073ec === 'audio') {
-      const _0x249c5e = Number(_0x52e401.laneIndex);
-      (!Number.isInteger(_0x249c5e) || _0x249c5e < 0 || _0x249c5e >= _0x57dc6f) &&
-        _0x5058a9.push(
+    if (text2 === 'audio') {
+      const count2 = Number(item12.laneIndex);
+      (!Number.isInteger(count2) || count2 < 0 || count2 >= input) &&
+        ok.push(
           makeIssue(
             'error',
             'audio_lane_out_of_range',
             'Audio clip laneIndex exceeds the lane contract.',
-            _0xb45eee,
+            output,
           ),
         );
     }
   });
-  const _0xd21f04 = _0x3e5ede
-    .filter((_0x5e07fd) => VISUAL_KINDS.has(normalizeText(_0x5e07fd.kind)))
+  const list8 = list7
+    .filter((item13) => VISUAL_KINDS.has(normalizeText(item13.kind)))
     .slice()
-    .sort(
-      (_0x227ba8, _0x3d70a8) =>
-        toNumber(_0x227ba8.timelineStartSec, 0) - toNumber(_0x3d70a8.timelineStartSec, 0),
-    );
-  for (let _0x1b1acb = 1; _0x1b1acb < _0xd21f04.length; _0x1b1acb += 1) {
-    const _0x32ede0 = _0xd21f04[_0x1b1acb - 1],
-      _0x2927fa = _0xd21f04[_0x1b1acb];
-    if (toNumber(_0x2927fa.timelineStartSec, 0) < toNumber(_0x32ede0.timelineEndSec, 0) - EPSILON_SEC) {
-      const _0x4cbf30 = makeIssue(
-        _0x495d37.failOnVisualOverlap === true ? 'error' : 'warning',
+    .sort((item14, value6) => toNumber(item14.timelineStartSec, 0) - toNumber(value6.timelineStartSec, 0));
+  for (let value7 = 1; value7 < list8.length; value7 += 1) {
+    const value8 = list8[value7 - 1],
+      value9 = list8[value7];
+    if (toNumber(value9.timelineStartSec, 0) < toNumber(value8.timelineEndSec, 0) - EPSILON_SEC) {
+      const issue = makeIssue(
+        scope.failOnVisualOverlap === true ? 'error' : 'warning',
         'visual_track_overlap',
         'Visual timeline clips overlap on a sequence track.',
-        { clipId: normalizeText(_0x2927fa.id), previousClipId: normalizeText(_0x32ede0.id) },
+        { clipId: normalizeText(value9.id), previousClipId: normalizeText(value8.id) },
       );
-      if (_0x495d37.failOnVisualOverlap === true) _0x5058a9.push(_0x4cbf30);
-      else _0x32d809.push(_0x4cbf30);
+      if (scope.failOnVisualOverlap === true) ok.push(issue);
+      else warnings.push(issue);
     }
   }
-  return { ok: _0x5058a9.length === 0, errors: _0x5058a9, warnings: _0x32d809 };
+  return { ok: ok.length === 0, errors: ok, warnings: warnings };
 }
-export function getMediaClipTimelineExportClips(_0xd46372 = {}, _0x9d5675 = {}) {
-  const _0x4374f5 = normalizeText(_0x9d5675.kind),
-    _0x4d03e9 = _0x9d5675.includeMuted === true,
-    _0x331818 = _0x9d5675.includeDisabled === true,
-    _0x3e7739 = Array.isArray(_0xd46372.clips) ? _0xd46372.clips : [];
-  return _0x3e7739
-    .filter((_0x2bf397) => {
-      if (_0x4374f5 === 'visual') return VISUAL_KINDS.has(normalizeText(_0x2bf397.kind));
-      if (_0x4374f5) return normalizeText(_0x2bf397.kind) === _0x4374f5;
+export function getMediaClipTimelineExportClips(options5 = {}, value10 = {}) {
+  const text3 = normalizeText(value10.kind),
+    value11 = value10.includeMuted === true,
+    value12 = value10.includeDisabled === true,
+    list9 = Array.isArray(options5.clips) ? options5.clips : [];
+  return list9
+    .filter((item15) => {
+      if (text3 === 'visual') return VISUAL_KINDS.has(normalizeText(item15.kind));
+      if (text3) return normalizeText(item15.kind) === text3;
       return true;
     })
-    .filter((_0x1cf52e) => _0x331818 || _0x1cf52e.disabled !== true)
-    .filter((_0x2b4d22) => _0x4d03e9 || _0x2b4d22.muted !== true)
-    .map((_0x48e704) => ({
-      id: _0x48e704.id,
-      sourceId: _0x48e704.sourceId,
-      sourceKey: _0x48e704.sourceKey,
-      src: _0x48e704.sourceKey,
-      kind: _0x48e704.kind,
-      startSec: _0x48e704.mediaStartSec,
-      endSec: _0x48e704.mediaEndSec,
-      durationSec: roundNonNegativeSec(_0x48e704.mediaEndSec - _0x48e704.mediaStartSec),
-      timelineStartSec: _0x48e704.timelineStartSec,
-      timelineEndSec: _0x48e704.timelineEndSec,
-      laneIndex: _0x48e704.laneIndex,
-      muted: _0x48e704.muted === true,
-      disabled: _0x48e704.disabled === true,
-      volume: _0x48e704.volume,
+    .filter((el) => value12 || el.disabled !== true)
+    .filter((item16) => value11 || item16.muted !== true)
+    .map((id2) => ({
+      id: id2.id,
+      sourceId: id2.sourceId,
+      sourceKey: id2.sourceKey,
+      src: id2.sourceKey,
+      kind: id2.kind,
+      startSec: id2.mediaStartSec,
+      endSec: id2.mediaEndSec,
+      durationSec: roundNonNegativeSec(id2.mediaEndSec - id2.mediaStartSec),
+      timelineStartSec: id2.timelineStartSec,
+      timelineEndSec: id2.timelineEndSec,
+      laneIndex: id2.laneIndex,
+      muted: id2.muted === true,
+      disabled: id2.disabled === true,
+      volume: id2.volume,
     }));
 }

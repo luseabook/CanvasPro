@@ -1,214 +1,221 @@
 import { pickAudioDurationSec } from '../services/audioMetadataService.js';
 import { localPathToUrl, normalizeLocalPath } from '../utils/localMediaPath.js';
 const AUDIO_VOICE_HISTORY_LIMIT = 0x5;
-export function firstNonEmptyString(..._0x1ebd61) {
-  for (const _0x22b661 of _0x1ebd61) {
-    const _0x5d68a8 = String(_0x22b661 || '')['trim']();
-    if (_0x5d68a8) return _0x5d68a8;
+export function firstNonEmptyString(...args) {
+  for (const value of args) {
+    const item = String(value || '')['trim']();
+    if (item) return item;
   }
   return '';
 }
-export function resolveSegmentLocalAudioUrl(_0x5339a0, _0x100e59) {
-  return firstNonEmptyString(_0x5339a0, localPathToUrl(_0x100e59));
+export function resolveSegmentLocalAudioUrl(key, index) {
+  return firstNonEmptyString(key, localPathToUrl(index));
 }
-function normalizeAudioVoiceHistoryEntry(_0x379196 = {}) {
-  const _0x376d7b = normalizeLocalPath(_0x379196['localPath'] || _0x379196['convertedAudioLocalPath'] || ''),
-    _0x20f5ea = resolveSegmentLocalAudioUrl(
-      firstNonEmptyString(_0x379196['audioUrl'], _0x379196['src'], _0x379196['convertedAudioUrl']),
-      _0x376d7b,
+function normalizeAudioVoiceHistoryEntry(options = {}) {
+  const localPath = normalizeLocalPath(options['localPath'] || options['convertedAudioLocalPath'] || ''),
+    audioUrl = resolveSegmentLocalAudioUrl(
+      firstNonEmptyString(options['audioUrl'], options['src'], options['convertedAudioUrl']),
+      localPath,
     );
-  if (!_0x20f5ea && !_0x376d7b) return null;
-  const _0x43dac3 = Number(_0x379196['createdAt'] || 0x0) || Date['now']();
+  if (!audioUrl && !localPath) return null;
+  const createdAt = Number(options['createdAt'] || 0x0) || Date['now']();
   return {
-    id: String(_0x379196['id'] || 'audio-voice-history-' + _0x43dac3)['trim'](),
-    createdAt: _0x43dac3,
-    modelId: String(_0x379196['modelId'] || '')['trim'](),
-    modelLabel: String(_0x379196['modelLabel'] || '')['trim'](),
-    localPath: _0x376d7b,
-    audioUrl: _0x20f5ea,
-    audioDuration: pickAudioDurationSec(_0x379196['audioDuration'], _0x379196['duration']),
+    id: String(options['id'] || 'audio-voice-history-' + createdAt)['trim'](),
+    createdAt: createdAt,
+    modelId: String(options['modelId'] || '')['trim'](),
+    modelLabel: String(options['modelLabel'] || '')['trim'](),
+    localPath: localPath,
+    audioUrl: audioUrl,
+    audioDuration: pickAudioDurationSec(options['audioDuration'], options['duration']),
   };
 }
-export function normalizeAudioVoiceHistory(_0x366304 = []) {
-  const _0x323449 = [],
-    _0x55a80c = new Set();
-  for (const _0x4ae7a1 of Array['isArray'](_0x366304) ? _0x366304 : []) {
-    const _0xf49bec = normalizeAudioVoiceHistoryEntry(_0x4ae7a1);
-    if (!_0xf49bec) continue;
-    const _0x4cbcfe = _0xf49bec['localPath'] + '::' + _0xf49bec['audioUrl'];
-    if (_0x55a80c['has'](_0x4cbcfe)) continue;
-    (_0x55a80c['add'](_0x4cbcfe), _0x323449['push'](_0xf49bec));
+export function normalizeAudioVoiceHistory(list = []) {
+  const list2 = [],
+    map = new Set();
+  for (const result of Array['isArray'](list) ? list : []) {
+    const audioVoiceHistoryEntry = normalizeAudioVoiceHistoryEntry(result);
+    if (!audioVoiceHistoryEntry) continue;
+    const data = audioVoiceHistoryEntry['localPath'] + '::' + audioVoiceHistoryEntry['audioUrl'];
+    if (map['has'](data)) continue;
+    (map['add'](data), list2['push'](audioVoiceHistoryEntry));
   }
-  return _0x323449['sort'](
-    (_0x46d3dd, _0x3e2ab3) => Number(_0x3e2ab3['createdAt'] || 0x0) - Number(_0x46d3dd['createdAt'] || 0x0),
+  return list2['sort'](
+    (target, source) => Number(source['createdAt'] || 0x0) - Number(target['createdAt'] || 0x0),
   )['slice'](0x0, AUDIO_VOICE_HISTORY_LIMIT);
 }
-export function buildAudioVoiceHistoryEntry(_0x5a50e1 = {}, _0x1ad689 = {}) {
-  const _0xf7d39e = Number(_0x1ad689['createdAt'] || 0x0) || Date['now']();
+export function buildAudioVoiceHistoryEntry(localPath2 = {}, id = {}) {
+  const createdAt2 = Number(id['createdAt'] || 0x0) || Date['now']();
   return normalizeAudioVoiceHistoryEntry({
-    id: _0x1ad689['id'] || 'audio-voice-history-' + _0xf7d39e + '-' + Math['round'](Math['random']() * 0x3e8),
-    createdAt: _0xf7d39e,
-    modelId: _0x1ad689['modelId'],
-    modelLabel: _0x1ad689['modelLabel'],
-    localPath: _0x5a50e1['localPath'],
-    audioUrl: firstNonEmptyString(_0x5a50e1['audioUrl'], _0x5a50e1['src']),
-    audioDuration: _0x5a50e1['audioDuration'],
+    id: id['id'] || 'audio-voice-history-' + createdAt2 + '-' + Math['round'](Math['random']() * 0x3e8),
+    createdAt: createdAt2,
+    modelId: id['modelId'],
+    modelLabel: id['modelLabel'],
+    localPath: localPath2['localPath'],
+    audioUrl: firstNonEmptyString(localPath2['audioUrl'], localPath2['src']),
+    audioDuration: localPath2['audioDuration'],
   });
 }
-export function prependAudioVoiceHistory(_0x20f48d = [], _0x54bf8a = null) {
-  return prependAudioVoiceHistoryEntries(_0x20f48d, _0x54bf8a);
+export function prependAudioVoiceHistory(list3 = [], next = null) {
+  return prependAudioVoiceHistoryEntries(list3, next);
 }
-export function prependAudioVoiceHistoryEntries(_0x428f74 = [], _0xab4c15 = []) {
-  const _0x21d5d0 = Array['isArray'](_0xab4c15) ? _0xab4c15 : [_0xab4c15];
-  return normalizeAudioVoiceHistory(
-    [..._0x21d5d0, ...(Array['isArray'](_0x428f74) ? _0x428f74 : [])]['filter'](Boolean),
-  );
+export function prependAudioVoiceHistoryEntries(list4 = [], current = []) {
+  const args2 = Array['isArray'](current) ? current : [current];
+  return normalizeAudioVoiceHistory([...args2, ...(Array['isArray'](list4) ? list4 : [])]['filter'](Boolean));
 }
-export function createAudioVoicePayloadError(_0x5c93b2) {
-  const _0x26dbca = new Error(_0x5c93b2);
-  return ((_0x26dbca['code'] = _0x5c93b2), _0x26dbca);
+export function createAudioVoicePayloadError(entry) {
+  const error = new Error(entry);
+  return ((error['code'] = entry), error);
 }
-export function getVisibleAudioVoiceSegments(_0x209b6f = []) {
-  return _0x209b6f['filter']((_0x2db0c6) => _0x2db0c6['status'] !== 'removed');
+export function getVisibleAudioVoiceSegments(list5 = []) {
+  return list5['filter']((response) => response['status'] !== 'removed');
 }
-function normalizeAudioVoiceModelSelectionMode(_0xa4cc9c) {
-  const _0x5133c5 = String(_0xa4cc9c || '')
+function normalizeAudioVoiceModelSelectionMode(record) {
+  const payload = String(record || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x5133c5 === 'segment' || _0x5133c5 === 'global' ? _0x5133c5 : '';
+  return payload === 'segment' || payload === 'global' ? payload : '';
 }
-function hasAudioVoiceGenerationRecord(_0x36a4c6 = {}, _0x2a4b51 = '') {
-  const _0x3192c = String(_0x2a4b51 || '')['trim']();
+function hasAudioVoiceGenerationRecord(response2 = {}, handle = '') {
+  const state = String(handle || '')['trim']();
   return (
-    _0x36a4c6['isGenerating'] === !![] ||
-    String(_0x36a4c6['status'] || '')
+    response2['isGenerating'] === !![] ||
+    String(response2['status'] || '')
       ['trim']()
       ['toLowerCase']() === 'generating' ||
-    Number(_0x36a4c6['generationStartTime'] || _0x36a4c6['rhTaskStartedAt'] || 0x0) > 0x0 ||
-    !!String(_0x36a4c6['rhTaskId'] || '')['trim']() ||
-    (Array['isArray'](_0x36a4c6['convertedAudioHistory']) &&
-      _0x36a4c6['convertedAudioHistory']['some'](
-        (_0x5bdddc) => String(_0x5bdddc?.['modelId'] || '')['trim']() === _0x3192c,
+    Number(response2['generationStartTime'] || response2['rhTaskStartedAt'] || 0x0) > 0x0 ||
+    !!String(response2['rhTaskId'] || '')['trim']() ||
+    (Array['isArray'](response2['convertedAudioHistory']) &&
+      response2['convertedAudioHistory']['some'](
+        (config) => String(config?.['modelId'] || '')['trim']() === state,
       ))
   );
 }
-export function normalizeAudioVoiceSegmentModelSelection(_0x2d2f0a = {}, _0x58e1d1 = '') {
-  const _0x1cf8c8 = String(_0x2d2f0a['voiceModelId'] || '')['trim'](),
-    _0x2f0a74 = String(_0x2d2f0a['taskModelId'] || '')['trim'](),
-    _0x10455f = normalizeAudioVoiceModelSelectionMode(_0x2d2f0a['voiceModelSelectionMode']);
-  if (_0x10455f)
+export function normalizeAudioVoiceSegmentModelSelection(args3 = {}, scope = '') {
+  const voiceModelId = String(args3['voiceModelId'] || '')['trim'](),
+    taskModelId = String(args3['taskModelId'] || '')['trim'](),
+    voiceModelId2 = normalizeAudioVoiceModelSelectionMode(args3['voiceModelSelectionMode']);
+  if (voiceModelId2)
     return {
-      ..._0x2d2f0a,
-      voiceModelId: _0x10455f === 'segment' ? _0x1cf8c8 : '',
-      voiceModelSelectionMode: _0x10455f,
-      taskModelId: _0x2f0a74,
+      ...args3,
+      voiceModelId: voiceModelId2 === 'segment' ? voiceModelId : '',
+      voiceModelSelectionMode: voiceModelId2,
+      taskModelId: taskModelId,
     };
-  const _0x36fb53 = String(_0x58e1d1 || '')['trim'](),
-    _0x2b5d12 =
-      !!_0x1cf8c8 &&
-      _0x1cf8c8 === _0x36fb53 &&
-      (!_0x2f0a74 || _0x2f0a74 === _0x1cf8c8) &&
-      hasAudioVoiceGenerationRecord(_0x2d2f0a, _0x1cf8c8);
-  if (_0x2b5d12)
+  const input = String(scope || '')['trim'](),
+    output =
+      !!voiceModelId &&
+      voiceModelId === input &&
+      (!taskModelId || taskModelId === voiceModelId) &&
+      hasAudioVoiceGenerationRecord(args3, voiceModelId);
+  if (output)
     return {
-      ..._0x2d2f0a,
+      ...args3,
       voiceModelId: '',
       voiceModelSelectionMode: 'global',
-      taskModelId: _0x2f0a74 || _0x1cf8c8,
+      taskModelId: taskModelId || voiceModelId,
     };
   return {
-    ..._0x2d2f0a,
-    voiceModelId: _0x1cf8c8,
-    voiceModelSelectionMode: _0x1cf8c8 ? 'segment' : 'global',
-    taskModelId: _0x2f0a74,
+    ...args3,
+    voiceModelId: voiceModelId,
+    voiceModelSelectionMode: voiceModelId ? 'segment' : 'global',
+    taskModelId: taskModelId,
   };
 }
-export function cloneAudioVoiceSegment(_0x4a092b = {}) {
-  const _0x583fa6 = String(_0x4a092b['voiceModelId'] || '')['trim'](),
-    _0x189271 =
-      normalizeAudioVoiceModelSelectionMode(_0x4a092b['voiceModelSelectionMode']) ||
-      (_0x583fa6 ? '' : 'global');
+export function cloneAudioVoiceSegment(imitateToneEnabled = {}) {
+  const value2 = String(imitateToneEnabled['voiceModelId'] || '')['trim'](),
+    voiceModelId3 =
+      normalizeAudioVoiceModelSelectionMode(imitateToneEnabled['voiceModelSelectionMode']) ||
+      (value2 ? '' : 'global');
   return {
-    id: String(_0x4a092b['id'] || 'segment-' + Date['now']()),
-    startMs: Number(_0x4a092b['startMs'] || 0x0),
-    endMs: Number(_0x4a092b['endMs'] || 0x0),
-    sourceText: String(_0x4a092b['sourceText'] || ''),
-    targetText: String(_0x4a092b['targetText'] || ''),
-    ...(String(_0x4a092b['speakerId'] || '')['trim']()
-      ? { speakerId: String(_0x4a092b['speakerId'])['trim']() }
+    id: String(imitateToneEnabled['id'] || 'segment-' + Date['now']()),
+    startMs: Number(imitateToneEnabled['startMs'] || 0x0),
+    endMs: Number(imitateToneEnabled['endMs'] || 0x0),
+    sourceText: String(imitateToneEnabled['sourceText'] || ''),
+    targetText: String(imitateToneEnabled['targetText'] || ''),
+    ...(String(imitateToneEnabled['speakerId'] || '')['trim']()
+      ? { speakerId: String(imitateToneEnabled['speakerId'])['trim']() }
       : {}),
-    ...(String(_0x4a092b['speaker'] || '')['trim']()
-      ? { speaker: String(_0x4a092b['speaker'])['trim']() }
+    ...(String(imitateToneEnabled['speaker'] || '')['trim']()
+      ? { speaker: String(imitateToneEnabled['speaker'])['trim']() }
       : {}),
-    sourceAudioLocalPath: normalizeLocalPath(_0x4a092b['sourceAudioLocalPath'] || ''),
+    sourceAudioLocalPath: normalizeLocalPath(imitateToneEnabled['sourceAudioLocalPath'] || ''),
     sourceAudioUrl: resolveSegmentLocalAudioUrl(
-      _0x4a092b['sourceAudioUrl'],
-      _0x4a092b['sourceAudioLocalPath'],
+      imitateToneEnabled['sourceAudioUrl'],
+      imitateToneEnabled['sourceAudioLocalPath'],
     ),
-    sourceClipBaseAudioLocalPath: normalizeLocalPath(_0x4a092b['sourceClipBaseAudioLocalPath'] || ''),
+    sourceClipBaseAudioLocalPath: normalizeLocalPath(
+      imitateToneEnabled['sourceClipBaseAudioLocalPath'] || '',
+    ),
     sourceClipBaseAudioUrl: resolveSegmentLocalAudioUrl(
-      _0x4a092b['sourceClipBaseAudioUrl'],
-      _0x4a092b['sourceClipBaseAudioLocalPath'],
+      imitateToneEnabled['sourceClipBaseAudioUrl'],
+      imitateToneEnabled['sourceClipBaseAudioLocalPath'],
     ),
-    sourceClipBaseStartMs: Math['max'](0x0, Math['round'](Number(_0x4a092b['sourceClipBaseStartMs']) || 0x0)),
-    sourceClipBaseEndMs: Math['max'](0x0, Math['round'](Number(_0x4a092b['sourceClipBaseEndMs']) || 0x0)),
-    convertedAudioLocalPath: normalizeLocalPath(_0x4a092b['convertedAudioLocalPath'] || ''),
+    sourceClipBaseStartMs: Math['max'](
+      0x0,
+      Math['round'](Number(imitateToneEnabled['sourceClipBaseStartMs']) || 0x0),
+    ),
+    sourceClipBaseEndMs: Math['max'](
+      0x0,
+      Math['round'](Number(imitateToneEnabled['sourceClipBaseEndMs']) || 0x0),
+    ),
+    convertedAudioLocalPath: normalizeLocalPath(imitateToneEnabled['convertedAudioLocalPath'] || ''),
     convertedAudioUrl: resolveSegmentLocalAudioUrl(
-      _0x4a092b['convertedAudioUrl'],
-      _0x4a092b['convertedAudioLocalPath'],
+      imitateToneEnabled['convertedAudioUrl'],
+      imitateToneEnabled['convertedAudioLocalPath'],
     ),
     convertedAudioDuration: pickAudioDurationSec(
-      _0x4a092b['convertedAudioDuration'],
-      _0x4a092b['audioDuration'],
+      imitateToneEnabled['convertedAudioDuration'],
+      imitateToneEnabled['audioDuration'],
     ),
-    voiceRefNodeId: String(_0x4a092b['voiceRefNodeId'] || ''),
-    voiceRefAudioLocalPath: normalizeLocalPath(_0x4a092b['voiceRefAudioLocalPath'] || ''),
+    voiceRefNodeId: String(imitateToneEnabled['voiceRefNodeId'] || ''),
+    voiceRefAudioLocalPath: normalizeLocalPath(imitateToneEnabled['voiceRefAudioLocalPath'] || ''),
     voiceRefAudioUrl: resolveSegmentLocalAudioUrl(
-      _0x4a092b['voiceRefAudioUrl'],
-      _0x4a092b['voiceRefAudioLocalPath'],
+      imitateToneEnabled['voiceRefAudioUrl'],
+      imitateToneEnabled['voiceRefAudioLocalPath'],
     ),
-    voiceRefName: String(_0x4a092b['voiceRefName'] || ''),
-    voiceRefImageUrl: String(_0x4a092b['voiceRefImageUrl'] || ''),
-    voiceModelId: _0x189271 === 'global' ? '' : _0x583fa6,
-    voiceModelSelectionMode: _0x189271,
-    taskModelId: String(_0x4a092b['taskModelId'] || '')['trim'](),
-    imitateToneEnabled: _0x4a092b['imitateToneEnabled'] === !![],
+    voiceRefName: String(imitateToneEnabled['voiceRefName'] || ''),
+    voiceRefImageUrl: String(imitateToneEnabled['voiceRefImageUrl'] || ''),
+    voiceModelId: voiceModelId3 === 'global' ? '' : value2,
+    voiceModelSelectionMode: voiceModelId3,
+    taskModelId: String(imitateToneEnabled['taskModelId'] || '')['trim'](),
+    imitateToneEnabled: imitateToneEnabled['imitateToneEnabled'] === !![],
     sourceAudioReady:
-      _0x4a092b['sourceAudioReady'] === !![] ||
-      !!resolveSegmentLocalAudioUrl(_0x4a092b['sourceAudioUrl'], _0x4a092b['sourceAudioLocalPath']),
-    convertedAudioReady: _0x4a092b['convertedAudioReady'] === !![],
-    activeAudio: _0x4a092b['activeAudio'] === 'converted' ? 'converted' : 'source',
-    status: String(_0x4a092b['status'] || 'detected'),
-    needsSourceAudioRecut: _0x4a092b['needsSourceAudioRecut'] === !![],
-    error: String(_0x4a092b['error'] || ''),
-    rhTaskId: String(_0x4a092b['rhTaskId'] || ''),
-    rhTaskStatus: String(_0x4a092b['rhTaskStatus'] || ''),
-    rhStatusMessage: String(_0x4a092b['rhStatusMessage'] || ''),
-    rhTaskStartedAt: Number(_0x4a092b['rhTaskStartedAt'] || 0x0) || 0x0,
-    rhTaskUseOpenapiQuery: _0x4a092b['rhTaskUseOpenapiQuery'] === !![],
-    isGenerating: _0x4a092b['isGenerating'] === !![],
-    jobStatus: String(_0x4a092b['jobStatus'] || ''),
-    jobError: _0x4a092b['jobError'] == null ? null : String(_0x4a092b['jobError'] || ''),
-    generationStartTime: Number(_0x4a092b['generationStartTime'] || 0x0) || 0x0,
+      imitateToneEnabled['sourceAudioReady'] === !![] ||
+      !!resolveSegmentLocalAudioUrl(
+        imitateToneEnabled['sourceAudioUrl'],
+        imitateToneEnabled['sourceAudioLocalPath'],
+      ),
+    convertedAudioReady: imitateToneEnabled['convertedAudioReady'] === !![],
+    activeAudio: imitateToneEnabled['activeAudio'] === 'converted' ? 'converted' : 'source',
+    status: String(imitateToneEnabled['status'] || 'detected'),
+    needsSourceAudioRecut: imitateToneEnabled['needsSourceAudioRecut'] === !![],
+    error: String(imitateToneEnabled['error'] || ''),
+    rhTaskId: String(imitateToneEnabled['rhTaskId'] || ''),
+    rhTaskStatus: String(imitateToneEnabled['rhTaskStatus'] || ''),
+    rhStatusMessage: String(imitateToneEnabled['rhStatusMessage'] || ''),
+    rhTaskStartedAt: Number(imitateToneEnabled['rhTaskStartedAt'] || 0x0) || 0x0,
+    rhTaskUseOpenapiQuery: imitateToneEnabled['rhTaskUseOpenapiQuery'] === !![],
+    isGenerating: imitateToneEnabled['isGenerating'] === !![],
+    jobStatus: String(imitateToneEnabled['jobStatus'] || ''),
+    jobError: imitateToneEnabled['jobError'] == null ? null : String(imitateToneEnabled['jobError'] || ''),
+    generationStartTime: Number(imitateToneEnabled['generationStartTime'] || 0x0) || 0x0,
     generationDuration:
-      _0x4a092b['generationDuration'] === null || _0x4a092b['generationDuration'] === undefined
+      imitateToneEnabled['generationDuration'] === null ||
+      imitateToneEnabled['generationDuration'] === undefined
         ? null
-        : Math['max'](0x0, Number(_0x4a092b['generationDuration'] || 0x0) || 0x0),
-    convertedAudioHistory: normalizeAudioVoiceHistory(_0x4a092b['convertedAudioHistory']),
+        : Math['max'](0x0, Number(imitateToneEnabled['generationDuration'] || 0x0) || 0x0),
+    convertedAudioHistory: normalizeAudioVoiceHistory(imitateToneEnabled['convertedAudioHistory']),
   };
 }
-export function createAudioVoiceSegmentAfter(_0x4d72b4 = {}, _0x490fc8 = null) {
-  const _0x4b0556 = Number(_0x4d72b4['endMs'] || 0x0),
-    _0x540a1a = _0x490fc8
-      ? Math['max'](
-          _0x4b0556 + 0xc8,
-          Math['round']((_0x4b0556 + Number(_0x490fc8['startMs'] || _0x4b0556)) / 0x2),
-        )
-      : _0x4b0556 + 0x5dc;
+export function createAudioVoiceSegmentAfter(options2 = {}, value3 = null) {
+  const startMs = Number(options2['endMs'] || 0x0),
+    endMs = value3
+      ? Math['max'](startMs + 0xc8, Math['round']((startMs + Number(value3['startMs'] || startMs)) / 0x2))
+      : startMs + 0x5dc;
   return {
     id: 'mock-insert-' + Date['now']() + '-' + Math['round'](Math['random']() * 0x3e8),
-    startMs: _0x4b0556,
-    endMs: _0x540a1a,
+    startMs: startMs,
+    endMs: endMs,
     sourceText: '',
     targetText: '',
     sourceAudioLocalPath: '',

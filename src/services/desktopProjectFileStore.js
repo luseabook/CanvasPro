@@ -17,191 +17,194 @@ export const RECOVERY_SNAPSHOT_VERSION = 1;
 export const DEFAULT_PROJECT_FILE_EXTENSION = '.aicanvas';
 export const SUPPORTED_PROJECT_FILE_EXTENSIONS = Object.freeze(['.aicanvas', '.aicproj', '.json']);
 export const ASSOCIATED_PROJECT_FILE_EXTENSIONS = Object.freeze(['aicanvas', 'aicproj']);
-function isPlainObject(_0x22506f) {
-  return !!_0x22506f && typeof _0x22506f === 'object' && !Array.isArray(_0x22506f);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array.isArray(enabled);
 }
-function normalizeComparablePath(_0x513c86) {
-  const _0x33dda0 = path.resolve(String(_0x513c86 || ''));
-  return process.platform === 'win32' || process.platform === 'darwin' ? _0x33dda0.toLowerCase() : _0x33dda0;
+function normalizeComparablePath(value) {
+  const item = path.resolve(String(value || ''));
+  return process.platform === 'win32' || process.platform === 'darwin' ? item.toLowerCase() : item;
 }
-function stripUtf8Bom(_0x13a5e0) {
-  return String(_0x13a5e0 || '').replace(/^\uFEFF/, '');
+function stripUtf8Bom(key) {
+  return String(key || '').replace(/^\uFEFF/, '');
 }
-function normalizeTimestamp(_0x2b292d, _0x4b4418 = 0) {
-  const _0x1e6589 = Number(_0x2b292d);
-  return Number.isFinite(_0x1e6589) && _0x1e6589 > 0 ? Math.round(_0x1e6589) : _0x4b4418;
+function normalizeTimestamp(index, result = 0) {
+  const count = Number(index);
+  return Number.isFinite(count) && count > 0 ? Math.round(count) : result;
 }
-export function isSupportedProjectFileExtension(_0x1ab72c) {
-  const _0x4fcaf3 = path.extname(String(_0x1ab72c || '')).toLowerCase();
-  return SUPPORTED_PROJECT_FILE_EXTENSIONS.includes(_0x4fcaf3);
+export function isSupportedProjectFileExtension(data) {
+  const options = path.extname(String(data || '')).toLowerCase();
+  return SUPPORTED_PROJECT_FILE_EXTENSIONS.includes(options);
 }
-export function stripProjectFileExtension(_0x3fc938) {
-  const _0x4b1cab = String(_0x3fc938 || ''),
-    _0x586e99 = path.extname(_0x4b1cab).toLowerCase();
-  return SUPPORTED_PROJECT_FILE_EXTENSIONS.includes(_0x586e99)
-    ? _0x4b1cab.slice(0, -_0x586e99.length)
-    : _0x4b1cab;
+export function stripProjectFileExtension(target) {
+  const list = String(target || ''),
+    list2 = path.extname(list).toLowerCase();
+  return SUPPORTED_PROJECT_FILE_EXTENSIONS.includes(list2) ? list.slice(0, -list2.length) : list;
 }
-export function sanitizeProjectName(_0x597b7e) {
-  const _0x4396b3 = t('coreServices.projectFile.unnamedCanvas'),
-    _0x1fef27 = String(_0x597b7e || '').trim() || _0x4396b3;
+export function sanitizeProjectName(source) {
+  const t2 = t('coreServices.projectFile.unnamedCanvas'),
+    next = String(source || '').trim() || t2;
   return (
-    _0x1fef27
+    next
       .replace(/[\\/:*?"<>|]/g, '_')
       .replace(/\s+/g, ' ')
-      .trim() || _0x4396b3
+      .trim() || t2
   );
 }
-export function sanitizeProjectFilename(_0x5036ff) {
-  const _0x549b74 = sanitizeProjectName(stripProjectFileExtension(_0x5036ff));
-  return '' + _0x549b74 + DEFAULT_PROJECT_FILE_EXTENSION;
+export function sanitizeProjectFilename(current) {
+  const sanitizeProjectName2 = sanitizeProjectName(stripProjectFileExtension(current));
+  return '' + sanitizeProjectName2 + DEFAULT_PROJECT_FILE_EXTENSION;
 }
-export function withJsonProjectExtension(_0x2ee4f0) {
-  const _0x259b59 = String(_0x2ee4f0 || '').trim();
-  if (!_0x259b59) return _0x259b59;
-  return path.extname(_0x259b59) ? _0x259b59 : '' + _0x259b59 + DEFAULT_PROJECT_FILE_EXTENSION;
+export function withJsonProjectExtension(entry) {
+  const enabled2 = String(entry || '').trim();
+  if (!enabled2) return enabled2;
+  return path.extname(enabled2) ? enabled2 : '' + enabled2 + DEFAULT_PROJECT_FILE_EXTENSION;
 }
-export function assertJsonProjectPath(_0x3fb159, { mustExist: mustExist = false } = {}) {
-  const _0xcefe40 = String(_0x3fb159 || '').trim();
-  if (!_0xcefe40) throw new Error('Project path is required');
-  if (!path.isAbsolute(_0xcefe40)) throw new Error('Project path must be absolute');
-  if (!isSupportedProjectFileExtension(_0xcefe40))
+export function assertJsonProjectPath(record, { mustExist: mustExist = false } = {}) {
+  const enabled3 = String(record || '').trim();
+  if (!enabled3) throw new Error('Project path is required');
+  if (!path.isAbsolute(enabled3)) throw new Error('Project path must be absolute');
+  if (!isSupportedProjectFileExtension(enabled3))
     throw new Error('Only .aicanvas, .aicproj, or .json project files are supported');
   if (mustExist) {
-    const _0x577576 = statSync(_0xcefe40);
-    if (!_0x577576.isFile()) throw new Error('Project path is not a file');
+    const statSync2 = statSync(enabled3);
+    if (!statSync2.isFile()) throw new Error('Project path is not a file');
   }
-  return path.resolve(_0xcefe40);
+  return path.resolve(enabled3);
 }
-export function findFirstSupportedProjectPathFromArgs(_0x1b813f, { mustExist: mustExist = true } = {}) {
-  const _0x1a890e = Array.isArray(_0x1b813f) ? _0x1b813f : [];
-  for (const _0x4a1980 of _0x1a890e) {
-    const _0x228f7b = String(_0x4a1980 || '')
+export function findFirstSupportedProjectPathFromArgs(payload, { mustExist: mustExist = true } = {}) {
+  const handle = Array.isArray(payload) ? payload : [];
+  for (const state of handle) {
+    const enabled4 = String(state || '')
       .trim()
       .replace(/^"|"$/g, '');
-    if (!_0x228f7b || !path.isAbsolute(_0x228f7b)) continue;
-    if (!isSupportedProjectFileExtension(_0x228f7b)) continue;
+    if (!enabled4 || !path.isAbsolute(enabled4)) continue;
+    if (!isSupportedProjectFileExtension(enabled4)) continue;
     try {
-      return assertJsonProjectPath(_0x228f7b, { mustExist: mustExist });
+      return assertJsonProjectPath(enabled4, { mustExist: mustExist });
     } catch {}
   }
   return '';
 }
-export function readProjectJson(_0x39ad2c) {
-  const _0x235c75 = assertJsonProjectPath(_0x39ad2c, { mustExist: true }),
-    _0x1aaf17 = JSON.parse(stripUtf8Bom(readFileSync(_0x235c75, 'utf8')));
-  return requireProjectDocument(_0x1aaf17);
+export function readProjectJson(config) {
+  const assertJsonProjectPath2 = assertJsonProjectPath(config, { mustExist: true }),
+    scope = JSON.parse(stripUtf8Bom(readFileSync(assertJsonProjectPath2, 'utf8')));
+  return requireProjectDocument(scope);
 }
-export function buildProjectFilePayload(_0x44912e) {
-  if (!isPlainObject(_0x44912e)) throw new Error('Project data must be an object');
-  if (Array.isArray(_0x44912e.canvases))
+export function buildProjectFilePayload(canvases) {
+  if (!isPlainObject(canvases)) throw new Error('Project data must be an object');
+  if (Array.isArray(canvases.canvases))
     return {
-      canvases: _0x44912e.canvases,
-      activeCanvasId: String(_0x44912e.activeCanvasId || _0x44912e.canvases[0]?.id || 'canvas_1'),
+      canvases: canvases.canvases,
+      activeCanvasId: String(canvases.activeCanvasId || canvases.canvases[0]?.id || 'canvas_1'),
     };
   return {
-    nodes: isPlainObject(_0x44912e.nodes) || Array.isArray(_0x44912e.nodes) ? _0x44912e.nodes : [],
-    edges: isPlainObject(_0x44912e.edges) || Array.isArray(_0x44912e.edges) ? _0x44912e.edges : [],
-    viewport: isPlainObject(_0x44912e.viewport) ? _0x44912e.viewport : {},
+    nodes: isPlainObject(canvases.nodes) || Array.isArray(canvases.nodes) ? canvases.nodes : [],
+    edges: isPlainObject(canvases.edges) || Array.isArray(canvases.edges) ? canvases.edges : [],
+    viewport: isPlainObject(canvases.viewport) ? canvases.viewport : {},
   };
 }
-export function writeProjectJson(_0x103bb7, _0x2d137b) {
-  const _0x3a7d64 = assertJsonProjectPath(_0x103bb7),
-    _0x30e9ca = buildProjectFilePayload(_0x2d137b);
-  mkdirSync(path.dirname(_0x3a7d64), { recursive: true });
-  const _0x5c3691 = _0x3a7d64 + '.tmp-' + process.pid + '-' + Date.now();
+export function writeProjectJson(input, output) {
+  const assertJsonProjectPath3 = assertJsonProjectPath(input),
+    projectFilePayload = buildProjectFilePayload(output);
+  mkdirSync(path.dirname(assertJsonProjectPath3), { recursive: true });
+  const value2 = assertJsonProjectPath3 + '.tmp-' + process.pid + '-' + Date.now();
   return (
-    writeFileSync(_0x5c3691, JSON.stringify(_0x30e9ca, null, 2) + '\n', 'utf8'),
-    renameSync(_0x5c3691, _0x3a7d64),
-    _0x30e9ca
+    writeFileSync(value2, JSON.stringify(projectFilePayload, null, 2) + '\n', 'utf8'),
+    renameSync(value2, assertJsonProjectPath3),
+    projectFilePayload
   );
 }
-export function buildRecoverySnapshotPayload(_0x229470 = {}, { now: now = Date.now() } = {}) {
-  const _0x1e4e0b = isPlainObject(_0x229470?.data) ? _0x229470.data : _0x229470?.multiData,
-    verifiedData = requireProjectDocument(_0x1e4e0b || {});
+export function buildRecoverySnapshotPayload(options2 = {}, { now: now = Date.now() } = {}) {
+  const isPlainObject2 = isPlainObject(options2?.data) ? options2.data : options2?.multiData,
+    verifiedData = requireProjectDocument(isPlainObject2 || {});
   if (Array.isArray(verifiedData.canvases) && verifiedData.canvases.length === 0)
     throw new Error('Recovery snapshot must include a canvas');
-  const _0x35e586 = buildProjectFilePayload(verifiedData),
-    _0x3f226e = normalizeTimestamp(_0x229470?.savedAt, normalizeTimestamp(now, Date.now())),
-    _0x478366 = String(_0x229470?.filename || '').trim();
+  const data2 = buildProjectFilePayload(verifiedData),
+    savedAt = normalizeTimestamp(options2?.savedAt, normalizeTimestamp(now, Date.now())),
+    filename2 = String(options2?.filename || '').trim();
   return {
     version: RECOVERY_SNAPSHOT_VERSION,
-    savedAt: _0x3f226e,
-    reason: String(_0x229470?.reason || 'auto').trim() || 'auto',
-    projectId: String(_0x229470?.projectId || '').trim() || 'default_v2_project',
+    savedAt: savedAt,
+    reason: String(options2?.reason || 'auto').trim() || 'auto',
+    projectId: String(options2?.projectId || '').trim() || 'default_v2_project',
     projectName: sanitizeProjectName(
-      _0x229470?.projectName || _0x229470?.projectId || t('coreServices.projectFile.unnamedCanvas'),
+      options2?.projectName || options2?.projectId || t('coreServices.projectFile.unnamedCanvas'),
     ),
-    filename: _0x478366 ? path.basename(_0x478366) : '',
-    recentId: String(_0x229470?.recentId || '').trim(),
-    displayPath: String(_0x229470?.displayPath || '').trim(),
+    filename: filename2 ? path.basename(filename2) : '',
+    recentId: String(options2?.recentId || '').trim(),
+    displayPath: String(options2?.displayPath || '').trim(),
     lastKnownProjectLastModified: normalizeTimestamp(
-      _0x229470?.lastKnownProjectLastModified ?? _0x229470?.lastModified,
+      options2?.lastKnownProjectLastModified ?? options2?.lastModified,
       0,
     ),
-    data: _0x35e586,
+    data: data2,
   };
 }
-export function writeRecoverySnapshot(_0x15deb4, _0x23747d, _0x1d7a36 = {}) {
-  const _0x152f21 = String(_0x15deb4 || '').trim();
-  if (!_0x152f21) throw new Error('Recovery path is required');
-  const _0x381f99 = path.resolve(_0x152f21),
-    _0x515d28 = buildRecoverySnapshotPayload(_0x23747d, _0x1d7a36);
-  const existing = getRecoverySnapshotInfo(_0x381f99);
-  if (existing.exists && (existing.invalid || existing.projectId !== _0x515d28.projectId ||
-      existing.filename !== _0x515d28.filename || existing.recentId !== _0x515d28.recentId ||
-      existing.displayPath !== _0x515d28.displayPath)) {
+export function writeRecoverySnapshot(value3, value4, value5 = {}) {
+  const enabled5 = String(value3 || '').trim();
+  if (!enabled5) throw new Error('Recovery path is required');
+  const value6 = path.resolve(enabled5),
+    recoverySnapshotPayload = buildRecoverySnapshotPayload(value4, value5);
+  const existing = getRecoverySnapshotInfo(value6);
+  if (
+    existing.exists &&
+    (existing.invalid ||
+      existing.projectId !== recoverySnapshotPayload.projectId ||
+      existing.filename !== recoverySnapshotPayload.filename ||
+      existing.recentId !== recoverySnapshotPayload.recentId ||
+      existing.displayPath !== recoverySnapshotPayload.displayPath)
+  ) {
     throw Object.assign(new Error('已有其他工程或无效恢复快照；原文件已保留，请先备份核对'), {
       code: 'RECOVERY_SNAPSHOT_PROTECTED',
     });
   }
-  mkdirSync(path.dirname(_0x381f99), { recursive: true });
-  const _0x46c67a = _0x381f99 + '.tmp-' + process.pid + '-' + Date.now();
+  mkdirSync(path.dirname(value6), { recursive: true });
+  const value7 = value6 + '.tmp-' + process.pid + '-' + Date.now();
   return (
-    writeFileSync(_0x46c67a, JSON.stringify(_0x515d28, null, 2) + '\n', 'utf8'),
-    renameSync(_0x46c67a, _0x381f99),
-    _0x515d28
+    writeFileSync(value7, JSON.stringify(recoverySnapshotPayload, null, 2) + '\n', 'utf8'),
+    renameSync(value7, value6),
+    recoverySnapshotPayload
   );
 }
-export function readRecoverySnapshot(_0x26addd) {
+export function readRecoverySnapshot(value8) {
   try {
-    const _0x21d2c7 = String(_0x26addd || '').trim();
-    if (!_0x21d2c7) return null;
-    const _0x4a7e91 = path.resolve(_0x21d2c7),
-      raw = readFileSync(_0x4a7e91, 'utf8'),
-      _0x20d427 = JSON.parse(stripUtf8Bom(raw));
-    if (!isPlainObject(_0x20d427)) return null;
-    if (Number(_0x20d427.version) !== RECOVERY_SNAPSHOT_VERSION) return null;
-    if (!isPlainObject(_0x20d427.data)) return null;
-    if (typeof _0x20d427.projectId !== 'string' || !_0x20d427.projectId.trim()) return null;
-    const verifiedData = requireProjectDocument(_0x20d427.data);
+    const enabled6 = String(value8 || '').trim();
+    if (!enabled6) return null;
+    const value9 = path.resolve(enabled6),
+      raw = readFileSync(value9, 'utf8'),
+      projectId2 = JSON.parse(stripUtf8Bom(raw));
+    if (!isPlainObject(projectId2)) return null;
+    if (Number(projectId2.version) !== RECOVERY_SNAPSHOT_VERSION) return null;
+    if (!isPlainObject(projectId2.data)) return null;
+    if (typeof projectId2.projectId !== 'string' || !projectId2.projectId.trim()) return null;
+    const verifiedData = requireProjectDocument(projectId2.data);
     if (Array.isArray(verifiedData.canvases) && verifiedData.canvases.length === 0) return null;
-    const _0x973593 = normalizeTimestamp(_0x20d427.savedAt, 0);
-    if (!_0x973593) return null;
+    const savedAt2 = normalizeTimestamp(projectId2.savedAt, 0);
+    if (!savedAt2) return null;
     return {
-      ..._0x20d427,
-      savedAt: _0x973593,
+      ...projectId2,
+      savedAt: savedAt2,
       revision: createHash('sha256').update(raw, 'utf8').digest('hex'),
-      projectId: _0x20d427.projectId.trim(),
+      projectId: projectId2.projectId.trim(),
       projectName: sanitizeProjectName(
-        _0x20d427.projectName || _0x20d427.projectId || t('coreServices.projectFile.unnamedCanvas'),
+        projectId2.projectName || projectId2.projectId || t('coreServices.projectFile.unnamedCanvas'),
       ),
-      filename: String(_0x20d427.filename || '').trim(),
-      recentId: String(_0x20d427.recentId || '').trim(),
-      displayPath: String(_0x20d427.displayPath || '').trim(),
-      lastKnownProjectLastModified: normalizeTimestamp(_0x20d427.lastKnownProjectLastModified, 0),
+      filename: String(projectId2.filename || '').trim(),
+      recentId: String(projectId2.recentId || '').trim(),
+      displayPath: String(projectId2.displayPath || '').trim(),
+      lastKnownProjectLastModified: normalizeTimestamp(projectId2.lastKnownProjectLastModified, 0),
     };
   } catch {
     return null;
   }
 }
-export function removeRecoverySnapshot(_0x1dc46a) {
+export function removeRecoverySnapshot(value10) {
   try {
-    const _0x1f2a6c = String(_0x1dc46a || '').trim();
-    if (!_0x1f2a6c) return;
-    unlinkSync(path.resolve(_0x1f2a6c));
-  } catch (_0x405646) {
-    if (_0x405646?.code !== 'ENOENT') throw _0x405646;
+    const enabled7 = String(value10 || '').trim();
+    if (!enabled7) return;
+    unlinkSync(path.resolve(enabled7));
+  } catch (value11) {
+    if (value11?.code !== 'ENOENT') throw value11;
   }
 }
 export function clearRecoverySnapshotIfMatches(filename, expected = {}) {
@@ -210,17 +213,21 @@ export function clearRecoverySnapshotIfMatches(filename, expected = {}) {
   if (!projectId || !/^[a-f0-9]{64}$/.test(revision))
     return { success: false, cleared: false, reason: 'guard-required' };
   const snapshot = readRecoverySnapshot(filename);
-  if (!snapshot) return { success: false, cleared: false,
-    reason: filename && existsSync(filename) ? 'invalid' : 'missing' };
+  if (!snapshot)
+    return {
+      success: false,
+      cleared: false,
+      reason: filename && existsSync(filename) ? 'invalid' : 'missing',
+    };
   if (snapshot.projectId !== projectId || snapshot.revision !== revision)
     return { success: false, cleared: false, reason: 'changed' };
   removeRecoverySnapshot(filename);
   return { success: true, cleared: true };
 }
-export function getRecoverySnapshotInfo(_0x9b8d5e, { currentLastModified: currentLastModified = 0 } = {}) {
-  const _0x384e0a = readRecoverySnapshot(_0x9b8d5e);
-  if (!_0x384e0a) {
-    const filename = String(_0x9b8d5e || '').trim();
+export function getRecoverySnapshotInfo(value12, { currentLastModified: currentLastModified = 0 } = {}) {
+  const revision2 = readRecoverySnapshot(value12);
+  if (!revision2) {
+    const filename = String(value12 || '').trim();
     const invalid = !!filename && existsSync(filename);
     return {
       exists: invalid,
@@ -230,77 +237,80 @@ export function getRecoverySnapshotInfo(_0x9b8d5e, { currentLastModified: curren
       currentLastModified: normalizeTimestamp(currentLastModified, 0),
     };
   }
-  const _0x1e6b2c = normalizeTimestamp(currentLastModified, _0x384e0a.lastKnownProjectLastModified);
+  const currentLastModified2 = normalizeTimestamp(
+    currentLastModified,
+    revision2.lastKnownProjectLastModified,
+  );
   return {
     exists: true,
-    revision: _0x384e0a.revision,
-    isNewerThanProject: _0x384e0a.savedAt > _0x1e6b2c,
-    savedAt: _0x384e0a.savedAt,
-    currentLastModified: _0x1e6b2c,
-    projectId: _0x384e0a.projectId,
-    projectName: _0x384e0a.projectName,
-    filename: _0x384e0a.filename,
-    recentId: _0x384e0a.recentId,
-    displayPath: _0x384e0a.displayPath,
-    lastKnownProjectLastModified: _0x384e0a.lastKnownProjectLastModified,
+    revision: revision2.revision,
+    isNewerThanProject: revision2.savedAt > currentLastModified2,
+    savedAt: revision2.savedAt,
+    currentLastModified: currentLastModified2,
+    projectId: revision2.projectId,
+    projectName: revision2.projectName,
+    filename: revision2.filename,
+    recentId: revision2.recentId,
+    displayPath: revision2.displayPath,
+    lastKnownProjectLastModified: revision2.lastKnownProjectLastModified,
   };
 }
-export function buildDefaultProjectPath(_0x37485a, _0x58ceba) {
-  const _0x3e7d39 = path.resolve(String(_0x37485a || ''));
-  return path.join(_0x3e7d39, sanitizeProjectFilename(_0x58ceba));
+export function buildDefaultProjectPath(value13, value14) {
+  const value15 = path.resolve(String(value13 || ''));
+  return path.join(value15, sanitizeProjectFilename(value14));
 }
-export function getProjectRecentId(_0x5c752e) {
-  const _0x82c213 = normalizeComparablePath(_0x5c752e);
-  return createHash('sha256').update(_0x82c213).digest('hex').slice(0, 24);
+export function getProjectRecentId(value16) {
+  const comparablePath = normalizeComparablePath(value16);
+  return createHash('sha256').update(comparablePath).digest('hex').slice(0, 24);
 }
-export function readRecentProjects(_0x3ef60c) {
+export function readRecentProjects(value17) {
   try {
-    const _0x142845 = readFileSync(_0x3ef60c, 'utf8'),
-      _0x32c06c = JSON.parse(stripUtf8Bom(_0x142845));
-    return Array.isArray(_0x32c06c?.items) ? _0x32c06c.items : [];
+    const fileSync = readFileSync(value17, 'utf8'),
+      value18 = JSON.parse(stripUtf8Bom(fileSync));
+    return Array.isArray(value18?.items) ? value18.items : [];
   } catch {
     return [];
   }
 }
-export function writeRecentProjects(_0x188285, _0x3455be) {
-  const _0x34c458 = {
+export function writeRecentProjects(value19, list3) {
+  const value20 = {
     version: PROJECT_RECENTS_VERSION,
     updatedAt: Date.now(),
-    items: Array.isArray(_0x3455be) ? _0x3455be.slice(0, PROJECT_RECENTS_LIMIT) : [],
+    items: Array.isArray(list3) ? list3.slice(0, PROJECT_RECENTS_LIMIT) : [],
   };
   return (
-    mkdirSync(path.dirname(_0x188285), { recursive: true }),
-    writeFileSync(_0x188285, JSON.stringify(_0x34c458, null, 2) + '\n', 'utf8'),
-    _0x34c458.items
+    mkdirSync(path.dirname(value19), { recursive: true }),
+    writeFileSync(value19, JSON.stringify(value20, null, 2) + '\n', 'utf8'),
+    value20.items
   );
 }
-export function buildRecentProjectItem(_0x13e382, { name: name = '', now: now = Date.now() } = {}) {
-  const _0x40d4e8 = assertJsonProjectPath(_0x13e382),
-    _0x6a9f83 = existsSync(_0x40d4e8),
-    _0x1097f7 = _0x6a9f83 ? statSync(_0x40d4e8) : null,
-    _0x3ff20b = path.basename(_0x40d4e8);
+export function buildRecentProjectItem(value21, { name: name = '', now: now = Date.now() } = {}) {
+  const path2 = assertJsonProjectPath(value21),
+    exists = existsSync(path2),
+    lastModified = exists ? statSync(path2) : null,
+    filename3 = path.basename(path2);
   return {
-    recentId: getProjectRecentId(_0x40d4e8),
-    name: sanitizeProjectName(name || stripProjectFileExtension(_0x3ff20b)),
-    filename: _0x3ff20b,
-    path: _0x40d4e8,
-    displayPath: _0x40d4e8,
-    lastModified: _0x1097f7 ? Math.round(_0x1097f7.mtimeMs) : 0,
+    recentId: getProjectRecentId(path2),
+    name: sanitizeProjectName(name || stripProjectFileExtension(filename3)),
+    filename: filename3,
+    path: path2,
+    displayPath: path2,
+    lastModified: lastModified ? Math.round(lastModified.mtimeMs) : 0,
     updatedAt: now,
-    exists: _0x6a9f83,
+    exists: exists,
   };
 }
-export function listRecentProjects(_0x76aeab) {
-  const _0x14b4df = readRecentProjects(_0x76aeab)
-    .filter((_0x411cbb) => _0x411cbb && _0x411cbb.path)
-    .map((_0x4665d0) => {
+export function listRecentProjects(value22) {
+  const list4 = readRecentProjects(value22)
+    .filter((item2) => item2 && item2.path)
+    .map((name2) => {
       try {
         return {
-          ...buildRecentProjectItem(_0x4665d0.path, {
-            name: _0x4665d0.name || _0x4665d0.filename,
-            now: Number(_0x4665d0.updatedAt || 0) || Date.now(),
+          ...buildRecentProjectItem(name2.path, {
+            name: name2.name || name2.filename,
+            now: Number(name2.updatedAt || 0) || Date.now(),
           }),
-          updatedAt: Number(_0x4665d0.updatedAt || 0) || 0,
+          updatedAt: Number(name2.updatedAt || 0) || 0,
         };
       } catch {
         return null;
@@ -308,31 +318,35 @@ export function listRecentProjects(_0x76aeab) {
     })
     .filter(Boolean);
   return (
-    _0x14b4df.sort(
-      (_0x2e8457, _0x4e0d51) =>
-        Number(_0x4e0d51.updatedAt || _0x4e0d51.lastModified || 0) -
-        Number(_0x2e8457.updatedAt || _0x2e8457.lastModified || 0),
+    list4.sort(
+      (item3, value23) =>
+        Number(value23.updatedAt || value23.lastModified || 0) -
+        Number(item3.updatedAt || item3.lastModified || 0),
     ),
-    _0x14b4df
+    list4
   );
 }
-export function upsertRecentProject(_0x1a0828, _0x196a3c, { name: name = '' } = {}) {
-  const _0x449442 = buildRecentProjectItem(_0x196a3c, { name: name, now: Date.now() }),
-    _0x1c5cf5 = readRecentProjects(_0x1a0828).filter(
-      (_0x467136) => _0x467136?.recentId !== _0x449442.recentId,
+export function upsertRecentProject(value24, value25, { name: name = '' } = {}) {
+  const recentProjectItem = buildRecentProjectItem(value25, { name: name, now: Date.now() }),
+    recentProjects = readRecentProjects(value24).filter(
+      (item4) => item4?.recentId !== recentProjectItem.recentId,
     );
-  return (_0x1c5cf5.unshift(_0x449442), writeRecentProjects(_0x1a0828, _0x1c5cf5), _0x449442);
-}
-export function removeRecentProject(_0x3f5104, _0xa4ae28) {
-  const _0xb74404 = String(_0xa4ae28 || '').trim();
-  if (!_0xb74404) return listRecentProjects(_0x3f5104);
-  const _0x5f1a66 = readRecentProjects(_0x3f5104).filter(
-    (_0x10d020) => String(_0x10d020?.recentId || '') !== _0xb74404,
+  return (
+    recentProjects.unshift(recentProjectItem),
+    writeRecentProjects(value24, recentProjects),
+    recentProjectItem
   );
-  return (writeRecentProjects(_0x3f5104, _0x5f1a66), listRecentProjects(_0x3f5104));
 }
-export function findRecentProject(_0x372484, _0x2a0b70) {
-  const _0x5276bc = String(_0x2a0b70 || '').trim();
-  if (!_0x5276bc) return null;
-  return listRecentProjects(_0x372484).find((_0x3f441d) => _0x3f441d.recentId === _0x5276bc) || null;
+export function removeRecentProject(value26, value27) {
+  const enabled8 = String(value27 || '').trim();
+  if (!enabled8) return listRecentProjects(value26);
+  const recentProjects2 = readRecentProjects(value26).filter(
+    (item5) => String(item5?.recentId || '') !== enabled8,
+  );
+  return (writeRecentProjects(value26, recentProjects2), listRecentProjects(value26));
+}
+export function findRecentProject(value28, value29) {
+  const enabled9 = String(value29 || '').trim();
+  if (!enabled9) return null;
+  return listRecentProjects(value28).find((item6) => item6.recentId === enabled9) || null;
 }

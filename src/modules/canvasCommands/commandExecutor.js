@@ -4,8 +4,8 @@ import {
   createCanvasCommandSuccess,
   isCanvasCommandFailure,
 } from './commandResult.js';
-function normalizeCommandId(_0x522207) {
-  return String(_0x522207 || '').trim();
+function normalizeCommandId(value) {
+  return String(value || '').trim();
 }
 const PLAN_ALIAS_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/,
   SIMPLE_VARIABLE_SOURCE = String.raw`\$([A-Za-z_][A-Za-z0-9_]*(?:\.(?:[A-Za-z_][A-Za-z0-9_]*|\d+))*)`,
@@ -17,326 +17,315 @@ const PLAN_ALIAS_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/,
     'g',
   ),
   VARIABLE_TEST_PATTERN = new RegExp(String.raw`\$\{[^}]+\}|\{\{\s*[^}]+?\s*\}\}|${SIMPLE_VARIABLE_SOURCE}`);
-function getRegistry(_0x2fb60e = {}) {
-  return _0x2fb60e.commandRegistry || _0x2fb60e.registry || commandRegistry;
+function getRegistry(options = {}) {
+  return options.commandRegistry || options.registry || commandRegistry;
 }
-function normalizeValidation(_0x241c19, _0x49f513, _0x37f588) {
-  if (_0x49f513 === undefined || _0x49f513 === null || _0x49f513 === true)
-    return { ok: true, args: _0x37f588 };
-  if (typeof _0x49f513 === 'string')
-    return { ok: false, commandId: _0x241c19, errorCode: 'VALIDATION_FAILED', message: _0x49f513 };
-  if (isCanvasCommandFailure(_0x49f513))
+function normalizeValidation(commandId, message, args) {
+  if (message === undefined || message === null || message === true) return { ok: true, args: args };
+  if (typeof message === 'string')
+    return { ok: false, commandId: commandId, errorCode: 'VALIDATION_FAILED', message: message };
+  if (isCanvasCommandFailure(message))
     return {
       ok: false,
-      commandId: _0x241c19,
-      errorCode: _0x49f513.errorCode || 'VALIDATION_FAILED',
-      message: _0x49f513.message || 'Canvas command validation failed.',
-      details: _0x49f513.details,
+      commandId: commandId,
+      errorCode: message.errorCode || 'VALIDATION_FAILED',
+      message: message.message || 'Canvas command validation failed.',
+      details: message.details,
     };
-  if (_0x49f513 && typeof _0x49f513 === 'object')
+  if (message && typeof message === 'object')
     return {
       ok: true,
-      args: Object.prototype.hasOwnProperty.call(_0x49f513, 'args') ? _0x49f513.args : _0x37f588,
+      args: Object.prototype.hasOwnProperty.call(message, 'args') ? message.args : args,
     };
-  if (_0x49f513 === false)
+  if (message === false)
     return {
       ok: false,
-      commandId: _0x241c19,
+      commandId: commandId,
       errorCode: 'VALIDATION_FAILED',
       message: 'Canvas command validation failed.',
     };
-  return { ok: true, args: _0x37f588 };
+  return { ok: true, args: args };
 }
-function buildFailure(_0x486b76, _0x3c9e2b, _0x3b0ebf, _0x3a61de = undefined) {
+function buildFailure(commandId2, errorCode, message2, details = undefined) {
   return createCanvasCommandFailure({
-    commandId: _0x486b76,
-    errorCode: _0x3c9e2b,
-    message: _0x3b0ebf,
-    details: _0x3a61de,
+    commandId: commandId2,
+    errorCode: errorCode,
+    message: message2,
+    details: details,
   });
 }
-function normalizeThrownError(_0x4a8ad8, _0x22fda4) {
-  if (_0x22fda4 instanceof CanvasCommandError)
-    return buildFailure(_0x4a8ad8, _0x22fda4.errorCode, _0x22fda4.message, _0x22fda4.details);
-  return buildFailure(
-    _0x4a8ad8,
-    'COMMAND_EXECUTION_FAILED',
-    _0x22fda4?.message || 'Canvas command execution failed.',
-  );
+function normalizeThrownError(item, error) {
+  if (error instanceof CanvasCommandError)
+    return buildFailure(item, error.errorCode, error.message, error.details);
+  return buildFailure(item, 'COMMAND_EXECUTION_FAILED', error?.message || 'Canvas command execution failed.');
 }
-function normalizeActionAlias(_0x380987 = {}) {
-  const _0x17273d = _0x380987.alias ?? _0x380987.resultAlias ?? _0x380987.as ?? '',
-    _0x3b01ad = String(_0x17273d || '').trim();
-  if (!_0x3b01ad) return { ok: true, alias: '' };
-  if (!PLAN_ALIAS_PATTERN.test(_0x3b01ad))
+function normalizeActionAlias(options2 = {}) {
+  const key = options2.alias ?? options2.resultAlias ?? options2.as ?? '',
+    alias = String(key || '').trim();
+  if (!alias) return { ok: true, alias: '' };
+  if (!PLAN_ALIAS_PATTERN.test(alias))
     return {
       ok: false,
       errorCode: 'INVALID_ACTION_ALIAS',
-      message: 'Canvas command plan action alias is invalid: ' + _0x3b01ad,
+      message: 'Canvas command plan action alias is invalid: ' + alias,
     };
-  return { ok: true, alias: _0x3b01ad };
+  return { ok: true, alias: alias };
 }
-function readPathSegment(_0x186828, _0x23484a) {
-  if (_0x186828 == null) return undefined;
-  if (Array.isArray(_0x186828) && /^\d+$/.test(_0x23484a)) return _0x186828[Number(_0x23484a)];
-  return _0x186828?.[_0x23484a];
+function readPathSegment(index, result) {
+  if (index == null) return undefined;
+  if (Array.isArray(index) && /^\d+$/.test(result)) return index[Number(result)];
+  return index?.[result];
 }
-function resolveVariable(_0x39ac37, _0x4285ae) {
-  const _0x1676f4 = String(_0x39ac37 || '')
+function resolveVariable(expression, map) {
+  const data = String(expression || '')
       .trim()
       .split('.')
-      .map((_0x545231) => _0x545231.trim())
+      .map((item2) => item2.trim())
       .filter(Boolean),
-    _0x56d7e6 = _0x1676f4.shift();
-  if (!_0x56d7e6 || !_0x4285ae.has(_0x56d7e6)) return { ok: false, expression: _0x39ac37 };
-  let _0x4f7559 = _0x4285ae.get(_0x56d7e6);
-  for (const _0x43c92e of _0x1676f4) {
-    _0x4f7559 = readPathSegment(_0x4f7559, _0x43c92e);
-    if (_0x4f7559 === undefined) return { ok: false, expression: _0x39ac37 };
+    enabled = data.shift();
+  if (!enabled || !map.has(enabled)) return { ok: false, expression: expression };
+  let value2 = map.get(enabled);
+  for (const target of data) {
+    value2 = readPathSegment(value2, target);
+    if (value2 === undefined) return { ok: false, expression: expression };
   }
-  return { ok: true, value: _0x4f7559 };
+  return { ok: true, value: value2 };
 }
-function stringifyInterpolatedValue(_0x3a4d7f) {
-  if (_0x3a4d7f == null) return '';
-  if (typeof _0x3a4d7f === 'string') return _0x3a4d7f;
-  if (typeof _0x3a4d7f === 'number' || typeof _0x3a4d7f === 'boolean') return String(_0x3a4d7f);
-  return JSON.stringify(_0x3a4d7f);
+function stringifyInterpolatedValue(source) {
+  if (source == null) return '';
+  if (typeof source === 'string') return source;
+  if (typeof source === 'number' || typeof source === 'boolean') return String(source);
+  return JSON.stringify(source);
 }
-function interpolateString(_0x40897a, _0x2235a3) {
-  const _0x5ac2e7 = _0x40897a.match(EXACT_VARIABLE_PATTERN);
-  if (_0x5ac2e7) {
-    const _0x1bba89 = resolveVariable(_0x5ac2e7[1] || _0x5ac2e7[2] || _0x5ac2e7[3], _0x2235a3);
-    if (!_0x1bba89.ok)
+function interpolateString(next, current) {
+  const entry = next.match(EXACT_VARIABLE_PATTERN);
+  if (entry) {
+    const expression2 = resolveVariable(entry[1] || entry[2] || entry[3], current);
+    if (!expression2.ok)
       throw new CanvasCommandError(
         'UNRESOLVED_PLAN_VARIABLE',
-        'Canvas command plan variable is not available: ' + _0x1bba89.expression,
-        { expression: _0x1bba89.expression },
+        'Canvas command plan variable is not available: ' + expression2.expression,
+        { expression: expression2.expression },
       );
-    return _0x1bba89.value;
+    return expression2.value;
   }
-  return _0x40897a.replace(VARIABLE_PATTERN, (_0x3106b7, _0xa96817, _0x11d390, _0x4435fe) => {
-    const _0x191cd9 = _0xa96817 || _0x11d390 || _0x4435fe,
-      _0x5a3627 = resolveVariable(_0x191cd9, _0x2235a3);
-    if (!_0x5a3627.ok)
+  return next.replace(VARIABLE_PATTERN, (record, payload, handle, state) => {
+    const config = payload || handle || state,
+      expression3 = resolveVariable(config, current);
+    if (!expression3.ok)
       throw new CanvasCommandError(
         'UNRESOLVED_PLAN_VARIABLE',
-        'Canvas command plan variable is not available: ' + _0x5a3627.expression,
-        { expression: _0x5a3627.expression },
+        'Canvas command plan variable is not available: ' + expression3.expression,
+        { expression: expression3.expression },
       );
-    return stringifyInterpolatedValue(_0x5a3627.value);
+    return stringifyInterpolatedValue(expression3.value);
   });
 }
-function interpolatePlanValue(_0x5d234a, _0x4eeb06) {
-  if (typeof _0x5d234a === 'string') return interpolateString(_0x5d234a, _0x4eeb06);
-  if (Array.isArray(_0x5d234a))
-    return _0x5d234a.map((_0x28438d) => interpolatePlanValue(_0x28438d, _0x4eeb06));
-  if (_0x5d234a && typeof _0x5d234a === 'object') {
-    const _0x4f42af = {};
-    for (const [_0x253d65, _0x4f82a9] of Object.entries(_0x5d234a)) {
-      _0x4f42af[_0x253d65] = interpolatePlanValue(_0x4f82a9, _0x4eeb06);
+function interpolatePlanValue(list, scope) {
+  if (typeof list === 'string') return interpolateString(list, scope);
+  if (Array.isArray(list)) return list.map((item3) => interpolatePlanValue(item3, scope));
+  if (list && typeof list === 'object') {
+    const input = {};
+    for (const [output, value3] of Object.entries(list)) {
+      input[output] = interpolatePlanValue(value3, scope);
     }
-    return _0x4f42af;
+    return input;
   }
-  return _0x5d234a;
+  return list;
 }
-function interpolatePlanArgs(_0x494d5f, _0x3f7091) {
+function interpolatePlanArgs(value4, value5) {
   try {
-    return { ok: true, args: interpolatePlanValue(_0x494d5f || {}, _0x3f7091) };
-  } catch (_0xb0dea8) {
-    if (_0xb0dea8 instanceof CanvasCommandError)
+    return { ok: true, args: interpolatePlanValue(value4 || {}, value5) };
+  } catch (errorCode2) {
+    if (errorCode2 instanceof CanvasCommandError)
       return {
         ok: false,
-        errorCode: _0xb0dea8.errorCode,
-        message: _0xb0dea8.message,
-        details: _0xb0dea8.details,
+        errorCode: errorCode2.errorCode,
+        message: errorCode2.message,
+        details: errorCode2.details,
       };
     return {
       ok: false,
       errorCode: 'PLAN_INTERPOLATION_FAILED',
-      message: _0xb0dea8?.message || 'Canvas command plan argument interpolation failed.',
+      message: errorCode2?.message || 'Canvas command plan argument interpolation failed.',
     };
   }
 }
-function snapshotVariables(_0x5321f7) {
-  const _0x564378 = {};
-  for (const [_0x3f195a, _0x22ecd2] of _0x5321f7.entries()) _0x564378[_0x3f195a] = _0x22ecd2;
-  return _0x564378;
+function snapshotVariables(map2) {
+  const value6 = {};
+  for (const [value7, value8] of map2.entries()) value6[value7] = value8;
+  return value6;
 }
-function createPlanScope(_0x815b35 = {}) {
-  const _0xc8385b = new Map();
-  if (_0x815b35 instanceof Map) {
-    for (const [_0x5b8366, _0x48868c] of _0x815b35.entries()) {
-      const _0x151a55 = String(_0x5b8366 || '').trim();
-      PLAN_ALIAS_PATTERN.test(_0x151a55) && _0xc8385b.set(_0x151a55, _0x48868c);
+function createPlanScope(map3 = {}) {
+  const map4 = new Map();
+  if (map3 instanceof Map) {
+    for (const [value9, value10] of map3.entries()) {
+      const value11 = String(value9 || '').trim();
+      PLAN_ALIAS_PATTERN.test(value11) && map4.set(value11, value10);
     }
-    return _0xc8385b;
+    return map4;
   }
-  if (_0x815b35 && typeof _0x815b35 === 'object')
-    for (const [_0x547bb3, _0x2fadac] of Object.entries(_0x815b35)) {
-      const _0x250ec0 = String(_0x547bb3 || '').trim();
-      PLAN_ALIAS_PATTERN.test(_0x250ec0) && _0xc8385b.set(_0x250ec0, _0x2fadac);
+  if (map3 && typeof map3 === 'object')
+    for (const [value12, value13] of Object.entries(map3)) {
+      const value14 = String(value12 || '').trim();
+      PLAN_ALIAS_PATTERN.test(value14) && map4.set(value14, value13);
     }
-  return _0xc8385b;
+  return map4;
 }
-export function hasCanvasCommandPlanVariableReference(_0x440b2e) {
-  if (typeof _0x440b2e === 'string') return VARIABLE_TEST_PATTERN.test(_0x440b2e);
-  if (Array.isArray(_0x440b2e))
-    return _0x440b2e.some((_0x55f46e) => hasCanvasCommandPlanVariableReference(_0x55f46e));
-  if (_0x440b2e && typeof _0x440b2e === 'object')
-    return Object.values(_0x440b2e).some((_0x376393) => hasCanvasCommandPlanVariableReference(_0x376393));
+export function hasCanvasCommandPlanVariableReference(list2) {
+  if (typeof list2 === 'string') return VARIABLE_TEST_PATTERN.test(list2);
+  if (Array.isArray(list2)) return list2.some((item4) => hasCanvasCommandPlanVariableReference(item4));
+  if (list2 && typeof list2 === 'object')
+    return Object.values(list2).some((item5) => hasCanvasCommandPlanVariableReference(item5));
   return false;
 }
-export async function executeCanvasCommand(_0x3ffd29, _0x459610 = {}, _0x274579 = {}) {
-  const _0x830846 = normalizeCommandId(_0x3ffd29);
-  if (!_0x830846) return buildFailure('', 'MISSING_COMMAND_ID', 'Canvas command id is required.');
-  const _0x55c1c7 = getRegistry(_0x274579),
-    _0x100785 = _0x55c1c7?.get?.(_0x830846) || null;
-  if (!_0x100785) return buildFailure(_0x830846, 'UNKNOWN_COMMAND', 'Unknown canvas command: ' + _0x830846);
+export async function executeCanvasCommand(value15, args2 = {}, value16 = {}) {
+  const commandId3 = normalizeCommandId(value15);
+  if (!commandId3) return buildFailure('', 'MISSING_COMMAND_ID', 'Canvas command id is required.');
+  const map5 = getRegistry(value16),
+    message3 = map5?.get?.(commandId3) || null;
+  if (!message3) return buildFailure(commandId3, 'UNKNOWN_COMMAND', 'Unknown canvas command: ' + commandId3);
   try {
-    const _0x73d0f4 = normalizeValidation(_0x830846, _0x100785.validate?.(_0x459610, _0x274579), _0x459610);
-    if (!_0x73d0f4.ok) return _0x73d0f4;
-    const _0x278ce4 = await _0x100785.execute(_0x73d0f4.args, _0x274579),
-      _0x2aa718 = createCanvasCommandSuccess({
-        commandId: _0x830846,
-        result: _0x278ce4,
-        message: _0x100785.description || _0x830846,
-        riskLevel: _0x100785.riskLevel || 'safe',
+    const args3 = normalizeValidation(commandId3, message3.validate?.(args2, value16), args2);
+    if (!args3.ok) return args3;
+    const result2 = await message3.execute(args3.args, value16),
+      result3 = createCanvasCommandSuccess({
+        commandId: commandId3,
+        result: result2,
+        message: message3.description || commandId3,
+        riskLevel: message3.riskLevel || 'safe',
       });
     return (
-      _0x274579.recordCommand?.({
-        commandId: _0x830846,
-        args: _0x73d0f4.args,
-        result: _0x2aa718,
-        riskLevel: _0x100785.riskLevel || 'safe',
+      value16.recordCommand?.({
+        commandId: commandId3,
+        args: args3.args,
+        result: result3,
+        riskLevel: message3.riskLevel || 'safe',
         ts: Date.now(),
       }),
-      _0x2aa718
+      result3
     );
-  } catch (_0x308ce4) {
-    const _0x5a631b = normalizeThrownError(_0x830846, _0x308ce4);
+  } catch (value17) {
+    const result4 = normalizeThrownError(commandId3, value17);
     return (
-      _0x274579.recordCommand?.({ commandId: _0x830846, args: _0x459610, result: _0x5a631b, ts: Date.now() }),
-      _0x5a631b
+      value16.recordCommand?.({ commandId: commandId3, args: args2, result: result4, ts: Date.now() }),
+      result4
     );
   }
 }
-function normalizePlanAction(_0x88db81, _0x49090e) {
-  if (!_0x88db81 || typeof _0x88db81 !== 'object' || Array.isArray(_0x88db81))
+function normalizePlanAction(args4, value18) {
+  if (!args4 || typeof args4 !== 'object' || Array.isArray(args4))
     return {
       ok: false,
       errorCode: 'INVALID_PLAN_ACTION',
-      message: 'Canvas command plan action at index ' + _0x49090e + ' must be an object.',
+      message: 'Canvas command plan action at index ' + value18 + ' must be an object.',
     };
-  const _0x446182 = normalizeCommandId(_0x88db81.commandId || _0x88db81.type || _0x88db81.id);
-  if (!_0x446182)
+  const commandId4 = normalizeCommandId(args4.commandId || args4.type || args4.id);
+  if (!commandId4)
     return {
       ok: false,
       errorCode: 'MISSING_COMMAND_ID',
-      message: 'Canvas command plan action at index ' + _0x49090e + ' is missing commandId or type.',
+      message: 'Canvas command plan action at index ' + value18 + ' is missing commandId or type.',
     };
   return {
     ok: true,
-    commandId: _0x446182,
-    args: _0x88db81.args && typeof _0x88db81.args === 'object' ? _0x88db81.args : {},
+    commandId: commandId4,
+    args: args4.args && typeof args4.args === 'object' ? args4.args : {},
     alias: '',
   };
 }
-export async function executeCanvasCommandPlan(_0xa72015 = [], _0x105788 = {}, _0x52a4bc = {}) {
-  if (!Array.isArray(_0xa72015))
+export async function executeCanvasCommandPlan(list3 = [], value19 = {}, value20 = {}) {
+  if (!Array.isArray(list3))
     return buildFailure('plan', 'INVALID_COMMAND_PLAN', 'Canvas command plan must be an array.');
-  const _0x3ffdfa = [],
-    _0x383968 = createPlanScope(_0x52a4bc.initialScope || _0x52a4bc.scope);
-  for (let _0x1ae547 = 0; _0x1ae547 < _0xa72015.length; _0x1ae547 += 1) {
-    const _0x35acfe = normalizePlanAction(_0xa72015[_0x1ae547], _0x1ae547);
-    if (!_0x35acfe.ok)
+  const actions = [],
+    map6 = createPlanScope(value20.initialScope || value20.scope);
+  for (let failedIndex = 0; failedIndex < list3.length; failedIndex += 1) {
+    const error2 = normalizePlanAction(list3[failedIndex], failedIndex);
+    if (!error2.ok)
       return {
-        ...buildFailure('plan', _0x35acfe.errorCode, _0x35acfe.message),
-        result: { actions: _0x3ffdfa, failedIndex: _0x1ae547 },
+        ...buildFailure('plan', error2.errorCode, error2.message),
+        result: { actions: actions, failedIndex: failedIndex },
       };
-    const _0x109da0 = normalizeActionAlias(_0xa72015[_0x1ae547]);
-    if (!_0x109da0.ok)
+    const alias2 = normalizeActionAlias(list3[failedIndex]);
+    if (!alias2.ok)
       return {
-        ...buildFailure('plan', _0x109da0.errorCode, _0x109da0.message),
-        result: { actions: _0x3ffdfa, failedIndex: _0x1ae547, aliases: snapshotVariables(_0x383968) },
+        ...buildFailure('plan', alias2.errorCode, alias2.message),
+        result: { actions: actions, failedIndex: failedIndex, aliases: snapshotVariables(map6) },
       };
-    const _0x4e2cd7 = interpolatePlanArgs(_0x35acfe.args, _0x383968);
-    if (!_0x4e2cd7.ok)
+    const error3 = interpolatePlanArgs(error2.args, map6);
+    if (!error3.ok)
       return {
-        ...buildFailure('plan', _0x4e2cd7.errorCode, _0x4e2cd7.message, _0x4e2cd7.details),
-        result: { actions: _0x3ffdfa, failedIndex: _0x1ae547, aliases: snapshotVariables(_0x383968) },
+        ...buildFailure('plan', error3.errorCode, error3.message, error3.details),
+        result: { actions: actions, failedIndex: failedIndex, aliases: snapshotVariables(map6) },
       };
-    const _0x899a45 = await executeCanvasCommand(_0x35acfe.commandId, _0x4e2cd7.args, _0x105788),
-      _0x3e2474 = _0x109da0.alias ? { ..._0x899a45, alias: _0x109da0.alias } : _0x899a45;
-    _0x3ffdfa.push(_0x3e2474);
-    if (!_0x899a45.ok)
+    const error4 = await executeCanvasCommand(error2.commandId, error3.args, value19),
+      value21 = alias2.alias ? { ...error4, alias: alias2.alias } : error4;
+    actions.push(value21);
+    if (!error4.ok)
       return {
-        ...buildFailure('plan', _0x899a45.errorCode, _0x899a45.message),
-        result: { actions: _0x3ffdfa, failedIndex: _0x1ae547, aliases: snapshotVariables(_0x383968) },
+        ...buildFailure('plan', error4.errorCode, error4.message),
+        result: { actions: actions, failedIndex: failedIndex, aliases: snapshotVariables(map6) },
       };
-    if (_0x109da0.alias) _0x383968.set(_0x109da0.alias, _0x899a45.result);
+    if (alias2.alias) map6.set(alias2.alias, error4.result);
   }
   return {
     ok: true,
     commandId: 'plan',
-    result: { actions: _0x3ffdfa, aliases: snapshotVariables(_0x383968) },
+    result: { actions: actions, aliases: snapshotVariables(map6) },
     message: 'Canvas command plan executed.',
   };
 }
-export function executeCanvasCommandSync(_0x5c7b0b, _0x379df3 = {}, _0x57cc49 = {}) {
-  const _0x22c92c = normalizeCommandId(_0x5c7b0b);
-  if (!_0x22c92c) return buildFailure('', 'MISSING_COMMAND_ID', 'Canvas command id is required.');
-  const _0x581ef1 = getRegistry(_0x57cc49),
-    _0x1d8bb0 = _0x581ef1?.['get']?.(_0x22c92c) || null;
-  if (!_0x1d8bb0) return buildFailure(_0x22c92c, 'UNKNOWN_COMMAND', 'Unknown canvas command: ' + _0x22c92c);
+export function executeCanvasCommandSync(value22, args5 = {}, value23 = {}) {
+  const commandId5 = normalizeCommandId(value22);
+  if (!commandId5) return buildFailure('', 'MISSING_COMMAND_ID', 'Canvas command id is required.');
+  const map7 = getRegistry(value23),
+    message4 = map7?.['get']?.(commandId5) || null;
+  if (!message4) return buildFailure(commandId5, 'UNKNOWN_COMMAND', 'Unknown canvas command: ' + commandId5);
   try {
-    const _0xf532ab = normalizeValidation(
-      _0x22c92c,
-      _0x1d8bb0['validate']?.(_0x379df3, _0x57cc49),
-      _0x379df3,
-    );
-    if (!_0xf532ab['ok']) return _0xf532ab;
-    if (_0x1d8bb0['execute']?.['constructor']?.['name'] === 'AsyncFunction')
+    const args6 = normalizeValidation(commandId5, message4['validate']?.(args5, value23), args5);
+    if (!args6['ok']) return args6;
+    if (message4['execute']?.['constructor']?.['name'] === 'AsyncFunction')
       return buildFailure(
-        _0x22c92c,
+        commandId5,
         'ASYNC_COMMAND_UNSUPPORTED',
-        _0x22c92c + ' cannot run through a synchronous command entry.',
+        commandId5 + ' cannot run through a synchronous command entry.',
       );
-    const _0x31f49a = _0x1d8bb0['execute'](_0xf532ab['args'], _0x57cc49);
-    if (_0x31f49a && typeof _0x31f49a['then'] === 'function')
+    const result5 = message4['execute'](args6['args'], value23);
+    if (result5 && typeof result5['then'] === 'function')
       return (
-        Promise['resolve'](_0x31f49a)['catch'](() => {}),
+        Promise['resolve'](result5)['catch'](() => {}),
         buildFailure(
-          _0x22c92c,
+          commandId5,
           'ASYNC_COMMAND_UNSUPPORTED',
-          _0x22c92c + ' cannot run through a synchronous command entry.',
+          commandId5 + ' cannot run through a synchronous command entry.',
         )
       );
-    const _0x1b5b25 = createCanvasCommandSuccess({
-      commandId: _0x22c92c,
-      result: _0x31f49a,
-      message: _0x1d8bb0['description'] || _0x22c92c,
-      riskLevel: _0x1d8bb0['riskLevel'] || 'safe',
+    const result6 = createCanvasCommandSuccess({
+      commandId: commandId5,
+      result: result5,
+      message: message4['description'] || commandId5,
+      riskLevel: message4['riskLevel'] || 'safe',
     });
     return (
-      _0x57cc49['recordCommand']?.({
-        commandId: _0x22c92c,
-        args: _0xf532ab['args'],
-        result: _0x1b5b25,
-        riskLevel: _0x1d8bb0['riskLevel'] || 'safe',
+      value23['recordCommand']?.({
+        commandId: commandId5,
+        args: args6['args'],
+        result: result6,
+        riskLevel: message4['riskLevel'] || 'safe',
         ts: Date['now'](),
       }),
-      _0x1b5b25
+      result6
     );
-  } catch (_0x56883e) {
-    const _0x547202 = normalizeThrownError(_0x22c92c, _0x56883e);
+  } catch (value24) {
+    const result7 = normalizeThrownError(commandId5, value24);
     return (
-      _0x57cc49['recordCommand']?.({
-        commandId: _0x22c92c,
-        args: _0x379df3,
-        result: _0x547202,
+      value23['recordCommand']?.({
+        commandId: commandId5,
+        args: args5,
+        result: result7,
         ts: Date['now'](),
       }),
-      _0x547202
+      result7
     );
   }
 }

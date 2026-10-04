@@ -15,211 +15,207 @@ const DEFAULT_MEDIA_EXTENSIONS = Object['freeze']({ image: 'png', video: 'mp4', 
     'audio/x-wav': 'wav',
     'audio/ogg': 'ogg',
   });
-function trimText(_0x26b611) {
-  return String(_0x26b611 || '')['trim']();
+function trimText(value) {
+  return String(value || '')['trim']();
 }
-function normalizeKind(_0x3c22ca) {
-  const _0x469e83 = trimText(_0x3c22ca)['toLowerCase']();
-  if (!Object['prototype']['hasOwnProperty']['call'](DEFAULT_MEDIA_EXTENSIONS, _0x469e83))
+function normalizeKind(item) {
+  const trimText2 = trimText(item)['toLowerCase']();
+  if (!Object['prototype']['hasOwnProperty']['call'](DEFAULT_MEDIA_EXTENSIONS, trimText2))
     throw new Error('不支持的媒体文件类型');
-  return _0x469e83;
+  return trimText2;
 }
-function normalizeExternalUrl(_0xa7ac0e) {
-  const _0x3d0a3a = trimText(_0xa7ac0e);
-  if (!_0x3d0a3a) return '';
-  if (_0x3d0a3a['startsWith']('//')) {
-    const _0x4dd612 = /^https?:$/i['test'](String(globalThis['location']?.['protocol'] || ''))
+function normalizeExternalUrl(key) {
+  const trimText3 = trimText(key);
+  if (!trimText3) return '';
+  if (trimText3['startsWith']('//')) {
+    const index = /^https?:$/i['test'](String(globalThis['location']?.['protocol'] || ''))
       ? globalThis['location']['protocol']
       : 'https:';
-    return '' + _0x4dd612 + _0x3d0a3a;
+    return '' + index + trimText3;
   }
-  return _0x3d0a3a;
+  return trimText3;
 }
-function extensionFromFile({ filename: _0x378c88, blob: _0x20a613, kind: _0x116b87 }) {
-  const _0x385ad8 = trimText(_0x378c88)['match'](/\.([a-z0-9]{1,10})$/i);
-  if (_0x385ad8?.[0x1]) return _0x385ad8[0x1]['toLowerCase']();
-  const _0x4a8168 = trimText(_0x20a613?.['type'])['split'](';', 0x1)[0x0]['toLowerCase']();
-  return MIME_EXTENSIONS[_0x4a8168] || DEFAULT_MEDIA_EXTENSIONS[_0x116b87] || 'bin';
+function extensionFromFile({ filename: filename, blob: blob, kind: kind }) {
+  const trimText4 = trimText(filename)['match'](/\.([a-z0-9]{1,10})$/i);
+  if (trimText4?.[0x1]) return trimText4[0x1]['toLowerCase']();
+  const trimText5 = trimText(blob?.['type'])['split'](';', 0x1)[0x0]['toLowerCase']();
+  return MIME_EXTENSIONS[trimText5] || DEFAULT_MEDIA_EXTENSIONS[kind] || 'bin';
 }
-function getDependency(_0xdf5834, _0x30067d, _0x1b8634) {
-  return Object['prototype']['hasOwnProperty']['call'](_0xdf5834 || {}, _0x30067d)
-    ? _0xdf5834[_0x30067d]
-    : _0x1b8634;
+function getDependency(result, data, options) {
+  return Object['prototype']['hasOwnProperty']['call'](result || {}, data) ? result[data] : options;
 }
-function canUseCapability(_0x493a69, _0x1b7292, _0x193bf5) {
-  const _0x74478b = _0x493a69?.['nodeExport'];
-  if (!_0x74478b) return ![];
-  if (typeof _0x74478b[_0x1b7292] === 'function') return _0x74478b[_0x1b7292]() === !![];
-  return typeof _0x74478b[_0x193bf5] === 'function';
+function canUseCapability(target, source, next) {
+  const enabled = target?.['nodeExport'];
+  if (!enabled) return ![];
+  if (typeof enabled[source] === 'function') return enabled[source]() === !![];
+  return typeof enabled[next] === 'function';
 }
 function triggerHrefDownload({
-  url: _0x2cf88b,
-  filename: _0x1f47dd,
+  url: url,
+  filename: filename2,
   documentRef: documentRef = globalThis['document'],
 }) {
-  if (!_0x2cf88b || !documentRef?.['createElement']) throw new Error('当前环境无法下载文件');
-  const _0x2fbd56 = documentRef['createElement']('a');
-  ((_0x2fbd56['href'] = _0x2cf88b),
-    (_0x2fbd56['download'] = _0x1f47dd || 'download'),
-    (_0x2fbd56['rel'] = 'noopener'),
-    (_0x2fbd56['hidden'] = !![]),
-    documentRef['body']?.['appendChild']?.(_0x2fbd56),
-    _0x2fbd56['click'](),
-    _0x2fbd56['remove']?.());
-  if (_0x2fbd56['parentNode']) _0x2fbd56['parentNode']['removeChild']?.(_0x2fbd56);
+  if (!url || !documentRef?.['createElement']) throw new Error('当前环境无法下载文件');
+  const el = documentRef['createElement']('a');
+  ((el['href'] = url),
+    (el['download'] = filename2 || 'download'),
+    (el['rel'] = 'noopener'),
+    (el['hidden'] = !![]),
+    documentRef['body']?.['appendChild']?.(el),
+    el['click'](),
+    el['remove']?.());
+  if (el['parentNode']) el['parentNode']['removeChild']?.(el);
 }
 function triggerBlobDownload({
-  blob: _0x19b4ed,
-  filename: _0x305430,
+  blob: blob2,
+  filename: filename3,
   documentRef: documentRef = globalThis['document'],
   urlApi: urlApi = globalThis['URL'],
   schedule: schedule = globalThis['setTimeout'],
 }) {
-  if (!_0x19b4ed || typeof urlApi?.['createObjectURL'] !== 'function')
-    throw new Error('当前环境无法下载文件');
-  const _0x4cacca = urlApi['createObjectURL'](_0x19b4ed);
+  if (!blob2 || typeof urlApi?.['createObjectURL'] !== 'function') throw new Error('当前环境无法下载文件');
+  const url2 = urlApi['createObjectURL'](blob2);
   try {
-    triggerHrefDownload({ url: _0x4cacca, filename: _0x305430, documentRef: documentRef });
+    triggerHrefDownload({ url: url2, filename: filename3, documentRef: documentRef });
   } finally {
     typeof schedule === 'function'
-      ? schedule(() => urlApi['revokeObjectURL']?.(_0x4cacca), 0x0)
-      : urlApi['revokeObjectURL']?.(_0x4cacca);
+      ? schedule(() => urlApi['revokeObjectURL']?.(url2), 0x0)
+      : urlApi['revokeObjectURL']?.(url2);
   }
 }
-async function persistBlobAsLocalMedia({ blob: _0x222a99, filename: _0x3b7b66, kind: _0x152943 }, _0x6d4063) {
-  const _0x32480b = getDependency(_0x6d4063, 'saveOutputToServer', saveOutputToServer);
-  if (typeof _0x32480b !== 'function') throw new Error('当前环境无法暂存媒体文件');
-  const _0x1617da = await _0x32480b(_0x222a99, {
-      ext: extensionFromFile({ filename: _0x3b7b66, blob: _0x222a99, kind: _0x152943 }),
+async function persistBlobAsLocalMedia({ blob: blob3, filename: filename4, kind: kind2 }, current) {
+  const run = getDependency(current, 'saveOutputToServer', saveOutputToServer);
+  if (typeof run !== 'function') throw new Error('当前环境无法暂存媒体文件');
+  const entry = await run(blob3, {
+      ext: extensionFromFile({ filename: filename4, blob: blob3, kind: kind2 }),
       subDir: 'desktop-save-staging',
     }),
-    _0x17bdcf = pickResultLocalPath(_0x1617da);
-  if (!_0x17bdcf) throw new Error('暂存媒体文件后未返回本地路径');
-  return { localPath: _0x17bdcf, url: localPathToUrl(_0x17bdcf), staged: !![] };
+    localPath = pickResultLocalPath(entry);
+  if (!localPath) throw new Error('暂存媒体文件后未返回本地路径');
+  return { localPath: localPath, url: localPathToUrl(localPath), staged: !![] };
 }
-async function cleanupStagedMedia(_0x126a6f, _0x25b05f) {
-  const _0x1129ca = (Array['isArray'](_0x126a6f) ? _0x126a6f : [_0x126a6f])
-    ['filter']((_0x2af3d4) => _0x2af3d4?.['staged'] === !![] && _0x2af3d4?.['localPath'])
-    ['map']((_0x2af256) => _0x2af256['localPath']);
-  if (_0x1129ca['length'] === 0x0) return;
-  const _0x485fb6 = getDependency(_0x25b05f, 'deleteOutputFilesFromServer', deleteOutputFilesFromServer);
-  if (typeof _0x485fb6 !== 'function') return;
+async function cleanupStagedMedia(record, payload) {
+  const localPaths = (Array['isArray'](record) ? record : [record])
+    ['filter']((handle) => handle?.['staged'] === !![] && handle?.['localPath'])
+    ['map']((state) => state['localPath']);
+  if (localPaths['length'] === 0x0) return;
+  const run2 = getDependency(payload, 'deleteOutputFilesFromServer', deleteOutputFilesFromServer);
+  if (typeof run2 !== 'function') return;
   try {
-    await _0x485fb6({ localPaths: _0x1129ca });
-  } catch (_0x2d8ff3) {
-    console['warn']('[downloadSaveService] cleanup staging files failed', _0x2d8ff3);
+    await run2({ localPaths: localPaths });
+  } catch (config) {
+    console['warn']('[downloadSaveService] cleanup staging files failed', config);
   }
 }
-async function resolveDesktopMediaSource(_0x261e64, _0x3f8ccc) {
-  const _0x494e88 = normalizeKind(_0x261e64?.['kind']),
-    _0x291b53 = normalizeExternalUrl(_0x261e64?.['url']),
-    _0x37a18f = normalizeLocalPath(_0x261e64?.['localPath'] || _0x291b53);
-  if (_0x37a18f)
-    return { kind: _0x494e88, localPath: _0x37a18f, url: localPathToUrl(_0x37a18f), staged: ![] };
-  let _0x516c3c = _0x261e64?.['blob'] || null;
-  if (!_0x516c3c && /^(?:blob:|data:)/i['test'](_0x291b53)) {
-    const _0x43d42c = getDependency(_0x3f8ccc, 'fetchRemoteBlob', fetchRemoteBlob);
-    if (typeof _0x43d42c !== 'function') throw new Error('当前环境无法读取临时媒体文件');
-    _0x516c3c = await _0x43d42c(_0x291b53);
+async function resolveDesktopMediaSource(filename5, scope) {
+  const kind3 = normalizeKind(filename5?.['kind']),
+    url3 = normalizeExternalUrl(filename5?.['url']),
+    localPath2 = normalizeLocalPath(filename5?.['localPath'] || url3);
+  if (localPath2) return { kind: kind3, localPath: localPath2, url: localPathToUrl(localPath2), staged: ![] };
+  let blob4 = filename5?.['blob'] || null;
+  if (!blob4 && /^(?:blob:|data:)/i['test'](url3)) {
+    const run3 = getDependency(scope, 'fetchRemoteBlob', fetchRemoteBlob);
+    if (typeof run3 !== 'function') throw new Error('当前环境无法读取临时媒体文件');
+    blob4 = await run3(url3);
   }
-  if (_0x516c3c)
+  if (blob4)
     return {
-      kind: _0x494e88,
+      kind: kind3,
       ...(await persistBlobAsLocalMedia(
-        { blob: _0x516c3c, filename: _0x261e64?.['filename'], kind: _0x494e88 },
-        _0x3f8ccc,
+        { blob: blob4, filename: filename5?.['filename'], kind: kind3 },
+        scope,
       )),
     };
-  if (/^https?:/i['test'](_0x291b53)) return { kind: _0x494e88, localPath: '', url: _0x291b53, staged: ![] };
+  if (/^https?:/i['test'](url3)) return { kind: kind3, localPath: '', url: url3, staged: ![] };
   throw new Error('没有可保存的媒体文件');
 }
-function browserMediaUrl(_0x25ecd8) {
-  const _0x469059 = normalizeLocalPath(_0x25ecd8?.['localPath'] || _0x25ecd8?.['url']);
-  return localPathToUrl(_0x469059) || normalizeExternalUrl(_0x25ecd8?.['url']);
+function browserMediaUrl(response) {
+  const localPath3 = normalizeLocalPath(response?.['localPath'] || response?.['url']);
+  return localPathToUrl(localPath3) || normalizeExternalUrl(response?.['url']);
 }
-export async function saveTextDownload(_0x5bb04e = {}, _0x13bead = {}) {
-  const _0x36d1d9 = getDependency(_0x13bead, 'desktopBridge', desktopBridge);
-  if (canUseCapability(_0x36d1d9, 'canSaveText', 'saveText'))
-    return await _0x36d1d9['nodeExport']['saveText']({
-      filename: trimText(_0x5bb04e?.['filename']) || 'export.txt',
-      content: String(_0x5bb04e?.['content'] ?? ''),
-      mimeType: trimText(_0x5bb04e?.['mimeType']),
-      title: trimText(_0x5bb04e?.['title']),
-      filterName: trimText(_0x5bb04e?.['filterName']),
+export async function saveTextDownload(options2 = {}, input = {}) {
+  const dependency = getDependency(input, 'desktopBridge', desktopBridge);
+  if (canUseCapability(dependency, 'canSaveText', 'saveText'))
+    return await dependency['nodeExport']['saveText']({
+      filename: trimText(options2?.['filename']) || 'export.txt',
+      content: String(options2?.['content'] ?? ''),
+      mimeType: trimText(options2?.['mimeType']),
+      title: trimText(options2?.['title']),
+      filterName: trimText(options2?.['filterName']),
     });
-  const _0x50c47d = getDependency(_0x13bead, 'Blob', globalThis['Blob']);
-  if (typeof _0x50c47d !== 'function') throw new Error('当前环境无法创建下载文件');
-  const _0x4aa8c8 = new _0x50c47d([String(_0x5bb04e?.['content'] ?? '')], {
-    type: trimText(_0x5bb04e?.['mimeType']) || 'text/plain;charset=utf-8',
+  const run4 = getDependency(input, 'Blob', globalThis['Blob']);
+  if (typeof run4 !== 'function') throw new Error('当前环境无法创建下载文件');
+  const blob5 = new run4([String(options2?.['content'] ?? '')], {
+    type: trimText(options2?.['mimeType']) || 'text/plain;charset=utf-8',
   });
   return (
     triggerBlobDownload({
-      blob: _0x4aa8c8,
-      filename: trimText(_0x5bb04e?.['filename']) || 'export.txt',
-      documentRef: getDependency(_0x13bead, 'documentRef', globalThis['document']),
-      urlApi: getDependency(_0x13bead, 'urlApi', globalThis['URL']),
-      schedule: getDependency(_0x13bead, 'schedule', globalThis['setTimeout']),
+      blob: blob5,
+      filename: trimText(options2?.['filename']) || 'export.txt',
+      documentRef: getDependency(input, 'documentRef', globalThis['document']),
+      urlApi: getDependency(input, 'urlApi', globalThis['URL']),
+      schedule: getDependency(input, 'schedule', globalThis['setTimeout']),
     }),
     { success: !![], canceled: ![], mode: 'browser' }
   );
 }
-export async function saveMediaDownload(_0x51bbf8 = {}, _0x59310b = {}) {
-  const _0x461c32 = getDependency(_0x59310b, 'desktopBridge', desktopBridge);
-  if (canUseCapability(_0x461c32, 'canSaveMedia', 'saveMedia')) {
-    const _0x1a339c = await resolveDesktopMediaSource(_0x51bbf8, _0x59310b),
-      _0x139960 = await _0x461c32['nodeExport']['saveMedia']({
-        kind: _0x1a339c['kind'],
-        localPath: _0x1a339c['localPath'],
-        url: _0x1a339c['url'],
-        filename: trimText(_0x51bbf8?.['filename']),
-        title: trimText(_0x51bbf8?.['title']),
+export async function saveMediaDownload(blob6 = {}, output = {}) {
+  const dependency2 = getDependency(output, 'desktopBridge', desktopBridge);
+  if (canUseCapability(dependency2, 'canSaveMedia', 'saveMedia')) {
+    const kind4 = await resolveDesktopMediaSource(blob6, output),
+      value2 = await dependency2['nodeExport']['saveMedia']({
+        kind: kind4['kind'],
+        localPath: kind4['localPath'],
+        url: kind4['url'],
+        filename: trimText(blob6?.['filename']),
+        title: trimText(blob6?.['title']),
       });
-    return (await cleanupStagedMedia(_0x1a339c, _0x59310b), _0x139960);
+    return (await cleanupStagedMedia(kind4, output), value2);
   }
   return (
-    _0x51bbf8?.['blob']
+    blob6?.['blob']
       ? triggerBlobDownload({
-          blob: _0x51bbf8['blob'],
-          filename: trimText(_0x51bbf8?.['filename']),
-          documentRef: getDependency(_0x59310b, 'documentRef', globalThis['document']),
-          urlApi: getDependency(_0x59310b, 'urlApi', globalThis['URL']),
-          schedule: getDependency(_0x59310b, 'schedule', globalThis['setTimeout']),
+          blob: blob6['blob'],
+          filename: trimText(blob6?.['filename']),
+          documentRef: getDependency(output, 'documentRef', globalThis['document']),
+          urlApi: getDependency(output, 'urlApi', globalThis['URL']),
+          schedule: getDependency(output, 'schedule', globalThis['setTimeout']),
         })
       : triggerHrefDownload({
-          url: browserMediaUrl(_0x51bbf8),
-          filename: trimText(_0x51bbf8?.['filename']),
-          documentRef: getDependency(_0x59310b, 'documentRef', globalThis['document']),
+          url: browserMediaUrl(blob6),
+          filename: trimText(blob6?.['filename']),
+          documentRef: getDependency(output, 'documentRef', globalThis['document']),
         }),
     { success: !![], canceled: ![], mode: 'browser' }
   );
 }
-export async function saveMediaFilesDownload(_0x21b05d = {}, _0x16a3e8 = {}) {
-  const _0x26f1d3 = Array['isArray'](_0x21b05d?.['files']) ? _0x21b05d['files'] : [];
-  if (_0x26f1d3['length'] === 0x0) throw new Error('没有可保存的媒体文件');
-  const _0x38ddbc = getDependency(_0x16a3e8, 'desktopBridge', desktopBridge);
-  if (canUseCapability(_0x38ddbc, 'canSaveMediaFiles', 'saveMediaFiles')) {
-    const _0x3fb10d = [],
-      _0x379f2e = [];
-    for (const _0x2bb70c of _0x26f1d3) {
-      const _0x138b25 = await resolveDesktopMediaSource(_0x2bb70c, _0x16a3e8);
-      (_0x379f2e['push'](_0x138b25),
-        _0x3fb10d['push']({
-          kind: _0x138b25['kind'],
-          localPath: _0x138b25['localPath'],
-          url: _0x138b25['url'],
-          filename: trimText(_0x2bb70c?.['filename']),
+export async function saveMediaFilesDownload(options3 = {}, args = {}) {
+  const count = Array['isArray'](options3?.['files']) ? options3['files'] : [];
+  if (count['length'] === 0x0) throw new Error('没有可保存的媒体文件');
+  const dependency3 = getDependency(args, 'desktopBridge', desktopBridge);
+  if (canUseCapability(dependency3, 'canSaveMediaFiles', 'saveMediaFiles')) {
+    const files = [],
+      list = [];
+    for (const value3 of count) {
+      const kind5 = await resolveDesktopMediaSource(value3, args);
+      (list['push'](kind5),
+        files['push']({
+          kind: kind5['kind'],
+          localPath: kind5['localPath'],
+          url: kind5['url'],
+          filename: trimText(value3?.['filename']),
         }));
     }
-    const _0x42cd5f = await _0x38ddbc['nodeExport']['saveMediaFiles']({
-      title: trimText(_0x21b05d?.['title']),
-      files: _0x3fb10d,
+    const value4 = await dependency3['nodeExport']['saveMediaFiles']({
+      title: trimText(options3?.['title']),
+      files: files,
     });
-    return (await cleanupStagedMedia(_0x379f2e, _0x16a3e8), _0x42cd5f);
+    return (await cleanupStagedMedia(list, args), value4);
   }
-  for (const _0x22f1c7 of _0x26f1d3) {
-    await saveMediaDownload(_0x22f1c7, { ..._0x16a3e8, desktopBridge: null });
+  for (const value5 of count) {
+    await saveMediaDownload(value5, { ...args, desktopBridge: null });
   }
-  return { success: !![], canceled: ![], count: _0x26f1d3['length'], mode: 'browser' };
+  return { success: !![], canceled: ![], count: count['length'], mode: 'browser' };
 }
 export const __downloadSaveServiceForTest = Object['freeze']({
   cleanupStagedMedia: cleanupStagedMedia,

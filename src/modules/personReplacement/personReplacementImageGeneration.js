@@ -1,1 +1,423 @@
-import{isAdaptiveRatioLabel,pickClosestRatioForProviderModel,resolveAdaptiveSourceSize}from'../../../api/imageRatioPolicy.js';import{getModelManifest,resolveModelProvider}from'../../manifests/index.js';import{normalizeCharacterAssetImageGenerationParams}from'../characterAssets/characterAssetImageGeneration.js';import{applyWorkspaceCharacterAssetPromptPreset,WORKSPACE_CHARACTER_ASSET_PROMPT_PRESET_NONE_ID,WORKSPACE_CHARACTER_ASSET_PROMPT_PRESETS}from'../workspaceAssetPromptPresets.js';import{getPersonReplacementImageResults,resolvePersonReplacementImageSourceRef,resolvePersonReplacementImageResultRef}from'./personReplacementProject.js';import{buildPersonReplacementPromptPackage}from'./personReplacementPromptCompiler.js';import{composePersonReplacementImagePrompt,PERSON_REPLACEMENT_PROMPT_MODE_TEST}from'./personReplacementPromptMode.js';import{localPathToUrl}from'../../utils/localMediaPath.js';import{getPersonReplacementPromptReferenceReviewMessage}from'./personReplacementPromptReferenceReview.js';import{resolvePersonReplacementPromptMentionRef}from'./personReplacementPromptMentions.js';import{resolvePromptTextWithTextRefs,sanitizePromptHtmlForCommit}from'../nodePromptShared.js';import{getRecoverablePersonReplacementGenerationTask,isPersonReplacementGenerationTaskActive,normalizePersonReplacementGenerationTaskIdentity}from'./personReplacementGenerationTaskIdentity.js';export const PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS=Object['freeze'](WORKSPACE_CHARACTER_ASSET_PROMPT_PRESETS['filter'](_0x30727a=>[WORKSPACE_CHARACTER_ASSET_PROMPT_PRESET_NONE_ID,"character-three-view",'character-three-view-face']["includes"](_0x30727a['id'])));const PERSON_REPLACEMENT_DEFAULT_ASSET_PROMPT_PRESET_ID=PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS["find"](_0x2a8164=>_0x2a8164['id']==="character-three-view")?.['id']||PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS[0x0]?.['id']||"character-three-view",PERSON_REPLACEMENT_IMAGE_GENERATION_STATUSES=new Set(["idle","queued","submitting","running",'succeeded',"failed"]);function normalizeText(_0x137074){return String(_0x137074??'')["trim"]();}function normalizePromptEnhancementSnapshot(_0x588098={}){const _0x33a732=_0x588098&&typeof _0x588098==="object"&&!Array["isArray"](_0x588098)?_0x588098:{},_0x699471=normalizeText(_0x33a732['prompt']);if(!_0x699471)return null;return{'prompt':_0x699471,'modelId':normalizeText(_0x33a732['modelId']),'provider':normalizeText(_0x33a732["provider"]),'providerProfileId':normalizeText(_0x33a732["providerProfileId"]),'createdAt':normalizeText(_0x33a732["createdAt"]),'analysis':_0x33a732["analysis"]&&typeof _0x33a732["analysis"]==="object"&&!Array["isArray"](_0x33a732["analysis"])?_0x33a732["analysis"]:{}};}function getPositiveSize(_0x5ab084={}){const _0x241887=Number(_0x5ab084?.["width"]),_0x2df11d=Number(_0x5ab084?.['height']);return Number['isFinite'](_0x241887)&&_0x241887>0x0&&Number['isFinite'](_0x2df11d)&&_0x2df11d>0x0?{'width':_0x241887,'height':_0x2df11d}:null;}function stableSerialize(_0x39190d){if(_0x39190d===null||typeof _0x39190d!=="object")return JSON["stringify"](_0x39190d);if(Array["isArray"](_0x39190d))return'['+_0x39190d["map"](_0x5cbd3e=>stableSerialize(_0x5cbd3e))["join"](',')+']';return'{'+Object["keys"](_0x39190d)["filter"](_0x42a2b4=>_0x39190d[_0x42a2b4]!==undefined)['sort']()["map"](_0x229976=>JSON["stringify"](_0x229976)+':'+stableSerialize(_0x39190d[_0x229976]))["join"](',')+'}';}export function createPersonReplacementImagePromptRequestResolver({documentObject:documentObject=null}={}){return({project:project={},shot:shot={},promptPackage:promptPackage={}}={})=>{const _0x2d9f42=getPersonReplacementPromptReferenceReviewMessage(shot,promptPackage);if(_0x2d9f42)throw new Error(_0x2d9f42);const _0x45c687=normalizeText(shot["imagePrompt"]),_0x32752c=getModelManifest(project["settings"]?.['replacementImageModelId'])?.["extensions"]?.['personReplacement']?.['imageMentionFormat'],_0x1df68d=_0x45c687?(documentObject||globalThis["document"])?.['createElement']?.('div'):null,_0x2b5dd4=[];let _0x44a840=_0x45c687;return _0x1df68d&&(_0x1df68d['innerHTML']=sanitizePromptHtmlForCommit(_0x45c687),_0x1df68d["querySelectorAll"]?.(".ref-pill")["forEach"](_0x4cd94f=>{const _0x5454f2=resolvePersonReplacementPromptMentionRef(_0x4cd94f,{'project':project,'promptPackage':promptPackage,'shot':shot}),_0x4a6c90=_0x34dcbd=>(localPathToUrl(_0x34dcbd["ref"])||_0x34dcbd["ref"])===_0x5454f2?.["url"],_0x13cb37=promptPackage["referenceImages"]?.["find"](_0x87c2c5=>_0x87c2c5["slot"]===_0x5454f2?.["referenceSlot"])||promptPackage["referenceImages"]?.["find"](_0x97b925=>_0x4a6c90(_0x97b925)&&(_0x97b925["targetCharacterId"]||_0x97b925["targetSceneId"])===_0x5454f2?.["assetId"])||promptPackage["referenceImages"]?.['find'](_0x4a6c90);if(_0x13cb37)_0x4cd94f["replaceWith"](_0x1df68d["ownerDocument"]['createTextNode'](_0x32752c==="at-image"?"@图片"+_0x13cb37['slot']:'图'+_0x13cb37['slot']));}),_0x44a840=resolvePromptTextWithTextRefs({'promptEl':_0x1df68d,'assetInputRefs':_0x2b5dd4,'assetMediaCounts':{'image':promptPackage["referenceImages"]?.["length"]||0x0,'video':0x0,'audio':0x0},'allowedAssetTypes':['image'],'resolveAssetMentionRef':_0x4e4d3f=>resolvePersonReplacementPromptMentionRef(_0x4e4d3f,{'project':project,'promptPackage':promptPackage,'shot':shot}),'dedupeAssetMentions':!![]})),{'savedPrompt':_0x45c687,'requestPrompt':composePersonReplacementImagePrompt(promptPackage,_0x44a840),'promptAssetRefs':_0x2b5dd4};};}export function createPersonReplacementImageGenerationMappingRevision({project:project={},shot:shot={}}={}){const _0x54586a=buildPersonReplacementPromptPackage({'project':project,'shot':shot});return stableSerialize({'shot':{'id':normalizeText(shot['id']),'keyframeRef':normalizeText(shot["keyframeRef"]),'imageSourceRef':resolvePersonReplacementImageSourceRef(shot),'frame':shot['frame'],'sceneReference':shot["sceneReference"],'people':(Array["isArray"](shot["people"])?shot['people']:[])["map"](_0x409a4b=>({'id':normalizeText(_0x409a4b['id']),'sourceCharacterId':normalizeText(_0x409a4b['sourceCharacterId']),'targetCharacterId':normalizeText(_0x409a4b["targetCharacterId"]),'targetAppearanceId':normalizeText(_0x409a4b['targetAppearanceId']),'label':normalizeText(_0x409a4b["label"]),'replacementScope':normalizeText(_0x409a4b['replacementScope']),'bbox':_0x409a4b["locator"]?.["bbox"]||_0x409a4b["bbox"]}))},'prompt':{'mode':_0x54586a['promptMode'],'bindingPrompt':_0x54586a['bindingPrompt'],'references':_0x54586a["referenceImages"]["map"](_0x30e8be=>({'role':normalizeText(_0x30e8be["role"]),'ref':normalizeText(_0x30e8be["ref"]),'targetCharacterId':normalizeText(_0x30e8be["targetCharacterId"]),'targetAppearanceId':normalizeText(_0x30e8be["targetAppearanceId"]),'targetSceneId':normalizeText(_0x30e8be['targetSceneId']),'targetSceneAppearanceId':normalizeText(_0x30e8be["targetSceneAppearanceId"])})),'unmappedPersonIds':_0x54586a['unmappedPersonIds'],'missingLocatorPersonIds':_0x54586a["missingLocatorPersonIds"],'unresolvedOrientationPersonIds':_0x54586a["unresolvedOrientationPersonIds"],'overflowPersonIds':_0x54586a['overflowPersonIds']}});}export function createPersonReplacementImageGenerationRequestRevision({project:project={},shot:shot={},payload:payload={},sourceImageSize:sourceImageSize={}}={}){const _0x3a187c=shot["replacementPromptMode"]==="positioning"?buildPersonReplacementPromptPackage({'project':project,'shot':shot}):null,_0x499c80=_0x3a187c?.['locationGuideSlot']||0x0,_0x263b15=_0x3a187c?.["referenceImages"][_0x499c80-0x1]?.["ref"]||'';return stableSerialize({'mappingRevision':createPersonReplacementImageGenerationMappingRevision({'project':project,'shot':shot}),'payload':shot['replacementPromptMode']===PERSON_REPLACEMENT_PROMPT_MODE_TEST&&payload['inputUrls']?.['length']?{...payload,'inputUrls':[resolvePersonReplacementImageSourceRef(shot),...payload["inputUrls"]["slice"](0x1)]}:_0x499c80&&payload["inputUrls"]?.["length"]?{...payload,'inputUrls':payload["inputUrls"]["map"]((_0x5475dc,_0x2d1fc3)=>_0x2d1fc3===_0x499c80-0x1?_0x263b15:_0x5475dc)}:payload,'sourceImageSize':getPositiveSize(sourceImageSize)});}export function appendPersonReplacementImageResult(_0xddd39b={},_0x3d092f={}){const _0x531477=getPersonReplacementImageResults(_0xddd39b),_0x315b6d=resolvePersonReplacementImageResultRef(_0x3d092f),_0x87a191=_0x531477['findIndex'](_0x49a092=>resolvePersonReplacementImageResultRef(_0x49a092)===_0x315b6d);if(_0x87a191>=0x0)return{'results':_0x531477,'activeIndex':_0x87a191};return{'results':[..._0x531477,{..._0x3d092f}],'activeIndex':_0x531477["length"]};}export function normalizePersonReplacementAssetPromptPresetId(_0x492085=''){const _0x396ea2=PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS["find"](_0x5c8f0b=>_0x5c8f0b['id']===normalizeText(_0x492085));return _0x396ea2?.['id']||PERSON_REPLACEMENT_DEFAULT_ASSET_PROMPT_PRESET_ID;}export function applyPersonReplacementCharacterAssetPromptPreset(_0x56c767='',_0x23a548=''){const _0x4c3be8=normalizeText(_0x23a548),_0xbe483=normalizeText(_0x56c767);if(!PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS["some"](_0x13e7a5=>_0x13e7a5['id']===_0xbe483))return _0x4c3be8;return applyWorkspaceCharacterAssetPromptPreset(_0xbe483,_0x4c3be8,{'hasImageInput':!![]});}export function resolveGeneratedPersonReplacementAppearanceName(_0x138598='',_0x5d9881=0x1){const _0x44b7ad=PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS["find"](_0x177e44=>_0x177e44['id']===normalizeText(_0x138598)),_0x56837c='形象\x20'+Math["max"](0x1,Number(_0x5d9881)||0x1);return _0x44b7ad?.['template']?normalizeText(_0x44b7ad["label"])||_0x56837c:_0x56837c;}export function normalizePersonReplacementImageGenerationState(_0x4809f8={},_0x1b9d05=''){const _0x58cb26=_0x4809f8&&typeof _0x4809f8==='object'&&!Array["isArray"](_0x4809f8)?_0x4809f8:{},_0x486198=normalizeText(_0x58cb26['status'])["toLowerCase"](),_0x19352d=normalizeText(_0x58cb26['requestId']),_0x4b2add=normalizePersonReplacementGenerationTaskIdentity(_0x58cb26),_0x5c0dbf=normalizePromptEnhancementSnapshot(_0x58cb26["promptEnhancement"]);return{'status':PERSON_REPLACEMENT_IMAGE_GENERATION_STATUSES["has"](_0x486198)?_0x486198:"idle",'shotId':normalizeText(_0x58cb26["shotId"])||normalizeText(_0x1b9d05),'error':normalizeText(_0x58cb26["error"]),..._0x19352d?{'requestId':_0x19352d}:{},..._0x5c0dbf?{'promptEnhancement':_0x5c0dbf}:{},..._0x4b2add};}export function getRecoverablePersonReplacementImageTask(_0x809b83={}){const _0x5696a5=normalizePersonReplacementImageGenerationState(_0x809b83),_0xfea3ae=getRecoverablePersonReplacementGenerationTask(_0x5696a5);return _0xfea3ae&&_0x5696a5["promptEnhancement"]?{..._0xfea3ae,'promptEnhancement':_0x5696a5["promptEnhancement"]}:_0xfea3ae;}export function normalizePersonReplacementImageGenerationsByShotId(_0x3df290={},_0x25fbe2=[],_0x2e88b8={}){const _0x264beb=new Set((Array['isArray'](_0x25fbe2)?_0x25fbe2:[])["map"](_0x605e3=>normalizeText(_0x605e3?.['id']))["filter"](Boolean)),_0x2c6359=_0x3df290&&typeof _0x3df290==="object"&&!Array["isArray"](_0x3df290)?_0x3df290:{},_0x32df0d=Object["fromEntries"](Object["entries"](_0x2c6359)['flatMap'](([_0xf12601,_0x268dac])=>{const _0x3e0be6=normalizeText(_0xf12601);if(!_0x264beb["has"](_0x3e0be6))return[];return[[_0x3e0be6,normalizePersonReplacementImageGenerationState(_0x268dac,_0x3e0be6)]];})),_0xfde2fd=normalizePersonReplacementImageGenerationState(_0x2e88b8);return _0x264beb['has'](_0xfde2fd['shotId'])&&!_0x32df0d[_0xfde2fd["shotId"]]&&(_0x32df0d[_0xfde2fd['shotId']]=_0xfde2fd),_0x32df0d;}export function resolvePersonReplacementImageGenerationState(_0x1d4d18={},_0x11e1b6=''){const _0x3d77b1=normalizeText(_0x11e1b6),_0x44d680=_0x1d4d18?.["imageGenerationsByShotId"]?.[_0x3d77b1];if(_0x44d680&&typeof _0x44d680==='object')return normalizePersonReplacementImageGenerationState(_0x44d680,_0x3d77b1);const _0x42468c=normalizePersonReplacementImageGenerationState(_0x1d4d18?.['imageGeneration']);return _0x42468c["shotId"]===_0x3d77b1?_0x42468c:normalizePersonReplacementImageGenerationState({},_0x3d77b1);}export function updatePersonReplacementImageGenerationState(_0x4b9d7f={},_0x478fd3={}){const _0x23b20b=normalizePersonReplacementImageGenerationState(_0x478fd3);if(!_0x23b20b["shotId"])return{..._0x4b9d7f};const _0x4a2f42={..._0x4b9d7f?.["imageGenerationsByShotId"]&&typeof _0x4b9d7f['imageGenerationsByShotId']==="object"&&!Array['isArray'](_0x4b9d7f["imageGenerationsByShotId"])?_0x4b9d7f['imageGenerationsByShotId']:{},[_0x23b20b["shotId"]]:_0x23b20b},_0x4dd23b=normalizePersonReplacementImageGenerationState(_0x4b9d7f?.["imageGeneration"]),_0x1c94ae=isPersonReplacementGenerationTaskActive(_0x4dd23b)&&isPersonReplacementGenerationTaskActive(_0x4a2f42[_0x4dd23b["shotId"]])?_0x4a2f42[_0x4dd23b["shotId"]]:null,_0x2ecb59=Object['values'](_0x4a2f42)['find'](isPersonReplacementGenerationTaskActive),_0x15441d=isPersonReplacementGenerationTaskActive(_0x23b20b)?_0x23b20b:_0x1c94ae||_0x2ecb59||_0x23b20b;return{..._0x4b9d7f,'imageGeneration':_0x15441d,'imageGenerationsByShotId':_0x4a2f42};}function createImageGenerationUiRevision(_0x4bcd5e={},_0x1a29c6=''){const _0x47c318=normalizeText(_0x1a29c6),_0x149462=(Array["isArray"](_0x4bcd5e?.["shots"])?_0x4bcd5e['shots']:[])['find'](_0x9f81f8=>normalizeText(_0x9f81f8?.['id'])===_0x47c318);return JSON["stringify"]({'shotId':_0x47c318,'replacementImageRef':normalizeText(_0x149462?.["replacementImageRef"]),'replacementImage':_0x149462?.['replacementImage']||null,'error':normalizeText(_0x149462?.['error']),'generation':resolvePersonReplacementImageGenerationState(_0x4bcd5e?.["workspace"],_0x47c318)});}function createImageGenerationTimelineRevision(_0x181387={}){return JSON["stringify"]((Array["isArray"](_0x181387?.["shots"])?_0x181387["shots"]:[])['map'](_0x9a7111=>createImageGenerationUiRevision(_0x181387,_0x9a7111?.['id'])));}export function resolvePersonReplacementImageGenerationUiRefreshScope(_0x559165={},_0x58d4b0={}){const _0x515d86=normalizeText(_0x58d4b0?.['workspace']?.["selectedShotId"]);if(createImageGenerationUiRevision(_0x559165,_0x515d86)!==createImageGenerationUiRevision(_0x58d4b0,_0x515d86))return "selected-shot";return createImageGenerationTimelineRevision(_0x559165)!==createImageGenerationTimelineRevision(_0x58d4b0)?"timeline":'';}export function resolvePersonReplacementImageGenerationParams({modelId:modelId='',provider:provider='',generationParams:generationParams={},sourceImageSize:sourceImageSize={},shot:shot={}}={}){const _0x17e0fe=normalizeText(modelId),_0x154624=resolveModelProvider(_0x17e0fe,provider),_0x55fd60=normalizeCharacterAssetImageGenerationParams(_0x17e0fe,generationParams),_0x3d836=_0x55fd60["aspectRatio"];if(!isAdaptiveRatioLabel(_0x3d836))return{'provider':_0x154624,'generationParams':_0x55fd60,'requestedAspectRatio':_0x3d836,'resolvedAspectRatio':_0x3d836,'adaptiveSource':"explicit"};const _0x4cca10=getPositiveSize(sourceImageSize)||getPositiveSize(shot?.["frame"])||{'width':0x0,'height':0x0},_0x96cc70=resolveAdaptiveSourceSize({'inputWidth':_0x4cca10['width'],'inputHeight':_0x4cca10['height']}),_0x431e49=pickClosestRatioForProviderModel({'provider':_0x154624,'model':_0x17e0fe,'width':_0x96cc70['width'],'height':_0x96cc70["height"],'imageSize':_0x55fd60['imageSize']});return{'provider':_0x154624,'generationParams':{..._0x55fd60,'aspectRatio':_0x431e49},'requestedAspectRatio':_0x3d836,'resolvedAspectRatio':_0x431e49,'adaptiveSource':_0x96cc70["source"]};}
+import {
+  isAdaptiveRatioLabel,
+  pickClosestRatioForProviderModel,
+  resolveAdaptiveSourceSize,
+} from '../../../api/imageRatioPolicy.js';
+import { getModelManifest, resolveModelProvider } from '../../manifests/index.js';
+import { normalizeCharacterAssetImageGenerationParams } from '../characterAssets/characterAssetImageGeneration.js';
+import {
+  applyWorkspaceCharacterAssetPromptPreset,
+  WORKSPACE_CHARACTER_ASSET_PROMPT_PRESET_NONE_ID,
+  WORKSPACE_CHARACTER_ASSET_PROMPT_PRESETS,
+} from '../workspaceAssetPromptPresets.js';
+import {
+  getPersonReplacementImageResults,
+  resolvePersonReplacementImageSourceRef,
+  resolvePersonReplacementImageResultRef,
+} from './personReplacementProject.js';
+import { buildPersonReplacementPromptPackage } from './personReplacementPromptCompiler.js';
+import {
+  composePersonReplacementImagePrompt,
+  PERSON_REPLACEMENT_PROMPT_MODE_TEST,
+} from './personReplacementPromptMode.js';
+import { localPathToUrl } from '../../utils/localMediaPath.js';
+import { getPersonReplacementPromptReferenceReviewMessage } from './personReplacementPromptReferenceReview.js';
+import { resolvePersonReplacementPromptMentionRef } from './personReplacementPromptMentions.js';
+import { resolvePromptTextWithTextRefs, sanitizePromptHtmlForCommit } from '../nodePromptShared.js';
+import {
+  getRecoverablePersonReplacementGenerationTask,
+  isPersonReplacementGenerationTaskActive,
+  normalizePersonReplacementGenerationTaskIdentity,
+} from './personReplacementGenerationTaskIdentity.js';
+export const PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS = Object['freeze'](
+  WORKSPACE_CHARACTER_ASSET_PROMPT_PRESETS['filter']((value) =>
+    [WORKSPACE_CHARACTER_ASSET_PROMPT_PRESET_NONE_ID, 'character-three-view', 'character-three-view-face'][
+      'includes'
+    ](value['id']),
+  ),
+);
+const PERSON_REPLACEMENT_DEFAULT_ASSET_PROMPT_PRESET_ID =
+    PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['find'](
+      (item) => item['id'] === 'character-three-view',
+    )?.['id'] ||
+    PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS[0x0]?.['id'] ||
+    'character-three-view',
+  PERSON_REPLACEMENT_IMAGE_GENERATION_STATUSES = new Set([
+    'idle',
+    'queued',
+    'submitting',
+    'running',
+    'succeeded',
+    'failed',
+  ]);
+function normalizeText(key) {
+  return String(key ?? '')['trim']();
+}
+function normalizePromptEnhancementSnapshot(options = {}) {
+  const index = options && typeof options === 'object' && !Array['isArray'](options) ? options : {},
+    text = normalizeText(index['prompt']);
+  if (!text) return null;
+  return {
+    prompt: text,
+    modelId: normalizeText(index['modelId']),
+    provider: normalizeText(index['provider']),
+    providerProfileId: normalizeText(index['providerProfileId']),
+    createdAt: normalizeText(index['createdAt']),
+    analysis:
+      index['analysis'] && typeof index['analysis'] === 'object' && !Array['isArray'](index['analysis'])
+        ? index['analysis']
+        : {},
+  };
+}
+function getPositiveSize(box = {}) {
+  const count = Number(box?.['width']),
+    count2 = Number(box?.['height']);
+  return Number['isFinite'](count) && count > 0x0 && Number['isFinite'](count2) && count2 > 0x0
+    ? { width: count, height: count2 }
+    : null;
+}
+function stableSerialize(result) {
+  if (result === null || typeof result !== 'object') return JSON['stringify'](result);
+  if (Array['isArray'](result))
+    return '[' + result['map']((data) => stableSerialize(data))['join'](',') + ']';
+  return (
+    '{' +
+    Object['keys'](result)
+      ['filter']((target) => result[target] !== undefined)
+      ['sort']()
+      ['map']((source) => JSON['stringify'](source) + ':' + stableSerialize(result[source]))
+      ['join'](',') +
+    '}'
+  );
+}
+export function createPersonReplacementImagePromptRequestResolver({
+  documentObject: documentObject = null,
+} = {}) {
+  return ({ project: project = {}, shot: shot = {}, promptPackage: promptPackage = {} } = {}) => {
+    const personReplacementPromptReferenceReviewMessage = getPersonReplacementPromptReferenceReviewMessage(
+      shot,
+      promptPackage,
+    );
+    if (personReplacementPromptReferenceReviewMessage)
+      throw new Error(personReplacementPromptReferenceReviewMessage);
+    const text2 = normalizeText(shot['imagePrompt']),
+      modelManifest = getModelManifest(project['settings']?.['replacementImageModelId'])?.['extensions']?.[
+        'personReplacement'
+      ]?.['imageMentionFormat'],
+      el = text2 ? (documentObject || globalThis['document'])?.['createElement']?.('div') : null,
+      next = [];
+    let promptTextWithTextRefs = text2;
+    return (
+      el &&
+        ((el['innerHTML'] = sanitizePromptHtmlForCommit(text2)),
+        el['querySelectorAll']?.('.ref-pill')['forEach']((current) => {
+          const personReplacementPromptMentionRef = resolvePersonReplacementPromptMentionRef(current, {
+              project: project,
+              promptPackage: promptPackage,
+              shot: shot,
+            }),
+            handler = (entry) =>
+              (localPathToUrl(entry['ref']) || entry['ref']) === personReplacementPromptMentionRef?.['url'],
+            record =
+              promptPackage['referenceImages']?.['find'](
+                (handle) => handle['slot'] === personReplacementPromptMentionRef?.['referenceSlot'],
+              ) ||
+              promptPackage['referenceImages']?.['find'](
+                (state) =>
+                  handler(state) &&
+                  (state['targetCharacterId'] || state['targetSceneId']) ===
+                    personReplacementPromptMentionRef?.['assetId'],
+              ) ||
+              promptPackage['referenceImages']?.['find'](handler);
+          if (record)
+            current['replaceWith'](
+              el['ownerDocument']['createTextNode'](
+                modelManifest === 'at-image' ? '@图片' + record['slot'] : '图' + record['slot'],
+              ),
+            );
+        }),
+        (promptTextWithTextRefs = resolvePromptTextWithTextRefs({
+          promptEl: el,
+          assetInputRefs: next,
+          assetMediaCounts: {
+            image: promptPackage['referenceImages']?.['length'] || 0x0,
+            video: 0x0,
+            audio: 0x0,
+          },
+          allowedAssetTypes: ['image'],
+          resolveAssetMentionRef: (config) =>
+            resolvePersonReplacementPromptMentionRef(config, {
+              project: project,
+              promptPackage: promptPackage,
+              shot: shot,
+            }),
+          dedupeAssetMentions: !![],
+        }))),
+      {
+        savedPrompt: text2,
+        requestPrompt: composePersonReplacementImagePrompt(promptPackage, promptTextWithTextRefs),
+        promptAssetRefs: next,
+      }
+    );
+  };
+}
+export function createPersonReplacementImageGenerationMappingRevision({
+  project: project = {},
+  shot: shot = {},
+} = {}) {
+  const personReplacementPromptPackage = buildPersonReplacementPromptPackage({
+    project: project,
+    shot: shot,
+  });
+  return stableSerialize({
+    shot: {
+      id: normalizeText(shot['id']),
+      keyframeRef: normalizeText(shot['keyframeRef']),
+      imageSourceRef: resolvePersonReplacementImageSourceRef(shot),
+      frame: shot['frame'],
+      sceneReference: shot['sceneReference'],
+      people: (Array['isArray'](shot['people']) ? shot['people'] : [])['map']((scope) => ({
+        id: normalizeText(scope['id']),
+        sourceCharacterId: normalizeText(scope['sourceCharacterId']),
+        targetCharacterId: normalizeText(scope['targetCharacterId']),
+        targetAppearanceId: normalizeText(scope['targetAppearanceId']),
+        label: normalizeText(scope['label']),
+        replacementScope: normalizeText(scope['replacementScope']),
+        bbox: scope['locator']?.['bbox'] || scope['bbox'],
+      })),
+    },
+    prompt: {
+      mode: personReplacementPromptPackage['promptMode'],
+      bindingPrompt: personReplacementPromptPackage['bindingPrompt'],
+      references: personReplacementPromptPackage['referenceImages']['map']((input) => ({
+        role: normalizeText(input['role']),
+        ref: normalizeText(input['ref']),
+        targetCharacterId: normalizeText(input['targetCharacterId']),
+        targetAppearanceId: normalizeText(input['targetAppearanceId']),
+        targetSceneId: normalizeText(input['targetSceneId']),
+        targetSceneAppearanceId: normalizeText(input['targetSceneAppearanceId']),
+      })),
+      unmappedPersonIds: personReplacementPromptPackage['unmappedPersonIds'],
+      missingLocatorPersonIds: personReplacementPromptPackage['missingLocatorPersonIds'],
+      unresolvedOrientationPersonIds: personReplacementPromptPackage['unresolvedOrientationPersonIds'],
+      overflowPersonIds: personReplacementPromptPackage['overflowPersonIds'],
+    },
+  });
+}
+export function createPersonReplacementImageGenerationRequestRevision({
+  project: project = {},
+  shot: shot = {},
+  payload: payload = {},
+  sourceImageSize: sourceImageSize = {},
+} = {}) {
+  const output =
+      shot['replacementPromptMode'] === 'positioning'
+        ? buildPersonReplacementPromptPackage({ project: project, shot: shot })
+        : null,
+    value2 = output?.['locationGuideSlot'] || 0x0,
+    value3 = output?.['referenceImages'][value2 - 0x1]?.['ref'] || '';
+  return stableSerialize({
+    mappingRevision: createPersonReplacementImageGenerationMappingRevision({ project: project, shot: shot }),
+    payload:
+      shot['replacementPromptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_TEST &&
+      payload['inputUrls']?.['length']
+        ? {
+            ...payload,
+            inputUrls: [resolvePersonReplacementImageSourceRef(shot), ...payload['inputUrls']['slice'](0x1)],
+          }
+        : value2 && payload['inputUrls']?.['length']
+          ? {
+              ...payload,
+              inputUrls: payload['inputUrls']['map']((value4, value5) =>
+                value5 === value2 - 0x1 ? value3 : value4,
+              ),
+            }
+          : payload,
+    sourceImageSize: getPositiveSize(sourceImageSize),
+  });
+}
+export function appendPersonReplacementImageResult(options2 = {}, args = {}) {
+  const list = getPersonReplacementImageResults(options2),
+    personReplacementImageResultRef = resolvePersonReplacementImageResultRef(args),
+    count3 = list['findIndex'](
+      (value6) => resolvePersonReplacementImageResultRef(value6) === personReplacementImageResultRef,
+    );
+  if (count3 >= 0x0) return { results: list, activeIndex: count3 };
+  return { results: [...list, { ...args }], activeIndex: list['length'] };
+}
+export function normalizePersonReplacementAssetPromptPresetId(value7 = '') {
+  const value8 = PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['find'](
+    (value9) => value9['id'] === normalizeText(value7),
+  );
+  return value8?.['id'] || PERSON_REPLACEMENT_DEFAULT_ASSET_PROMPT_PRESET_ID;
+}
+export function applyPersonReplacementCharacterAssetPromptPreset(value10 = '', value11 = '') {
+  const text3 = normalizeText(value11),
+    text4 = normalizeText(value10);
+  if (!PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['some']((value12) => value12['id'] === text4))
+    return text3;
+  return applyWorkspaceCharacterAssetPromptPreset(text4, text3, { hasImageInput: !![] });
+}
+export function resolveGeneratedPersonReplacementAppearanceName(value13 = '', value14 = 0x1) {
+  const value15 = PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['find'](
+      (value16) => value16['id'] === normalizeText(value13),
+    ),
+    value17 = '形象\x20' + Math['max'](0x1, Number(value14) || 0x1);
+  return value15?.['template'] ? normalizeText(value15['label']) || value17 : value17;
+}
+export function normalizePersonReplacementImageGenerationState(options3 = {}, value18 = '') {
+  const response = options3 && typeof options3 === 'object' && !Array['isArray'](options3) ? options3 : {},
+    text5 = normalizeText(response['status'])['toLowerCase'](),
+    args2 = normalizeText(response['requestId']),
+    args3 = normalizePersonReplacementGenerationTaskIdentity(response),
+    args4 = normalizePromptEnhancementSnapshot(response['promptEnhancement']);
+  return {
+    status: PERSON_REPLACEMENT_IMAGE_GENERATION_STATUSES['has'](text5) ? text5 : 'idle',
+    shotId: normalizeText(response['shotId']) || normalizeText(value18),
+    error: normalizeText(response['error']),
+    ...(args2 ? { requestId: args2 } : {}),
+    ...(args4 ? { promptEnhancement: args4 } : {}),
+    ...args3,
+  };
+}
+export function getRecoverablePersonReplacementImageTask(options4 = {}) {
+  const personReplacementImageGenerationState = normalizePersonReplacementImageGenerationState(options4),
+    args5 = getRecoverablePersonReplacementGenerationTask(personReplacementImageGenerationState);
+  return args5 && personReplacementImageGenerationState['promptEnhancement']
+    ? { ...args5, promptEnhancement: personReplacementImageGenerationState['promptEnhancement'] }
+    : args5;
+}
+export function normalizePersonReplacementImageGenerationsByShotId(
+  options5 = {},
+  value19 = [],
+  value20 = {},
+) {
+  const map = new Set(
+      (Array['isArray'](value19) ? value19 : [])
+        ['map']((value21) => normalizeText(value21?.['id']))
+        ['filter'](Boolean),
+    ),
+    value22 = options5 && typeof options5 === 'object' && !Array['isArray'](options5) ? options5 : {},
+    enabled = Object['fromEntries'](
+      Object['entries'](value22)['flatMap'](([value23, value24]) => {
+        const text6 = normalizeText(value23);
+        if (!map['has'](text6)) return [];
+        return [[text6, normalizePersonReplacementImageGenerationState(value24, text6)]];
+      }),
+    ),
+    personReplacementImageGenerationState2 = normalizePersonReplacementImageGenerationState(value20);
+  return (
+    map['has'](personReplacementImageGenerationState2['shotId']) &&
+      !enabled[personReplacementImageGenerationState2['shotId']] &&
+      (enabled[personReplacementImageGenerationState2['shotId']] = personReplacementImageGenerationState2),
+    enabled
+  );
+}
+export function resolvePersonReplacementImageGenerationState(options6 = {}, value25 = '') {
+  const text7 = normalizeText(value25),
+    value26 = options6?.['imageGenerationsByShotId']?.[text7];
+  if (value26 && typeof value26 === 'object')
+    return normalizePersonReplacementImageGenerationState(value26, text7);
+  const personReplacementImageGenerationState3 = normalizePersonReplacementImageGenerationState(
+    options6?.['imageGeneration'],
+  );
+  return personReplacementImageGenerationState3['shotId'] === text7
+    ? personReplacementImageGenerationState3
+    : normalizePersonReplacementImageGenerationState({}, text7);
+}
+export function updatePersonReplacementImageGenerationState(args6 = {}, value27 = {}) {
+  const personReplacementImageGenerationState4 = normalizePersonReplacementImageGenerationState(value27);
+  if (!personReplacementImageGenerationState4['shotId']) return { ...args6 };
+  const value28 = {
+      ...(args6?.['imageGenerationsByShotId'] &&
+      typeof args6['imageGenerationsByShotId'] === 'object' &&
+      !Array['isArray'](args6['imageGenerationsByShotId'])
+        ? args6['imageGenerationsByShotId']
+        : {}),
+      [personReplacementImageGenerationState4['shotId']]: personReplacementImageGenerationState4,
+    },
+    personReplacementImageGenerationState5 = normalizePersonReplacementImageGenerationState(
+      args6?.['imageGeneration'],
+    ),
+    isPersonReplacementGenerationTaskActive2 =
+      isPersonReplacementGenerationTaskActive(personReplacementImageGenerationState5) &&
+      isPersonReplacementGenerationTaskActive(value28[personReplacementImageGenerationState5['shotId']])
+        ? value28[personReplacementImageGenerationState5['shotId']]
+        : null,
+    value29 = Object['values'](value28)['find'](isPersonReplacementGenerationTaskActive),
+    isPersonReplacementGenerationTaskActive3 = isPersonReplacementGenerationTaskActive(
+      personReplacementImageGenerationState4,
+    )
+      ? personReplacementImageGenerationState4
+      : isPersonReplacementGenerationTaskActive2 || value29 || personReplacementImageGenerationState4;
+  return {
+    ...args6,
+    imageGeneration: isPersonReplacementGenerationTaskActive3,
+    imageGenerationsByShotId: value28,
+  };
+}
+function createImageGenerationUiRevision(options7 = {}, value30 = '') {
+  const text8 = normalizeText(value30),
+    value31 = (Array['isArray'](options7?.['shots']) ? options7['shots'] : [])['find'](
+      (value32) => normalizeText(value32?.['id']) === text8,
+    );
+  return JSON['stringify']({
+    shotId: text8,
+    replacementImageRef: normalizeText(value31?.['replacementImageRef']),
+    replacementImage: value31?.['replacementImage'] || null,
+    error: normalizeText(value31?.['error']),
+    generation: resolvePersonReplacementImageGenerationState(options7?.['workspace'], text8),
+  });
+}
+function createImageGenerationTimelineRevision(options8 = {}) {
+  return JSON['stringify'](
+    (Array['isArray'](options8?.['shots']) ? options8['shots'] : [])['map']((value33) =>
+      createImageGenerationUiRevision(options8, value33?.['id']),
+    ),
+  );
+}
+export function resolvePersonReplacementImageGenerationUiRefreshScope(options9 = {}, value34 = {}) {
+  const text9 = normalizeText(value34?.['workspace']?.['selectedShotId']);
+  if (createImageGenerationUiRevision(options9, text9) !== createImageGenerationUiRevision(value34, text9))
+    return 'selected-shot';
+  return createImageGenerationTimelineRevision(options9) !== createImageGenerationTimelineRevision(value34)
+    ? 'timeline'
+    : '';
+}
+export function resolvePersonReplacementImageGenerationParams({
+  modelId: modelId = '',
+  provider: provider = '',
+  generationParams: generationParams = {},
+  sourceImageSize: sourceImageSize = {},
+  shot: shot = {},
+} = {}) {
+  const text10 = normalizeText(modelId),
+    modelProvider = resolveModelProvider(text10, provider),
+    args7 = normalizeCharacterAssetImageGenerationParams(text10, generationParams),
+    value35 = args7['aspectRatio'];
+  if (!isAdaptiveRatioLabel(value35))
+    return {
+      provider: modelProvider,
+      generationParams: args7,
+      requestedAspectRatio: value35,
+      resolvedAspectRatio: value35,
+      adaptiveSource: 'explicit',
+    };
+  const box2 = getPositiveSize(sourceImageSize) ||
+      getPositiveSize(shot?.['frame']) || { width: 0x0, height: 0x0 },
+    box3 = resolveAdaptiveSourceSize({ inputWidth: box2['width'], inputHeight: box2['height'] }),
+    closestRatioForProviderModel = pickClosestRatioForProviderModel({
+      provider: modelProvider,
+      model: text10,
+      width: box3['width'],
+      height: box3['height'],
+      imageSize: args7['imageSize'],
+    });
+  return {
+    provider: modelProvider,
+    generationParams: { ...args7, aspectRatio: closestRatioForProviderModel },
+    requestedAspectRatio: value35,
+    resolvedAspectRatio: closestRatioForProviderModel,
+    adaptiveSource: box3['source'],
+  };
+}

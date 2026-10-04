@@ -1,1 +1,306 @@
-import{protectStoryPromptPills}from'./storyClipPromptReferences.js';import{normalizeStoryPromptMode}from'./storyPromptModes.js';const text=_0x3a35a0=>String(_0x3a35a0??'')["trim"](),escapeRegExp=_0x3d2aab=>_0x3d2aab["replace"](/[.*+?^${}()|[\]\\]/gu,'\x5c$&'),ref=_0x32bc64=>text(_0x32bc64?.["planningRef"]||_0x32bc64?.["ref"]||_0x32bc64?.['id']),matchesRef=(_0x115d7f,_0x5b133d)=>[text(_0x115d7f?.['id']),ref(_0x115d7f)]["includes"](text(_0x5b133d)),mention=(_0x509bf8,_0x42d897)=>'@'+text(_0x509bf8["name"])+(text(_0x42d897?.["name"])?'\x20·\x20'+text(_0x42d897["name"]):'');function compactCharacterReferenceHeaders(_0x224b4d,_0x336c8c){const _0x2226e2=new Map(),_0x5a4d1e="character-reference-header";for(const {asset:_0x392e3c,appearance:_0x51701c,token:_0x114815}of _0x336c8c){if(_0x392e3c["kind"]!=="character")continue;const _0x1848f6=new RegExp('(^|\x5cn|<div>|<p>|<br\x5cs*/?>)'+escapeRegExp(_0x114815)+"：人物外观、发型和服装以该参考图为准。",'gu');_0x224b4d=_0x224b4d['replace'](_0x1848f6,(_0x109c86,_0x4b350f)=>{const _0xce4000=_0x2226e2["size"]===0x0;return _0x2226e2["set"](_0x392e3c['id']+':'+_0x51701c['id'],_0x114815),_0x4b350f+(_0xce4000?_0x5a4d1e:'');});}return _0x224b4d['replace'](_0x5a4d1e,'人物形象、发型与服装分别参考\x20'+[..._0x2226e2["values"]()]['join']('、')+'。');}function compactSeedanceReplicationLines(_0x26d05f,_0x1ae58d,_0x1d83d0){const _0x37695a=_0x19d8fd=>{for(const _0x5cf596 of _0x1ae58d)_0x19d8fd=_0x19d8fd["split"](_0x5cf596["token"])["join"](mention(_0x5cf596["asset"],_0x5cf596["appearance"]));return _0x19d8fd["trim"]();},_0x46d15d=_0x26d05f["split"]('\x0a'),_0x477c98=_0x46d15d["findIndex"](_0x2f8845=>_0x2f8845['startsWith']("人物站位：")),_0x736ba8=_0x46d15d["findIndex"](_0x550718=>/^分镜1\b/u["test"](_0x550718));if(_0x477c98>=0x0&&_0x736ba8>_0x477c98){const _0x23513c=_0x46d15d[_0x477c98]["slice"]("人物站位："["length"]);!_0x37695a(_0x46d15d[_0x736ba8])["includes"](_0x37695a(_0x23513c))&&(_0x46d15d[_0x736ba8]=_0x46d15d[_0x736ba8]["replace"]('：','：'+_0x23513c+'\x20')),_0x46d15d[_0x477c98]='';}let _0x2d1307=-0x1;return _0x46d15d["map"](_0x5f1cf0=>{const _0x4b5231=_0x5f1cf0["match"](/^分镜(\d+)\b/u)?.[0x1];if(_0x4b5231)_0x2d1307=Number(_0x4b5231)-0x1;if(_0x1d83d0["shots"]?.[_0x2d1307]?.["dialogue"]&&/^音效：(?:人声对话|激动的人声对话)[。.]?$/u["test"](_0x5f1cf0))return'';return _0x5f1cf0['replace'](/^发声与口型约束：本分镜仅(.+?)发声并同步口型；(.+?)其他画面角色保持静默，不张嘴、不做说话口型。$/u,(_0x45935b,_0x4f49ac,_0x2c0628)=>"发声与口型约束："+_0x4f49ac+"说话时口型同步；"+_0x2c0628["replace"](/及$/u,'')+"保持沉默。")["replace"](/^发声与口型约束：本分镜仅(.+?)发声并同步口型；其他画面角色保持静默，不张嘴、不做说话口型。$/u,'发声与口型约束：$1说话时口型同步，其他角色保持沉默。')["replace"](/^发声与口型约束：本分镜对白按标注顺序轮流发声；每句仅当前标注的说话人发声并同步口型；其余角色保持静默，不张嘴、不做说话口型。$/u,"发声与口型约束：按台词顺序轮流说话，当前说话人口型同步，其他角色保持沉默。");})["filter"](Boolean)["join"]('\x0a');}export function getStoryReplicationCharacterDisplayLabel(_0x2da1be,_0x73f522,_0x4f4cdf=[]){if(_0x2da1be?.['kind']!=="character"||!_0x2da1be["replicationSource"])return'';const _0x496bc5=_0x4f4cdf["filter"](_0x576dc8=>_0x576dc8["kind"]==="character"),_0x341ed8=_0x496bc5["findIndex"](_0x19190a=>_0x19190a['id']===_0x2da1be['id']);if(_0x341ed8<0x0)return'';const _0x34efc6=_0x2da1be['appearances']||[],_0x6ebee8=_0x34efc6['findIndex'](_0x181af2=>_0x181af2['id']===_0x73f522?.['id']);return'角色'+(_0x341ed8+0x1)+" · "+(_0x73f522?.["sourceOrigin"]==='library'?'替换形象':"参考形象")+(_0x34efc6["length"]>0x1?_0x6ebee8+0x1:'');}function selectedCharacters(_0x468f3f,_0x29d732){const _0x5a41f4=new Map();for(const _0x19cd58 of _0x468f3f){for(const _0x319d3e of _0x19cd58['assetUsages']||[]){const _0x38d162=_0x29d732["filter"](_0x1c11f5=>matchesRef(_0x1c11f5,_0x319d3e["assetRef"])),_0x3769f7=_0x38d162["length"]===0x1?_0x38d162[0x0]:null;if(_0x3769f7?.["kind"]!=="character")continue;const _0x14cd5b=_0x3769f7["appearances"]||[],_0x180d3a=_0x319d3e["appearanceRef"]?_0x14cd5b["find"](_0x44e391=>matchesRef(_0x44e391,_0x319d3e["appearanceRef"])):_0x14cd5b["find"](_0x2d5c81=>_0x2d5c81['id']===_0x3769f7["baseAppearanceId"])||_0x14cd5b[0x0];if(!_0x180d3a)continue;const _0x563de0=_0x5a41f4['get'](_0x3769f7['id']);if(!_0x563de0)_0x5a41f4["set"](_0x3769f7['id'],{'asset':_0x3769f7,'appearance':_0x180d3a});else{if(_0x563de0['appearance']?.['id']!==_0x180d3a['id'])_0x5a41f4["set"](_0x3769f7['id'],{'asset':_0x3769f7,'appearance':null});}}}return[..._0x5a41f4["values"]()]['filter'](_0x1a8551=>_0x1a8551['appearance']);}export function syncStoryReplicationPromptReferences(_0x4fb827,_0x2d2acf={},_0x2156d8=[]){if(_0x2d2acf["promptMode"]==="seedance-2.5"&&String(_0x4fb827)["includes"]("【参考素材】")&&String(_0x4fb827)["includes"]('【分镜与声音】'))return _0x4fb827;if(_0x2d2acf["promptMode"]==='seedance-2.5'&&String(_0x4fb827)["includes"]("素材定义（本片段）：")&&String(_0x4fb827)['includes']("素材定义结束。"))return _0x4fb827;const _0x1639fa=normalizeStoryPromptMode(_0x2d2acf["promptMode"],{'allowDeveloperModes':!![]})==="seedance-2.0",_0xb6b7f0=protectStoryPromptPills(_0x4fb827);let _0x195466=_0xb6b7f0["source"];const _0x363639=[],_0x17ede2=_0x2a1dd1=>{const _0x2d7611="replication-text-"+_0x363639["length"]+'';return _0x363639["push"]({'token':_0x2d7611,'content':_0x2a1dd1}),_0x2d7611;},_0x1eaaf9=[];for(const _0x16e786 of _0x2156d8){for(const _0x11a38f of _0x16e786["appearances"]||[]){const _0x81f9f3=mention(_0x16e786,_0x11a38f);_0x1eaaf9["push"]({'asset':_0x16e786,'appearance':_0x11a38f,'label':_0x81f9f3});}}const _0x8ee48f=[],_0x1406fa=new Map([..._0x195466["matchAll"](/((?:<|&lt;)Subject \d+(?:>|&gt;)) 是角色 ([^，\n]+)，/gu)]["map"](_0xa24673=>[_0xa24673[0x2],_0xa24673[0x1]]));_0x195466=_0x195466["replace"](/((?:<|&lt;)Subject \d+(?:>|&gt;)) 是角色 [^，\n]+，/gu,"$1 是人物参考，");const _0x2cf12a=new Map(_0x1eaaf9['map'](_0x2cca0d=>[_0x2cca0d["label"],_0x2cca0d])),_0x102acc=[..._0x2cf12a["keys"]()]['sort']((_0x119cc6,_0xe62640)=>_0xe62640["length"]-_0x119cc6['length']);if(_0x102acc['length'])_0x195466=_0x195466["replace"](new RegExp(_0x102acc["map"](escapeRegExp)["join"]('|'),'gu'),_0x59142e=>{const _0x1a3697=_0x17ede2(_0x59142e);return _0x8ee48f["push"]({..._0x2cf12a["get"](_0x59142e),'token':_0x1a3697}),_0x1a3697;});for(const _0x1277c5 of _0xb6b7f0["pills"]){const _0x28cbf1=_0x1eaaf9['find'](({asset:_0xf656df,appearance:_0x24a3e6})=>_0x1277c5["html"]["includes"]('data-asset-id=\x22story-asset:'+encodeURIComponent(_0xf656df['id'])+':'+encodeURIComponent(_0x24a3e6['id'])+'\x22'));if(_0x28cbf1)_0x8ee48f['push']({..._0x28cbf1,'token':_0x1277c5["token"]});}for(const {asset:_0x2604d2,token:_0x59039a}of _0x8ee48f){if(_0x2604d2["kind"]!=="character")continue;const _0x1f0967=escapeRegExp(_0x59039a),_0x2e0d6c="(^|\\n|<div>|<p>|<br\\s*/?>)";_0x195466=_0x195466["replace"](new RegExp(_0x2e0d6c+"将(?:<|&lt;)"+_0x1f0967+"(?:>|&gt;)[^\\n]*?定义为(?:<|&lt;)[^\\n]*?(?:>|&gt;)。(?:人物外观、发型和服装以该参考图为准。)?",'gu'),(_0xcff40,_0x279f65)=>''+_0x279f65+_0x59039a+'：人物外观、发型和服装以该参考图为准。'),_0x195466=_0x195466["replace"](new RegExp(''+_0x2e0d6c+_0x1f0967+"：定义为[^。\\n]*。",'gu'),(_0x35a4f3,_0x1e697f)=>''+_0x1e697f+_0x59039a+'：人物外观、发型和服装以该参考图为准。');}if(_0x1639fa)_0x195466=compactCharacterReferenceHeaders(_0x195466,_0x8ee48f);_0x195466=_0x195466["replace"](/(^|\n|<div>|<p>|<br\s*\/?>)画外音：([^\n]*?)(?=<\/(?:div|p)>|<br\s*\/?>|\n|$)/gu,(_0x3538bd,_0x4829d1,_0xa2c6c5)=>{const _0x79f6d4=_0xa2c6c5["match"](/^([^：:]+)[：:]([\s\S]*)$/u);if(!_0x79f6d4)return _0x4829d1+_0x17ede2(_0x3538bd["slice"](_0x4829d1["length"]));const _0x5b0ad4=_0x79f6d4[0x1]["trim"](),_0x2f7c2e=_0x5b0ad4["match"](/^(旁白|内心独白|独白|解说|画外音)[（(]([^）)]+)[）)]$/u),_0x36db6c=_0x2f7c2e?_0x2f7c2e[0x2]["trim"]():_0x5b0ad4,_0x32a024=_0x2156d8["filter"](_0x33fabe=>_0x33fabe["kind"]==="character"&&[text(_0x33fabe["name"]),text(_0x33fabe["replicationSource"]?.['name'])]["includes"](_0x36db6c));if(_0x32a024["length"]!==0x1)return _0x4829d1+_0x17ede2(_0x3538bd["slice"](_0x4829d1['length']));const _0xfb3bc9=_0x32a024[0x0],_0x285d22=selectedCharacters(_0x2d2acf['shots']||[],_0x2156d8)["find"](_0x2bb923=>_0x2bb923["asset"]['id']===_0xfb3bc9['id']),_0x1f5b5e=_0xfb3bc9["appearances"]||[],_0x387d6f=_0x285d22?.["appearance"]||(_0x1f5b5e["length"]===0x1?_0x1f5b5e[0x0]:null);if(!_0x387d6f)return _0x4829d1+_0x17ede2(_0x3538bd["slice"](_0x4829d1["length"]));const _0x4b2279=_0x8ee48f["find"](_0x22b62d=>_0x22b62d["asset"]['id']===_0xfb3bc9['id']&&_0x22b62d["appearance"]['id']===_0x387d6f['id']),_0x5df278=_0x1406fa["get"](text(_0xfb3bc9["name"]))||_0x4b2279?.['token']||_0x17ede2(mention(_0xfb3bc9,_0x387d6f));return _0x4829d1+"画外音："+(_0x2f7c2e?.[0x1]||'旁白')+'（'+_0x5df278+"，该旁白不驱动口型）："+_0x17ede2(_0x79f6d4[0x2]);}),_0x195466=_0x195466["replace"](/(?:<d>|&lt;d&gt;)[\s\S]*?(?:<\/d>|&lt;\/d&gt;)/gu,_0x17ede2)["replace"](/<[^>]+>/gu,_0x17ede2)["replace"](/“[^”]*”|「[^」]*」|"[^"\n]*"|&quot;[\s\S]*?&quot;/gu,_0x17ede2),_0x195466=_0x195466["replace"](/(^|\n)(声音设定（[^\n]*?）：)([^\n]*)/gu,(_0x118d1d,_0x599679,_0x25d874,_0x4b4dd5)=>_0x599679+_0x25d874+_0x17ede2(_0x4b4dd5)),_0x195466=_0x195466["replace"](/(^|\n)((?:本片段场景设定在|本片段道具设定)：[^\n]*)/gu,(_0x20ae16,_0x478032,_0x4e48e2)=>_0x478032+_0x17ede2(_0x4e48e2));const _0x1da28c=_0x2156d8["filter"](_0x1f93c4=>_0x1f93c4["kind"]!=="character")['map'](_0x58774d=>text(_0x58774d["name"]))["filter"](Boolean)["sort"]((_0x12c3df,_0x38e66f)=>_0x38e66f['length']-_0x12c3df["length"]);if(_0x1da28c["length"])_0x195466=_0x195466["replace"](new RegExp(_0x1da28c["map"](escapeRegExp)['join']('|'),'gu'),_0x17ede2);const _0x3485a5=_0x2d2acf["shots"]||[];if(_0x1639fa)_0x195466=compactSeedanceReplicationLines(_0x195466,_0x8ee48f,_0x2d2acf);const _0x4b34e7=selectedCharacters(_0x3485a5,_0x2156d8);let _0x3b651c=_0x4b34e7;_0x195466=_0x195466['split']('\x0a')["map"](_0x476b4c=>{const _0x4414a2=_0x476b4c['replace'](/\uE002replication-text-(\d+)\uE003/gu,(_0x2065d4,_0x25221b)=>_0x363639[_0x25221b]?.["content"]["startsWith"]('<')?'':_0x2065d4),_0x153cae=_0x4414a2["match"](/^(?:分镜|镜头|\[Shot )(\d+)/u)?.[0x1];if(_0x153cae)_0x3b651c=selectedCharacters([_0x3485a5[Number(_0x153cae)-0x1]||{}],_0x2156d8);else{const _0x169d1a=_0x4414a2["match"](/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)秒：/u)?.[0x1];if(_0x169d1a!=null)_0x3b651c=selectedCharacters(_0x3485a5["filter"](_0x2288f3=>Number(Number(_0x2288f3["startSec"])["toFixed"](0x1))===Number(_0x169d1a)),_0x2156d8);}const _0x349926=new Map();for(const _0x3bcf27 of _0x3b651c){const _0x3bae92=text(_0x3bcf27["asset"]["name"]);_0x349926["set"](_0x3bae92,_0x349926["has"](_0x3bae92)?null:_0x3bcf27);}const _0x3ab11=[..._0x3b651c,..._0x8ee48f]["filter"](({asset:_0x2a9c94,appearance:_0x4d7c33})=>_0x2a9c94["kind"]==='character'&&_0x4d7c33?.['sourceOrigin']==="library"&&_0x4d7c33["imageUrl"]);for(const {asset:_0x777b48,appearance:_0x54f077,token:_0x1dcf4d}of _0x3ab11){const _0x389376=text(_0x54f077['name']),_0x163c81=_0x1dcf4d||text(_0x777b48["name"]);if(!_0x389376||!_0x163c81)continue;_0x476b4c=_0x476b4c['replace'](new RegExp('('+escapeRegExp(_0x163c81)+")[ \\t]*[（(]"+escapeRegExp(_0x389376)+"[）)](?![ \\t]*[：:])",'gu'),'$1');}const _0x59203c=[..._0x349926["keys"]()]["filter"](Boolean)["sort"]((_0x4decb9,_0x3c966c)=>_0x3c966c["length"]-_0x4decb9["length"]);if(!_0x59203c["length"])return _0x476b4c;return _0x476b4c["replace"](new RegExp(_0x59203c["map"](escapeRegExp)["join"]('|'),'gu'),(_0x13aa0a,_0x3bcac0)=>{if(_0x476b4c[_0x3bcac0-0x1]==='@')return _0x13aa0a;const _0x16ff8a=_0x349926['get'](_0x13aa0a);if(!_0x16ff8a)return _0x13aa0a;if(_0x1406fa["has"](_0x13aa0a))return _0x1406fa['get'](_0x13aa0a);const _0x551701=_0x8ee48f["find"](_0x904ce1=>_0x904ce1["token"]['startsWith']('')&&_0x904ce1['asset']['id']===_0x16ff8a['asset']['id']&&_0x904ce1["appearance"]['id']===_0x16ff8a["appearance"]['id']);return _0x551701?.["token"]||mention(_0x16ff8a["asset"],_0x16ff8a["appearance"]);});})["join"]('\x0a');for(const {token:_0x5c29d3,content:_0x17b4fc}of _0x363639["reverse"]())_0x195466=_0x195466['split'](_0x5c29d3)["join"](_0x17b4fc);return _0xb6b7f0["restore"](_0x195466);}
+import { protectStoryPromptPills } from './storyClipPromptReferences.js';
+import { normalizeStoryPromptMode } from './storyPromptModes.js';
+const text = (value) => String(value ?? '')['trim'](),
+  escapeRegExp = (item) => item['replace'](/[.*+?^${}()|[\]\\]/gu, '\x5c$&'),
+  ref = (key) => text(key?.['planningRef'] || key?.['ref'] || key?.['id']),
+  matchesRef = (index, result) => [text(index?.['id']), ref(index)]['includes'](text(result)),
+  mention = (data, options) =>
+    '@' + text(data['name']) + (text(options?.['name']) ? '\x20·\x20' + text(options['name']) : '');
+function compactCharacterReferenceHeaders(target, source) {
+  const args = new Map(),
+    next = 'character-reference-header';
+  for (const { asset: asset, appearance: appearance, token: token } of source) {
+    if (asset['kind'] !== 'character') continue;
+    const regExp = new RegExp(
+      '(^|\x5cn|<div>|<p>|<br\x5cs*/?>)' + escapeRegExp(token) + '：人物外观、发型和服装以该参考图为准。',
+      'gu',
+    );
+    target = target['replace'](regExp, (current, entry) => {
+      const record = args['size'] === 0x0;
+      return (args['set'](asset['id'] + ':' + appearance['id'], token), entry + (record ? next : ''));
+    });
+  }
+  return target['replace'](
+    next,
+    '人物形象、发型与服装分别参考\x20' + [...args['values']()]['join']('、') + '。',
+  );
+}
+function compactSeedanceReplicationLines(payload, handle, state) {
+  const run = (config) => {
+      for (const scope of handle)
+        config = config['split'](scope['token'])['join'](mention(scope['asset'], scope['appearance']));
+      return config['trim']();
+    },
+    input = payload['split']('\x0a'),
+    count = input['findIndex']((output) => output['startsWith']('人物站位：')),
+    value2 = input['findIndex']((value3) => /^分镜1\b/u['test'](value3));
+  if (count >= 0x0 && value2 > count) {
+    const value4 = input[count]['slice']('人物站位：'['length']);
+    (!run(input[value2])['includes'](run(value4)) &&
+      (input[value2] = input[value2]['replace']('：', '：' + value4 + '\x20')),
+      (input[count] = ''));
+  }
+  let value5 = -0x1;
+  return input['map']((value6) => {
+    const value7 = value6['match'](/^分镜(\d+)\b/u)?.[0x1];
+    if (value7) value5 = Number(value7) - 0x1;
+    if (
+      state['shots']?.[value5]?.['dialogue'] &&
+      /^音效：(?:人声对话|激动的人声对话)[。.]?$/u['test'](value6)
+    )
+      return '';
+    return value6['replace'](
+      /^发声与口型约束：本分镜仅(.+?)发声并同步口型；(.+?)其他画面角色保持静默，不张嘴、不做说话口型。$/u,
+      (value8, value9, value10) =>
+        '发声与口型约束：' + value9 + '说话时口型同步；' + value10['replace'](/及$/u, '') + '保持沉默。',
+    )
+      ['replace'](
+        /^发声与口型约束：本分镜仅(.+?)发声并同步口型；其他画面角色保持静默，不张嘴、不做说话口型。$/u,
+        '发声与口型约束：$1说话时口型同步，其他角色保持沉默。',
+      )
+      ['replace'](
+        /^发声与口型约束：本分镜对白按标注顺序轮流发声；每句仅当前标注的说话人发声并同步口型；其余角色保持静默，不张嘴、不做说话口型。$/u,
+        '发声与口型约束：按台词顺序轮流说话，当前说话人口型同步，其他角色保持沉默。',
+      );
+  })
+    ['filter'](Boolean)
+    ['join']('\x0a');
+}
+export function getStoryReplicationCharacterDisplayLabel(enabled, value11, value12 = []) {
+  if (enabled?.['kind'] !== 'character' || !enabled['replicationSource']) return '';
+  const value13 = value12['filter']((value14) => value14['kind'] === 'character'),
+    count2 = value13['findIndex']((value15) => value15['id'] === enabled['id']);
+  if (count2 < 0x0) return '';
+  const list = enabled['appearances'] || [],
+    value16 = list['findIndex']((value17) => value17['id'] === value11?.['id']);
+  return (
+    '角色' +
+    (count2 + 0x1) +
+    ' · ' +
+    (value11?.['sourceOrigin'] === 'library' ? '替换形象' : '参考形象') +
+    (list['length'] > 0x1 ? value16 + 0x1 : '')
+  );
+}
+function selectedCharacters(value18, value19) {
+  const map = new Map();
+  for (const value20 of value18) {
+    for (const value21 of value20['assetUsages'] || []) {
+      const value22 = value19['filter']((value23) => matchesRef(value23, value21['assetRef'])),
+        value24 = value22['length'] === 0x1 ? value22[0x0] : null;
+      if (value24?.['kind'] !== 'character') continue;
+      const value25 = value24['appearances'] || [],
+        enabled2 = value21['appearanceRef']
+          ? value25['find']((value26) => matchesRef(value26, value21['appearanceRef']))
+          : value25['find']((value27) => value27['id'] === value24['baseAppearanceId']) || value25[0x0];
+      if (!enabled2) continue;
+      const enabled3 = map['get'](value24['id']);
+      if (!enabled3) map['set'](value24['id'], { asset: value24, appearance: enabled2 });
+      else {
+        if (enabled3['appearance']?.['id'] !== enabled2['id'])
+          map['set'](value24['id'], { asset: value24, appearance: null });
+      }
+    }
+  }
+  return [...map['values']()]['filter']((value28) => value28['appearance']);
+}
+export function syncStoryReplicationPromptReferences(value29, value30 = {}, value31 = []) {
+  if (
+    value30['promptMode'] === 'seedance-2.5' &&
+    String(value29)['includes']('【参考素材】') &&
+    String(value29)['includes']('【分镜与声音】')
+  )
+    return value29;
+  if (
+    value30['promptMode'] === 'seedance-2.5' &&
+    String(value29)['includes']('素材定义（本片段）：') &&
+    String(value29)['includes']('素材定义结束。')
+  )
+    return value29;
+  const storyPromptMode =
+      normalizeStoryPromptMode(value30['promptMode'], { allowDeveloperModes: !![] }) === 'seedance-2.0',
+    protectStoryPromptPills2 = protectStoryPromptPills(value29);
+  let args2 = protectStoryPromptPills2['source'];
+  const value32 = [],
+    handler = (value33) => {
+      const value34 = 'replication-text-' + value32['length'] + '';
+      return (value32['push']({ token: value34, content: value33 }), value34);
+    },
+    list2 = [];
+  for (const value35 of value31) {
+    for (const value36 of value35['appearances'] || []) {
+      const mention2 = mention(value35, value36);
+      list2['push']({ asset: value35, appearance: value36, label: mention2 });
+    }
+  }
+  const list3 = [],
+    map2 = new Map(
+      [...args2['matchAll'](/((?:<|&lt;)Subject \d+(?:>|&gt;)) 是角色 ([^，\n]+)，/gu)]['map']((value37) => [
+        value37[0x2],
+        value37[0x1],
+      ]),
+    );
+  args2 = args2['replace'](/((?:<|&lt;)Subject \d+(?:>|&gt;)) 是角色 [^，\n]+，/gu, '$1 是人物参考，');
+  const args3 = new Map(list2['map']((value38) => [value38['label'], value38])),
+    list4 = [...args3['keys']()]['sort']((list5, value39) => value39['length'] - list5['length']);
+  if (list4['length'])
+    args2 = args2['replace'](new RegExp(list4['map'](escapeRegExp)['join']('|'), 'gu'), (value40) => {
+      const value41 = handler(value40);
+      return (list3['push']({ ...args3['get'](value40), token: value41 }), value41);
+    });
+  for (const value42 of protectStoryPromptPills2['pills']) {
+    const args4 = list2['find'](({ asset: asset2, appearance: appearance2 }) =>
+      value42['html']['includes'](
+        'data-asset-id=\x22story-asset:' +
+          encodeURIComponent(asset2['id']) +
+          ':' +
+          encodeURIComponent(appearance2['id']) +
+          '\x22',
+      ),
+    );
+    if (args4) list3['push']({ ...args4, token: value42['token'] });
+  }
+  for (const { asset: asset3, token: token2 } of list3) {
+    if (asset3['kind'] !== 'character') continue;
+    const escapeRegExp2 = escapeRegExp(token2),
+      value43 = '(^|\\n|<div>|<p>|<br\\s*/?>)';
+    ((args2 = args2['replace'](
+      new RegExp(
+        value43 +
+          '将(?:<|&lt;)' +
+          escapeRegExp2 +
+          '(?:>|&gt;)[^\\n]*?定义为(?:<|&lt;)[^\\n]*?(?:>|&gt;)。(?:人物外观、发型和服装以该参考图为准。)?',
+        'gu',
+      ),
+      (value44, value45) => '' + value45 + token2 + '：人物外观、发型和服装以该参考图为准。',
+    )),
+      (args2 = args2['replace'](
+        new RegExp('' + value43 + escapeRegExp2 + '：定义为[^。\\n]*。', 'gu'),
+        (value46, value47) => '' + value47 + token2 + '：人物外观、发型和服装以该参考图为准。',
+      )));
+  }
+  if (storyPromptMode) args2 = compactCharacterReferenceHeaders(args2, list3);
+  ((args2 = args2['replace'](
+    /(^|\n|<div>|<p>|<br\s*\/?>)画外音：([^\n]*?)(?=<\/(?:div|p)>|<br\s*\/?>|\n|$)/gu,
+    (value48, list6, value49) => {
+      const enabled4 = value49['match'](/^([^：:]+)[：:]([\s\S]*)$/u);
+      if (!enabled4) return list6 + handler(value48['slice'](list6['length']));
+      const value50 = enabled4[0x1]['trim'](),
+        value51 = value50['match'](/^(旁白|内心独白|独白|解说|画外音)[（(]([^）)]+)[）)]$/u),
+        value52 = value51 ? value51[0x2]['trim']() : value50,
+        value53 = value31['filter'](
+          (value54) =>
+            value54['kind'] === 'character' &&
+            [text(value54['name']), text(value54['replicationSource']?.['name'])]['includes'](value52),
+        );
+      if (value53['length'] !== 0x1) return list6 + handler(value48['slice'](list6['length']));
+      const value55 = value53[0x0],
+        edCharacters = selectedCharacters(value30['shots'] || [], value31)['find'](
+          (value56) => value56['asset']['id'] === value55['id'],
+        ),
+        value57 = value55['appearances'] || [],
+        enabled5 = edCharacters?.['appearance'] || (value57['length'] === 0x1 ? value57[0x0] : null);
+      if (!enabled5) return list6 + handler(value48['slice'](list6['length']));
+      const value58 = list3['find'](
+          (value59) =>
+            value59['asset']['id'] === value55['id'] && value59['appearance']['id'] === enabled5['id'],
+        ),
+        value60 =
+          map2['get'](text(value55['name'])) || value58?.['token'] || handler(mention(value55, enabled5));
+      return (
+        list6 +
+        '画外音：' +
+        (value51?.[0x1] || '旁白') +
+        '（' +
+        value60 +
+        '，该旁白不驱动口型）：' +
+        handler(enabled4[0x2])
+      );
+    },
+  )),
+    (args2 = args2['replace'](/(?:<d>|&lt;d&gt;)[\s\S]*?(?:<\/d>|&lt;\/d&gt;)/gu, handler)
+      ['replace'](/<[^>]+>/gu, handler)
+      ['replace'](/“[^”]*”|「[^」]*」|"[^"\n]*"|&quot;[\s\S]*?&quot;/gu, handler)),
+    (args2 = args2['replace'](
+      /(^|\n)(声音设定（[^\n]*?）：)([^\n]*)/gu,
+      (value61, value62, value63, value64) => value62 + value63 + handler(value64),
+    )),
+    (args2 = args2['replace'](
+      /(^|\n)((?:本片段场景设定在|本片段道具设定)：[^\n]*)/gu,
+      (value65, value66, value67) => value66 + handler(value67),
+    )));
+  const value68 = value31['filter']((value69) => value69['kind'] !== 'character')
+    ['map']((value70) => text(value70['name']))
+    ['filter'](Boolean)
+    ['sort']((value71, list7) => list7['length'] - value71['length']);
+  if (value68['length'])
+    args2 = args2['replace'](new RegExp(value68['map'](escapeRegExp)['join']('|'), 'gu'), handler);
+  const value72 = value30['shots'] || [];
+  if (storyPromptMode) args2 = compactSeedanceReplicationLines(args2, list3, value30);
+  const edCharacters2 = selectedCharacters(value72, value31);
+  let args5 = edCharacters2;
+  args2 = args2['split']('\x0a')
+    ['map']((value73) => {
+      const value74 = value73['replace'](/\uE002replication-text-(\d+)\uE003/gu, (value75, value76) =>
+          value32[value76]?.['content']['startsWith']('<') ? '' : value75,
+        ),
+        value77 = value74['match'](/^(?:分镜|镜头|\[Shot )(\d+)/u)?.[0x1];
+      if (value77) args5 = selectedCharacters([value72[Number(value77) - 0x1] || {}], value31);
+      else {
+        const value78 = value74['match'](/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)秒：/u)?.[0x1];
+        if (value78 != null)
+          args5 = selectedCharacters(
+            value72['filter'](
+              (value79) => Number(Number(value79['startSec'])['toFixed'](0x1)) === Number(value78),
+            ),
+            value31,
+          );
+      }
+      const map3 = new Map();
+      for (const value80 of args5) {
+        const text2 = text(value80['asset']['name']);
+        map3['set'](text2, map3['has'](text2) ? null : value80);
+      }
+      const value81 = [...args5, ...list3]['filter'](
+        ({ asset: asset4, appearance: appearance3 }) =>
+          asset4['kind'] === 'character' &&
+          appearance3?.['sourceOrigin'] === 'library' &&
+          appearance3['imageUrl'],
+      );
+      for (const { asset: asset5, appearance: appearance4, token: token3 } of value81) {
+        const text3 = text(appearance4['name']),
+          enabled6 = token3 || text(asset5['name']);
+        if (!text3 || !enabled6) continue;
+        value73 = value73['replace'](
+          new RegExp(
+            '(' + escapeRegExp(enabled6) + ')[ \\t]*[（(]' + escapeRegExp(text3) + '[）)](?![ \\t]*[：:])',
+            'gu',
+          ),
+          '$1',
+        );
+      }
+      const enabled7 = [...map3['keys']()]
+        ['filter'](Boolean)
+        ['sort']((value82, value83) => value83['length'] - value82['length']);
+      if (!enabled7['length']) return value73;
+      return value73['replace'](
+        new RegExp(enabled7['map'](escapeRegExp)['join']('|'), 'gu'),
+        (value84, value85) => {
+          if (value73[value85 - 0x1] === '@') return value84;
+          const enabled8 = map3['get'](value84);
+          if (!enabled8) return value84;
+          if (map2['has'](value84)) return map2['get'](value84);
+          const value86 = list3['find'](
+            (value87) =>
+              value87['token']['startsWith']('') &&
+              value87['asset']['id'] === enabled8['asset']['id'] &&
+              value87['appearance']['id'] === enabled8['appearance']['id'],
+          );
+          return value86?.['token'] || mention(enabled8['asset'], enabled8['appearance']);
+        },
+      );
+    })
+    ['join']('\x0a');
+  for (const { token: token4, content: content } of value32['reverse']())
+    args2 = args2['split'](token4)['join'](content);
+  return protectStoryPromptPills2['restore'](args2);
+}

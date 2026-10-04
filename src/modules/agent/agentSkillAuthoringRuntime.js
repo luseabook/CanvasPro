@@ -27,213 +27,213 @@ const TEXT = Object['freeze']({
     stopped: 'Skill creation stopped.',
   }),
 });
-function normalizeLocale(_0x26c568 = '') {
-  return String(_0x26c568 || '')
+function normalizeLocale(value = '') {
+  return String(value || '')
     ['toLowerCase']()
     ['startsWith']('en')
     ? 'en-US'
     : 'zh-CN';
 }
-function formatText(_0x1c84e7, _0x4a0cbe = {}, _0x57e279 = 'zh-CN') {
-  return (TEXT[normalizeLocale(_0x57e279)]?.[_0x1c84e7] || TEXT['zh-CN'][_0x1c84e7] || _0x1c84e7)['replace'](
+function formatText(item, key = {}, index = 'zh-CN') {
+  return (TEXT[normalizeLocale(index)]?.[item] || TEXT['zh-CN'][item] || item)['replace'](
     /\{(\w+)\}/g,
-    (_0xe3ce3d, _0x5056d8) => String(_0x4a0cbe[_0x5056d8] ?? ''),
+    (result, data) => String(key[data] ?? ''),
   );
 }
-function compactExistingSkills(_0x73c71a) {
-  return (_0x73c71a?.['listSkills']?.() || _0x73c71a?.['listCatalog']?.() || [])
-    ['map']((_0x4b788c = {}) => ({
-      id: String(_0x4b788c['id'] || '')['trim'](),
-      title: String(_0x4b788c['title'] || _0x4b788c['id'] || '')
+function compactExistingSkills(options) {
+  return (options?.['listSkills']?.() || options?.['listCatalog']?.() || [])
+    ['map']((options2 = {}) => ({
+      id: String(options2['id'] || '')['trim'](),
+      title: String(options2['title'] || options2['id'] || '')
         ['trim']()
         ['slice'](0x0, 0x78),
     }))
-    ['filter']((_0x4364d7) => _0x4364d7['id'])
+    ['filter']((target) => target['id'])
     ['slice'](0x0, 0x64);
 }
 export function createAgentSkillAuthoringRuntime({
-  sessionStore: _0x1101f2,
+  sessionStore: sessionStore,
   skillRegistry: skillRegistry = null,
   author: author = null,
   saveSkill: saveSkill = null,
   localeProvider: localeProvider = () => 'zh-CN',
   isActiveRun: isActiveRun = () => !![],
 } = {}) {
-  const _0x2a8292 = () => typeof author === 'function' && typeof saveSkill === 'function',
-    _0x4eb42b = () => {
-      const _0x4c1ca1 = _0x1101f2?.['getPendingClarification']?.();
-      return _0x4c1ca1?.['targetKind'] === AGENT_SKILL_AUTHORING_TARGET_KIND ? _0x4c1ca1 : null;
+  const isAvailable = () => typeof author === 'function' && typeof saveSkill === 'function',
+    getPending = () => {
+      const source = sessionStore?.['getPendingClarification']?.();
+      return source?.['targetKind'] === AGENT_SKILL_AUTHORING_TARGET_KIND ? source : null;
     },
-    _0x5267e4 = (_0x291f3b, _0x2806bf, _0x19ac98) => {
-      (_0x1101f2?.['pushHistory']?.({
+    handler = (turnId, status, content) => {
+      (sessionStore?.['pushHistory']?.({
         role: 'assistant',
-        status: _0x2806bf,
-        content: _0x19ac98,
-        turnId: _0x291f3b,
+        status: status,
+        content: content,
+        turnId: turnId,
       }),
-        _0x1101f2?.['setCurrentRun']?.({ id: _0x291f3b, status: _0x2806bf, stopped: ![] }));
+        sessionStore?.['setCurrentRun']?.({ id: turnId, status: status, stopped: ![] }));
     },
-    _0x4ae8b7 = () => ({
+    handler2 = () => ({
       ok: ![],
       status: 'stopped',
       reply: formatText('stopped', {}, localeProvider?.()),
       responseChannel: 'skill.authoring',
     });
-  async function _0x4b707e({
+  async function run({
     message: message = '',
     originalMessage: originalMessage = message,
     clarificationAnswer: clarificationAnswer = '',
     runId: runId = '',
     signal: signal = null,
   } = {}) {
-    _0x1101f2?.['recordTrace']?.({
+    sessionStore?.['recordTrace']?.({
       type: 'agent_turn_routed',
       channel: 'skill.authoring',
       reason: clarificationAnswer ? 'skill-authoring-continuation' : 'skill-authoring-request',
     });
-    let _0x3a32b4;
+    let question;
     try {
-      _0x3a32b4 = await requestNormalizedAgentSkillDraft({
+      question = await requestNormalizedAgentSkillDraft({
         author: author,
         payload: {
           operation: 'create',
           message: message,
           originalMessage: originalMessage,
           clarificationAnswer: clarificationAnswer,
-          history: _0x1101f2?.['getHistory']?.() || [],
+          history: sessionStore?.['getHistory']?.() || [],
           existingSkills: compactExistingSkills(skillRegistry),
           signal: signal,
-          onTrace: (_0x4b6340) => _0x1101f2?.['recordTrace']?.(_0x4b6340),
+          onTrace: (next) => sessionStore?.['recordTrace']?.(next),
         },
-        onTrace: (_0x9b0fa) => _0x1101f2?.['recordTrace']?.(_0x9b0fa),
+        onTrace: (current) => sessionStore?.['recordTrace']?.(current),
       });
-    } catch (_0x7e0163) {
-      _0x3a32b4 = {
+    } catch (message2) {
+      question = {
         ok: ![],
         status: 'failed',
         errorCode: 'SKILL_AUTHORING_FAILED',
-        message: _0x7e0163?.['message'] || formatText('failed', {}, localeProvider?.()),
+        message: message2?.['message'] || formatText('failed', {}, localeProvider?.()),
       };
     }
-    if (!isActiveRun(runId)) return _0x4ae8b7();
-    if (_0x3a32b4['status'] === 'need_clarification')
+    if (!isActiveRun(runId)) return handler2();
+    if (question['status'] === 'need_clarification')
       return (
-        _0x1101f2?.['setPendingClarification']?.({
+        sessionStore?.['setPendingClarification']?.({
           originalMessage: String(originalMessage || message)['trim'](),
-          question: _0x3a32b4['question'],
-          reply: _0x3a32b4['reply'] || _0x3a32b4['question'],
-          options: _0x3a32b4['options'] || [],
+          question: question['question'],
+          reply: question['reply'] || question['question'],
+          options: question['options'] || [],
           targetKind: AGENT_SKILL_AUTHORING_TARGET_KIND,
         }),
-        _0x5267e4(runId, 'need_clarification', _0x3a32b4['question']),
+        handler(runId, 'need_clarification', question['question']),
         {
           ok: !![],
           status: 'need_clarification',
-          reply: _0x3a32b4['reply'] || _0x3a32b4['question'],
-          question: _0x3a32b4['question'],
-          options: _0x3a32b4['options'] || [],
+          reply: question['reply'] || question['question'],
+          question: question['question'],
+          options: question['options'] || [],
           responseChannel: 'skill.authoring',
         }
       );
-    if (!_0x3a32b4['ok']) {
-      const _0xd99a73 = _0x3a32b4['message'] || formatText('failed', {}, localeProvider?.());
+    if (!question['ok']) {
+      const reply = question['message'] || formatText('failed', {}, localeProvider?.());
       return (
-        _0x5267e4(runId, 'failed', _0xd99a73),
+        handler(runId, 'failed', reply),
         {
           ok: ![],
           status: 'failed',
-          reply: _0xd99a73,
-          errorCode: _0x3a32b4['errorCode'],
+          reply: reply,
+          errorCode: question['errorCode'],
           responseChannel: 'skill.authoring',
         }
       );
     }
-    const _0x367a41 = compactExistingSkills(skillRegistry)['map']((_0x55405d) => _0x55405d['id']),
-      _0x49d112 = createAvailableAgentSkillId(_0x3a32b4['definition']['id'], _0x367a41);
-    _0x49d112 !== _0x3a32b4['definition']['id'] &&
-      _0x1101f2?.['recordTrace']?.({
+    const args = compactExistingSkills(skillRegistry)['map']((entry) => entry['id']),
+      skillId = createAvailableAgentSkillId(question['definition']['id'], args);
+    skillId !== question['definition']['id'] &&
+      sessionStore?.['recordTrace']?.({
         type: 'agent_skill_duplicate_id_repaired',
-        requestedId: _0x3a32b4['definition']['id'],
-        skillId: _0x49d112,
+        requestedId: question['definition']['id'],
+        skillId: skillId,
       });
-    let _0xf6ee94 = { mode: 'create', ..._0x3a32b4['definition'], id: _0x49d112 },
-      _0x24c730;
+    let requestedId = { mode: 'create', ...question['definition'], id: skillId },
+      response;
     try {
-      _0x24c730 = await saveSkill(_0xf6ee94);
-      if (_0x24c730?.['errorCode'] === 'SKILL_ALREADY_INSTALLED') {
-        const _0x4ea604 = createAvailableAgentSkillId(_0xf6ee94['id'], [..._0x367a41, _0xf6ee94['id']]);
-        (_0x1101f2?.['recordTrace']?.({
+      response = await saveSkill(requestedId);
+      if (response?.['errorCode'] === 'SKILL_ALREADY_INSTALLED') {
+        const skillId2 = createAvailableAgentSkillId(requestedId['id'], [...args, requestedId['id']]);
+        (sessionStore?.['recordTrace']?.({
           type: 'agent_skill_duplicate_id_repaired',
-          requestedId: _0xf6ee94['id'],
-          skillId: _0x4ea604,
+          requestedId: requestedId['id'],
+          skillId: skillId2,
           reason: 'save-race',
         }),
-          (_0xf6ee94 = { ..._0xf6ee94, id: _0x4ea604 }),
-          (_0x24c730 = await saveSkill(_0xf6ee94)));
+          (requestedId = { ...requestedId, id: skillId2 }),
+          (response = await saveSkill(requestedId)));
       }
-    } catch (_0x486e32) {
-      _0x24c730 = { success: ![], errorCode: 'SKILL_SAVE_FAILED', message: _0x486e32?.['message'] };
+    } catch (message3) {
+      response = { success: ![], errorCode: 'SKILL_SAVE_FAILED', message: message3?.['message'] };
     }
-    if (!isActiveRun(runId)) return _0x4ae8b7();
-    if (_0x24c730?.['success'] === !![]) {
-      const _0x18c3f3 = formatText(
+    if (!isActiveRun(runId)) return handler2();
+    if (response?.['success'] === !![]) {
+      const reply2 = formatText(
         'created',
-        { id: _0xf6ee94['id'], title: _0xf6ee94['title'] || _0xf6ee94['id'] },
+        { id: requestedId['id'], title: requestedId['title'] || requestedId['id'] },
         localeProvider?.(),
       );
       return (
-        _0x1101f2?.['clearPendingClarification']?.(),
-        _0x1101f2?.['recordTrace']?.({
+        sessionStore?.['clearPendingClarification']?.(),
+        sessionStore?.['recordTrace']?.({
           type: 'agent_skill_created',
-          skillId: _0xf6ee94['id'],
+          skillId: requestedId['id'],
           source: 'conversation',
         }),
-        _0x5267e4(runId, 'success', _0x18c3f3),
+        handler(runId, 'success', reply2),
         {
           ok: !![],
           status: 'success',
-          reply: _0x18c3f3,
-          skill: _0xf6ee94,
+          reply: reply2,
+          skill: requestedId,
           responseChannel: 'skill.authoring',
         }
       );
     }
-    const _0x115656 = String(_0x24c730?.['errorCode'] || 'SKILL_SAVE_FAILED'),
-      _0x265401 =
-        _0x115656 === 'SKILL_ALREADY_INSTALLED'
+    const errorCode = String(response?.['errorCode'] || 'SKILL_SAVE_FAILED'),
+      record =
+        errorCode === 'SKILL_ALREADY_INSTALLED'
           ? 'duplicate'
-          : _0x115656 === 'SKILL_SAVE_UNAVAILABLE'
+          : errorCode === 'SKILL_SAVE_UNAVAILABLE'
             ? 'unavailable'
-            : _0x115656 === 'SKILL_REFRESH_AFTER_SAVE_FAILED'
+            : errorCode === 'SKILL_REFRESH_AFTER_SAVE_FAILED'
               ? 'refreshFailed'
               : 'failed',
-      _0x47890c = formatText(_0x265401, { id: _0xf6ee94['id'] }, localeProvider?.());
+      reply3 = formatText(record, { id: requestedId['id'] }, localeProvider?.());
     return (
-      _0x5267e4(runId, 'failed', _0x47890c),
+      handler(runId, 'failed', reply3),
       {
         ok: ![],
         status: 'failed',
-        reply: _0x47890c,
-        errorCode: _0x115656,
+        reply: reply3,
+        errorCode: errorCode,
         responseChannel: 'skill.authoring',
       }
     );
   }
-  async function _0x24c14e({
+  async function answer2({
     answer: answer = '',
-    pending: pending = _0x4eb42b(),
+    pending: pending = getPending(),
     runId: runId = '',
     signal: signal = null,
   } = {}) {
     if (!pending) return null;
     if (isAgentSkillAuthoringCancelMessage(answer)) {
-      const _0x232714 = formatText('canceled', {}, localeProvider?.());
+      const reply4 = formatText('canceled', {}, localeProvider?.());
       return (
-        _0x5267e4(runId, 'cancelled', _0x232714),
-        { ok: !![], status: 'cancelled', reply: _0x232714, responseChannel: 'skill.authoring' }
+        handler(runId, 'cancelled', reply4),
+        { ok: !![], status: 'cancelled', reply: reply4, responseChannel: 'skill.authoring' }
       );
     }
-    return _0x4b707e({
+    return run({
       message: answer,
       originalMessage: pending['originalMessage'],
       clarificationAnswer: answer,
@@ -242,10 +242,10 @@ export function createAgentSkillAuthoringRuntime({
     });
   }
   return {
-    isAvailable: _0x2a8292,
-    matches: (_0x4334bc) => _0x2a8292() && isAgentSkillAuthoringIntent(_0x4334bc),
-    getPending: _0x4eb42b,
-    run: _0x4b707e,
-    answer: _0x24c14e,
+    isAvailable: isAvailable,
+    matches: (payload) => isAvailable() && isAgentSkillAuthoringIntent(payload),
+    getPending: getPending,
+    run: run,
+    answer: answer2,
   };
 }

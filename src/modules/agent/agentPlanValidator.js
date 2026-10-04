@@ -1,249 +1,245 @@
 import { canvasCommandRegistry, hasCanvasCommandPlanVariableReference } from '../canvasCommands/index.js';
 import { AGENT_BATCH_CONFIRM_THRESHOLD, normalizeAgentPlan } from './agentActionSchema.js';
 const RISK_ORDER = Object.freeze({ safe: 0, confirm: 1, danger: 2, blocked: 3 });
-function maxRisk(_0x226877, _0x4ba7f4) {
-  return (RISK_ORDER[_0x4ba7f4] || 0) > (RISK_ORDER[_0x226877] || 0) ? _0x4ba7f4 : _0x226877;
+function maxRisk(value, item) {
+  return (RISK_ORDER[item] || 0) > (RISK_ORDER[value] || 0) ? item : value;
 }
-function actionSize(_0x43bb88 = {}) {
-  const _0x77132e = _0x43bb88.args?.ids;
-  if (Array.isArray(_0x77132e)) return _0x77132e.length;
-  return _0x43bb88.args?.nodeId ? 1 : 0;
+function actionSize(options = {}) {
+  const list = options.args?.ids;
+  if (Array.isArray(list)) return list.length;
+  return options.args?.nodeId ? 1 : 0;
 }
-function getAliasNodeIdReference(_0x1d48a0) {
-  const _0x7cd9d2 = /^\$([A-Za-z_][A-Za-z0-9_]*)\.nodeId$/.exec(String(_0x1d48a0 || '').trim());
-  return _0x7cd9d2?.[1] || '';
+function getAliasNodeIdReference(key) {
+  const index = /^\$([A-Za-z_][A-Za-z0-9_]*)\.nodeId$/.exec(String(key || '').trim());
+  return index?.[1] || '';
 }
-function getAliasEdgeIdReference(_0x222843) {
-  const _0x3e965f = /^\$([A-Za-z_][A-Za-z0-9_]*)\.edgeId$/.exec(String(_0x222843 || '').trim());
-  return _0x3e965f?.[1] || '';
+function getAliasEdgeIdReference(result) {
+  const data = /^\$([A-Za-z_][A-Za-z0-9_]*)\.edgeId$/.exec(String(result || '').trim());
+  return data?.[1] || '';
 }
-function isSamePlanCreatedNodeReference(_0x4fda11, _0x1dc71f = {}) {
-  const _0x2eb6c3 = getAliasNodeIdReference(_0x4fda11);
-  return !!_0x2eb6c3 && _0x1dc71f.createdNodeAliases?.has?.(_0x2eb6c3);
+function isSamePlanCreatedNodeReference(target, source = {}) {
+  const aliasNodeIdReference = getAliasNodeIdReference(target);
+  return !!aliasNodeIdReference && source.createdNodeAliases?.has?.(aliasNodeIdReference);
 }
-function isSamePlanCreatedEdgeReference(_0x35b180, _0x2a0685 = {}) {
-  const _0x371c55 = getAliasEdgeIdReference(_0x35b180);
-  return !!_0x371c55 && _0x2a0685.createdEdgeAliases?.has?.(_0x371c55);
+function isSamePlanCreatedEdgeReference(next, current = {}) {
+  const aliasEdgeIdReference = getAliasEdgeIdReference(next);
+  return !!aliasEdgeIdReference && current.createdEdgeAliases?.has?.(aliasEdgeIdReference);
 }
-function isSamePlanConnectionPreparation(_0x3ed469 = {}, _0x35d3ec = {}) {
-  if (_0x3ed469.type !== 'graph.connect') return false;
+function isSamePlanConnectionPreparation(options2 = {}, entry = {}) {
+  if (options2.type !== 'graph.connect') return false;
   return (
-    isSamePlanCreatedNodeReference(_0x3ed469.args?.sourceId, _0x35d3ec) ||
-    isSamePlanCreatedNodeReference(_0x3ed469.args?.targetId, _0x35d3ec)
+    isSamePlanCreatedNodeReference(options2.args?.sourceId, entry) ||
+    isSamePlanCreatedNodeReference(options2.args?.targetId, entry)
   );
 }
-function isSamePlanNodePreparation(_0x2fabbe = {}, _0x59f369 = {}) {
+function isSamePlanNodePreparation(options3 = {}, record = {}) {
   if (
-    _0x2fabbe.type === 'node.setPrompt' ||
-    _0x2fabbe.type === 'node.appendPrompt' ||
-    _0x2fabbe.type === 'node.setParams' ||
-    _0x2fabbe.type === 'node.setModel' ||
-    _0x2fabbe.type === 'node.changeModel'
+    options3.type === 'node.setPrompt' ||
+    options3.type === 'node.appendPrompt' ||
+    options3.type === 'node.setParams' ||
+    options3.type === 'node.setModel' ||
+    options3.type === 'node.changeModel'
   )
-    return isSamePlanCreatedNodeReference(_0x2fabbe.args?.nodeId, _0x59f369);
-  if (_0x2fabbe.type === 'node.setInputSlot') {
-    if (isSamePlanCreatedEdgeReference(_0x2fabbe.args?.edgeId, _0x59f369)) return true;
+    return isSamePlanCreatedNodeReference(options3.args?.nodeId, record);
+  if (options3.type === 'node.setInputSlot') {
+    if (isSamePlanCreatedEdgeReference(options3.args?.edgeId, record)) return true;
     return (
-      isSamePlanCreatedNodeReference(_0x2fabbe.args?.sourceId, _0x59f369) ||
-      isSamePlanCreatedNodeReference(_0x2fabbe.args?.targetId, _0x59f369)
+      isSamePlanCreatedNodeReference(options3.args?.sourceId, record) ||
+      isSamePlanCreatedNodeReference(options3.args?.targetId, record)
     );
   }
   return false;
 }
-function isExistingNodeMutationAction(_0x18c65f = {}) {
+function isExistingNodeMutationAction(options4 = {}) {
   return (
-    _0x18c65f.type === 'graph.connect' ||
-    _0x18c65f.type === 'node.setPrompt' ||
-    _0x18c65f.type === 'node.appendPrompt' ||
-    _0x18c65f.type === 'node.setParams' ||
-    _0x18c65f.type === 'node.setModel' ||
-    _0x18c65f.type === 'node.changeModel' ||
-    _0x18c65f.type === 'node.setInputSlot'
+    options4.type === 'graph.connect' ||
+    options4.type === 'node.setPrompt' ||
+    options4.type === 'node.appendPrompt' ||
+    options4.type === 'node.setParams' ||
+    options4.type === 'node.setModel' ||
+    options4.type === 'node.changeModel' ||
+    options4.type === 'node.setInputSlot'
   );
 }
-function getMutationConfirmReason(_0x2c6539 = {}) {
-  if (_0x2c6539.type === 'graph.connect') return 'existing node connection change requires confirmation';
-  if (_0x2c6539.type === 'node.setPrompt' || _0x2c6539.type === 'node.appendPrompt')
+function getMutationConfirmReason(options5 = {}) {
+  if (options5.type === 'graph.connect') return 'existing node connection change requires confirmation';
+  if (options5.type === 'node.setPrompt' || options5.type === 'node.appendPrompt')
     return 'existing node prompt change requires confirmation';
-  if (_0x2c6539.type === 'node.setParams')
+  if (options5.type === 'node.setParams')
     return 'existing node generation params change requires confirmation';
-  if (_0x2c6539.type === 'node.setModel' || _0x2c6539.type === 'node.changeModel')
+  if (options5.type === 'node.setModel' || options5.type === 'node.changeModel')
     return 'existing node model change requires confirmation';
-  if (_0x2c6539.type === 'node.setInputSlot') return 'existing input slot change requires confirmation';
+  if (options5.type === 'node.setInputSlot') return 'existing input slot change requires confirmation';
   return '';
 }
-function getActionRisk(_0x5709a0, _0x5d843d, _0x4e0ccd = {}) {
-  let _0x3dcbc6 = _0x5d843d?.riskLevel || 'safe',
-    _0x51cb07 = _0x3dcbc6 !== 'safe' ? 'command risk requires confirmation' : '';
+function getActionRisk(payload, handle, state = {}) {
+  let risk = handle?.riskLevel || 'safe',
+    reason = risk !== 'safe' ? 'command risk requires confirmation' : '';
   return (
-    _0x5709a0.type === 'generation.run' &&
-      ((_0x3dcbc6 = maxRisk(_0x3dcbc6, 'confirm')), (_0x51cb07 = 'generation run requires confirmation')),
-    _0x5709a0.type === 'node.delete' &&
-      ((_0x3dcbc6 = maxRisk(_0x3dcbc6, 'danger')), (_0x51cb07 = 'node delete requires confirmation')),
-    isExistingNodeMutationAction(_0x5709a0) &&
-      !isSamePlanNodePreparation(_0x5709a0, _0x4e0ccd) &&
-      !isSamePlanConnectionPreparation(_0x5709a0, _0x4e0ccd) &&
-      ((_0x3dcbc6 = maxRisk(_0x3dcbc6, 'confirm')), (_0x51cb07 = getMutationConfirmReason(_0x5709a0))),
-    actionSize(_0x5709a0) > AGENT_BATCH_CONFIRM_THRESHOLD &&
-      ((_0x3dcbc6 = maxRisk(_0x3dcbc6, 'confirm')), (_0x51cb07 = 'large batch requires confirmation')),
-    { risk: _0x3dcbc6, reason: _0x51cb07 }
+    payload.type === 'generation.run' &&
+      ((risk = maxRisk(risk, 'confirm')), (reason = 'generation run requires confirmation')),
+    payload.type === 'node.delete' &&
+      ((risk = maxRisk(risk, 'danger')), (reason = 'node delete requires confirmation')),
+    isExistingNodeMutationAction(payload) &&
+      !isSamePlanNodePreparation(payload, state) &&
+      !isSamePlanConnectionPreparation(payload, state) &&
+      ((risk = maxRisk(risk, 'confirm')), (reason = getMutationConfirmReason(payload))),
+    actionSize(payload) > AGENT_BATCH_CONFIRM_THRESHOLD &&
+      ((risk = maxRisk(risk, 'confirm')), (reason = 'large batch requires confirmation')),
+    { risk: risk, reason: reason }
   );
 }
-function buildFailure(_0x14d1cc, _0x1b9d0a = undefined) {
+function buildFailure(message, details = undefined) {
   return {
     ok: false,
     status: 'failed',
     errorCode: 'AGENT_PLAN_INVALID',
-    message: _0x14d1cc,
-    details: _0x1b9d0a,
+    message: message,
+    details: details,
   };
 }
-function isImageNodeType(_0x386236 = '') {
-  const _0x166cc7 = String(_0x386236 || '');
-  return _0x166cc7 === 'ai-image' || _0x166cc7 === 'source-image';
+function isImageNodeType(config = '') {
+  const scope = String(config || '');
+  return scope === 'ai-image' || scope === 'source-image';
 }
-function findSelectedImageNodeId(_0x2dbbdc = {}) {
-  const _0x476f9c = _0x2dbbdc?.canvas || {},
-    _0xffb5cd = Array.isArray(_0x476f9c.selectedNodes) ? _0x476f9c.selectedNodes : [],
-    _0x5cce40 = _0xffb5cd.find((_0x2c22bc) => isImageNodeType(_0x2c22bc?.type));
-  if (_0x5cce40?.id) return String(_0x5cce40.id);
-  const _0x5b2866 = Array.isArray(_0x476f9c.selectedNodeIds)
-    ? _0x476f9c.selectedNodeIds.map((_0x3ac5f8) => String(_0x3ac5f8 || '')).filter(Boolean)
+function findSelectedImageNodeId(canvas = {}) {
+  const input = canvas?.canvas || {},
+    list2 = Array.isArray(input.selectedNodes) ? input.selectedNodes : [],
+    output = list2.find((item2) => isImageNodeType(item2?.type));
+  if (output?.id) return String(output.id);
+  const list3 = Array.isArray(input.selectedNodeIds)
+    ? input.selectedNodeIds.map((item3) => String(item3 || '')).filter(Boolean)
     : [];
-  if (_0x5b2866.length === 0) return '';
-  const _0x5dfa26 = new Set(_0x5b2866),
-    _0x5da47b = Array.isArray(_0x476f9c.nodes) ? _0x476f9c.nodes : [];
+  if (list3.length === 0) return '';
+  const map = new Set(list3),
+    list4 = Array.isArray(input.nodes) ? input.nodes : [];
   return String(
-    _0x5da47b.find(
-      (_0x2cf931) => _0x5dfa26.has(String(_0x2cf931?.id || '')) && isImageNodeType(_0x2cf931?.type),
-    )?.id || '',
+    list4.find((item4) => map.has(String(item4?.id || '')) && isImageNodeType(item4?.type))?.id || '',
   );
 }
-function modelAllowsImageInput(_0x4fa863 = {}) {
-  const _0x239c92 =
-      _0x4fa863?.inputSlots && typeof _0x4fa863.inputSlots === 'object' ? _0x4fa863.inputSlots : {},
-    _0x53978a = Array.isArray(_0x239c92.allowedKinds) ? _0x239c92.allowedKinds : [];
-  if (_0x53978a.includes('image')) return true;
-  const _0x39aaf8 = Number(_0x239c92.maxByKind?.image);
-  return Number.isFinite(_0x39aaf8) && _0x39aaf8 > 0;
+function modelAllowsImageInput(options6 = {}) {
+  const value2 = options6?.inputSlots && typeof options6.inputSlots === 'object' ? options6.inputSlots : {},
+    list5 = Array.isArray(value2.allowedKinds) ? value2.allowedKinds : [];
+  if (list5.includes('image')) return true;
+  const count = Number(value2.maxByKind?.image);
+  return Number.isFinite(count) && count > 0;
 }
-function modelRequiresMissingMedia(_0x3fd00b = {}) {
-  const _0x21df37 =
-      _0x3fd00b?.inputSlots && typeof _0x3fd00b.inputSlots === 'object' ? _0x3fd00b.inputSlots : {},
-    _0x23dc17 = _0x21df37.minByKind || {};
-  if (Number(_0x23dc17.video) > 0) return true;
-  if (Number(_0x23dc17.audio) > 0) return true;
-  const _0x1f1f0c = Array.isArray(_0x21df37.fixedSlots) ? _0x21df37.fixedSlots : [];
-  return _0x1f1f0c.some(
-    (_0x5d05e3) =>
-      _0x5d05e3?.required === true &&
-      (String(_0x5d05e3?.kind || '') === 'video' || String(_0x5d05e3?.kind || '') === 'audio'),
+function modelRequiresMissingMedia(options7 = {}) {
+  const value3 = options7?.inputSlots && typeof options7.inputSlots === 'object' ? options7.inputSlots : {},
+    value4 = value3.minByKind || {};
+  if (Number(value4.video) > 0) return true;
+  if (Number(value4.audio) > 0) return true;
+  const list6 = Array.isArray(value3.fixedSlots) ? value3.fixedSlots : [];
+  return list6.some(
+    (item5) =>
+      item5?.required === true &&
+      (String(item5?.kind || '') === 'video' || String(item5?.kind || '') === 'audio'),
   );
 }
-function getModelFieldIds(_0x1a50d4 = {}) {
+function getModelFieldIds(options8 = {}) {
   return new Set(
-    (Array.isArray(_0x1a50d4?.uiSchema?.fields) ? _0x1a50d4.uiSchema.fields : [])
-      .map((_0x3d6db6) => String(_0x3d6db6?.id || '').trim())
+    (Array.isArray(options8?.uiSchema?.fields) ? options8.uiSchema.fields : [])
+      .map((item6) => String(item6?.id || '').trim())
       .filter(Boolean),
   );
 }
-function findImageToVideoModel(_0x39c656 = {}) {
-  const _0x38059b = Array.isArray(_0x39c656?.canvas?.availableModels) ? _0x39c656.canvas.availableModels : [];
+function findImageToVideoModel(canvas2 = {}) {
+  const list7 = Array.isArray(canvas2?.canvas?.availableModels) ? canvas2.canvas.availableModels : [];
   return (
-    _0x38059b.find(
-      (_0x53f363) =>
-        _0x53f363?.kind === 'video' &&
-        _0x53f363?.modelId &&
-        modelAllowsImageInput(_0x53f363) &&
-        !modelRequiresMissingMedia(_0x53f363),
+    list7.find(
+      (item7) =>
+        item7?.kind === 'video' &&
+        item7?.modelId &&
+        modelAllowsImageInput(item7) &&
+        !modelRequiresMissingMedia(item7),
     ) || null
   );
 }
-function findContextModel(_0x5b60ae = {}, _0x3deca4 = '') {
-  const _0x5ec9ad = String(_0x3deca4 || '').trim();
-  if (!_0x5ec9ad) return null;
-  const _0x39cced = Array.isArray(_0x5b60ae?.canvas?.availableModels) ? _0x5b60ae.canvas.availableModels : [];
-  return _0x39cced.find((_0x21cd98) => _0x21cd98?.modelId === _0x5ec9ad) || null;
+function findContextModel(canvas3 = {}, value5 = '') {
+  const enabled = String(value5 || '').trim();
+  if (!enabled) return null;
+  const list8 = Array.isArray(canvas3?.canvas?.availableModels) ? canvas3.canvas.availableModels : [];
+  return list8.find((item8) => item8?.modelId === enabled) || null;
 }
-function applyContextualPlanDefaults(_0x2adf85, _0x1e8258 = {}) {
-  const _0x43c392 = findSelectedImageNodeId(_0x1e8258),
-    _0x367544 = _0x43c392 ? findImageToVideoModel(_0x1e8258) : null;
-  if (!_0x43c392 || !_0x367544) return { plan: _0x2adf85, trace: [] };
-  const _0x46eaf7 = new Map(),
-    _0x4c9a3d = [];
-  let _0x35a44b = false;
-  const _0x295ee1 = [];
-  for (const _0x5f3911 of _0x2adf85.actions) {
-    let _0x351091 = _0x5f3911;
-    if (_0x5f3911.type === 'node.create' && _0x5f3911.args?.type === 'ai-video') {
-      const _0x138610 = String(_0x5f3911.args.model || _0x5f3911.args.modelId || '').trim(),
-        _0x925c24 = _0x138610 ? findContextModel(_0x1e8258, _0x138610) : null,
-        _0x5b5b15 = _0x925c24 || _0x367544;
-      ((!_0x138610 || !_0x925c24) &&
-        _0x5b5b15?.modelId &&
-        ((_0x351091 = {
-          ..._0x5f3911,
-          args: { ..._0x5f3911.args, model: _0x5b5b15.modelId, provider: _0x5b5b15.provider || '' },
+function applyContextualPlanDefaults(plan, value6 = {}) {
+  const selectedImageId = findSelectedImageNodeId(value6),
+    enabled2 = selectedImageId ? findImageToVideoModel(value6) : null;
+  if (!selectedImageId || !enabled2) return { plan: plan, trace: [] };
+  const map2 = new Map(),
+    actions = [];
+  let plan2 = false;
+  const trace = [];
+  for (const actionType of plan.actions) {
+    let actionType2 = actionType;
+    if (actionType.type === 'node.create' && actionType.args?.type === 'ai-video') {
+      const enabled3 = String(actionType.args.model || actionType.args.modelId || '').trim(),
+        reason2 = enabled3 ? findContextModel(value6, enabled3) : null,
+        model = reason2 || enabled2;
+      ((!enabled3 || !reason2) &&
+        model?.modelId &&
+        ((actionType2 = {
+          ...actionType,
+          args: { ...actionType.args, model: model.modelId, provider: model.provider || '' },
         }),
-        (_0x35a44b = true),
-        _0x295ee1.push({
+        (plan2 = true),
+        trace.push({
           type: 'contextual_default_applied',
           field: 'model',
-          actionType: _0x5f3911.type,
-          alias: String(_0x5f3911.alias || _0x5f3911.as || ''),
-          selectedImageId: _0x43c392,
-          modelId: _0x5b5b15.modelId,
-          provider: _0x5b5b15.provider || '',
-          reason: _0x925c24
+          actionType: actionType.type,
+          alias: String(actionType.alias || actionType.as || ''),
+          selectedImageId: selectedImageId,
+          modelId: model.modelId,
+          provider: model.provider || '',
+          reason: reason2
             ? 'requested model was available in context'
             : 'selected image has compatible image-to-video model',
         })),
-        _0x5f3911.alias && _0x5b5b15 && _0x46eaf7.set(_0x5f3911.alias, getModelFieldIds(_0x5b5b15)));
+        actionType.alias && model && map2.set(actionType.alias, getModelFieldIds(model)));
     }
-    if (_0x351091.type === 'node.setParams') {
-      const _0x5067f4 = getAliasNodeIdReference(_0x351091.args?.nodeId),
-        _0x4556ec = _0x5067f4 ? _0x46eaf7.get(_0x5067f4) : null,
-        _0x859546 =
-          _0x351091.args?.params &&
-          typeof _0x351091.args.params === 'object' &&
-          !Array.isArray(_0x351091.args.params)
-            ? _0x351091.args.params
+    if (actionType2.type === 'node.setParams') {
+      const alias = getAliasNodeIdReference(actionType2.args?.nodeId),
+        map3 = alias ? map2.get(alias) : null,
+        value7 =
+          actionType2.args?.params &&
+          typeof actionType2.args.params === 'object' &&
+          !Array.isArray(actionType2.args.params)
+            ? actionType2.args.params
             : null;
-      if (_0x4556ec && _0x859546) {
-        const _0x107aa8 = {};
-        for (const [_0xfd2eea, _0x4de2e8] of Object.entries(_0x859546)) {
-          if (_0x4556ec.has(_0xfd2eea)) _0x107aa8[_0xfd2eea] = _0x4de2e8;
+      if (map3 && value7) {
+        const params = {};
+        for (const [value8, value9] of Object.entries(value7)) {
+          if (map3.has(value8)) params[value8] = value9;
         }
-        if (Object.keys(_0x107aa8).length !== Object.keys(_0x859546).length) {
-          ((_0x35a44b = true),
-            _0x295ee1.push({
+        if (Object.keys(params).length !== Object.keys(value7).length) {
+          ((plan2 = true),
+            trace.push({
               type: 'params_filtered',
-              actionType: _0x351091.type,
-              alias: _0x5067f4,
-              keptParamIds: Object.keys(_0x107aa8),
-              removedParamIds: Object.keys(_0x859546).filter((_0x3a1bdd) => !_0x4556ec.has(_0x3a1bdd)),
+              actionType: actionType2.type,
+              alias: alias,
+              keptParamIds: Object.keys(params),
+              removedParamIds: Object.keys(value7).filter((item9) => !map3.has(item9)),
               reason: 'target model uiSchema does not declare removed params',
             }));
-          if (Object.keys(_0x107aa8).length === 0) continue;
-          _0x351091 = { ..._0x351091, args: { ..._0x351091.args, params: _0x107aa8 } };
+          if (Object.keys(params).length === 0) continue;
+          actionType2 = { ...actionType2, args: { ...actionType2.args, params: params } };
         }
       }
     }
-    _0x4c9a3d.push(_0x351091);
+    actions.push(actionType2);
   }
-  return { plan: _0x35a44b ? { ..._0x2adf85, actions: _0x4c9a3d } : _0x2adf85, trace: _0x295ee1 };
+  return { plan: plan2 ? { ...plan, actions: actions } : plan, trace: trace };
 }
 function buildRiskContext() {
   return { createdNodeAliases: new Set(), createdEdgeAliases: new Set() };
 }
-function rememberActionAlias(_0x876b8a = {}, _0x4c30d2 = {}) {
-  const _0x1f14ad = String(_0x876b8a.alias || '').trim();
-  if (!_0x1f14ad) return;
-  (_0x876b8a.type === 'node.create' && _0x4c30d2.createdNodeAliases.add(_0x1f14ad),
-    isSamePlanConnectionPreparation(_0x876b8a, _0x4c30d2) && _0x4c30d2.createdEdgeAliases.add(_0x1f14ad));
+function rememberActionAlias(options9 = {}, value10 = {}) {
+  const enabled4 = String(options9.alias || '').trim();
+  if (!enabled4) return;
+  (options9.type === 'node.create' && value10.createdNodeAliases.add(enabled4),
+    isSamePlanConnectionPreparation(options9, value10) && value10.createdEdgeAliases.add(enabled4));
 }
 export function validateAgentPlan(
-  _0x57cbdf,
+  value11,
   {
     commandRegistry: commandRegistry = canvasCommandRegistry,
     commandContext: commandContext = {},
@@ -251,108 +247,107 @@ export function validateAgentPlan(
     traceRecorder: traceRecorder = null,
   } = {},
 ) {
-  const _0x383e2d = applyContextualPlanDefaults(normalizeAgentPlan(_0x57cbdf), agentContext),
-    _0x40d80d = _0x383e2d.plan;
-  for (const _0x37a850 of _0x383e2d.trace) traceRecorder?.(_0x37a850);
-  if (_0x40d80d.status === 'failed')
+  const contextualPlanDefaults = applyContextualPlanDefaults(normalizeAgentPlan(value11), agentContext),
+    message2 = contextualPlanDefaults.plan;
+  for (const value12 of contextualPlanDefaults.trace) traceRecorder?.(value12);
+  if (message2.status === 'failed')
     return {
       ok: false,
       status: 'failed',
       errorCode: 'AGENT_PLAN_FAILED',
-      message: _0x40d80d.reply || 'Agent planner failed.',
-      plan: _0x40d80d,
+      message: message2.reply || 'Agent planner failed.',
+      plan: message2,
     };
-  if (_0x40d80d.status === 'chat')
+  if (message2.status === 'chat')
     return {
       ok: true,
       status: 'chat',
       riskLevel: 'safe',
-      plan: { ..._0x40d80d, status: 'chat', actions: [], requiresConfirmation: false },
+      plan: { ...message2, status: 'chat', actions: [], requiresConfirmation: false },
     };
-  if (_0x40d80d.status === 'need_clarification') {
-    if (!_0x40d80d.question)
-      return buildFailure('Clarification plans require question.', { plan: _0x40d80d });
-    return { ok: true, status: 'need_clarification', plan: _0x40d80d, riskLevel: 'safe' };
+  if (message2.status === 'need_clarification') {
+    if (!message2.question) return buildFailure('Clarification plans require question.', { plan: message2 });
+    return { ok: true, status: 'need_clarification', plan: message2, riskLevel: 'safe' };
   }
-  if (_0x40d80d.actions.length === 0)
-    return buildFailure('Ready or confirmation plans require at least one action.', { plan: _0x40d80d });
-  let _0x4ae281 = _0x40d80d.riskLevel || 'safe';
-  const _0x8e762b = [],
-    _0x4eac85 = buildRiskContext();
-  for (const _0x29a580 of _0x40d80d.actions) {
-    const _0x26b455 = commandRegistry?.get?.(_0x29a580.type);
-    if (!_0x26b455)
+  if (message2.actions.length === 0)
+    return buildFailure('Ready or confirmation plans require at least one action.', { plan: message2 });
+  let riskLevel = message2.riskLevel || 'safe';
+  const actions2 = [],
+    riskContext = buildRiskContext();
+  for (const actionType3 of message2.actions) {
+    const enabled5 = commandRegistry?.get?.(actionType3.type);
+    if (!enabled5)
       return {
         ok: false,
         status: 'failed',
         errorCode: 'UNKNOWN_AGENT_ACTION',
-        message: 'Unknown canvas command in agent plan: ' + _0x29a580.type,
-        plan: _0x40d80d,
+        message: 'Unknown canvas command in agent plan: ' + actionType3.type,
+        plan: message2,
       };
-    const { risk: _0x3dee98, reason: _0x477731 } = getActionRisk(_0x29a580, _0x26b455, _0x4eac85);
-    if (_0x3dee98 === 'blocked')
+    const { risk: risk2, reason: reason3 } = getActionRisk(actionType3, enabled5, riskContext);
+    if (risk2 === 'blocked')
       return {
         ok: false,
         status: 'failed',
         errorCode: 'BLOCKED_AGENT_ACTION',
-        message: 'Blocked canvas command in agent plan: ' + _0x29a580.type,
-        plan: _0x40d80d,
+        message: 'Blocked canvas command in agent plan: ' + actionType3.type,
+        plan: message2,
       };
-    const _0x20beca = hasCanvasCommandPlanVariableReference(_0x29a580.args);
-    if (!_0x20beca && typeof _0x26b455.validate === 'function') {
-      const _0x4dbfa0 = _0x26b455.validate(_0x29a580.args, commandContext);
-      if (_0x4dbfa0?.ok === false)
+    const hasCanvasCommandPlanVariableReference2 = hasCanvasCommandPlanVariableReference(actionType3.args);
+    if (!hasCanvasCommandPlanVariableReference2 && typeof enabled5.validate === 'function') {
+      const errorCode = enabled5.validate(actionType3.args, commandContext);
+      if (errorCode?.ok === false)
         return {
           ok: false,
           status: 'failed',
-          errorCode: _0x4dbfa0.errorCode || 'ACTION_ARGS_INVALID',
-          message: _0x4dbfa0.message || 'Invalid args for ' + _0x29a580.type,
-          details: _0x4dbfa0.details,
-          plan: _0x40d80d,
+          errorCode: errorCode.errorCode || 'ACTION_ARGS_INVALID',
+          message: errorCode.message || 'Invalid args for ' + actionType3.type,
+          details: errorCode.details,
+          plan: message2,
         };
     }
-    _0x4ae281 = maxRisk(_0x4ae281, _0x3dee98);
-    _0x3dee98 !== 'safe' &&
-      _0x477731 &&
+    riskLevel = maxRisk(riskLevel, risk2);
+    risk2 !== 'safe' &&
+      reason3 &&
       traceRecorder?.({
         type: 'action_risk_elevated',
-        actionType: _0x29a580.type,
-        riskLevel: _0x3dee98,
-        reason: _0x477731,
+        actionType: actionType3.type,
+        riskLevel: risk2,
+        reason: reason3,
       });
-    const _0xc416b1 = { ..._0x29a580, riskLevel: _0x3dee98, ...(_0x477731 ? { riskReason: _0x477731 } : {}) };
-    (_0x8e762b.push(_0xc416b1), rememberActionAlias(_0x29a580, _0x4eac85));
+    const value13 = { ...actionType3, riskLevel: risk2, ...(reason3 ? { riskReason: reason3 } : {}) };
+    (actions2.push(value13), rememberActionAlias(actionType3, riskContext));
   }
-  const _0x162754 =
-    _0x4ae281 === 'confirm' ||
-    _0x4ae281 === 'danger' ||
-    _0x40d80d.requiresConfirmation === true ||
-    _0x40d80d.status === 'need_confirmation';
-  if (_0x162754) {
-    const _0x1c0e02 =
-      _0x8e762b.find((_0xd89f38) => String(_0xd89f38.riskLevel || 'safe') !== 'safe') || _0x8e762b[0] || null;
+  const value14 =
+    riskLevel === 'confirm' ||
+    riskLevel === 'danger' ||
+    message2.requiresConfirmation === true ||
+    message2.status === 'need_confirmation';
+  if (value14) {
+    const value15 =
+      actions2.find((item10) => String(item10.riskLevel || 'safe') !== 'safe') || actions2[0] || null;
     return (
       traceRecorder?.({
         type: 'confirmation_required',
-        actionType: String(_0x1c0e02?.type || ''),
-        riskLevel: _0x4ae281,
+        actionType: String(value15?.type || ''),
+        riskLevel: riskLevel,
         reason:
-          _0x40d80d.requiresConfirmation === true || _0x40d80d.status === 'need_confirmation'
+          message2.requiresConfirmation === true || message2.status === 'need_confirmation'
             ? 'planner requested confirmation'
-            : _0x1c0e02?.riskReason || 'action risk requires confirmation',
+            : value15?.riskReason || 'action risk requires confirmation',
       }),
       {
         ok: true,
         status: 'need_confirmation',
-        riskLevel: _0x4ae281,
-        plan: { ..._0x40d80d, status: 'need_confirmation', requiresConfirmation: true, actions: _0x8e762b },
+        riskLevel: riskLevel,
+        plan: { ...message2, status: 'need_confirmation', requiresConfirmation: true, actions: actions2 },
       }
     );
   }
   return {
     ok: true,
     status: 'ready',
-    riskLevel: _0x4ae281,
-    plan: { ..._0x40d80d, status: 'ready', actions: _0x8e762b },
+    riskLevel: riskLevel,
+    plan: { ...message2, status: 'ready', actions: actions2 },
   };
 }

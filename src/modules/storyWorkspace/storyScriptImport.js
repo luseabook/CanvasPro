@@ -6,18 +6,16 @@ const UPLOADED_EPISODE_HEADING_PATTERN =
     /^(?:第\s*[0-9０-９零〇一二三四五六七八九十百千两]+\s*场|场景\s*[0-9０-９零〇一二三四五六七八九十百千两]+)(?:\s|[：:.、\-—])\s*\S/iu,
   UPLOADED_CHINESE_SCENE_HEADING_PATTERN =
     /^(?:\d{1,4}[.)、-]\s*)?(?:(?:日|夜|晨|早晨|上午|中午|下午|傍晚|黄昏|黎明|凌晨)\s+)?(?:内景|外景|内外景|内外|内|外)(?:\s|[：:.、\-—])\s*\S/iu;
-function normalizeText(_0x4be3ba) {
-  return String(_0x4be3ba || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function normalizeFullWidthDigits(_0x307e83) {
-  return String(_0x307e83 || '')['replace'](/[０-９]/g, (_0x1c2734) =>
-    String(_0x1c2734['charCodeAt'](0x0) - 0xff10),
-  );
+function normalizeFullWidthDigits(item) {
+  return String(item || '')['replace'](/[０-９]/g, (key) => String(key['charCodeAt'](0x0) - 0xff10));
 }
-function parseChineseNumber(_0xd7073f) {
-  const _0x324859 = normalizeFullWidthDigits(_0xd7073f);
-  if (/^\d+$/['test'](_0x324859)) return Number(_0x324859);
-  const _0x15e4f7 = {
+function parseChineseNumber(index) {
+  const fullWidthDigits = normalizeFullWidthDigits(index);
+  if (/^\d+$/['test'](fullWidthDigits)) return Number(fullWidthDigits);
+  const result = {
       零: 0x0,
       〇: 0x0,
       一: 0x1,
@@ -31,102 +29,102 @@ function parseChineseNumber(_0xd7073f) {
       八: 0x8,
       九: 0x9,
     },
-    _0x39f29a = { 十: 0xa, 百: 0x64, 千: 0x3e8 };
-  let _0x2f0c59 = 0x0,
-    _0x4a3e63 = 0x0;
-  for (const _0x4cd379 of _0x324859) {
-    if (Object['prototype']['hasOwnProperty']['call'](_0x15e4f7, _0x4cd379)) {
-      _0x4a3e63 = _0x15e4f7[_0x4cd379];
+    data = { 十: 0xa, 百: 0x64, 千: 0x3e8 };
+  let options = 0x0,
+    target = 0x0;
+  for (const source of fullWidthDigits) {
+    if (Object['prototype']['hasOwnProperty']['call'](result, source)) {
+      target = result[source];
       continue;
     }
-    const _0x2e5401 = _0x39f29a[_0x4cd379];
-    if (!_0x2e5401) return 0x0;
-    ((_0x2f0c59 += (_0x4a3e63 || 0x1) * _0x2e5401), (_0x4a3e63 = 0x0));
+    const enabled = data[source];
+    if (!enabled) return 0x0;
+    ((options += (target || 0x1) * enabled), (target = 0x0));
   }
-  return _0x2f0c59 + _0x4a3e63;
+  return options + target;
 }
-function stripFileExtension(_0x57edb7) {
-  const _0x4c547c = normalizeText(_0x57edb7)['replace'](/^.*[\\/]/, '');
-  if (!_0x4c547c || _0x4c547c === '粘贴文本') return '';
-  return _0x4c547c['replace'](/\.(?:txt|docx?|pdf|md|rtf)$/iu, '')['trim']();
+function stripFileExtension(next) {
+  const text = normalizeText(next)['replace'](/^.*[\\/]/, '');
+  if (!text || text === '粘贴文本') return '';
+  return text['replace'](/\.(?:txt|docx?|pdf|md|rtf)$/iu, '')['trim']();
 }
-function findUploadedEpisodeHeadings(_0x179be1) {
-  const _0x2edbf7 = [],
-    _0x54684c = new RegExp(
+function findUploadedEpisodeHeadings(current) {
+  const list = [],
+    endIndex = new RegExp(
       UPLOADED_EPISODE_HEADING_PATTERN['source'],
       UPLOADED_EPISODE_HEADING_PATTERN['flags'],
     );
-  let _0x5c91f4 = _0x54684c['exec'](_0x179be1);
-  while (_0x5c91f4) {
-    (_0x2edbf7['push']({
-      index: _0x5c91f4['index'],
-      endIndex: _0x54684c['lastIndex'],
-      numberToken: _0x5c91f4[0x1] || _0x5c91f4[0x2] || '',
-      title: normalizeText(_0x5c91f4[0x3]),
-      heading: normalizeText(_0x5c91f4[0x0]),
+  let index2 = endIndex['exec'](current);
+  while (index2) {
+    (list['push']({
+      index: index2['index'],
+      endIndex: endIndex['lastIndex'],
+      numberToken: index2[0x1] || index2[0x2] || '',
+      title: normalizeText(index2[0x3]),
+      heading: normalizeText(index2[0x0]),
     }),
-      (_0x5c91f4 = _0x54684c['exec'](_0x179be1)));
+      (index2 = endIndex['exec'](current)));
   }
-  return _0x2edbf7;
+  return list;
 }
-function deriveUploadedStoryTitle(_0x346ad9, _0x31b3cd, _0x543e00) {
-  const _0x421bfb = stripFileExtension(_0x346ad9);
-  if (_0x421bfb) return _0x421bfb;
-  const _0x4b33e7 =
-      String(_0x31b3cd || '')
+function deriveUploadedStoryTitle(entry, record, payload) {
+  const stripFileExtension2 = stripFileExtension(entry);
+  if (stripFileExtension2) return stripFileExtension2;
+  const args =
+      String(record || '')
         ['split'](/\r?\n/u)
         ['map'](normalizeText)
         ['find'](Boolean) || '',
-    _0x2fd7a4 = _0x543e00[0x0];
-  if (_0x4b33e7 && _0x4b33e7 !== _0x2fd7a4?.['heading'] && [..._0x4b33e7]['length'] <= 0x50)
-    return _0x4b33e7['replace'](/^[《〈【】“”"']+|[《〈【】“”"']+$/gu, '')['trim']();
-  return _0x2fd7a4?.['title'] || '未命名剧本';
+    handle = payload[0x0];
+  if (args && args !== handle?.['heading'] && [...args]['length'] <= 0x50)
+    return args['replace'](/^[《〈【】“”"']+|[《〈【】“”"']+$/gu, '')['trim']();
+  return handle?.['title'] || '未命名剧本';
 }
-function isUploadedSceneHeading(_0x5a4308) {
-  const _0x635ddd = normalizeText(_0x5a4308)['replace'](/^#{1,6}\s*/u, '');
-  if (!_0x635ddd || [..._0x635ddd]['length'] > 0x78) return ![];
+function isUploadedSceneHeading(state) {
+  const args2 = normalizeText(state)['replace'](/^#{1,6}\s*/u, '');
+  if (!args2 || [...args2]['length'] > 0x78) return ![];
   return (
-    UPLOADED_FOUNTAIN_SCENE_HEADING_PATTERN['test'](_0x635ddd) ||
-    UPLOADED_NUMBERED_SCENE_HEADING_PATTERN['test'](_0x635ddd) ||
-    UPLOADED_CHINESE_SCENE_HEADING_PATTERN['test'](_0x635ddd)
+    UPLOADED_FOUNTAIN_SCENE_HEADING_PATTERN['test'](args2) ||
+    UPLOADED_NUMBERED_SCENE_HEADING_PATTERN['test'](args2) ||
+    UPLOADED_CHINESE_SCENE_HEADING_PATTERN['test'](args2)
   );
 }
-function normalizeUploadedCharacterCue(_0x568f70) {
-  return normalizeText(_0x568f70)
+function normalizeUploadedCharacterCue(config) {
+  return normalizeText(config)
     ['replace'](/^@/u, '')
     ['replace'](/\s*[（(][^（）()\r\n]{0,40}[）)]\s*$/u, '')
     ['trim']();
 }
-function extractUploadedSceneCharacters(_0x36023a = []) {
-  const _0x202af7 = [],
-    _0x30cfee = (_0x48e6d1) => {
-      const _0x593efe = normalizeUploadedCharacterCue(_0x48e6d1);
-      if (!_0x593efe || [..._0x593efe]['length'] > 0x18) return;
-      if (/^(?:旁白|画外音|VO|V\.O\.?|OS|O\.S\.?)$/iu['test'](_0x593efe)) return;
-      if (!_0x202af7['includes'](_0x593efe)) _0x202af7['push'](_0x593efe);
+function extractUploadedSceneCharacters(list2 = []) {
+  const list3 = [],
+    handler = (scope) => {
+      const args3 = normalizeUploadedCharacterCue(scope);
+      if (!args3 || [...args3]['length'] > 0x18) return;
+      if (/^(?:旁白|画外音|VO|V\.O\.?|OS|O\.S\.?)$/iu['test'](args3)) return;
+      if (!list3['includes'](args3)) list3['push'](args3);
     };
   return (
-    _0x36023a['forEach']((_0x55301f, _0x32e9bf) => {
-      const _0x22be89 = normalizeText(_0x55301f)['replace'](/^[>*#-]+\s*/u, ''),
-        _0x252d58 = _0x22be89['match'](
+    list2['forEach']((input, count) => {
+      const text2 = normalizeText(input)['replace'](/^[>*#-]+\s*/u, ''),
+        output = text2['match'](
           /^(?:【)?([\p{Script=Han}A-Za-z][\p{Script=Han}A-Za-z0-9·•._-]{0,23})(?:】)?(?:\s*[（(][^（）()\r\n]{0,40}[）)])?\s*[:：]/u,
         );
-      if (_0x252d58) {
-        _0x30cfee(_0x252d58[0x1]);
+      if (output) {
+        handler(output[0x1]);
         return;
       }
-      const _0x55e6e6 = _0x22be89['match'](/^@([^\r\n]{1,40})$/u);
-      if (_0x55e6e6) {
-        _0x30cfee(_0x55e6e6[0x1]);
+      const value2 = text2['match'](/^@([^\r\n]{1,40})$/u);
+      if (value2) {
+        handler(value2[0x1]);
         return;
       }
-      const _0x271d87 = normalizeUploadedCharacterCue(_0x22be89),
-        _0x355c83 = _0x32e9bf === 0x0 || !normalizeText(_0x36023a[_0x32e9bf - 0x1]),
-        _0x2443a6 =
-          _0x32e9bf + 0x1 < _0x36023a['length'] && Boolean(normalizeText(_0x36023a[_0x32e9bf + 0x1]));
-      if (_0x355c83 && _0x2443a6 && /^[A-Z][A-Z0-9 ._'\-]{0,39}$/u['test'](_0x271d87)) _0x30cfee(_0x271d87);
+      const uploadedCharacterCue = normalizeUploadedCharacterCue(text2),
+        value3 = count === 0x0 || !normalizeText(list2[count - 0x1]),
+        value4 = count + 0x1 < list2['length'] && Boolean(normalizeText(list2[count + 0x1]));
+      if (value3 && value4 && /^[A-Z][A-Z0-9 ._'\-]{0,39}$/u['test'](uploadedCharacterCue))
+        handler(uploadedCharacterCue);
     }),
-    _0x202af7
+    list3
   );
 }
 export function parseUploadedStoryEpisodeScenes({
@@ -134,65 +132,60 @@ export function parseUploadedStoryEpisodeScenes({
   episodeRef: episodeRef = 'episode-1',
   fallbackHeading: fallbackHeading = '未命名场次',
 } = {}) {
-  const _0x4c3e40 = normalizeText(fullText);
-  if (!_0x4c3e40) return [];
-  const _0x353df3 = _0x4c3e40['split'](/\r?\n/u),
-    _0xbb5607 = [];
-  _0x353df3['forEach']((_0xdac059, _0x501f92) => {
-    if (isUploadedSceneHeading(_0xdac059)) _0xbb5607['push'](_0x501f92);
+  const body = normalizeText(fullText);
+  if (!body) return [];
+  const list4 = body['split'](/\r?\n/u),
+    list5 = [];
+  list4['forEach']((value5, value6) => {
+    if (isUploadedSceneHeading(value5)) list5['push'](value6);
   });
-  if (!_0xbb5607['length'])
+  if (!list5['length'])
     return [
       {
         ref: episodeRef + '-scene-1',
         heading: normalizeText(fallbackHeading) || '未命名场次',
-        characters: extractUploadedSceneCharacters(_0x353df3),
-        body: _0x4c3e40,
+        characters: extractUploadedSceneCharacters(list4),
+        body: body,
         source: 'upload-fallback',
       },
     ];
-  return _0xbb5607['map']((_0x4c8012, _0x9e04ce) => {
-    const _0x36984a = _0xbb5607[_0x9e04ce + 0x1] ?? _0x353df3['length'],
-      _0x409cbb = _0x353df3['slice'](_0x4c8012 + 0x1, _0x36984a);
+  return list5['map']((value7, value8) => {
+    const value9 = list5[value8 + 0x1] ?? list4['length'],
+      body2 = list4['slice'](value7 + 0x1, value9);
     return {
-      ref: episodeRef + '-scene-' + (_0x9e04ce + 0x1),
-      heading: normalizeText(_0x353df3[_0x4c8012])['replace'](/^#{1,6}\s*/u, ''),
-      characters: extractUploadedSceneCharacters(_0x409cbb),
-      body: _0x409cbb['join']('\x0a')['trim'](),
+      ref: episodeRef + '-scene-' + (value8 + 0x1),
+      heading: normalizeText(list4[value7])['replace'](/^#{1,6}\s*/u, ''),
+      characters: extractUploadedSceneCharacters(body2),
+      body: body2['join']('\x0a')['trim'](),
       source: 'upload-structured',
     };
-  })['filter']((_0xc1fa1d) => _0xc1fa1d['heading'] && _0xc1fa1d['body']);
+  })['filter']((dom) => dom['heading'] && dom['body']);
 }
-function createUploadedEpisode({
-  fullText: _0x38d5ef,
-  number: _0x2ef4cf,
-  title: _0x947d72,
-  index: _0x101d66,
-}) {
-  const _0xb90f11 = 'episode-' + (_0x101d66 + 0x1),
-    _0x525186 = normalizeText(_0x947d72) || '第\x20' + _0x2ef4cf + '\x20集',
-    _0x394888 = parseUploadedStoryEpisodeScenes({
-      fullText: _0x38d5ef,
-      episodeRef: _0xb90f11,
-      fallbackHeading: _0x525186,
+function createUploadedEpisode({ fullText: fullText2, number: number, title: title, index: index3 }) {
+  const episodeRef2 = 'episode-' + (index3 + 0x1),
+    fallbackHeading2 = normalizeText(title) || '第\x20' + number + '\x20集',
+    scenes = parseUploadedStoryEpisodeScenes({
+      fullText: fullText2,
+      episodeRef: episodeRef2,
+      fallbackHeading: fallbackHeading2,
     });
   return {
-    id: _0xb90f11,
-    planningRef: _0xb90f11,
-    number: _0x2ef4cf,
-    title: _0x525186,
+    id: episodeRef2,
+    planningRef: episodeRef2,
+    number: number,
+    title: fallbackHeading2,
     synopsis: '',
     hook: '',
-    sourceChapterIds: [_0xb90f11],
+    sourceChapterIds: [episodeRef2],
     assetRefs: [],
     assetIds: [],
     scriptStatus: 'completed',
     script: {
       schemaVersion: 0x1,
       source: 'upload',
-      episodeRef: _0xb90f11,
-      scenes: _0x394888,
-      fullText: _0x38d5ef,
+      episodeRef: episodeRef2,
+      scenes: scenes,
+      fullText: fullText2,
     },
     clips: [],
     clipCount: 0x0,
@@ -204,66 +197,65 @@ function createUploadedEpisode({
   };
 }
 export function parseUploadedStoryScript({ sourceText: sourceText = '', fileName: fileName = '' } = {}) {
-  const _0x271990 = normalizeText(sourceText);
-  if (!_0x271990) throw new Error('没有可导入的剧本文本。');
-  const _0xdf934c = findUploadedEpisodeHeadings(_0x271990),
-    _0x25347c = _0xdf934c['length']
-      ? _0xdf934c['map']((_0x1fe1dc, _0x3f670d) => {
-          const _0x5a7e79 = _0x3f670d === 0x0 ? 0x0 : _0x1fe1dc['index'],
-            _0x35b1e4 = _0xdf934c[_0x3f670d + 0x1]?.['index'] ?? _0x271990['length'];
+  const fullText3 = normalizeText(sourceText);
+  if (!fullText3) throw new Error('没有可导入的剧本文本。');
+  const list6 = findUploadedEpisodeHeadings(fullText3),
+    list7 = list6['length']
+      ? list6['map']((title2, count2) => {
+          const value10 = count2 === 0x0 ? 0x0 : title2['index'],
+            value11 = list6[count2 + 0x1]?.['index'] ?? fullText3['length'];
           return {
-            fullText: _0x271990['slice'](_0x5a7e79, _0x35b1e4)['trim'](),
-            number: parseChineseNumber(_0x1fe1dc['numberToken']) || _0x3f670d + 0x1,
-            title: _0x1fe1dc['title'],
+            fullText: fullText3['slice'](value10, value11)['trim'](),
+            number: parseChineseNumber(title2['numberToken']) || count2 + 0x1,
+            title: title2['title'],
           };
         })
-      : [{ fullText: _0x271990, number: 0x1, title: '' }],
-    _0x55ee60 = deriveUploadedStoryTitle(fileName, _0x271990, _0xdf934c),
-    _0x6bab80 = _0x25347c['filter']((_0x1e56cf) => _0x1e56cf['fullText'])['map']((_0x1e2f62, _0x577d9c) =>
+      : [{ fullText: fullText3, number: 0x1, title: '' }],
+    title3 = deriveUploadedStoryTitle(fileName, fullText3, list6),
+    episodes = list7['filter']((value12) => value12['fullText'])['map']((title4, index4) =>
       createUploadedEpisode({
-        ..._0x1e2f62,
-        index: _0x577d9c,
-        title: _0x1e2f62['title'] || (_0x25347c['length'] === 0x1 ? _0x55ee60 : ''),
+        ...title4,
+        index: index4,
+        title: title4['title'] || (list7['length'] === 0x1 ? title3 : ''),
       }),
     );
-  if (!_0x6bab80['length']) throw new Error('剧本中没有可导入的正文。');
+  if (!episodes['length']) throw new Error('剧本中没有可导入的正文。');
   return {
-    title: _0x55ee60,
-    sourceText: _0x271990,
-    episodes: _0x6bab80,
-    chapters: _0x6bab80['map']((_0x545052) => ({
-      id: _0x545052['id'],
-      title: '第\x20' + _0x545052['number'] + ' 集：' + _0x545052['title'],
-      content: _0x545052['script']['fullText'],
+    title: title3,
+    sourceText: fullText3,
+    episodes: episodes,
+    chapters: episodes['map']((id) => ({
+      id: id['id'],
+      title: '第\x20' + id['number'] + ' 集：' + id['title'],
+      content: id['script']['fullText'],
     })),
   };
 }
-export function attachUploadedStoryAssetsToEpisodes(_0x30907a = [], _0x47bc65 = []) {
-  const _0x2bf116 = Array['isArray'](_0x47bc65) ? _0x47bc65 : [];
-  return (Array['isArray'](_0x30907a) ? _0x30907a : [])['map']((_0x55d64f) => {
-    const _0x17867a = normalizeText(_0x55d64f?.['id']),
-      _0x4d80bd = _0x2bf116['filter']((_0x329dae) => {
-        const _0x54ac73 = [
-          ...(Array['isArray'](_0x329dae?.['sourceChapterIds']) ? _0x329dae['sourceChapterIds'] : []),
-          ...(Array['isArray'](_0x329dae?.['appearances'])
-            ? _0x329dae['appearances']['flatMap']((_0x18ca5e) =>
-                Array['isArray'](_0x18ca5e?.['sourceChapterIds']) ? _0x18ca5e['sourceChapterIds'] : [],
+export function attachUploadedStoryAssetsToEpisodes(list8 = [], value13 = []) {
+  const list9 = Array['isArray'](value13) ? value13 : [];
+  return (Array['isArray'](list8) ? list8 : [])['map']((args4) => {
+    const text3 = normalizeText(args4?.['id']),
+      assetRefs = list9['filter']((value14) => {
+        const list10 = [
+          ...(Array['isArray'](value14?.['sourceChapterIds']) ? value14['sourceChapterIds'] : []),
+          ...(Array['isArray'](value14?.['appearances'])
+            ? value14['appearances']['flatMap']((value15) =>
+                Array['isArray'](value15?.['sourceChapterIds']) ? value15['sourceChapterIds'] : [],
               )
             : []),
         ]['map'](normalizeText);
-        return _0x54ac73['includes'](_0x17867a);
+        return list10['includes'](text3);
       }),
-      _0x4b7286 = (_0x531bed) =>
-        _0x4d80bd['filter']((_0x463dea) => _0x463dea?.['kind'] === _0x531bed)['length'];
+      characterCount = (value16) => assetRefs['filter']((value17) => value17?.['kind'] === value16)['length'];
     return {
-      ..._0x55d64f,
-      assetRefs: _0x4d80bd['map']((_0x4697aa) =>
-        normalizeText(_0x4697aa?.['planningRef'] || _0x4697aa?.['ref'] || _0x4697aa?.['id']),
+      ...args4,
+      assetRefs: assetRefs['map']((value18) =>
+        normalizeText(value18?.['planningRef'] || value18?.['ref'] || value18?.['id']),
       )['filter'](Boolean),
-      assetIds: _0x4d80bd['map']((_0x15d161) => normalizeText(_0x15d161?.['id']))['filter'](Boolean),
-      characterCount: _0x4b7286('character'),
-      sceneCount: _0x4b7286('scene'),
-      propCount: _0x4b7286('prop'),
+      assetIds: assetRefs['map']((value19) => normalizeText(value19?.['id']))['filter'](Boolean),
+      characterCount: characterCount('character'),
+      sceneCount: characterCount('scene'),
+      propCount: characterCount('prop'),
     };
   });
 }

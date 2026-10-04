@@ -1,118 +1,93 @@
-import {
-  getAssetMentionCandidates,
-  getAssetMentionLibrarySettings,
-} from "./assetMentionRegistry.js";
+import { getAssetMentionCandidates, getAssetMentionLibrarySettings } from './assetMentionRegistry.js';
 import {
   DEFAULT_MATERIAL_LIBRARY_CATEGORIES,
   getMaterialFolderAssetCounts,
   getMaterialLibraryGroups,
   normalizeMaterialFolderParents,
-} from "./materialLibraryPolicy.js";
-const MEDIA_LABELS = Object["freeze"]({
-  image: "图片",
-  video: "视频",
-  audio: "音频",
-  text: "文本",
+} from './materialLibraryPolicy.js';
+const MEDIA_LABELS = Object['freeze']({
+  image: '图片',
+  video: '视频',
+  audio: '音频',
+  text: '文本',
 });
-function normalizeText(_0x21f09d) {
-  return String(_0x21f09d ?? "")["trim"]();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function normalizeCategoryKey(_0x33896b) {
-  return normalizeText(_0x33896b)["toLocaleLowerCase"]();
+function normalizeCategoryKey(item) {
+  return normalizeText(item)['toLocaleLowerCase']();
 }
-function escapeHtml(_0x384aa6) {
-  return String(_0x384aa6 ?? "")
-    ["replaceAll"]("&", "&amp;")
-    ["replaceAll"]("<", "&lt;")
-    ["replaceAll"](">", "&gt;")
-    ["replaceAll"]("\x22", "&quot;")
-    ["replaceAll"]("\x27", "&#39;");
+function escapeHtml(key) {
+  return String(key ?? '')
+    ['replaceAll']('&', '&amp;')
+    ['replaceAll']('<', '&lt;')
+    ['replaceAll']('>', '&gt;')
+    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('\x27', '&#39;');
 }
-function resolveAssetCategory(_0x4ee553 = {}) {
-  return (
-    normalizeText(_0x4ee553["category"] || _0x4ee553["assetCategory"]) || "其他"
-  );
+function resolveAssetCategory(options = {}) {
+  return normalizeText(options['category'] || options['assetCategory']) || '其他';
 }
-function formatCategoryLabel(_0x5d8a16) {
-  return normalizeText(_0x5d8a16) === "Others"
-    ? "其他"
-    : normalizeText(_0x5d8a16);
+function formatCategoryLabel(index) {
+  return normalizeText(index) === 'Others' ? '其他' : normalizeText(index);
 }
-function createCategoryValueMap(_0xf9cc93 = {}) {
+function createCategoryValueMap(options2 = {}) {
   return new Map(
-    Object["entries"](
-      _0xf9cc93 && typeof _0xf9cc93 === "object" ? _0xf9cc93 : {},
-    )
-      ["map"](([_0x36ded5, _0xc1b715]) => [
-        normalizeCategoryKey(_0x36ded5),
-        normalizeText(_0xc1b715),
-      ])
-      ["filter"](([_0x2d2c76, _0x5eacfa]) => _0x2d2c76 && _0x5eacfa),
+    Object['entries'](options2 && typeof options2 === 'object' ? options2 : {})
+      ['map'](([result, data]) => [normalizeCategoryKey(result), normalizeText(data)])
+      ['filter'](([target, source]) => target && source),
   );
 }
-function activateWorkspaceAssetLibraryImages(_0x573cbe) {
-  _0x573cbe?.["querySelectorAll"]?.(
-    ":scope > .workspace-asset-library-grid [data-workspace-asset-library-image]",
-  )?.["forEach"]?.((_0x19285f) => {
-    _0x19285f["loading"] = "eager";
+function activateWorkspaceAssetLibraryImages(next) {
+  next?.['querySelectorAll']?.(
+    ':scope > .workspace-asset-library-grid [data-workspace-asset-library-image]',
+  )?.['forEach']?.((current) => {
+    current['loading'] = 'eager';
   });
 }
-export function handleWorkspaceAssetLibraryImageError(_0x31878b) {
-  const _0x2afa5e = _0x31878b?.["target"],
-    _0x34d8c2 = normalizeText(
-      _0x2afa5e?.["getAttribute"]?.(
-        "data-workspace-asset-library-fallback-src",
-      ),
-    );
-  if (!_0x34d8c2) return ![];
-  _0x2afa5e["removeAttribute"]?.("data-workspace-asset-library-fallback-src");
-  if (normalizeText(_0x2afa5e["getAttribute"]?.("src")) === _0x34d8c2)
-    return ![];
-  return (
-    (_0x2afa5e["loading"] = "eager"),
-    _0x2afa5e["setAttribute"]?.("src", _0x34d8c2),
-    !![]
-  );
+export function handleWorkspaceAssetLibraryImageError(entry) {
+  const record = entry?.['target'],
+    text = normalizeText(record?.['getAttribute']?.('data-workspace-asset-library-fallback-src'));
+  if (!text) return ![];
+  record['removeAttribute']?.('data-workspace-asset-library-fallback-src');
+  if (normalizeText(record['getAttribute']?.('src')) === text) return ![];
+  return ((record['loading'] = 'eager'), record['setAttribute']?.('src', text), !![]);
 }
-export function getWorkspaceAssetLibraryMediaLabel(_0x52c7b3) {
-  return (
-    MEDIA_LABELS[normalizeText(_0x52c7b3)["toLocaleLowerCase"]()] || "素材"
-  );
+export function getWorkspaceAssetLibraryMediaLabel(payload) {
+  return MEDIA_LABELS[normalizeText(payload)['toLocaleLowerCase']()] || '素材';
 }
 export function buildWorkspaceAssetLibraryItems({
-  allowedTypes: allowedTypes = ["image"],
+  allowedTypes: allowedTypes = ['image'],
   limit: limit = 0x0,
 } = {}) {
-  const _0xf0035f = getAssetMentionCandidates({ allowedTypes: allowedTypes }),
-    _0x6c2782 =
+  const assetMentionCandidates = getAssetMentionCandidates({ allowedTypes: allowedTypes }),
+    handle =
       Number(limit) > 0x0
-        ? _0xf0035f["slice"](0x0, Math["trunc"](Number(limit)))
-        : _0xf0035f;
-  return _0x6c2782["map"]((_0x38f974) => {
-    const _0xf1fd2e = normalizeText(_0x38f974["thumbUrl"]),
-      _0x208369 = normalizeText(_0x38f974["url"]) || _0xf1fd2e,
-      _0x3e09bd =
-        normalizeText(_0x38f974["category"] || _0x38f974["assetCategory"]) ||
-        "其他";
+        ? assetMentionCandidates['slice'](0x0, Math['trunc'](Number(limit)))
+        : assetMentionCandidates;
+  return handle['map']((sourceAssetId) => {
+    const thumbnailUrl = normalizeText(sourceAssetId['thumbUrl']),
+      imageUrl = normalizeText(sourceAssetId['url']) || thumbnailUrl,
+      category = normalizeText(sourceAssetId['category'] || sourceAssetId['assetCategory']) || '其他';
     return {
-      id: "library-" + _0x38f974["assetId"] + "-" + _0x38f974["itemIndex"],
-      sourceAssetId: _0x38f974["assetId"],
-      sourceItemIndex: _0x38f974["itemIndex"],
-      kind: "library",
-      mediaKind: _0x38f974["type"],
-      category: _0x3e09bd,
-      assetCategory: _0x3e09bd,
-      name: _0x38f974["name"] || _0x38f974["assetName"] || "素材",
-      assetName: _0x38f974["assetName"] || "未分组素材",
-      role: getWorkspaceAssetLibraryMediaLabel(_0x38f974["type"]) + "素材",
-      occurrences: "来自总素材",
-      description: _0x38f974["assetName"]
-        ? "来自素材组「" + _0x38f974["assetName"] + "」"
-        : "来自总素材",
-      prompt: "",
-      imageUrl: _0x208369,
-      thumbnailUrl: _0xf1fd2e,
-      sourceUrl: _0x208369,
+      id: 'library-' + sourceAssetId['assetId'] + '-' + sourceAssetId['itemIndex'],
+      sourceAssetId: sourceAssetId['assetId'],
+      sourceItemIndex: sourceAssetId['itemIndex'],
+      kind: 'library',
+      mediaKind: sourceAssetId['type'],
+      category: category,
+      assetCategory: category,
+      name: sourceAssetId['name'] || sourceAssetId['assetName'] || '素材',
+      assetName: sourceAssetId['assetName'] || '未分组素材',
+      role: getWorkspaceAssetLibraryMediaLabel(sourceAssetId['type']) + '素材',
+      occurrences: '来自总素材',
+      description: sourceAssetId['assetName']
+        ? '来自素材组「' + sourceAssetId['assetName'] + '」'
+        : '来自总素材',
+      prompt: '',
+      imageUrl: imageUrl,
+      thumbnailUrl: thumbnailUrl,
+      sourceUrl: imageUrl,
       isLibraryAsset: !![],
     };
   });
@@ -123,208 +98,175 @@ export function buildWorkspaceAssetLibraryHierarchy({
   displayNames: displayNames = null,
   parents: parents = null,
 } = {}) {
-  const _0x19ee41 = getAssetMentionLibrarySettings(),
-    _0x5b2d13 = Array["isArray"](categories)
-      ? categories
-      : _0x19ee41["categories"],
-    _0x5979ae =
-      displayNames && typeof displayNames === "object"
+  const assetMentionLibrarySettings = getAssetMentionLibrarySettings(),
+    categories2 = Array['isArray'](categories) ? categories : assetMentionLibrarySettings['categories'],
+    state =
+      displayNames && typeof displayNames === 'object'
         ? displayNames
-        : _0x19ee41["displayNames"],
-    _0xddfc37 =
-      parents && typeof parents === "object" ? parents : _0x19ee41["parents"],
-    _0x79785f = (Array["isArray"](assets) ? assets : [])["map"](
-      (_0x288de2) => ({
-        ..._0x288de2,
-        category: resolveAssetCategory(_0x288de2),
-      }),
-    ),
-    _0x1a8c13 = getMaterialLibraryGroups({
-      assets: _0x79785f,
-      categories: _0x5b2d13["length"]
-        ? _0x5b2d13
-        : DEFAULT_MATERIAL_LIBRARY_CATEGORIES,
+        : assetMentionLibrarySettings['displayNames'],
+    parents2 = parents && typeof parents === 'object' ? parents : assetMentionLibrarySettings['parents'],
+    assets2 = (Array['isArray'](assets) ? assets : [])['map']((args) => ({
+      ...args,
+      category: resolveAssetCategory(args),
+    })),
+    allCategories = getMaterialLibraryGroups({
+      assets: assets2,
+      categories: categories2['length'] ? categories2 : DEFAULT_MATERIAL_LIBRARY_CATEGORIES,
       categoryKey: normalizeCategoryKey,
     }),
-    _0x307c54 = normalizeMaterialFolderParents({
-      parents: _0xddfc37,
-      userCategories: Object["keys"](_0xddfc37 || {}),
-      allCategories: _0x1a8c13["map"]((_0x35e625) => _0x35e625["category"]),
+    parents3 = normalizeMaterialFolderParents({
+      parents: parents2,
+      userCategories: Object['keys'](parents2 || {}),
+      allCategories: allCategories['map']((config) => config['category']),
       categoryKey: normalizeCategoryKey,
     }),
-    _0x51aae1 = createCategoryValueMap(_0x307c54),
-    _0x4271b6 = createCategoryValueMap(_0x5979ae),
-    _0x38ec66 = getMaterialFolderAssetCounts({
-      groups: _0x1a8c13,
-      parents: _0x307c54,
+    categoryValueMap = createCategoryValueMap(parents3),
+    label = createCategoryValueMap(state),
+    count = getMaterialFolderAssetCounts({
+      groups: allCategories,
+      parents: parents3,
       categoryKey: normalizeCategoryKey,
     }),
-    _0x210109 = _0x1a8c13["map"]((_0x13bae2) => {
-      const _0x420df9 = resolveAssetCategory(_0x13bae2),
-        _0x41ffc8 = normalizeCategoryKey(_0x420df9);
+    scope = allCategories['map']((assets3) => {
+      const category2 = resolveAssetCategory(assets3),
+        categoryKey = normalizeCategoryKey(category2);
       return {
-        category: _0x420df9,
-        label: _0x4271b6["get"](_0x41ffc8) || formatCategoryLabel(_0x420df9),
-        count: _0x38ec66["get"](_0x41ffc8) ?? _0x13bae2["assets"]["length"],
-        assets: _0x13bae2["assets"],
+        category: category2,
+        label: label['get'](categoryKey) || formatCategoryLabel(category2),
+        count: count['get'](categoryKey) ?? assets3['assets']['length'],
+        assets: assets3['assets'],
         children: [],
       };
     }),
-    _0x232a0f = new Map(
-      _0x210109["map"]((_0xaf7f6c) => [
-        normalizeCategoryKey(_0xaf7f6c["category"]),
-        _0xaf7f6c,
-      ]),
-    ),
-    _0x3beb88 = [];
-  _0x210109["forEach"]((_0x1dee5c) => {
-    const _0x5a6d09 = _0x232a0f["get"](
-      normalizeCategoryKey(
-        _0x51aae1["get"](normalizeCategoryKey(_0x1dee5c["category"])),
-      ),
+    input = new Map(scope['map']((output) => [normalizeCategoryKey(output['category']), output])),
+    value2 = [];
+  scope['forEach']((value3) => {
+    const value4 = input['get'](
+      normalizeCategoryKey(categoryValueMap['get'](normalizeCategoryKey(value3['category']))),
     );
-    if (_0x5a6d09 && _0x5a6d09 !== _0x1dee5c)
-      _0x5a6d09["children"]["push"](_0x1dee5c);
-    else _0x3beb88["push"](_0x1dee5c);
+    if (value4 && value4 !== value3) value4['children']['push'](value3);
+    else value2['push'](value3);
   });
-  const _0x153e8e = (_0x741ac2) => {
+  const value5 = (value6) => {
     return (
-      (_0x741ac2["children"] = _0x741ac2["children"]["filter"](_0x153e8e)),
-      _0x741ac2["assets"]["length"] > 0x0 ||
-        _0x741ac2["children"]["length"] > 0x0
+      (value6['children'] = value6['children']['filter'](value5)),
+      value6['assets']['length'] > 0x0 || value6['children']['length'] > 0x0
     );
   };
-  return _0x3beb88["filter"](_0x153e8e);
+  return value2['filter'](value5);
 }
-export function getWorkspaceAssetLibrarySelectionOrder(_0x3b42d1, _0x3c91a3) {
-  const _0x536374 = (_0x1172a5) =>
-    _0x1172a5["flatMap"]((_0x30c64d) =>
-      _0x3c91a3?.["isExpanded"](_0x30c64d["category"])
-        ? [
-            ..._0x536374(_0x30c64d["children"]),
-            ..._0x30c64d["assets"]["map"]((_0x8a6774) => _0x8a6774["id"]),
-          ]
+export function getWorkspaceAssetLibrarySelectionOrder(assets4, value7) {
+  const run = (value8) =>
+    value8['flatMap']((args2) =>
+      value7?.['isExpanded'](args2['category'])
+        ? [...run(args2['children']), ...args2['assets']['map']((value9) => value9['id'])]
         : [],
     );
-  return _0x536374(buildWorkspaceAssetLibraryHierarchy({ assets: _0x3b42d1 }));
+  return run(buildWorkspaceAssetLibraryHierarchy({ assets: assets4 }));
 }
 export function renderWorkspaceAssetLibraryGroups({
   assets: assets = [],
   expandedCategories: expandedCategories = [],
-  renderAsset: renderAsset = () => "",
+  renderAsset: renderAsset = () => '',
 } = {}) {
-  const _0x12f43b = new Set(
-      (Array["isArray"](expandedCategories) ? expandedCategories : [])
-        ["map"](normalizeCategoryKey)
-        ["filter"](Boolean),
+  const value10 = new Set(
+      (Array['isArray'](expandedCategories) ? expandedCategories : [])
+        ['map'](normalizeCategoryKey)
+        ['filter'](Boolean),
     ),
-    _0x57bb86 = buildWorkspaceAssetLibraryHierarchy({ assets: assets });
-  if (!_0x57bb86["length"]) return "";
-  const _0x2103fb = (_0x53fac1, _0x5e43d0 = 0x0) => {
-    const _0x3cfc5a = _0x53fac1["category"],
-      _0x2af28c = escapeHtml(_0x3cfc5a),
-      _0x40cb75 = _0x12f43b["has"](normalizeCategoryKey(_0x3cfc5a)),
-      _0x3e52bc = _0x53fac1["children"]
-        ["map"]((_0x2b4362) => _0x2103fb(_0x2b4362, _0x5e43d0 + 0x1))
-        ["join"](""),
-      _0x18d9c2 = _0x53fac1["assets"]["length"]
+    workspaceAssetLibraryHierarchy = buildWorkspaceAssetLibraryHierarchy({ assets: assets });
+  if (!workspaceAssetLibraryHierarchy['length']) return '';
+  const run2 = (value11, count2 = 0x0) => {
+    const value12 = value11['category'],
+      escapeHtml2 = escapeHtml(value12),
+      enabled = value10['has'](normalizeCategoryKey(value12)),
+      value13 = value11['children']['map']((value14) => run2(value14, count2 + 0x1))['join'](''),
+      value15 = value11['assets']['length']
         ? '<div class="story-asset-grid workspace-asset-library-grid">' +
-          _0x53fac1["assets"]["map"](renderAsset)["join"]("") +
-          "</div>"
-        : "";
+          value11['assets']['map'](renderAsset)['join']('') +
+          '</div>'
+        : '';
     return (
-      "<section\x20class=\x22v2-material-folder\x20workspace-asset-library-group" +
-      (_0x5e43d0 > 0x0 ? " is-nested" : "") +
-      "\x22\x20data-workspace-asset-library-category=\x22" +
-      _0x2af28c +
+      '<section\x20class=\x22v2-material-folder\x20workspace-asset-library-group' +
+      (count2 > 0x0 ? ' is-nested' : '') +
+      '\x22\x20data-workspace-asset-library-category=\x22' +
+      escapeHtml2 +
       '" role="treeitem" aria-level="' +
-      (_0x5e43d0 + 0x1) +
-      "\x22\x20aria-expanded=\x22" +
-      _0x40cb75 +
+      (count2 + 0x1) +
+      '\x22\x20aria-expanded=\x22' +
+      enabled +
       '">\n      <div class="v2-material-folder-row workspace-asset-library-folder-row">\n        <button type="button" class="v2-material-folder-toggle workspace-asset-library-folder-toggle" data-workspace-asset-library-toggle="' +
-      _0x2af28c +
+      escapeHtml2 +
       '" aria-expanded="' +
-      _0x40cb75 +
-      "\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-material-tree-chevron" +
-      (_0x40cb75 ? " is-open" : "") +
+      enabled +
+      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-material-tree-chevron' +
+      (enabled ? ' is-open' : '') +
       '" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>\n          <span class="v2-material-folder-icon" aria-hidden="true"><svg viewBox="0 0 28 24"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3H11l2.4 2.5h10.1A2.5 2.5 0 0 1 26 8v11.5a2.5 2.5 0 0 1-2.5 2.5h-19A2.5 2.5 0 0 1 2 19.5v-14Z" fill="currentColor"/></svg></span>\n          <span class="v2-material-folder-name">' +
-      escapeHtml(_0x53fac1["label"]) +
+      escapeHtml(value11['label']) +
       '</span>\n        </button>\n        <span class="v2-material-folder-count">' +
-      _0x53fac1["count"] +
-      "</span>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-material-folder-content\x20workspace-asset-library-category-content\x22\x20data-workspace-asset-library-category-content=\x22" +
-      _0x2af28c +
-      "\x22\x20role=\x22group\x22\x20aria-hidden=\x22" +
-      !_0x40cb75 +
-      "\x22" +
-      (_0x40cb75 ? "" : " hidden") +
-      ">\n        " +
-      _0x3e52bc +
-      _0x18d9c2 +
-      "\n      </div>\n    </section>"
+      value11['count'] +
+      '</span>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-material-folder-content\x20workspace-asset-library-category-content\x22\x20data-workspace-asset-library-category-content=\x22' +
+      escapeHtml2 +
+      '\x22\x20role=\x22group\x22\x20aria-hidden=\x22' +
+      !enabled +
+      '\x22' +
+      (enabled ? '' : ' hidden') +
+      '>\n        ' +
+      value13 +
+      value15 +
+      '\n      </div>\n    </section>'
     );
   };
   return (
     '<div class="workspace-asset-library-groups" data-workspace-asset-library-groups role="tree" aria-label="总素材分类">\n    ' +
-    _0x57bb86["map"]((_0x2ef129) => _0x2103fb(_0x2ef129))["join"]("") +
-    "\n  </div>"
+    workspaceAssetLibraryHierarchy['map']((value16) => run2(value16))['join']('') +
+    '\n  </div>'
   );
 }
-export function createWorkspaceAssetLibraryDisclosure({
-  expandedCategories: expandedCategories = [],
-} = {}) {
-  const _0x116e94 = new Set(
-      (Array["isArray"](expandedCategories) ? expandedCategories : [])
-        ["map"](normalizeCategoryKey)
-        ["filter"](Boolean),
+export function createWorkspaceAssetLibraryDisclosure({ expandedCategories: expandedCategories = [] } = {}) {
+  const args3 = new Set(
+      (Array['isArray'](expandedCategories) ? expandedCategories : [])
+        ['map'](normalizeCategoryKey)
+        ['filter'](Boolean),
     ),
-    _0x29cc6d = new Map(),
-    _0x1e43bc = (_0x2613c6) =>
-      _0x116e94["has"](normalizeCategoryKey(_0x2613c6)),
-    _0x421b05 = (_0x507016) => {
-      const _0x1c85a9 = normalizeText(_0x507016),
-        _0x12550f = normalizeCategoryKey(_0x1c85a9);
-      if (!_0x12550f) return ![];
-      _0x29cc6d["set"](_0x12550f, _0x1c85a9);
-      if (_0x116e94["has"](_0x12550f)) _0x116e94["delete"](_0x12550f);
-      else _0x116e94["add"](_0x12550f);
-      return _0x116e94["has"](_0x12550f);
+    value17 = new Map(),
+    isExpanded = (value18) => args3['has'](normalizeCategoryKey(value18)),
+    toggle = (value19) => {
+      const text2 = normalizeText(value19),
+        categoryKey2 = normalizeCategoryKey(text2);
+      if (!categoryKey2) return ![];
+      value17['set'](categoryKey2, text2);
+      if (args3['has'](categoryKey2)) args3['delete'](categoryKey2);
+      else args3['add'](categoryKey2);
+      return args3['has'](categoryKey2);
     };
   return {
-    getExpandedCategories: () =>
-      [..._0x116e94]["map"](
-        (_0x1ec2ea) => _0x29cc6d["get"](_0x1ec2ea) || _0x1ec2ea,
-      ),
-    isExpanded: _0x1e43bc,
-    toggle: _0x421b05,
-    toggleFromTarget(_0x12d8d9) {
-      const _0xcb5852 = _0x12d8d9?.["closest"]?.(
-        "[data-workspace-asset-library-toggle]",
-      );
-      if (!_0xcb5852) return ![];
-      const _0x30c2ca = _0xcb5852["dataset"]?.["workspaceAssetLibraryToggle"],
-        _0x974f36 = _0x421b05(_0x30c2ca),
-        _0x31bf21 = _0xcb5852["closest"]?.(
-          "[data-workspace-asset-library-category]",
-        ),
-        _0x493913 = _0x31bf21?.["querySelector"]?.(
-          "[data-workspace-asset-library-category-content]",
-        );
-      (_0x31bf21?.["setAttribute"]?.("aria-expanded", String(_0x974f36)),
-        _0xcb5852["setAttribute"]?.("aria-expanded", String(_0x974f36)),
-        _0xcb5852["querySelector"]?.(".v2-material-tree-chevron")?.[
-          "classList"
-        ]?.["toggle"]?.("is-open", _0x974f36));
-      if (_0x493913) {
-        ((_0x493913["hidden"] = !_0x974f36),
-          _0x493913["setAttribute"]?.("aria-hidden", String(!_0x974f36)));
-        if (_0x974f36) activateWorkspaceAssetLibraryImages(_0x493913);
+    getExpandedCategories: () => [...args3]['map']((value20) => value17['get'](value20) || value20),
+    isExpanded: isExpanded,
+    toggle: toggle,
+    toggleFromTarget(value21) {
+      const enabled2 = value21?.['closest']?.('[data-workspace-asset-library-toggle]');
+      if (!enabled2) return ![];
+      const value22 = enabled2['dataset']?.['workspaceAssetLibraryToggle'],
+        enabled3 = toggle(value22),
+        value23 = enabled2['closest']?.('[data-workspace-asset-library-category]'),
+        value24 = value23?.['querySelector']?.('[data-workspace-asset-library-category-content]');
+      (value23?.['setAttribute']?.('aria-expanded', String(enabled3)),
+        enabled2['setAttribute']?.('aria-expanded', String(enabled3)),
+        enabled2['querySelector']?.('.v2-material-tree-chevron')?.['classList']?.['toggle']?.(
+          'is-open',
+          enabled3,
+        ));
+      if (value24) {
+        ((value24['hidden'] = !enabled3), value24['setAttribute']?.('aria-hidden', String(!enabled3)));
+        if (enabled3) activateWorkspaceAssetLibraryImages(value24);
       }
       return !![];
     },
-    render(_0x55e469 = {}) {
+    render(args4 = {}) {
       return renderWorkspaceAssetLibraryGroups({
-        ..._0x55e469,
-        expandedCategories: [..._0x116e94],
+        ...args4,
+        expandedCategories: [...args3],
       });
     },
   };

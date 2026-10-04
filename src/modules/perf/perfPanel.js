@@ -14,332 +14,326 @@ function getDefaultWindow() {
   if (typeof window === 'undefined') return null;
   return window;
 }
-function toFiniteNumber(_0x156e53, _0x18b682 = null) {
-  const _0x201053 = Number(_0x156e53);
-  return Number.isFinite(_0x201053) ? _0x201053 : _0x18b682;
+function toFiniteNumber(value, item = null) {
+  const key = Number(value);
+  return Number.isFinite(key) ? key : item;
 }
-function asArray(_0x3dd3fb) {
-  return Array.isArray(_0x3dd3fb) ? _0x3dd3fb : [];
+function asArray(index) {
+  return Array.isArray(index) ? index : [];
 }
-function latestSample(_0x55cbe9) {
-  const _0x4d4a4a = asArray(_0x55cbe9);
-  return _0x4d4a4a.length > 0 ? _0x4d4a4a[_0x4d4a4a.length - 1] : null;
+function latestSample(result) {
+  const list = asArray(result);
+  return list.length > 0 ? list[list.length - 1] : null;
 }
-function averageField(_0x516a16, _0x5d412d) {
-  const _0x36905e = asArray(_0x516a16)
-    .map((_0x1c3276) => toFiniteNumber(_0x1c3276?.[_0x5d412d]))
-    .filter((_0x19086b) => _0x19086b !== null && _0x19086b >= 0);
-  if (_0x36905e.length === 0) return null;
-  return _0x36905e.reduce((_0x129b2c, _0x3a2a12) => _0x129b2c + _0x3a2a12, 0) / _0x36905e.length;
+function averageField(data, options) {
+  const list2 = asArray(data)
+    .map((item2) => toFiniteNumber(item2?.[options]))
+    .filter((count) => count !== null && count >= 0);
+  if (list2.length === 0) return null;
+  return list2.reduce((item3, target) => item3 + target, 0) / list2.length;
 }
-function formatMs(_0x293f86) {
-  const _0x35ad44 = toFiniteNumber(_0x293f86);
-  if (_0x35ad44 === null) return '-';
-  if (_0x35ad44 === 0) return '0 ms';
-  return _0x35ad44.toFixed(_0x35ad44 >= 10 ? 1 : 2) + ' ms';
+function formatMs(source) {
+  const toFiniteNumber2 = toFiniteNumber(source);
+  if (toFiniteNumber2 === null) return '-';
+  if (toFiniteNumber2 === 0) return '0 ms';
+  return toFiniteNumber2.toFixed(toFiniteNumber2 >= 10 ? 1 : 2) + ' ms';
 }
-function formatFps(_0xcc15bb) {
-  const _0x4e99a3 = toFiniteNumber(_0xcc15bb);
-  if (_0x4e99a3 === null) return '-';
-  return _0x4e99a3.toFixed(_0x4e99a3 >= 100 ? 0 : 1) + ' fps';
+function formatFps(next) {
+  const toFiniteNumber3 = toFiniteNumber(next);
+  if (toFiniteNumber3 === null) return '-';
+  return toFiniteNumber3.toFixed(toFiniteNumber3 >= 100 ? 0 : 1) + ' fps';
 }
-function formatCount(_0x447cd6) {
-  const _0x6bef9a = toFiniteNumber(_0x447cd6);
-  if (_0x6bef9a === null) return '-';
-  return String(Math.round(_0x6bef9a));
+function formatCount(current) {
+  const toFiniteNumber4 = toFiniteNumber(current);
+  if (toFiniteNumber4 === null) return '-';
+  return String(Math.round(toFiniteNumber4));
 }
-function formatDurationWithAverage(_0x5eb8a8, _0x1ce280) {
-  if (!_0x1ce280) return '-';
-  const _0x42773a = averageField(_0x5eb8a8, 'durationMs');
-  return formatMs(_0x1ce280.durationMs) + ' / avg ' + formatMs(_0x42773a);
+function formatDurationWithAverage(entry, enabled) {
+  if (!enabled) return '-';
+  const averageField2 = averageField(entry, 'durationMs');
+  return formatMs(enabled.durationMs) + ' / avg ' + formatMs(averageField2);
 }
-function formatFpsSession(_0x5d0900) {
-  if (!_0x5d0900) return '-';
-  return formatFps(_0x5d0900.avgFps) + ' / ' + formatCount(_0x5d0900.frameCount) + ' frames';
+function formatFpsSession(enabled2) {
+  if (!enabled2) return '-';
+  return formatFps(enabled2.avgFps) + ' / ' + formatCount(enabled2.frameCount) + ' frames';
 }
-export function formatPerfPanelRows(_0x26b921 = {}) {
-  const _0x5bd97f = asArray(_0x26b921.renderFrameSamples),
-    _0x4d5997 = asArray(_0x26b921.edgeRedrawSamples),
-    _0x25535b = asArray(_0x26b921.canvasPanSamples),
-    _0x57e1d9 = asArray(_0x26b921.minimapUpdateSamples),
-    _0x25f0c2 = asArray(_0x26b921.virtualizationSamples),
-    _0x9226cc = latestSample(_0x5bd97f),
-    _0x6d518d = latestSample(_0x4d5997),
-    _0x479e6a = latestSample(_0x25535b),
-    _0x223b6c = latestSample(_0x57e1d9),
-    _0x51e05a = latestSample(_0x25f0c2),
-    _0x13a513 = latestSample(_0x26b921.panFpsSessions),
-    _0x488709 = latestSample(_0x26b921.zoomFpsSessions),
-    _0x134b68 = latestSample(_0x26b921.dragFpsSessions),
-    _0x54aab5 = latestSample(_0x26b921.resizeFpsSessions),
-    _0x32f19d = _0x9226cc || _0x479e6a || {},
-    _0x39341b = _0x26b921.staticMediaResourceSummary || {},
-    _0x2e6b46 = _0x26b921.mediaSchedulerStats || {};
+export function formatPerfPanelRows(value2 = {}) {
+  const asArray2 = asArray(value2.renderFrameSamples),
+    asArray3 = asArray(value2.edgeRedrawSamples),
+    asArray4 = asArray(value2.canvasPanSamples),
+    asArray5 = asArray(value2.minimapUpdateSamples),
+    asArray6 = asArray(value2.virtualizationSamples),
+    latestSample2 = latestSample(asArray2),
+    value3 = latestSample(asArray3),
+    value4 = latestSample(asArray4),
+    value5 = latestSample(asArray5),
+    value6 = latestSample(asArray6),
+    latestSample3 = latestSample(value2.panFpsSessions),
+    latestSample4 = latestSample(value2.zoomFpsSessions),
+    latestSample5 = latestSample(value2.dragFpsSessions),
+    latestSample6 = latestSample(value2.resizeFpsSessions),
+    record = latestSample2 || value4 || {},
+    payload = value2.staticMediaResourceSummary || {},
+    handle = value2.mediaSchedulerStats || {};
   return [
-    { label: 'Probe', value: _0x26b921.enabled === true ? 'on' : 'off' },
-    { label: 'Render', value: formatDurationWithAverage(_0x5bd97f, _0x9226cc) },
+    { label: 'Probe', value: value2.enabled === true ? 'on' : 'off' },
+    { label: 'Render', value: formatDurationWithAverage(asArray2, latestSample2) },
     {
       label: 'Startup',
       value:
         'visual ' +
-        formatMs(_0x26b921.firstVisualMs) +
+        formatMs(value2.firstVisualMs) +
         ' / interactive ' +
-        formatMs(_0x26b921.firstInteractiveMs) +
+        formatMs(value2.firstInteractiveMs) +
         ' / max long ' +
-        formatMs(_0x26b921.maxLongTaskMs),
+        formatMs(value2.maxLongTaskMs),
     },
     {
       label: 'Nodes',
-      value:
-        formatCount(_0x32f19d.mountedNodeCount) + ' mounted / ' + formatCount(_0x32f19d.nodeCount) + ' total',
+      value: formatCount(record.mountedNodeCount) + ' mounted / ' + formatCount(record.nodeCount) + ' total',
     },
     {
       label: 'Edges',
-      value: _0x6d518d
-        ? formatDurationWithAverage(_0x4d5997, _0x6d518d) +
+      value: value3
+        ? formatDurationWithAverage(asArray3, value3) +
           ' / ' +
-          formatCount(_0x6d518d.visibleEdgeCount) +
+          formatCount(value3.visibleEdgeCount) +
           ' visible'
         : '-',
     },
     {
       label: 'Pan',
-      value: _0x479e6a
-        ? formatDurationWithAverage(_0x25535b, _0x479e6a) +
-          ' / ' +
-          formatCount(_0x479e6a.moveCount) +
-          ' moves'
+      value: value4
+        ? formatDurationWithAverage(asArray4, value4) + ' / ' + formatCount(value4.moveCount) + ' moves'
         : '-',
     },
-    { label: 'Pan FPS', value: formatFpsSession(_0x13a513) },
-    { label: 'Zoom FPS', value: formatFpsSession(_0x488709) },
-    { label: 'Drag FPS', value: formatFpsSession(_0x134b68 || _0x54aab5) },
+    { label: 'Pan FPS', value: formatFpsSession(latestSample3) },
+    { label: 'Zoom FPS', value: formatFpsSession(latestSample4) },
+    { label: 'Drag FPS', value: formatFpsSession(latestSample5 || latestSample6) },
     {
       label: 'Minimap',
-      value: _0x223b6c
-        ? formatDurationWithAverage(_0x57e1d9, _0x223b6c) + ' / ' + formatCount(_0x223b6c.dotCount) + ' dots'
+      value: value5
+        ? formatDurationWithAverage(asArray5, value5) + ' / ' + formatCount(value5.dotCount) + ' dots'
         : '-',
     },
     {
       label: 'Virtualize',
-      value: _0x51e05a
-        ? (_0x51e05a.spatialIndex ? 'index' : 'scan') +
+      value: value6
+        ? (value6.spatialIndex ? 'index' : 'scan') +
           ' / ' +
-          formatCount(_0x51e05a.mountCandidateCount) +
+          formatCount(value6.mountCandidateCount) +
           ' mount / ' +
-          formatCount(_0x51e05a.parkCandidateCount) +
+          formatCount(value6.parkCandidateCount) +
           ' park'
         : '-',
     },
     {
       label: 'Preview',
       value:
-        formatCount(_0x9226cc?.fastPreviewCount) +
+        formatCount(latestSample2?.fastPreviewCount) +
         ' fast / ' +
-        formatCount(_0x9226cc?.visibleFastPreviewCount) +
+        formatCount(latestSample2?.visibleFastPreviewCount) +
         ' visible / ' +
-        formatCount(_0x9226cc?.previewWithMediaCount) +
+        formatCount(latestSample2?.previewWithMediaCount) +
         ' media / ' +
-        formatCount(_0x9226cc?.deferredMountedWithPreviewCount) +
+        formatCount(latestSample2?.deferredMountedWithPreviewCount) +
         ' deferred',
     },
     {
       label: 'Media Queue',
       value:
-        formatCount(_0x2e6b46.imagePreloadActive) +
+        formatCount(handle.imagePreloadActive) +
         ' active / ' +
-        formatCount(_0x2e6b46.imagePreloadQueued) +
+        formatCount(handle.imagePreloadQueued) +
         ' queued / ' +
-        formatCount(_0x2e6b46.imagePreloadDeduped) +
+        formatCount(handle.imagePreloadDeduped) +
         ' dedupe / ' +
-        formatCount(_0x2e6b46.imagePreloadPromoted) +
+        formatCount(handle.imagePreloadPromoted) +
         ' promote / ' +
-        formatCount(_0x2e6b46.imagePreloadCanceled) +
+        formatCount(handle.imagePreloadCanceled) +
         ' cancel / ' +
-        (_0x2e6b46.imagePreloadPaused === true ? 'paused' : 'live'),
+        (handle.imagePreloadPaused === true ? 'paused' : 'live'),
     },
     {
       label: 'Media',
       value:
-        formatCount(_0x39341b.staticMediaCount) +
+        formatCount(payload.staticMediaCount) +
         ' static / ' +
-        formatCount(_0x39341b.derivedMediaCount) +
+        formatCount(payload.derivedMediaCount) +
         ' thumbs / ' +
-        formatCount(_0x39341b.cacheHitLikeCount) +
+        formatCount(payload.cacheHitLikeCount) +
         ' cached / ' +
-        formatCount(_0x39341b.imageRequestCount) +
+        formatCount(payload.imageRequestCount) +
         ' img req / ' +
-        formatCount(_0x39341b.mp4RequestCount) +
+        formatCount(payload.mp4RequestCount) +
         ' mp4 / ' +
-        formatCount(_0x39341b.videoElementCount) +
+        formatCount(payload.videoElementCount) +
         ' video els',
     },
   ];
 }
-function createTextElement(_0x32ba50, _0x5dbc82, _0x3806f3, _0x4b2b61) {
-  const _0x46acb4 = _0x32ba50.createElement(_0x5dbc82);
-  return ((_0x46acb4.className = _0x3806f3), (_0x46acb4.textContent = _0x4b2b61), _0x46acb4);
+function createTextElement(el, state, config, scope) {
+  const el2 = el.createElement(state);
+  return ((el2.className = config), (el2.textContent = scope), el2);
 }
-function createPanelButton(_0x3bc06a, _0x3794c3, _0x7660b5, _0x5d55d3) {
-  const _0x3b35bc = _0x3bc06a.createElement('button');
+function createPanelButton(el3, input, output, value7) {
+  const el4 = el3.createElement('button');
   return (
-    (_0x3b35bc.type = 'button'),
-    (_0x3b35bc.className = _0x3794c3),
-    (_0x3b35bc.title = _0x5d55d3),
-    _0x3b35bc.setAttribute('aria-label', _0x5d55d3),
-    (_0x3b35bc.textContent = _0x7660b5),
-    _0x3b35bc
+    (el4.type = 'button'),
+    (el4.className = input),
+    (el4.title = value7),
+    el4.setAttribute('aria-label', value7),
+    (el4.textContent = output),
+    el4
   );
 }
-function createPerfPanel(_0x2bd4d6) {
-  const _0xf17811 = _0x2bd4d6.createElement('section');
-  ((_0xf17811.id = PERF_PANEL_ID),
-    (_0xf17811.className = 'perf-panel'),
-    (_0xf17811.hidden = true),
-    _0xf17811.setAttribute('aria-label', 'Performance panel'),
-    _0xf17811.setAttribute('aria-live', 'polite'));
-  const _0x442957 = _0x2bd4d6.createElement('div');
-  _0x442957.className = 'perf-panel-head';
-  const _0x292bb1 = createTextElement(_0x2bd4d6, 'div', 'perf-panel-title', 'Perf'),
-    _0x243695 = _0x2bd4d6.createElement('div');
-  _0x243695.className = 'perf-panel-actions';
-  const _0x190b8b = createPanelButton(_0x2bd4d6, 'perf-panel-action', 'Reset', 'Reset performance samples'),
-    _0x405b09 = createPanelButton(
-      _0x2bd4d6,
+function createPerfPanel(el5) {
+  const el6 = el5.createElement('section');
+  ((el6.id = PERF_PANEL_ID),
+    (el6.className = 'perf-panel'),
+    (el6.hidden = true),
+    el6.setAttribute('aria-label', 'Performance panel'),
+    el6.setAttribute('aria-live', 'polite'));
+  const el7 = el5.createElement('div');
+  el7.className = 'perf-panel-head';
+  const textElement = createTextElement(el5, 'div', 'perf-panel-title', 'Perf'),
+    el8 = el5.createElement('div');
+  el8.className = 'perf-panel-actions';
+  const resetBtn = createPanelButton(el5, 'perf-panel-action', 'Reset', 'Reset performance samples'),
+    closeBtn = createPanelButton(
+      el5,
       'perf-panel-action perf-panel-action-close',
       'Close',
       'Close performance panel',
     );
-  (_0x243695.appendChild(_0x190b8b),
-    _0x243695.appendChild(_0x405b09),
-    _0x442957.appendChild(_0x292bb1),
-    _0x442957.appendChild(_0x243695));
-  const _0x54eaad = _0x2bd4d6.createElement('div');
+  (el8.appendChild(resetBtn), el8.appendChild(closeBtn), el7.appendChild(textElement), el7.appendChild(el8));
+  const grid = el5.createElement('div');
   return (
-    (_0x54eaad.className = 'perf-panel-grid'),
-    _0xf17811.appendChild(_0x442957),
-    _0xf17811.appendChild(_0x54eaad),
-    (_0xf17811.__perfPanelParts = { grid: _0x54eaad, resetBtn: _0x190b8b, closeBtn: _0x405b09, rows: [] }),
-    _0x2bd4d6.body?.appendChild(_0xf17811),
-    _0xf17811
+    (grid.className = 'perf-panel-grid'),
+    el6.appendChild(el7),
+    el6.appendChild(grid),
+    (el6.__perfPanelParts = { grid: grid, resetBtn: resetBtn, closeBtn: closeBtn, rows: [] }),
+    el5.body?.appendChild(el6),
+    el6
   );
 }
-function ensurePerfPanel(_0x15b57d) {
-  const _0x29aaea = _0x15b57d.getElementById(PERF_PANEL_ID);
-  if (_0x29aaea?.__perfPanelParts) return _0x29aaea;
-  return (_0x29aaea?.remove(), createPerfPanel(_0x15b57d));
+function ensurePerfPanel(value8) {
+  const el9 = value8.getElementById(PERF_PANEL_ID);
+  if (el9?.__perfPanelParts) return el9;
+  return (el9?.remove(), createPerfPanel(value8));
 }
-function renderPerfPanel(_0x11f751, _0x123277) {
-  const _0x4096d6 = _0x11f751.__perfPanelParts;
-  if (!_0x4096d6?.grid) return;
-  const _0x1e09ec = _0x11f751.ownerDocument;
-  while (_0x4096d6.rows.length < _0x123277.length) {
-    const _0x1f1f97 = _0x1e09ec.createElement('div');
-    _0x1f1f97.className = 'perf-panel-row';
-    const _0xb17e01 = createTextElement(_0x1e09ec, 'span', 'perf-panel-row-label', ''),
-      _0x4e36ca = createTextElement(_0x1e09ec, 'span', 'perf-panel-row-value', '');
-    (_0x1f1f97.appendChild(_0xb17e01),
-      _0x1f1f97.appendChild(_0x4e36ca),
-      _0x4096d6.grid.appendChild(_0x1f1f97),
-      _0x4096d6.rows.push({ row: _0x1f1f97, label: _0xb17e01, value: _0x4e36ca }));
+function renderPerfPanel(value9, list3) {
+  const enabled3 = value9.__perfPanelParts;
+  if (!enabled3?.grid) return;
+  const el10 = value9.ownerDocument;
+  while (enabled3.rows.length < list3.length) {
+    const row = el10.createElement('div');
+    row.className = 'perf-panel-row';
+    const label = createTextElement(el10, 'span', 'perf-panel-row-label', ''),
+      value10 = createTextElement(el10, 'span', 'perf-panel-row-value', '');
+    (row.appendChild(label),
+      row.appendChild(value10),
+      enabled3.grid.appendChild(row),
+      enabled3.rows.push({ row: row, label: label, value: value10 }));
   }
-  while (_0x4096d6.rows.length > _0x123277.length) {
-    const _0x489f63 = _0x4096d6.rows.pop();
-    _0x489f63?.row?.remove();
+  while (enabled3.rows.length > list3.length) {
+    const value11 = enabled3.rows.pop();
+    value11?.row?.remove();
   }
-  _0x123277.forEach((_0x90aac4, _0x3646f5) => {
-    const _0x5efb1a = _0x4096d6.rows[_0x3646f5];
-    ((_0x5efb1a.label.textContent = _0x90aac4.label), (_0x5efb1a.value.textContent = _0x90aac4.value));
+  list3.forEach((el11, value12) => {
+    const el12 = enabled3.rows[value12];
+    ((el12.label.textContent = el11.label), (el12.value.textContent = el11.value));
   });
 }
 export function initPerfPanelDevEntry({
-  button: _0x52ea2f,
+  button: button,
   documentRef: documentRef = getDefaultDocument(),
   windowRef: windowRef = getDefaultWindow(),
 } = {}) {
-  if (!_0x52ea2f || !documentRef || !windowRef) return null;
-  let _0x19cc0b = false,
-    _0x503412 = null,
-    _0x2f3d5c = false,
-    _0xc594a6 = false;
-  const _0x4098a4 = ensurePerfPanel(documentRef),
-    _0x145e4a = _0x4098a4.__perfPanelParts;
-  function _0x3fb7ff() {
+  if (!button || !documentRef || !windowRef) return null;
+  let enabled4 = false,
+    value13 = null,
+    isPerfProbeEnabled2 = false,
+    value14 = false;
+  const el13 = ensurePerfPanel(documentRef),
+    value15 = el13.__perfPanelParts;
+  function run() {
     return windowRef.DEV_MODE === true || documentRef.body?.classList?.contains('dev-mode') === true;
   }
-  function _0x37613e(_0x9d3dde) {
-    (_0x52ea2f.classList.toggle('is-active', _0x9d3dde === true),
-      _0x52ea2f.setAttribute('aria-pressed', _0x9d3dde === true ? 'true' : 'false'),
-      (_0x52ea2f.title = _0x9d3dde === true ? 'Close performance panel' : 'Open performance panel'),
-      _0x52ea2f.setAttribute('aria-label', _0x52ea2f.title));
+  function run2(value16) {
+    (button.classList.toggle('is-active', value16 === true),
+      button.setAttribute('aria-pressed', value16 === true ? 'true' : 'false'),
+      (button.title = value16 === true ? 'Close performance panel' : 'Open performance panel'),
+      button.setAttribute('aria-label', button.title));
   }
-  function _0x59f781() {
-    if (!_0x19cc0b) return;
-    renderPerfPanel(_0x4098a4, formatPerfPanelRows(getPerfProbeSnapshot()));
+  function refresh() {
+    if (!enabled4) return;
+    renderPerfPanel(el13, formatPerfPanelRows(getPerfProbeSnapshot()));
   }
-  function _0x5b6c96() {
-    if (_0x503412 !== null) return;
-    const _0x4064a4 = windowRef.setInterval?.bind(windowRef) || setInterval;
-    _0x503412 = _0x4064a4(_0x59f781, REFRESH_INTERVAL_MS);
+  function run3() {
+    if (value13 !== null) return;
+    const run4 = windowRef.setInterval?.bind(windowRef) || setInterval;
+    value13 = run4(refresh, REFRESH_INTERVAL_MS);
   }
-  function _0x145ab5() {
-    if (_0x503412 === null) return;
-    const _0xbe573a = windowRef.clearInterval?.bind(windowRef) || clearInterval;
-    (_0xbe573a(_0x503412), (_0x503412 = null));
+  function run5() {
+    if (value13 === null) return;
+    const run6 = windowRef.clearInterval?.bind(windowRef) || clearInterval;
+    (run6(value13), (value13 = null));
   }
-  function _0x1b610e(_0x337fa6) {
-    const _0x26c5db = _0x337fa6 === true && _0x3fb7ff();
-    if (_0x26c5db === _0x19cc0b) {
-      if (_0x19cc0b) _0x59f781();
-      return _0x19cc0b;
+  function setVisible(value17) {
+    const value18 = value17 === true && run();
+    if (value18 === enabled4) {
+      if (enabled4) refresh();
+      return enabled4;
     }
     return (
-      (_0x19cc0b = _0x26c5db),
-      (_0x4098a4.hidden = !_0x19cc0b),
-      _0x37613e(_0x19cc0b),
-      _0x19cc0b
-        ? ((_0x2f3d5c = isPerfProbeEnabled()),
-          (_0xc594a6 = true),
+      (enabled4 = value18),
+      (el13.hidden = !enabled4),
+      run2(enabled4),
+      enabled4
+        ? ((isPerfProbeEnabled2 = isPerfProbeEnabled()),
+          (value14 = true),
           setPerfProbeEnabled(true),
-          _0x59f781(),
-          _0x5b6c96())
-        : (_0x145ab5(),
-          _0xc594a6 && (setPerfProbeEnabled(_0x2f3d5c), (_0xc594a6 = false), (_0x2f3d5c = false))),
-      _0x19cc0b
+          refresh(),
+          run3())
+        : (run5(),
+          value14 &&
+            (setPerfProbeEnabled(isPerfProbeEnabled2), (value14 = false), (isPerfProbeEnabled2 = false))),
+      enabled4
     );
   }
-  function _0x43cba6(_0x22b4a8) {
-    (_0x22b4a8?.preventDefault?.(), _0x1b610e(!_0x19cc0b));
+  function run7(event) {
+    (event?.preventDefault?.(), setVisible(!enabled4));
   }
-  function _0x2ed6ae() {
-    (resetPerfProbeData(), _0x59f781());
+  function run8() {
+    (resetPerfProbeData(), refresh());
   }
-  function _0x1f8fe0() {
-    _0x1b610e(false);
+  function run9() {
+    setVisible(false);
   }
-  function _0x33da84(_0x25c91a) {
-    const _0x4d4eb3 = Boolean(_0x25c91a?.detail?.enabled ?? windowRef.DEV_MODE);
-    if (!_0x4d4eb3) _0x1b610e(false);
+  function run10(value19) {
+    const enabled5 = Boolean(value19?.detail?.enabled ?? windowRef.DEV_MODE);
+    if (!enabled5) setVisible(false);
   }
   return (
-    _0x52ea2f.addEventListener('click', _0x43cba6),
-    _0x145e4a?.resetBtn?.addEventListener('click', _0x2ed6ae),
-    _0x145e4a?.closeBtn?.addEventListener('click', _0x1f8fe0),
-    windowRef.addEventListener?.('dev-mode-changed', _0x33da84),
-    _0x37613e(false),
+    button.addEventListener('click', run7),
+    value15?.resetBtn?.addEventListener('click', run8),
+    value15?.closeBtn?.addEventListener('click', run9),
+    windowRef.addEventListener?.('dev-mode-changed', run10),
+    run2(false),
     {
       isVisible() {
-        return _0x19cc0b;
+        return enabled4;
       },
-      refresh: _0x59f781,
-      setVisible: _0x1b610e,
+      refresh: refresh,
+      setVisible: setVisible,
       destroy() {
-        (_0x1b610e(false),
-          _0x52ea2f.removeEventListener('click', _0x43cba6),
-          _0x145e4a?.resetBtn?.removeEventListener('click', _0x2ed6ae),
-          _0x145e4a?.closeBtn?.removeEventListener('click', _0x1f8fe0),
-          windowRef.removeEventListener?.('dev-mode-changed', _0x33da84),
-          _0x4098a4.remove());
+        (setVisible(false),
+          button.removeEventListener('click', run7),
+          value15?.resetBtn?.removeEventListener('click', run8),
+          value15?.closeBtn?.removeEventListener('click', run9),
+          windowRef.removeEventListener?.('dev-mode-changed', run10),
+          el13.remove());
       },
     }
   );

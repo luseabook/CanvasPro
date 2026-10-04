@@ -3,88 +3,83 @@ function nowContinuationProbeMs() {
     ? globalThis['performance']['now']()
     : Date['now']();
 }
-function recordFastPreviewContinuationEvent(_0x37d411, _0x49d710 = {}) {
+function recordFastPreviewContinuationEvent(type, args = {}) {
   globalThis['window']?.['__runtimeCompareRecordFastPreviewContinuation']?.({
-    type: _0x37d411,
-    ..._0x49d710,
+    type: type,
+    ...args,
   });
 }
-function buildContinuationProbeContext(_0x3a2d33 = {}) {
+function buildContinuationProbeContext(deferFullSync2 = {}) {
   return {
-    deferFullSync: _0x3a2d33['deferFullSync'] === !![],
-    hasPendingStructuralOps: _0x3a2d33['hasPendingStructuralOps'] === !![],
+    deferFullSync: deferFullSync2['deferFullSync'] === !![],
+    hasPendingStructuralOps: deferFullSync2['hasPendingStructuralOps'] === !![],
   };
 }
-function buildNodeIdSetKey(_0x17b4e6) {
-  if (!_0x17b4e6 || typeof _0x17b4e6[Symbol['iterator']] !== 'function') return '';
-  return Array['from'](_0x17b4e6, (_0x1cd374) => String(_0x1cd374 || ''))['join']('\x1f');
+function buildNodeIdSetKey(enabled) {
+  if (!enabled || typeof enabled[Symbol['iterator']] !== 'function') return '';
+  return Array['from'](enabled, (value) => String(value || ''))['join']('\x1f');
 }
-function buildContinuationKey(_0x3e6f16, _0x1b5fec = {}) {
-  const _0x1113a6 = _0x1b5fec['viewport'] || {},
-    _0x2ba129 = _0x1b5fec['connOverlay'] || {},
-    _0x27dee0 = _0x1b5fec['dragContext'] || {},
-    _0x5a3f0c =
-      _0x1b5fec['keepMountedMediaPreview'] === !![]
-        ? _0x1b5fec['nonMediaLifecycleRevision']
-        : _0x1b5fec['lifecycleRevision'],
-    _0x1e1b1e = Array['isArray'](_0x2ba129['invalidNodeIds'])
-      ? _0x2ba129['invalidNodeIds']['join']('\x1f')
-      : '';
+function buildContinuationKey(item, key = {}) {
+  const box = key['viewport'] || {},
+    index = key['connOverlay'] || {},
+    result = key['dragContext'] || {},
+    data =
+      key['keepMountedMediaPreview'] === !![] ? key['nonMediaLifecycleRevision'] : key['lifecycleRevision'],
+    options = Array['isArray'](index['invalidNodeIds']) ? index['invalidNodeIds']['join']('\x1f') : '';
   return [
-    _0x3e6f16,
-    _0x1113a6['x'],
-    _0x1113a6['y'],
-    _0x1113a6['zoom'],
-    _0x1b5fec['viewportBusy'] === !![] ? 0x1 : 0x0,
-    _0x1b5fec['suppressNewMedia'] === !![] ? 0x1 : 0x0,
-    _0x1b5fec['deferVisibleMediaSrc'] === !![] ? 0x1 : 0x0,
-    _0x1b5fec['suspendNewMediaSrc'] === !![] ? 0x1 : 0x0,
-    _0x1b5fec['keepMountedMediaPreview'] === !![] ? 0x1 : 0x0,
-    buildNodeIdSetKey(_0x1b5fec['fullEligibleVisibleImageNodeIds']),
-    buildNodeIdSetKey(_0x1b5fec['fullEligiblePreviewImageNodeIds']),
-    _0x1b5fec['mediaSourceOwnerIds'] == null
+    item,
+    box['x'],
+    box['y'],
+    box['zoom'],
+    key['viewportBusy'] === !![] ? 0x1 : 0x0,
+    key['suppressNewMedia'] === !![] ? 0x1 : 0x0,
+    key['deferVisibleMediaSrc'] === !![] ? 0x1 : 0x0,
+    key['suspendNewMediaSrc'] === !![] ? 0x1 : 0x0,
+    key['keepMountedMediaPreview'] === !![] ? 0x1 : 0x0,
+    buildNodeIdSetKey(key['fullEligibleVisibleImageNodeIds']),
+    buildNodeIdSetKey(key['fullEligiblePreviewImageNodeIds']),
+    key['mediaSourceOwnerIds'] == null
       ? 'legacy-media-source-owners'
-      : buildNodeIdSetKey(_0x1b5fec['mediaSourceOwnerIds']),
-    _0x1b5fec['requiredImmediateMediaSourceOwnerIds'] == null
+      : buildNodeIdSetKey(key['mediaSourceOwnerIds']),
+    key['requiredImmediateMediaSourceOwnerIds'] == null
       ? 'legacy-required-media-source-owners'
-      : buildNodeIdSetKey(_0x1b5fec['requiredImmediateMediaSourceOwnerIds']),
-    Number(_0x5a3f0c) || 0x0,
-    _0x2ba129['side'] || '',
-    _0x1e1b1e,
-    _0x27dee0['isCommittingDrag'] === !![] ? 0x1 : 0x0,
-    _0x27dee0['hasMoved'] === !![] ? 0x1 : 0x0,
+      : buildNodeIdSetKey(key['requiredImmediateMediaSourceOwnerIds']),
+    Number(data) || 0x0,
+    index['side'] || '',
+    options,
+    result['isCommittingDrag'] === !![] ? 0x1 : 0x0,
+    result['hasMoved'] === !![] ? 0x1 : 0x0,
   ]['join']('|');
 }
-function requestContinuationFrame(_0x3ba785) {
-  if (typeof requestAnimationFrame === 'function')
-    return { kind: 'raf', id: requestAnimationFrame(_0x3ba785) };
-  return { kind: 'timer', id: setTimeout(_0x3ba785, 0x20) };
+function requestContinuationFrame(target) {
+  if (typeof requestAnimationFrame === 'function') return { kind: 'raf', id: requestAnimationFrame(target) };
+  return { kind: 'timer', id: setTimeout(target, 0x20) };
 }
-function cancelContinuationFrame(_0x3fd4de) {
-  if (!_0x3fd4de) return;
-  if (_0x3fd4de['kind'] === 'raf' && typeof cancelAnimationFrame === 'function') {
-    cancelAnimationFrame(_0x3fd4de['id']);
+function cancelContinuationFrame(enabled2) {
+  if (!enabled2) return;
+  if (enabled2['kind'] === 'raf' && typeof cancelAnimationFrame === 'function') {
+    cancelAnimationFrame(enabled2['id']);
     return;
   }
-  if (_0x3fd4de['kind'] === 'timer') clearTimeout(_0x3fd4de['id']);
+  if (enabled2['kind'] === 'timer') clearTimeout(enabled2['id']);
 }
 export function createRendererFastPreviewLifecycleTracker() {
-  let _0x420c92 = 0x0,
-    _0xae3180 = 0x0;
+  let lifecycleRevision2 = 0x0,
+    nonMediaLifecycleRevision2 = 0x0;
   return {
-    record(_0x2b2027) {
-      _0x420c92 += 0x1;
-      const _0x2d259d = String(_0x2b2027 || '')['toLowerCase']();
-      !_0x2d259d['includes']('image') &&
-        !_0x2d259d['includes']('video') &&
-        !_0x2d259d['includes']('media-clip') &&
-        (_0xae3180 += 0x1);
+    record(source) {
+      lifecycleRevision2 += 0x1;
+      const list = String(source || '')['toLowerCase']();
+      !list['includes']('image') &&
+        !list['includes']('video') &&
+        !list['includes']('media-clip') &&
+        (nonMediaLifecycleRevision2 += 0x1);
     },
     reset() {
-      ((_0x420c92 = 0x0), (_0xae3180 = 0x0));
+      ((lifecycleRevision2 = 0x0), (nonMediaLifecycleRevision2 = 0x0));
     },
     getContinuationOptions() {
-      return { lifecycleRevision: _0x420c92, nonMediaLifecycleRevision: _0xae3180 };
+      return { lifecycleRevision: lifecycleRevision2, nonMediaLifecycleRevision: nonMediaLifecycleRevision2 };
     },
   };
 }
@@ -104,26 +99,26 @@ export function shouldDeferRendererFastPreviewSync({
   );
 }
 export function syncRendererFastPreviewAfterNodeRender({
-  continuation: _0x4c9885,
-  layer: _0x248eb8,
-  canvasEl: _0x1ada41,
-  nodes: _0x4566ca,
-  previewCandidateIds: _0xbc5fed,
-  selectedNodeSet: _0xfbd09d,
-  candidateSignature: _0x28b565,
-  hasPendingStructuralOps: _0x5af51a,
-  connOverlay: _0x2681a7,
-  pickConnectMode: _0x117005,
+  continuation: continuation,
+  layer: layer,
+  canvasEl: canvasEl,
+  nodes: nodes,
+  previewCandidateIds: previewCandidateIds,
+  selectedNodeSet: selectedNodeSet,
+  candidateSignature: candidateSignature,
+  hasPendingStructuralOps: hasPendingStructuralOps,
+  connOverlay: connOverlay,
+  pickConnectMode: pickConnectMode,
   nodeCount: nodeCount = 0x0,
-  viewport: _0x34d881,
-  containerWidth: _0x32bf47,
-  containerHeight: _0x4df913,
+  viewport: viewport,
+  containerWidth: containerWidth,
+  containerHeight: containerHeight,
   suppressNewMedia: suppressNewMedia = ![],
   deferVisibleMediaSrc: deferVisibleMediaSrc = ![],
   freezeRasterSurface: freezeRasterSurface = ![],
   viewportBusy: viewportBusy = ![],
-  dragContext: _0x1ac82d,
-  dragTargets: _0x4d5f72,
+  dragContext: dragContext2,
+  dragTargets: dragTargets,
   suspendNewMediaSrc: suspendNewMediaSrc = ![],
   fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds = null,
   fullEligiblePreviewImageNodeIds: fullEligiblePreviewImageNodeIds = null,
@@ -135,19 +130,19 @@ export function syncRendererFastPreviewAfterNodeRender({
   updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame = ![],
   hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts = ![],
 } = {}) {
-  const _0x1b8ab1 = {
-      connOverlay: _0x2681a7,
-      pickConnectMode: _0x117005,
+  const options2 = {
+      connOverlay: connOverlay,
+      pickConnectMode: pickConnectMode,
       nodeCount: nodeCount,
-      viewport: _0x34d881,
-      containerWidth: _0x32bf47,
-      containerHeight: _0x4df913,
+      viewport: viewport,
+      containerWidth: containerWidth,
+      containerHeight: containerHeight,
       suppressNewMedia: suppressNewMedia,
       deferVisibleMediaSrc: deferVisibleMediaSrc,
       freezeRasterSurface: freezeRasterSurface,
       viewportBusy: viewportBusy,
-      dragContext: _0x1ac82d,
-      dragTargets: _0x4d5f72,
+      dragContext: dragContext2,
+      dragTargets: dragTargets,
       suspendNewMediaSrc: suspendNewMediaSrc,
       fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds,
       fullEligiblePreviewImageNodeIds: fullEligiblePreviewImageNodeIds,
@@ -156,168 +151,171 @@ export function syncRendererFastPreviewAfterNodeRender({
       lifecycleRevision: lifecycleRevision,
       nonMediaLifecycleRevision: nonMediaLifecycleRevision,
       keepMountedMediaPreview:
-        nodeCount >= 0x30 && (viewportBusy || Number(_0x34d881?.['zoom'] || 0x1) <= 0.45),
+        nodeCount >= 0x30 && (viewportBusy || Number(viewport?.['zoom'] || 0x1) <= 0.45),
     },
-    _0x263f6f =
+    deferFullSync3 =
       shouldDeferRendererFastPreviewSync({
         mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame,
         updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame,
         hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts,
-        hasExistingPreviewSurface: _0x248eb8?.['getStats']?.()['fastPreviewCount'] > 0x0,
-        dragContext: _0x1ac82d,
+        hasExistingPreviewSurface: layer?.['getStats']?.()['fastPreviewCount'] > 0x0,
+        dragContext: dragContext2,
       }) &&
       !(
         requiredImmediateMediaSourceOwnerIds != null &&
         typeof requiredImmediateMediaSourceOwnerIds?.[Symbol['iterator']] === 'function' &&
         Array['from'](requiredImmediateMediaSourceOwnerIds)['some'](
-          (_0x568f29) => _0x248eb8?.['isNodePreviewReady']?.(_0x568f29) !== !![],
+          (next) => layer?.['isNodePreviewReady']?.(next) !== !![],
         )
       );
   return (
-    _0x248eb8?.['prune']?.(_0xbc5fed),
-    _0x4c9885?.['syncIfNeeded']({
-      canvasEl: _0x1ada41,
-      nodes: _0x4566ca,
-      previewCandidateIds: _0xbc5fed,
-      selectedNodeSet: _0xfbd09d,
-      candidateSignature: _0x28b565,
-      hasPendingStructuralOps: _0x5af51a,
-      options: _0x1b8ab1,
-      deferFullSync: _0x263f6f,
+    layer?.['prune']?.(previewCandidateIds),
+    continuation?.['syncIfNeeded']({
+      canvasEl: canvasEl,
+      nodes: nodes,
+      previewCandidateIds: previewCandidateIds,
+      selectedNodeSet: selectedNodeSet,
+      candidateSignature: candidateSignature,
+      hasPendingStructuralOps: hasPendingStructuralOps,
+      options: options2,
+      deferFullSync: deferFullSync3,
     })
   );
 }
 export function createRendererFastPreviewContinuationController({
-  sync: _0x4b9a6f,
+  sync: sync,
   requestFrame: requestFrame = requestContinuationFrame,
   cancelFrame: cancelFrame = cancelContinuationFrame,
 } = {}) {
-  let _0x14d2ec = '',
-    _0x505eee = null,
-    _0x3c4869 = null,
-    _0x4a9c48 = null;
-  function _0x2ab523(_0x33d6c8 = 'clear') {
-    _0x3c4869 = null;
-    if (_0x4a9c48 === null) return;
-    (recordFastPreviewContinuationEvent('deferred-cleared', { reason: _0x33d6c8 }),
-      cancelFrame?.(_0x4a9c48),
-      (_0x4a9c48 = null));
+  let current = '',
+    value2 = null,
+    args2 = null,
+    value3 = null;
+  function run(reason = 'clear') {
+    args2 = null;
+    if (value3 === null) return;
+    (recordFastPreviewContinuationEvent('deferred-cleared', { reason: reason }),
+      cancelFrame?.(value3),
+      (value3 = null));
   }
-  function _0xd18fde() {
-    ((_0x14d2ec = ''), (_0x505eee = null), _0x2ab523('reset'));
+  function reset2() {
+    ((current = ''), (value2 = null), run('reset'));
   }
-  function _0x36ccc0(_0x382ea9) {
-    _0x3c4869 = _0x382ea9;
-    if (_0x4a9c48 !== null) {
+  function run2(entry) {
+    args2 = entry;
+    if (value3 !== null) {
       recordFastPreviewContinuationEvent('deferred-coalesced', {
-        ...buildContinuationProbeContext(_0x382ea9),
+        ...buildContinuationProbeContext(entry),
       });
       return;
     }
-    ((_0x4a9c48 = requestFrame?.(() => {
-      _0x4a9c48 = null;
-      const _0x134e0f = _0x3c4869;
-      _0x3c4869 = null;
-      if (!_0x134e0f) return;
-      (recordFastPreviewContinuationEvent('deferred-flush', { ...buildContinuationProbeContext(_0x134e0f) }),
-        _0x14f25e({ ..._0x134e0f, deferFullSync: ![] }));
+    ((value3 = requestFrame?.(() => {
+      value3 = null;
+      const args3 = args2;
+      args2 = null;
+      if (!args3) return;
+      (recordFastPreviewContinuationEvent('deferred-flush', { ...buildContinuationProbeContext(args3) }),
+        syncIfNeeded({ ...args3, deferFullSync: ![] }));
     })),
       recordFastPreviewContinuationEvent('deferred-created', {
-        ...buildContinuationProbeContext(_0x382ea9),
+        ...buildContinuationProbeContext(entry),
       }));
   }
-  function _0x256e4f({
-    candidateSignature: _0x1a4fab,
-    nodes: _0x54256e,
-    hasPendingStructuralOps: _0x18b1e4,
-    options: _0x2d5562,
+  function shouldRunFullSync({
+    candidateSignature: candidateSignature2,
+    nodes: nodes2,
+    hasPendingStructuralOps: hasPendingStructuralOps2,
+    options: options3,
   } = {}) {
-    const _0x2adca5 = buildContinuationKey(_0x1a4fab, _0x2d5562),
-      _0x5f209f = _0x14d2ec !== _0x2adca5,
-      _0x4c7547 = _0x505eee !== _0x54256e,
-      _0x2d655c = _0x18b1e4 !== !![] || _0x5f209f || _0x4c7547;
+    const continuationKey = buildContinuationKey(candidateSignature2, options3),
+      keyChanged = current !== continuationKey,
+      nodesChanged = value2 !== nodes2,
+      shouldRun = hasPendingStructuralOps2 !== !![] || keyChanged || nodesChanged;
     return (
       recordFastPreviewContinuationEvent('full-sync-decision', {
-        hasPendingStructuralOps: _0x18b1e4 === !![],
-        keyChanged: _0x5f209f,
-        nodesChanged: _0x4c7547,
-        shouldRun: _0x2d655c,
+        hasPendingStructuralOps: hasPendingStructuralOps2 === !![],
+        keyChanged: keyChanged,
+        nodesChanged: nodesChanged,
+        shouldRun: shouldRun,
       }),
-      _0x18b1e4 === !![] ? ((_0x14d2ec = _0x2adca5), (_0x505eee = _0x54256e)) : _0xd18fde(),
-      _0x2d655c
+      hasPendingStructuralOps2 === !![] ? ((current = continuationKey), (value2 = nodes2)) : reset2(),
+      shouldRun
     );
   }
-  function _0x14f25e({
-    canvasEl: _0x2e83d3,
-    nodes: _0x1b2b45,
-    previewCandidateIds: _0x13b74a,
-    selectedNodeSet: _0x467e18,
-    candidateSignature: _0x3fa668,
-    hasPendingStructuralOps: _0x558631,
-    options: _0x5bee45,
+  function syncIfNeeded({
+    canvasEl: canvasEl2,
+    nodes: nodes3,
+    previewCandidateIds: previewCandidateIds2,
+    selectedNodeSet: selectedNodeSet2,
+    candidateSignature: candidateSignature3,
+    hasPendingStructuralOps: hasPendingStructuralOps3,
+    options: options4,
     deferFullSync: deferFullSync = ![],
   } = {}) {
     recordFastPreviewContinuationEvent('sync-call', {
       deferFullSync: deferFullSync === !![],
-      hasPendingStructuralOps: _0x558631 === !![],
+      hasPendingStructuralOps: hasPendingStructuralOps3 === !![],
     });
     if (deferFullSync === !![])
       return (
-        _0x36ccc0({
-          canvasEl: _0x2e83d3,
-          nodes: _0x1b2b45,
-          previewCandidateIds: _0x13b74a,
-          selectedNodeSet: _0x467e18,
-          candidateSignature: _0x3fa668,
-          hasPendingStructuralOps: _0x558631,
-          options: _0x5bee45,
+        run2({
+          canvasEl: canvasEl2,
+          nodes: nodes3,
+          previewCandidateIds: previewCandidateIds2,
+          selectedNodeSet: selectedNodeSet2,
+          candidateSignature: candidateSignature3,
+          hasPendingStructuralOps: hasPendingStructuralOps3,
+          options: options4,
         }),
         ![]
       );
-    _0x2ab523('direct-sync');
+    run('direct-sync');
     if (
-      !_0x256e4f({
-        candidateSignature: _0x3fa668,
-        nodes: _0x1b2b45,
-        hasPendingStructuralOps: _0x558631,
-        options: _0x5bee45,
+      !shouldRunFullSync({
+        candidateSignature: candidateSignature3,
+        nodes: nodes3,
+        hasPendingStructuralOps: hasPendingStructuralOps3,
+        options: options4,
       })
     )
       return (
         recordFastPreviewContinuationEvent('full-sync-skipped', {
-          hasPendingStructuralOps: _0x558631 === !![],
+          hasPendingStructuralOps: hasPendingStructuralOps3 === !![],
         }),
         ![]
       );
-    const _0x49911a = nowContinuationProbeMs();
+    const nowContinuationProbeMs2 = nowContinuationProbeMs();
     try {
-      _0x4b9a6f?.(_0x2e83d3, _0x1b2b45, _0x13b74a, _0x467e18, _0x5bee45);
+      sync?.(canvasEl2, nodes3, previewCandidateIds2, selectedNodeSet2, options4);
     } finally {
       recordFastPreviewContinuationEvent('full-sync-run', {
-        durationMs: Math['max'](0x0, nowContinuationProbeMs() - _0x49911a),
-        hasPendingStructuralOps: _0x558631 === !![],
+        durationMs: Math['max'](0x0, nowContinuationProbeMs() - nowContinuationProbeMs2),
+        hasPendingStructuralOps: hasPendingStructuralOps3 === !![],
       });
     }
     return !![];
   }
-  function _0x416ee7(_0x43658c) {
-    if (!_0x3c4869) return;
-    const _0x2b2de2 = new Set(_0x43658c),
-      _0x206b29 = (_0x5774e1) =>
-        _0x5774e1 == null
-          ? _0x5774e1
-          : new Set([..._0x5774e1]['filter']((_0x5c11e1) => !_0x2b2de2['has'](_0x5c11e1)));
-    _0x3c4869 = {
-      ..._0x3c4869,
-      previewCandidateIds: _0x206b29(_0x3c4869['previewCandidateIds']),
+  function excludeNodes(payload) {
+    if (!args2) return;
+    const map = new Set(payload),
+      previewCandidateIds3 = (args4) =>
+        args4 == null ? args4 : new Set([...args4]['filter']((handle) => !map['has'](handle)));
+    args2 = {
+      ...args2,
+      previewCandidateIds: previewCandidateIds3(args2['previewCandidateIds']),
       options: {
-        ..._0x3c4869['options'],
-        mediaSourceOwnerIds: _0x206b29(_0x3c4869['options']?.['mediaSourceOwnerIds']),
-        requiredImmediateMediaSourceOwnerIds: _0x206b29(
-          _0x3c4869['options']?.['requiredImmediateMediaSourceOwnerIds'],
+        ...args2['options'],
+        mediaSourceOwnerIds: previewCandidateIds3(args2['options']?.['mediaSourceOwnerIds']),
+        requiredImmediateMediaSourceOwnerIds: previewCandidateIds3(
+          args2['options']?.['requiredImmediateMediaSourceOwnerIds'],
         ),
       },
     };
   }
-  return { reset: _0xd18fde, shouldRunFullSync: _0x256e4f, syncIfNeeded: _0x14f25e, excludeNodes: _0x416ee7 };
+  return {
+    reset: reset2,
+    shouldRunFullSync: shouldRunFullSync,
+    syncIfNeeded: syncIfNeeded,
+    excludeNodes: excludeNodes,
+  };
 }

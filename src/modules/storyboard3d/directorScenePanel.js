@@ -1,1 +1,305 @@
-import{normalizeDirectorSceneSettings}from'./directorSceneSettings.js';import{DIRECTOR_AXIS_VIEWS,transformDirectorScene,findDirectorObstacleRoute,sampleDirectorGroundRoute}from'./directorSceneAuthoring.js';import{authorDirectorPath}from'./directorPathAuthoring.js';import{validateStoryboard3DBackgroundImageFile}from'./backgroundImageController.js';const escape=_0x47fe1e=>String(_0x47fe1e??'')['replaceAll']('&',"&amp;")["replaceAll"]('\x22',"&quot;")['replaceAll']('<','&lt;');export class DirectorScenePanel{constructor(_0x4b64df){this['panel']=_0x4b64df,this["transform"]={'x':0x0,'y':0x0,'z':0x0,'yaw':0x0,'scale':0x1},this["loading"]=![],this["disposed"]=![];}["render"](){const {scene:_0x1eb11b}=this["panel"]['context']();if(!_0x1eb11b)return'';const _0x984c33=normalizeDirectorSceneSettings(_0x1eb11b['directorSettings']);return'<fieldset\x20data-director-scene\x20aria-busy=\x22'+this["loading"]+"\"><legend>场景与全景</legend><div class=\"storyboard-3d-director-fields\">\n      "+DIRECTOR_AXIS_VIEWS["map"](([_0x26dde5,_0x4794ae])=>"<button data-storyboard-3d-action=\"timeline-scene-view\" data-view=\""+_0x26dde5+'\x22>'+_0x4794ae+'视图</button>')["join"]('')+"\n      <button data-storyboard-3d-action=\"timeline-scene-perspective\">透视图</button><button data-storyboard-3d-action=\"timeline-scene-quad\">四视图</button>\n      <label>显示<select data-director-scene=\"displayMode\">"+[["solid",'实体'],["transparent",'半透明'],["clay",'灰模']]["map"](([_0x2bd227,_0x39014d])=>"<option value=\""+_0x2bd227+'\x22\x20'+(_0x984c33["displayMode"]===_0x2bd227?"selected":'')+'>'+_0x39014d+"</option>")["join"]('')+"</select></label>\n      <label><input type=\"checkbox\" data-director-scene=\"labels\" "+(_0x984c33['labels']?"checked":'')+">对象标签</label><label><input type=\"checkbox\" data-director-scene=\"groundVisible\" "+(_0x984c33['groundVisible']?"checked":'')+">显示地面</label>\n      <label>地面高度 / 米<input type=\"number\" step=\"0.1\" data-director-scene=\"groundHeight\" value=\""+_0x984c33["groundHeight"]+"\"></label><label>地面透明度<input type=\"number\" min=\"0\" max=\"1\" step=\"0.05\" data-director-scene=\"groundOpacity\" value=\""+_0x984c33['groundOpacity']+"\"></label>\n      <button data-storyboard-3d-action=\"timeline-scene-ground\">选中物体贴合模型表面</button><button data-storyboard-3d-action=\"timeline-scene-path-ground\">路线贴合模型表面</button><button data-storyboard-3d-action=\"timeline-scene-avoid\">路线绕开障碍</button>\n    </div><details><summary>场景整体变换（含所有镜头与轨迹）</summary><div class=\"storyboard-3d-director-fields\">"+Object["entries"](this["transform"])["map"](([_0x1ae120,_0x25221c])=>"<label>"+(_0x1ae120==="yaw"?'旋转\x20/\x20度':_0x1ae120==="scale"?'缩放':"平移 "+_0x1ae120["toUpperCase"]()+" / 米")+"<input type=\"number\" step=\"0.1\" data-director-scene-transform=\""+_0x1ae120+'\x22\x20value=\x22'+_0x25221c+"\"></label>")["join"]('')+"<button data-storyboard-3d-action=\"timeline-scene-transform\">应用整体变换</button></div></details>\n    <div class=\"storyboard-3d-director-fields\"><label><input type=\"checkbox\" data-director-panorama=\"enabled\" "+(_0x984c33["panorama"]["enabled"]?"checked":'')+">球面全景</label>\n      <label>"+(this["loading"]?"正在导入全景…":"导入全景图片")+'<input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20data-director-panorama-file\x20'+(this["loading"]?"disabled":'')+"></label>\n      <label>历史<select data-director-panorama=\"assetId\"><option value=\"\">选择全景</option>"+_0x984c33["panorama"]["history"]["map"](_0x425744=>"<option value=\""+escape(_0x425744['assetId'])+'\x22\x20'+(_0x984c33["panorama"]["assetId"]===_0x425744["assetId"]?"selected":'')+'>'+escape(_0x425744["name"])+"</option>")["join"]('')+"</select></label>\n      <label>半径 / 米<input type=\"number\" min=\"5\" max=\"2000\" value=\""+_0x984c33["panorama"]["radius"]+"\" data-director-panorama=\"radius\"></label>\n      "+_0x984c33["panorama"]["rotation"]['map']((_0x41563f,_0x1ab93e)=>"<label>"+['俯仰','方位','倾斜'][_0x1ab93e]+" / 度<input type=\"number\" step=\"1\" value=\""+_0x41563f*0xb4/Math['PI']+"\" data-director-panorama=\"rotation-"+_0x1ab93e+"\"></label>")["join"]('')+"\n    </div>"+(this['loading']?"<progress aria-label=\"正在导入全景\"></progress>":'')+"</fieldset>";}['mutate'](_0x2a0bdb,_0x25a6f1){const {scene:_0xe2947d,project:_0x547c5f}=this["panel"]['context']();try{this["panel"]["timeline"]["commitMutation"]({'type':"director-scene",'label':_0x2a0bdb,'mutate':_0x497c64=>{if(_0x497c64['id']!==_0x547c5f['id'])return _0x497c64;const _0x415b1=_0x497c64['scenes']['find'](_0x1ac884=>_0x1ac884['id']===_0xe2947d['id']);return _0x415b1&&(_0x415b1["directorSettings"]=normalizeDirectorSceneSettings(_0x415b1["directorSettings"]),_0x25a6f1(_0x415b1,_0x497c64)),_0x497c64;}});}catch(_0x81b77f){this['panel']["timeline"]["setMessage"]?.(_0x81b77f["message"]);}}["change"](_0x27935a){const _0x25924e=_0x27935a['target'];if(_0x25924e['matches']?.("[data-director-panorama-file]")){const _0x272290=_0x25924e["files"]?.[0x0];_0x25924e['value']='';if(_0x272290)void this["importPanorama"](_0x272290);return!![];}if(_0x25924e["matches"]?.("[data-director-scene-transform]"))return this["transform"][_0x25924e["dataset"]["directorSceneTransform"]]=Number(_0x25924e["value"]),!![];if(_0x25924e["matches"]?.("[data-director-scene]"))return this['mutate']("调整场景显示",_0x1eb5b9=>{_0x1eb5b9['directorSettings'][_0x25924e["dataset"]['directorScene']]=_0x25924e['type']==="checkbox"?_0x25924e['checked']:_0x25924e["type"]==="number"?Number(_0x25924e["value"]):_0x25924e["value"];}),!![];if(_0x25924e['matches']?.('[data-director-panorama]'))return this["mutate"]('调整全景背景',_0x49d05f=>{const [_0x30985b,_0x2552dc]=_0x25924e["dataset"]['directorPanorama']['split']('-');if(_0x2552dc!=null)_0x49d05f["directorSettings"]["panorama"]["rotation"][Number(_0x2552dc)]=Number(_0x25924e["value"])*Math['PI']/0xb4;else _0x49d05f["directorSettings"]["panorama"][_0x30985b]=_0x25924e["type"]==='checkbox'?_0x25924e["checked"]:_0x25924e["type"]==="number"?Number(_0x25924e["value"]):_0x25924e["value"];}),!![];return![];}["click"](_0x1493dd,_0x390238){if(!_0x1493dd["startsWith"]("timeline-scene-"))return![];const _0x34fe3e=this['panel']["timeline"]['getRuntime']?.(),{object:_0x397b3d,scene:_0x16f791}=this['panel']["context"]();if(!_0x34fe3e)return!![];if(_0x1493dd==='timeline-scene-view'){const _0x2c3195=DIRECTOR_AXIS_VIEWS["find"](([_0x32498d])=>_0x32498d===_0x390238["dataset"]["view"]),_0x233d15=_0x34fe3e["getSceneView"]();_0x2c3195&&_0x233d15&&(_0x34fe3e["setViewProjection"]("orthographic"),_0x34fe3e['commitSceneView']({..._0x233d15,'orbitYaw':_0x2c3195[0x2],'orbitPitch':_0x2c3195[0x3]}));}if(_0x1493dd==="timeline-scene-perspective")_0x34fe3e["setViewProjection"]('perspective');if(_0x1493dd==="timeline-scene-quad")this['panel']["timeline"]["multiView"]?.["toggle"]();if(_0x1493dd==='timeline-scene-transform')this["mutate"]('整体变换场景',_0xdb93e1=>Object["assign"](_0xdb93e1,transformDirectorScene(_0xdb93e1,this['transform'])));if(_0x1493dd==="timeline-scene-ground"&&_0x397b3d&&!_0x397b3d["locked"]){const _0x3df5b9=_0x34fe3e["directorScene"]["surfaceHeight"](_0x397b3d["transform"]['position'][0x0],_0x397b3d['transform']["position"][0x2],[_0x397b3d['id']]),_0x3284d7=_0x34fe3e['resolveObjectGroundPosition'](_0x397b3d['id'])||0x0;this["mutate"]("贴合模型表面",_0x2d51de=>{_0x2d51de["objects"]["find"](_0x5b13ae=>_0x5b13ae['id']===_0x397b3d['id'])["transform"]["position"][0x1]=_0x3df5b9+_0x3284d7;});}if(["timeline-scene-path-ground",'timeline-scene-avoid']["includes"](_0x1493dd)){const _0x1fac20=this["panel"]['timeline']['cameraPath'],_0x13751f=_0x1fac20['points']()["map"](_0x45d21a=>_0x45d21a["camera"]["position"]),_0x5d07b7=_0x16f791['objects']["find"](_0x1c6e61=>_0x1c6e61['id']===_0x1fac20["objectId"]);if(!_0x5d07b7||_0x5d07b7['locked']||_0x13751f["length"]<0x2)return this["panel"]["timeline"]["setMessage"]?.("请先选择已解锁物体的路线，至少设置两个控制点。"),!![];try{const _0x3699fa=_0x1493dd==="timeline-scene-avoid"?findDirectorObstacleRoute(_0x13751f[0x0],_0x13751f['at'](-0x1),_0x34fe3e["directorScene"]["obstacles"]([_0x5d07b7['id']])):_0x13751f,_0x4ced7f=_0x34fe3e['resolveObjectGroundPosition'](_0x5d07b7['id'])||0x0,_0x53ae5d=sampleDirectorGroundRoute(_0x3699fa,(_0x239532,_0x2fb17a)=>_0x34fe3e["directorScene"]["surfaceHeight"](_0x239532,_0x2fb17a,[_0x5d07b7['id']]),_0x4ced7f),_0x1a400a=_0x1fac20["points"]();_0x1fac20["commit"](_0x2927d7=>authorDirectorPath(_0x2927d7,{'object':_0x5d07b7,'points':_0x53ae5d,'start':_0x1a400a[0x0]["time"],'duration':_0x1a400a['at'](-0x1)["time"]-_0x1a400a[0x0]["time"],'smooth':![]}));}catch(_0x5c27a6){this["panel"]['timeline']["setMessage"]?.(_0x5c27a6["message"]);}}return!![];}async['importPanorama'](_0x56e0bd){if(this['loading'])return;const _0x43b64d=validateStoryboard3DBackgroundImageFile(_0x56e0bd);if(!_0x43b64d['ok']){this["panel"]['timeline']["setMessage"]?.(_0x43b64d["errors"][0x0]["message"]);return;}const {project:_0x19c7ac,scene:_0x23bbf5}=this["panel"]["context"](),_0x15c12e='panorama-'+globalThis["crypto"]["randomUUID"]();this['loading']=!![],this["panel"]['timeline']['requestRender']?.();try{await this["panel"]["timeline"]["getBinaryAssetRepository"]()["put"]({'assetId':_0x15c12e,'kind':'background','descriptor':{'sceneId':_0x23bbf5['id'],'fileName':_0x56e0bd["name"],'projection':"equirectangular"},'primaryFile':_0x56e0bd,'relatedFiles':[]});if(this["disposed"]||this["panel"]['context']()["project"]['id']!==_0x19c7ac['id'])return;this["panel"]['timeline']["commitMutation"]({'type':"director-panorama",'label':'导入全景背景','mutate':_0x1540b6=>{if(_0x1540b6['id']!==_0x19c7ac['id'])return _0x1540b6;const _0x45e81b=_0x1540b6["scenes"]["find"](_0x1110c1=>_0x1110c1['id']===_0x23bbf5['id']);if(!_0x45e81b)return _0x1540b6;return _0x45e81b["directorSettings"]=normalizeDirectorSceneSettings(_0x45e81b["directorSettings"]),Object["assign"](_0x45e81b["directorSettings"]['panorama'],{'assetId':_0x15c12e,'enabled':!![],'history':[..._0x45e81b["directorSettings"]["panorama"]["history"],{'assetId':_0x15c12e,'name':_0x56e0bd['name']}]}),_0x1540b6;}});}catch(_0x147d71){if(!this['disposed'])this["panel"]["timeline"]["setMessage"]?.("全景导入失败："+_0x147d71["message"]);}finally{this["loading"]=![];if(!this["disposed"])this["panel"]["timeline"]["requestRender"]?.();}}["destroy"](){this["disposed"]=!![];}}
+import { normalizeDirectorSceneSettings } from './directorSceneSettings.js';
+import {
+  DIRECTOR_AXIS_VIEWS,
+  transformDirectorScene,
+  findDirectorObstacleRoute,
+  sampleDirectorGroundRoute,
+} from './directorSceneAuthoring.js';
+import { authorDirectorPath } from './directorPathAuthoring.js';
+import { validateStoryboard3DBackgroundImageFile } from './backgroundImageController.js';
+const escape = (value) =>
+  String(value ?? '')
+    ['replaceAll']('&', '&amp;')
+    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('<', '&lt;');
+export class DirectorScenePanel {
+  constructor(item) {
+    ((this['panel'] = item),
+      (this['transform'] = { x: 0x0, y: 0x0, z: 0x0, yaw: 0x0, scale: 0x1 }),
+      (this['loading'] = ![]),
+      (this['disposed'] = ![]));
+  }
+  ['render']() {
+    const { scene: scene } = this['panel']['context']();
+    if (!scene) return '';
+    const directorSceneSettings = normalizeDirectorSceneSettings(scene['directorSettings']);
+    return (
+      '<fieldset\x20data-director-scene\x20aria-busy=\x22' +
+      this['loading'] +
+      '"><legend>场景与全景</legend><div class="storyboard-3d-director-fields">\n      ' +
+      DIRECTOR_AXIS_VIEWS['map'](
+        ([key, index]) =>
+          '<button data-storyboard-3d-action="timeline-scene-view" data-view="' +
+          key +
+          '\x22>' +
+          index +
+          '视图</button>',
+      )['join']('') +
+      '\n      <button data-storyboard-3d-action="timeline-scene-perspective">透视图</button><button data-storyboard-3d-action="timeline-scene-quad">四视图</button>\n      <label>显示<select data-director-scene="displayMode">' +
+      [
+        ['solid', '实体'],
+        ['transparent', '半透明'],
+        ['clay', '灰模'],
+      ]
+        ['map'](
+          ([result, data]) =>
+            '<option value="' +
+            result +
+            '\x22\x20' +
+            (directorSceneSettings['displayMode'] === result ? 'selected' : '') +
+            '>' +
+            data +
+            '</option>',
+        )
+        ['join']('') +
+      '</select></label>\n      <label><input type="checkbox" data-director-scene="labels" ' +
+      (directorSceneSettings['labels'] ? 'checked' : '') +
+      '>对象标签</label><label><input type="checkbox" data-director-scene="groundVisible" ' +
+      (directorSceneSettings['groundVisible'] ? 'checked' : '') +
+      '>显示地面</label>\n      <label>地面高度 / 米<input type="number" step="0.1" data-director-scene="groundHeight" value="' +
+      directorSceneSettings['groundHeight'] +
+      '"></label><label>地面透明度<input type="number" min="0" max="1" step="0.05" data-director-scene="groundOpacity" value="' +
+      directorSceneSettings['groundOpacity'] +
+      '"></label>\n      <button data-storyboard-3d-action="timeline-scene-ground">选中物体贴合模型表面</button><button data-storyboard-3d-action="timeline-scene-path-ground">路线贴合模型表面</button><button data-storyboard-3d-action="timeline-scene-avoid">路线绕开障碍</button>\n    </div><details><summary>场景整体变换（含所有镜头与轨迹）</summary><div class="storyboard-3d-director-fields">' +
+      Object['entries'](this['transform'])
+        ['map'](
+          ([options, target]) =>
+            '<label>' +
+            (options === 'yaw'
+              ? '旋转\x20/\x20度'
+              : options === 'scale'
+                ? '缩放'
+                : '平移 ' + options['toUpperCase']() + ' / 米') +
+            '<input type="number" step="0.1" data-director-scene-transform="' +
+            options +
+            '\x22\x20value=\x22' +
+            target +
+            '"></label>',
+        )
+        ['join']('') +
+      '<button data-storyboard-3d-action="timeline-scene-transform">应用整体变换</button></div></details>\n    <div class="storyboard-3d-director-fields"><label><input type="checkbox" data-director-panorama="enabled" ' +
+      (directorSceneSettings['panorama']['enabled'] ? 'checked' : '') +
+      '>球面全景</label>\n      <label>' +
+      (this['loading'] ? '正在导入全景…' : '导入全景图片') +
+      '<input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20data-director-panorama-file\x20' +
+      (this['loading'] ? 'disabled' : '') +
+      '></label>\n      <label>历史<select data-director-panorama="assetId"><option value="">选择全景</option>' +
+      directorSceneSettings['panorama']['history']
+        ['map'](
+          (source) =>
+            '<option value="' +
+            escape(source['assetId']) +
+            '\x22\x20' +
+            (directorSceneSettings['panorama']['assetId'] === source['assetId'] ? 'selected' : '') +
+            '>' +
+            escape(source['name']) +
+            '</option>',
+        )
+        ['join']('') +
+      '</select></label>\n      <label>半径 / 米<input type="number" min="5" max="2000" value="' +
+      directorSceneSettings['panorama']['radius'] +
+      '" data-director-panorama="radius"></label>\n      ' +
+      directorSceneSettings['panorama']['rotation']
+        ['map'](
+          (next, current) =>
+            '<label>' +
+            ['俯仰', '方位', '倾斜'][current] +
+            ' / 度<input type="number" step="1" value="' +
+            (next * 0xb4) / Math['PI'] +
+            '" data-director-panorama="rotation-' +
+            current +
+            '"></label>',
+        )
+        ['join']('') +
+      '\n    </div>' +
+      (this['loading'] ? '<progress aria-label="正在导入全景"></progress>' : '') +
+      '</fieldset>'
+    );
+  }
+  ['mutate'](entry, handler) {
+    const { scene: scene2, project: project } = this['panel']['context']();
+    try {
+      this['panel']['timeline']['commitMutation']({
+        type: 'director-scene',
+        label: entry,
+        mutate: (record) => {
+          if (record['id'] !== project['id']) return record;
+          const payload = record['scenes']['find']((handle) => handle['id'] === scene2['id']);
+          return (
+            payload &&
+              ((payload['directorSettings'] = normalizeDirectorSceneSettings(payload['directorSettings'])),
+              handler(payload, record)),
+            record
+          );
+        },
+      });
+    } catch (state) {
+      this['panel']['timeline']['setMessage']?.(state['message']);
+    }
+  }
+  ['change'](event) {
+    const el = event['target'];
+    if (el['matches']?.('[data-director-panorama-file]')) {
+      const config = el['files']?.[0x0];
+      el['value'] = '';
+      if (config) void this['importPanorama'](config);
+      return !![];
+    }
+    if (el['matches']?.('[data-director-scene-transform]'))
+      return ((this['transform'][el['dataset']['directorSceneTransform']] = Number(el['value'])), !![]);
+    if (el['matches']?.('[data-director-scene]'))
+      return (
+        this['mutate']('调整场景显示', (scope) => {
+          scope['directorSettings'][el['dataset']['directorScene']] =
+            el['type'] === 'checkbox'
+              ? el['checked']
+              : el['type'] === 'number'
+                ? Number(el['value'])
+                : el['value'];
+        }),
+        !![]
+      );
+    if (el['matches']?.('[data-director-panorama]'))
+      return (
+        this['mutate']('调整全景背景', (input) => {
+          const [output, value2] = el['dataset']['directorPanorama']['split']('-');
+          if (value2 != null)
+            input['directorSettings']['panorama']['rotation'][Number(value2)] =
+              (Number(el['value']) * Math['PI']) / 0xb4;
+          else
+            input['directorSettings']['panorama'][output] =
+              el['type'] === 'checkbox'
+                ? el['checked']
+                : el['type'] === 'number'
+                  ? Number(el['value'])
+                  : el['value'];
+        }),
+        !![]
+      );
+    return ![];
+  }
+  ['click'](enabled, value3) {
+    if (!enabled['startsWith']('timeline-scene-')) return ![];
+    const enabled2 = this['panel']['timeline']['getRuntime']?.(),
+      { object: object, scene: scene3 } = this['panel']['context']();
+    if (!enabled2) return !![];
+    if (enabled === 'timeline-scene-view') {
+      const value4 = DIRECTOR_AXIS_VIEWS['find'](([value5]) => value5 === value3['dataset']['view']),
+        args = enabled2['getSceneView']();
+      value4 &&
+        args &&
+        (enabled2['setViewProjection']('orthographic'),
+        enabled2['commitSceneView']({ ...args, orbitYaw: value4[0x2], orbitPitch: value4[0x3] }));
+    }
+    if (enabled === 'timeline-scene-perspective') enabled2['setViewProjection']('perspective');
+    if (enabled === 'timeline-scene-quad') this['panel']['timeline']['multiView']?.['toggle']();
+    if (enabled === 'timeline-scene-transform')
+      this['mutate']('整体变换场景', (value6) =>
+        Object['assign'](value6, transformDirectorScene(value6, this['transform'])),
+      );
+    if (enabled === 'timeline-scene-ground' && object && !object['locked']) {
+      const value7 = enabled2['directorScene']['surfaceHeight'](
+          object['transform']['position'][0x0],
+          object['transform']['position'][0x2],
+          [object['id']],
+        ),
+        value8 = enabled2['resolveObjectGroundPosition'](object['id']) || 0x0;
+      this['mutate']('贴合模型表面', (value9) => {
+        value9['objects']['find']((value10) => value10['id'] === object['id'])['transform']['position'][0x1] =
+          value7 + value8;
+      });
+    }
+    if (['timeline-scene-path-ground', 'timeline-scene-avoid']['includes'](enabled)) {
+      const value11 = this['panel']['timeline']['cameraPath'],
+        value12 = value11['points']()['map']((value13) => value13['camera']['position']),
+        enabled3 = scene3['objects']['find']((value14) => value14['id'] === value11['objectId']);
+      if (!enabled3 || enabled3['locked'] || value12['length'] < 0x2)
+        return (
+          this['panel']['timeline']['setMessage']?.('请先选择已解锁物体的路线，至少设置两个控制点。'),
+          !![]
+        );
+      try {
+        const value15 =
+            enabled === 'timeline-scene-avoid'
+              ? findDirectorObstacleRoute(
+                  value12[0x0],
+                  value12['at'](-0x1),
+                  enabled2['directorScene']['obstacles']([enabled3['id']]),
+                )
+              : value12,
+          value16 = enabled2['resolveObjectGroundPosition'](enabled3['id']) || 0x0,
+          sampleDirectorGroundRoute2 = sampleDirectorGroundRoute(
+            value15,
+            (value17, value18) =>
+              enabled2['directorScene']['surfaceHeight'](value17, value18, [enabled3['id']]),
+            value16,
+          ),
+          value19 = value11['points']();
+        value11['commit']((value20) =>
+          authorDirectorPath(value20, {
+            object: enabled3,
+            points: sampleDirectorGroundRoute2,
+            start: value19[0x0]['time'],
+            duration: value19['at'](-0x1)['time'] - value19[0x0]['time'],
+            smooth: ![],
+          }),
+        );
+      } catch (value21) {
+        this['panel']['timeline']['setMessage']?.(value21['message']);
+      }
+    }
+    return !![];
+  }
+  async ['importPanorama'](error) {
+    if (this['loading']) return;
+    const response = validateStoryboard3DBackgroundImageFile(error);
+    if (!response['ok']) {
+      this['panel']['timeline']['setMessage']?.(response['errors'][0x0]['message']);
+      return;
+    }
+    const { project: project2, scene: scene4 } = this['panel']['context'](),
+      value22 = 'panorama-' + globalThis['crypto']['randomUUID']();
+    ((this['loading'] = !![]), this['panel']['timeline']['requestRender']?.());
+    try {
+      await this['panel']['timeline']
+        ['getBinaryAssetRepository']()
+        ['put']({
+          assetId: value22,
+          kind: 'background',
+          descriptor: { sceneId: scene4['id'], fileName: error['name'], projection: 'equirectangular' },
+          primaryFile: error,
+          relatedFiles: [],
+        });
+      if (this['disposed'] || this['panel']['context']()['project']['id'] !== project2['id']) return;
+      this['panel']['timeline']['commitMutation']({
+        type: 'director-panorama',
+        label: '导入全景背景',
+        mutate: (value23) => {
+          if (value23['id'] !== project2['id']) return value23;
+          const args2 = value23['scenes']['find']((value24) => value24['id'] === scene4['id']);
+          if (!args2) return value23;
+          return (
+            (args2['directorSettings'] = normalizeDirectorSceneSettings(args2['directorSettings'])),
+            Object['assign'](args2['directorSettings']['panorama'], {
+              assetId: value22,
+              enabled: !![],
+              history: [
+                ...args2['directorSettings']['panorama']['history'],
+                { assetId: value22, name: error['name'] },
+              ],
+            }),
+            value23
+          );
+        },
+      });
+    } catch (value25) {
+      if (!this['disposed']) this['panel']['timeline']['setMessage']?.('全景导入失败：' + value25['message']);
+    } finally {
+      this['loading'] = ![];
+      if (!this['disposed']) this['panel']['timeline']['requestRender']?.();
+    }
+  }
+  ['destroy']() {
+    this['disposed'] = !![];
+  }
+}

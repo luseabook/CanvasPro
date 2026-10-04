@@ -6,91 +6,91 @@ import {
   pasteDirectorClip,
 } from './directorClips.js';
 import { collectDirectorKeys, directorKeyIdentity } from './directorTimelineOperations.js';
-const escape = (_0x3e1edf) =>
-  String(_0x3e1edf)['replaceAll']('&', '&amp;')['replaceAll']('\x22', '&quot;')['replaceAll']('<', '&lt;');
+const escape = (value) =>
+  String(value)['replaceAll']('&', '&amp;')['replaceAll']('\x22', '&quot;')['replaceAll']('<', '&lt;');
 export class DirectorClipTimeline {
-  constructor(_0x36a457) {
-    ((this['timeline'] = _0x36a457),
+  constructor(item) {
+    ((this['timeline'] = item),
       (this['selected'] = null),
       (this['clipboard'] = null),
-      (this['onDown'] = (_0x5ac8fc) => this['drag'](_0x5ac8fc)));
+      (this['onDown'] = (key) => this['drag'](key)));
   }
-  ['render'](_0x55b4ba) {
-    const _0xdcb119 = [
-      ...(_0x55b4ba['motionClips'] || [])['map']((_0x24566a) => ({
-        ..._0x24566a,
+  ['render'](args) {
+    const list = [
+      ...(args['motionClips'] || [])['map']((label) => ({
+        ...label,
         kind: 'motion',
-        label: _0x24566a['name'],
+        label: label['name'],
       })),
-      ..._0x55b4ba['actionClips']['map']((_0x5f0a15) => ({
-        ..._0x5f0a15,
+      ...args['actionClips']['map']((args2) => ({
+        ...args2,
         kind: 'action',
-        label: '动作\x20·\x20' + _0x5f0a15['actionId'],
+        label: '动作\x20·\x20' + args2['actionId'],
       })),
     ];
     return (
       '<div\x20class=\x22storyboard-3d-director-fields\x22><button\x20data-storyboard-3d-action=\x22timeline-clip-create\x22>选中关键帧组成片段</button><button\x20data-storyboard-3d-action=\x22timeline-clip-copy\x22>复制片段</button><button\x20data-storyboard-3d-action=\x22timeline-clip-paste\x22>粘贴片段到播放头</button><button\x20data-storyboard-3d-action=\x22timeline-clip-duplicate\x22>紧后复制片段</button><button\x20data-storyboard-3d-action=\x22timeline-clip-delete\x22>删除片段</button></div>\x0a\x20\x20\x20\x20' +
-      _0xdcb119['map'](
-        (_0x19ef9a) =>
+      list['map'](
+        (index) =>
           '<div class="storyboard-3d-timeline-row"><div class="storyboard-3d-timeline-track-label">' +
-          escape(_0x19ef9a['label']) +
+          escape(index['label']) +
           '</div><div class="storyboard-3d-timeline-lane"><div role="button" tabindex="0" class="storyboard-3d-motion-clip ' +
-          (this['selected']?.['id'] === _0x19ef9a['id'] ? 'is-selected' : '') +
+          (this['selected']?.['id'] === index['id'] ? 'is-selected' : '') +
           '" data-storyboard-3d-action="timeline-clip-select" data-clip-kind="' +
-          _0x19ef9a['kind'] +
+          index['kind'] +
           '" data-clip-id="' +
-          escape(_0x19ef9a['id']) +
+          escape(index['id']) +
           '" style="--clip-start:' +
-          (_0x19ef9a['start'] / _0x55b4ba['duration']) * 0x64 +
+          (index['start'] / args['duration']) * 0x64 +
           '%;--clip-width:' +
-          ((_0x19ef9a['end'] - _0x19ef9a['start']) / _0x55b4ba['duration']) * 0x64 +
+          ((index['end'] - index['start']) / args['duration']) * 0x64 +
           '%\x22><span\x20data-clip-edge=\x22start\x22\x20aria-label=\x22裁剪片段开始\x22></span><b>' +
-          _0x19ef9a['start']['toFixed'](0x2) +
+          index['start']['toFixed'](0x2) +
           '–' +
-          _0x19ef9a['end']['toFixed'](0x2) +
+          index['end']['toFixed'](0x2) +
           's</b><span data-clip-edge="end" aria-label="裁剪片段结束"></span></div></div></div>',
       )['join']('')
     );
   }
   ['bind']() {
-    const _0x4f2222 = this['timeline']['getRoot']?.();
-    if (_0x4f2222 === this['root']) return;
+    const el = this['timeline']['getRoot']?.();
+    if (el === this['root']) return;
     (this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
-      (this['root'] = _0x4f2222),
-      _0x4f2222?.['addEventListener']('pointerdown', this['onDown'], !![]));
+      (this['root'] = el),
+      el?.['addEventListener']('pointerdown', this['onDown'], !![]));
   }
-  ['handleClick'](_0x2b4231, _0x44f6c9) {
-    if (!_0x2b4231['startsWith']('timeline-clip-')) return ![];
-    const _0x357345 = this['timeline']['_context']()['shot']?.['animation'];
-    if (!_0x357345) return !![];
-    const _0x39e80a = this['selected'],
-      _0x286a64 =
-        _0x39e80a &&
-        (_0x39e80a['kind'] === 'action' ? _0x357345['actionClips'] : _0x357345['motionClips'])?.['find'](
-          (_0x42d999) => _0x42d999['id'] === _0x39e80a['id'],
+  ['handleClick'](enabled, id) {
+    if (!enabled['startsWith']('timeline-clip-')) return ![];
+    const enabled2 = this['timeline']['_context']()['shot']?.['animation'];
+    if (!enabled2) return !![];
+    const result = this['selected'],
+      data =
+        result &&
+        (result['kind'] === 'action' ? enabled2['actionClips'] : enabled2['motionClips'])?.['find'](
+          (options) => options['id'] === result['id'],
         );
-    switch (_0x2b4231) {
+    switch (enabled) {
       case 'timeline-clip-select':
-        this['selected'] = { id: _0x44f6c9['dataset']['clipId'], kind: _0x44f6c9['dataset']['clipKind'] };
+        this['selected'] = { id: id['dataset']['clipId'], kind: id['dataset']['clipKind'] };
         break;
       case 'timeline-clip-create':
-        this['timeline']['editing']['mutate']('创建运动片段', (_0x33a71f) =>
+        this['timeline']['editing']['mutate']('创建运动片段', (target) =>
           createDirectorClip(
-            _0x33a71f,
-            collectDirectorKeys(_0x33a71f)
-              ['filter']((_0x148df9) =>
-                this['timeline']['editing']['selected']['has'](directorKeyIdentity(_0x148df9)),
+            target,
+            collectDirectorKeys(target)
+              ['filter']((source) =>
+                this['timeline']['editing']['selected']['has'](directorKeyIdentity(source)),
               )
-              ['map'](({ key: _0x483fd9 }) => _0x483fd9['id']),
+              ['map'](({ key: key2 }) => key2['id']),
           ),
         );
         break;
       case 'timeline-clip-copy':
-        if (_0x286a64)
+        if (data)
           this['clipboard'] = {
             projectId: this['timeline']['_context']()['project']['id'],
             shotId: this['timeline']['_context']()['shot']['id'],
-            value: copyDirectorClip(_0x357345, _0x39e80a['kind'], _0x39e80a['id']),
+            value: copyDirectorClip(enabled2, result['kind'], result['id']),
           };
         break;
       case 'timeline-clip-paste':
@@ -98,172 +98,158 @@ export class DirectorClipTimeline {
           this['clipboard']?.['projectId'] === this['timeline']['_context']()['project']['id'] &&
           this['clipboard']['shotId'] === this['timeline']['_context']()['shot']['id']
         )
-          this['timeline']['editing']['mutate']('粘贴片段', (_0x1d65e9) =>
+          this['timeline']['editing']['mutate']('粘贴片段', (next) =>
             pasteDirectorClip(
-              _0x1d65e9,
+              next,
               this['clipboard']['value'],
               this['timeline']['_timeForShot'](this['timeline']['_context']()['shot']),
             ),
           );
         break;
       case 'timeline-clip-duplicate':
-        if (_0x286a64)
-          this['timeline']['editing']['mutate']('紧后复制片段', (_0x4d5b65) =>
-            duplicateDirectorClip(_0x4d5b65, _0x39e80a['kind'], _0x39e80a['id'], _0x286a64['end']),
+        if (data)
+          this['timeline']['editing']['mutate']('紧后复制片段', (current) =>
+            duplicateDirectorClip(current, result['kind'], result['id'], data['end']),
           );
         break;
       case 'timeline-clip-delete':
-        if (_0x286a64)
-          this['timeline']['editing']['mutate']('删除片段', (_0x3bc1e5) => {
-            if (_0x39e80a['kind'] === 'action')
-              _0x3bc1e5['actionClips'] = _0x3bc1e5['actionClips']['filter'](
-                (_0x5585ea) => _0x5585ea['id'] !== _0x286a64['id'],
-              );
+        if (data)
+          this['timeline']['editing']['mutate']('删除片段', (entry) => {
+            if (result['kind'] === 'action')
+              entry['actionClips'] = entry['actionClips']['filter']((record) => record['id'] !== data['id']);
             else {
-              const _0x4e70f3 = new Set(_0x286a64['keyframeIds']);
-              ((_0x3bc1e5['motionClips'] = _0x3bc1e5['motionClips']['filter'](
-                (_0x58c61c) => _0x58c61c['id'] !== _0x286a64['id'],
+              const map = new Set(data['keyframeIds']);
+              ((entry['motionClips'] = entry['motionClips']['filter'](
+                (payload) => payload['id'] !== data['id'],
               )),
-                (_0x3bc1e5['cameraKeyframes'] = _0x3bc1e5['cameraKeyframes']['filter'](
-                  (_0x49de5f) => !_0x4e70f3['has'](_0x49de5f['id']),
+                (entry['cameraKeyframes'] = entry['cameraKeyframes']['filter'](
+                  (handle) => !map['has'](handle['id']),
                 )),
-                _0x3bc1e5['objectTracks']['forEach']((_0x459c10) => {
-                  for (const _0xcd2350 of ['positionKeyframes', 'rotationKeyframes', 'scaleKeyframes'])
-                    _0x459c10[_0xcd2350] = _0x459c10[_0xcd2350]['filter'](
-                      (_0x42f6f7) => !_0x4e70f3['has'](_0x42f6f7['id']),
-                    );
+                entry['objectTracks']['forEach']((state) => {
+                  for (const config of ['positionKeyframes', 'rotationKeyframes', 'scaleKeyframes'])
+                    state[config] = state[config]['filter']((scope) => !map['has'](scope['id']));
                 }));
             }
-            return _0x3bc1e5;
+            return entry;
           });
         break;
     }
     return (this['timeline']['requestRender']?.(), !![]);
   }
-  ['drag'](_0x5103d1) {
-    const _0x70d70 = _0x5103d1['target']['closest']?.('.storyboard-3d-motion-clip');
-    if (!_0x70d70 || _0x5103d1['button'] !== 0x0) return;
-    (_0x5103d1['preventDefault'](),
-      _0x5103d1['stopImmediatePropagation'](),
-      (this['selected'] = { id: _0x70d70['dataset']['clipId'], kind: _0x70d70['dataset']['clipKind'] }));
-    const { shot: _0x10b5b4, project: _0x345786 } = this['timeline']['_context'](),
-      _0x4cc6ac = _0x10b5b4['animation'],
-      _0xb93ce3 = (
-        this['selected']['kind'] === 'action' ? _0x4cc6ac['actionClips'] : _0x4cc6ac['motionClips']
-      )['find']((_0x395257) => _0x395257['id'] === this['selected']['id']),
-      _0x549018 = { ...this['selected'] },
-      _0x2f4751 = _0x5103d1['target']['dataset']['clipEdge'],
-      _0x586a8e = _0x70d70['parentElement']['getBoundingClientRect'](),
-      _0x1e015f = _0x5103d1['clientX'],
-      _0x37fa72 = new this['timeline']['window']['AbortController']();
+  ['drag'](event) {
+    const id2 = event['target']['closest']?.('.storyboard-3d-motion-clip');
+    if (!id2 || event['button'] !== 0x0) return;
+    (event['preventDefault'](),
+      event['stopImmediatePropagation'](),
+      (this['selected'] = { id: id2['dataset']['clipId'], kind: id2['dataset']['clipKind'] }));
+    const { shot: shot, project: project } = this['timeline']['_context'](),
+      actionClips = shot['animation'],
+      input = (
+        this['selected']['kind'] === 'action' ? actionClips['actionClips'] : actionClips['motionClips']
+      )['find']((output) => output['id'] === this['selected']['id']),
+      args3 = { ...this['selected'] },
+      enabled3 = event['target']['dataset']['clipEdge'],
+      box = id2['parentElement']['getBoundingClientRect'](),
+      value2 = event['clientX'],
+      signal = new this['timeline']['window']['AbortController']();
     this['cancel']?.();
-    const _0x24b63e = JSON['stringify'](_0x4cc6ac);
-    let _0x360eb5 = _0xb93ce3['start'],
-      _0x369f3c = _0xb93ce3['end'];
+    const value3 = JSON['stringify'](actionClips);
+    let start = input['start'],
+      end = input['end'];
     ((this['cancel'] = () => {
-      (_0x37fa72['abort'](),
-        _0x70d70['style']['setProperty'](
-          '--clip-start',
-          (_0xb93ce3['start'] / _0x4cc6ac['duration']) * 0x64 + '%',
-        ),
-        _0x70d70['style']['setProperty'](
+      (signal['abort'](),
+        id2['style']['setProperty']('--clip-start', (input['start'] / actionClips['duration']) * 0x64 + '%'),
+        id2['style']['setProperty'](
           '--clip-width',
-          ((_0xb93ce3['end'] - _0xb93ce3['start']) / _0x4cc6ac['duration']) * 0x64 + '%',
+          ((input['end'] - input['start']) / actionClips['duration']) * 0x64 + '%',
         ),
         (this['cancel'] = null));
     }),
       this['timeline']['window']['addEventListener'](
         'pointermove',
-        (_0x28735c) => {
-          if (_0x28735c['pointerId'] !== _0x5103d1['pointerId']) return;
-          let _0x38d49a =
+        (event2) => {
+          if (event2['pointerId'] !== event['pointerId']) return;
+          let value4 =
             Math['round'](
-              ((_0x28735c['clientX'] - _0x1e015f) / _0x586a8e['width']) *
-                _0x4cc6ac['duration'] *
-                _0x4cc6ac['fps'],
-            ) / _0x4cc6ac['fps'];
-          const _0x53000e = _0x2f4751 === 'end' ? _0xb93ce3['end'] : _0xb93ce3['start'],
-            _0x1a9c92 = {
-              ..._0x4cc6ac,
-              actionClips: _0x4cc6ac['actionClips']['filter'](
-                (_0x2dc8e3) => _0x2dc8e3['id'] !== _0xb93ce3['id'],
-              ),
-              motionClips: (_0x4cc6ac['motionClips'] || [])['filter'](
-                (_0x148d55) => _0x148d55['id'] !== _0xb93ce3['id'],
+              ((event2['clientX'] - value2) / box['width']) * actionClips['duration'] * actionClips['fps'],
+            ) / actionClips['fps'];
+          const value5 = enabled3 === 'end' ? input['end'] : input['start'],
+            value6 = {
+              ...actionClips,
+              actionClips: actionClips['actionClips']['filter']((value7) => value7['id'] !== input['id']),
+              motionClips: (actionClips['motionClips'] || [])['filter'](
+                (value8) => value8['id'] !== input['id'],
               ),
             };
-          ((_0x38d49a =
+          ((value4 =
             this['timeline']['editing']['snapTime'](
-              _0x53000e + _0x38d49a,
-              _0x1a9c92,
-              _0x586a8e['width'],
-              _0x28735c['altKey'],
-              _0xb93ce3['keyframeIds'] || [],
-            ) - _0x53000e),
-            (_0x360eb5 = _0x2f4751 === 'end' ? _0xb93ce3['start'] : _0xb93ce3['start'] + _0x38d49a),
-            (_0x369f3c = _0x2f4751 === 'start' ? _0xb93ce3['end'] : _0xb93ce3['end'] + _0x38d49a),
-            _0x70d70['style']['setProperty'](
-              '--clip-start',
-              (_0x360eb5 / _0x4cc6ac['duration']) * 0x64 + '%',
-            ),
-            _0x70d70['style']['setProperty'](
+              value5 + value4,
+              value6,
+              box['width'],
+              event2['altKey'],
+              input['keyframeIds'] || [],
+            ) - value5),
+            (start = enabled3 === 'end' ? input['start'] : input['start'] + value4),
+            (end = enabled3 === 'start' ? input['end'] : input['end'] + value4),
+            id2['style']['setProperty']('--clip-start', (start / actionClips['duration']) * 0x64 + '%'),
+            id2['style']['setProperty'](
               '--clip-width',
-              (Math['max'](0x0, _0x369f3c - _0x360eb5) / _0x4cc6ac['duration']) * 0x64 + '%',
+              (Math['max'](0x0, end - start) / actionClips['duration']) * 0x64 + '%',
             ));
         },
-        { signal: _0x37fa72['signal'] },
+        { signal: signal['signal'] },
       ),
       this['timeline']['window']['addEventListener']('pointercancel', () => this['cancel']?.(), {
-        signal: _0x37fa72['signal'],
+        signal: signal['signal'],
       }),
       this['timeline']['window']['addEventListener'](
         'keydown',
-        (_0x53bebf) => {
-          _0x53bebf['key'] === 'Escape' &&
-            (_0x53bebf['preventDefault'](), _0x53bebf['stopImmediatePropagation'](), this['cancel']?.());
+        (event3) => {
+          event3['key'] === 'Escape' &&
+            (event3['preventDefault'](), event3['stopImmediatePropagation'](), this['cancel']?.());
         },
-        { capture: !![], signal: _0x37fa72['signal'] },
+        { capture: !![], signal: signal['signal'] },
       ),
       this['timeline']['window']['addEventListener'](
         'pointerup',
-        (_0x5ce44a) => {
-          if (_0x5ce44a['pointerId'] !== _0x5103d1['pointerId']) return;
+        (event4) => {
+          if (event4['pointerId'] !== event['pointerId']) return;
           this['cancel']?.();
-          const _0x6d0e17 = this['timeline']['_context']();
+          const value9 = this['timeline']['_context']();
           if (
-            _0x6d0e17['project']['id'] !== _0x345786['id'] ||
-            _0x6d0e17['shot']['id'] !== _0x10b5b4['id'] ||
-            _0x24b63e !== JSON['stringify'](_0x6d0e17['shot']['animation'])
+            value9['project']['id'] !== project['id'] ||
+            value9['shot']['id'] !== shot['id'] ||
+            value3 !== JSON['stringify'](value9['shot']['animation'])
           )
             return;
-          this['timeline']['editing']['mutate']('移动或裁剪片段', (_0x2be694) =>
-            editDirectorClip(_0x2be694, { ..._0x549018, start: _0x360eb5, end: _0x369f3c, move: !_0x2f4751 }),
+          this['timeline']['editing']['mutate']('移动或裁剪片段', (value10) =>
+            editDirectorClip(value10, { ...args3, start: start, end: end, move: !enabled3 }),
           );
         },
-        { once: !![], signal: _0x37fa72['signal'] },
+        { once: !![], signal: signal['signal'] },
       ));
   }
-  ['handleKey'](_0x4fab62) {
-    const _0x141a7f = _0x4fab62['target']['closest']?.('.storyboard-3d-motion-clip');
-    if (!_0x141a7f) return ![];
-    this['selected'] = { kind: _0x141a7f['dataset']['clipKind'], id: _0x141a7f['dataset']['clipId'] };
-    const _0x21a7c2 = _0x4fab62['key']['toLowerCase'](),
-      _0x3869f7 = _0x4fab62['ctrlKey'] || _0x4fab62['metaKey'],
-      _0x56d3cc =
-        _0x3869f7 && _0x21a7c2 === 'c'
+  ['handleKey'](event5) {
+    const kind = event5['target']['closest']?.('.storyboard-3d-motion-clip');
+    if (!kind) return ![];
+    this['selected'] = { kind: kind['dataset']['clipKind'], id: kind['dataset']['clipId'] };
+    const value11 = event5['key']['toLowerCase'](),
+      value12 = event5['ctrlKey'] || event5['metaKey'],
+      enabled4 =
+        value12 && value11 === 'c'
           ? 'copy'
-          : _0x3869f7 && _0x21a7c2 === 'v'
+          : value12 && value11 === 'v'
             ? 'paste'
-            : ['delete', 'backspace']['includes'](_0x21a7c2)
+            : ['delete', 'backspace']['includes'](value11)
               ? 'delete'
-              : ['enter', '\x20']['includes'](_0x21a7c2)
+              : ['enter', '\x20']['includes'](value11)
                 ? 'select'
                 : null;
-    if (!_0x56d3cc) return ![];
+    if (!enabled4) return ![];
     return (
-      _0x4fab62['preventDefault'](),
-      _0x4fab62['stopImmediatePropagation'](),
-      this['handleClick']('timeline-clip-' + _0x56d3cc, _0x141a7f),
+      event5['preventDefault'](),
+      event5['stopImmediatePropagation'](),
+      this['handleClick']('timeline-clip-' + enabled4, kind),
       !![]
     );
   }

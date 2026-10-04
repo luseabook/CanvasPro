@@ -8,34 +8,34 @@ function getRuntimeRoot() {
   return globalThis;
 }
 function getRuntimeStorage() {
-  const _0x2173ab = getRuntimeRoot();
+  const runtimeRoot = getRuntimeRoot();
   try {
-    if (_0x2173ab?.localStorage) return _0x2173ab.localStorage;
+    if (runtimeRoot?.localStorage) return runtimeRoot.localStorage;
   } catch {}
   try {
     if (typeof localStorage !== 'undefined' && localStorage) return localStorage;
   } catch {}
   return null;
 }
-function normalizePercent(_0x5e452f, _0x2d08ed) {
-  if (_0x5e452f === null || _0x5e452f === undefined || _0x5e452f === '') return _0x2d08ed;
-  const _0x14469f = Number(_0x5e452f);
-  if (!Number.isFinite(_0x14469f)) return _0x2d08ed;
-  return Math.max(0, Math.min(100, Math.round(_0x14469f)));
+function normalizePercent(value, item) {
+  if (value === null || value === undefined || value === '') return item;
+  const key = Number(value);
+  if (!Number.isFinite(key)) return item;
+  return Math.max(0, Math.min(100, Math.round(key)));
 }
-function readPercentPref(_0x542d3d, _0x24c60f) {
-  let _0x7fbe81 = null;
+function readPercentPref(index, result) {
+  let runtimeStorage = null;
   try {
-    _0x7fbe81 = getRuntimeStorage()?.getItem(_0x542d3d) ?? null;
+    runtimeStorage = getRuntimeStorage()?.getItem(index) ?? null;
   } catch {}
-  return normalizePercent(_0x7fbe81, _0x24c60f);
+  return normalizePercent(runtimeStorage, result);
 }
-function writePercentPref(_0x8610f, _0x536087, _0x5e23e4) {
-  const _0x354d83 = normalizePercent(_0x536087, _0x5e23e4);
+function writePercentPref(data, options, target) {
+  const percent = normalizePercent(options, target);
   try {
-    getRuntimeStorage()?.setItem(_0x8610f, String(_0x354d83));
+    getRuntimeStorage()?.setItem(data, String(percent));
   } catch {}
-  return _0x354d83;
+  return percent;
 }
 export function readCommentNoteJumpFocusPref() {
   return {
@@ -45,193 +45,188 @@ export function readCommentNoteJumpFocusPref() {
       readPercentPref(COMMENT_NOTE_JUMP_FOCUS_Y_STORAGE_KEY, DEFAULT_COMMENT_NOTE_JUMP_FOCUS_Y_PERCENT) / 100,
   };
 }
-export function applyImageVideoNodeResizePref(_0x2416f2) {
+export function applyImageVideoNodeResizePref(source) {
   if (typeof document === 'undefined') return;
-  const _0xf99069 = document.getElementById('v2-wrap');
-  if (!_0xf99069) return;
-  _0xf99069.classList.toggle('v2-media-node-resize-enabled', _0x2416f2 === true);
+  const el = document.getElementById('v2-wrap');
+  if (!el) return;
+  el.classList.toggle('v2-media-node-resize-enabled', source === true);
 }
-function syncButtonPair(_0x4e51d4, _0x26482b, _0x2275f4) {
+function syncButtonPair(next, current, entry) {
   if (typeof document === 'undefined') return;
-  const _0x184d6f = _0x2275f4 === true;
-  (document.getElementById(_0x4e51d4)?.classList.toggle('active', _0x184d6f),
-    document.getElementById(_0x26482b)?.classList.toggle('active', !_0x184d6f));
+  const enabled = entry === true;
+  (document.getElementById(next)?.classList.toggle('active', enabled),
+    document.getElementById(current)?.classList.toggle('active', !enabled));
 }
-function normalizePromptEnterBehavior(_0x575c7f) {
-  return _0x575c7f === 'newline' ? 'newline' : 'submit';
+function normalizePromptEnterBehavior(record) {
+  return record === 'newline' ? 'newline' : 'submit';
 }
-function syncPromptEnterBehaviorButtons(_0x179e39) {
+function syncPromptEnterBehaviorButtons(payload) {
   if (typeof document === 'undefined') return;
-  const _0x238c2d = normalizePromptEnterBehavior(_0x179e39);
-  document.querySelectorAll('#promptEnterBehaviorGroup .cursor-size-btn').forEach((_0x23e3dd) => {
-    _0x23e3dd.classList.toggle('active', _0x23e3dd.dataset.promptEnterBehavior === _0x238c2d);
+  const promptEnterBehavior = normalizePromptEnterBehavior(payload);
+  document.querySelectorAll('#promptEnterBehaviorGroup .cursor-size-btn').forEach((el2) => {
+    el2.classList.toggle('active', el2.dataset.promptEnterBehavior === promptEnterBehavior);
   });
 }
-function syncNodeAvoidOverlapButtons(_0x2b6da6) {
+function syncNodeAvoidOverlapButtons(handle) {
   if (typeof document === 'undefined') return;
-  const _0x3c3225 = _0x2b6da6 !== false;
-  document.querySelectorAll('#nodeAvoidOverlapGroup .cursor-size-btn').forEach((_0x2570d6) => {
-    const _0x1d73c6 = _0x2570d6.dataset.avoid === 'on';
-    _0x2570d6.classList.toggle('active', _0x1d73c6 === _0x3c3225);
+  const state = handle !== false;
+  document.querySelectorAll('#nodeAvoidOverlapGroup .cursor-size-btn').forEach((el3) => {
+    const config = el3.dataset.avoid === 'on';
+    el3.classList.toggle('active', config === state);
   });
 }
-export function setVideoMetaPref(_0x1df58a, _0x5d41d2 = appStore) {
-  const _0x12bf43 = _0x1df58a === true;
+export function setVideoMetaPref(scope, input = appStore) {
+  const output = scope === true;
   return (
-    _0x5d41d2.setShowVideoMeta(_0x12bf43),
-    syncButtonPair('btnVideoMetaOn', 'btnVideoMetaOff', _0x12bf43),
-    _0x12bf43
+    input.setShowVideoMeta(output),
+    syncButtonPair('btnVideoMetaOn', 'btnVideoMetaOff', output),
+    output
   );
 }
-export function setImageVideoNodeResizePref(_0x49d4dc, _0x44b22c = appStore) {
-  const _0x33cd73 = _0x49d4dc === true;
+export function setImageVideoNodeResizePref(value2, value3 = appStore) {
+  const value4 = value2 === true;
   return (
-    _0x44b22c.setImageVideoNodeResizeEnabled(_0x33cd73),
-    applyImageVideoNodeResizePref(_0x33cd73),
-    syncButtonPair('btnMediaNodeResizeOn', 'btnMediaNodeResizeOff', _0x33cd73),
-    _0x33cd73
+    value3.setImageVideoNodeResizeEnabled(value4),
+    applyImageVideoNodeResizePref(value4),
+    syncButtonPair('btnMediaNodeResizeOn', 'btnMediaNodeResizeOff', value4),
+    value4
   );
 }
-export function setTitleFollowsCanvasZoomPref(_0x4ae617, _0x236a72 = appStore) {
-  const _0x484fcc = _0x4ae617 === true;
+export function setTitleFollowsCanvasZoomPref(value5, value6 = appStore) {
+  const value7 = value5 === true;
   return (
-    _0x236a72.setTitleFollowsCanvasZoom(_0x484fcc),
-    syncButtonPair('btnTitleFollowsZoomOn', 'btnTitleFollowsZoomOff', _0x484fcc),
-    _0x484fcc
+    value6.setTitleFollowsCanvasZoom(value7),
+    syncButtonPair('btnTitleFollowsZoomOn', 'btnTitleFollowsZoomOff', value7),
+    value7
   );
 }
-export function setPromptBoxResizePref(_0x147be9, _0x1e829a = appStore) {
-  const _0x563938 = _0x147be9 !== false;
+export function setPromptBoxResizePref(value8, value9 = appStore) {
+  const value10 = value8 !== false;
   return (
-    _0x1e829a.setPromptBoxResizeEnabled(_0x563938),
-    syncButtonPair('btnPromptBoxResizeOn', 'btnPromptBoxResizeOff', _0x563938),
-    _0x563938
+    value9.setPromptBoxResizeEnabled(value10),
+    syncButtonPair('btnPromptBoxResizeOn', 'btnPromptBoxResizeOff', value10),
+    value10
   );
 }
-export function setPromptEnterBehaviorPref(_0x11372f, _0x2431ec = appStore) {
-  const _0x2db544 = normalizePromptEnterBehavior(_0x11372f);
-  return (_0x2431ec.setPromptEnterBehavior(_0x2db544), syncPromptEnterBehaviorButtons(_0x2db544), _0x2db544);
+export function setPromptEnterBehaviorPref(value11, value12 = appStore) {
+  const promptEnterBehavior2 = normalizePromptEnterBehavior(value11);
+  return (
+    value12.setPromptEnterBehavior(promptEnterBehavior2),
+    syncPromptEnterBehaviorButtons(promptEnterBehavior2),
+    promptEnterBehavior2
+  );
 }
-export function applyPromptAttachmentButtonHiddenPref(_0x6d0f5b) {
+export function applyPromptAttachmentButtonHiddenPref(value13) {
   if (typeof document === 'undefined') return;
-  const _0x715ed = document.getElementById('v2-wrap');
-  if (!_0x715ed) return;
-  _0x715ed.classList.toggle('prompt-attachment-button-hidden', _0x6d0f5b === true);
+  const el4 = document.getElementById('v2-wrap');
+  if (!el4) return;
+  el4.classList.toggle('prompt-attachment-button-hidden', value13 === true);
 }
-export function setPromptAttachmentButtonHiddenPref(_0x6251b0, _0x5eb689 = appStore) {
-  const _0x2ada3b = _0x6251b0 === true;
+export function setPromptAttachmentButtonHiddenPref(value14, store = appStore) {
+  const value15 = value14 === true;
   return (
-    _0x5eb689.setPromptAttachmentButtonHidden(_0x2ada3b),
-    applyPromptAttachmentButtonHiddenPref(_0x2ada3b),
-    syncButtonPair('btnPromptAttachmentButtonHiddenYes', 'btnPromptAttachmentButtonHiddenNo', _0x2ada3b),
-    _0x2ada3b &&
-      _0x5eb689.getState?.()?.pickConnectMode?.active &&
-      _0x5eb689.setPickConnectMode?.({ active: false }),
-    _0x2ada3b
+    store.setPromptAttachmentButtonHidden(value15),
+    applyPromptAttachmentButtonHiddenPref(value15),
+    syncButtonPair('btnPromptAttachmentButtonHiddenYes', 'btnPromptAttachmentButtonHiddenNo', value15),
+    value15 && store.getState?.()?.pickConnectMode?.active && store.setPickConnectMode?.({ active: false }),
+    value15
   );
 }
-export function setNodeAvoidOverlapPref(_0x5e50f3) {
-  const _0x34c725 = _0x5e50f3 !== false,
-    _0x303bf1 = typeof window !== 'undefined' ? window : globalThis;
-  _0x303bf1.v2NodeAvoidOverlap = _0x34c725;
+export function setNodeAvoidOverlapPref(value16) {
+  const value17 = value16 !== false,
+    value18 = typeof window !== 'undefined' ? window : globalThis;
+  value18.v2NodeAvoidOverlap = value17;
   try {
-    _0x303bf1?.localStorage?.setItem('v2-node-avoid-overlap', _0x34c725 ? '1' : '0');
+    value18?.localStorage?.setItem('v2-node-avoid-overlap', value17 ? '1' : '0');
   } catch {}
-  return (syncNodeAvoidOverlapButtons(_0x34c725), _0x34c725);
+  return (syncNodeAvoidOverlapButtons(value17), value17);
 }
 function initVideoMeta() {
-  const _0x1b3a0f = document.getElementById('btnVideoMetaOn'),
-    _0x2ce4cc = document.getElementById('btnVideoMetaOff');
-  if (!_0x1b3a0f || !_0x2ce4cc) return;
-  const _0x5e37b7 = appStore.getState(),
-    _0x53e1cf = _0x5e37b7?.ui?.showVideoMeta === true;
-  (setVideoMetaPref(_0x53e1cf),
-    _0x1b3a0f.addEventListener('click', () => setVideoMetaPref(true)),
-    _0x2ce4cc.addEventListener('click', () => setVideoMetaPref(false)));
+  const el5 = document.getElementById('btnVideoMetaOn'),
+    el6 = document.getElementById('btnVideoMetaOff');
+  if (!el5 || !el6) return;
+  const value19 = appStore.getState(),
+    value20 = value19?.ui?.showVideoMeta === true;
+  (setVideoMetaPref(value20),
+    el5.addEventListener('click', () => setVideoMetaPref(true)),
+    el6.addEventListener('click', () => setVideoMetaPref(false)));
 }
 function initImageVideoNodeResize() {
-  const _0x4d80e7 = document.getElementById('btnMediaNodeResizeOn'),
-    _0x3fca23 = document.getElementById('btnMediaNodeResizeOff');
-  if (!_0x4d80e7 || !_0x3fca23) return;
-  const _0x3e1d45 = appStore.getState(),
-    _0x21893a = _0x3e1d45?.ui?.imageVideoNodeResizeEnabled === true;
-  (setImageVideoNodeResizePref(_0x21893a),
-    _0x4d80e7.addEventListener('click', () => setImageVideoNodeResizePref(true)),
-    _0x3fca23.addEventListener('click', () => setImageVideoNodeResizePref(false)));
+  const el7 = document.getElementById('btnMediaNodeResizeOn'),
+    el8 = document.getElementById('btnMediaNodeResizeOff');
+  if (!el7 || !el8) return;
+  const value21 = appStore.getState(),
+    value22 = value21?.ui?.imageVideoNodeResizeEnabled === true;
+  (setImageVideoNodeResizePref(value22),
+    el7.addEventListener('click', () => setImageVideoNodeResizePref(true)),
+    el8.addEventListener('click', () => setImageVideoNodeResizePref(false)));
 }
 function initTitleFollowsCanvasZoom() {
-  const _0x372ffa = document.getElementById('btnTitleFollowsZoomOn'),
-    _0x16db4e = document.getElementById('btnTitleFollowsZoomOff');
-  if (!_0x372ffa || !_0x16db4e) return;
-  const _0x59c798 = appStore.getState(),
-    _0x5f0bb2 = _0x59c798?.ui?.titleFollowsCanvasZoom === true;
-  (setTitleFollowsCanvasZoomPref(_0x5f0bb2),
-    _0x372ffa.addEventListener('click', () => setTitleFollowsCanvasZoomPref(true)),
-    _0x16db4e.addEventListener('click', () => setTitleFollowsCanvasZoomPref(false)));
+  const el9 = document.getElementById('btnTitleFollowsZoomOn'),
+    el10 = document.getElementById('btnTitleFollowsZoomOff');
+  if (!el9 || !el10) return;
+  const value23 = appStore.getState(),
+    value24 = value23?.ui?.titleFollowsCanvasZoom === true;
+  (setTitleFollowsCanvasZoomPref(value24),
+    el9.addEventListener('click', () => setTitleFollowsCanvasZoomPref(true)),
+    el10.addEventListener('click', () => setTitleFollowsCanvasZoomPref(false)));
 }
 function initPromptBoxResize() {
-  const _0x3297e9 = document.getElementById('btnPromptBoxResizeOn'),
-    _0x4c7e3f = document.getElementById('btnPromptBoxResizeOff');
-  if (!_0x3297e9 || !_0x4c7e3f) return;
-  const _0x4335f3 = appStore.getState(),
-    _0x153f65 = _0x4335f3?.ui?.promptBoxResizeEnabled !== false;
-  (setPromptBoxResizePref(_0x153f65),
-    _0x3297e9.addEventListener('click', () => setPromptBoxResizePref(true)),
-    _0x4c7e3f.addEventListener('click', () => setPromptBoxResizePref(false)));
+  const el11 = document.getElementById('btnPromptBoxResizeOn'),
+    el12 = document.getElementById('btnPromptBoxResizeOff');
+  if (!el11 || !el12) return;
+  const value25 = appStore.getState(),
+    value26 = value25?.ui?.promptBoxResizeEnabled !== false;
+  (setPromptBoxResizePref(value26),
+    el11.addEventListener('click', () => setPromptBoxResizePref(true)),
+    el12.addEventListener('click', () => setPromptBoxResizePref(false)));
 }
 function initPromptEnterBehavior() {
-  const _0x30bee8 = document.getElementById('promptEnterBehaviorGroup');
-  if (!_0x30bee8) return;
-  const _0x36f698 = appStore.getState(),
-    _0x20dda6 = normalizePromptEnterBehavior(_0x36f698?.ui?.promptEnterBehavior);
-  (setPromptEnterBehaviorPref(_0x20dda6),
-    document.querySelectorAll('#promptEnterBehaviorGroup .cursor-size-btn').forEach((_0x36123a) => {
-      _0x36123a.addEventListener('click', () =>
-        setPromptEnterBehaviorPref(_0x36123a.dataset.promptEnterBehavior),
-      );
+  const enabled2 = document.getElementById('promptEnterBehaviorGroup');
+  if (!enabled2) return;
+  const value27 = appStore.getState(),
+    promptEnterBehavior3 = normalizePromptEnterBehavior(value27?.ui?.promptEnterBehavior);
+  (setPromptEnterBehaviorPref(promptEnterBehavior3),
+    document.querySelectorAll('#promptEnterBehaviorGroup .cursor-size-btn').forEach((el13) => {
+      el13.addEventListener('click', () => setPromptEnterBehaviorPref(el13.dataset.promptEnterBehavior));
     }));
 }
 function initPromptAttachmentButtonHidden() {
-  const _0x20b2bb = document.getElementById('btnPromptAttachmentButtonHiddenNo'),
-    _0x10896b = document.getElementById('btnPromptAttachmentButtonHiddenYes');
-  if (!_0x20b2bb || !_0x10896b) return;
-  const _0x2d312c = appStore.getState(),
-    _0x4cf764 = _0x2d312c?.ui?.promptAttachmentButtonHidden === true;
-  (setPromptAttachmentButtonHiddenPref(_0x4cf764),
-    _0x20b2bb.addEventListener('click', () => setPromptAttachmentButtonHiddenPref(false)),
-    _0x10896b.addEventListener('click', () => setPromptAttachmentButtonHiddenPref(true)));
+  const el14 = document.getElementById('btnPromptAttachmentButtonHiddenNo'),
+    el15 = document.getElementById('btnPromptAttachmentButtonHiddenYes');
+  if (!el14 || !el15) return;
+  const value28 = appStore.getState(),
+    value29 = value28?.ui?.promptAttachmentButtonHidden === true;
+  (setPromptAttachmentButtonHiddenPref(value29),
+    el14.addEventListener('click', () => setPromptAttachmentButtonHiddenPref(false)),
+    el15.addEventListener('click', () => setPromptAttachmentButtonHiddenPref(true)));
 }
 function initCommentNoteJumpFocus() {
-  const _0x4d5959 = ({
-    sliderId: _0x3a6986,
-    valueId: _0x5d8750,
-    storageKey: _0x3f2940,
-    fallback: _0xbdb5f3,
-  }) => {
-    const _0x27fa6c = document.getElementById(_0x3a6986),
-      _0x59bb50 = document.getElementById(_0x5d8750);
-    if (!_0x27fa6c) return;
-    const _0x525ae1 = (_0x4fc161) => {
-      const _0x312c5e = normalizePercent(_0x4fc161, _0xbdb5f3);
-      _0x27fa6c.value = String(_0x312c5e);
-      if (_0x59bb50) _0x59bb50.textContent = _0x312c5e + '%';
-      return _0x312c5e;
+  const run = ({ sliderId: sliderId, valueId: valueId, storageKey: storageKey, fallback: fallback }) => {
+    const el16 = document.getElementById(sliderId),
+      el17 = document.getElementById(valueId);
+    if (!el16) return;
+    const run2 = (value30) => {
+      const percent2 = normalizePercent(value30, fallback);
+      el16.value = String(percent2);
+      if (el17) el17.textContent = percent2 + '%';
+      return percent2;
     };
-    (_0x525ae1(readPercentPref(_0x3f2940, _0xbdb5f3)),
-      _0x27fa6c.addEventListener('input', (_0x1c4760) => {
-        _0x525ae1(_0x1c4760.target?.value);
+    (run2(readPercentPref(storageKey, fallback)),
+      el16.addEventListener('input', (event) => {
+        run2(event.target?.value);
       }),
-      _0x27fa6c.addEventListener('change', (_0xbcf3f) => {
-        _0x525ae1(writePercentPref(_0x3f2940, _0xbcf3f.target?.value, _0xbdb5f3));
+      el16.addEventListener('change', (event2) => {
+        run2(writePercentPref(storageKey, event2.target?.value, fallback));
       }));
   };
-  (_0x4d5959({
+  (run({
     sliderId: 'commentNoteJumpFocusXSlider',
     valueId: 'commentNoteJumpFocusXValue',
     storageKey: COMMENT_NOTE_JUMP_FOCUS_X_STORAGE_KEY,
     fallback: DEFAULT_COMMENT_NOTE_JUMP_FOCUS_X_PERCENT,
   }),
-    _0x4d5959({
+    run({
       sliderId: 'commentNoteJumpFocusYSlider',
       valueId: 'commentNoteJumpFocusYValue',
       storageKey: COMMENT_NOTE_JUMP_FOCUS_Y_STORAGE_KEY,
@@ -239,49 +234,49 @@ function initCommentNoteJumpFocus() {
     }));
 }
 function initNodeSpacing() {
-  const _0x21727c = document.getElementById('nodeSpacingSlider'),
-    _0x44ba03 = document.getElementById('nodeSpacingValue');
-  let _0x26d7c3 = parseInt(localStorage.getItem('v2-node-spacing'), 10);
-  if (isNaN(_0x26d7c3)) _0x26d7c3 = 120;
-  window.v2NodeSpacing = _0x26d7c3;
-  if (_0x21727c) {
-    _0x21727c.value = _0x26d7c3;
-    if (_0x44ba03) _0x44ba03.textContent = _0x26d7c3;
+  const el18 = document.getElementById('nodeSpacingSlider'),
+    el19 = document.getElementById('nodeSpacingValue');
+  let value31 = parseInt(localStorage.getItem('v2-node-spacing'), 10);
+  if (isNaN(value31)) value31 = 120;
+  window.v2NodeSpacing = value31;
+  if (el18) {
+    el18.value = value31;
+    if (el19) el19.textContent = value31;
   }
-  (_0x21727c?.addEventListener('input', (_0x391be0) => {
-    const _0x5dd362 = parseInt(_0x391be0.target.value, 10);
-    if (_0x44ba03) _0x44ba03.textContent = _0x5dd362;
+  (el18?.addEventListener('input', (event3) => {
+    const value32 = parseInt(event3.target.value, 10);
+    if (el19) el19.textContent = value32;
   }),
-    _0x21727c?.addEventListener('change', (_0x5126a7) => {
-      const _0x40af26 = parseInt(_0x5126a7.target.value, 10);
-      ((window.v2NodeSpacing = _0x40af26), localStorage.setItem('v2-node-spacing', _0x40af26));
+    el18?.addEventListener('change', (event4) => {
+      const value33 = parseInt(event4.target.value, 10);
+      ((window.v2NodeSpacing = value33), localStorage.setItem('v2-node-spacing', value33));
     }));
 }
 function initNodeDirection() {
-  const _0x34d402 = localStorage.getItem('v2-node-direction') || 'right';
-  window.v2NodeDirection = _0x34d402;
-  const _0xf8eb1b = document.querySelectorAll('#nodeDirectionGroup .cursor-size-btn');
-  _0xf8eb1b.forEach((_0x417dd6) => {
-    (_0x417dd6.classList.toggle('active', _0x417dd6.dataset.dir === _0x34d402),
-      _0x417dd6.addEventListener('click', () => {
-        (_0xf8eb1b.forEach((_0x477ed9) => _0x477ed9.classList.remove('active')),
-          _0x417dd6.classList.add('active'),
-          (window.v2NodeDirection = _0x417dd6.dataset.dir),
-          localStorage.setItem('v2-node-direction', _0x417dd6.dataset.dir));
+  const value34 = localStorage.getItem('v2-node-direction') || 'right';
+  window.v2NodeDirection = value34;
+  const list = document.querySelectorAll('#nodeDirectionGroup .cursor-size-btn');
+  list.forEach((el20) => {
+    (el20.classList.toggle('active', el20.dataset.dir === value34),
+      el20.addEventListener('click', () => {
+        (list.forEach((el21) => el21.classList.remove('active')),
+          el20.classList.add('active'),
+          (window.v2NodeDirection = el20.dataset.dir),
+          localStorage.setItem('v2-node-direction', el20.dataset.dir));
       }));
   });
 }
 function initNodeAvoidOverlap() {
-  const _0x3f8101 = localStorage.getItem('v2-node-avoid-overlap');
-  let _0x3fcbb1 = true;
-  _0x3f8101 == null
+  const value35 = localStorage.getItem('v2-node-avoid-overlap');
+  let value36 = true;
+  value35 == null
     ? localStorage.setItem('v2-node-avoid-overlap', '1')
-    : (_0x3fcbb1 = _0x3f8101 === '1' || _0x3f8101 === 'true');
-  setNodeAvoidOverlapPref(_0x3fcbb1);
-  const _0x14b364 = document.querySelectorAll('#nodeAvoidOverlapGroup .cursor-size-btn');
-  _0x14b364.forEach((_0x1c7d9b) => {
-    _0x1c7d9b.addEventListener('click', () => {
-      setNodeAvoidOverlapPref(_0x1c7d9b.dataset.avoid === 'on');
+    : (value36 = value35 === '1' || value35 === 'true');
+  setNodeAvoidOverlapPref(value36);
+  const list2 = document.querySelectorAll('#nodeAvoidOverlapGroup .cursor-size-btn');
+  list2.forEach((el22) => {
+    el22.addEventListener('click', () => {
+      setNodeAvoidOverlapPref(el22.dataset.avoid === 'on');
     });
   });
 }

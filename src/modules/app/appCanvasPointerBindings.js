@@ -4,141 +4,140 @@ const CANVAS_UI_EXCLUSION_SELECTOR =
   PANEL_SCROLL_SELECTOR =
     '.canvas-proj-dropdown, .v2-asset-sidebar-panel, .v2-workflow-sidebar-panel, .v2-file-history-panel',
   CANVAS_PAN_OVERLAY_SELECTOR = '.side-plus-btn';
-function selectVideoInteractionLockState(_0x569e46 = {}) {
-  const _0x1db325 = _0x569e46.videoKeying || null,
-    _0x57d0a1 = _0x569e46.videoClip || null,
-    _0x22b30b = _0x1db325?.active ? _0x1db325 : _0x57d0a1?.active ? _0x57d0a1 : null;
-  return { active: !!_0x22b30b?.active, nodeId: _0x22b30b?.nodeId || null };
+function selectVideoInteractionLockState(options = {}) {
+  const value = options.videoKeying || null,
+    item = options.videoClip || null,
+    nodeId = value?.active ? value : item?.active ? item : null;
+  return { active: !!nodeId?.active, nodeId: nodeId?.nodeId || null };
 }
-function getInitialState(_0x3d5cee) {
-  if (typeof _0x3d5cee?.getState === 'function') return _0x3d5cee.getState() || {};
+function getInitialState(store) {
+  if (typeof store?.getState === 'function') return store.getState() || {};
   return {};
 }
-function subscribeSelectorOrPrime(_0x56f12b, _0x26925a, _0x450357) {
-  if (typeof _0x56f12b?.subscribeSelector === 'function')
-    return _0x56f12b.subscribeSelector(_0x26925a, _0x450357);
-  return (_0x450357(_0x26925a(getInitialState(_0x56f12b))), () => {});
+function subscribeSelectorOrPrime(store2, handler, handler2) {
+  if (typeof store2?.subscribeSelector === 'function') return store2.subscribeSelector(handler, handler2);
+  return (handler2(handler(getInitialState(store2))), () => {});
 }
-function subscribeRawOrPrime(_0x318e04, _0x47c337) {
-  if (typeof _0x318e04?.subscribeRaw === 'function') return _0x318e04.subscribeRaw(_0x47c337);
-  return (_0x47c337(getInitialState(_0x318e04)), () => {});
+function subscribeRawOrPrime(key, handler3) {
+  if (typeof key?.subscribeRaw === 'function') return key.subscribeRaw(handler3);
+  return (handler3(getInitialState(key)), () => {});
 }
-function getRequiredInteractionFunction(_0x3c9d92, _0xbee824) {
-  const _0x304b7d = _0x3c9d92?.[_0xbee824];
-  if (typeof _0x304b7d !== 'function')
-    throw new TypeError('[appCanvasPointerBindings] missing interaction.' + _0xbee824);
-  return _0x304b7d;
+function getRequiredInteractionFunction(index, result) {
+  const data = index?.[result];
+  if (typeof data !== 'function')
+    throw new TypeError('[appCanvasPointerBindings] missing interaction.' + result);
+  return data;
 }
-export function createCanvasPointerStateCache({ graphStore: _0x2ce3f2, uiStore: _0x213536 } = {}) {
-  const _0x1e9991 = { nodes: {}, videoInteractionLock: null, pickerVisible: false, annotateActive: false },
-    _0x1c853e = [
-      subscribeRawOrPrime(_0x2ce3f2, (_0x4bf260) => {
-        _0x1e9991.nodes = _0x4bf260?.nodes || {};
+export function createCanvasPointerStateCache({ graphStore: graphStore, uiStore: uiStore } = {}) {
+  const cache = { nodes: {}, videoInteractionLock: null, pickerVisible: false, annotateActive: false },
+    list = [
+      subscribeRawOrPrime(graphStore, (target) => {
+        cache.nodes = target?.nodes || {};
       }),
-      subscribeSelectorOrPrime(_0x213536, selectVideoInteractionLockState, (_0x3aa2b0) => {
-        _0x1e9991.videoInteractionLock = _0x3aa2b0?.active ? _0x3aa2b0 : null;
+      subscribeSelectorOrPrime(uiStore, selectVideoInteractionLockState, (source) => {
+        cache.videoInteractionLock = source?.active ? source : null;
       }),
       subscribeSelectorOrPrime(
-        _0x213536,
-        (_0x4caf4a) => !!_0x4caf4a.picker?.visible,
-        (_0x1ace3d) => {
-          _0x1e9991.pickerVisible = !!_0x1ace3d;
+        uiStore,
+        (enabled) => !!enabled.picker?.visible,
+        (enabled2) => {
+          cache.pickerVisible = !!enabled2;
         },
       ),
       subscribeSelectorOrPrime(
-        _0x213536,
-        (_0x324a93) => !!_0x324a93.annotate?.active,
-        (_0x502ee7) => {
-          _0x1e9991.annotateActive = !!_0x502ee7;
+        uiStore,
+        (enabled3) => !!enabled3.annotate?.active,
+        (enabled4) => {
+          cache.annotateActive = !!enabled4;
         },
       ),
     ];
   return {
-    cache: _0x1e9991,
+    cache: cache,
     dispose() {
-      _0x1c853e.forEach((_0x2f3d49) => _0x2f3d49?.());
+      list.forEach((item2) => item2?.());
     },
   };
 }
-function isVideoInteractionLocked(_0x206c76) {
-  return !!_0x206c76.videoInteractionLock?.active;
+function isVideoInteractionLocked(enabled5) {
+  return !!enabled5.videoInteractionLock?.active;
 }
-function isPanoramaEditing(_0x53c290) {
-  const _0x117d9a = _0x53c290?.type === 'panorama-360' ? _0x53c290?.panorama360Node : _0x53c290?.sceneNode;
+function isPanoramaEditing(next) {
+  const current = next?.type === 'panorama-360' ? next?.panorama360Node : next?.sceneNode;
   return (
-    (_0x53c290?.type === 'panorama-scene' || _0x53c290?.type === 'panorama-360') &&
-    _0x53c290?.isCollapsed !== true &&
-    _0x117d9a?.ui?.isEditing === true
+    (next?.type === 'panorama-scene' || next?.type === 'panorama-360') &&
+    next?.isCollapsed !== true &&
+    current?.ui?.isEditing === true
   );
 }
-function blurActiveEditableForCanvasPointer(_0x563022, _0x490905) {
-  if (!_0x563022) return;
-  if (_0x563022.closest?.("input, textarea, [contenteditable='true']")) return;
-  const _0x163342 = _0x490905?.activeElement;
-  if (!_0x163342) return;
-  const _0x5025ba =
-    _0x163342.tagName === 'INPUT' || _0x163342.tagName === 'TEXTAREA' || _0x163342.contentEditable === 'true';
-  _0x5025ba && typeof _0x163342.blur === 'function' && _0x163342.blur();
+function blurActiveEditableForCanvasPointer(el, dom) {
+  if (!el) return;
+  if (el.closest?.("input, textarea, [contenteditable='true']")) return;
+  const enabled6 = dom?.activeElement;
+  if (!enabled6) return;
+  const entry =
+    enabled6.tagName === 'INPUT' || enabled6.tagName === 'TEXTAREA' || enabled6.contentEditable === 'true';
+  entry && typeof enabled6.blur === 'function' && enabled6.blur();
 }
-function isScrollableTextEditWheel(_0x4410f5, _0xdf5e13) {
-  const _0x262837 = _0x4410f5?.closest?.('.source-text-content');
-  if (!_0x262837 || _0xdf5e13?.activeElement !== _0x262837) return false;
-  return _0x262837.scrollHeight > _0x262837.clientHeight;
+function isScrollableTextEditWheel(el2, dom2) {
+  const el3 = el2?.closest?.('.source-text-content');
+  if (!el3 || dom2?.activeElement !== el3) return false;
+  return el3.scrollHeight > el3.clientHeight;
 }
-function isCanvasPanSurfaceTarget(_0x34dd26, _0x55a018) {
-  if (!_0x34dd26 || !_0x55a018) return false;
-  if (_0x55a018.contains?.(_0x34dd26)) return true;
-  return !!_0x34dd26.closest?.(CANVAS_PAN_OVERLAY_SELECTOR);
+function isCanvasPanSurfaceTarget(el4, enabled7) {
+  if (!el4 || !enabled7) return false;
+  if (enabled7.contains?.(el4)) return true;
+  return !!el4.closest?.(CANVAS_PAN_OVERLAY_SELECTOR);
 }
-function createLastPointerTracker(_0x564ce3) {
-  const _0x260c87 = { x: Number(_0x564ce3?.innerWidth) / 2 || 0, y: Number(_0x564ce3?.innerHeight) / 2 || 0 };
-  function _0x998a49() {
-    if (!_0x564ce3) return;
-    ((_0x564ce3._lastMx = _0x260c87.x), (_0x564ce3._lastMy = _0x260c87.y));
+function createLastPointerTracker(enabled8) {
+  const x = { x: Number(enabled8?.innerWidth) / 2 || 0, y: Number(enabled8?.innerHeight) / 2 || 0 };
+  function run() {
+    if (!enabled8) return;
+    ((enabled8._lastMx = x.x), (enabled8._lastMy = x.y));
   }
-  function _0x12b46e(_0x535de9) {
-    ((_0x260c87.x = _0x535de9.clientX), (_0x260c87.y = _0x535de9.clientY), _0x998a49());
+  function updateFromEvent(event) {
+    ((x.x = event.clientX), (x.y = event.clientY), run());
   }
   return (
-    _0x998a49(),
+    run(),
     {
-      updateFromEvent: _0x12b46e,
+      updateFromEvent: updateFromEvent,
       getCursorScreenPosition() {
-        return { x: _0x260c87.x, y: _0x260c87.y };
+        return { x: x.x, y: x.y };
       },
     }
   );
 }
 export function installAppCanvasPointerBindings({
-  graphStore: _0x209285,
-  uiStore: _0x5c5041,
-  wrap: _0x5acae5,
-  appViewport: _0x10d42a,
-  interaction: _0x1d04e5,
+  graphStore: graphStore2,
+  uiStore: uiStore2,
+  wrap: wrap,
+  appViewport: appViewport,
+  interaction: interaction,
   targetWindow: targetWindow = typeof window === 'undefined' ? null : window,
   targetDocument: targetDocument = typeof document === 'undefined' ? null : document,
 } = {}) {
-  const _0x44b8e1 = getRequiredInteractionFunction(_0x1d04e5, 'getDragContext'),
-    _0x576f5b = getRequiredInteractionFunction(_0x1d04e5, 'handleContextMenu'),
-    _0x3dbb37 = getRequiredInteractionFunction(_0x1d04e5, 'handlePointerDown'),
-    _0x1f478f = getRequiredInteractionFunction(_0x1d04e5, 'handlePointerMove'),
-    _0x280c16 = getRequiredInteractionFunction(_0x1d04e5, 'handlePointerUp'),
-    _0x218536 = getRequiredInteractionFunction(_0x1d04e5, 'handleWheel'),
-    _0x28f05e = getRequiredInteractionFunction(_0x1d04e5, 'initConnectionHandles'),
-    _0x142865 = getRequiredInteractionFunction(_0x1d04e5, 'initPickConnect'),
-    _0x4b68f4 = createCanvasPointerStateCache({ graphStore: _0x209285, uiStore: _0x5c5041 }),
-    { cache: _0x3c80f7 } = _0x4b68f4,
-    _0x28a2ab = createLastPointerTracker(targetWindow),
-    _0x26352e = [];
-  let _0x2e2165 = null,
-    _0x2333e8 = false;
-  function _0x689734() {
-    return targetDocument?.getElementById?.('v2-wrap') || _0x5acae5 || null;
+  const run2 = getRequiredInteractionFunction(interaction, 'getDragContext'),
+    handler4 = getRequiredInteractionFunction(interaction, 'handleContextMenu'),
+    handler5 = getRequiredInteractionFunction(interaction, 'handlePointerDown'),
+    handler6 = getRequiredInteractionFunction(interaction, 'handlePointerMove'),
+    handler7 = getRequiredInteractionFunction(interaction, 'handlePointerUp'),
+    handler8 = getRequiredInteractionFunction(interaction, 'handleWheel'),
+    handler9 = getRequiredInteractionFunction(interaction, 'initConnectionHandles'),
+    handler10 = getRequiredInteractionFunction(interaction, 'initPickConnect'),
+    canvasPointerStateCache = createCanvasPointerStateCache({ graphStore: graphStore2, uiStore: uiStore2 }),
+    { cache: cache2 } = canvasPointerStateCache,
+    getCursorScreenPosition2 = createLastPointerTracker(targetWindow),
+    list2 = [];
+  let value2 = null,
+    record = false;
+  function run3() {
+    return targetDocument?.getElementById?.('v2-wrap') || wrap || null;
   }
-  function _0x5aebe4(_0x1f422a, _0x296060, _0x164361, _0x12de28) {
-    if (!_0x1f422a || typeof _0x1f422a.addEventListener !== 'function') return;
-    (_0x1f422a.addEventListener(_0x296060, _0x164361, _0x12de28),
-      _0x26352e.push(() => _0x1f422a.removeEventListener?.(_0x296060, _0x164361, _0x12de28)));
+  function run4(el5, payload, handle, state) {
+    if (!el5 || typeof el5.addEventListener !== 'function') return;
+    (el5.addEventListener(payload, handle, state),
+      list2.push(() => el5.removeEventListener?.(payload, handle, state)));
   }
   targetWindow &&
     (targetWindow._mathImports = {
@@ -146,181 +145,174 @@ export function installAppCanvasPointerBindings({
       worldToScreen: worldToScreen,
       hitTestNode: hitTestNode,
     });
-  const _0x496828 = _0x689734();
+  const config = run3();
   return (
-    _0x142865(_0x496828),
-    _0x28f05e(_0x496828),
-    _0x5aebe4(
+    handler10(config),
+    handler9(config),
+    run4(
       targetWindow,
       'pointerdown',
-      (_0xc9e889) => {
-        const _0xe6de77 = _0x689734();
-        if (!isCanvasPanSurfaceTarget(_0xc9e889.target, _0xe6de77)) return;
-        const _0x5f28fe = _0xc9e889.target?.closest?.('.panorama-scene-viewport');
-        if (_0x5f28fe) {
-          const _0x46a484 = _0x5f28fe.closest('.v2-node'),
-            _0x114c9f = _0x46a484?.id || '',
-            _0x86f4e2 = _0x114c9f ? _0x3c80f7.nodes?.[_0x114c9f] : null;
-          if (isPanoramaEditing(_0x86f4e2)) return;
+      (event2) => {
+        const el6 = run3();
+        if (!isCanvasPanSurfaceTarget(event2.target, el6)) return;
+        const el7 = event2.target?.closest?.('.panorama-scene-viewport');
+        if (el7) {
+          const scope = el7.closest('.v2-node'),
+            input = scope?.id || '',
+            output = input ? cache2.nodes?.[input] : null;
+          if (isPanoramaEditing(output)) return;
         }
-        const _0x2cd363 = _0x3c80f7.videoInteractionLock;
-        if (_0x2cd363?.active) {
-          const _0x290f04 = _0x2cd363.nodeId ? targetDocument?.getElementById?.(_0x2cd363.nodeId) : null;
-          if (_0x290f04 && _0x290f04.contains(_0xc9e889.target)) return;
-          (_0xc9e889.preventDefault(), _0xc9e889.stopPropagation());
+        const value3 = cache2.videoInteractionLock;
+        if (value3?.active) {
+          const value4 = value3.nodeId ? targetDocument?.getElementById?.(value3.nodeId) : null;
+          if (value4 && value4.contains(event2.target)) return;
+          (event2.preventDefault(), event2.stopPropagation());
           return;
         }
-        const _0xba1d39 = _0xc9e889.button === 1 || (targetWindow?._spaceHeld && _0xc9e889.button === 0);
-        if (!_0xba1d39) return;
-        (_0xc9e889.preventDefault(),
-          _0xc9e889.stopPropagation(),
-          _0x10d42a?.clearTrackedFocus?.('pan-start'));
-        if (targetWindow?._spaceHeld) _0xe6de77.style.cursor = 'var(--grab-cursor)';
-        const _0xdc7b97 = _0x44b8e1(),
-          _0x3b750a = !!_0xdc7b97?.isDragging;
+        const enabled9 = event2.button === 1 || (targetWindow?._spaceHeld && event2.button === 0);
+        if (!enabled9) return;
+        (event2.preventDefault(), event2.stopPropagation(), appViewport?.clearTrackedFocus?.('pan-start'));
+        if (targetWindow?._spaceHeld) el6.style.cursor = 'var(--grab-cursor)';
+        const enabled10 = run2(),
+          enabled11 = !!enabled10?.isDragging;
         try {
-          (_0xe6de77.setPointerCapture(_0xc9e889.pointerId), (_0x2e2165 = _0xc9e889.pointerId));
+          (el6.setPointerCapture(event2.pointerId), (value2 = event2.pointerId));
         } catch {}
-        !_0x3b750a && _0x3dbb37(_0xc9e889.clientX, _0xc9e889.clientY, true, false, _0xc9e889);
+        !enabled11 && handler5(event2.clientX, event2.clientY, true, false, event2);
       },
       { capture: true },
     ),
-    _0x5aebe4(_0x5acae5, 'pointerdown', (_0x58a598) => {
-      _0x28a2ab.updateFromEvent(_0x58a598);
-      const _0x5e4d43 = _0x58a598.target?.closest?.(CANVAS_UI_EXCLUSION_SELECTOR);
-      if (_0x5e4d43) return;
-      (blurActiveEditableForCanvasPointer(_0x58a598.target, targetDocument), _0x5c5041?.hideContextMenu?.());
-      const _0x4c46f2 = _0x3c80f7.videoInteractionLock;
-      if (_0x4c46f2?.active) {
-        const _0x1195b8 = _0x4c46f2.nodeId ? targetDocument?.getElementById?.(_0x4c46f2.nodeId) : null;
-        if (!_0x1195b8 || !_0x1195b8.contains(_0x58a598.target)) return;
+    run4(wrap, 'pointerdown', (event3) => {
+      getCursorScreenPosition2.updateFromEvent(event3);
+      const value5 = event3.target?.closest?.(CANVAS_UI_EXCLUSION_SELECTOR);
+      if (value5) return;
+      (blurActiveEditableForCanvasPointer(event3.target, targetDocument), uiStore2?.hideContextMenu?.());
+      const value6 = cache2.videoInteractionLock;
+      if (value6?.active) {
+        const enabled12 = value6.nodeId ? targetDocument?.getElementById?.(value6.nodeId) : null;
+        if (!enabled12 || !enabled12.contains(event3.target)) return;
         return;
       }
-      const _0x2b005d = _0x58a598.altKey && !targetWindow?._spaceHeld;
-      if (_0x3c80f7.pickerVisible) {
-        _0x5c5041?.hidePicker?.();
+      const value7 = event3.altKey && !targetWindow?._spaceHeld;
+      if (cache2.pickerVisible) {
+        uiStore2?.hidePicker?.();
         return;
       }
-      _0x3dbb37(_0x58a598.clientX, _0x58a598.clientY, false, _0x2b005d, _0x58a598);
-      if (_0x2e2165 != null) return;
-      const _0xf94438 = _0x44b8e1();
-      _0xf94438.isPanning && _0x10d42a?.clearTrackedFocus?.('pan-start');
-      if (
-        _0xf94438.isPanning ||
-        _0xf94438.isConnecting ||
-        _0xf94438.isBoxSelecting ||
-        _0xf94438.isDraggingCell
-      )
+      handler5(event3.clientX, event3.clientY, false, value7, event3);
+      if (value2 != null) return;
+      const value8 = run2();
+      value8.isPanning && appViewport?.clearTrackedFocus?.('pan-start');
+      if (value8.isPanning || value8.isConnecting || value8.isBoxSelecting || value8.isDraggingCell)
         try {
-          (_0x5acae5.setPointerCapture(_0x58a598.pointerId), (_0x2e2165 = _0x58a598.pointerId));
+          (wrap.setPointerCapture(event3.pointerId), (value2 = event3.pointerId));
         } catch {}
     }),
-    _0x5aebe4(_0x5acae5, 'dblclick', () => {}),
-    _0x5aebe4(_0x5acae5, 'contextmenu', (_0x2b4cad) => {
-      if (_0x2b4cad.__aiCanvasGroupedEditableContextMenu) return;
-      (_0x2b4cad.preventDefault(),
-        _0x2b4cad.target?.closest?.('.v2-node') && _0x576f5b(_0x2b4cad.clientX, _0x2b4cad.clientY));
+    run4(wrap, 'dblclick', () => {}),
+    run4(wrap, 'contextmenu', (event4) => {
+      if (event4.__aiCanvasGroupedEditableContextMenu) return;
+      (event4.preventDefault(),
+        event4.target?.closest?.('.v2-node') && handler4(event4.clientX, event4.clientY));
     }),
-    _0x5aebe4(_0x5acae5, 'pointermove', (_0x795121) => {
-      _0x28a2ab.updateFromEvent(_0x795121);
-      if (isVideoInteractionLocked(_0x3c80f7)) return;
-      _0x2333e8 && _0x44b8e1()?.isDragging && (_0x795121.__aiCanvasLeftDragHeld = true);
-      _0x1f478f(_0x795121.clientX, _0x795121.clientY, _0x795121);
-      if (_0x2e2165 != null) return;
-      const _0x1f5803 = _0x44b8e1();
-      if (_0x1f5803.isDragging && _0x1f5803.hasMoved)
+    run4(wrap, 'pointermove', (event5) => {
+      getCursorScreenPosition2.updateFromEvent(event5);
+      if (isVideoInteractionLocked(cache2)) return;
+      record && run2()?.isDragging && (event5.__aiCanvasLeftDragHeld = true);
+      handler6(event5.clientX, event5.clientY, event5);
+      if (value2 != null) return;
+      const value9 = run2();
+      if (value9.isDragging && value9.hasMoved)
         try {
-          (_0x5acae5.setPointerCapture(_0x795121.pointerId), (_0x2e2165 = _0x795121.pointerId));
+          (wrap.setPointerCapture(event5.pointerId), (value2 = event5.pointerId));
         } catch {}
     }),
-    _0x5aebe4(_0x5acae5, 'pointerup', (_0x55312b) => {
-      if (isVideoInteractionLocked(_0x3c80f7)) return;
-      const _0x562241 = _0x44b8e1(),
-        _0x3fc87c = !!_0x562241?.isDragging && _0x55312b.button !== 0 && (_0x55312b.buttons & 1) !== 0;
-      if (_0x3fc87c) {
-        ((_0x2333e8 = true),
-          (_0x55312b.__aiCanvasLeftDragHeld = true),
-          _0x1f478f(_0x55312b.clientX, _0x55312b.clientY, _0x55312b));
-        if (targetWindow?._spaceHeld) _0x5acae5.style.cursor = 'var(--grab-cursor)';
+    run4(wrap, 'pointerup', (event6) => {
+      if (isVideoInteractionLocked(cache2)) return;
+      const enabled13 = run2(),
+        value10 = !!enabled13?.isDragging && event6.button !== 0 && (event6.buttons & 1) !== 0;
+      if (value10) {
+        ((record = true),
+          (event6.__aiCanvasLeftDragHeld = true),
+          handler6(event6.clientX, event6.clientY, event6));
+        if (targetWindow?._spaceHeld) wrap.style.cursor = 'var(--grab-cursor)';
         return;
       }
-      ((_0x2333e8 = false), (_0x2e2165 = null), _0x280c16(_0x55312b.clientX, _0x55312b.clientY));
-      if (targetWindow?._spaceHeld) _0x5acae5.style.cursor = 'var(--grab-cursor)';
+      ((record = false), (value2 = null), handler7(event6.clientX, event6.clientY));
+      if (targetWindow?._spaceHeld) wrap.style.cursor = 'var(--grab-cursor)';
     }),
-    _0x5aebe4(_0x5acae5, 'pointercancel', (_0x378a7e) => {
-      ((_0x2333e8 = false), (_0x2e2165 = null));
-      if (isVideoInteractionLocked(_0x3c80f7)) return;
-      _0x280c16(_0x378a7e.clientX, _0x378a7e.clientY);
-      if (targetWindow?._spaceHeld) _0x5acae5.style.cursor = 'var(--grab-cursor)';
+    run4(wrap, 'pointercancel', (event7) => {
+      ((record = false), (value2 = null));
+      if (isVideoInteractionLocked(cache2)) return;
+      handler7(event7.clientX, event7.clientY);
+      if (targetWindow?._spaceHeld) wrap.style.cursor = 'var(--grab-cursor)';
     }),
-    _0x5aebe4(targetDocument, 'pointerup', (_0x1de014) => {
-      const _0x524703 = _0x689734(),
-        _0x31f0c0 = _0x44b8e1(),
-        _0x512fad = !!_0x31f0c0?.isDragging && _0x1de014.button !== 0 && (_0x1de014.buttons & 1) !== 0;
-      if (_0x2e2165 != null) {
-        if (_0x512fad) {
-          ((_0x2333e8 = true),
-            (_0x1de014.__aiCanvasLeftDragHeld = true),
-            _0x1f478f(_0x1de014.clientX, _0x1de014.clientY, _0x1de014));
+    run4(targetDocument, 'pointerup', (event8) => {
+      const el8 = run3(),
+        enabled14 = run2(),
+        value11 = !!enabled14?.isDragging && event8.button !== 0 && (event8.buttons & 1) !== 0;
+      if (value2 != null) {
+        if (value11) {
+          ((record = true),
+            (event8.__aiCanvasLeftDragHeld = true),
+            handler6(event8.clientX, event8.clientY, event8));
           return;
         }
-        ((_0x2333e8 = false), (_0x2e2165 = null));
+        ((record = false), (value2 = null));
         return;
       }
-      if (_0x524703 && _0x524703.contains(_0x1de014.target)) return;
-      if (_0x512fad) {
-        ((_0x2333e8 = true),
-          (_0x1de014.__aiCanvasLeftDragHeld = true),
-          _0x1f478f(_0x1de014.clientX, _0x1de014.clientY, _0x1de014));
+      if (el8 && el8.contains(event8.target)) return;
+      if (value11) {
+        ((record = true),
+          (event8.__aiCanvasLeftDragHeld = true),
+          handler6(event8.clientX, event8.clientY, event8));
         return;
       }
-      ((_0x2333e8 = false),
-        _0x280c16(),
-        targetWindow?._spaceHeld && _0x524703 && (_0x524703.style.cursor = 'var(--grab-cursor)'));
+      ((record = false),
+        handler7(),
+        targetWindow?._spaceHeld && el8 && (el8.style.cursor = 'var(--grab-cursor)'));
     }),
-    _0x5aebe4(
-      _0x5acae5,
+    run4(
+      wrap,
       'wheel',
-      (_0x205ce1) => {
-        _0x28a2ab.updateFromEvent(_0x205ce1);
-        const _0x1ad1a9 = _0x205ce1.target;
-        if (_0x1ad1a9?.closest?.(PANEL_SCROLL_SELECTOR)) return;
-        const _0x5cdb99 = _0x1ad1a9?.tagName,
-          _0x3ce8a8 =
-            _0x5cdb99 === 'INPUT' ||
-            _0x5cdb99 === 'TEXTAREA' ||
-            _0x1ad1a9?.contentEditable === 'true' ||
-            _0x1ad1a9?.closest?.('[contenteditable="true"]');
-        if (_0x3ce8a8 || isScrollableTextEditWheel(_0x1ad1a9, targetDocument)) return;
-        _0x205ce1.preventDefault();
-        if (isVideoInteractionLocked(_0x3c80f7)) return;
-        (_0x10d42a?.clearTrackedFocus?.('wheel-zoom'),
-          _0x218536(_0x205ce1.clientX, _0x205ce1.clientY, _0x205ce1.deltaY));
+      (event9) => {
+        getCursorScreenPosition2.updateFromEvent(event9);
+        const el9 = event9.target;
+        if (el9?.closest?.(PANEL_SCROLL_SELECTOR)) return;
+        const value12 = el9?.tagName,
+          value13 =
+            value12 === 'INPUT' ||
+            value12 === 'TEXTAREA' ||
+            el9?.contentEditable === 'true' ||
+            el9?.closest?.('[contenteditable="true"]');
+        if (value13 || isScrollableTextEditWheel(el9, targetDocument)) return;
+        event9.preventDefault();
+        if (isVideoInteractionLocked(cache2)) return;
+        (appViewport?.clearTrackedFocus?.('wheel-zoom'),
+          handler8(event9.clientX, event9.clientY, event9.deltaY));
       },
       { passive: false },
     ),
-    _0x5aebe4(
+    run4(
       targetDocument,
       'wheel',
-      (_0xced4e1) => {
-        const _0x1fce45 = _0xced4e1.target;
-        if (!_0x1fce45) return;
-        _0x28a2ab.updateFromEvent(_0xced4e1);
-        const _0x13e096 = _0x1fce45.closest?.('.side-plus-btn'),
-          _0x2ac7de = _0x1fce45.closest?.('#v2-conn-scissor-btn') || _0x1fce45.closest?.('.conn-scissor-btn');
-        if (!_0x13e096 && !_0x2ac7de) return;
-        if (_0x3c80f7.annotateActive) return;
-        (_0xced4e1.preventDefault(), _0x218536(_0xced4e1.clientX, _0xced4e1.clientY, _0xced4e1.deltaY));
+      (event10) => {
+        const el10 = event10.target;
+        if (!el10) return;
+        getCursorScreenPosition2.updateFromEvent(event10);
+        const enabled15 = el10.closest?.('.side-plus-btn'),
+          enabled16 = el10.closest?.('#v2-conn-scissor-btn') || el10.closest?.('.conn-scissor-btn');
+        if (!enabled15 && !enabled16) return;
+        if (cache2.annotateActive) return;
+        (event10.preventDefault(), handler8(event10.clientX, event10.clientY, event10.deltaY));
       },
       { passive: false, capture: true },
     ),
-    _0x5aebe4(_0x5acae5, 'mousedown', (_0x1abd7f) => {
-      if (_0x1abd7f.button === 1) _0x1abd7f.preventDefault();
+    run4(wrap, 'mousedown', (event11) => {
+      if (event11.button === 1) event11.preventDefault();
     }),
     {
-      getCursorScreenPosition: _0x28a2ab.getCursorScreenPosition,
+      getCursorScreenPosition: getCursorScreenPosition2.getCursorScreenPosition,
       dispose() {
-        (_0x26352e.splice(0).forEach((_0x541b51) => _0x541b51()), _0x4b68f4.dispose());
+        (list2.splice(0).forEach((handler11) => handler11()), canvasPointerStateCache.dispose());
       },
     }
   );

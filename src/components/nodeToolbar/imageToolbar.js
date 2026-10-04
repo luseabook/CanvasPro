@@ -87,64 +87,64 @@ import { bindImageResetSizeAction } from './imageActions/resetSizeAction.js';
 import { bindApimartPrivateAvatarAction } from './apimartPrivateAvatarAction.js';
 const getStateSnapshot = () =>
   typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
-function imageToolbarText(_0x21334a, _0x18d4dd = {}) {
-  return t('nodeToolbar.image.' + _0x21334a, _0x18d4dd);
+function imageToolbarText(value, item = {}) {
+  return t('nodeToolbar.image.' + value, item);
 }
 function createViewportSnapshotTracker() {
-  let _0x4f879e = getStateSnapshot().viewport || {},
-    _0x1be4bb =
+  let args = getStateSnapshot().viewport || {},
+    value2 =
       typeof appStore.subscribeSelector === 'function'
         ? appStore.subscribeSelector(
-            (_0x4a3789) => _0x4a3789.viewport,
-            (_0x190780) => {
-              _0x4f879e = _0x190780 || {};
+            (key) => key.viewport,
+            (index) => {
+              args = index || {};
             },
           )
         : null;
   return {
-    openedViewport: { ..._0x4f879e },
-    getViewport: () => _0x4f879e,
+    openedViewport: { ...args },
+    getViewport: () => args,
     dispose: () => {
-      (_0x1be4bb?.(), (_0x1be4bb = null));
+      (value2?.(), (value2 = null));
     },
   };
 }
 const TOOLBAR_TASK_CANCELLED_MESSAGE = imageToolbarText('taskCancelled'),
   IMAGE_LOCAL_SAVE_FAILURE_MESSAGE = imageToolbarText('localSaveGeneratedFailed');
 function createToolbarCancelledError() {
-  const _0x2b483a = new Error(TOOLBAR_TASK_CANCELLED_MESSAGE);
-  return ((_0x2b483a.name = 'AbortError'), _0x2b483a);
+  const error = new Error(TOOLBAR_TASK_CANCELLED_MESSAGE);
+  return ((error.name = 'AbortError'), error);
 }
-function isToolbarCancelledError(_0x32deaf) {
-  const _0x4f80aa = String(_0x32deaf?.message || _0x32deaf || '');
+function isToolbarCancelledError(error2) {
+  const result = String(error2?.message || error2 || '');
   return (
-    _0x32deaf?.name === 'AbortError' ||
-    _0x4f80aa === TOOLBAR_TASK_CANCELLED_MESSAGE ||
-    _0x4f80aa === 'CANCELLED' ||
-    _0x4f80aa.toLowerCase().includes('aborted')
+    error2?.name === 'AbortError' ||
+    result === TOOLBAR_TASK_CANCELLED_MESSAGE ||
+    result === 'CANCELLED' ||
+    result.toLowerCase().includes('aborted')
   );
 }
 function createLocalSaveFailureError() {
-  const _0x362a14 = new Error(IMAGE_LOCAL_SAVE_FAILURE_MESSAGE);
-  return ((_0x362a14.isLocalSaveFailure = true), _0x362a14);
+  const error3 = new Error(IMAGE_LOCAL_SAVE_FAILURE_MESSAGE);
+  return ((error3.isLocalSaveFailure = true), error3);
 }
-function isLocalSaveFailure(_0x4e66ab) {
+function isLocalSaveFailure(error4) {
   return (
-    _0x4e66ab?.isLocalSaveFailure === true ||
-    String(_0x4e66ab?.message || _0x4e66ab || '') === IMAGE_LOCAL_SAVE_FAILURE_MESSAGE
+    error4?.isLocalSaveFailure === true ||
+    String(error4?.message || error4 || '') === IMAGE_LOCAL_SAVE_FAILURE_MESSAGE
   );
 }
-function throwIfToolbarTaskCancelled(_0x23a59c) {
-  if (isRunningHubToolbarTaskCancelled(_0x23a59c)) throw createToolbarCancelledError();
+function throwIfToolbarTaskCancelled(data) {
+  if (isRunningHubToolbarTaskCancelled(data)) throw createToolbarCancelledError();
 }
-function focusToolbarTaskNodes(_0x367679, _0x11d1ee) {
-  (appStore.setSelectedNodes([_0x11d1ee]),
+function focusToolbarTaskNodes(options, target) {
+  (appStore.setSelectedNodes([target]),
     typeof window.v2FocusOnNodes === 'function'
-      ? window.v2FocusOnNodes([_0x367679, _0x11d1ee])
-      : window.v2FocusOnNode?.(_0x11d1ee));
+      ? window.v2FocusOnNodes([options, target])
+      : window.v2FocusOnNode?.(target));
 }
-function notifyImageToolbarTaskChange({ sourceNodeId: _0x13617d, targetNodeId: _0x286113 }) {
-  (notifyRunningHubToolbarTasksChanged({ sourceNodeId: _0x13617d, outId: _0x286113 }),
+function notifyImageToolbarTaskChange({ sourceNodeId: sourceNodeId, targetNodeId: targetNodeId }) {
+  (notifyRunningHubToolbarTasksChanged({ sourceNodeId: sourceNodeId, outId: targetNodeId }),
     window._triggerLocalCacheSave?.());
 }
 function buildClearedImageMediaFields() {
@@ -152,26 +152,25 @@ function buildClearedImageMediaFields() {
 }
 export { IMAGE_TOOLBAR_HTML };
 registerStaticInnerHTML('toolbar:image', IMAGE_TOOLBAR_HTML);
-function getToolbarActionFromButton(_0x65d40b) {
-  if (!_0x65d40b?.classList) return '';
-  for (const _0x4fb2d of _0x65d40b.classList) {
-    if (!_0x4fb2d.startsWith('act-')) continue;
-    const _0x5d9ddf = _0x4fb2d.slice(4);
-    if (IMAGE_TOOLBAR_ACTIONS.includes(_0x5d9ddf)) return _0x5d9ddf;
+function getToolbarActionFromButton(el) {
+  if (!el?.classList) return '';
+  for (const list of el.classList) {
+    if (!list.startsWith('act-')) continue;
+    const source = list.slice(4);
+    if (IMAGE_TOOLBAR_ACTIONS.includes(source)) return source;
   }
   return '';
 }
-export function bindImageToolbarEvents(_0x40a979, _0x2501d3) {
-  if (!_0x40a979) return;
-  const _0xd8ae09 = typeof _0x2501d3 === 'string' ? _0x2501d3 : _0x2501d3?.id;
-  if (!_0xd8ae09) return;
-  const _0x242d39 = () =>
-    getStateSnapshot().nodes?.[_0xd8ae09] || (typeof _0x2501d3 === 'object' ? _0x2501d3 : null);
-  (_0x40a979.addEventListener('pointerdown', (_0x10f2e7) => _0x10f2e7.stopPropagation()),
-    _0x40a979.addEventListener('dblclick', (_0x2967f7) => {
-      (_0x2967f7.preventDefault(), _0x2967f7.stopPropagation());
+export function bindImageToolbarEvents(toolbarEl, next) {
+  if (!toolbarEl) return;
+  const nodeId = typeof next === 'string' ? next : next?.id;
+  if (!nodeId) return;
+  const getNodeData = () => getStateSnapshot().nodes?.[nodeId] || (typeof next === 'object' ? next : null);
+  (toolbarEl.addEventListener('pointerdown', (event) => event.stopPropagation()),
+    toolbarEl.addEventListener('dblclick', (event2) => {
+      (event2.preventDefault(), event2.stopPropagation());
     }));
-  const _0x596dfe = bindImageToolbarLayoutUi(_0x40a979, {
+  const bindImageToolbarLayoutUi2 = bindImageToolbarLayoutUi(toolbarEl, {
       store: appStore,
       getStateSnapshot: getStateSnapshot,
       imageToolbarActions: IMAGE_TOOLBAR_ACTIONS,
@@ -179,16 +178,16 @@ export function bindImageToolbarEvents(_0x40a979, _0x2501d3) {
       serializeImageToolbarLayout: serializeImageToolbarLayout,
       getToolbarActionFromButton: getToolbarActionFromButton,
     }),
-    _0x1f0c2f = createRunningHubTaskStateMachine(),
-    _0x20ec79 = _0x1f0c2f.state,
-    _0x5b478a = {
-      toolbarEl: _0x40a979,
-      nodeId: _0xd8ae09,
+    _hdTaskMachine = createRunningHubTaskStateMachine(),
+    _hdState = _hdTaskMachine.state,
+    current = {
+      toolbarEl: toolbarEl,
+      nodeId: nodeId,
       mediaKind: 'image',
-      getNodeData: _0x242d39,
+      getNodeData: getNodeData,
       getStateSnapshot: getStateSnapshot,
-      _hdTaskMachine: _0x1f0c2f,
-      _hdState: _0x20ec79,
+      _hdTaskMachine: _hdTaskMachine,
+      _hdState: _hdState,
       store: appStore,
       generateId: generateId,
       submitTask: submitTask,
@@ -243,18 +242,18 @@ export function bindImageToolbarEvents(_0x40a979, _0x2501d3) {
       buildClearedImageMediaFields: buildClearedImageMediaFields,
       IMAGE_LOCAL_SAVE_FAILURE_MESSAGE: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
     };
-  (bindImageAnnotateCloneActions(_0x5b478a),
-    bindImageMattingAction(_0x5b478a),
-    bindImageAutoSubjectAction(_0x5b478a),
-    bindImagePanorama360Action(_0x5b478a),
-    bindApimartPrivateAvatarAction(_0x5b478a),
-    bindImageHdAction(_0x5b478a),
-    bindImageCropAction(_0x5b478a),
-    bindImageExpandAction(_0x5b478a),
-    bindImageAnnotateAction(_0x5b478a),
-    bindImageFreeAngleAction(_0x5b478a),
-    bindImageMultigridAction(_0x5b478a),
-    bindImageDownloadAction(_0x5b478a),
-    bindImageFullscreenAction(_0x5b478a),
-    bindImageResetSizeAction(_0x5b478a));
+  (bindImageAnnotateCloneActions(current),
+    bindImageMattingAction(current),
+    bindImageAutoSubjectAction(current),
+    bindImagePanorama360Action(current),
+    bindApimartPrivateAvatarAction(current),
+    bindImageHdAction(current),
+    bindImageCropAction(current),
+    bindImageExpandAction(current),
+    bindImageAnnotateAction(current),
+    bindImageFreeAngleAction(current),
+    bindImageMultigridAction(current),
+    bindImageDownloadAction(current),
+    bindImageFullscreenAction(current),
+    bindImageResetSizeAction(current));
 }

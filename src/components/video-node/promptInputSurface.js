@@ -1,1 +1,323 @@
-import{createReferenceInputThumbnailHtml}from'../../modules/referenceInputThumbnail.js';import{sanitizePromptHtml}from'../../utils/dom.js';import{createPromptAttachmentButtonHTML}from'../refAttachmentButton.js';import{formatInputSlotLabelHtml}from'../shared/inputSlotLabelFormatter.js';import{t}from'../../i18n/index.js';const FIXED_REF_KIND_LABEL_KEYS=Object["freeze"]({'text':"kind.text",'image':"kind.image",'video':"kind.video",'audio':"kind.audio"}),FIXED_REF_SLOT_FALLBACK_LABEL_KEYS=Object['freeze']({'sourceVideo':'slots.sourceVideo','refImage':"slots.refImage",'firstFrame':"slots.firstFrame",'videoMask':"slots.videoMask",'maskImage':'slots.maskImage','audio':"slots.audio"});function referenceInputText(_0x4d4319,_0x5d55b0={}){return t("videoNode.referenceInput."+_0x4d4319,_0x5d55b0);}function escapeHtmlText(_0x439691){return String(_0x439691??'')['replace'](/&/g,"&amp;")["replace"](/</g,'&lt;')["replace"](/>/g,'&gt;');}function escapeHtmlAttr(_0x7dac66){return escapeHtmlText(_0x7dac66)["replace"](/"/g,"&quot;")["replace"](/'/g,"&#39;");}function normalizeInputUrl(_0x593ab1={}){return String(_0x593ab1?.["thumbUrl"]||_0x593ab1?.['url']||_0x593ab1?.["displayUrl"]||_0x593ab1?.["imageUrl"]||_0x593ab1?.['videoUrl']||_0x593ab1?.['audioUrl']||_0x593ab1?.["localUrl"]||_0x593ab1?.["localPath"]||'')["trim"]();}export function getVideoFixedInputSlotLabelText(_0x139978,_0x2abf77){const _0x5b232c=String(_0x2abf77||'')['trim'](),_0x6cc3a6=_0x139978?.["slotById"]?.[_0x5b232c]||null,_0x118ddd=String(_0x139978?.["slotKindById"]?.[_0x5b232c]||'')["trim"](),_0x16e7dc=FIXED_REF_KIND_LABEL_KEYS[_0x118ddd],_0x3ed361=FIXED_REF_SLOT_FALLBACK_LABEL_KEYS[_0x5b232c];return String(_0x6cc3a6?.["label"]||'')["trim"]()||(_0x3ed361?referenceInputText(_0x3ed361):'')||(_0x16e7dc?referenceInputText(_0x16e7dc):'')||_0x5b232c;}export function createVideoPromptEditorElements({documentObject:documentObject=globalThis["document"],promptHtml:promptHtml='',placeholder:placeholder=''}={}){const _0x63d23f=documentObject['createElement']("div");_0x63d23f["className"]="prompt-input-wrapper",_0x63d23f['classList']["add"]("is-resizable");const _0x5ed714=documentObject['createElement']("div");return _0x5ed714["className"]="prompt-textarea custom-textarea",_0x5ed714["contentEditable"]="true",_0x5ed714['spellcheck']=![],_0x5ed714["dataset"]['placeholder']=String(placeholder||''),_0x5ed714["innerHTML"]=String(promptHtml||''),_0x63d23f["appendChild"](_0x5ed714),{'inputWrap':_0x63d23f,'promptEl':_0x5ed714};}export function renderVideoPromptEditorMarkup({promptHtml:promptHtml='',placeholder:placeholder='',attributes:attributes=''}={}){const _0x100d9e=sanitizePromptHtml(String(promptHtml||'')),_0x183dff=String(attributes||'')['trim']();return "<div class=\"prompt-input-wrapper is-resizable\"><div class=\"prompt-textarea custom-textarea\" contenteditable=\"true\" spellcheck=\"false\" data-placeholder=\""+escapeHtmlAttr(placeholder)+'\x22'+(_0x183dff?'\x20'+_0x183dff:'')+'>'+_0x100d9e+'</div></div>';}function createReferenceMediaMarkup(_0x172e08,_0x405e35){const _0x2998ae=normalizeInputUrl(_0x405e35);if(_0x172e08==="image"&&_0x2998ae)return createReferenceInputThumbnailHtml({'kind':_0x172e08,'thumbnailUrl':_0x2998ae});if(_0x172e08==='video'&&_0x2998ae){const _0x3ddafb=String(_0x405e35?.["thumbUrl"]||'')["trim"]();if(_0x3ddafb||_0x405e35?.["previewVideoUrl"])return createReferenceInputThumbnailHtml({'kind':_0x172e08,'thumbnailUrl':_0x3ddafb,'videoUrl':_0x405e35?.['previewVideoUrl']});}return createReferenceInputThumbnailHtml({'kind':_0x172e08||"image"});}function createReferenceDeleteButtonMarkup(_0x1a47f,{action:action='',value:value='',showTitle:showTitle=!![]}={}){const _0x212c93=String(action||'')['trim'](),_0x133fd8=_0x212c93?" data-ref-remove-action=\""+escapeHtmlAttr(_0x212c93)+"\" data-ref-remove-value=\""+escapeHtmlAttr(value)+'\x22':'',_0x340054=showTitle?" title=\""+escapeHtmlAttr(referenceInputText("removeReference"))+'\x22':'';return "<button type=\"button\" class=\"ref-thumb-delete\""+_0x133fd8+_0x340054+" aria-label=\""+escapeHtmlAttr(referenceInputText('removeReference')+'\x20'+_0x1a47f)+"\">&times;</button>";}export function renderVideoFixedInputSlotMarkup({fixedInputConfig:_0x18e1dc,slot:_0x34966d,input:input=null,readOnly:readOnly=![],showTitle:showTitle=!![]}={}){const _0x31c6ea=String(_0x34966d||'')["trim"](),_0x24fd2e=String(_0x18e1dc?.["slotKindById"]?.[_0x31c6ea]||'')["trim"](),_0x51eb93=getVideoFixedInputSlotLabelText(_0x18e1dc,_0x31c6ea),_0x4406ff=showTitle?" title=\""+escapeHtmlAttr(_0x51eb93)+'\x22':'',_0x358e82="data-slot=\""+escapeHtmlAttr(_0x31c6ea)+"\" data-kind=\""+escapeHtmlAttr(_0x24fd2e)+'\x22'+_0x4406ff;if(!input||!normalizeInputUrl(input)){if(readOnly)return'<div\x20class=\x22ref-thumb-wrap\x20ref-upload-slot\x20rh-v5-ref-box\x20ref-thumb-wrap--readonly\x20is-empty\x22\x20'+_0x358e82+" role=\"img\" aria-label=\""+escapeHtmlAttr(_0x51eb93)+"\"><span class=\"ref-upload-label\">"+formatInputSlotLabelHtml(_0x51eb93)+'</span></div>';return "<button type=\"button\" class=\"ref-thumb-wrap ref-upload-slot rh-v5-ref-box\" "+_0x358e82+"><span class=\"ref-upload-label\">"+formatInputSlotLabelHtml(_0x51eb93)+'</span></button>';}if(readOnly)return renderReadOnlyReferenceItem({...input,'kind':_0x24fd2e,'slotId':_0x31c6ea,'name':_0x51eb93,'showTitle':showTitle});return "<div class=\"ref-thumb-wrap rh-v5-ref-box\" "+_0x358e82+" data-ref-origin=\"asset\">"+createReferenceMediaMarkup(_0x24fd2e,input)+createReferenceDeleteButtonMarkup(_0x51eb93,{'showTitle':showTitle})+"</div>";}export function renderVideoFixedInputSlotsMarkup({fixedInputConfig:_0x5afba9,inputsBySlot:inputsBySlot={},readOnly:readOnly=![],readOnlySlots:readOnlySlots=[],showTitles:showTitles=!![]}={}){const _0x402628=new Set(Array["isArray"](readOnlySlots)?readOnlySlots["map"](_0x4fa6b5=>String(_0x4fa6b5||'')["trim"]())["filter"](Boolean):[]);return(Array["isArray"](_0x5afba9?.['visibleSlots'])?_0x5afba9["visibleSlots"]:[])['map'](_0x325b89=>renderVideoFixedInputSlotMarkup({'fixedInputConfig':_0x5afba9,'slot':_0x325b89,'input':inputsBySlot?.[_0x325b89]||null,'readOnly':readOnly||_0x402628["has"](String(_0x325b89||'')["trim"]()),'showTitle':showTitles}))['join']('');}function renderGenericReferenceItem(_0x4d7fb1,_0x467e0b,{showTitle:showTitle=!![]}={}){const _0x243be1=String(_0x4d7fb1?.['kind']||"image")["trim"](),_0x3d7319=String(_0x4d7fb1?.['name']||_0x4d7fb1?.['label']||_0x243be1+'\x20'+(_0x467e0b+0x1))["trim"](),_0x4c2429=String(_0x4d7fb1?.["slotId"]||_0x243be1+'-'+(_0x467e0b+0x1))["trim"]();return'<div\x20class=\x22ref-thumb-wrap\x22\x20data-slot=\x22'+escapeHtmlAttr(_0x4c2429)+"\" data-kind=\""+escapeHtmlAttr(_0x243be1)+"\" data-ref-origin=\"asset\">"+createReferenceMediaMarkup(_0x243be1,_0x4d7fb1)+createReferenceDeleteButtonMarkup(_0x3d7319,{'showTitle':showTitle})+"</div>";}function renderReadOnlyReferenceItem(_0x3c9790,_0x13b4d6){const _0x50eae5=String(_0x3c9790?.["kind"]||_0x3c9790?.['type']||"image")["trim"](),_0x425323=String(_0x3c9790?.["name"]||_0x3c9790?.['label']||_0x50eae5+'\x20'+(_0x13b4d6+0x1))['trim'](),_0x505b76=String(_0x3c9790?.["slotId"]||_0x3c9790?.['slot']||'')["trim"](),_0x4bfed1=String(_0x3c9790?.["removeAction"]||'')["trim"](),_0x5daeb2=String(_0x3c9790?.['removeValue']||''),_0x4557c3=_0x3c9790?.['showTitle']!==![],_0x74b725=_0x50eae5+':'+String(_0x3c9790?.['url']||normalizeInputUrl(_0x3c9790))['trim'](),_0x2bf592=_0x4557c3?'\x20title=\x22'+escapeHtmlAttr(_0x425323)+'\x22':'';return "<div class=\"ref-thumb-wrap ref-thumb-wrap--readonly\""+(_0x505b76?" data-slot=\""+escapeHtmlAttr(_0x505b76)+'\x22':'')+" data-kind=\""+escapeHtmlAttr(_0x50eae5)+"\" data-ref-origin=\"asset\" data-ref-readonly-key=\""+escapeHtmlAttr(_0x74b725)+"\" role=\""+(_0x4bfed1?'group':'img')+'\x22\x20aria-label=\x22'+escapeHtmlAttr(_0x425323)+'\x22'+_0x2bf592+'>'+createReferenceMediaMarkup(_0x50eae5,_0x3c9790)+(_0x4bfed1?createReferenceDeleteButtonMarkup(_0x425323,{'action':_0x4bfed1,'value':_0x5daeb2,'showTitle':_0x4557c3}):'')+"</div>";}function renderReadOnlyReferenceInputsMarkup(_0x4fdea1=[],{showTitles:showTitles=!![]}={}){const _0x1e143f=Array['isArray'](_0x4fdea1)?_0x4fdea1['filter'](_0x41d284=>normalizeInputUrl(_0x41d284)):[];if(!_0x1e143f["length"])return'';return'<div\x20class=\x22ref-thumb-container\x20ref-thumb-container--readonly\x22>'+_0x1e143f["map"]((_0x4eee18,_0x46d010)=>renderReadOnlyReferenceItem({..._0x4eee18,'showTitle':showTitles&&_0x4eee18?.['showTitle']!==![]},_0x46d010))["join"]('')+"</div>";}export function renderVideoReferenceBarContentMarkup({fixedInputConfig:fixedInputConfig=null,inputsBySlot:inputsBySlot={},readOnlyFixedInputs:readOnlyFixedInputs=![],readOnlyFixedInputSlots:readOnlyFixedInputSlots=[],inputs:inputs=[],readOnlyInputs:readOnlyInputs=[],showItemTitles:showItemTitles=!![],attachmentButtonHtml:attachmentButtonHtml=createPromptAttachmentButtonHTML({'stroke':"var(--white-90)"})}={}){const _0x46e54f=renderReadOnlyReferenceInputsMarkup(readOnlyInputs,{'showTitles':showItemTitles});if(fixedInputConfig?.["visibleSlots"]?.["length"]){const _0x441de1=String(fixedInputConfig?.["manifest"]?.["displayName"]||'')["trim"]()||String(fixedInputConfig?.['manifest']?.['label']||'')["trim"]()||referenceInputText("fixedInputs");return attachmentButtonHtml+" <div class=\"ref-thumb-container rh-v5-ref-container\" aria-label=\""+escapeHtmlAttr(referenceInputText("fixedInputsAria",{'label':_0x441de1}))+'\x22>'+renderVideoFixedInputSlotsMarkup({'fixedInputConfig':fixedInputConfig,'inputsBySlot':inputsBySlot,'readOnly':readOnlyFixedInputs,'readOnlySlots':readOnlyFixedInputSlots,'showTitles':showItemTitles})+"</div>"+_0x46e54f;}const _0x121a68=Array["isArray"](inputs)?inputs['filter'](_0x554616=>normalizeInputUrl(_0x554616)):[];if(!_0x121a68["length"])return''+attachmentButtonHtml+_0x46e54f;return attachmentButtonHtml+'\x20<div\x20class=\x22ref-thumb-container\x22>'+_0x121a68["map"]((_0xf0c35c,_0x9903e)=>renderGenericReferenceItem(_0xf0c35c,_0x9903e,{'showTitle':showItemTitles}))['join']('')+"</div>"+_0x46e54f;}export function renderVideoReferenceBarMarkup(_0x2a295c={}){const _0x1a1f43=Boolean(_0x2a295c?.["fixedInputConfig"]?.["visibleSlots"]?.["length"]),_0x46bb68=Array["isArray"](_0x2a295c?.['inputs'])&&_0x2a295c["inputs"]["some"](_0x4fc1b7=>normalizeInputUrl(_0x4fc1b7)),_0x2f5ac4=Array["isArray"](_0x2a295c?.["readOnlyInputs"])&&_0x2a295c["readOnlyInputs"]['some'](_0x355b99=>normalizeInputUrl(_0x355b99)),_0x2d7ce2=_0x1a1f43?"node-ref-bar active rh-v5-refbar":_0x46bb68||_0x2f5ac4?"node-ref-bar active":"node-ref-bar";return "<div class=\""+_0x2d7ce2+'\x22>'+renderVideoReferenceBarContentMarkup(_0x2a295c)+"</div>";}
+import { createReferenceInputThumbnailHtml } from '../../modules/referenceInputThumbnail.js';
+import { sanitizePromptHtml } from '../../utils/dom.js';
+import { createPromptAttachmentButtonHTML } from '../refAttachmentButton.js';
+import { formatInputSlotLabelHtml } from '../shared/inputSlotLabelFormatter.js';
+import { t } from '../../i18n/index.js';
+const FIXED_REF_KIND_LABEL_KEYS = Object['freeze']({
+    text: 'kind.text',
+    image: 'kind.image',
+    video: 'kind.video',
+    audio: 'kind.audio',
+  }),
+  FIXED_REF_SLOT_FALLBACK_LABEL_KEYS = Object['freeze']({
+    sourceVideo: 'slots.sourceVideo',
+    refImage: 'slots.refImage',
+    firstFrame: 'slots.firstFrame',
+    videoMask: 'slots.videoMask',
+    maskImage: 'slots.maskImage',
+    audio: 'slots.audio',
+  });
+function referenceInputText(item, key = {}) {
+  return t('videoNode.referenceInput.' + item, key);
+}
+function escapeHtmlText(index) {
+  return String(index ?? '')
+    ['replace'](/&/g, '&amp;')
+    ['replace'](/</g, '&lt;')
+    ['replace'](/>/g, '&gt;');
+}
+function escapeHtmlAttr(result) {
+  return escapeHtmlText(result)['replace'](/"/g, '&quot;')['replace'](/'/g, '&#39;');
+}
+function normalizeInputUrl(response = {}) {
+  return String(
+    response?.['thumbUrl'] ||
+      response?.['url'] ||
+      response?.['displayUrl'] ||
+      response?.['imageUrl'] ||
+      response?.['videoUrl'] ||
+      response?.['audioUrl'] ||
+      response?.['localUrl'] ||
+      response?.['localPath'] ||
+      '',
+  )['trim']();
+}
+export function getVideoFixedInputSlotLabelText(data, options) {
+  const target = String(options || '')['trim'](),
+    source = data?.['slotById']?.[target] || null,
+    next = String(data?.['slotKindById']?.[target] || '')['trim'](),
+    current = FIXED_REF_KIND_LABEL_KEYS[next],
+    entry = FIXED_REF_SLOT_FALLBACK_LABEL_KEYS[target];
+  return (
+    String(source?.['label'] || '')['trim']() ||
+    (entry ? referenceInputText(entry) : '') ||
+    (current ? referenceInputText(current) : '') ||
+    target
+  );
+}
+export function createVideoPromptEditorElements({
+  documentObject: documentObject = globalThis['document'],
+  promptHtml: promptHtml = '',
+  placeholder: placeholder = '',
+} = {}) {
+  const el = documentObject['createElement']('div');
+  ((el['className'] = 'prompt-input-wrapper'), el['classList']['add']('is-resizable'));
+  const record = documentObject['createElement']('div');
+  return (
+    (record['className'] = 'prompt-textarea custom-textarea'),
+    (record['contentEditable'] = 'true'),
+    (record['spellcheck'] = ![]),
+    (record['dataset']['placeholder'] = String(placeholder || '')),
+    (record['innerHTML'] = String(promptHtml || '')),
+    el['appendChild'](record),
+    { inputWrap: el, promptEl: record }
+  );
+}
+export function renderVideoPromptEditorMarkup({
+  promptHtml: promptHtml = '',
+  placeholder: placeholder = '',
+  attributes: attributes = '',
+} = {}) {
+  const sanitizePromptHtml2 = sanitizePromptHtml(String(promptHtml || '')),
+    payload = String(attributes || '')['trim']();
+  return (
+    '<div class="prompt-input-wrapper is-resizable"><div class="prompt-textarea custom-textarea" contenteditable="true" spellcheck="false" data-placeholder="' +
+    escapeHtmlAttr(placeholder) +
+    '\x22' +
+    (payload ? '\x20' + payload : '') +
+    '>' +
+    sanitizePromptHtml2 +
+    '</div></div>'
+  );
+}
+function createReferenceMediaMarkup(handle, state) {
+  const inputUrl = normalizeInputUrl(state);
+  if (handle === 'image' && inputUrl)
+    return createReferenceInputThumbnailHtml({ kind: handle, thumbnailUrl: inputUrl });
+  if (handle === 'video' && inputUrl) {
+    const config = String(state?.['thumbUrl'] || '')['trim']();
+    if (config || state?.['previewVideoUrl'])
+      return createReferenceInputThumbnailHtml({
+        kind: handle,
+        thumbnailUrl: config,
+        videoUrl: state?.['previewVideoUrl'],
+      });
+  }
+  return createReferenceInputThumbnailHtml({ kind: handle || 'image' });
+}
+function createReferenceDeleteButtonMarkup(
+  scope,
+  { action: action = '', value: value = '', showTitle: showTitle = !![] } = {},
+) {
+  const output = String(action || '')['trim'](),
+    value2 = output
+      ? ' data-ref-remove-action="' +
+        escapeHtmlAttr(output) +
+        '" data-ref-remove-value="' +
+        escapeHtmlAttr(value) +
+        '\x22'
+      : '',
+    value3 = showTitle ? ' title="' + escapeHtmlAttr(referenceInputText('removeReference')) + '\x22' : '';
+  return (
+    '<button type="button" class="ref-thumb-delete"' +
+    value2 +
+    value3 +
+    ' aria-label="' +
+    escapeHtmlAttr(referenceInputText('removeReference') + '\x20' + scope) +
+    '">&times;</button>'
+  );
+}
+export function renderVideoFixedInputSlotMarkup({
+  fixedInputConfig: fixedInputConfig2,
+  slot: slot,
+  input: input = null,
+  readOnly: readOnly = ![],
+  showTitle: showTitle = !![],
+} = {}) {
+  const value4 = String(slot || '')['trim'](),
+    value5 = String(fixedInputConfig2?.['slotKindById']?.[value4] || '')['trim'](),
+    videoFixedInputSlotLabelText = getVideoFixedInputSlotLabelText(fixedInputConfig2, value4),
+    value6 = showTitle ? ' title="' + escapeHtmlAttr(videoFixedInputSlotLabelText) + '\x22' : '',
+    value7 =
+      'data-slot="' + escapeHtmlAttr(value4) + '" data-kind="' + escapeHtmlAttr(value5) + '\x22' + value6;
+  if (!input || !normalizeInputUrl(input)) {
+    if (readOnly)
+      return (
+        '<div\x20class=\x22ref-thumb-wrap\x20ref-upload-slot\x20rh-v5-ref-box\x20ref-thumb-wrap--readonly\x20is-empty\x22\x20' +
+        value7 +
+        ' role="img" aria-label="' +
+        escapeHtmlAttr(videoFixedInputSlotLabelText) +
+        '"><span class="ref-upload-label">' +
+        formatInputSlotLabelHtml(videoFixedInputSlotLabelText) +
+        '</span></div>'
+      );
+    return (
+      '<button type="button" class="ref-thumb-wrap ref-upload-slot rh-v5-ref-box" ' +
+      value7 +
+      '><span class="ref-upload-label">' +
+      formatInputSlotLabelHtml(videoFixedInputSlotLabelText) +
+      '</span></button>'
+    );
+  }
+  if (readOnly)
+    return renderReadOnlyReferenceItem({
+      ...input,
+      kind: value5,
+      slotId: value4,
+      name: videoFixedInputSlotLabelText,
+      showTitle: showTitle,
+    });
+  return (
+    '<div class="ref-thumb-wrap rh-v5-ref-box" ' +
+    value7 +
+    ' data-ref-origin="asset">' +
+    createReferenceMediaMarkup(value5, input) +
+    createReferenceDeleteButtonMarkup(videoFixedInputSlotLabelText, { showTitle: showTitle }) +
+    '</div>'
+  );
+}
+export function renderVideoFixedInputSlotsMarkup({
+  fixedInputConfig: fixedInputConfig3,
+  inputsBySlot: inputsBySlot = {},
+  readOnly: readOnly = ![],
+  readOnlySlots: readOnlySlots = [],
+  showTitles: showTitles = !![],
+} = {}) {
+  const value8 = new Set(
+    Array['isArray'](readOnlySlots)
+      ? readOnlySlots['map']((value9) => String(value9 || '')['trim']())['filter'](Boolean)
+      : [],
+  );
+  return (Array['isArray'](fixedInputConfig3?.['visibleSlots']) ? fixedInputConfig3['visibleSlots'] : [])
+    ['map']((value10) =>
+      renderVideoFixedInputSlotMarkup({
+        fixedInputConfig: fixedInputConfig3,
+        slot: value10,
+        input: inputsBySlot?.[value10] || null,
+        readOnly: readOnly || value8['has'](String(value10 || '')['trim']()),
+        showTitle: showTitles,
+      }),
+    )
+    ['join']('');
+}
+function renderGenericReferenceItem(error, value11, { showTitle: showTitle = !![] } = {}) {
+  const value12 = String(error?.['kind'] || 'image')['trim'](),
+    value13 = String(error?.['name'] || error?.['label'] || value12 + '\x20' + (value11 + 0x1))['trim'](),
+    value14 = String(error?.['slotId'] || value12 + '-' + (value11 + 0x1))['trim']();
+  return (
+    '<div\x20class=\x22ref-thumb-wrap\x22\x20data-slot=\x22' +
+    escapeHtmlAttr(value14) +
+    '" data-kind="' +
+    escapeHtmlAttr(value12) +
+    '" data-ref-origin="asset">' +
+    createReferenceMediaMarkup(value12, error) +
+    createReferenceDeleteButtonMarkup(value13, { showTitle: showTitle }) +
+    '</div>'
+  );
+}
+function renderReadOnlyReferenceItem(response2, value15) {
+  const value16 = String(response2?.['kind'] || response2?.['type'] || 'image')['trim'](),
+    value17 = String(response2?.['name'] || response2?.['label'] || value16 + '\x20' + (value15 + 0x1))[
+      'trim'
+    ](),
+    value18 = String(response2?.['slotId'] || response2?.['slot'] || '')['trim'](),
+    value19 = String(response2?.['removeAction'] || '')['trim'](),
+    value20 = String(response2?.['removeValue'] || ''),
+    value21 = response2?.['showTitle'] !== ![],
+    value22 = value16 + ':' + String(response2?.['url'] || normalizeInputUrl(response2))['trim'](),
+    value23 = value21 ? '\x20title=\x22' + escapeHtmlAttr(value17) + '\x22' : '';
+  return (
+    '<div class="ref-thumb-wrap ref-thumb-wrap--readonly"' +
+    (value18 ? ' data-slot="' + escapeHtmlAttr(value18) + '\x22' : '') +
+    ' data-kind="' +
+    escapeHtmlAttr(value16) +
+    '" data-ref-origin="asset" data-ref-readonly-key="' +
+    escapeHtmlAttr(value22) +
+    '" role="' +
+    (value19 ? 'group' : 'img') +
+    '\x22\x20aria-label=\x22' +
+    escapeHtmlAttr(value17) +
+    '\x22' +
+    value23 +
+    '>' +
+    createReferenceMediaMarkup(value16, response2) +
+    (value19
+      ? createReferenceDeleteButtonMarkup(value17, { action: value19, value: value20, showTitle: value21 })
+      : '') +
+    '</div>'
+  );
+}
+function renderReadOnlyReferenceInputsMarkup(list = [], { showTitles: showTitles = !![] } = {}) {
+  const enabled = Array['isArray'](list) ? list['filter']((value24) => normalizeInputUrl(value24)) : [];
+  if (!enabled['length']) return '';
+  return (
+    '<div\x20class=\x22ref-thumb-container\x20ref-thumb-container--readonly\x22>' +
+    enabled['map']((args, value25) =>
+      renderReadOnlyReferenceItem({ ...args, showTitle: showTitles && args?.['showTitle'] !== ![] }, value25),
+    )['join']('') +
+    '</div>'
+  );
+}
+export function renderVideoReferenceBarContentMarkup({
+  fixedInputConfig: fixedInputConfig = null,
+  inputsBySlot: inputsBySlot = {},
+  readOnlyFixedInputs: readOnlyFixedInputs = ![],
+  readOnlyFixedInputSlots: readOnlyFixedInputSlots = [],
+  inputs: inputs = [],
+  readOnlyInputs: readOnlyInputs = [],
+  showItemTitles: showItemTitles = !![],
+  attachmentButtonHtml: attachmentButtonHtml = createPromptAttachmentButtonHTML({
+    stroke: 'var(--white-90)',
+  }),
+} = {}) {
+  const renderReadOnlyReferenceInputsMarkup2 = renderReadOnlyReferenceInputsMarkup(readOnlyInputs, {
+    showTitles: showItemTitles,
+  });
+  if (fixedInputConfig?.['visibleSlots']?.['length']) {
+    const value26 =
+      String(fixedInputConfig?.['manifest']?.['displayName'] || '')['trim']() ||
+      String(fixedInputConfig?.['manifest']?.['label'] || '')['trim']() ||
+      referenceInputText('fixedInputs');
+    return (
+      attachmentButtonHtml +
+      ' <div class="ref-thumb-container rh-v5-ref-container" aria-label="' +
+      escapeHtmlAttr(referenceInputText('fixedInputsAria', { label: value26 })) +
+      '\x22>' +
+      renderVideoFixedInputSlotsMarkup({
+        fixedInputConfig: fixedInputConfig,
+        inputsBySlot: inputsBySlot,
+        readOnly: readOnlyFixedInputs,
+        readOnlySlots: readOnlyFixedInputSlots,
+        showTitles: showItemTitles,
+      }) +
+      '</div>' +
+      renderReadOnlyReferenceInputsMarkup2
+    );
+  }
+  const enabled2 = Array['isArray'](inputs) ? inputs['filter']((value27) => normalizeInputUrl(value27)) : [];
+  if (!enabled2['length']) return '' + attachmentButtonHtml + renderReadOnlyReferenceInputsMarkup2;
+  return (
+    attachmentButtonHtml +
+    '\x20<div\x20class=\x22ref-thumb-container\x22>' +
+    enabled2['map']((value28, value29) =>
+      renderGenericReferenceItem(value28, value29, { showTitle: showItemTitles }),
+    )['join']('') +
+    '</div>' +
+    renderReadOnlyReferenceInputsMarkup2
+  );
+}
+export function renderVideoReferenceBarMarkup(options2 = {}) {
+  const value30 = Boolean(options2?.['fixedInputConfig']?.['visibleSlots']?.['length']),
+    value31 =
+      Array['isArray'](options2?.['inputs']) &&
+      options2['inputs']['some']((value32) => normalizeInputUrl(value32)),
+    value33 =
+      Array['isArray'](options2?.['readOnlyInputs']) &&
+      options2['readOnlyInputs']['some']((value34) => normalizeInputUrl(value34)),
+    value35 = value30
+      ? 'node-ref-bar active rh-v5-refbar'
+      : value31 || value33
+        ? 'node-ref-bar active'
+        : 'node-ref-bar';
+  return '<div class="' + value35 + '\x22>' + renderVideoReferenceBarContentMarkup(options2) + '</div>';
+}

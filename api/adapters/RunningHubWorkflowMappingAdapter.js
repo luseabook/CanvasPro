@@ -1,260 +1,252 @@
 import { translateMinimaxH3EditorAssetMentions } from './minimaxH3Prompt.js';
-function hasOwnManifestValue(_0x467600, _0x426969) {
-  return Object['prototype']['hasOwnProperty']['call'](_0x467600 || {}, _0x426969);
+function hasOwnManifestValue(value, item) {
+  return Object['prototype']['hasOwnProperty']['call'](value || {}, item);
 }
-function isPresentManifestValue(_0x232f9c) {
-  if (_0x232f9c === undefined || _0x232f9c === null) return ![];
-  if (typeof _0x232f9c === 'string') return _0x232f9c['trim']() !== '';
-  if (Array['isArray'](_0x232f9c)) return _0x232f9c['length'] > 0x0;
+function isPresentManifestValue(list) {
+  if (list === undefined || list === null) return ![];
+  if (typeof list === 'string') return list['trim']() !== '';
+  if (Array['isArray'](list)) return list['length'] > 0x0;
   return !![];
 }
-function getManifestPayloadPathValue(_0x342309 = {}, _0x2c1c9f = '') {
-  const _0x37a152 = String(_0x2c1c9f || '')['trim']();
-  if (!_0x37a152) return undefined;
-  return _0x37a152['split']('.')['reduce']((_0x1bc724, _0x699787) => {
-    if (_0x1bc724 === undefined || _0x1bc724 === null) return undefined;
-    return _0x1bc724[_0x699787];
-  }, _0x342309);
+function getManifestPayloadPathValue(options = {}, key = '') {
+  const enabled = String(key || '')['trim']();
+  if (!enabled) return undefined;
+  return enabled['split']('.')['reduce']((index, result) => {
+    if (index === undefined || index === null) return undefined;
+    return index[result];
+  }, options);
 }
 function resolveManifestPayloadValue(
-  _0x1bc52b,
-  _0x4d1745 = [],
-  _0x4285c3 = undefined,
+  data,
+  target = [],
+  source = undefined,
   { allowEmpty: allowEmpty = ![] } = {},
 ) {
-  const _0xca96d3 = Array['isArray'](_0x4d1745) ? _0x4d1745 : [_0x4d1745];
-  for (const _0x304d18 of _0xca96d3['filter'](Boolean)) {
-    const _0xdbbd1b = getManifestPayloadPathValue(_0x1bc52b, _0x304d18);
-    if (allowEmpty && _0xdbbd1b !== undefined && _0xdbbd1b !== null) return _0xdbbd1b;
-    if (isPresentManifestValue(_0xdbbd1b)) return _0xdbbd1b;
+  const list2 = Array['isArray'](target) ? target : [target];
+  for (const next of list2['filter'](Boolean)) {
+    const manifestPayloadPathValue = getManifestPayloadPathValue(data, next);
+    if (allowEmpty && manifestPayloadPathValue !== undefined && manifestPayloadPathValue !== null)
+      return manifestPayloadPathValue;
+    if (isPresentManifestValue(manifestPayloadPathValue)) return manifestPayloadPathValue;
   }
-  return _0x4285c3;
+  return source;
 }
-function normalizeManifestFieldList(_0x562fa9, _0x46f740 = '') {
-  const _0x45dc18 = _0x562fa9?.['fields'] !== undefined ? _0x562fa9['fields'] : _0x562fa9?.['field'],
-    _0x514afc = Array['isArray'](_0x45dc18) ? _0x45dc18 : [_0x45dc18 || _0x46f740];
-  return _0x514afc['map']((_0x15c0f9) => String(_0x15c0f9 || '')['trim']())['filter'](Boolean);
+function normalizeManifestFieldList(current, entry = '') {
+  const record = current?.['fields'] !== undefined ? current['fields'] : current?.['field'],
+    list3 = Array['isArray'](record) ? record : [record || entry];
+  return list3['map']((handle) => String(handle || '')['trim']())['filter'](Boolean);
 }
-function manifestValuesEqual(_0x554df2, _0x223a75) {
-  if (typeof _0x223a75 === 'boolean') {
-    const _0x136d6b = String(_0x554df2 ?? '')
+function manifestValuesEqual(state, config) {
+  if (typeof config === 'boolean') {
+    const scope = String(state ?? '')
       ['trim']()
       ['toLowerCase']();
-    return _0x554df2 === _0x223a75 || _0x136d6b === String(_0x223a75);
+    return state === config || scope === String(config);
   }
-  if (typeof _0x223a75 === 'number') return Number(_0x554df2) === _0x223a75;
-  return String(_0x554df2 ?? '')['trim']() === String(_0x223a75 ?? '')['trim']();
+  if (typeof config === 'number') return Number(state) === config;
+  return String(state ?? '')['trim']() === String(config ?? '')['trim']();
 }
-function evaluateManifestWhenRule(_0x3d0882, _0x5cdb6d) {
-  if (!_0x3d0882 || typeof _0x3d0882 !== 'object') return !![];
-  const _0x3dc6d0 = _0x3d0882['field']
-      ? getManifestPayloadPathValue(_0x5cdb6d, _0x3d0882['field'])
-      : undefined,
-    _0x5a04c1 = isPresentManifestValue(_0x3dc6d0);
-  if (hasOwnManifestValue(_0x3d0882, 'exists') && Boolean(_0x3d0882['exists']) !== _0x5a04c1) return ![];
-  if (_0x3d0882['truthy'] === !![] && !Boolean(_0x3dc6d0)) return ![];
-  if (_0x3d0882['falsy'] === !![] && Boolean(_0x3dc6d0)) return ![];
-  if (hasOwnManifestValue(_0x3d0882, 'equals') && !manifestValuesEqual(_0x3dc6d0, _0x3d0882['equals']))
+function evaluateManifestWhenRule(enabled2, input) {
+  if (!enabled2 || typeof enabled2 !== 'object') return !![];
+  const output = enabled2['field'] ? getManifestPayloadPathValue(input, enabled2['field']) : undefined,
+    isPresentManifestValue2 = isPresentManifestValue(output);
+  if (hasOwnManifestValue(enabled2, 'exists') && Boolean(enabled2['exists']) !== isPresentManifestValue2)
     return ![];
-  if (hasOwnManifestValue(_0x3d0882, 'notEquals') && manifestValuesEqual(_0x3dc6d0, _0x3d0882['notEquals']))
+  if (enabled2['truthy'] === !![] && !Boolean(output)) return ![];
+  if (enabled2['falsy'] === !![] && Boolean(output)) return ![];
+  if (hasOwnManifestValue(enabled2, 'equals') && !manifestValuesEqual(output, enabled2['equals'])) return ![];
+  if (hasOwnManifestValue(enabled2, 'notEquals') && manifestValuesEqual(output, enabled2['notEquals']))
     return ![];
   if (
-    Array['isArray'](_0x3d0882['in']) &&
-    !_0x3d0882['in']['some']((_0x257c6c) => manifestValuesEqual(_0x3dc6d0, _0x257c6c))
+    Array['isArray'](enabled2['in']) &&
+    !enabled2['in']['some']((value2) => manifestValuesEqual(output, value2))
   )
     return ![];
   if (
-    Array['isArray'](_0x3d0882['notIn']) &&
-    _0x3d0882['notIn']['some']((_0xcab9b7) => manifestValuesEqual(_0x3dc6d0, _0xcab9b7))
+    Array['isArray'](enabled2['notIn']) &&
+    enabled2['notIn']['some']((value3) => manifestValuesEqual(output, value3))
   )
     return ![];
   return !![];
 }
-function shouldUseManifestNodeMapping(_0xc5cef5, _0x15f262) {
-  const _0x3d2149 = _0xc5cef5?.['when'];
-  if (_0x3d2149 === undefined || _0x3d2149 === null) return !![];
-  if (Array['isArray'](_0x3d2149))
-    return _0x3d2149['every']((_0x597b9a) => evaluateManifestWhenRule(_0x597b9a, _0x15f262));
-  return evaluateManifestWhenRule(_0x3d2149, _0x15f262);
+function shouldUseManifestNodeMapping(value4, value5) {
+  const list4 = value4?.['when'];
+  if (list4 === undefined || list4 === null) return !![];
+  if (Array['isArray'](list4)) return list4['every']((value6) => evaluateManifestWhenRule(value6, value5));
+  return evaluateManifestWhenRule(list4, value5);
 }
-function applyManifestNodeValueMap(_0x3c0dfd, _0x3237ca = {}) {
-  const _0x29d887 = _0x3237ca['valueMap'] || _0x3237ca['values'] || {},
-    _0x2ec204 = String(_0x3c0dfd ?? '')['trim']();
-  if (_0x2ec204 && _0x29d887[_0x2ec204] !== undefined) return _0x29d887[_0x2ec204];
-  const _0xac6f91 = _0x2ec204['toLowerCase']();
-  if (_0x2ec204 && _0x29d887[_0xac6f91] !== undefined) return _0x29d887[_0xac6f91];
-  return _0x3c0dfd;
+function applyManifestNodeValueMap(value7, map = {}) {
+  const value8 = map['valueMap'] || map['values'] || {},
+    value9 = String(value7 ?? '')['trim']();
+  if (value9 && value8[value9] !== undefined) return value8[value9];
+  const value10 = value9['toLowerCase']();
+  if (value9 && value8[value10] !== undefined) return value8[value10];
+  return value7;
 }
-function normalizeManifestTransformSpec(_0x59e1a8) {
-  if (!_0x59e1a8) return { name: '' };
-  if (typeof _0x59e1a8 === 'string') return { name: _0x59e1a8 };
-  if (typeof _0x59e1a8 === 'object' && !Array['isArray'](_0x59e1a8))
-    return { ..._0x59e1a8, name: String(_0x59e1a8['name'] || '')['trim']() };
+function normalizeManifestTransformSpec(name) {
+  if (!name) return { name: '' };
+  if (typeof name === 'string') return { name: name };
+  if (typeof name === 'object' && !Array['isArray'](name))
+    return { ...name, name: String(name['name'] || '')['trim']() };
   return { name: '' };
 }
-function clampManifestNumber(_0x1390f0, _0x50becd) {
-  let _0x5d1f7b = _0x1390f0;
-  if (Number['isFinite'](Number(_0x50becd['min'])))
-    _0x5d1f7b = Math['max'](Number(_0x50becd['min']), _0x5d1f7b);
-  if (Number['isFinite'](Number(_0x50becd['max'])))
-    _0x5d1f7b = Math['min'](Number(_0x50becd['max']), _0x5d1f7b);
-  return _0x5d1f7b;
+function clampManifestNumber(value11, value12) {
+  let value13 = value11;
+  if (Number['isFinite'](Number(value12['min']))) value13 = Math['max'](Number(value12['min']), value13);
+  if (Number['isFinite'](Number(value12['max']))) value13 = Math['min'](Number(value12['max']), value13);
+  return value13;
 }
-function applyManifestNodeTransform(_0x48e4ee, _0xbad245 = {}, _0x8576b4 = {}) {
-  const _0x18252b = normalizeManifestTransformSpec(_0xbad245['transform']),
-    _0x44feef = _0x8576b4[_0x18252b['name']];
-  if (typeof _0x44feef === 'function') return _0x44feef(_0x48e4ee, _0x18252b, _0xbad245);
-  switch (_0x18252b['name']) {
+function applyManifestNodeTransform(value14, value15 = {}, value16 = {}) {
+  const error = normalizeManifestTransformSpec(value15['transform']),
+    handler = value16[error['name']];
+  if (typeof handler === 'function') return handler(value14, error, value15);
+  switch (error['name']) {
     case '':
-      return _0x48e4ee;
+      return value14;
     case 'trim':
-      return String(_0x48e4ee ?? '')['trim']();
+      return String(value14 ?? '')['trim']();
     case 'string':
-      return String(_0x48e4ee ?? '');
+      return String(value14 ?? '');
     case 'minimaxH3AssetMentions':
-      return translateMinimaxH3EditorAssetMentions(_0x48e4ee);
+      return translateMinimaxH3EditorAssetMentions(value14);
     case 'boolean':
     case 'booleanString': {
-      const _0x528079 = String(_0x48e4ee ?? '')
+      const value17 = String(value14 ?? '')
         ['trim']()
         ['toLowerCase']();
-      return _0x48e4ee === !![] ||
-        _0x528079 === 'true' ||
-        _0x528079 === '1' ||
-        _0x528079 === 'yes' ||
-        _0x528079 === 'on'
+      return value14 === !![] ||
+        value17 === 'true' ||
+        value17 === '1' ||
+        value17 === 'yes' ||
+        value17 === 'on'
         ? 'true'
         : 'false';
     }
     case 'integer': {
-      const _0x52cf5b = Number(_0x48e4ee),
-        _0x2661b1 = Number(_0x18252b['defaultValue'] ?? _0xbad245['defaultValue'] ?? 0x0),
-        _0x3dd2cc = Number['isFinite'](_0x52cf5b)
-          ? Math['trunc'](_0x52cf5b)
-          : Number['isFinite'](_0x2661b1)
-            ? Math['trunc'](_0x2661b1)
+      const value18 = Number(value14),
+        value19 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
+        value20 = Number['isFinite'](value18)
+          ? Math['trunc'](value18)
+          : Number['isFinite'](value19)
+            ? Math['trunc'](value19)
             : 0x0;
-      return clampManifestNumber(_0x3dd2cc, _0x18252b);
+      return clampManifestNumber(value20, error);
     }
     case 'number': {
-      const _0x4bd016 = Number(_0x48e4ee),
-        _0x24cdea = Number(_0x18252b['defaultValue'] ?? _0xbad245['defaultValue'] ?? 0x0),
-        _0x2b08c0 = Number['isFinite'](_0x4bd016)
-          ? _0x4bd016
-          : Number['isFinite'](_0x24cdea)
-            ? _0x24cdea
-            : 0x0;
-      return clampManifestNumber(_0x2b08c0, _0x18252b);
+      const value21 = Number(value14),
+        value22 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
+        value23 = Number['isFinite'](value21) ? value21 : Number['isFinite'](value22) ? value22 : 0x0;
+      return clampManifestNumber(value23, error);
     }
     default:
-      throw new Error('Unsupported RunningHub workflow transform: ' + _0x18252b['name']);
+      throw new Error('Unsupported RunningHub workflow transform: ' + error['name']);
   }
 }
 async function resolveRunningHubManifestNodeValue({
-  item: _0x14e9a2,
-  payload: _0x369a1a,
-  finalPrompt: _0x374c00,
+  item: item2,
+  payload: payload2,
+  finalPrompt: finalPrompt2,
   sourceResolvers: sourceResolvers = {},
 }) {
-  const _0x4268e4 = String(_0x14e9a2?.['source'] || 'param')['trim']();
-  if (_0x4268e4 === 'constant')
-    return hasOwnManifestValue(_0x14e9a2, 'value') ? _0x14e9a2['value'] : _0x14e9a2['defaultValue'];
-  if (_0x4268e4 === 'prompt') {
-    const _0xe10626 = resolveManifestPayloadValue(_0x369a1a, normalizeManifestFieldList(_0x14e9a2), '');
-    return isPresentManifestValue(_0xe10626) ? _0xe10626 : _0x374c00;
+  const value24 = String(item2?.['source'] || 'param')['trim']();
+  if (value24 === 'constant')
+    return hasOwnManifestValue(item2, 'value') ? item2['value'] : item2['defaultValue'];
+  if (value24 === 'prompt') {
+    const manifestPayloadValue = resolveManifestPayloadValue(payload2, normalizeManifestFieldList(item2), '');
+    return isPresentManifestValue(manifestPayloadValue) ? manifestPayloadValue : finalPrompt2;
   }
-  if (_0x4268e4 === 'param') {
-    const _0x3331ee = normalizeManifestFieldList(_0x14e9a2),
-      _0x358fc3 = resolveManifestPayloadValue(_0x369a1a, _0x3331ee, undefined, {
-        allowEmpty: _0x14e9a2?.['allowEmpty'] === !![],
+  if (value24 === 'param') {
+    const list5 = normalizeManifestFieldList(item2),
+      manifestPayloadValue2 = resolveManifestPayloadValue(payload2, list5, undefined, {
+        allowEmpty: item2?.['allowEmpty'] === !![],
       });
     if (
-      isPresentManifestValue(_0x358fc3) ||
-      (_0x14e9a2?.['allowEmpty'] === !![] && _0x358fc3 !== undefined && _0x358fc3 !== null)
+      isPresentManifestValue(manifestPayloadValue2) ||
+      (item2?.['allowEmpty'] === !![] &&
+        manifestPayloadValue2 !== undefined &&
+        manifestPayloadValue2 !== null)
     )
-      return _0x358fc3;
-    const _0x53aa8a = _0x3331ee['filter']((_0x1a247f) => !_0x1a247f['startsWith']('generationParams.'))[
-      'map'
-    ]((_0x5e7106) => 'generationParams.' + _0x5e7106);
-    return resolveManifestPayloadValue(_0x369a1a, _0x53aa8a, undefined, {
-      allowEmpty: _0x14e9a2?.['allowEmpty'] === !![],
+      return manifestPayloadValue2;
+    const value25 = list5['filter']((enabled3) => !enabled3['startsWith']('generationParams.'))['map'](
+      (value26) => 'generationParams.' + value26,
+    );
+    return resolveManifestPayloadValue(payload2, value25, undefined, {
+      allowEmpty: item2?.['allowEmpty'] === !![],
     });
   }
-  const _0x4b8f79 = sourceResolvers[_0x4268e4];
-  if (typeof _0x4b8f79 === 'function')
-    return _0x4b8f79({ item: _0x14e9a2, payload: _0x369a1a, finalPrompt: _0x374c00 });
-  throw new Error('Unsupported RunningHub workflow mapping source: ' + _0x4268e4);
+  const run = sourceResolvers[value24];
+  if (typeof run === 'function') return run({ item: item2, payload: payload2, finalPrompt: finalPrompt2 });
+  throw new Error('Unsupported RunningHub workflow mapping source: ' + value24);
 }
-export function pushRunningHubManifestNode(_0x48a1e6, _0x4fd5ce, _0x15223b, _0x1dbded = {}) {
-  if (!_0x4fd5ce?.['nodeId'] || !_0x4fd5ce?.['fieldName']) return;
-  _0x48a1e6['push']({
-    nodeId: String(_0x4fd5ce['nodeId']),
-    fieldName: String(_0x1dbded['fieldName'] || _0x4fd5ce['fieldName']),
+export function pushRunningHubManifestNode(list6, fieldValue, value27, description = {}) {
+  if (!fieldValue?.['nodeId'] || !fieldValue?.['fieldName']) return;
+  list6['push']({
+    nodeId: String(fieldValue['nodeId']),
+    fieldName: String(description['fieldName'] || fieldValue['fieldName']),
     fieldValue:
-      _0x4fd5ce['preserveValueType'] === !![]
-        ? _0x4fd5ce['transform'] === 'boolean'
-          ? String(_0x15223b) === 'true'
-          : _0x15223b
-        : String(_0x15223b),
-    ...(_0x4fd5ce['description'] || _0x1dbded['description']
-      ? { description: _0x1dbded['description'] || _0x4fd5ce['description'] }
+      fieldValue['preserveValueType'] === !![]
+        ? fieldValue['transform'] === 'boolean'
+          ? String(value27) === 'true'
+          : value27
+        : String(value27),
+    ...(fieldValue['description'] || description['description']
+      ? { description: description['description'] || fieldValue['description'] }
       : {}),
   });
 }
-export function getRunningHubMappedValue(_0x1ca4d0, _0x4847fb, _0x992f61 = '') {
-  const _0x2841ed = String(_0x1ca4d0 ?? '')['trim'](),
-    _0x52e99a = _0x4847fb?.['valueMap'] || {};
-  if (_0x2841ed && _0x52e99a[_0x2841ed] !== undefined) return _0x52e99a[_0x2841ed];
-  if (_0x2841ed && _0x52e99a[_0x2841ed['toLowerCase']()] !== undefined)
-    return _0x52e99a[_0x2841ed['toLowerCase']()];
-  return _0x4847fb?.['defaultValue'] ?? _0x992f61;
+export function getRunningHubMappedValue(value28, value29, value30 = '') {
+  const value31 = String(value28 ?? '')['trim'](),
+    value32 = value29?.['valueMap'] || {};
+  if (value31 && value32[value31] !== undefined) return value32[value31];
+  if (value31 && value32[value31['toLowerCase']()] !== undefined) return value32[value31['toLowerCase']()];
+  return value29?.['defaultValue'] ?? value30;
 }
 export async function buildRunningHubNodeInfoListFromManifest({
-  mapping: _0x2d0f29,
+  mapping: mapping,
   payload: payload = {},
   finalPrompt: finalPrompt = '',
   sourceResolvers: sourceResolvers = {},
   transforms: transforms = {},
 }) {
-  const _0x6f48c1 = Array['isArray'](_0x2d0f29?.['nodeInfoList']) ? _0x2d0f29['nodeInfoList'] : [];
-  if (_0x6f48c1['length'] === 0x0) return _0x2d0f29?.['allowEmptyNodeInfoList'] === !![] ? [] : null;
-  const _0x1b989f = [];
-  for (const _0x67915c of _0x6f48c1) {
-    if (!_0x67915c?.['nodeId'] || !_0x67915c?.['fieldName']) continue;
-    if (!shouldUseManifestNodeMapping(_0x67915c, payload)) continue;
-    const _0x295329 = await resolveRunningHubManifestNodeValue({
-        item: _0x67915c,
+  const list7 = Array['isArray'](mapping?.['nodeInfoList']) ? mapping['nodeInfoList'] : [];
+  if (list7['length'] === 0x0) return mapping?.['allowEmptyNodeInfoList'] === !![] ? [] : null;
+  const value33 = [];
+  for (const item3 of list7) {
+    if (!item3?.['nodeId'] || !item3?.['fieldName']) continue;
+    if (!shouldUseManifestNodeMapping(item3, payload)) continue;
+    const runningHubManifestNodeValue = await resolveRunningHubManifestNodeValue({
+        item: item3,
         payload: payload,
         finalPrompt: finalPrompt,
         sourceResolvers: sourceResolvers,
       }),
-      _0x102eea = _0x67915c?.['allowEmpty'] === !![],
-      _0x40e45c = _0x67915c?.['includeEmpty'] === !![] || _0x102eea,
-      _0x4238de = hasOwnManifestValue(_0x67915c, 'defaultValue');
-    let _0x5e758e = _0x295329;
-    !isPresentManifestValue(_0x5e758e) &&
-      _0x4238de &&
-      !(_0x102eea && _0x5e758e !== undefined && _0x5e758e !== null) &&
-      (_0x5e758e = _0x67915c['defaultValue']);
-    if (!isPresentManifestValue(_0x5e758e)) {
-      if (_0x40e45c) _0x5e758e = '';
+      value34 = item3?.['allowEmpty'] === !![],
+      enabled4 = item3?.['includeEmpty'] === !![] || value34,
+      hasOwnManifestValue2 = hasOwnManifestValue(item3, 'defaultValue');
+    let manifestNodeValueMap = runningHubManifestNodeValue;
+    !isPresentManifestValue(manifestNodeValueMap) &&
+      hasOwnManifestValue2 &&
+      !(value34 && manifestNodeValueMap !== undefined && manifestNodeValueMap !== null) &&
+      (manifestNodeValueMap = item3['defaultValue']);
+    if (!isPresentManifestValue(manifestNodeValueMap)) {
+      if (enabled4) manifestNodeValueMap = '';
       else {
-        if (_0x67915c['required'])
+        if (item3['required'])
           throw new Error(
-            _0x67915c['missingMessage'] ||
-              'Missing\x20RunningHub\x20workflow\x20node\x20input:\x20' + _0x67915c['fieldName'],
+            item3['missingMessage'] ||
+              'Missing\x20RunningHub\x20workflow\x20node\x20input:\x20' + item3['fieldName'],
           );
         else continue;
       }
     }
-    ((_0x5e758e = applyManifestNodeValueMap(_0x5e758e, _0x67915c)),
-      (_0x5e758e = applyManifestNodeTransform(_0x5e758e, _0x67915c, transforms)));
-    if (!isPresentManifestValue(_0x5e758e) && _0x67915c['required'] && !_0x40e45c)
+    ((manifestNodeValueMap = applyManifestNodeValueMap(manifestNodeValueMap, item3)),
+      (manifestNodeValueMap = applyManifestNodeTransform(manifestNodeValueMap, item3, transforms)));
+    if (!isPresentManifestValue(manifestNodeValueMap) && item3['required'] && !enabled4)
       throw new Error(
-        _0x67915c['missingMessage'] || 'Missing RunningHub workflow node input: ' + _0x67915c['fieldName'],
+        item3['missingMessage'] || 'Missing RunningHub workflow node input: ' + item3['fieldName'],
       );
-    if (!isPresentManifestValue(_0x5e758e) && !_0x40e45c) continue;
-    pushRunningHubManifestNode(_0x1b989f, _0x67915c, _0x5e758e);
+    if (!isPresentManifestValue(manifestNodeValueMap) && !enabled4) continue;
+    pushRunningHubManifestNode(value33, item3, manifestNodeValueMap);
   }
-  return _0x1b989f;
+  return value33;
 }

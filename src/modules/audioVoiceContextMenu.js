@@ -23,61 +23,61 @@ export function buildAudioVoiceSegmentMenuEntries({
   hasConverted: hasConverted = ![],
   hasSource: hasSource = ![],
   usingConverted: usingConverted = ![],
-  text: _0x2b46de,
+  text: text,
 } = {}) {
   return [
     {
       action: 'use-converted',
-      label: _0x2b46de('menu.useGenerated'),
+      label: text('menu.useGenerated'),
       disabled: !hasConverted,
       checked: usingConverted,
     },
     {
       action: 'use-source',
-      label: _0x2b46de('menu.useSource'),
+      label: text('menu.useSource'),
       disabled: !hasSource,
       checked: !usingConverted,
     },
     {
-      label: _0x2b46de('menu.download'),
+      label: text('menu.download'),
       icon: 'download',
       disabled: !hasSource && !hasConverted,
       subItems: [
-        { action: 'download-source', label: _0x2b46de('menu.sourceAudio'), disabled: !hasSource },
-        { action: 'download-converted', label: _0x2b46de('menu.convertedAudio'), disabled: !hasConverted },
+        { action: 'download-source', label: text('menu.sourceAudio'), disabled: !hasSource },
+        { action: 'download-converted', label: text('menu.convertedAudio'), disabled: !hasConverted },
       ],
     },
     {
-      label: _0x2b46de('menu.addToCanvas'),
+      label: text('menu.addToCanvas'),
       icon: 'add-to-canvas',
       disabled: !hasSource && !hasConverted,
       subItems: [
-        { action: 'add-source-to-canvas', label: _0x2b46de('menu.sourceAudio'), disabled: !hasSource },
+        { action: 'add-source-to-canvas', label: text('menu.sourceAudio'), disabled: !hasSource },
         {
           action: 'add-converted-to-canvas',
-          label: _0x2b46de('menu.convertedAudio'),
+          label: text('menu.convertedAudio'),
           disabled: !hasConverted,
         },
       ],
     },
-    { action: 'remove', label: _0x2b46de('menu.remove'), disabled: ![], danger: !![] },
+    { action: 'remove', label: text('menu.remove'), disabled: ![], danger: !![] },
   ];
 }
-function buildAudioVoiceContextMenuEntry(_0x25c372, _0x5211d2) {
-  const _0x548334 = Array['isArray'](_0x25c372?.['subItems'])
-    ? _0x25c372['subItems']['map']((_0x2b5613) => buildAudioVoiceContextMenuEntry(_0x2b5613, _0x5211d2))
+function buildAudioVoiceContextMenuEntry(label, action) {
+  const subItems = Array['isArray'](label?.['subItems'])
+    ? label['subItems']['map']((value) => buildAudioVoiceContextMenuEntry(value, action))
     : null;
   return {
-    label: _0x25c372['label'],
-    icon: _0x25c372['icon'] || AUDIO_VOICE_ACTION_ICONS[_0x25c372['action']] || 'action',
-    checked: _0x25c372['checked'],
-    disabled: _0x25c372['disabled'] === !![],
-    danger: _0x25c372['danger'],
-    ...(_0x548334
-      ? { subItems: _0x548334 }
+    label: label['label'],
+    icon: label['icon'] || AUDIO_VOICE_ACTION_ICONS[label['action']] || 'action',
+    checked: label['checked'],
+    disabled: label['disabled'] === !![],
+    danger: label['danger'],
+    ...(subItems
+      ? { subItems: subItems }
       : {
-          shortcutActionId: AUDIO_VOICE_SHORTCUT_ACTIONS[_0x25c372['action']],
-          action: _0x5211d2(_0x25c372['action'], _0x25c372['dataset']),
+          shortcutActionId: AUDIO_VOICE_SHORTCUT_ACTIONS[label['action']],
+          action: action(label['action'], label['dataset']),
         }),
   };
 }
@@ -87,180 +87,169 @@ export function buildAudioVoiceSegmentContextMenuItems({
   selectedModelId: selectedModelId = '',
   imitateToneAvailable: imitateToneAvailable = ![],
   imitateToneEnabled: imitateToneEnabled = ![],
-  text: _0x3be728,
+  text: text2,
   onAction: onAction = null,
 } = {}) {
-  const _0x4e940a =
-      (_0x51d13d, _0x357e58 = {}) =>
+  const action2 =
+      (item, key = {}) =>
       () =>
-        onAction?.(_0x51d13d, _0x357e58),
-    _0x35fb90 = [];
+        onAction?.(item, key),
+    list = [];
   return (
     imitateToneAvailable &&
-      _0x35fb90['push']({
-        label: _0x3be728('actions.imitateTone'),
+      list['push']({
+        label: text2('actions.imitateTone'),
         icon: 'tone',
         checked: imitateToneEnabled,
         shortcutActionId: 'context-audio-voice-toggle-imitate-tone',
-        action: _0x4e940a('toggle-imitate-tone'),
+        action: action2('toggle-imitate-tone'),
       }),
-    _0x35fb90['push']({
-      label: _0x3be728('actions.segmentModel'),
+    list['push']({
+      label: text2('actions.segmentModel'),
       icon: 'model',
       shortcutActionId: 'context-audio-voice-open-model-menu',
       subItems: [
         {
-          label: _0x3be728('actions.useGlobalModel'),
+          label: text2('actions.useGlobalModel'),
           icon: 'model',
           checked: !selectedModelId,
           shortcutActionId: 'context-audio-voice-use-global-model',
-          action: _0x4e940a('select-segment-model', { modelId: '' }),
+          action: action2('select-segment-model', { modelId: '' }),
         },
-        ...modelOptions['map']((_0x393d1b) => ({
-          label: _0x393d1b['label'] || _0x393d1b['id'],
+        ...modelOptions['map']((label2) => ({
+          label: label2['label'] || label2['id'],
           icon: 'model',
-          checked: _0x393d1b['id'] === selectedModelId,
-          action: _0x4e940a('select-segment-model', { modelId: _0x393d1b['id'] }),
+          checked: label2['id'] === selectedModelId,
+          action: action2('select-segment-model', { modelId: label2['id'] }),
         })),
       ],
     }),
-    entries['forEach']((_0x4ee85e) => {
-      if (_0x4ee85e['action'] === 'remove') _0x35fb90['push']('sep');
-      _0x35fb90['push'](buildAudioVoiceContextMenuEntry(_0x4ee85e, _0x4e940a));
+    entries['forEach']((index) => {
+      if (index['action'] === 'remove') list['push']('sep');
+      list['push'](buildAudioVoiceContextMenuEntry(index, action2));
     }),
-    _0x35fb90
+    list
   );
 }
-function createAudioVoiceInlineMenuItem(_0x189bed, _0x25ce85, _0x88bf40 = '') {
-  const _0x5f0c8f = createEl(
+function createAudioVoiceInlineMenuItem(el, result, data = '') {
+  const el2 = createEl(
     'button',
-    ['audio-voice-menu-item', _0x88bf40]['filter'](Boolean)['join']('\x20'),
-    _0x189bed['label'],
+    ['audio-voice-menu-item', data]['filter'](Boolean)['join']('\x20'),
+    el['label'],
   );
-  _0x5f0c8f['type'] = 'button';
-  if (_0x189bed['action']) _0x5f0c8f['dataset']['audioVoiceAction'] = _0x189bed['action'];
-  ((_0x5f0c8f['dataset']['segmentId'] = _0x25ce85),
-    Object['entries'](_0x189bed['dataset'] || {})['forEach'](([_0x383295, _0x120e89]) => {
-      _0x5f0c8f['dataset'][_0x383295] = String(_0x120e89 ?? '');
+  el2['type'] = 'button';
+  if (el['action']) el2['dataset']['audioVoiceAction'] = el['action'];
+  ((el2['dataset']['segmentId'] = result),
+    Object['entries'](el['dataset'] || {})['forEach'](([options, target]) => {
+      el2['dataset'][options] = String(target ?? '');
     }),
-    (_0x5f0c8f['disabled'] = _0x189bed['disabled'] === !![]));
-  if (_0x5f0c8f['disabled']) _0x5f0c8f['setAttribute']('aria-disabled', 'true');
+    (el2['disabled'] = el['disabled'] === !![]));
+  if (el2['disabled']) el2['setAttribute']('aria-disabled', 'true');
   return (
-    _0x189bed['checked'] &&
-      (_0x5f0c8f['classList']['add']('is-active'), _0x5f0c8f['setAttribute']('aria-pressed', 'true')),
-    _0x5f0c8f
+    el['checked'] && (el2['classList']['add']('is-active'), el2['setAttribute']('aria-pressed', 'true')),
+    el2
   );
 }
-function appendAudioVoiceInlineSubmenu(_0x261d5e, _0x1b19c0, _0x5b4df9, _0x4ff2db) {
-  const _0x1c0f62 = createEl('div', 'audio-voice-menu-submenu-wrap'),
-    _0x52066f = createAudioVoiceInlineMenuItem(_0x1b19c0, _0x5b4df9);
-  (_0x52066f['classList']['add']('audio-voice-submenu-trigger'),
-    _0x52066f['setAttribute']('aria-haspopup', 'menu'));
-  const _0x4f0ef2 = createEl('div', 'audio-voice-model-submenu');
-  (_0x4f0ef2['setAttribute']('role', 'menu'),
-    _0x1b19c0['subItems']['forEach']((_0x43ec87) => {
-      _0x4f0ef2['appendChild'](
-        createAudioVoiceInlineMenuItem(
-          _0x43ec87,
-          _0x5b4df9,
-          _0x1b19c0['modelMenu'] ? 'audio-voice-model-menu-item' : '',
-        ),
+function appendAudioVoiceInlineSubmenu(el3, source, next, current) {
+  const el4 = createEl('div', 'audio-voice-menu-submenu-wrap'),
+    el5 = createAudioVoiceInlineMenuItem(source, next);
+  (el5['classList']['add']('audio-voice-submenu-trigger'), el5['setAttribute']('aria-haspopup', 'menu'));
+  const el6 = createEl('div', 'audio-voice-model-submenu');
+  (el6['setAttribute']('role', 'menu'),
+    source['subItems']['forEach']((entry) => {
+      el6['appendChild'](
+        createAudioVoiceInlineMenuItem(entry, next, source['modelMenu'] ? 'audio-voice-model-menu-item' : ''),
       );
     }),
-    _0x1c0f62['append'](_0x52066f, _0x4f0ef2),
-    bindAudioVoiceModelSubmenuPosition(_0x1c0f62, _0x4f0ef2, _0x4ff2db),
-    _0x261d5e['appendChild'](_0x1c0f62));
+    el4['append'](el5, el6),
+    bindAudioVoiceModelSubmenuPosition(el4, el6, current),
+    el3['appendChild'](el4));
 }
 export function renderAudioVoiceSegmentInlineMenu({
   segmentId: segmentId = '',
   entries: entries = [],
   modelOptions: modelOptions = [],
   selectedModelId: selectedModelId = '',
-  text: _0x3d560c,
+  text: text3,
   windowObject: windowObject = globalThis['window'],
 } = {}) {
-  const _0x3c5c93 = createEl('div', 'audio-voice-more-menu');
-  _0x3c5c93['setAttribute']('role', 'menu');
-  const _0x3ddc9e = {
-    label: _0x3d560c('actions.segmentModel'),
+  const el7 = createEl('div', 'audio-voice-more-menu');
+  el7['setAttribute']('role', 'menu');
+  const record = {
+    label: text3('actions.segmentModel'),
     modelMenu: !![],
     subItems: [
       {
         action: 'select-segment-model',
-        label: _0x3d560c('actions.useGlobalModel'),
+        label: text3('actions.useGlobalModel'),
         checked: !selectedModelId,
         dataset: { modelId: '' },
       },
-      ...modelOptions['map']((_0x507029) => ({
+      ...modelOptions['map']((label3) => ({
         action: 'select-segment-model',
-        label: _0x507029['label'] || _0x507029['id'],
-        checked: _0x507029['id'] === selectedModelId,
-        dataset: { modelId: _0x507029['id'] },
+        label: label3['label'] || label3['id'],
+        checked: label3['id'] === selectedModelId,
+        dataset: { modelId: label3['id'] },
       })),
     ],
   };
   return (
-    [_0x3ddc9e, ...entries]['forEach']((_0x5abccd) => {
-      Array['isArray'](_0x5abccd['subItems'])
-        ? appendAudioVoiceInlineSubmenu(_0x3c5c93, _0x5abccd, segmentId, windowObject)
-        : _0x3c5c93['appendChild'](createAudioVoiceInlineMenuItem(_0x5abccd, segmentId));
+    [record, ...entries]['forEach']((payload) => {
+      Array['isArray'](payload['subItems'])
+        ? appendAudioVoiceInlineSubmenu(el7, payload, segmentId, windowObject)
+        : el7['appendChild'](createAudioVoiceInlineMenuItem(payload, segmentId));
     }),
-    _0x3c5c93
+    el7
   );
 }
 export function createAudioVoiceSegmentContextMenuController({
-  panel: _0x766dcf,
-  getSegment: _0x1a1b3b,
-  buildItems: _0x1767b7,
-  onAction: _0x3eaf71,
-  closeInlineMenus: _0x38fb2e,
+  panel: panel,
+  getSegment: getSegment,
+  buildItems: buildItems,
+  onAction: onAction2,
+  closeInlineMenus: closeInlineMenus,
 } = {}) {
-  let _0xb62858 = null;
-  const _0x28d0da = () => {
-      (_0xb62858?.['close']?.(), (_0xb62858 = null));
+  let showContextMenu2 = null;
+  const close = () => {
+      (showContextMenu2?.['close']?.(), (showContextMenu2 = null));
     },
-    _0x1efac6 = (_0x4fdb83) => {
+    handle = (event) => {
       if (
-        _0x4fdb83['defaultPrevented'] ||
-        _0x4fdb83['target']?.['closest']?.(
+        event['defaultPrevented'] ||
+        event['target']?.['closest']?.(
           TEXT_CONTEXT_MENU_TARGET_SELECTOR + ',\x20.audio-voice-more-menu,\x20.audio-voice-model-submenu',
         )
       )
         return;
-      const _0x4bdba6 = _0x4fdb83['target']?.['closest']?.('.audio-voice-segment-card'),
-        _0x42cf2f = _0x4bdba6 ? _0x1a1b3b?.(_0x4bdba6['dataset']['segmentId'] || '') : null,
-        _0x492957 = String(_0x42cf2f?.['id'] || '')['trim']();
-      if (!_0x492957) return;
-      const _0x529b52 = _0x1767b7(_0x42cf2f, (_0x54f9a4, _0x5b5693 = {}) => {
-        _0x3eaf71?.(
-          _0x54f9a4,
-          _0x492957,
-          { dataset: _0x5b5693, closest: () => null, setAttribute: () => {} },
-          _0x4fdb83,
-        );
+      const ownerElement = event['target']?.['closest']?.('.audio-voice-segment-card'),
+        state = ownerElement ? getSegment?.(ownerElement['dataset']['segmentId'] || '') : null,
+        enabled = String(state?.['id'] || '')['trim']();
+      if (!enabled) return;
+      const config = buildItems(state, (scope, dataset = {}) => {
+        onAction2?.(scope, enabled, { dataset: dataset, closest: () => null, setAttribute: () => {} }, event);
       });
-      (_0x4fdb83['preventDefault']?.(),
-        _0x4fdb83['stopPropagation']?.(),
-        _0x38fb2e?.(),
-        _0x28d0da(),
-        (_0xb62858 = showContextMenu(
-          Number(_0x4fdb83['clientX']) || 0x0,
-          Number(_0x4fdb83['clientY']) || 0x0,
-          _0x529b52,
+      (event['preventDefault']?.(),
+        event['stopPropagation']?.(),
+        closeInlineMenus?.(),
+        close(),
+        (showContextMenu2 = showContextMenu(
+          Number(event['clientX']) || 0x0,
+          Number(event['clientY']) || 0x0,
+          config,
           {
             className: 'v2-canvas-ctx-menu audio-voice-segment-context-menu',
             ensureItemIcons: !![],
-            ownerElement: _0x4bdba6,
-            ownerRoot: _0x766dcf,
+            ownerElement: ownerElement,
+            ownerRoot: panel,
           },
         )));
     };
   return (
-    _0x766dcf?.['addEventListener']?.('contextmenu', _0x1efac6),
+    panel?.['addEventListener']?.('contextmenu', handle),
     {
-      close: _0x28d0da,
+      close: close,
       destroy() {
-        (_0x28d0da(), _0x766dcf?.['removeEventListener']?.('contextmenu', _0x1efac6));
+        (close(), panel?.['removeEventListener']?.('contextmenu', handle));
       },
     }
   );

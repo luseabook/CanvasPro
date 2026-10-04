@@ -9,118 +9,121 @@ let cachedEdgeVisibilityIndexSignature = '',
   cachedEdgeGeometrySignatureKey = '',
   cachedEdgeGeometrySignatureNodes = null,
   cachedEdgeGeometrySignature = '';
-function formatEdgeSignatureNumber(_0x370572) {
-  const _0x4930d3 = Number(_0x370572);
-  return Number['isFinite'](_0x4930d3) ? _0x4930d3['toFixed'](0x1) : '0.0';
+function formatEdgeSignatureNumber(value) {
+  const item = Number(value);
+  return Number['isFinite'](item) ? item['toFixed'](0x1) : '0.0';
 }
-function updateStringHash(_0x59db1c, _0x3c6b60) {
-  const _0x579103 = String(_0x3c6b60);
-  let _0x1a8b7f = _0x59db1c >>> 0x0;
-  for (let _0x5b3f55 = 0x0; _0x5b3f55 < _0x579103['length']; _0x5b3f55 += 0x1) {
-    ((_0x1a8b7f ^= _0x579103['charCodeAt'](_0x5b3f55)),
-      (_0x1a8b7f = Math['imul'](_0x1a8b7f, 0x1000193) >>> 0x0));
+function updateStringHash(key, index) {
+  const list = String(index);
+  let result = key >>> 0x0;
+  for (let data = 0x0; data < list['length']; data += 0x1) {
+    ((result ^= list['charCodeAt'](data)), (result = Math['imul'](result, 0x1000193) >>> 0x0));
   }
-  return _0x1a8b7f;
+  return result;
 }
-function appendSortedSetSignature(_0x38fa9e, _0x52f891, _0x3ccb43) {
-  if (!(_0x3ccb43 instanceof Set) || _0x3ccb43['size'] === 0x0) {
-    _0x38fa9e['push'](_0x52f891 + ':');
+function appendSortedSetSignature(list2, options, target) {
+  if (!(target instanceof Set) || target['size'] === 0x0) {
+    list2['push'](options + ':');
     return;
   }
-  _0x38fa9e['push'](_0x52f891 + ':' + Array['from'](_0x3ccb43)['sort']()['join'](','));
+  list2['push'](options + ':' + Array['from'](target)['sort']()['join'](','));
 }
-function normalizeEdgeLodZoom(_0x33a9c3) {
-  const _0x43b73c = Number(_0x33a9c3?.['zoom']);
-  return Number['isFinite'](_0x43b73c) && _0x43b73c > 0x0 ? _0x43b73c : 0x1;
+function normalizeEdgeLodZoom(box) {
+  const count = Number(box?.['zoom']);
+  return Number['isFinite'](count) && count > 0x0 ? count : 0x1;
 }
 export function shouldRenderAllEdgesAtLowZoom({
-  edgeCount: _0x24d455,
-  viewport: _0x5c3aaa,
+  edgeCount: edgeCount,
+  viewport: viewport,
   maxEdgeCount: maxEdgeCount = EDGE_RENDER_ALL_MAX_EDGE_COUNT,
   lowZoomThreshold: lowZoomThreshold = EDGE_RENDER_ALL_LOW_ZOOM_THRESHOLD,
 } = {}) {
-  const _0x191d1d = Number(_0x24d455) || 0x0;
-  if (_0x191d1d <= 0x0 || _0x191d1d > maxEdgeCount) return ![];
-  return normalizeEdgeLodZoom(_0x5c3aaa) <= lowZoomThreshold;
+  const count2 = Number(edgeCount) || 0x0;
+  if (count2 <= 0x0 || count2 > maxEdgeCount) return ![];
+  return normalizeEdgeLodZoom(viewport) <= lowZoomThreshold;
 }
-function edgeVisibilityCellCoord(_0x49da70, _0x5b93a2 = EDGE_VISIBILITY_CELL_SIZE) {
-  return Math['floor']((Number(_0x49da70) || 0x0) / _0x5b93a2);
+function edgeVisibilityCellCoord(source, next = EDGE_VISIBILITY_CELL_SIZE) {
+  return Math['floor']((Number(source) || 0x0) / next);
 }
-function edgeVisibilityCellKey(_0x1a407e, _0x52a50d) {
-  return _0x1a407e + ':' + _0x52a50d;
+function edgeVisibilityCellKey(current, entry) {
+  return current + ':' + entry;
 }
-function pushEdgeVisibilityCell(_0x186c84, _0x5137de, _0x530bb1, _0x2da3f2) {
-  const _0x5851db = edgeVisibilityCellKey(_0x5137de, _0x530bb1);
-  let _0x25429b = _0x186c84['get'](_0x5851db);
-  (!_0x25429b && ((_0x25429b = []), _0x186c84['set'](_0x5851db, _0x25429b)), _0x25429b['push'](_0x2da3f2));
+function pushEdgeVisibilityCell(map, record, payload, handle) {
+  const edgeVisibilityCellKey2 = edgeVisibilityCellKey(record, payload);
+  let list3 = map['get'](edgeVisibilityCellKey2);
+  (!list3 && ((list3 = []), map['set'](edgeVisibilityCellKey2, list3)), list3['push'](handle));
 }
-function intersectsEdgeVisibilityBounds(_0x3942b3, _0x176118) {
+function intersectsEdgeVisibilityBounds(state, config) {
   return (
-    _0x3942b3['maxX'] > _0x176118['minX'] &&
-    _0x3942b3['minX'] < _0x176118['maxX'] &&
-    _0x3942b3['maxY'] > _0x176118['minY'] &&
-    _0x3942b3['minY'] < _0x176118['maxY']
+    state['maxX'] > config['minX'] &&
+    state['minX'] < config['maxX'] &&
+    state['maxY'] > config['minY'] &&
+    state['minY'] < config['maxY']
   );
 }
-function computeEdgeWorldBounds(_0x32c3f3, _0x1529de) {
-  if (!_0x32c3f3?.['id']) return null;
-  const _0x41393f = _0x1529de?.[_0x32c3f3['sourceId']],
-    _0x540f90 = _0x1529de?.[_0x32c3f3['targetId']];
-  if (!_0x41393f || !_0x540f90) return null;
-  const _0x1a5141 = Number(_0x41393f['x'] || 0x0),
-    _0x2dab93 = Number(_0x41393f['y'] || 0x0),
-    _0x33d499 = Number(_0x540f90['x'] || 0x0),
-    _0x18f5c4 = Number(_0x540f90['y'] || 0x0),
-    _0x39ad4d = _0x1a5141 + Number(_0x41393f['width'] ?? 0x0),
-    _0x45f85a = _0x2dab93 + Number(_0x41393f['height'] ?? 0x0) / 0x2,
-    _0x507e74 = _0x33d499,
-    _0x3f174a = _0x18f5c4 + Number(_0x540f90['height'] ?? 0x0) / 0x2,
-    _0x53b25c = Math['max'](Math['abs'](_0x507e74 - _0x39ad4d) * 0.5, 0x3c);
+function computeEdgeWorldBounds(enabled, scope) {
+  if (!enabled?.['id']) return null;
+  const box2 = scope?.[enabled['sourceId']],
+    box3 = scope?.[enabled['targetId']];
+  if (!box2 || !box3) return null;
+  const input = Number(box2['x'] || 0x0),
+    output = Number(box2['y'] || 0x0),
+    value2 = Number(box3['x'] || 0x0),
+    value3 = Number(box3['y'] || 0x0),
+    value4 = input + Number(box2['width'] ?? 0x0),
+    value5 = output + Number(box2['height'] ?? 0x0) / 0x2,
+    value6 = value2,
+    value7 = value3 + Number(box3['height'] ?? 0x0) / 0x2,
+    value8 = Math['max'](Math['abs'](value6 - value4) * 0.5, 0x3c);
   return {
-    minX: Math['min'](_0x39ad4d, _0x507e74, _0x39ad4d + _0x53b25c, _0x507e74 - _0x53b25c),
-    maxX: Math['max'](_0x39ad4d, _0x507e74, _0x39ad4d + _0x53b25c, _0x507e74 - _0x53b25c),
-    minY: Math['min'](_0x45f85a, _0x3f174a),
-    maxY: Math['max'](_0x45f85a, _0x3f174a),
+    minX: Math['min'](value4, value6, value4 + value8, value6 - value8),
+    maxX: Math['max'](value4, value6, value4 + value8, value6 - value8),
+    minY: Math['min'](value5, value7),
+    maxY: Math['max'](value5, value7),
   };
 }
-export function createEdgeVisibilityIndex(_0xc28903, _0x218afc) {
-  const _0x45fe4c = new Map(),
-    _0x5cc3a7 = new Set(),
-    _0x40fa04 = new Map(),
-    _0x3ab1f8 = new Map(),
-    _0x37bf16 = new Map();
-  let _0xa54a2c = 0x0;
-  for (const _0x57bed0 of _0xc28903 || []) {
-    const _0x1fd681 = String(_0x57bed0?.['id'] || '')['trim']();
-    if (!_0x1fd681) continue;
-    const _0x5ec5ab = computeEdgeWorldBounds(_0x57bed0, _0x218afc);
-    if (!_0x5ec5ab) continue;
-    (_0x40fa04['set'](_0x1fd681, _0x5ec5ab),
-      _0x3ab1f8['set'](_0x1fd681, _0x57bed0),
-      _0x37bf16['set'](_0x1fd681, _0xa54a2c),
-      (_0xa54a2c += 0x1));
-    const _0x478e93 = edgeVisibilityCellCoord(_0x5ec5ab['minX']),
-      _0x4a4421 = edgeVisibilityCellCoord(_0x5ec5ab['maxX']),
-      _0x133825 = edgeVisibilityCellCoord(_0x5ec5ab['minY']),
-      _0x378016 = edgeVisibilityCellCoord(_0x5ec5ab['maxY']);
-    if ((_0x4a4421 - _0x478e93 + 0x1) * (_0x378016 - _0x133825 + 0x1) > MAX_EDGE_VISIBILITY_CELLS) {
-      _0x5cc3a7['add'](_0x1fd681);
+export function createEdgeVisibilityIndex(value9, value10) {
+  const cells = new Map(),
+    spanningEdgeIds = new Set(),
+    edgeBounds = new Map(),
+    edgesById = new Map(),
+    edgeOrder = new Map();
+  let value11 = 0x0;
+  for (const value12 of value9 || []) {
+    const enabled2 = String(value12?.['id'] || '')['trim']();
+    if (!enabled2) continue;
+    const edgeWorldBounds = computeEdgeWorldBounds(value12, value10);
+    if (!edgeWorldBounds) continue;
+    (edgeBounds['set'](enabled2, edgeWorldBounds),
+      edgesById['set'](enabled2, value12),
+      edgeOrder['set'](enabled2, value11),
+      (value11 += 0x1));
+    const edgeVisibilityCellCoord2 = edgeVisibilityCellCoord(edgeWorldBounds['minX']),
+      edgeVisibilityCellCoord3 = edgeVisibilityCellCoord(edgeWorldBounds['maxX']),
+      edgeVisibilityCellCoord4 = edgeVisibilityCellCoord(edgeWorldBounds['minY']),
+      edgeVisibilityCellCoord5 = edgeVisibilityCellCoord(edgeWorldBounds['maxY']);
+    if (
+      (edgeVisibilityCellCoord3 - edgeVisibilityCellCoord2 + 0x1) *
+        (edgeVisibilityCellCoord5 - edgeVisibilityCellCoord4 + 0x1) >
+      MAX_EDGE_VISIBILITY_CELLS
+    ) {
+      spanningEdgeIds['add'](enabled2);
       continue;
     }
-    for (let _0x4e0ff0 = _0x478e93; _0x4e0ff0 <= _0x4a4421; _0x4e0ff0 += 0x1) {
-      for (let _0x546616 = _0x133825; _0x546616 <= _0x378016; _0x546616 += 0x1) {
-        pushEdgeVisibilityCell(_0x45fe4c, _0x4e0ff0, _0x546616, _0x1fd681);
+    for (let value13 = edgeVisibilityCellCoord2; value13 <= edgeVisibilityCellCoord3; value13 += 0x1) {
+      for (let value14 = edgeVisibilityCellCoord4; value14 <= edgeVisibilityCellCoord5; value14 += 0x1) {
+        pushEdgeVisibilityCell(cells, value13, value14, enabled2);
       }
     }
   }
   return {
     cellSize: EDGE_VISIBILITY_CELL_SIZE,
-    cells: _0x45fe4c,
-    spanningEdgeIds: _0x5cc3a7,
-    edgeBounds: _0x40fa04,
-    edgesById: _0x3ab1f8,
-    edgeOrder: _0x37bf16,
-    edgeCount: _0x37bf16['size'],
+    cells: cells,
+    spanningEdgeIds: spanningEdgeIds,
+    edgeBounds: edgeBounds,
+    edgesById: edgesById,
+    edgeOrder: edgeOrder,
+    edgeCount: edgeOrder['size'],
   };
 }
 export function clearCachedEdgeVisibilityIndex() {
@@ -132,77 +135,77 @@ export function clearCachedEdgeVisibilityIndex() {
     (cachedEdgeGeometrySignature = ''));
 }
 export function getCachedEdgeGeometrySignature(
-  _0x188732,
-  _0x3e3031,
+  list4,
+  value15,
   { edgesRev: edgesRev = 0x0, geometryRev: geometryRev = 0x0 } = {},
 ) {
-  const _0x31e8fa = Array['isArray'](_0x188732) ? _0x188732['length'] : 0x0,
-    _0x1f3071 =
-      _0x31e8fa +
+  const value16 = Array['isArray'](list4) ? list4['length'] : 0x0,
+    value17 =
+      value16 +
       ':' +
       (Number['isFinite'](edgesRev) ? edgesRev : 0x0) +
       ':' +
       (Number['isFinite'](geometryRev) ? geometryRev : 0x0);
   if (
     cachedEdgeGeometrySignature &&
-    cachedEdgeGeometrySignatureKey === _0x1f3071 &&
-    cachedEdgeGeometrySignatureNodes === _0x3e3031
+    cachedEdgeGeometrySignatureKey === value17 &&
+    cachedEdgeGeometrySignatureNodes === value15
   )
     return cachedEdgeGeometrySignature;
-  const _0x32eae9 = Number['isFinite'](edgesRev) ? edgesRev : 0x0,
-    _0x4a253a = Number['isFinite'](geometryRev) ? geometryRev : 0x0;
-  let _0x3e4a92 = 0x811c9dc5;
-  _0x3e4a92 = updateStringHash(_0x3e4a92, 'geom:' + _0x31e8fa + ':' + _0x32eae9 + ':' + _0x4a253a);
-  for (const _0x33150a of _0x188732 || []) {
-    if (!_0x33150a?.['id']) continue;
-    const _0x57ef71 = _0x3e3031?.[_0x33150a['sourceId']],
-      _0x5db5ff = _0x3e3031?.[_0x33150a['targetId']];
-    if (!_0x57ef71 || !_0x5db5ff) {
-      _0x3e4a92 = updateStringHash(
-        _0x3e4a92,
+  const value18 = Number['isFinite'](edgesRev) ? edgesRev : 0x0,
+    value19 = Number['isFinite'](geometryRev) ? geometryRev : 0x0;
+  let updateStringHash2 = 0x811c9dc5;
+  updateStringHash2 = updateStringHash(updateStringHash2, 'geom:' + value16 + ':' + value18 + ':' + value19);
+  for (const enabled3 of list4 || []) {
+    if (!enabled3?.['id']) continue;
+    const box4 = value15?.[enabled3['sourceId']],
+      box5 = value15?.[enabled3['targetId']];
+    if (!box4 || !box5) {
+      updateStringHash2 = updateStringHash(
+        updateStringHash2,
         'e:' +
-          _0x33150a['id'] +
+          enabled3['id'] +
           ':' +
-          (_0x33150a['sourceId'] || '') +
+          (enabled3['sourceId'] || '') +
           ':' +
-          (_0x33150a['targetId'] || '') +
+          (enabled3['targetId'] || '') +
           ':missing',
       );
       continue;
     }
-    const _0xbfc26a = Number(_0x57ef71['x'] || 0x0) + Number(_0x57ef71['width'] ?? 0x0),
-      _0x548c2c = Number(_0x57ef71['y'] || 0x0) + Number(_0x57ef71['height'] ?? 0x0) / 0x2,
-      _0x145ef8 = Number(_0x5db5ff['x'] || 0x0),
-      _0x3ac210 = Number(_0x5db5ff['y'] || 0x0) + Number(_0x5db5ff['height'] ?? 0x0) / 0x2;
-    _0x3e4a92 = updateStringHash(
-      _0x3e4a92,
+    const value20 = Number(box4['x'] || 0x0) + Number(box4['width'] ?? 0x0),
+      value21 = Number(box4['y'] || 0x0) + Number(box4['height'] ?? 0x0) / 0x2,
+      value22 = Number(box5['x'] || 0x0),
+      value23 = Number(box5['y'] || 0x0) + Number(box5['height'] ?? 0x0) / 0x2;
+    updateStringHash2 = updateStringHash(
+      updateStringHash2,
       'e:' +
-        _0x33150a['id'] +
+        enabled3['id'] +
         ':' +
-        (_0x33150a['sourceId'] || '') +
+        (enabled3['sourceId'] || '') +
         ':' +
-        (_0x33150a['targetId'] || '') +
+        (enabled3['targetId'] || '') +
         ':' +
-        formatEdgeSignatureNumber(_0xbfc26a) +
+        formatEdgeSignatureNumber(value20) +
         ':' +
-        formatEdgeSignatureNumber(_0x548c2c) +
+        formatEdgeSignatureNumber(value21) +
         ':' +
-        formatEdgeSignatureNumber(_0x145ef8) +
+        formatEdgeSignatureNumber(value22) +
         ':' +
-        formatEdgeSignatureNumber(_0x3ac210),
+        formatEdgeSignatureNumber(value23),
     );
   }
   return (
-    (cachedEdgeGeometrySignatureKey = _0x1f3071),
-    (cachedEdgeGeometrySignatureNodes = _0x3e3031 || null),
+    (cachedEdgeGeometrySignatureKey = value17),
+    (cachedEdgeGeometrySignatureNodes = value15 || null),
     (cachedEdgeGeometrySignature =
-      'geom:' + _0x31e8fa + ':' + _0x32eae9 + ':' + _0x4a253a + ':' + _0x3e4a92['toString'](0x24)),
+      'geom:' + value16 + ':' + value18 + ':' + value19 + ':' + updateStringHash2['toString'](0x24)),
     cachedEdgeGeometrySignature
   );
 }
 export function getCachedEdgeVisibilityIndex(
-  _0x229e21,
-  _0x4c0897,
+  list5,
+  value24,
   {
     edgesRev: edgesRev = 0x0,
     geometryRev: geometryRev = 0x0,
@@ -210,150 +213,152 @@ export function getCachedEdgeVisibilityIndex(
     geometrySignature: geometrySignature = '',
   } = {},
 ) {
-  const _0x278e54 = Array['isArray'](_0x229e21) ? _0x229e21['length'] : 0x0;
-  if (_0x278e54 < threshold) return (clearCachedEdgeVisibilityIndex(), null);
-  const _0x4acdde =
+  const value25 = Array['isArray'](list5) ? list5['length'] : 0x0;
+  if (value25 < threshold) return (clearCachedEdgeVisibilityIndex(), null);
+  const value26 =
       typeof geometrySignature === 'string' && geometrySignature
         ? geometrySignature
         : String(Number['isFinite'](geometryRev) ? geometryRev : 0x0),
-    _0x13c24d = _0x278e54 + ':' + (Number['isFinite'](edgesRev) ? edgesRev : 0x0) + ':' + _0x4acdde;
+    value27 = value25 + ':' + (Number['isFinite'](edgesRev) ? edgesRev : 0x0) + ':' + value26;
   if (
     cachedEdgeVisibilityIndex &&
-    cachedEdgeVisibilityIndexSignature === _0x13c24d &&
-    cachedEdgeVisibilityIndexNodes === _0x4c0897
+    cachedEdgeVisibilityIndexSignature === value27 &&
+    cachedEdgeVisibilityIndexNodes === value24
   )
     return cachedEdgeVisibilityIndex;
   return (
-    (cachedEdgeVisibilityIndex = createEdgeVisibilityIndex(_0x229e21, _0x4c0897)),
-    (cachedEdgeVisibilityIndexSignature = _0x13c24d),
-    (cachedEdgeVisibilityIndexNodes = _0x4c0897 || null),
+    (cachedEdgeVisibilityIndex = createEdgeVisibilityIndex(list5, value24)),
+    (cachedEdgeVisibilityIndexSignature = value27),
+    (cachedEdgeVisibilityIndexNodes = value24 || null),
     cachedEdgeVisibilityIndex
   );
 }
-export function queryEdgeVisibilityIndex(_0x2aa71d, _0x5aeb93) {
-  if (!_0x2aa71d || !_0x5aeb93 || !(_0x2aa71d['cells'] instanceof Map)) return [];
-  const _0x159d5f = edgeVisibilityCellCoord(_0x5aeb93['minX'], _0x2aa71d['cellSize']),
-    _0xb67140 = edgeVisibilityCellCoord(_0x5aeb93['maxX'], _0x2aa71d['cellSize']),
-    _0x511a18 = edgeVisibilityCellCoord(_0x5aeb93['minY'], _0x2aa71d['cellSize']),
-    _0x2dfeb0 = edgeVisibilityCellCoord(_0x5aeb93['maxY'], _0x2aa71d['cellSize']),
-    _0x21cb15 = new Set(),
-    _0x5ab00a = (_0xfc4322) => {
-      if (_0x21cb15['has'](_0xfc4322)) return;
-      const _0x581e66 = _0x2aa71d['edgeBounds']?.['get']?.(_0xfc4322);
-      if (_0x581e66 && intersectsEdgeVisibilityBounds(_0x581e66, _0x5aeb93)) _0x21cb15['add'](_0xfc4322);
+export function queryEdgeVisibilityIndex(enabled4, enabled5) {
+  if (!enabled4 || !enabled5 || !(enabled4['cells'] instanceof Map)) return [];
+  const edgeVisibilityCellCoord6 = edgeVisibilityCellCoord(enabled5['minX'], enabled4['cellSize']),
+    edgeVisibilityCellCoord7 = edgeVisibilityCellCoord(enabled5['maxX'], enabled4['cellSize']),
+    edgeVisibilityCellCoord8 = edgeVisibilityCellCoord(enabled5['minY'], enabled4['cellSize']),
+    edgeVisibilityCellCoord9 = edgeVisibilityCellCoord(enabled5['maxY'], enabled4['cellSize']),
+    map2 = new Set(),
+    handler = (value28) => {
+      if (map2['has'](value28)) return;
+      const value29 = enabled4['edgeBounds']?.['get']?.(value28);
+      if (value29 && intersectsEdgeVisibilityBounds(value29, enabled5)) map2['add'](value28);
     },
-    _0x4a07dc = (_0xb67140 - _0x159d5f + 0x1) * (_0x2dfeb0 - _0x511a18 + 0x1);
-  if (_0x4a07dc > Math['max'](MAX_EDGE_VISIBILITY_CELLS, _0x2aa71d['cells']['size'])) {
-    for (const _0x50ffc2 of _0x2aa71d['edgeBounds']['keys']()) _0x5ab00a(_0x50ffc2);
+    value30 =
+      (edgeVisibilityCellCoord7 - edgeVisibilityCellCoord6 + 0x1) *
+      (edgeVisibilityCellCoord9 - edgeVisibilityCellCoord8 + 0x1);
+  if (value30 > Math['max'](MAX_EDGE_VISIBILITY_CELLS, enabled4['cells']['size'])) {
+    for (const value31 of enabled4['edgeBounds']['keys']()) handler(value31);
   } else {
-    for (const _0x22ec75 of _0x2aa71d['spanningEdgeIds'] || []) _0x5ab00a(_0x22ec75);
-    for (let _0x555c49 = _0x159d5f; _0x555c49 <= _0xb67140; _0x555c49 += 0x1) {
-      for (let _0x3890e8 = _0x511a18; _0x3890e8 <= _0x2dfeb0; _0x3890e8 += 0x1) {
-        const _0x24706e = _0x2aa71d['cells']['get'](edgeVisibilityCellKey(_0x555c49, _0x3890e8));
-        if (!_0x24706e || _0x24706e['length'] === 0x0) continue;
-        for (const _0x2be50b of _0x24706e) _0x5ab00a(_0x2be50b);
+    for (const value32 of enabled4['spanningEdgeIds'] || []) handler(value32);
+    for (let value33 = edgeVisibilityCellCoord6; value33 <= edgeVisibilityCellCoord7; value33 += 0x1) {
+      for (let value34 = edgeVisibilityCellCoord8; value34 <= edgeVisibilityCellCoord9; value34 += 0x1) {
+        const list6 = enabled4['cells']['get'](edgeVisibilityCellKey(value33, value34));
+        if (!list6 || list6['length'] === 0x0) continue;
+        for (const value35 of list6) handler(value35);
       }
     }
   }
-  return Array['from'](_0x21cb15)['sort']((_0x240729, _0x534d25) => {
-    const _0x5a5a65 = _0x2aa71d['edgeOrder']?.['get']?.(_0x240729) ?? Infinity,
-      _0x4c8cca = _0x2aa71d['edgeOrder']?.['get']?.(_0x534d25) ?? Infinity;
-    return _0x5a5a65 - _0x4c8cca;
+  return Array['from'](map2)['sort']((value36, value37) => {
+    const value38 = enabled4['edgeOrder']?.['get']?.(value36) ?? Infinity,
+      value39 = enabled4['edgeOrder']?.['get']?.(value37) ?? Infinity;
+    return value38 - value39;
   });
 }
 export function buildFullEdgeRenderSignature({
-  edgeEntries: _0x19a4db,
-  nodes: _0x3b9ed7,
-  viewport: _0x45dce3,
-  dragOffsetCtx: _0x566b71,
-  relatedEdgeIds: _0x35409e,
-  containerW: _0x4cee8e,
-  containerH: _0x186f83,
+  edgeEntries: edgeEntries,
+  nodes: nodes,
+  viewport: viewport2,
+  dragOffsetCtx: dragOffsetCtx,
+  relatedEdgeIds: relatedEdgeIds,
+  containerW: containerW,
+  containerH: containerH,
   edgesRev: edgesRev = 0x0,
   geometryRev: geometryRev = 0x0,
   threshold: threshold = MANY_EDGES_THRESHOLD,
   geometrySignature: geometrySignature = '',
   edgePathStyle: edgePathStyle = 'curve',
 }) {
-  const _0x24fecc = _0x45dce3 || { x: 0x0, y: 0x0, zoom: 0x1 },
-    _0x4e6b0a = _0x566b71?.['movedNodeIds'] instanceof Set ? _0x566b71['movedNodeIds'] : null,
-    _0x289157 = Number['isFinite'](_0x566b71?.['dx']) ? _0x566b71['dx'] : 0x0,
-    _0x151a7a = Number['isFinite'](_0x566b71?.['dy']) ? _0x566b71['dy'] : 0x0,
-    _0x3ef2dc = Array['isArray'](_0x19a4db) ? _0x19a4db['length'] : 0x0,
-    _0x3fd44f = (_0x4e6b0a && _0x4e6b0a['size'] > 0x0) || _0x289157 !== 0x0 || _0x151a7a !== 0x0,
-    _0x142a44 = [
+  const box6 = viewport2 || { x: 0x0, y: 0x0, zoom: 0x1 },
+    map3 = dragOffsetCtx?.['movedNodeIds'] instanceof Set ? dragOffsetCtx['movedNodeIds'] : null,
+    count3 = Number['isFinite'](dragOffsetCtx?.['dx']) ? dragOffsetCtx['dx'] : 0x0,
+    count4 = Number['isFinite'](dragOffsetCtx?.['dy']) ? dragOffsetCtx['dy'] : 0x0,
+    value40 = Array['isArray'](edgeEntries) ? edgeEntries['length'] : 0x0,
+    enabled6 = (map3 && map3['size'] > 0x0) || count3 !== 0x0 || count4 !== 0x0,
+    list7 = [
       'edge-full',
       'vp:' +
-        formatEdgeSignatureNumber(_0x24fecc['x']) +
+        formatEdgeSignatureNumber(box6['x']) +
         ':' +
-        formatEdgeSignatureNumber(_0x24fecc['y']) +
+        formatEdgeSignatureNumber(box6['y']) +
         ':' +
-        formatEdgeSignatureNumber(_0x24fecc['zoom'] || 0x1),
-      'box:' + formatEdgeSignatureNumber(_0x4cee8e) + ':' + formatEdgeSignatureNumber(_0x186f83),
-      'drag:' + formatEdgeSignatureNumber(_0x289157) + ':' + formatEdgeSignatureNumber(_0x151a7a),
+        formatEdgeSignatureNumber(box6['zoom'] || 0x1),
+      'box:' + formatEdgeSignatureNumber(containerW) + ':' + formatEdgeSignatureNumber(containerH),
+      'drag:' + formatEdgeSignatureNumber(count3) + ':' + formatEdgeSignatureNumber(count4),
       'path:' + String(edgePathStyle || 'curve'),
     ];
-  (appendSortedSetSignature(_0x142a44, 'dragIds', _0x4e6b0a),
-    appendSortedSetSignature(_0x142a44, 'highlight', _0x35409e));
-  if (_0x3ef2dc >= threshold && !_0x3fd44f) {
-    const _0x4f209b =
+  (appendSortedSetSignature(list7, 'dragIds', map3),
+    appendSortedSetSignature(list7, 'highlight', relatedEdgeIds));
+  if (value40 >= threshold && !enabled6) {
+    const value41 =
       typeof geometrySignature === 'string' && geometrySignature
         ? geometrySignature
-        : getCachedEdgeGeometrySignature(_0x19a4db, _0x3b9ed7, {
+        : getCachedEdgeGeometrySignature(edgeEntries, nodes, {
             edgesRev: edgesRev,
             geometryRev: geometryRev,
           });
     return (
-      _0x142a44['push'](
-        'compact:' + _0x3ef2dc + ':' + (Number['isFinite'](edgesRev) ? edgesRev : 0x0) + ':' + _0x4f209b,
+      list7['push'](
+        'compact:' + value40 + ':' + (Number['isFinite'](edgesRev) ? edgesRev : 0x0) + ':' + value41,
       ),
-      _0x142a44['join']('|')
+      list7['join']('|')
     );
   }
-  for (const _0x398d08 of _0x19a4db || []) {
-    if (!_0x398d08?.['id']) continue;
-    const _0x1919f2 = _0x3b9ed7?.[_0x398d08['sourceId']],
-      _0x22a9dc = _0x3b9ed7?.[_0x398d08['targetId']];
-    if (!_0x1919f2 || !_0x22a9dc) {
-      _0x142a44['push'](
+  for (const enabled7 of edgeEntries || []) {
+    if (!enabled7?.['id']) continue;
+    const box7 = nodes?.[enabled7['sourceId']],
+      box8 = nodes?.[enabled7['targetId']];
+    if (!box7 || !box8) {
+      list7['push'](
         'e:' +
-          _0x398d08['id'] +
+          enabled7['id'] +
           ':' +
-          (_0x398d08['sourceId'] || '') +
+          (enabled7['sourceId'] || '') +
           ':' +
-          (_0x398d08['targetId'] || '') +
+          (enabled7['targetId'] || '') +
           ':missing',
       );
       continue;
     }
-    const _0xb8c782 = _0x4e6b0a && _0x4e6b0a['has'](_0x398d08['sourceId']) ? _0x289157 : 0x0,
-      _0xe99414 = _0x4e6b0a && _0x4e6b0a['has'](_0x398d08['sourceId']) ? _0x151a7a : 0x0,
-      _0xed383d = _0x4e6b0a && _0x4e6b0a['has'](_0x398d08['targetId']) ? _0x289157 : 0x0,
-      _0xfbb3a3 = _0x4e6b0a && _0x4e6b0a['has'](_0x398d08['targetId']) ? _0x151a7a : 0x0,
-      _0x59aea7 = Number(_0x1919f2['x'] || 0x0) + _0xb8c782,
-      _0x2772e8 = Number(_0x1919f2['y'] || 0x0) + _0xe99414,
-      _0x220a8f = Number(_0x22a9dc['x'] || 0x0) + _0xed383d,
-      _0x475537 = Number(_0x22a9dc['y'] || 0x0) + _0xfbb3a3,
-      _0x5e92f3 = _0x59aea7 + Number(_0x1919f2['width'] ?? 0x0),
-      _0x96c1c3 = _0x2772e8 + Number(_0x1919f2['height'] ?? 0x0) / 0x2,
-      _0x4997f1 = _0x220a8f,
-      _0x55dcb0 = _0x475537 + Number(_0x22a9dc['height'] ?? 0x0) / 0x2;
-    _0x142a44['push'](
+    const value42 = map3 && map3['has'](enabled7['sourceId']) ? count3 : 0x0,
+      value43 = map3 && map3['has'](enabled7['sourceId']) ? count4 : 0x0,
+      value44 = map3 && map3['has'](enabled7['targetId']) ? count3 : 0x0,
+      value45 = map3 && map3['has'](enabled7['targetId']) ? count4 : 0x0,
+      value46 = Number(box7['x'] || 0x0) + value42,
+      value47 = Number(box7['y'] || 0x0) + value43,
+      value48 = Number(box8['x'] || 0x0) + value44,
+      value49 = Number(box8['y'] || 0x0) + value45,
+      value50 = value46 + Number(box7['width'] ?? 0x0),
+      value51 = value47 + Number(box7['height'] ?? 0x0) / 0x2,
+      value52 = value48,
+      value53 = value49 + Number(box8['height'] ?? 0x0) / 0x2;
+    list7['push'](
       'e:' +
-        _0x398d08['id'] +
+        enabled7['id'] +
         ':' +
-        (_0x398d08['sourceId'] || '') +
+        (enabled7['sourceId'] || '') +
         ':' +
-        (_0x398d08['targetId'] || '') +
+        (enabled7['targetId'] || '') +
         ':' +
-        formatEdgeSignatureNumber(_0x5e92f3) +
+        formatEdgeSignatureNumber(value50) +
         ':' +
-        formatEdgeSignatureNumber(_0x96c1c3) +
+        formatEdgeSignatureNumber(value51) +
         ':' +
-        formatEdgeSignatureNumber(_0x4997f1) +
+        formatEdgeSignatureNumber(value52) +
         ':' +
-        formatEdgeSignatureNumber(_0x55dcb0),
+        formatEdgeSignatureNumber(value53),
     );
   }
-  return _0x142a44['join']('|');
+  return list7['join']('|');
 }

@@ -26,369 +26,368 @@ import {
   flowSpeechRecoveryPrompt,
 } from './story-generation/storyReplicationFlowPrompts.js';
 export async function runStoryReplicationFlow({
-  videoRef: _0xb9558c,
-  durationSec: _0x2d800e,
-  model: _0x49fdf4,
+  videoRef: videoRef,
+  durationSec: durationSec,
+  model: model,
   provider: provider = '',
   providerProfileId: providerProfileId = '',
-  maxClipSeconds: _0x20ddae,
-  promptMode: _0x10d4e2,
+  maxClipSeconds: maxClipSeconds,
+  promptMode: promptMode,
   cutHints: cutHints = [],
   request: request = generateText,
-  prepareEvidence: _0x549c99,
-  onInvocation: _0x25a9f2,
-  onCheckpoint: _0x25a27f,
-  onProgress: _0x583e7b,
-  signal: _0x2d62b2,
+  prepareEvidence: prepareEvidence,
+  onInvocation: onInvocation,
+  onCheckpoint: onCheckpoint,
+  onProgress: onProgress,
+  signal: signal,
   isActive: isActive = () => !![],
   totalMs: totalMs = 0x8 * 0xea60,
   stageMs: stageMs = 0x2bf20,
   reviewWindowSec: reviewWindowSec = 0x23,
 } = {}) {
   (requireFlow(
-    typeof _0xb9558c === 'string' && _0xb9558c['trim']() && Number['isFinite'](_0x2d800e) && _0x2d800e > 0x0,
+    typeof videoRef === 'string' &&
+      videoRef['trim']() &&
+      Number['isFinite'](durationSec) &&
+      durationSec > 0x0,
     '原视频或时长无效',
   ),
-    assertVideoAnalysisModel(_0x49fdf4));
-  const _0x20f84c = resolveReplicationFlowOptions({ promptMode: _0x10d4e2, maxSeconds: _0x20ddae }),
-    _0x39d415 = (_0x38e70b) => compileReplicationFlow(_0x38e70b, _0x20f84c['maxSeconds'], _0x20f84c),
-    _0x116262 = Date['now'](),
-    _0x4809e3 = [],
-    _0x577f49 = [];
-  let _0x58b2ac = null,
-    _0x213915 = 'observe',
-    _0x3e3b28,
-    _0x3f1f8f = 0x0,
-    _0x4e66cd = '';
-  const _0xe45b44 = () => {
-      requireFlow(!_0x2d62b2?.['aborted'] && isActive(), '流程已取消或项目已失效');
+    assertVideoAnalysisModel(model));
+  const args = resolveReplicationFlowOptions({ promptMode: promptMode, maxSeconds: maxClipSeconds }),
+    handler = (value) => compileReplicationFlow(value, args['maxSeconds'], args),
+    item = Date['now'](),
+    stages = [],
+    notes = [];
+  let source = null,
+    stage = 'observe',
+    key,
+    transportRetries = 0x0,
+    index = '';
+  const run = () => {
+      requireFlow(!signal?.['aborted'] && isActive(), '流程已取消或项目已失效');
     },
-    _0x20a932 = async (_0x3c572a, _0x22e442 = {}) => {
-      (_0xe45b44(),
-        await _0x25a27f?.({
-          stage: _0x3c572a,
-          source: _0x58b2ac,
-          stages: structuredClone(_0x4809e3),
-          notes: structuredClone(_0x577f49),
-          ..._0x22e442,
+    handler2 = async (stage2, args2 = {}) => {
+      (run(),
+        await onCheckpoint?.({
+          stage: stage2,
+          source: source,
+          stages: structuredClone(stages),
+          notes: structuredClone(notes),
+          ...args2,
         }));
     },
-    _0x6720c1 = async (_0x516a00) =>
-      _0x549c99
-        ? _0x549c99({ videoRef: _0xb9558c, durationSec: _0x2d800e, windows: _0x516a00, signal: _0x2d62b2 })
+    handler3 = async (windows) =>
+      prepareEvidence
+        ? prepareEvidence({ videoRef: videoRef, durationSec: durationSec, windows: windows, signal: signal })
         : {
-            videoRef: _0xb9558c,
+            videoRef: videoRef,
             windows: [
-              { sourceStartSec: 0x0, sourceEndSec: _0x2d800e, reelStartSec: 0x0, reelEndSec: _0x2d800e },
+              { sourceStartSec: 0x0, sourceEndSec: durationSec, reelStartSec: 0x0, reelEndSec: durationSec },
             ],
           };
-  async function _0x3f17da(_0x3be1e1, _0x29f3ec, _0x54f929, _0x21bfe2, _0x4f3bba = 0x1) {
-    (_0xe45b44(), (_0x213915 = _0x3be1e1));
-    const _0x5ac8c5 = totalMs - (Date['now']() - _0x116262);
-    requireFlow(_0x5ac8c5 > 0x3e8, '自动流程总时限已到');
-    const _0x16cb0f = new AbortController(),
-      _0x2871b5 = () => _0x16cb0f['abort'](_0x2d62b2['reason']);
-    _0x2d62b2?.['addEventListener']('abort', _0x2871b5, { once: !![] });
-    const _0x31d3a2 = Math['min'](stageMs, _0x5ac8c5),
-      _0x7ed401 = setTimeout(() => _0x16cb0f['abort'](new Error('自动流程请求达到时限')), _0x31d3a2),
-      _0x589bc3 = Date['now']();
-    let _0x32bbc3 = ![];
-    _0x583e7b?.({ stage: _0x3be1e1, status: 'running', elapsedMs: Date['now']() - _0x116262 });
+  async function run2(stage3, args3, result, maxOutputTokens, attempt = 0x1) {
+    (run(), (stage = stage3));
+    const count = totalMs - (Date['now']() - item);
+    requireFlow(count > 0x3e8, '自动流程总时限已到');
+    const signal2 = new AbortController(),
+      data = () => signal2['abort'](signal['reason']);
+    signal?.['addEventListener']('abort', data, { once: !![] });
+    const options = Math['min'](stageMs, count),
+      setTimeout2 = setTimeout(() => signal2['abort'](new Error('自动流程请求达到时限')), options),
+      target = Date['now']();
+    let enabled = ![];
+    onProgress?.({ stage: stage3, status: 'running', elapsedMs: Date['now']() - item });
     try {
-      const _0xab5551 = await invokeStoryGenerationRequest({
+      const response = await invokeStoryGenerationRequest({
         request: request,
-        stepId: 'replication-flow-' + _0x3be1e1,
-        attempt: _0x4f3bba,
-        onInvocation: _0x25a9f2,
+        stepId: 'replication-flow-' + stage3,
+        attempt: attempt,
+        onInvocation: onInvocation,
         requestPayload: {
-          model: _0x49fdf4,
+          model: model,
           provider: provider,
           ...(providerProfileId ? { providerProfileId: providerProfileId } : {}),
-          ..._0x29f3ec,
-          inputVideoUrls: [_0x54f929],
+          ...args3,
+          inputVideoUrls: [result],
           mediaPolicy: 'image-video',
           allowVideo: !![],
           thinking: { type: 'disabled' },
           temperature: 0.2,
-          maxOutputTokens: _0x21bfe2,
-          timeoutMs: Math['min'](0x15f90, _0x31d3a2),
-          signal: _0x16cb0f['signal'],
-          onText: (_0x31034f) => {
-            if (String(_0x31034f)['trim']()) _0x32bbc3 = !![];
+          maxOutputTokens: maxOutputTokens,
+          timeoutMs: Math['min'](0x15f90, options),
+          signal: signal2['signal'],
+          onText: (next) => {
+            if (String(next)['trim']()) enabled = !![];
           },
         },
       });
-      _0xe45b44();
-      const _0x180634 = typeof _0xab5551 === 'string' ? _0xab5551 : _0xab5551['text'];
-      _0x4e66cd = _0x180634;
-      let _0x46bce0;
+      run();
+      const rawResponse = typeof response === 'string' ? response : response['text'];
+      index = rawResponse;
+      let strictJson;
       try {
-        _0x46bce0 = parseStrictJson(_0x180634);
-      } catch (_0x3c6fff) {
-        throw Object['assign'](new Error('模型 JSON 格式无效：' + _0x3c6fff['message']), {
-          rawResponse: _0x180634,
+        strictJson = parseStrictJson(rawResponse);
+      } catch (error) {
+        throw Object['assign'](new Error('模型 JSON 格式无效：' + error['message']), {
+          rawResponse: rawResponse,
         });
       }
       return (
-        _0x4809e3['push']({
-          stage: _0x3be1e1,
-          attempt: _0x4f3bba,
+        stages['push']({
+          stage: stage3,
+          attempt: attempt,
           status: 'completed',
-          elapsedMs: Date['now']() - _0x589bc3,
-          responseBytes: new TextEncoder()['encode'](_0x180634)['length'],
+          elapsedMs: Date['now']() - target,
+          responseBytes: new TextEncoder()['encode'](rawResponse)['length'],
         }),
-        _0x46bce0
+        strictJson
       );
-    } catch (_0x3fc646) {
-      _0x4809e3['push']({
-        stage: _0x3be1e1,
-        attempt: _0x4f3bba,
+    } catch (error2) {
+      stages['push']({
+        stage: stage3,
+        attempt: attempt,
         status: 'failed',
-        elapsedMs: Date['now']() - _0x589bc3,
-        error: _0x3fc646['message'],
+        elapsedMs: Date['now']() - target,
+        error: error2['message'],
       });
       if (
-        !_0x32bbc3 &&
-        !_0x3fc646['partialText'] &&
-        _0x3fc646['retryable'] === !![] &&
-        _0x3f1f8f === 0x0 &&
-        !_0x16cb0f['signal']['aborted']
+        !enabled &&
+        !error2['partialText'] &&
+        error2['retryable'] === !![] &&
+        transportRetries === 0x0 &&
+        !signal2['signal']['aborted']
       )
         return (
-          _0x3f1f8f++,
-          clearTimeout(_0x7ed401),
-          _0x2d62b2?.['removeEventListener']('abort', _0x2871b5),
-          await _0x20a932(_0x3be1e1 + '-transport-retry', { error: _0x3fc646['message'] }),
-          _0x3f17da(_0x3be1e1, _0x29f3ec, _0x54f929, _0x21bfe2, _0x4f3bba + 0x1)
+          transportRetries++,
+          clearTimeout(setTimeout2),
+          signal?.['removeEventListener']('abort', data),
+          await handler2(stage3 + '-transport-retry', { error: error2['message'] }),
+          run2(stage3, args3, result, maxOutputTokens, attempt + 0x1)
         );
-      throw Object['assign'](_0x3fc646, { flowRequestFailed: !![] });
+      throw Object['assign'](error2, { flowRequestFailed: !![] });
     } finally {
-      (clearTimeout(_0x7ed401), _0x2d62b2?.['removeEventListener']('abort', _0x2871b5));
+      (clearTimeout(setTimeout2), signal?.['removeEventListener']('abort', data));
     }
   }
   try {
-    let _0x5a5094;
+    let observed;
     try {
-      ((_0x5a5094 = await _0x3f17da(
+      ((observed = await run2(
         'observe',
-        flowObservationPrompt({ durationSec: _0x2d800e, cutHints: cutHints }),
-        _0xb9558c,
+        flowObservationPrompt({ durationSec: durationSec, cutHints: cutHints }),
+        videoRef,
         0x4000,
       )),
-        (_0x58b2ac = validateFlowSource(_0x5a5094, _0x2d800e, _0x577f49)),
-        _0x39d415(_0x58b2ac));
-    } catch (_0x229940) {
-      if (!_0x5a5094 && !_0x229940['rawResponse']) throw _0x229940;
-      ((_0x5a5094 = _0x229940['rawResponse'] || _0x4e66cd || _0x5a5094),
-        await _0x20a932('observe-invalid', { observed: _0x5a5094, validationError: _0x229940['message'] }),
-        (_0x5a5094 = await _0x3f17da(
+        (source = validateFlowSource(observed, durationSec, notes)),
+        handler(source));
+    } catch (validationError) {
+      if (!observed && !validationError['rawResponse']) throw validationError;
+      ((observed = validationError['rawResponse'] || index || observed),
+        await handler2('observe-invalid', {
+          observed: observed,
+          validationError: validationError['message'],
+        }),
+        (observed = await run2(
           'structure-repair',
           flowObservationPrompt({
-            durationSec: _0x2d800e,
+            durationSec: durationSec,
             cutHints: cutHints,
-            invalid: _0x5a5094,
-            error: _0x229940['message'],
+            invalid: observed,
+            error: validationError['message'],
           }),
-          _0xb9558c,
+          videoRef,
           0x4000,
         )),
-        (_0x58b2ac = validateFlowSource(_0x5a5094, _0x2d800e, _0x577f49)),
-        _0x39d415(_0x58b2ac));
+        (source = validateFlowSource(observed, durationSec, notes)),
+        handler(source));
     }
-    const _0x5b208f = inspectFlowSpeech(_0x58b2ac);
-    if (_0x5b208f['length']) {
-      await _0x20a932('speech-incomplete', { missingSpeech: _0x5b208f });
+    const missingSpeech = inspectFlowSpeech(source);
+    if (missingSpeech['length']) {
+      await handler2('speech-incomplete', { missingSpeech: missingSpeech });
       try {
-        const _0x4c77a6 = await _0x3f17da(
+        const current = await run2(
             'speech-recovery',
-            flowSpeechRecoveryPrompt(_0x58b2ac, _0x2d800e),
-            _0xb9558c,
+            flowSpeechRecoveryPrompt(source, durationSec),
+            videoRef,
             0x2000,
           ),
-          _0x560dc6 = applyFlowSpeechRecovery(_0x58b2ac, _0x4c77a6, _0x2d800e);
-        (_0x39d415(_0x560dc6['source']),
-          (_0x58b2ac = _0x560dc6['source']),
-          _0x577f49['push'](..._0x560dc6['notes']),
-          await _0x20a932('speech-recovered', { removedCaptionDuplicates: _0x560dc6['removals'] }));
-      } catch (_0x4a4447) {
-        _0xe45b44();
-        if (_0x4a4447['flowRequestFailed'] && !_0x4a4447['rawResponse']) throw _0x4a4447;
-        (_0x577f49['push']({
+          removedCaptionDuplicates = applyFlowSpeechRecovery(source, current, durationSec);
+        (handler(removedCaptionDuplicates['source']),
+          (source = removedCaptionDuplicates['source']),
+          notes['push'](...removedCaptionDuplicates['notes']),
+          await handler2('speech-recovered', {
+            removedCaptionDuplicates: removedCaptionDuplicates['removals'],
+          }));
+      } catch (detail) {
+        run();
+        if (detail['flowRequestFailed'] && !detail['rawResponse']) throw detail;
+        (notes['push']({
           code: 'stage-failed',
           stage: 'speech-recovery',
           blocking: ![],
-          detail: _0x4a4447['message'],
+          detail: detail['message'],
         }),
-          await _0x20a932('speech-recovery-skipped'));
+          await handler2('speech-recovery-skipped'));
       }
     }
-    await _0x20a932('observe');
-    const _0x208cb2 = createFlowReviewWindows(_0x58b2ac, _0x2d800e, reviewWindowSec),
-      _0x4330ee = { actionable: [] };
-    let _0x38c4eb = ![];
-    for (const [_0x3105cd, _0x2e1299] of _0x208cb2['entries']()) {
-      const _0x9f662b = _0x208cb2['length'] === 0x1 ? 'review' : 'review-' + (_0x3105cd + 0x1);
-      let _0x4f3b2b;
+    await handler2('observe');
+    const id = createFlowReviewWindows(source, durationSec, reviewWindowSec),
+      actionable = { actionable: [] };
+    let enabled2 = ![];
+    for (const [entry, enabled3] of id['entries']()) {
+      const stage4 = id['length'] === 0x1 ? 'review' : 'review-' + (entry + 0x1);
+      let record;
       try {
-        (_0xe45b44(), (_0x213915 = _0x9f662b), (_0x4f3b2b = await _0x6720c1(_0x2e1299['windows'])));
-        const _0x44a212 = Object['fromEntries'](
-            ['shots', 'speech']['map']((_0x320663) => [
-              _0x320663,
-              _0x58b2ac[_0x320663]['filter'](
-                (_0x28a905) =>
-                  !_0x2e1299['scope'][_0x320663]['some'](
-                    (_0x3a0767) => _0x3a0767['id'] === _0x28a905['id'],
-                  ) &&
-                  _0x4f3b2b['windows']['some'](
-                    (_0x455607) =>
-                      _0x28a905['endSec'] > _0x455607['sourceStartSec'] &&
-                      _0x28a905['startSec'] < _0x455607['sourceEndSec'],
+        (run(), (stage = stage4), (record = await handler3(enabled3['windows'])));
+        const payload = Object['fromEntries'](
+            ['shots', 'speech']['map']((handle) => [
+              handle,
+              source[handle]['filter'](
+                (state) =>
+                  !enabled3['scope'][handle]['some']((config) => config['id'] === state['id']) &&
+                  record['windows']['some'](
+                    (scope) =>
+                      state['endSec'] > scope['sourceStartSec'] && state['startSec'] < scope['sourceEndSec'],
                   ),
               ),
             ]),
           ),
-          _0x54896d = mapFlowReviewTimes(
-            await _0x3f17da(
-              _0x9f662b,
-              flowReviewPrompt(_0x2e1299['scope'], _0x4f3b2b['windows'], _0x44a212),
-              _0x4f3b2b['videoRef'],
+          review = mapFlowReviewTimes(
+            await run2(
+              stage4,
+              flowReviewPrompt(enabled3['scope'], record['windows'], payload),
+              record['videoRef'],
               0x1000,
             ),
-            _0x4f3b2b['windows'],
-            _0x577f49,
+            record['windows'],
+            notes,
           ),
-          _0x447c03 = classifyFlowReview(_0x2e1299['scope'], _0x54896d, _0x2d800e);
-        (_0x4330ee['actionable']['push'](
-          ..._0x447c03['actionable']['map']((_0x2e994d) => ({
-            ..._0x2e994d,
-            id:
-              _0x208cb2['length'] === 0x1 ? _0x2e994d['id'] : 'w' + (_0x3105cd + 0x1) + '-' + _0x2e994d['id'],
+          args4 = classifyFlowReview(enabled3['scope'], review, durationSec);
+        (actionable['actionable']['push'](
+          ...args4['actionable']['map']((args5) => ({
+            ...args5,
+            id: id['length'] === 0x1 ? args5['id'] : 'w' + (entry + 0x1) + '-' + args5['id'],
           })),
         ),
-          _0x577f49['push'](..._0x447c03['notes']),
-          await _0x20a932(_0x9f662b, { review: _0x54896d, actionable: _0x4330ee['actionable'] }));
-      } catch (_0x160619) {
-        (_0xe45b44(),
-          _0x577f49['push']({
+          notes['push'](...args4['notes']),
+          await handler2(stage4, { review: review, actionable: actionable['actionable'] }));
+      } catch (detail2) {
+        (run(),
+          notes['push']({
             code: 'stage-failed',
-            stage: _0x9f662b,
+            stage: stage4,
             blocking: ![],
-            detail: _0x160619['message'],
+            detail: detail2['message'],
           }),
-          await _0x20a932(_0x9f662b + '-skipped'));
-        if (_0x160619['flowRequestFailed'] && !_0x160619['rawResponse']) {
-          _0x38c4eb = !![];
+          await handler2(stage4 + '-skipped'));
+        if (detail2['flowRequestFailed'] && !detail2['rawResponse']) {
+          enabled2 = !![];
           break;
         }
       } finally {
-        await _0x4f3b2b?.['dispose']?.();
+        await record?.['dispose']?.();
       }
     }
-    if (_0x4330ee['actionable']['length'] && !_0x38c4eb) {
-      const _0x7d4944 = flowEvidenceWindows(_0x58b2ac, _0x4330ee['actionable'], _0x2d800e),
-        _0x3c5f65 = await _0x6720c1(_0x7d4944);
-      ((_0x3e3b28 = _0x3c5f65['dispose']),
+    if (actionable['actionable']['length'] && !enabled2) {
+      const flowEvidenceWindows2 = flowEvidenceWindows(source, actionable['actionable'], durationSec),
+        input = await handler3(flowEvidenceWindows2);
+      ((key = input['dispose']),
         requireFlow(
-          _0x3c5f65['videoRef'] && Array['isArray'](_0x3c5f65['windows']) && _0x3c5f65['windows']['length'],
+          input['videoRef'] && Array['isArray'](input['windows']) && input['windows']['length'],
           '局部原片证据未就绪',
         ),
-        _0xe45b44());
-      const _0x324c39 = await _0x3f17da(
+        run());
+      const repair = await run2(
         'repair',
-        flowRepairPrompt(_0x58b2ac, _0x4330ee['actionable'], _0x3c5f65['windows']),
-        _0x3c5f65['videoRef'],
+        flowRepairPrompt(source, actionable['actionable'], input['windows']),
+        input['videoRef'],
         0x1800,
       );
-      let _0x185029;
+      let candidate;
       try {
-        const _0x52ae8b = applyFlowRepairIndividually(
-          _0x58b2ac,
-          _0x4330ee['actionable'],
-          _0x324c39,
-          _0x2d800e,
-        );
-        ((_0x185029 = _0x52ae8b['candidate']),
-          _0x577f49['push'](
-            ..._0x52ae8b['rejected']['map']((_0x1cf81a) => ({
-              ..._0x1cf81a,
+        const args6 = applyFlowRepairIndividually(source, actionable['actionable'], repair, durationSec);
+        ((candidate = args6['candidate']),
+          notes['push'](
+            ...args6['rejected']['map']((args7) => ({
+              ...args7,
               code: 'patch-rejected',
               blocking: ![],
             })),
           ),
-          _0x39d415(_0x185029));
-      } catch (_0x278df1) {
-        (_0x577f49['push']({ code: 'repair-contract', blocking: ![], detail: _0x278df1['message'] }),
-          await _0x20a932('repair-rejected', { repair: _0x324c39 }));
+          handler(candidate));
+      } catch (detail3) {
+        (notes['push']({ code: 'repair-contract', blocking: ![], detail: detail3['message'] }),
+          await handler2('repair-rejected', { repair: repair }));
       }
-      if (_0x185029 && !_0x577f49['some']((_0x45b062) => _0x45b062['code'] === 'repair-contract')) {
-        await _0x20a932('repair-candidate', { candidate: _0x185029, repair: _0x324c39 });
-        const _0x186f78 = await _0x3f17da(
+      if (candidate && !notes['some']((output) => output['code'] === 'repair-contract')) {
+        await handler2('repair-candidate', { candidate: candidate, repair: repair });
+        const verification = await run2(
           'verify',
-          flowVerifyPrompt(_0x185029, _0x4330ee['actionable'], _0x3c5f65['windows']),
-          _0x3c5f65['videoRef'],
+          flowVerifyPrompt(candidate, actionable['actionable'], input['windows']),
+          input['videoRef'],
           0x1000,
         );
         (requireFlow(
-          _0x186f78?.['videoObserved'] === !![] &&
-            Array['isArray'](_0x186f78['checks']) &&
-            Array['isArray'](_0x186f78['newMaterialIssues']),
+          verification?.['videoObserved'] === !![] &&
+            Array['isArray'](verification['checks']) &&
+            Array['isArray'](verification['newMaterialIssues']),
           '复验返回结构无效',
         ),
           requireFlow(
-            JSON['stringify'](_0x186f78['checks']['map']((_0x1cc83c) => _0x1cc83c['issueId'])['sort']()) ===
-              JSON['stringify'](_0x4330ee['actionable']['map']((_0x283d56) => _0x283d56['id'])['sort']()),
+            JSON['stringify'](verification['checks']['map']((value2) => value2['issueId'])['sort']()) ===
+              JSON['stringify'](actionable['actionable']['map']((value3) => value3['id'])['sort']()),
             '复验没有回应全部问题',
           ));
-        for (const _0x295334 of _0x186f78['checks']) {
+        for (const response2 of verification['checks']) {
           requireFlow(
-            ['resolved', 'unresolved', 'uncertain']['includes'](_0x295334['status']) &&
-              typeof _0x295334['evidence'] === 'string' &&
-              _0x295334['evidence']['trim'](),
+            ['resolved', 'unresolved', 'uncertain']['includes'](response2['status']) &&
+              typeof response2['evidence'] === 'string' &&
+              response2['evidence']['trim'](),
             '复验结论缺少有效状态或证据',
           );
-          if (_0x295334['status'] !== 'resolved')
-            _0x577f49['push']({ ..._0x295334, code: 'verification', blocking: ![] });
+          if (response2['status'] !== 'resolved')
+            notes['push']({ ...response2, code: 'verification', blocking: ![] });
         }
-        (_0x577f49['push'](
-          ..._0x186f78['newMaterialIssues']['map']((_0x4f6ac1) => ({
-            ..._0x4f6ac1,
+        (notes['push'](
+          ...verification['newMaterialIssues']['map']((args8) => ({
+            ...args8,
             code: 'new-material-issue',
             blocking: ![],
           })),
         ),
-          (_0x58b2ac = _0x185029),
-          await _0x20a932('verify', { verification: _0x186f78 }));
+          (source = candidate),
+          await handler2('verify', { verification: verification }));
       }
     }
-  } catch (_0x4dbf81) {
-    if (_0x2d62b2?.['aborted'] || !isActive()) throw _0x4dbf81;
-    _0x577f49['push']({
+  } catch (detail4) {
+    if (signal?.['aborted'] || !isActive()) throw detail4;
+    notes['push']({
       code: 'stage-failed',
-      stage: _0x213915,
+      stage: stage,
       blocking: ![],
-      detail: _0x4dbf81['message'],
+      detail: detail4['message'],
     });
   } finally {
-    await _0x3e3b28?.();
+    await key?.();
   }
-  const _0x2ee257 = finalizeReplicationFlow(_0x58b2ac, {
-      durationSec: _0x2d800e,
-      ..._0x20f84c,
-      notes: _0x577f49,
+  const promptBytes = finalizeReplicationFlow(source, {
+      durationSec: durationSec,
+      ...args,
+      notes: notes,
     }),
-    _0x2c3d88 = {
-      ..._0x2ee257,
-      startedAt: new Date(_0x116262)['toISOString'](),
-      elapsedMs: Date['now']() - _0x116262,
-      stages: _0x4809e3,
-      promptBytes: _0x2ee257['clips']['reduce'](
-        (_0x42978d, _0x2a8105) => _0x42978d + new TextEncoder()['encode'](_0x2a8105['prompt'])['length'],
+    result2 = {
+      ...promptBytes,
+      startedAt: new Date(item)['toISOString'](),
+      elapsedMs: Date['now']() - item,
+      stages: stages,
+      promptBytes: promptBytes['clips']['reduce'](
+        (value4, value5) => value4 + new TextEncoder()['encode'](value5['prompt'])['length'],
         0x0,
       ),
       initialObservationRerun: !![],
       importedFindings: ![],
       productionProjectWritten: ![],
-      transportRetries: _0x3f1f8f,
+      transportRetries: transportRetries,
     };
-  return (await _0x20a932('finished', { result: _0x2c3d88 }), _0x2c3d88);
+  return (await handler2('finished', { result: result2 }), result2);
 }

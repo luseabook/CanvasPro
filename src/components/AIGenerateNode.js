@@ -36,10 +36,7 @@ import {
   resumeDreaminaImageTask,
   resumeRunningHubImageTask,
 } from '../../api/aiImageApi.js';
-import {
-  fetchDreaminaCliStatusFromServer,
-  getCachedDreaminaCliStatus,
-} from '../../api/dreaminaCliApi.js';
+import { fetchDreaminaCliStatusFromServer, getCachedDreaminaCliStatus } from '../../api/dreaminaCliApi.js';
 import { generateId } from '../core/math.js';
 import { checkSlashTrigger, handleSlashKeyboardNavigation, closeSlashMenu } from '../modules/slashMenu.js';
 import { activateMenuKeyboard } from '../modules/floatingMenuKeyboard.js';
@@ -101,9 +98,9 @@ const api = {
     ImageFreeAngleController: ImageFreeAngleController,
   };
 export class AIGenerateNode {
-  constructor(_0x3f5454) {
-    ((this._data = _0x3f5454),
-      (this.nodeId = _0x3f5454.id),
+  constructor(value) {
+    ((this._data = value),
+      (this.nodeId = value.id),
       (this.previewEl = null),
       (this.imgEl = null),
       (this.refBarEl = null),
@@ -137,7 +134,7 @@ export class AIGenerateNode {
       (this._renderRefBarLock = null),
       (this._ratioAnimTimer = null),
       (this._ratioFlipAnim = null),
-      (this._rendererMediaDeferred = shouldDeferRendererMediaOnMount(_0x3f5454)),
+      (this._rendererMediaDeferred = shouldDeferRendererMediaOnMount(value)),
       (this._rhAbortController = null),
       (this._rhTaskId = null),
       (this._rhApiKey = null),
@@ -166,134 +163,119 @@ export class AIGenerateNode {
       (this._maskOverlay.style.display = 'none'),
       (this._currentMaskPreview = null));
   }
-  ['_applyMaskPreview'](_0x4174b1) {
+  ['_applyMaskPreview'](item) {
     if (!this._maskOverlay) return;
-    const _0x316898 = String(_0x4174b1 || '').trim();
-    if (!_0x316898) {
+    const enabled = String(item || '').trim();
+    if (!enabled) {
       ((this._suppressedEmptyMaskPreview = null), this._hideMaskPreview());
       return;
     }
     if (!hasAIGenMaskPreviewBaseImage(this._data)) {
-      ((this._suppressedEmptyMaskPreview = _0x316898), this._hideMaskPreview());
+      ((this._suppressedEmptyMaskPreview = enabled), this._hideMaskPreview());
       return;
     }
-    if (this._suppressedEmptyMaskPreview === _0x316898) {
+    if (this._suppressedEmptyMaskPreview === enabled) {
       this._hideMaskPreview();
       return;
     }
     this._suppressedEmptyMaskPreview = null;
-    if (this._currentMaskPreview === _0x316898) return;
-    const _0x230e33 =
-      _0x316898.startsWith('blob:') || _0x316898.startsWith('data:') || _0x316898.startsWith('/')
-        ? _0x316898
-        : '/' + _0x316898.replace(/^\//, '');
-    ((this._maskOverlay.src = encodeURI(_0x230e33)),
+    if (this._currentMaskPreview === enabled) return;
+    const key =
+      enabled.startsWith('blob:') || enabled.startsWith('data:') || enabled.startsWith('/')
+        ? enabled
+        : '/' + enabled.replace(/^\//, '');
+    ((this._maskOverlay.src = encodeURI(key)),
       (this._maskOverlay.style.display = 'block'),
-      (this._currentMaskPreview = _0x316898));
+      (this._currentMaskPreview = enabled));
   }
-  ['_checkAtTrigger'](_0x48aac5) {
-    return _checkAtTrigger(this, _0x48aac5);
+  ['_checkAtTrigger'](index) {
+    return _checkAtTrigger(this, index);
   }
-  ['_populateMentionMenu'](
-    _0x4d1353,
-    _0x4a6287,
-    _0x4fea23,
-    _0x4bee7e = null,
-    _0x4792e7 = '',
-    _0x277988 = -1,
-  ) {
+  ['_populateMentionMenu'](x, y, triggerRange, pillToEdit = null, query = '', atIndex = -1) {
     return _populateMentionMenu(this, {
-      x: _0x4d1353,
-      y: _0x4a6287,
-      triggerRange: _0x4fea23,
-      pillToEdit: _0x4bee7e,
-      query: _0x4792e7,
-      atIndex: _0x277988,
+      x: x,
+      y: y,
+      triggerRange: triggerRange,
+      pillToEdit: pillToEdit,
+      query: query,
+      atIndex: atIndex,
     });
   }
-  ['_insertMentionPill'](_0x15dbd7, _0xd14801, _0x140420, _0x7c0722 = -1) {
+  ['_insertMentionPill'](label, nodeId, triggerRange2, atIndex2 = -1) {
     return _insertMentionPill(this, {
-      label: _0x15dbd7,
-      nodeId: _0xd14801,
-      triggerRange: _0x140420,
-      atIndex: _0x7c0722,
+      label: label,
+      nodeId: nodeId,
+      triggerRange: triggerRange2,
+      atIndex: atIndex2,
     });
   }
-  ['_handlePillKeyboard'](_0x31b86b) {
-    return _handlePillKeyboard(this, _0x31b86b);
+  ['_handlePillKeyboard'](result) {
+    return _handlePillKeyboard(this, result);
   }
-  ['_buildFloatingMenu'](_0xe738e5, _0x3e402a, _0x436bda, _0x10ba0c, _0x5a7b07) {
-    const _0x10b1ff = document.createElement('div');
-    _0x10b1ff.style.position = 'relative';
-    const _0x330231 = document.createElement('button');
-    ((_0x330231.type = 'button'), (_0x330231.className = 'img-pill-btn'), (_0x330231.id = _0xe738e5));
-    const _0x5f27af = document.createElement('span');
-    ((_0x5f27af.className = _0x3e402a),
-      (_0x5f27af.textContent = _0x436bda),
-      _0x330231.appendChild(_0x5f27af));
-    const _0x1714ab = document.createElement('svg');
-    (_0x1714ab.setAttribute('width', '10'),
-      _0x1714ab.setAttribute('height', '10'),
-      _0x1714ab.setAttribute('viewBox', '0 0 24 24'),
-      _0x1714ab.setAttribute('fill', 'none'),
-      _0x1714ab.setAttribute('stroke', 'currentColor'),
-      _0x1714ab.setAttribute('stroke-width', '2'),
-      (_0x1714ab.style.opacity = '0.5'),
-      (_0x1714ab.innerHTML = '<polyline points="6 9 12 15 18 9"/>'),
-      _0x330231.appendChild(_0x1714ab));
-    const _0x942415 = document.createElement('div');
+  ['_buildFloatingMenu'](data, options, target, list, handler) {
+    const modelWrap = document.createElement('div');
+    modelWrap.style.position = 'relative';
+    const trig = document.createElement('button');
+    ((trig.type = 'button'), (trig.className = 'img-pill-btn'), (trig.id = data));
+    const el = document.createElement('span');
+    ((el.className = options), (el.textContent = target), trig.appendChild(el));
+    const el2 = document.createElement('svg');
+    (el2.setAttribute('width', '10'),
+      el2.setAttribute('height', '10'),
+      el2.setAttribute('viewBox', '0 0 24 24'),
+      el2.setAttribute('fill', 'none'),
+      el2.setAttribute('stroke', 'currentColor'),
+      el2.setAttribute('stroke-width', '2'),
+      (el2.style.opacity = '0.5'),
+      (el2.innerHTML = '<polyline points="6 9 12 15 18 9"/>'),
+      trig.appendChild(el2));
+    const menu = document.createElement('div');
     return (
-      (_0x942415.className = 'floating-menu'),
-      _0x10ba0c.forEach((_0x4e6eb0) => {
-        const _0x7325a9 = document.createElement('div');
-        ((_0x7325a9.className =
-          'floating-menu-item' + (_0x4e6eb0.v === _0x436bda || _0x4e6eb0.l === _0x436bda ? ' active' : '')),
-          (_0x7325a9.dataset.value = _0x4e6eb0.v),
-          (_0x7325a9.textContent = _0x4e6eb0.l),
-          _0x7325a9.addEventListener('mousedown', (_0x83aae5) => {
-            (_0x83aae5.preventDefault(),
-              (_0x5f27af.textContent = _0x4e6eb0.l),
-              _0x942415
-                .querySelectorAll('.floating-menu-item')
-                .forEach((_0x277b6f) => _0x277b6f.classList.remove('active')),
-              _0x7325a9.classList.add('active'),
-              _0x942415.classList.remove('open'),
-              _0x5a7b07(_0x4e6eb0.v));
+      (menu.className = 'floating-menu'),
+      list.forEach((item2) => {
+        const el3 = document.createElement('div');
+        ((el3.className = 'floating-menu-item' + (item2.v === target || item2.l === target ? ' active' : '')),
+          (el3.dataset.value = item2.v),
+          (el3.textContent = item2.l),
+          el3.addEventListener('mousedown', (event) => {
+            (event.preventDefault(),
+              (el.textContent = item2.l),
+              menu.querySelectorAll('.floating-menu-item').forEach((el4) => el4.classList.remove('active')),
+              el3.classList.add('active'),
+              menu.classList.remove('open'),
+              handler(item2.v));
           }),
-          _0x942415.appendChild(_0x7325a9));
+          menu.appendChild(el3));
       }),
-      _0x330231.addEventListener('mousedown', (_0x5504c0) => {
-        (_0x5504c0.preventDefault(), _0x5504c0.stopPropagation());
-        const _0x2917f7 = _0x942415.classList.contains('open');
-        document
-          .querySelectorAll('.floating-menu.open')
-          .forEach((_0x67045b) => _0x67045b.classList.remove('open'));
-        if (!_0x2917f7) _0x942415.classList.add('open');
+      trig.addEventListener('mousedown', (event2) => {
+        (event2.preventDefault(), event2.stopPropagation());
+        const enabled2 = menu.classList.contains('open');
+        document.querySelectorAll('.floating-menu.open').forEach((el5) => el5.classList.remove('open'));
+        if (!enabled2) menu.classList.add('open');
       }),
       document.addEventListener(
         'mousedown',
-        (_0xdf191a) => {
-          if (!_0x10b1ff.contains(_0xdf191a.target)) _0x942415.classList.remove('open');
+        (event3) => {
+          if (!modelWrap.contains(event3.target)) menu.classList.remove('open');
         },
         true,
       ),
-      _0x10b1ff.appendChild(_0x330231),
-      _0x10b1ff.appendChild(_0x942415),
-      { modelWrap: _0x10b1ff, trig: _0x330231, menu: _0x942415 }
+      modelWrap.appendChild(trig),
+      modelWrap.appendChild(menu),
+      { modelWrap: modelWrap, trig: trig, menu: menu }
     );
   }
 }
 const aiGenerateNodeUiModule = createAIGenerateNodeUiModule(AI_GENERATE_NODE_MODULE_DEPS),
   aiGenerateNodeStateSyncModule = createAIGenerateNodeStateSyncModule(AI_GENERATE_NODE_MODULE_DEPS),
-  aiGenerateNodeSelectionStateModule =
-    createAIGenerateNodeSelectionStateModule(AI_GENERATE_NODE_MODULE_DEPS),
+  aiGenerateNodeSelectionStateModule = createAIGenerateNodeSelectionStateModule(AI_GENERATE_NODE_MODULE_DEPS),
   aiGenerateNodeTaskOrchestrationModule = createAIGenerateNodeTaskOrchestrationModule(
     AI_GENERATE_NODE_MODULE_DEPS,
   );
-function applyClassPrototypeMethods(_0x562abf, _0x5c26fd) {
-  if (!_0x5c26fd) return;
-  const _0x44329a = Object.getOwnPropertyDescriptors(_0x5c26fd);
-  (delete _0x44329a.constructor, Object.defineProperties(_0x562abf, _0x44329a));
+function applyClassPrototypeMethods(source, enabled3) {
+  if (!enabled3) return;
+  const next = Object.getOwnPropertyDescriptors(enabled3);
+  (delete next.constructor, Object.defineProperties(source, next));
 }
 (applyClassPrototypeMethods(AIGenerateNode.prototype, aiGenerateNodeUiModule),
   applyClassPrototypeMethods(AIGenerateNode.prototype, aiGenerateNodeStateSyncModule),

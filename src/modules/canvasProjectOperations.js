@@ -4,208 +4,209 @@ import { buildUniqueCanvasName, stripCanvasProjectFileExtension } from '../utils
 import { sanitizeMultiCanvasDataForPersistence } from '../utils/thumbnailPersistence.js';
 import { commit as commit_2 } from './history.js';
 import { t } from '../i18n/index.js';
-const text = (_0x101229) => t('projectDropdown.' + _0x101229),
-  normalizeName = (_0x2b67ef) =>
-    String(_0x2b67ef || '')
+const text = (value) => t('projectDropdown.' + value),
+  normalizeName = (item) =>
+    String(item || '')
       ['replace'](/\s+/g, '\x20')
       ['trim'](),
-  lookupName = (_0x2c56b4) => normalizeName(stripCanvasProjectFileExtension(_0x2c56b4))['toLowerCase']();
-export function buildCanvasProjectContext(_0x12f1f7 = {}, _0x329611 = {}) {
-  const _0x2fa419 = String(_0x12f1f7['filename'] || _0x329611['filename'] || '')['trim']();
+  lookupName = (key) => normalizeName(stripCanvasProjectFileExtension(key))['toLowerCase']();
+export function buildCanvasProjectContext(isTemporary = {}, index = {}) {
+  const filename = String(isTemporary['filename'] || index['filename'] || '')['trim']();
   return {
     projectId: String(
-      _0x12f1f7['projectId'] || _0x329611['projectId'] || stripCanvasProjectFileExtension(_0x2fa419),
+      isTemporary['projectId'] || index['projectId'] || stripCanvasProjectFileExtension(filename),
     )['trim'](),
-    filename: _0x2fa419,
+    filename: filename,
     projectName: String(
-      _0x12f1f7['projectName'] || _0x329611['projectName'] || stripCanvasProjectFileExtension(_0x2fa419),
+      isTemporary['projectName'] || index['projectName'] || stripCanvasProjectFileExtension(filename),
     )['trim'](),
-    recentId: String(_0x12f1f7['recentId'] || _0x329611['recentId'] || '')['trim'](),
-    displayPath: String(_0x12f1f7['displayPath'] || _0x329611['displayPath'] || '')['trim'](),
-    lastModified: Number(_0x12f1f7['lastModified'] || _0x329611['lastModified'] || 0x0) || 0x0,
-    isTemporary: _0x12f1f7['isTemporary'] === !![],
+    recentId: String(isTemporary['recentId'] || index['recentId'] || '')['trim'](),
+    displayPath: String(isTemporary['displayPath'] || index['displayPath'] || '')['trim'](),
+    lastModified: Number(isTemporary['lastModified'] || index['lastModified'] || 0x0) || 0x0,
+    isTemporary: isTemporary['isTemporary'] === !![],
     workspaceProjectScoped: !![],
   };
 }
 export function createCanvasProjectOperations({
-  getCanvasManager: _0x55242f,
+  getCanvasManager: getCanvasManager,
   getActiveProjectContext: getActiveProjectContext = () =>
-    _0x55242f?.()?.['getCanvasProjectContext']?.() || {},
+    getCanvasManager?.()?.['getCanvasProjectContext']?.() || {},
   loadProject: loadProject = loadProjectStrict,
   listProjects: listProjects = fetchV2ProjectsFromServer,
   renameProject: renameProject = renameV2ProjectOnServer,
-  projectWorkspaceSessions: _0xa80f30,
+  projectWorkspaceSessions: projectWorkspaceSessions,
   renameTemporaryProject: renameTemporaryProject = () => ![],
-  applySourceNames: _0x9bb039,
+  applySourceNames: applySourceNames,
   commit: commit = commit_2,
-  onProjectHydrated: _0x32c183,
-  requestCacheSave: _0x39380c,
+  onProjectHydrated: onProjectHydrated,
+  requestCacheSave: requestCacheSave,
 } = {}) {
-  let _0x59c7a8 = Promise['resolve']();
-  const _0x4be844 = new Map();
-  function _0x39eae9(_0x5cb62a) {
-    const _0x4584d8 = _0x59c7a8['then'](_0x5cb62a);
-    return ((_0x59c7a8 = _0x4584d8['catch'](() => {})), _0x4584d8);
+  let promise = Promise['resolve']();
+  const map = new Map();
+  function run(result) {
+    const promise2 = promise['then'](result);
+    return ((promise = promise2['catch'](() => {})), promise2);
   }
-  function _0x307e51() {
-    const _0x39083d = _0x55242f?.();
-    if (!_0x39083d?.['addCanvas'] || !_0x39083d?.['hydrateActiveCanvasSnapshot'])
+  function run2() {
+    const enabled = getCanvasManager?.();
+    if (!enabled?.['addCanvas'] || !enabled?.['hydrateActiveCanvasSnapshot'])
       throw new Error('CanvasTabManager is unavailable');
-    return _0x39083d;
+    return enabled;
   }
-  async function _0x1a2a26(_0x46eba2, _0x366bd, _0x16c7d2) {
-    const _0x58c8e6 = _0x46eba2['getActiveCanvasId']?.() || _0x46eba2['_activeId'];
-    if (_0x366bd !== _0x58c8e6 && (await _0x46eba2['switchTo']?.(_0x366bd)) === ![]) return ![];
+  async function run3(canvasName, activeCanvasId, args) {
+    const data = canvasName['getActiveCanvasId']?.() || canvasName['_activeId'];
+    if (activeCanvasId !== data && (await canvasName['switchTo']?.(activeCanvasId)) === ![]) return ![];
     return (
-      _0x46eba2['setCanvasProjectContext']?.(_0x366bd, {
-        ...(_0x46eba2['getCanvasProjectContext']?.(_0x366bd) || {}),
-        ..._0x16c7d2,
+      canvasName['setCanvasProjectContext']?.(activeCanvasId, {
+        ...(canvasName['getCanvasProjectContext']?.(activeCanvasId) || {}),
+        ...args,
       }),
       {
-        activeCanvasId: _0x366bd,
+        activeCanvasId: activeCanvasId,
         canvasName:
-          _0x46eba2['_canvases']?.['find']((_0x53cece) => _0x53cece['id'] === _0x366bd)?.['name'] ||
-          _0x16c7d2['projectName'] ||
+          canvasName['_canvases']?.['find']((options) => options['id'] === activeCanvasId)?.['name'] ||
+          args['projectName'] ||
           text('loadedPackageBase'),
         hydratedData: null,
         alreadyOpen: !![],
       }
     );
   }
-  async function _0x4cd379(_0xddfdc2, { applySourceNames: _0x197c26 = ![] } = {}) {
-    if (!_0xddfdc2 || _0xddfdc2['canceled']) return ![];
-    const _0x498279 = _0x307e51(),
-      _0x22016c = buildCanvasProjectContext(_0xddfdc2),
-      _0x5d6282 = _0x498279['findCanvasIdByProjectIdentity']?.(_0x22016c);
-    if (_0x5d6282) return _0x1a2a26(_0x498279, _0x5d6282, _0x22016c);
-    const _0x108956 = sanitizeMultiCanvasDataForPersistence(
-        _0xddfdc2['multiData'] || resolveCanvasData(_0xddfdc2['data'] || {}),
+  async function run4(enabled2, { applySourceNames: applySourceNames2 = ![] } = {}) {
+    if (!enabled2 || enabled2['canceled']) return ![];
+    const target = run2(),
+      projectName = buildCanvasProjectContext(enabled2),
+      source = target['findCanvasIdByProjectIdentity']?.(projectName);
+    if (source) return run3(target, source, projectName);
+    const hydratedData = sanitizeMultiCanvasDataForPersistence(
+        enabled2['multiData'] || resolveCanvasData(enabled2['data'] || {}),
       ),
-      _0x5812ff =
-        _0x108956?.['canvases']?.['find']((_0x347457) => _0x347457?.['id'] === _0x108956['activeCanvasId']) ||
-        _0x108956?.['canvases']?.[0x0];
-    if (!_0x5812ff) throw new Error(text('loadFailed'));
-    const _0xc99765 = buildUniqueCanvasName(
-        _0xddfdc2['projectName'] ||
-          stripCanvasProjectFileExtension(_0xddfdc2['filename']) ||
-          _0x5812ff['name'],
-        _0x498279['_canvases'] || [],
+      error =
+        hydratedData?.['canvases']?.['find']((next) => next?.['id'] === hydratedData['activeCanvasId']) ||
+        hydratedData?.['canvases']?.[0x0];
+    if (!error) throw new Error(text('loadFailed'));
+    const name = buildUniqueCanvasName(
+        enabled2['projectName'] || stripCanvasProjectFileExtension(enabled2['filename']) || error['name'],
+        target['_canvases'] || [],
         { fallbackName: text('loadedPackageBase') },
       ),
-      _0x2d53ef = { ..._0x5812ff, name: _0xc99765 };
-    if (_0x197c26) _0x9bb039?.(_0x2d53ef);
-    if ((await _0x498279['addCanvas']()) === ![]) return ![];
-    const _0x5c092a = _0x498279['getActiveCanvasId']?.() || _0x498279['_activeId'];
-    if (!_0x5c092a) return ![];
+      current = { ...error, name: name };
+    if (applySourceNames2) applySourceNames?.(current);
+    if ((await target['addCanvas']()) === ![]) return ![];
+    const activeCanvasId2 = target['getActiveCanvasId']?.() || target['_activeId'];
+    if (!activeCanvasId2) return ![];
     return (
-      _0x498279['renameCanvas']?.(_0x5c092a, _0xc99765),
-      _0x498279['hydrateActiveCanvasSnapshot'](_0x2d53ef),
-      _0x498279['setCanvasProjectContext']?.(_0x5c092a, {
-        ..._0x22016c,
-        projectName: _0x22016c['projectName'] || _0xc99765,
+      target['renameCanvas']?.(activeCanvasId2, name),
+      target['hydrateActiveCanvasSnapshot'](current),
+      target['setCanvasProjectContext']?.(activeCanvasId2, {
+        ...projectName,
+        projectName: projectName['projectName'] || name,
       }),
-      _0x498279['markCanvasClean']?.(_0x5c092a),
-      _0x498279['renderTabs']?.(),
+      target['markCanvasClean']?.(activeCanvasId2),
+      target['renderTabs']?.(),
       commit(),
-      _0x32c183?.({ activeCanvasId: _0x5c092a, projectContext: _0x22016c }),
-      _0x39380c?.(),
-      { activeCanvasId: _0x5c092a, canvasName: _0xc99765, hydratedData: _0x108956 }
+      onProjectHydrated?.({ activeCanvasId: activeCanvasId2, projectContext: projectName }),
+      requestCacheSave?.(),
+      { activeCanvasId: activeCanvasId2, canvasName: name, hydratedData: hydratedData }
     );
   }
-  function _0x14699d(_0x24accb, _0x6e2ebf, { onProgress: _0x590467 } = {}) {
-    const _0x3a626b = String(_0x24accb || '')['trim'](),
-      _0x32af91 = stripCanvasProjectFileExtension(_0x3a626b),
-      _0x3712f1 = JSON['stringify']([_0x3a626b, String(_0x6e2ebf || _0x32af91)]);
-    if (_0x4be844['has'](_0x3712f1)) return _0x4be844['get'](_0x3712f1);
-    const _0x414c59 = _0x39eae9(async () => {
-      if (!_0x3a626b) throw new Error(text('loadFailed'));
-      await _0x590467?.('reading');
-      const _0x5b73a9 = _0x307e51(),
-        _0x490851 = {
-          projectId: _0x32af91,
-          filename: _0x3a626b,
-          projectName: _0x6e2ebf || _0x32af91,
+  function openProject(entry, projectName2, { onProgress: onProgress } = {}) {
+    const filename2 = String(entry || '')['trim'](),
+      projectId = stripCanvasProjectFileExtension(filename2),
+      record = JSON['stringify']([filename2, String(projectName2 || projectId)]);
+    if (map['has'](record)) return map['get'](record);
+    const payload = run(async () => {
+      if (!filename2) throw new Error(text('loadFailed'));
+      await onProgress?.('reading');
+      const handle = run2(),
+        args2 = {
+          projectId: projectId,
+          filename: filename2,
+          projectName: projectName2 || projectId,
           isTemporary: ![],
           workspaceProjectScoped: !![],
         },
-        _0x5e916b = _0x5b73a9['findCanvasIdByProjectIdentity']?.(_0x490851);
-      if (_0x5e916b) return _0x1a2a26(_0x5b73a9, _0x5e916b, _0x490851);
-      let _0x193122;
+        state = handle['findCanvasIdByProjectIdentity']?.(args2);
+      if (state) return run3(handle, state, args2);
+      let multiData;
       try {
-        _0x193122 = sanitizeMultiCanvasDataForPersistence(await loadProject(_0x3a626b));
-      } catch (_0x43dca3) {
-        throw new Error(text('loadFailed'), { cause: _0x43dca3 });
+        multiData = sanitizeMultiCanvasDataForPersistence(await loadProject(filename2));
+      } catch (cause) {
+        throw new Error(text('loadFailed'), { cause: cause });
       }
-      if (!_0x193122?.['canvases']?.['length']) throw new Error(text('loadFailed'));
+      if (!multiData?.['canvases']?.['length']) throw new Error(text('loadFailed'));
       return (
-        await _0x590467?.('hydrating'),
-        _0x4cd379({ ..._0x490851, multiData: _0x193122 }, { applySourceNames: !![] })
+        await onProgress?.('hydrating'),
+        run4({ ...args2, multiData: multiData }, { applySourceNames: !![] })
       );
-    })['finally'](() => _0x4be844['delete'](_0x3712f1));
-    return (_0x4be844['set'](_0x3712f1, _0x414c59), _0x414c59);
+    })['finally'](() => map['delete'](record));
+    return (map['set'](record, payload), payload);
   }
-  function _0x5341c8(_0x3304b5, _0x505389) {
-    const _0x5de330 = { ..._0x3304b5 },
-      _0x1bd8d6 = normalizeName(_0x505389);
-    return _0x39eae9(async () => {
-      if (!_0x1bd8d6) throw new Error(text('renameFailed'));
-      const _0x219304 = await listProjects(),
-        _0x9d2f1 = _0x219304['some'](
-          (_0x626148) =>
-            String(_0x626148?.['filename'] || '')['trim']() !==
-              String(_0x5de330['filename'] || '')['trim']() &&
-            [_0x626148?.['name'], _0x626148?.['filename']]['some'](
-              (_0x53c625) => lookupName(_0x53c625) === lookupName(_0x1bd8d6),
+  function renameProject2(args3, config) {
+    const filename3 = { ...args3 },
+      projectName3 = normalizeName(config);
+    return run(async () => {
+      if (!projectName3) throw new Error(text('renameFailed'));
+      const list = await listProjects(),
+        scope = list['some'](
+          (error2) =>
+            String(error2?.['filename'] || '')['trim']() !== String(filename3['filename'] || '')['trim']() &&
+            [error2?.['name'], error2?.['filename']]['some'](
+              (input) => lookupName(input) === lookupName(projectName3),
             ),
         );
-      if (_0x9d2f1) throw new Error(text('nameExists'));
-      const _0x1b6482 = await renameProject(_0x5de330['filename'], _0x1bd8d6);
-      if (!_0x1b6482?.['success']) throw new Error(text('renameFailed'));
-      const _0x3b05c2 = _0x55242f?.(),
-        _0x523165 = {
-          projectId: stripCanvasProjectFileExtension(_0x5de330['filename']),
-          filename: _0x5de330['filename'],
-          projectName: _0x5de330['name'] || stripCanvasProjectFileExtension(_0x5de330['filename']),
+      if (scope) throw new Error(text('nameExists'));
+      const response = await renameProject(filename3['filename'], projectName3);
+      if (!response?.['success']) throw new Error(text('renameFailed'));
+      const output = getCanvasManager?.(),
+        value2 = {
+          projectId: stripCanvasProjectFileExtension(filename3['filename']),
+          filename: filename3['filename'],
+          projectName: filename3['name'] || stripCanvasProjectFileExtension(filename3['filename']),
         },
-        _0x51980d = _0x3b05c2?.['findCanvasIdByProjectIdentity']?.(_0x523165),
-        _0x322b5a = String(_0x1b6482['filename'] || _0x5de330['filename'] || '')['trim']();
+        value3 = output?.['findCanvasIdByProjectIdentity']?.(value2),
+        projectId2 = String(response['filename'] || filename3['filename'] || '')['trim']();
       return (
-        _0x51980d &&
-          (_0x3b05c2['setCanvasProjectContext']?.(_0x51980d, {
-            ...(_0x3b05c2['getCanvasProjectContext']?.(_0x51980d) || {}),
-            projectId: _0x322b5a ? stripCanvasProjectFileExtension(_0x322b5a) : _0x1bd8d6,
-            filename: _0x322b5a,
-            projectName: _0x1bd8d6,
+        value3 &&
+          (output['setCanvasProjectContext']?.(value3, {
+            ...(output['getCanvasProjectContext']?.(value3) || {}),
+            projectId: projectId2 ? stripCanvasProjectFileExtension(projectId2) : projectName3,
+            filename: projectId2,
+            projectName: projectName3,
             recentId: '',
             displayPath: '',
             lastModified: 0x0,
             isTemporary: ![],
           }),
-          _0x3b05c2['renameCanvas']?.(_0x51980d, _0x1bd8d6),
-          _0x3b05c2['renderTabs']?.()),
-        await _0xa80f30?.['move']?.(_0x5de330['filename'], _0x1b6482['filename'] || _0x1bd8d6, {
-          projectName: _0x1bd8d6,
-        }),
-        { ..._0x1b6482, name: _0x1bd8d6, filename: _0x322b5a }
+          output['renameCanvas']?.(value3, projectName3),
+          output['renderTabs']?.()),
+        await projectWorkspaceSessions?.['move']?.(
+          filename3['filename'],
+          response['filename'] || projectName3,
+          {
+            projectName: projectName3,
+          },
+        ),
+        { ...response, name: projectName3, filename: projectId2 }
       );
     });
   }
-  function _0xb8f95(_0x1620af) {
-    const _0x2374ee = normalizeName(_0x1620af);
-    if (!_0x2374ee) return Promise['resolve'](![]);
-    const _0x478c3d = getActiveProjectContext(),
-      _0x499ca4 = String(_0x478c3d?.['filename'] || _0x478c3d?.['projectId'] || '')['trim']();
-    if (_0x478c3d?.['isTemporary'] === !![] || !_0x499ca4)
-      return Promise['resolve'](renameTemporaryProject(_0x2374ee));
-    return _0x5341c8(
-      { filename: _0x499ca4, name: _0x478c3d['projectName'] || stripCanvasProjectFileExtension(_0x499ca4) },
-      _0x2374ee,
-    )['then']((_0x24a089) => _0x24a089['name']);
+  function renameCurrentProject(value4) {
+    const name2 = normalizeName(value4);
+    if (!name2) return Promise['resolve'](![]);
+    const name3 = getActiveProjectContext(),
+      filename4 = String(name3?.['filename'] || name3?.['projectId'] || '')['trim']();
+    if (name3?.['isTemporary'] === !![] || !filename4)
+      return Promise['resolve'](renameTemporaryProject(name2));
+    return renameProject2(
+      { filename: filename4, name: name3['projectName'] || stripCanvasProjectFileExtension(filename4) },
+      name2,
+    )['then']((error3) => error3['name']);
   }
   return Object['freeze']({
-    openProject: _0x14699d,
-    appendProject: (_0x350bf0, _0x50b0bc) => _0x39eae9(() => _0x4cd379(_0x350bf0, _0x50b0bc)),
-    renameProject: _0x5341c8,
-    renameCurrentProject: _0xb8f95,
+    openProject: openProject,
+    appendProject: (value5, value6) => run(() => run4(value5, value6)),
+    renameProject: renameProject2,
+    renameCurrentProject: renameCurrentProject,
   });
 }

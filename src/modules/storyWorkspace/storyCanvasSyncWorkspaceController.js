@@ -1,37 +1,36 @@
 import { normalizeStoryClipFrames, upsertStoryClipFrame } from './storyClipFrames.js';
-function normalizeText(_0x28b150) {
-  return String(_0x28b150 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function requireFunctions(_0xab2f16, _0x3f5434) {
-  for (const [_0x3f17f9, _0x482761] of Object['entries'](_0x3f5434)) {
-    if (typeof _0x482761 !== 'function') throw new TypeError(_0xab2f16 + ' requires ' + _0x3f17f9 + '.');
+function requireFunctions(item, key) {
+  for (const [index, result] of Object['entries'](key)) {
+    if (typeof result !== 'function') throw new TypeError(item + ' requires ' + index + '.');
   }
 }
-function createCanvasBinding(_0x509ccb = {}) {
-  const _0x2ce08b = _0x509ccb['binding'] || _0x509ccb['canvasBinding'] || {};
+function createCanvasBinding(options = {}) {
+  const canvasId = options['binding'] || options['canvasBinding'] || {};
   return {
-    ..._0x2ce08b,
-    canvasId: _0x2ce08b['canvasId'] || _0x509ccb['canvasId'],
-    nodes: { ...(_0x2ce08b['nodes'] || {}) },
-    ...(_0x2ce08b['layout'] ? { layout: { ..._0x2ce08b['layout'] } } : {}),
+    ...canvasId,
+    canvasId: canvasId['canvasId'] || options['canvasId'],
+    nodes: { ...(canvasId['nodes'] || {}) },
+    ...(canvasId['layout'] ? { layout: { ...canvasId['layout'] } } : {}),
   };
 }
 export function createStoryCanvasSyncWorkspaceController({
-  state: _0x39e836,
-  root: _0x391c56,
-  workspaceShell: _0x47a889,
-  loadingElement: _0x542195,
+  state: state,
+  root: root,
+  workspaceShell: workspaceShell,
+  loadingElement: loadingElement,
   documentObject: documentObject = globalThis['document'],
   operations: operations = {},
   projectTasks: projectTasks = {},
   persistence: persistence = {},
   presentation: presentation = {},
-  getSelectedEpisode: _0x4b0335,
-  getProjectCanvasEpisodes: _0x412c2b,
-  resolveClipGenerationSettings: _0x558f9c,
+  getSelectedEpisode: getSelectedEpisode,
+  getProjectCanvasEpisodes: getProjectCanvasEpisodes,
+  resolveClipGenerationSettings: resolveClipGenerationSettings,
 } = {}) {
-  if (!_0x39e836 || typeof _0x39e836 !== 'object')
-    throw new TypeError('Story canvas sync requires workspace state.');
+  if (!state || typeof state !== 'object') throw new TypeError('Story canvas sync requires workspace state.');
   (requireFunctions('Story\x20canvas\x20sync\x20project\x20tasks', {
     createToken: projectTasks['createToken'],
     isCurrent: projectTasks['isCurrent'],
@@ -48,246 +47,241 @@ export function createStoryCanvasSyncWorkspaceController({
       showToast: presentation['showToast'],
     }),
     requireFunctions('Story\x20canvas\x20sync\x20projection', {
-      getProjectCanvasEpisodes: _0x412c2b,
-      getSelectedEpisode: _0x4b0335,
-      resolveClipGenerationSettings: _0x558f9c,
+      getProjectCanvasEpisodes: getProjectCanvasEpisodes,
+      getSelectedEpisode: getSelectedEpisode,
+      resolveClipGenerationSettings: resolveClipGenerationSettings,
     }));
-  const _0x36a526 = new Map();
-  let _0x2f9981 = null,
-    _0x1442a7 = null,
-    _0x488e07 = '';
-  function _0x7edf9({
+  const map = new Map();
+  let value2 = null,
+    el = null,
+    data = '';
+  function run({
     pending: pending = ![],
     scope: scope = '',
     captureFocus: captureFocus = ![],
     refreshToolbar: refreshToolbar = !![],
   } = {}) {
-    const _0x32b1ab = _0x39e836['canvasSyncPending'] === !![];
+    const enabled = state['canvasSyncPending'] === !![];
     pending &&
       captureFocus &&
-      !_0x32b1ab &&
-      ((_0x1442a7 = documentObject?.['activeElement'] || null),
-      (_0x488e07 = _0x1442a7?.['closest']?.('.story-canvas-sync-menu-wrap:not(.story-clip-export-menu-wrap)')
+      !enabled &&
+      ((el = documentObject?.['activeElement'] || null),
+      (data = el?.['closest']?.('.story-canvas-sync-menu-wrap:not(.story-clip-export-menu-wrap)')
         ? '.story-canvas-sync-menu-wrap:not(.story-clip-export-menu-wrap) [data-story-action="toggle-canvas-sync-menu"]'
         : ''));
-    ((_0x39e836['canvasSyncPending'] = pending === !![]),
-      (_0x39e836['canvasSyncScope'] = _0x39e836['canvasSyncPending'] ? normalizeText(scope) : ''),
+    ((state['canvasSyncPending'] = pending === !![]),
+      (state['canvasSyncScope'] = state['canvasSyncPending'] ? normalizeText(scope) : ''),
       presentation['closeMenu'](),
-      _0x391c56?.['classList']?.['toggle']?.('is-canvas-sync-pending', _0x39e836['canvasSyncPending']),
-      _0x391c56?.['setAttribute']?.('aria-busy', _0x39e836['canvasSyncPending'] ? 'true' : 'false'));
-    if (_0x47a889) {
-      _0x47a889['inert'] = _0x39e836['canvasSyncPending'];
-      if (_0x39e836['canvasSyncPending']) _0x47a889['setAttribute']?.('inert', '');
-      else _0x47a889['removeAttribute']?.('inert');
+      root?.['classList']?.['toggle']?.('is-canvas-sync-pending', state['canvasSyncPending']),
+      root?.['setAttribute']?.('aria-busy', state['canvasSyncPending'] ? 'true' : 'false'));
+    if (workspaceShell) {
+      workspaceShell['inert'] = state['canvasSyncPending'];
+      if (state['canvasSyncPending']) workspaceShell['setAttribute']?.('inert', '');
+      else workspaceShell['removeAttribute']?.('inert');
     }
-    _0x542195 &&
-      ((_0x542195['hidden'] = !_0x39e836['canvasSyncPending']),
-      _0x542195['setAttribute']?.('aria-hidden', _0x39e836['canvasSyncPending'] ? 'false' : 'true'));
+    loadingElement &&
+      ((loadingElement['hidden'] = !state['canvasSyncPending']),
+      loadingElement['setAttribute']?.('aria-hidden', state['canvasSyncPending'] ? 'false' : 'true'));
     if (refreshToolbar) presentation['refreshToolbar']();
-    if (_0x39e836['canvasSyncPending']) {
-      if (captureFocus && !_0x32b1ab)
+    if (state['canvasSyncPending']) {
+      if (captureFocus && !enabled)
         try {
-          _0x542195?.['focus']?.({ preventScroll: !![] });
+          loadingElement?.['focus']?.({ preventScroll: !![] });
         } catch {
-          _0x542195?.['focus']?.();
+          loadingElement?.['focus']?.();
         }
       return;
     }
-    const _0x383dc4 = _0x1442a7?.['isConnected']
-      ? _0x1442a7
-      : _0x488e07
-        ? _0x391c56?.['querySelector']?.(_0x488e07)
-        : null;
-    ((_0x1442a7 = null), (_0x488e07 = ''));
-    if (_0x383dc4?.['isConnected'] && !_0x391c56?.['hidden'])
+    const el2 = el?.['isConnected'] ? el : data ? root?.['querySelector']?.(data) : null;
+    ((el = null), (data = ''));
+    if (el2?.['isConnected'] && !root?.['hidden'])
       try {
-        _0x383dc4['focus']?.({ preventScroll: !![] });
+        el2['focus']?.({ preventScroll: !![] });
       } catch {
-        _0x383dc4['focus']?.();
+        el2['focus']?.();
       }
   }
-  async function _0x23e025(_0x1d3882, _0x25205f) {
+  async function syncFrame(project, frame) {
     if (
       typeof operations['syncClipFrame'] !== 'function' ||
-      !normalizeText(_0x1d3882?.['data']?.['project']?.['canvasBinding']?.['canvasId']) ||
-      !_0x25205f
+      !normalizeText(project?.['data']?.['project']?.['canvasBinding']?.['canvasId']) ||
+      !frame
     )
       return ![];
     try {
-      const _0x24c515 = await operations['syncClipFrame']({
-        project: _0x1d3882['data']['project'],
-        frame: _0x25205f,
+      const args = await operations['syncClipFrame']({
+        project: project['data']['project'],
+        frame: frame,
       });
-      if (!_0x24c515?.['synced'] || !projectTasks['isLive'](_0x1d3882)) return ![];
-      const _0x335c46 = normalizeStoryClipFrames(_0x1d3882['data']['clipFrames'])['find'](
-        (_0x1a0a7d) => _0x1a0a7d['id'] === _0x25205f['id'],
+      if (!args?.['synced'] || !projectTasks['isLive'](project)) return ![];
+      const args2 = normalizeStoryClipFrames(project['data']['clipFrames'])['find'](
+        (target) => target['id'] === frame['id'],
       );
-      if (!_0x335c46) return ![];
+      if (!args2) return ![];
       return (
-        (_0x1d3882['data']['clipFrames'] = upsertStoryClipFrame(_0x1d3882['data']['clipFrames'], {
-          ..._0x335c46,
-          ..._0x24c515['frame'],
+        (project['data']['clipFrames'] = upsertStoryClipFrame(project['data']['clipFrames'], {
+          ...args2,
+          ...args['frame'],
         })),
-        projectTasks['syncEntry'](_0x1d3882),
+        projectTasks['syncEntry'](project),
         persistence['schedule']({ immediate: !![] }),
-        projectTasks['isCurrent'](_0x1d3882) &&
-          _0x39e836['view'] === 'episode' &&
+        projectTasks['isCurrent'](project) &&
+          state['view'] === 'episode' &&
           presentation['refreshEpisodeRail']({ refreshContent: !![] }),
         !![]
       );
-    } catch (_0xa8062d) {
+    } catch (error) {
       return (
-        globalThis['console']?.['warn']?.('[storyWorkspace]\x20片段帧同步到项目画布失败', _0xa8062d),
-        projectTasks['isCurrent'](_0x1d3882) &&
-          presentation['showToast'](_0xa8062d?.['message'] || '片段帧同步到项目画布失败。', 'warning'),
+        globalThis['console']?.['warn']?.('[storyWorkspace]\x20片段帧同步到项目画布失败', error),
+        projectTasks['isCurrent'](project) &&
+          presentation['showToast'](error?.['message'] || '片段帧同步到项目画布失败。', 'warning'),
         ![]
       );
     }
   }
-  async function _0x2d3389(_0x21ba9b, { episodeId: episodeId = '' } = {}) {
-    const _0x154670 = normalizeText(episodeId),
-      _0x9f88b0 = normalizeStoryClipFrames(_0x21ba9b?.['data']?.['clipFrames'])['filter'](
-        (_0x57d91f) =>
-          !normalizeText(_0x57d91f['canvasNodeId']) &&
-          _0x57d91f['captureSavePending'] !== !![] &&
-          _0x57d91f['isTransient'] !== !![] &&
-          (!_0x154670 || normalizeText(_0x57d91f['episodeId']) === _0x154670),
+  async function run2(source, { episodeId: episodeId = '' } = {}) {
+    const text = normalizeText(episodeId),
+      storyClipFrames = normalizeStoryClipFrames(source?.['data']?.['clipFrames'])['filter'](
+        (next) =>
+          !normalizeText(next['canvasNodeId']) &&
+          next['captureSavePending'] !== !![] &&
+          next['isTransient'] !== !![] &&
+          (!text || normalizeText(next['episodeId']) === text),
       );
-    for (const _0x3c6745 of _0x9f88b0) {
-      if (!projectTasks['isLive'](_0x21ba9b)) return ![];
-      if (!(await _0x23e025(_0x21ba9b, _0x3c6745))) return ![];
+    for (const current of storyClipFrames) {
+      if (!projectTasks['isLive'](source)) return ![];
+      if (!(await syncFrame(source, current))) return ![];
     }
     return !![];
   }
-  function _0x33eb54(_0x6ce720, _0xf3883b, _0x11a965) {
-    ((_0x6ce720['data']['project']['canvasBinding'] = createCanvasBinding(_0xf3883b)),
-      presentation['handleMediaNodeChanges']({ canvasId: _0xf3883b['canvasId'], nodes: _0x11a965 }),
-      projectTasks['syncEntry'](_0x6ce720),
+  function run3(entry, canvasId2, nodes) {
+    ((entry['data']['project']['canvasBinding'] = createCanvasBinding(canvasId2)),
+      presentation['handleMediaNodeChanges']({ canvasId: canvasId2['canvasId'], nodes: nodes }),
+      projectTasks['syncEntry'](entry),
       persistence['schedule']({ immediate: !![] }));
   }
-  function _0x5b8b9c(_0x1d7f2c, _0x183c64, _0x330293) {
-    const _0x1eedc1 = _0x36a526['get'](_0x1d7f2c['projectId']);
-    if (_0x1eedc1?.['promise']) return _0x1eedc1['promise'];
-    _0x7edf9({ pending: !![], scope: _0x183c64, captureFocus: !![] });
-    const _0x43a925 = Promise['resolve']()['then'](_0x330293);
+  function run4(record, scope2, payload) {
+    const handle = map['get'](record['projectId']);
+    if (handle?.['promise']) return handle['promise'];
+    run({ pending: !![], scope: scope2, captureFocus: !![] });
+    const promise = Promise['resolve']()['then'](payload);
     return (
-      _0x36a526['set'](_0x1d7f2c['projectId'], { scope: _0x183c64, promise: _0x43a925 }),
-      (_0x2f9981 = _0x43a925),
-      void _0x43a925['finally'](() => {
-        (_0x36a526['get'](_0x1d7f2c['projectId'])?.['promise'] === _0x43a925 &&
-          _0x36a526['delete'](_0x1d7f2c['projectId']),
-          _0x2f9981 === _0x43a925 && ((_0x2f9981 = null), _0x7edf9({ pending: ![] })));
+      map['set'](record['projectId'], { scope: scope2, promise: promise }),
+      (value2 = promise),
+      void promise['finally'](() => {
+        (map['get'](record['projectId'])?.['promise'] === promise && map['delete'](record['projectId']),
+          value2 === promise && ((value2 = null), run({ pending: ![] })));
       }),
-      _0x43a925
+      promise
     );
   }
-  async function _0x542dd5() {
-    const _0x14c046 = projectTasks['createToken'](),
-      _0x4e4718 = _0x4b0335(_0x14c046['data']);
-    if (!_0x4e4718) return ![];
-    const _0x193bf3 = _0x36a526['get'](_0x14c046['projectId']);
-    if (_0x193bf3?.['promise']) return _0x193bf3['promise'];
+  async function addSelectedEpisode() {
+    const project2 = projectTasks['createToken'](),
+      episode = getSelectedEpisode(project2['data']);
+    if (!episode) return ![];
+    const config = map['get'](project2['projectId']);
+    if (config?.['promise']) return config['promise'];
     if (typeof operations['createEpisodeCanvas'] !== 'function')
       return (presentation['showToast']('项目关联画布服务尚未初始化。', 'error'), ![]);
-    return _0x5b8b9c(_0x14c046, 'episode', async () => {
+    return run4(project2, 'episode', async () => {
       try {
-        const _0x4466d4 = await operations['createEpisodeCanvas']({
-          project: _0x14c046['data']['project'],
-          episode: _0x4e4718,
-          modelId: _0x14c046['modelSettings']['models']['video'],
-          provider: _0x14c046['modelSettings']['videoProvider'],
-          generationParams: _0x14c046['modelSettings']['videoGenerationParams'],
-          resolveClipGenerationSettings: (_0x302a2c) => _0x558f9c(_0x302a2c, _0x14c046),
+        const state2 = await operations['createEpisodeCanvas']({
+          project: project2['data']['project'],
+          episode: episode,
+          modelId: project2['modelSettings']['models']['video'],
+          provider: project2['modelSettings']['videoProvider'],
+          generationParams: project2['modelSettings']['videoGenerationParams'],
+          resolveClipGenerationSettings: (input) => resolveClipGenerationSettings(input, project2),
         });
-        if (!projectTasks['isLive'](_0x14c046)) return ![];
-        _0x33eb54(_0x14c046, _0x4466d4, Array['isArray'](_0x4466d4['nodes']) ? _0x4466d4['nodes'] : []);
-        const _0x46c315 = await _0x2d3389(_0x14c046, { episodeId: _0x4e4718['id'] });
-        if (!_0x46c315) return ![];
+        if (!projectTasks['isLive'](project2)) return ![];
+        run3(project2, state2, Array['isArray'](state2['nodes']) ? state2['nodes'] : []);
+        const enabled2 = await run2(project2, { episodeId: episode['id'] });
+        if (!enabled2) return ![];
         return (
-          projectTasks['syncEntry'](_0x14c046),
+          projectTasks['syncEntry'](project2),
           persistence['schedule']({ immediate: !![] }),
-          projectTasks['isCurrent'](_0x14c046) &&
+          projectTasks['isCurrent'](project2) &&
             (presentation['requestWorkspaceMode']('canvas'),
             presentation['showToast'](
-              _0x4466d4['reused'] ? '已同步本集到项目关联画布。' : '已创建项目关联画布并同步本集。',
+              state2['reused'] ? '已同步本集到项目关联画布。' : '已创建项目关联画布并同步本集。',
               'success',
             )),
           !![]
         );
-      } catch (_0x1af98d) {
+      } catch (error2) {
         return (
-          projectTasks['isCurrent'](_0x14c046) &&
-            presentation['showToast'](_0x1af98d?.['message'] || '分集加入画布失败。', 'error'),
+          projectTasks['isCurrent'](project2) &&
+            presentation['showToast'](error2?.['message'] || '分集加入画布失败。', 'error'),
           ![]
         );
       }
     });
   }
-  async function _0x86cf3a() {
-    const _0xca05c8 = projectTasks['createToken'](),
-      _0x459cd0 = _0x412c2b(_0xca05c8['data']['episodes'], _0x39e836['selectedEpisodeId']),
-      _0x5a979d = _0x459cd0[0x0];
-    if (!_0x5a979d) return ![];
-    const _0xc6809d = _0x36a526['get'](_0xca05c8['projectId']);
-    if (_0xc6809d?.['promise']) return _0xc6809d['promise'];
+  async function addProject() {
+    const project3 = projectTasks['createToken'](),
+      episodes = getProjectCanvasEpisodes(project3['data']['episodes'], state['selectedEpisodeId']),
+      episodeId2 = episodes[0x0];
+    if (!episodeId2) return ![];
+    const output = map['get'](project3['projectId']);
+    if (output?.['promise']) return output['promise'];
     if (typeof operations['createProjectCanvas'] !== 'function')
       return (presentation['showToast']('项目画布服务尚未初始化。', 'error'), ![]);
-    return _0x5b8b9c(_0xca05c8, 'project', async () => {
+    return run4(project3, 'project', async () => {
       try {
-        const _0x48a68c = await operations['createProjectCanvas']({
-          project: _0xca05c8['data']['project'],
-          assets: _0xca05c8['data']['assets'],
-          episodes: _0x459cd0,
-          imageModelId: _0xca05c8['modelSettings']['models']['image'],
-          imageProvider: _0xca05c8['modelSettings']['imageProvider'],
-          imageGenerationParams: _0xca05c8['modelSettings']['imageGenerationParams'],
-          videoModelId: _0xca05c8['modelSettings']['models']['video'],
-          videoProvider: _0xca05c8['modelSettings']['videoProvider'],
-          videoGenerationParams: _0xca05c8['modelSettings']['videoGenerationParams'],
+        const state3 = await operations['createProjectCanvas']({
+          project: project3['data']['project'],
+          assets: project3['data']['assets'],
+          episodes: episodes,
+          imageModelId: project3['modelSettings']['models']['image'],
+          imageProvider: project3['modelSettings']['imageProvider'],
+          imageGenerationParams: project3['modelSettings']['imageGenerationParams'],
+          videoModelId: project3['modelSettings']['models']['video'],
+          videoProvider: project3['modelSettings']['videoProvider'],
+          videoGenerationParams: project3['modelSettings']['videoGenerationParams'],
         });
-        if (!projectTasks['isLive'](_0xca05c8)) return ![];
-        _0x33eb54(
-          _0xca05c8,
-          _0x48a68c,
-          Array['isArray'](_0x48a68c['nodes'])
-            ? _0x48a68c['nodes']['map']((_0x57c764) => _0x57c764?.['node'])['filter'](Boolean)
+        if (!projectTasks['isLive'](project3)) return ![];
+        run3(
+          project3,
+          state3,
+          Array['isArray'](state3['nodes'])
+            ? state3['nodes']['map']((value3) => value3?.['node'])['filter'](Boolean)
             : [],
         );
-        const _0x2cbc64 = await _0x2d3389(_0xca05c8, { episodeId: _0x5a979d['id'] });
-        if (!_0x2cbc64) return ![];
+        const enabled3 = await run2(project3, { episodeId: episodeId2['id'] });
+        if (!enabled3) return ![];
         return (
-          projectTasks['syncEntry'](_0xca05c8),
+          projectTasks['syncEntry'](project3),
           persistence['schedule']({ immediate: !![] }),
-          projectTasks['isCurrent'](_0xca05c8) &&
+          projectTasks['isCurrent'](project3) &&
             (presentation['requestWorkspaceMode']('canvas'),
             presentation['showToast'](
-              _0x48a68c['reused']
+              state3['reused']
                 ? '项目画布已同步：更新 ' +
-                    (_0x48a68c['updatedCount'] || 0x0) +
+                    (state3['updatedCount'] || 0x0) +
                     '\x20项，新增\x20' +
-                    (_0x48a68c['createdCount'] || 0x0) +
+                    (state3['createdCount'] || 0x0) +
                     ' 项。'
-                : '已创建项目画布，加入 ' + (_0x48a68c['createdCount'] || 0x0) + ' 项内容。',
+                : '已创建项目画布，加入 ' + (state3['createdCount'] || 0x0) + ' 项内容。',
               'success',
             )),
           !![]
         );
-      } catch (_0x28bb00) {
+      } catch (error3) {
         return (
-          projectTasks['isCurrent'](_0xca05c8) &&
-            presentation['showToast'](_0x28bb00?.['message'] || '项目同步到画布失败。', 'error'),
+          projectTasks['isCurrent'](project3) &&
+            presentation['showToast'](error3?.['message'] || '项目同步到画布失败。', 'error'),
           ![]
         );
       }
     });
   }
-  function _0x3dd752() {
-    ((_0x2f9981 = null), _0x36a526['clear'](), _0x7edf9({ pending: ![], refreshToolbar: ![] }));
+  function destroy() {
+    ((value2 = null), map['clear'](), run({ pending: ![], refreshToolbar: ![] }));
   }
   return Object['freeze']({
-    addProject: _0x86cf3a,
-    addSelectedEpisode: _0x542dd5,
-    destroy: _0x3dd752,
-    syncFrame: _0x23e025,
+    addProject: addProject,
+    addSelectedEpisode: addSelectedEpisode,
+    destroy: destroy,
+    syncFrame: syncFrame,
   });
 }

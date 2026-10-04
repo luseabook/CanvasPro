@@ -3,84 +3,84 @@ import { t } from '../i18n/index.js';
 export const WEB_PREVIEW_MAX_TABS = 8;
 export const WEB_PREVIEW_DEFAULT_TAB_TITLE = '新标签页';
 let nextGeneratedTabId = 0;
-function nowMs(_0x2fb49b = Date.now()) {
-  const _0x2b6ee4 = Number(_0x2fb49b);
-  return Number.isFinite(_0x2b6ee4) && _0x2b6ee4 > 0 ? _0x2b6ee4 : Date.now();
+function nowMs(value = Date.now()) {
+  const count = Number(value);
+  return Number.isFinite(count) && count > 0 ? count : Date.now();
 }
-function normalizeTabId(_0x3fad92) {
-  return String(_0x3fad92 || '')
+function normalizeTabId(item) {
+  return String(item || '')
     .trim()
     .slice(0, 120);
 }
 export function getWebPreviewDefaultTabTitle() {
   return t('webPreview.tabs.defaultTitle');
 }
-function normalizeTitle(_0x199da8, _0x3df563 = getWebPreviewDefaultTabTitle()) {
-  const _0xa49fd4 = String(_0x199da8 || '')
+function normalizeTitle(key, webPreviewDefaultTabTitle = getWebPreviewDefaultTabTitle()) {
+  const index = String(key || '')
     .replace(/\s+/g, ' ')
     .trim();
-  return (_0xa49fd4 || _0x3df563 || getWebPreviewDefaultTabTitle()).slice(0, 80);
+  return (index || webPreviewDefaultTabTitle || getWebPreviewDefaultTabTitle()).slice(0, 80);
 }
-function getHostLabel(_0x2e5b9b) {
+function getHostLabel(result) {
   try {
-    const _0x15f159 = new URL(_0x2e5b9b).hostname.replace(/^www\./i, '');
-    return _0x15f159 || _0x2e5b9b;
+    const uRL = new URL(result).hostname.replace(/^www\./i, '');
+    return uRL || result;
   } catch {
-    return _0x2e5b9b;
+    return result;
   }
 }
-function getOrigin(_0x256066) {
+function getOrigin(data) {
   try {
-    return new URL(_0x256066).origin;
+    return new URL(data).origin;
   } catch {
     return '';
   }
 }
-function withOptionalFavicon(_0x5e79e0, _0x15833a) {
-  const _0x1d5896 = { ..._0x5e79e0 },
-    _0x337051 = normalizeWebPreviewFaviconUrl(_0x15833a);
-  if (_0x337051) _0x1d5896.faviconUrl = _0x337051;
-  else delete _0x1d5896.faviconUrl;
-  return _0x1d5896;
+function withOptionalFavicon(args, options) {
+  const target = { ...args },
+    webPreviewFaviconUrl = normalizeWebPreviewFaviconUrl(options);
+  if (webPreviewFaviconUrl) target.faviconUrl = webPreviewFaviconUrl;
+  else delete target.faviconUrl;
+  return target;
 }
-function withPendingPopup(_0x22580f, _0x4a604d) {
-  if (_0x4a604d === true) return { ..._0x22580f, pendingPopup: true };
-  const _0x2a8a09 = { ..._0x22580f };
-  return (delete _0x2a8a09.pendingPopup, _0x2a8a09);
+function withPendingPopup(args2, source) {
+  if (source === true) return { ...args2, pendingPopup: true };
+  const next = { ...args2 };
+  return (delete next.pendingPopup, next);
 }
-export function getWebPreviewTabDisplayTitle(_0x31f8db = {}) {
-  if (!_0x31f8db?.url) return normalizeTitle(_0x31f8db?.title, getWebPreviewDefaultTabTitle());
-  return normalizeTitle(_0x31f8db?.title, getHostLabel(_0x31f8db.url));
+export function getWebPreviewTabDisplayTitle(response = {}) {
+  if (!response?.url) return normalizeTitle(response?.title, getWebPreviewDefaultTabTitle());
+  return normalizeTitle(response?.title, getHostLabel(response.url));
 }
-function createTabId(_0x1b8a41 = new Set(), _0x2b5b03 = Date.now()) {
-  const _0x457863 = Math.max(1, Math.floor(Number(_0x2b5b03) || Date.now()));
-  let _0x4b8a9d = '';
+function createTabId(map = new Set(), current = Date.now()) {
+  const entry = Math.max(1, Math.floor(Number(current) || Date.now()));
+  let record = '';
   do {
-    ((nextGeneratedTabId += 1), (_0x4b8a9d = 'tab-' + _0x457863 + '-' + nextGeneratedTabId));
-  } while (_0x1b8a41.has(_0x4b8a9d));
-  return _0x4b8a9d;
+    ((nextGeneratedTabId += 1), (record = 'tab-' + entry + '-' + nextGeneratedTabId));
+  } while (map.has(record));
+  return record;
 }
-function normalizeTab(_0x312dc6 = {}, _0x3d5039 = 0, _0xb93a21 = new Set()) {
-  const _0x42c051 = normalizeWebPreviewUrl(_0x312dc6.url || _0x312dc6.webUrl) || '',
-    _0x521905 = nowMs(_0x312dc6.createdAt || _0x312dc6.updatedAt || _0x312dc6.lastOpenedAt);
-  let _0x4e4c11 = normalizeTabId(_0x312dc6.id);
-  if (!_0x4e4c11 || _0xb93a21.has(_0x4e4c11)) _0x4e4c11 = createTabId(_0xb93a21, _0x521905 + _0x3d5039);
+function normalizeTab(title2 = {}, payload = 0, map2 = new Set()) {
+  const url2 = normalizeWebPreviewUrl(title2.url || title2.webUrl) || '',
+    createdAt = nowMs(title2.createdAt || title2.updatedAt || title2.lastOpenedAt);
+  let id2 = normalizeTabId(title2.id);
+  if (!id2 || map2.has(id2)) id2 = createTabId(map2, createdAt + payload);
   return (
-    _0xb93a21.add(_0x4e4c11),
+    map2.add(id2),
     withPendingPopup(
       {
         ...withOptionalFavicon(
           {
-            id: _0x4e4c11,
-            title: getWebPreviewTabDisplayTitle({ title: _0x312dc6.title, url: _0x42c051 }),
-            url: _0x42c051,
-            createdAt: _0x521905,
-            updatedAt: nowMs(_0x312dc6.updatedAt || _0x521905),
+            id: id2,
+            title: getWebPreviewTabDisplayTitle({ title: title2.title, url: url2 }),
+            url: url2,
+            createdAt: createdAt,
+            updatedAt: nowMs(title2.updatedAt || createdAt),
           },
-          _0x312dc6.faviconUrl,
+          title2.faviconUrl,
         ),
       },
-      _0x312dc6.pendingPopup === true && !_0x42c051,
+      title2.pendingPopup === true && !url2,
     )
   );
 }
@@ -91,223 +91,223 @@ export function createWebPreviewTab(
     url: url = '',
     faviconUrl: faviconUrl = '',
     pendingPopup: pendingPopup = false,
-    now: _0x592ba6,
+    now: now,
   } = {},
-  _0x1a5cfb = new Set(),
+  map3 = new Set(),
 ) {
-  const _0xd25b4f = normalizeWebPreviewUrl(url) || '',
-    _0x4fdcf9 = nowMs(_0x592ba6);
-  let _0x17d7f6 = normalizeTabId(id);
-  if (!_0x17d7f6 || _0x1a5cfb.has(_0x17d7f6)) _0x17d7f6 = createTabId(_0x1a5cfb, _0x4fdcf9);
+  const url3 = normalizeWebPreviewUrl(url) || '',
+    createdAt2 = nowMs(now);
+  let id3 = normalizeTabId(id);
+  if (!id3 || map3.has(id3)) id3 = createTabId(map3, createdAt2);
   return (
-    _0x1a5cfb.add(_0x17d7f6),
+    map3.add(id3),
     withPendingPopup(
       withOptionalFavicon(
         {
-          id: _0x17d7f6,
-          title: getWebPreviewTabDisplayTitle({ title: title, url: _0xd25b4f }),
-          url: _0xd25b4f,
-          createdAt: _0x4fdcf9,
-          updatedAt: _0x4fdcf9,
+          id: id3,
+          title: getWebPreviewTabDisplayTitle({ title: title, url: url3 }),
+          url: url3,
+          createdAt: createdAt2,
+          updatedAt: createdAt2,
         },
         faviconUrl,
       ),
-      pendingPopup === true && !_0xd25b4f,
+      pendingPopup === true && !url3,
     )
   );
 }
-export function normalizeWebPreviewTabs(_0x5c2046 = {}) {
-  const _0xc4800f = new Set(),
-    _0x213581 = Array.isArray(_0x5c2046.webTabs) ? _0x5c2046.webTabs : [];
-  let _0x19c8dc = _0x213581.map((_0x14cbde, _0x3ccf15) => normalizeTab(_0x14cbde, _0x3ccf15, _0xc4800f));
-  if (_0x19c8dc.length === 0) {
-    const _0x50f7d9 = normalizeWebPreviewUrl(_0x5c2046.webUrl) || '';
-    _0x19c8dc = [
+export function normalizeWebPreviewTabs(now2 = {}) {
+  const handle = new Set(),
+    list = Array.isArray(now2.webTabs) ? now2.webTabs : [];
+  let tabs = list.map((item2, state) => normalizeTab(item2, state, handle));
+  if (tabs.length === 0) {
+    const title3 = normalizeWebPreviewUrl(now2.webUrl) || '';
+    tabs = [
       createWebPreviewTab(
         {
-          id: normalizeTabId(_0x5c2046.activeTabId) || 'tab-main',
-          title: _0x50f7d9 ? _0x5c2046.webTitle || '' : getWebPreviewDefaultTabTitle(),
-          url: _0x50f7d9,
-          now: _0x5c2046.updatedAt || _0x5c2046.createdAt,
+          id: normalizeTabId(now2.activeTabId) || 'tab-main',
+          title: title3 ? now2.webTitle || '' : getWebPreviewDefaultTabTitle(),
+          url: title3,
+          now: now2.updatedAt || now2.createdAt,
         },
-        _0xc4800f,
+        handle,
       ),
     ];
   }
-  _0x19c8dc = _0x19c8dc.slice(0, WEB_PREVIEW_MAX_TABS);
-  const _0x3b132a = normalizeTabId(_0x5c2046.activeTabId),
-    _0x59310f = normalizeWebPreviewUrl(_0x5c2046.webUrl) || '',
-    _0xd9815d = _0x59310f ? _0x19c8dc.find((_0x571995) => _0x571995.url === _0x59310f) : null,
-    _0x447aec = _0x19c8dc.find((_0x2bd09a) => _0x2bd09a.id === _0x3b132a) || _0xd9815d || _0x19c8dc[0];
-  return { tabs: _0x19c8dc, activeTabId: _0x447aec.id, activeTab: _0x447aec, webUrl: _0x447aec.url || '' };
+  tabs = tabs.slice(0, WEB_PREVIEW_MAX_TABS);
+  const tabId = normalizeTabId(now2.activeTabId),
+    webPreviewUrl = normalizeWebPreviewUrl(now2.webUrl) || '',
+    config = webPreviewUrl ? tabs.find((response2) => response2.url === webPreviewUrl) : null,
+    activeTabId = tabs.find((item3) => item3.id === tabId) || config || tabs[0];
+  return { tabs: tabs, activeTabId: activeTabId.id, activeTab: activeTabId, webUrl: activeTabId.url || '' };
 }
-function buildTabsPatch(_0x44c80e, _0x2f00a0) {
-  const _0x28957a = normalizeWebPreviewTabs({ webTabs: _0x44c80e, activeTabId: _0x2f00a0 });
-  return { webTabs: _0x28957a.tabs, activeTabId: _0x28957a.activeTabId, webUrl: _0x28957a.webUrl };
+function buildTabsPatch(webTabs, activeTabId2) {
+  const webTabs2 = normalizeWebPreviewTabs({ webTabs: webTabs, activeTabId: activeTabId2 });
+  return { webTabs: webTabs2.tabs, activeTabId: webTabs2.activeTabId, webUrl: webTabs2.webUrl };
 }
-export function getWebPreviewActiveTab(_0x130c3d = {}) {
-  return normalizeWebPreviewTabs(_0x130c3d).activeTab;
+export function getWebPreviewActiveTab(options2 = {}) {
+  return normalizeWebPreviewTabs(options2).activeTab;
 }
-export function getWebPreviewActiveTabUrl(_0x2d6a46 = {}) {
-  return normalizeWebPreviewTabs(_0x2d6a46).webUrl;
+export function getWebPreviewActiveTabUrl(options3 = {}) {
+  return normalizeWebPreviewTabs(options3).webUrl;
 }
-export function activateWebPreviewTabData(_0x425eb4 = {}, _0xed6d00) {
-  const _0x4b796d = normalizeWebPreviewTabs(_0x425eb4),
-    _0x495cb2 = _0x4b796d.tabs.find((_0x1fe39a) => _0x1fe39a.id === normalizeTabId(_0xed6d00));
-  if (!_0x495cb2)
+export function activateWebPreviewTabData(options4 = {}, scope) {
+  const state2 = normalizeWebPreviewTabs(options4),
+    tabId2 = state2.tabs.find((item4) => item4.id === normalizeTabId(scope));
+  if (!tabId2)
     return {
       ok: false,
       error: 'missing-tab',
-      state: _0x4b796d,
-      patch: buildTabsPatch(_0x4b796d.tabs, _0x4b796d.activeTabId),
+      state: state2,
+      patch: buildTabsPatch(state2.tabs, state2.activeTabId),
     };
   return {
     ok: true,
-    tabId: _0x495cb2.id,
-    state: { ..._0x4b796d, activeTabId: _0x495cb2.id, activeTab: _0x495cb2, webUrl: _0x495cb2.url },
-    patch: buildTabsPatch(_0x4b796d.tabs, _0x495cb2.id),
+    tabId: tabId2.id,
+    state: { ...state2, activeTabId: tabId2.id, activeTab: tabId2, webUrl: tabId2.url },
+    patch: buildTabsPatch(state2.tabs, tabId2.id),
   };
 }
 export function addWebPreviewTabData(
-  _0x38769a = {},
-  { id: id = '', title: title = '', url: url = '', pendingPopup: pendingPopup = false, now: _0xff7e0b } = {},
+  options5 = {},
+  { id: id = '', title: title = '', url: url = '', pendingPopup: pendingPopup = false, now: now3 } = {},
 ) {
-  const _0x1fb828 = normalizeWebPreviewTabs(_0x38769a);
-  if (_0x1fb828.tabs.length >= WEB_PREVIEW_MAX_TABS)
+  const state3 = normalizeWebPreviewTabs(options5);
+  if (state3.tabs.length >= WEB_PREVIEW_MAX_TABS)
     return {
       ok: false,
       error: 'max-tabs',
-      state: _0x1fb828,
-      patch: buildTabsPatch(_0x1fb828.tabs, _0x1fb828.activeTabId),
+      state: state3,
+      patch: buildTabsPatch(state3.tabs, state3.activeTabId),
     };
-  const _0x49272a = new Set(_0x1fb828.tabs.map((_0x5e61b1) => _0x5e61b1.id)),
-    _0x552774 = createWebPreviewTab(
-      { id: id, title: title, url: url, pendingPopup: pendingPopup, now: _0xff7e0b },
-      _0x49272a,
+  const input = new Set(state3.tabs.map((item5) => item5.id)),
+    tabId3 = createWebPreviewTab(
+      { id: id, title: title, url: url, pendingPopup: pendingPopup, now: now3 },
+      input,
     ),
-    _0x1c777a = [..._0x1fb828.tabs, _0x552774];
+    tabs2 = [...state3.tabs, tabId3];
   return {
     ok: true,
-    tabId: _0x552774.id,
-    tab: _0x552774,
-    state: { tabs: _0x1c777a, activeTabId: _0x552774.id, activeTab: _0x552774, webUrl: _0x552774.url },
-    patch: buildTabsPatch(_0x1c777a, _0x552774.id),
+    tabId: tabId3.id,
+    tab: tabId3,
+    state: { tabs: tabs2, activeTabId: tabId3.id, activeTab: tabId3, webUrl: tabId3.url },
+    patch: buildTabsPatch(tabs2, tabId3.id),
   };
 }
-export function closeWebPreviewTabData(_0xbfda45 = {}, _0x48e684) {
-  const _0x2a01b2 = normalizeWebPreviewTabs(_0xbfda45),
-    _0x9d50d9 = normalizeTabId(_0x48e684) || _0x2a01b2.activeTabId,
-    _0x5ddca0 = _0x2a01b2.tabs.findIndex((_0x1c6422) => _0x1c6422.id === _0x9d50d9);
-  if (_0x5ddca0 < 0)
+export function closeWebPreviewTabData(options6 = {}, output) {
+  const state4 = normalizeWebPreviewTabs(options6),
+    closedTabId = normalizeTabId(output) || state4.activeTabId,
+    count2 = state4.tabs.findIndex((item6) => item6.id === closedTabId);
+  if (count2 < 0)
     return {
       ok: false,
       error: 'missing-tab',
-      state: _0x2a01b2,
-      patch: buildTabsPatch(_0x2a01b2.tabs, _0x2a01b2.activeTabId),
+      state: state4,
+      patch: buildTabsPatch(state4.tabs, state4.activeTabId),
     };
-  if (_0x2a01b2.tabs.length <= 1) {
-    const _0x58ddfe = createWebPreviewTab({}, new Set());
+  if (state4.tabs.length <= 1) {
+    const tabId4 = createWebPreviewTab({}, new Set());
     return {
       ok: true,
-      tabId: _0x58ddfe.id,
-      closedTabId: _0x9d50d9,
-      state: { tabs: [_0x58ddfe], activeTabId: _0x58ddfe.id, activeTab: _0x58ddfe, webUrl: '' },
-      patch: buildTabsPatch([_0x58ddfe], _0x58ddfe.id),
+      tabId: tabId4.id,
+      closedTabId: closedTabId,
+      state: { tabs: [tabId4], activeTabId: tabId4.id, activeTab: tabId4, webUrl: '' },
+      patch: buildTabsPatch([tabId4], tabId4.id),
     };
   }
-  const _0x33f0aa = _0x2a01b2.tabs.filter((_0x93bb2f) => _0x93bb2f.id !== _0x9d50d9);
-  let _0x103b46 = _0x2a01b2.activeTabId;
-  _0x9d50d9 === _0x2a01b2.activeTabId &&
-    (_0x103b46 = _0x33f0aa[Math.min(_0x5ddca0, _0x33f0aa.length - 1)]?.id || _0x33f0aa[0].id);
-  const _0x39ea74 = _0x33f0aa.find((_0x199237) => _0x199237.id === _0x103b46) || _0x33f0aa[0];
+  const tabs3 = state4.tabs.filter((item7) => item7.id !== closedTabId);
+  let value2 = state4.activeTabId;
+  closedTabId === state4.activeTabId &&
+    (value2 = tabs3[Math.min(count2, tabs3.length - 1)]?.id || tabs3[0].id);
+  const tabId5 = tabs3.find((item8) => item8.id === value2) || tabs3[0];
   return {
     ok: true,
-    tabId: _0x39ea74.id,
-    closedTabId: _0x9d50d9,
-    state: { tabs: _0x33f0aa, activeTabId: _0x39ea74.id, activeTab: _0x39ea74, webUrl: _0x39ea74.url },
-    patch: buildTabsPatch(_0x33f0aa, _0x39ea74.id),
+    tabId: tabId5.id,
+    closedTabId: closedTabId,
+    state: { tabs: tabs3, activeTabId: tabId5.id, activeTab: tabId5, webUrl: tabId5.url },
+    patch: buildTabsPatch(tabs3, tabId5.id),
   };
 }
 export function updateWebPreviewTabUrlData(
-  _0x30ddf5 = {},
-  { tabId: _0x496ef5, url: _0x3386b9, title: title = '', now: _0xa83989, activate: activate = true } = {},
+  options7 = {},
+  { tabId: tabId6, url: url4, title: title = '', now: now4, activate: activate = true } = {},
 ) {
-  const _0x4c791d = normalizeWebPreviewUrl(_0x3386b9);
-  if (!_0x4c791d)
-    return { ok: false, error: 'invalid-url', state: normalizeWebPreviewTabs(_0x30ddf5), patch: null };
-  const _0x2a1ad4 = normalizeWebPreviewTabs(_0x30ddf5),
-    _0x5bc77d = normalizeTabId(_0x496ef5) || _0x2a1ad4.activeTabId,
-    _0x51e04f = nowMs(_0xa83989);
-  let _0x1f7f6f = null;
-  const _0x596225 = _0x2a1ad4.tabs.map((_0x180921) => {
-    if (_0x180921.id !== _0x5bc77d) return _0x180921;
-    const _0x162e58 = !title && _0x180921.url === _0x4c791d;
+  const url5 = normalizeWebPreviewUrl(url4);
+  if (!url5)
+    return { ok: false, error: 'invalid-url', state: normalizeWebPreviewTabs(options7), patch: null };
+  const state5 = normalizeWebPreviewTabs(options7),
+    tabId7 = normalizeTabId(tabId6) || state5.activeTabId,
+    updatedAt = nowMs(now4);
+  let tabId8 = null;
+  const tabs4 = state5.tabs.map((response3) => {
+    if (response3.id !== tabId7) return response3;
+    const title4 = !title && response3.url === url5;
     return (
-      (_0x1f7f6f = {
-        ..._0x180921,
-        url: _0x4c791d,
-        title: getWebPreviewTabDisplayTitle({ title: _0x162e58 ? _0x180921.title : title, url: _0x4c791d }),
-        updatedAt: _0x51e04f,
+      (tabId8 = {
+        ...response3,
+        url: url5,
+        title: getWebPreviewTabDisplayTitle({ title: title4 ? response3.title : title, url: url5 }),
+        updatedAt: updatedAt,
       }),
-      delete _0x1f7f6f.pendingPopup,
-      getOrigin(_0x180921.url) !== getOrigin(_0x4c791d) && delete _0x1f7f6f.faviconUrl,
-      _0x1f7f6f
+      delete tabId8.pendingPopup,
+      getOrigin(response3.url) !== getOrigin(url5) && delete tabId8.faviconUrl,
+      tabId8
     );
   });
-  if (!_0x1f7f6f)
+  if (!tabId8)
     return {
       ok: false,
       error: 'missing-tab',
-      state: _0x2a1ad4,
-      patch: buildTabsPatch(_0x2a1ad4.tabs, _0x2a1ad4.activeTabId),
+      state: state5,
+      patch: buildTabsPatch(state5.tabs, state5.activeTabId),
     };
-  const _0x4b9f1a = activate ? _0x1f7f6f.id : _0x2a1ad4.activeTabId,
-    _0x341565 = _0x596225.find((_0x27af9e) => _0x27af9e.id === _0x4b9f1a) || _0x1f7f6f;
+  const value3 = activate ? tabId8.id : state5.activeTabId,
+    activeTabId3 = tabs4.find((item9) => item9.id === value3) || tabId8;
   return {
     ok: true,
-    tabId: _0x1f7f6f.id,
-    tab: _0x1f7f6f,
-    state: { tabs: _0x596225, activeTabId: _0x341565.id, activeTab: _0x341565, webUrl: _0x341565.url },
-    patch: buildTabsPatch(_0x596225, _0x341565.id),
+    tabId: tabId8.id,
+    tab: tabId8,
+    state: { tabs: tabs4, activeTabId: activeTabId3.id, activeTab: activeTabId3, webUrl: activeTabId3.url },
+    patch: buildTabsPatch(tabs4, activeTabId3.id),
   };
 }
 export function updateWebPreviewTabFaviconData(
-  _0x2bf8b1 = {},
-  { tabId: _0x227c27, faviconUrl: _0x165f55, now: _0x556b93 } = {},
+  options8 = {},
+  { tabId: tabId9, faviconUrl: faviconUrl2, now: now5 } = {},
 ) {
-  const _0x8dfa94 = normalizeWebPreviewFaviconUrl(_0x165f55);
-  if (!_0x8dfa94)
+  const faviconUrl3 = normalizeWebPreviewFaviconUrl(faviconUrl2);
+  if (!faviconUrl3)
     return {
       ok: false,
       error: 'invalid-favicon-url',
-      state: normalizeWebPreviewTabs(_0x2bf8b1),
+      state: normalizeWebPreviewTabs(options8),
       patch: null,
     };
-  const _0x1c1101 = normalizeWebPreviewTabs(_0x2bf8b1),
-    _0x1ba021 = normalizeTabId(_0x227c27) || _0x1c1101.activeTabId,
-    _0x1f689b = nowMs(_0x556b93);
-  let _0x354303 = null;
-  const _0x2661dc = _0x1c1101.tabs.map((_0x15df7d) => {
-    if (_0x15df7d.id !== _0x1ba021) return _0x15df7d;
-    return ((_0x354303 = { ..._0x15df7d, faviconUrl: _0x8dfa94, updatedAt: _0x1f689b }), _0x354303);
+  const state6 = normalizeWebPreviewTabs(options8),
+    tabId10 = normalizeTabId(tabId9) || state6.activeTabId,
+    updatedAt2 = nowMs(now5);
+  let tabId11 = null;
+  const tabs5 = state6.tabs.map((args3) => {
+    if (args3.id !== tabId10) return args3;
+    return ((tabId11 = { ...args3, faviconUrl: faviconUrl3, updatedAt: updatedAt2 }), tabId11);
   });
-  if (!_0x354303)
+  if (!tabId11)
     return {
       ok: false,
       error: 'missing-tab',
-      state: _0x1c1101,
-      patch: buildTabsPatch(_0x1c1101.tabs, _0x1c1101.activeTabId),
+      state: state6,
+      patch: buildTabsPatch(state6.tabs, state6.activeTabId),
     };
   return {
     ok: true,
-    tabId: _0x354303.id,
-    tab: _0x354303,
+    tabId: tabId11.id,
+    tab: tabId11,
     state: {
-      tabs: _0x2661dc,
-      activeTabId: _0x1c1101.activeTabId,
-      activeTab: _0x2661dc.find((_0x32a29f) => _0x32a29f.id === _0x1c1101.activeTabId) || _0x354303,
-      webUrl: _0x1c1101.webUrl,
+      tabs: tabs5,
+      activeTabId: state6.activeTabId,
+      activeTab: tabs5.find((item10) => item10.id === state6.activeTabId) || tabId11,
+      webUrl: state6.webUrl,
     },
-    patch: buildTabsPatch(_0x2661dc, _0x1c1101.activeTabId),
+    patch: buildTabsPatch(tabs5, state6.activeTabId),
   };
 }

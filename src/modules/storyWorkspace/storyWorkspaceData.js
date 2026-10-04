@@ -220,15 +220,15 @@ export function createDemoStoryWorkspaceData() {
       plotScript: PLOT_SCRIPT,
       narrationScript: NARRATION_SCRIPT,
     },
-    assets: DEMO_ASSETS['map']((_0x1f1702) => ({
-      ..._0x1f1702,
-      appearances: Array['isArray'](_0x1f1702['appearances'])
-        ? _0x1f1702['appearances']['map']((_0x25740c) => ({ ..._0x25740c }))
+    assets: DEMO_ASSETS['map']((args) => ({
+      ...args,
+      appearances: Array['isArray'](args['appearances'])
+        ? args['appearances']['map']((args2) => ({ ...args2 }))
         : undefined,
     })),
-    episodes: EPISODES['map']((_0x2710af) => ({
-      ..._0x2710af,
-      clips: _0x2710af['clips']['map']((_0x417430) => ({ ..._0x417430 })),
+    episodes: EPISODES['map']((clips) => ({
+      ...clips,
+      clips: clips['clips']['map']((args3) => ({ ...args3 })),
     })),
   };
 }

@@ -6,357 +6,361 @@ import {
 } from './rendererSpatialIndex.js';
 import { shouldShowGenerationBusyUi } from './generationTaskUiState.js';
 import { calculateDenseLowZoomRasterStrength } from './rendererRasterProxyPolicy.js';
-function toIdSet(_0x50c1c7) {
-  if (_0x50c1c7 instanceof Set) return new Set(_0x50c1c7);
-  if (Array['isArray'](_0x50c1c7)) return new Set(_0x50c1c7);
+function toIdSet(value) {
+  if (value instanceof Set) return new Set(value);
+  if (Array['isArray'](value)) return new Set(value);
   return new Set();
 }
-function getContainerSize(_0x415185) {
+function getContainerSize(box) {
   return {
-    width: Number['isFinite'](_0x415185?.['width']) ? _0x415185['width'] : 0x0,
-    height: Number['isFinite'](_0x415185?.['height']) ? _0x415185['height'] : 0x0,
+    width: Number['isFinite'](box?.['width']) ? box['width'] : 0x0,
+    height: Number['isFinite'](box?.['height']) ? box['height'] : 0x0,
   };
 }
-function createSpatialNodeMapView(_0x3662a0, _0x5c4823) {
-  const _0x496228 = _0x3662a0?.['nodesById'];
-  if (!(_0x496228 instanceof Map)) return null;
-  const _0x3b0cbb = (_0x4aec8c) => {
-    if (_0x5c4823 instanceof Map) return _0x5c4823['get'](_0x4aec8c);
-    if (_0x5c4823 && typeof _0x5c4823 === 'object' && !Array['isArray'](_0x5c4823))
-      return _0x5c4823[_0x4aec8c];
-    return getRendererSpatialIndexNode(_0x3662a0, _0x4aec8c);
+function createSpatialNodeMapView(item, map) {
+  const map2 = item?.['nodesById'];
+  if (!(map2 instanceof Map)) return null;
+  const run = (key) => {
+    if (map instanceof Map) return map['get'](key);
+    if (map && typeof map === 'object' && !Array['isArray'](map)) return map[key];
+    return getRendererSpatialIndexNode(item, key);
   };
   return {
     get size() {
-      return _0x496228['size'];
+      return map2['size'];
     },
-    get(_0x21f840) {
-      return _0x3b0cbb(_0x21f840);
+    get(index) {
+      return run(index);
     },
-    has(_0x2f50fa) {
-      return _0x496228['has'](_0x2f50fa);
+    has(result) {
+      return map2['has'](result);
     },
     keys() {
-      return _0x496228['keys']();
+      return map2['keys']();
     },
     *[Symbol['iterator']]() {
-      for (const [_0x3632d9] of _0x496228) {
-        yield [_0x3632d9, _0x3b0cbb(_0x3632d9)];
+      for (const [data] of map2) {
+        yield [data, run(data)];
       }
     },
   };
 }
-function createNodeMap(_0x570841, _0x34cb38 = null) {
-  const _0x9a1308 = createSpatialNodeMapView(_0x34cb38, _0x570841);
-  if (_0x9a1308) return _0x9a1308;
-  const _0xefbfb0 = new Map();
-  let _0x4cd801 = [];
-  if (Array['isArray'](_0x570841))
-    _0x4cd801 = _0x570841['map']((_0xb95fc6) => [_0xb95fc6?.['id'], _0xb95fc6]);
+function createNodeMap(list, options = null) {
+  const spatialNodeMapView = createSpatialNodeMapView(options, list);
+  if (spatialNodeMapView) return spatialNodeMapView;
+  const map3 = new Map();
+  let target = [];
+  if (Array['isArray'](list)) target = list['map']((source) => [source?.['id'], source]);
   else {
-    if (_0x570841 instanceof Map) _0x4cd801 = _0x570841['entries']();
-    else _0x570841 && typeof _0x570841 === 'object' && (_0x4cd801 = Object['entries'](_0x570841));
+    if (list instanceof Map) target = list['entries']();
+    else list && typeof list === 'object' && (target = Object['entries'](list));
   }
-  for (const [_0x37f783, _0x2cfc31] of _0x4cd801) {
-    if (!_0x2cfc31 || typeof _0x2cfc31 !== 'object') continue;
-    const _0x25dfc5 = _0x2cfc31['id'] ?? _0x37f783;
-    if (_0x25dfc5 == null || _0x25dfc5 === '') continue;
-    _0xefbfb0['set'](_0x25dfc5, _0x2cfc31);
+  for (const [next, enabled] of target) {
+    if (!enabled || typeof enabled !== 'object') continue;
+    const current = enabled['id'] ?? next;
+    if (current == null || current === '') continue;
+    map3['set'](current, enabled);
   }
-  return _0xefbfb0;
+  return map3;
 }
-function getSpatialNodeOrder(_0x56eac5, _0x518990) {
-  const _0x4b04ba = _0x56eac5?.['nodesById']?.['get']?.(_0x518990)?.['order'];
-  return Number['isFinite'](_0x4b04ba) ? _0x4b04ba : 0x0;
+function getSpatialNodeOrder(entry, record) {
+  const payload = entry?.['nodesById']?.['get']?.(record)?.['order'];
+  return Number['isFinite'](payload) ? payload : 0x0;
 }
 function collectViewportRangeIds({
-  nodeById: _0x464d05,
-  spatialIndex: _0x8110fe,
-  viewport: _0x258adb,
-  width: _0x5d7491,
-  height: _0x45ca76,
-  padding: _0x590392,
+  nodeById: nodeById,
+  spatialIndex: spatialIndex2,
+  viewport: viewport2,
+  width: width,
+  height: height,
+  padding: padding,
 }) {
-  if (!_0x8110fe)
+  if (!spatialIndex2)
     return new Set(
-      [..._0x464d05['keys']()]['filter']((_0x3ea425) =>
-        isNodeInsideViewportPadding(_0x464d05['get'](_0x3ea425), _0x258adb, _0x5d7491, _0x45ca76, _0x590392),
+      [...nodeById['keys']()]['filter']((handle) =>
+        isNodeInsideViewportPadding(nodeById['get'](handle), viewport2, width, height, padding),
       ),
     );
-  const _0x5519cf = screenViewportToWorldBounds({
-    viewport: _0x258adb,
-    containerWidth: _0x5d7491,
-    containerHeight: _0x45ca76,
-    padding: _0x590392,
+  const worldBounds = screenViewportToWorldBounds({
+    viewport: viewport2,
+    containerWidth: width,
+    containerHeight: height,
+    padding: padding,
   });
   return new Set(
-    [...queryRendererSpatialIndexIds(_0x8110fe, _0x5519cf)]['filter']((_0x12ab43) =>
-      isNodeInsideViewportPadding(_0x464d05['get'](_0x12ab43), _0x258adb, _0x5d7491, _0x45ca76, _0x590392),
+    [...queryRendererSpatialIndexIds(spatialIndex2, worldBounds)]['filter']((state) =>
+      isNodeInsideViewportPadding(nodeById['get'](state), viewport2, width, height, padding),
     ),
   );
 }
-function smoothstep(_0x103e29, _0x3d64a4, _0x1879f6) {
-  if (_0x1879f6 <= _0x103e29) return 0x0;
-  if (_0x1879f6 >= _0x3d64a4) return 0x1;
-  const _0x23f848 = (_0x1879f6 - _0x103e29) / (_0x3d64a4 - _0x103e29);
-  return _0x23f848 * _0x23f848 * (0x3 - 0x2 * _0x23f848);
+function smoothstep(config, scope, input) {
+  if (input <= config) return 0x0;
+  if (input >= scope) return 0x1;
+  const output = (input - config) / (scope - config);
+  return output * output * (0x3 - 0x2 * output);
 }
-function calculateScenePressure(_0x17ef30, _0x4cd583) {
-  const _0x3f9fb5 = smoothstep(0x18, 0x78, _0x17ef30),
-    _0x4284e1 = smoothstep(0x50, 0x140, _0x4cd583);
-  return Math['max'](_0x3f9fb5, _0x4284e1);
+function calculateScenePressure(value2, value3) {
+  const smoothstep2 = smoothstep(0x18, 0x78, value2),
+    smoothstep3 = smoothstep(0x50, 0x140, value3);
+  return Math['max'](smoothstep2, smoothstep3);
 }
-function calculateProjectedDetail(_0x73a5c3, _0x229b3c, _0x30afc6) {
-  if (_0x73a5c3['size'] === 0x0) return 0x0;
-  const _0x3fbfb2 =
-    Number['isFinite'](_0x30afc6?.['zoom']) && _0x30afc6['zoom'] > 0x0 ? _0x30afc6['zoom'] : 0x1;
-  let _0x598f58 = 0x0,
-    _0x5bd929 = 0x0;
-  for (const _0x44cffb of _0x73a5c3) {
-    const _0x15e5f9 = _0x229b3c['get'](_0x44cffb);
-    if (!_0x15e5f9) continue;
-    const _0x42508f = Math['max'](0x1, Number(_0x15e5f9['width']) || 0xa0) * _0x3fbfb2,
-      _0x50e6b7 = Math['max'](0x1, Number(_0x15e5f9['height']) || 0x78) * _0x3fbfb2;
-    ((_0x598f58 += _0x42508f * _0x50e6b7), (_0x5bd929 += 0x1));
+function calculateProjectedDetail(value4, map4, box2) {
+  if (value4['size'] === 0x0) return 0x0;
+  const value5 = Number['isFinite'](box2?.['zoom']) && box2['zoom'] > 0x0 ? box2['zoom'] : 0x1;
+  let value6 = 0x0,
+    count = 0x0;
+  for (const value7 of value4) {
+    const box3 = map4['get'](value7);
+    if (!box3) continue;
+    const value8 = Math['max'](0x1, Number(box3['width']) || 0xa0) * value5,
+      value9 = Math['max'](0x1, Number(box3['height']) || 0x78) * value5;
+    ((value6 += value8 * value9), (count += 0x1));
   }
-  if (_0x5bd929 === 0x0) return 0x0;
-  const _0x38dcc2 = _0x598f58 / _0x5bd929,
-    _0x128e3 = Math['round'](_0x38dcc2 * 0x3b9aca00) / 0x3b9aca00;
-  return smoothstep(0x4b0, 0x1c20, _0x128e3);
+  if (count === 0x0) return 0x0;
+  const value10 = value6 / count,
+    value11 = Math['round'](value10 * 0x3b9aca00) / 0x3b9aca00;
+  return smoothstep(0x4b0, 0x1c20, value11);
 }
-function interpolate(_0x332482, _0x5ce201, _0x5d1139) {
-  return _0x332482 + (_0x5ce201 - _0x332482) * _0x5d1139;
+function interpolate(value12, value13, value14) {
+  return value12 + (value13 - value12) * value14;
 }
-function calculateDynamicPadding(_0x262a53, _0x3e53ac) {
-  const _0x541d15 = interpolate(0x1a4, 0x60, _0x262a53),
-    _0x3158f5 = 0x2d0 * _0x262a53 * (0x1 - _0x3e53ac) ** 0x2,
-    _0x4554f0 = Math['max'](
-      _0x541d15,
-      interpolate(0x2d0, 0xf0, _0x262a53) +
-        interpolate(0xf0, 0x0, _0x3e53ac) -
-        0x90 * _0x262a53 * _0x3e53ac +
-        _0x3158f5,
+function calculateDynamicPadding(value15, value16) {
+  const mount = interpolate(0x1a4, 0x60, value15),
+    value17 = 0x2d0 * value15 * (0x1 - value16) ** 0x2,
+    preview = Math['max'](
+      mount,
+      interpolate(0x2d0, 0xf0, value15) +
+        interpolate(0xf0, 0x0, value16) -
+        0x90 * value15 * value16 +
+        value17,
     );
   return {
-    mount: _0x541d15,
-    preview: _0x4554f0,
-    park: Math['max'](interpolate(0x384, 0x168, _0x262a53), _0x4554f0 + 0x78),
+    mount: mount,
+    preview: preview,
+    park: Math['max'](interpolate(0x384, 0x168, value15), preview + 0x78),
   };
 }
-function collectLiveIds(_0x4bbfa4, ..._0x3325fe) {
-  const _0x10b10f = new Set();
-  for (const _0x5493ed of _0x3325fe) {
-    for (const _0x1e1315 of toIdSet(_0x5493ed)) {
-      if (_0x4bbfa4['has'](_0x1e1315)) _0x10b10f['add'](_0x1e1315);
+function collectLiveIds(map5, ...args) {
+  const value18 = new Set();
+  for (const value19 of args) {
+    for (const value20 of toIdSet(value19)) {
+      if (map5['has'](value20)) value18['add'](value20);
     }
   }
-  return _0x10b10f;
+  return value18;
 }
-function buildSurfaceSignature(_0x43d3fb, _0x4a3a48, _0x447d56) {
-  return ['full', ..._0x43d3fb, 'proxy', ..._0x4a3a48, 'generation-busy', ..._0x447d56]['join']('\x1f');
+function buildSurfaceSignature(args2, args3, args4) {
+  return ['full', ...args2, 'proxy', ...args3, 'generation-busy', ...args4]['join']('\x1f');
 }
-function getNodeDistanceSquared(_0x1d6ea1, _0x18f8f0, _0x3e8fde, _0xf7427c) {
-  const _0x506a6e =
-      Number['isFinite'](_0x18f8f0?.['zoom']) && _0x18f8f0['zoom'] > 0x0 ? _0x18f8f0['zoom'] : 0x1,
-    _0x1b0095 = Number['isFinite'](_0x18f8f0?.['x']) ? _0x18f8f0['x'] : 0x0,
-    _0x5bdd4a = Number['isFinite'](_0x18f8f0?.['y']) ? _0x18f8f0['y'] : 0x0,
-    _0x16ee97 =
-      ((Number['isFinite'](_0x1d6ea1?.['x']) ? _0x1d6ea1['x'] : 0x0) +
-        (Number['isFinite'](_0x1d6ea1?.['width']) ? _0x1d6ea1['width'] : 0x0) / 0x2) *
-        _0x506a6e +
-      _0x1b0095,
-    _0x484f51 =
-      ((Number['isFinite'](_0x1d6ea1?.['y']) ? _0x1d6ea1['y'] : 0x0) +
-        (Number['isFinite'](_0x1d6ea1?.['height']) ? _0x1d6ea1['height'] : 0x0) / 0x2) *
-        _0x506a6e +
-      _0x5bdd4a,
-    _0x2220fb = _0x16ee97 - _0x3e8fde / 0x2,
-    _0x5b872c = _0x484f51 - _0xf7427c / 0x2;
-  return _0x2220fb * _0x2220fb + _0x5b872c * _0x5b872c;
+function getNodeDistanceSquared(box4, box5, value21, value22) {
+  const value23 = Number['isFinite'](box5?.['zoom']) && box5['zoom'] > 0x0 ? box5['zoom'] : 0x1,
+    value24 = Number['isFinite'](box5?.['x']) ? box5['x'] : 0x0,
+    value25 = Number['isFinite'](box5?.['y']) ? box5['y'] : 0x0,
+    value26 =
+      ((Number['isFinite'](box4?.['x']) ? box4['x'] : 0x0) +
+        (Number['isFinite'](box4?.['width']) ? box4['width'] : 0x0) / 0x2) *
+        value23 +
+      value24,
+    value27 =
+      ((Number['isFinite'](box4?.['y']) ? box4['y'] : 0x0) +
+        (Number['isFinite'](box4?.['height']) ? box4['height'] : 0x0) / 0x2) *
+        value23 +
+      value25,
+    value28 = value26 - value21 / 0x2,
+    value29 = value27 - value22 / 0x2;
+  return value28 * value28 + value29 * value29;
 }
 export function buildRendererScenePlan({
   nodes: nodes = [],
   spatialIndex: spatialIndex = null,
   viewport: viewport = { x: 0x0, y: 0x0, zoom: 0x1 },
-  containerRect: _0x477e2a,
-  mountCandidateIds: _0x1e5fd9,
-  previewCandidateIds: _0x4dcb3e,
-  parkCandidateIds: _0x4214ab,
-  selectedNodeIds: _0x363c80,
-  activeNodeIds: _0x180dc0,
-  keepAliveNodeIds: _0x287680,
-  mountedNodeIds: _0x5fb85d,
-  fullEligibleVisibleImageNodeIds: _0x53c847,
+  containerRect: containerRect,
+  mountCandidateIds: mountCandidateIds,
+  previewCandidateIds: previewCandidateIds,
+  parkCandidateIds: parkCandidateIds,
+  selectedNodeIds: selectedNodeIds,
+  activeNodeIds: activeNodeIds,
+  keepAliveNodeIds: keepAliveNodeIds,
+  mountedNodeIds: mountedNodeIds,
+  fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds,
   includeParkIds: includeParkIds = !![],
   deferInitialPlanning: deferInitialPlanning = ![],
 } = {}) {
-  const { width: _0x24d10d, height: _0x16eb81 } = getContainerSize(_0x477e2a),
-    _0x5325cf = createNodeMap(nodes, spatialIndex),
-    _0x3271ac = new Map(),
-    _0x4cac6c = (_0xc47f3e) => {
-      if (_0x3271ac['has'](_0xc47f3e)) return _0x3271ac['get'](_0xc47f3e);
-      const _0x1c9451 = getNodeDistanceSquared(_0x5325cf['get'](_0xc47f3e), viewport, _0x24d10d, _0x16eb81);
-      return (_0x3271ac['set'](_0xc47f3e, _0x1c9451), _0x1c9451);
+  const { width: width2, height: height2 } = getContainerSize(containerRect),
+    nodeById2 = createNodeMap(nodes, spatialIndex),
+    map6 = new Map(),
+    handler = (value30) => {
+      if (map6['has'](value30)) return map6['get'](value30);
+      const nodeDistanceSquared = getNodeDistanceSquared(
+        nodeById2['get'](value30),
+        viewport,
+        width2,
+        height2,
+      );
+      return (map6['set'](value30, nodeDistanceSquared), nodeDistanceSquared);
     },
-    _0x420d0c = collectViewportRangeIds({
-      nodeById: _0x5325cf,
+    exactVisibleIds = collectViewportRangeIds({
+      nodeById: nodeById2,
       spatialIndex: spatialIndex,
       viewport: viewport,
-      width: _0x24d10d,
-      height: _0x16eb81,
+      width: width2,
+      height: height2,
       padding: 0x0,
     }),
-    _0x586020 = new Set(),
-    _0x179dca = new Set(),
-    _0xe1ce94 = calculateScenePressure(_0x420d0c['size'], _0x5325cf['size']),
-    _0x43d74f = calculateProjectedDetail(_0x420d0c, _0x5325cf, viewport),
-    _0x3f3a69 = calculateDynamicPadding(_0xe1ce94, _0x43d74f),
-    _0x55c616 = smoothstep(0x78, 0x140, _0x5325cf['size']),
-    _0x35f2b0 = calculateDenseLowZoomRasterStrength(_0x55c616, viewport),
-    _0x299621 = Math['round']((0x30 - 0x10 * _0xe1ce94) * _0x43d74f * (0x1 - _0x35f2b0)),
-    _0x395a28 = collectLiveIds(_0x5325cf, _0x5fb85d),
-    _0x584f10 = collectLiveIds(_0x5325cf, _0x363c80, _0x180dc0, _0x287680),
-    _0x1afd9b = [];
-  for (const _0x5732ca of _0x420d0c) {
-    shouldShowGenerationBusyUi(_0x5325cf['get'](_0x5732ca)) && _0x1afd9b['push'](_0x5732ca);
+    fullSurfaceIds = new Set(),
+    proxySurfaceIds = new Set(),
+    pressure = calculateScenePressure(exactVisibleIds['size'], nodeById2['size']),
+    projectedDetail = calculateProjectedDetail(exactVisibleIds, nodeById2, viewport),
+    padding2 = calculateDynamicPadding(pressure, projectedDetail),
+    smoothstep4 = smoothstep(0x78, 0x140, nodeById2['size']),
+    calculateDenseLowZoomRasterStrength2 = calculateDenseLowZoomRasterStrength(smoothstep4, viewport),
+    fullSurfaceBudget = Math['round'](
+      (0x30 - 0x10 * pressure) * projectedDetail * (0x1 - calculateDenseLowZoomRasterStrength2),
+    ),
+    map7 = collectLiveIds(nodeById2, mountedNodeIds),
+    liveIds = collectLiveIds(nodeById2, selectedNodeIds, activeNodeIds, keepAliveNodeIds),
+    list2 = [];
+  for (const value31 of exactVisibleIds) {
+    shouldShowGenerationBusyUi(nodeById2['get'](value31)) && list2['push'](value31);
   }
   spatialIndex &&
-    _0x1afd9b['length'] > 0x1 &&
-    _0x1afd9b['sort'](
-      (_0x177592, _0x3f1dbd) =>
-        getSpatialNodeOrder(spatialIndex, _0x177592) - getSpatialNodeOrder(spatialIndex, _0x3f1dbd),
+    list2['length'] > 0x1 &&
+    list2['sort'](
+      (value32, value33) =>
+        getSpatialNodeOrder(spatialIndex, value32) - getSpatialNodeOrder(spatialIndex, value33),
     );
-  const _0xbc4df9 = new Set(_0x1afd9b),
-    _0x23ec90 = collectLiveIds(_0x5325cf, _0x1e5fd9);
-  for (const _0x154536 of _0x584f10) _0x586020['add'](_0x154536);
-  if (deferInitialPlanning === !![] && includeParkIds === ![] && _0x299621 === 0x0) {
-    const _0xa22dfe = collectLiveIds(_0x5325cf, _0x4dcb3e, _0x1e5fd9, _0x420d0c);
-    for (const _0x53768c of _0xa22dfe) {
-      if (!_0x586020['has'](_0x53768c)) _0x179dca['add'](_0x53768c);
+  const exactVisibleGenerationBusyIds = new Set(list2),
+    map8 = collectLiveIds(nodeById2, mountCandidateIds);
+  for (const value34 of liveIds) fullSurfaceIds['add'](value34);
+  if (deferInitialPlanning === !![] && includeParkIds === ![] && fullSurfaceBudget === 0x0) {
+    const liveIds2 = collectLiveIds(nodeById2, previewCandidateIds, mountCandidateIds, exactVisibleIds);
+    for (const value35 of liveIds2) {
+      if (!fullSurfaceIds['has'](value35)) proxySurfaceIds['add'](value35);
     }
-    const _0x20ddb1 = new Set([..._0x395a28]['filter']((_0x144812) => !_0x586020['has'](_0x144812))),
-      _0x35019f = new Set([..._0x586020, ..._0x179dca]),
-      _0x4eded0 = new Set([...toIdSet(_0x53c847)]['filter']((_0x14417b) => _0x586020['has'](_0x14417b)));
+    const fullSurfaceReleaseIds = new Set([...map7]['filter']((value36) => !fullSurfaceIds['has'](value36))),
+      presentationSurfaceIds = new Set([...fullSurfaceIds, ...proxySurfaceIds]),
+      plannedFullEligibleVisibleImageNodeIds = new Set(
+        [...toIdSet(fullEligibleVisibleImageNodeIds)]['filter']((value37) => fullSurfaceIds['has'](value37)),
+      );
     return {
-      pressure: _0xe1ce94,
-      projectedDetail: _0x43d74f,
-      padding: _0x3f3a69,
-      fullSurfaceBudget: _0x299621,
-      exactVisibleIds: _0x420d0c,
-      exactVisibleGenerationBusyIds: _0xbc4df9,
-      fullSurfaceIds: _0x586020,
-      proxySurfaceIds: _0x179dca,
+      pressure: pressure,
+      projectedDetail: projectedDetail,
+      padding: padding2,
+      fullSurfaceBudget: fullSurfaceBudget,
+      exactVisibleIds: exactVisibleIds,
+      exactVisibleGenerationBusyIds: exactVisibleGenerationBusyIds,
+      fullSurfaceIds: fullSurfaceIds,
+      proxySurfaceIds: proxySurfaceIds,
       parkIds: new Set(),
-      fullSurfaceReleaseIds: _0x20ddb1,
-      presentationSurfaceIds: _0x35019f,
-      plannedFullEligibleVisibleImageNodeIds: _0x4eded0,
+      fullSurfaceReleaseIds: fullSurfaceReleaseIds,
+      presentationSurfaceIds: presentationSurfaceIds,
+      plannedFullEligibleVisibleImageNodeIds: plannedFullEligibleVisibleImageNodeIds,
       deferredInitialPlanning: !![],
-      surfaceSignature: buildSurfaceSignature(_0x586020, _0x179dca, _0xbc4df9),
+      surfaceSignature: buildSurfaceSignature(fullSurfaceIds, proxySurfaceIds, exactVisibleGenerationBusyIds),
     };
   }
-  const _0x3eb12a = collectViewportRangeIds({
-      nodeById: _0x5325cf,
+  const args5 = collectViewportRangeIds({
+      nodeById: nodeById2,
       spatialIndex: spatialIndex,
       viewport: viewport,
-      width: _0x24d10d,
-      height: _0x16eb81,
-      padding: _0x3f3a69['mount'],
+      width: width2,
+      height: height2,
+      padding: padding2['mount'],
     }),
-    _0x2ad677 = Math['max'](0x0, _0x299621 - _0x586020['size']);
-  if (_0x2ad677 > 0x0) {
-    const _0x528a30 = [..._0x3eb12a]
-      ['filter']((_0x4f4e1f) => !_0x586020['has'](_0x4f4e1f))
-      ['sort']((_0x31c1ec, _0x439f30) => {
-        const _0x23ead6 = Number(!_0x420d0c['has'](_0x31c1ec)) - Number(!_0x420d0c['has'](_0x439f30));
-        if (_0x23ead6 !== 0x0) return _0x23ead6;
-        const _0x1f8376 = Number(!_0xbc4df9['has'](_0x31c1ec)) - Number(!_0xbc4df9['has'](_0x439f30));
-        if (_0x1f8376 !== 0x0) return _0x1f8376;
-        const _0x4e0ee5 = Number(!_0x23ec90['has'](_0x31c1ec)) - Number(!_0x23ec90['has'](_0x439f30));
-        if (_0x4e0ee5 !== 0x0) return _0x4e0ee5;
-        const _0x26eae7 = Number(!_0x395a28['has'](_0x31c1ec)) - Number(!_0x395a28['has'](_0x439f30));
-        if (_0x26eae7 !== 0x0) return _0x26eae7;
-        const _0x2e1fd1 = _0x4cac6c(_0x31c1ec) - _0x4cac6c(_0x439f30);
-        if (_0x2e1fd1 !== 0x0) return _0x2e1fd1;
-        return getSpatialNodeOrder(spatialIndex, _0x31c1ec) - getSpatialNodeOrder(spatialIndex, _0x439f30);
+    count2 = Math['max'](0x0, fullSurfaceBudget - fullSurfaceIds['size']);
+  if (count2 > 0x0) {
+    const list3 = [...args5]
+      ['filter']((value38) => !fullSurfaceIds['has'](value38))
+      ['sort']((value39, value40) => {
+        const count3 = Number(!exactVisibleIds['has'](value39)) - Number(!exactVisibleIds['has'](value40));
+        if (count3 !== 0x0) return count3;
+        const count4 =
+          Number(!exactVisibleGenerationBusyIds['has'](value39)) -
+          Number(!exactVisibleGenerationBusyIds['has'](value40));
+        if (count4 !== 0x0) return count4;
+        const count5 = Number(!map8['has'](value39)) - Number(!map8['has'](value40));
+        if (count5 !== 0x0) return count5;
+        const count6 = Number(!map7['has'](value39)) - Number(!map7['has'](value40));
+        if (count6 !== 0x0) return count6;
+        const count7 = handler(value39) - handler(value40);
+        if (count7 !== 0x0) return count7;
+        return getSpatialNodeOrder(spatialIndex, value39) - getSpatialNodeOrder(spatialIndex, value40);
       });
-    for (const _0x2b1803 of _0x528a30['slice'](0x0, _0x2ad677)) {
-      _0x586020['add'](_0x2b1803);
+    for (const value41 of list3['slice'](0x0, count2)) {
+      fullSurfaceIds['add'](value41);
     }
   }
-  const _0x1faad9 = collectLiveIds(_0x5325cf, _0x4dcb3e),
-    _0x442bcf = new Set(
+  const map9 = collectLiveIds(nodeById2, previewCandidateIds),
+    value42 = new Set(
       [
         ...collectViewportRangeIds({
-          nodeById: _0x5325cf,
+          nodeById: nodeById2,
           spatialIndex: spatialIndex,
           viewport: viewport,
-          width: _0x24d10d,
-          height: _0x16eb81,
-          padding: _0x3f3a69['preview'],
+          width: width2,
+          height: height2,
+          padding: padding2['preview'],
         }),
-      ]['sort']((_0x49af4e, _0x276edb) => {
-        const _0x60bc3b = Number(!_0x1faad9['has'](_0x49af4e)) - Number(!_0x1faad9['has'](_0x276edb));
-        if (_0x60bc3b !== 0x0) return _0x60bc3b;
-        const _0x46dc1 = _0x4cac6c(_0x49af4e) - _0x4cac6c(_0x276edb);
-        if (_0x46dc1 !== 0x0) return _0x46dc1;
-        return getSpatialNodeOrder(spatialIndex, _0x49af4e) - getSpatialNodeOrder(spatialIndex, _0x276edb);
+      ]['sort']((value43, value44) => {
+        const count8 = Number(!map9['has'](value43)) - Number(!map9['has'](value44));
+        if (count8 !== 0x0) return count8;
+        const count9 = handler(value43) - handler(value44);
+        if (count9 !== 0x0) return count9;
+        return getSpatialNodeOrder(spatialIndex, value43) - getSpatialNodeOrder(spatialIndex, value44);
       }),
     );
-  for (const _0x4663b8 of _0x3eb12a) _0x442bcf['add'](_0x4663b8);
-  for (const _0xa32082 of _0x420d0c) {
-    _0x442bcf['add'](_0xa32082);
+  for (const value45 of args5) value42['add'](value45);
+  for (const value46 of exactVisibleIds) {
+    value42['add'](value46);
   }
-  for (const _0x29d639 of _0x442bcf) {
-    if (!_0x586020['has'](_0x29d639)) _0x179dca['add'](_0x29d639);
+  for (const value47 of value42) {
+    if (!fullSurfaceIds['has'](value47)) proxySurfaceIds['add'](value47);
   }
-  let _0x104ac5 = new Set();
+  let parkIds = new Set();
   if (includeParkIds !== ![]) {
-    const _0x28ff15 = collectLiveIds(_0x5325cf, _0x4214ab),
-      _0x195ccb = collectViewportRangeIds({
-        nodeById: _0x5325cf,
+    const map10 = collectLiveIds(nodeById2, parkCandidateIds),
+      map11 = collectViewportRangeIds({
+        nodeById: nodeById2,
         spatialIndex: spatialIndex,
         viewport: viewport,
-        width: _0x24d10d,
-        height: _0x16eb81,
-        padding: _0x3f3a69['park'],
+        width: width2,
+        height: height2,
+        padding: padding2['park'],
       });
-    _0x104ac5 = new Set(
-      [..._0x5325cf['keys']()]
-        ['filter']((_0x10a340) => !_0x195ccb['has'](_0x10a340))
-        ['sort']((_0x435860, _0xdd3b5d) => {
-          const _0x5be0b7 = Number(!_0x28ff15['has'](_0x435860)) - Number(!_0x28ff15['has'](_0xdd3b5d));
-          if (_0x5be0b7 !== 0x0) return _0x5be0b7;
-          return getSpatialNodeOrder(spatialIndex, _0x435860) - getSpatialNodeOrder(spatialIndex, _0xdd3b5d);
+    parkIds = new Set(
+      [...nodeById2['keys']()]
+        ['filter']((value48) => !map11['has'](value48))
+        ['sort']((value49, value50) => {
+          const count10 = Number(!map10['has'](value49)) - Number(!map10['has'](value50));
+          if (count10 !== 0x0) return count10;
+          return getSpatialNodeOrder(spatialIndex, value49) - getSpatialNodeOrder(spatialIndex, value50);
         }),
     );
-    for (const _0x6bc7e5 of _0x395a28) {
-      !isNodeInsideViewportPadding(
-        _0x5325cf['get'](_0x6bc7e5),
-        viewport,
-        _0x24d10d,
-        _0x16eb81,
-        _0x3f3a69['park'],
-      ) && _0x104ac5['add'](_0x6bc7e5);
+    for (const value51 of map7) {
+      !isNodeInsideViewportPadding(nodeById2['get'](value51), viewport, width2, height2, padding2['park']) &&
+        parkIds['add'](value51);
     }
-    for (const _0x4fdc6d of _0x586020) _0x104ac5['delete'](_0x4fdc6d);
-    for (const _0x57c543 of _0x179dca) _0x104ac5['delete'](_0x57c543);
+    for (const value52 of fullSurfaceIds) parkIds['delete'](value52);
+    for (const value53 of proxySurfaceIds) parkIds['delete'](value53);
   }
-  const _0x317181 = new Set([..._0x395a28]['filter']((_0x2bc734) => !_0x586020['has'](_0x2bc734))),
-    _0xf04568 = new Set([..._0x586020, ..._0x179dca]),
-    _0x3989de = new Set([...toIdSet(_0x53c847)]['filter']((_0x25b18c) => _0x586020['has'](_0x25b18c)));
+  const fullSurfaceReleaseIds2 = new Set([...map7]['filter']((value54) => !fullSurfaceIds['has'](value54))),
+    presentationSurfaceIds2 = new Set([...fullSurfaceIds, ...proxySurfaceIds]),
+    plannedFullEligibleVisibleImageNodeIds2 = new Set(
+      [...toIdSet(fullEligibleVisibleImageNodeIds)]['filter']((value55) => fullSurfaceIds['has'](value55)),
+    );
   return {
-    pressure: _0xe1ce94,
-    projectedDetail: _0x43d74f,
-    padding: _0x3f3a69,
-    fullSurfaceBudget: _0x299621,
-    exactVisibleIds: _0x420d0c,
-    exactVisibleGenerationBusyIds: _0xbc4df9,
-    fullSurfaceIds: _0x586020,
-    proxySurfaceIds: _0x179dca,
-    parkIds: _0x104ac5,
-    fullSurfaceReleaseIds: _0x317181,
-    presentationSurfaceIds: _0xf04568,
-    plannedFullEligibleVisibleImageNodeIds: _0x3989de,
-    surfaceSignature: buildSurfaceSignature(_0x586020, _0x179dca, _0xbc4df9),
+    pressure: pressure,
+    projectedDetail: projectedDetail,
+    padding: padding2,
+    fullSurfaceBudget: fullSurfaceBudget,
+    exactVisibleIds: exactVisibleIds,
+    exactVisibleGenerationBusyIds: exactVisibleGenerationBusyIds,
+    fullSurfaceIds: fullSurfaceIds,
+    proxySurfaceIds: proxySurfaceIds,
+    parkIds: parkIds,
+    fullSurfaceReleaseIds: fullSurfaceReleaseIds2,
+    presentationSurfaceIds: presentationSurfaceIds2,
+    plannedFullEligibleVisibleImageNodeIds: plannedFullEligibleVisibleImageNodeIds2,
+    surfaceSignature: buildSurfaceSignature(fullSurfaceIds, proxySurfaceIds, exactVisibleGenerationBusyIds),
   };
 }

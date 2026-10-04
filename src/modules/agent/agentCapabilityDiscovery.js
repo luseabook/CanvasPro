@@ -1,197 +1,194 @@
 import { listModelManifests } from '../../manifests/index.js';
 const DEFAULT_RESULT_LIMIT = 0x6,
   MAX_RESULT_LIMIT = 0xc;
-export function normalizeAgentSearchText(_0x5eb2eb) {
-  return String(_0x5eb2eb || '')
+export function normalizeAgentSearchText(value) {
+  return String(value || '')
     ['normalize']('NFKC')
     ['trim']()
     ['toLowerCase']();
 }
-export function normalizeAgentSearchKey(_0x719db4) {
-  return normalizeAgentSearchText(_0x719db4)['replace'](/[\s\-_.:/|,，。()（）\[\]【】]+/g, '');
+export function normalizeAgentSearchKey(item) {
+  return normalizeAgentSearchText(item)['replace'](/[\s\-_.:/|,，。()（）\[\]【】]+/g, '');
 }
-function normalizeStringArray(_0x5759e8) {
-  return Array['isArray'](_0x5759e8)
-    ? [...new Set(_0x5759e8['map']((_0xe28e46) => String(_0xe28e46 || '')['trim']())['filter'](Boolean))]
+function normalizeStringArray(list) {
+  return Array['isArray'](list)
+    ? [...new Set(list['map']((key) => String(key || '')['trim']())['filter'](Boolean))]
     : [];
 }
-function normalizeLimit(_0x1414f0) {
-  const _0x1511fc = Number(_0x1414f0);
-  if (!Number['isFinite'](_0x1511fc)) return DEFAULT_RESULT_LIMIT;
-  return Math['max'](0x1, Math['min'](MAX_RESULT_LIMIT, Math['trunc'](_0x1511fc)));
+function normalizeLimit(index) {
+  const result = Number(index);
+  if (!Number['isFinite'](result)) return DEFAULT_RESULT_LIMIT;
+  return Math['max'](0x1, Math['min'](MAX_RESULT_LIMIT, Math['trunc'](result)));
 }
-function collectSearchTokens(_0xc2d351) {
-  return normalizeAgentSearchText(_0xc2d351)
+function collectSearchTokens(data) {
+  return normalizeAgentSearchText(data)
     ['split'](/[\s,，。:：/|]+/)
-    ['map']((_0x36da7e) => _0x36da7e['trim']())
-    ['filter']((_0x229f36) => _0x229f36['length'] >= 0x2);
+    ['map']((options) => options['trim']())
+    ['filter']((list2) => list2['length'] >= 0x2);
 }
-function scoreHaystack(_0x1d9dde, _0x31e2de, _0x4374ed = []) {
-  const _0x47e1d7 = normalizeAgentSearchText(_0x1d9dde);
-  if (!_0x47e1d7) return 0x1;
-  const _0x562acf = normalizeAgentSearchKey(_0x47e1d7);
-  let _0x50273b = 0x0;
-  for (const _0x298449 of _0x4374ed['map'](normalizeAgentSearchText)['filter'](Boolean)) {
-    if (_0x298449 === _0x47e1d7) _0x50273b += 0x3e8;
+function scoreHaystack(target, source, list3 = []) {
+  const list4 = normalizeAgentSearchText(target);
+  if (!list4) return 0x1;
+  const list5 = normalizeAgentSearchKey(list4);
+  let next = 0x0;
+  for (const list6 of list3['map'](normalizeAgentSearchText)['filter'](Boolean)) {
+    if (list6 === list4) next += 0x3e8;
     else {
-      if (_0x47e1d7['includes'](_0x298449) || _0x298449['includes'](_0x47e1d7)) _0x50273b += 0xdc;
+      if (list4['includes'](list6) || list6['includes'](list4)) next += 0xdc;
     }
-    const _0x3ceb6e = normalizeAgentSearchKey(_0x298449);
-    if (_0x562acf && _0x3ceb6e === _0x562acf) _0x50273b += 0x384;
+    const list7 = normalizeAgentSearchKey(list6);
+    if (list5 && list7 === list5) next += 0x384;
     else
-      _0x562acf['length'] >= 0x3 &&
-        _0x3ceb6e &&
-        (_0x562acf['includes'](_0x3ceb6e) || _0x3ceb6e['includes'](_0x562acf)) &&
-        (_0x50273b += 0xc8);
+      list5['length'] >= 0x3 &&
+        list7 &&
+        (list5['includes'](list7) || list7['includes'](list5)) &&
+        (next += 0xc8);
   }
-  const _0x1b7e17 = normalizeAgentSearchText(_0x31e2de);
-  if (_0x1b7e17['includes'](_0x47e1d7)) _0x50273b += 0xb4;
-  const _0x4ce576 = normalizeAgentSearchKey(_0x1b7e17);
-  if (_0x562acf['length'] >= 0x3 && _0x4ce576['includes'](_0x562acf)) _0x50273b += 0xa0;
-  for (const _0x488d84 of collectSearchTokens(_0x47e1d7)) {
-    if (_0x1b7e17['includes'](_0x488d84)) _0x50273b += 0x1e;
+  const list8 = normalizeAgentSearchText(source);
+  if (list8['includes'](list4)) next += 0xb4;
+  const list9 = normalizeAgentSearchKey(list8);
+  if (list5['length'] >= 0x3 && list9['includes'](list5)) next += 0xa0;
+  for (const current of collectSearchTokens(list4)) {
+    if (list8['includes'](current)) next += 0x1e;
   }
-  return _0x50273b;
+  return next;
 }
-function summarizeCommand(_0x52dcf3 = {}) {
+function summarizeCommand(options2 = {}) {
   return {
-    commandId: String(_0x52dcf3['id'] || ''),
-    description: String(_0x52dcf3['description'] || ''),
-    riskLevel: String(_0x52dcf3['riskLevel'] || 'safe'),
-    reads: normalizeStringArray(_0x52dcf3['capabilitySchema']?.['reads']),
-    writes: normalizeStringArray(_0x52dcf3['capabilitySchema']?.['writes']),
-    argNames: Object['keys'](_0x52dcf3['argsSchema']?.['properties'] || {}),
+    commandId: String(options2['id'] || ''),
+    description: String(options2['description'] || ''),
+    riskLevel: String(options2['riskLevel'] || 'safe'),
+    reads: normalizeStringArray(options2['capabilitySchema']?.['reads']),
+    writes: normalizeStringArray(options2['capabilitySchema']?.['writes']),
+    argNames: Object['keys'](options2['argsSchema']?.['properties'] || {}),
   };
 }
 export function searchAgentCommands({
-  commandRegistry: _0x65e51d,
+  commandRegistry: commandRegistry,
   query: query = '',
-  limit: _0x4dd8ca,
+  limit: limit,
 } = {}) {
-  const _0x26d27f = typeof _0x65e51d?.['list'] === 'function' ? _0x65e51d['list']() : [],
-    _0x4a01de = _0x26d27f['map']((_0x2999d2, _0x5e8ff6) => {
-      const _0x107d0c = summarizeCommand(_0x2999d2),
-        _0x17e138 = [
-          _0x107d0c['commandId'],
-          _0x107d0c['description'],
-          ..._0x107d0c['reads'],
-          ..._0x107d0c['writes'],
-          ..._0x107d0c['argNames'],
+  const list10 = typeof commandRegistry?.['list'] === 'function' ? commandRegistry['list']() : [],
+    totalMatched = list10['map']((entry, index2) => {
+      const summary = summarizeCommand(entry),
+        record = [
+          summary['commandId'],
+          summary['description'],
+          ...summary['reads'],
+          ...summary['writes'],
+          ...summary['argNames'],
         ]['join']('\x20');
       return {
-        summary: _0x107d0c,
-        index: _0x5e8ff6,
-        score: scoreHaystack(query, _0x17e138, [_0x107d0c['commandId']]),
+        summary: summary,
+        index: index2,
+        score: scoreHaystack(query, record, [summary['commandId']]),
       };
     })
-      ['filter']((_0x27c3e0) => _0x27c3e0['score'] > 0x0)
-      ['sort'](
-        (_0x538106, _0x44c61d) =>
-          _0x44c61d['score'] - _0x538106['score'] || _0x538106['index'] - _0x44c61d['index'],
-      ),
-    _0x5e1f33 = _0x4a01de['slice'](0x0, normalizeLimit(_0x4dd8ca));
+      ['filter']((payload) => payload['score'] > 0x0)
+      ['sort']((handle, state) => state['score'] - handle['score'] || handle['index'] - state['index']),
+    commandIds = totalMatched['slice'](0x0, normalizeLimit(limit));
   return {
     query: String(query || '')['trim'](),
-    commandIds: _0x5e1f33['map']((_0x5e03f7) => _0x5e03f7['summary']['commandId']),
-    commands: _0x5e1f33['map']((_0x50f169) => _0x50f169['summary']),
-    totalMatched: _0x4a01de['length'],
+    commandIds: commandIds['map']((config) => config['summary']['commandId']),
+    commands: commandIds['map']((scope) => scope['summary']),
+    totalMatched: totalMatched['length'],
   };
 }
-export function describeAgentCommand({ commandRegistry: _0x5edbe6, commandId: commandId = '' } = {}) {
-  const _0x1e0489 = String(commandId || '')['trim'](),
-    _0x53272e = _0x5edbe6?.['get']?.(_0x1e0489) || null;
-  if (!_0x53272e)
+export function describeAgentCommand({ commandRegistry: commandRegistry2, commandId: commandId = '' } = {}) {
+  const commandId2 = String(commandId || '')['trim'](),
+    commandId3 = commandRegistry2?.['get']?.(commandId2) || null;
+  if (!commandId3)
     return {
       found: ![],
-      commandId: _0x1e0489,
+      commandId: commandId2,
       errorCode: 'AGENT_COMMAND_NOT_FOUND',
-      message: 'Canvas\x20command\x20is\x20not\x20registered:\x20' + _0x1e0489,
+      message: 'Canvas\x20command\x20is\x20not\x20registered:\x20' + commandId2,
     };
   return {
     found: !![],
-    commandId: _0x53272e['id'],
-    description: String(_0x53272e['description'] || ''),
-    riskLevel: String(_0x53272e['riskLevel'] || 'safe'),
-    argsSchema: _0x53272e['argsSchema'],
-    capabilitySchema: _0x53272e['capabilitySchema'],
-    returnSchema: _0x53272e['returnSchema'],
-    returnAliasFields: normalizeStringArray(_0x53272e['returnSchema']?.['aliasFields']),
+    commandId: commandId3['id'],
+    description: String(commandId3['description'] || ''),
+    riskLevel: String(commandId3['riskLevel'] || 'safe'),
+    argsSchema: commandId3['argsSchema'],
+    capabilitySchema: commandId3['capabilitySchema'],
+    returnSchema: commandId3['returnSchema'],
+    returnAliasFields: normalizeStringArray(commandId3['returnSchema']?.['aliasFields']),
   };
 }
-function summarizeInputSlots(_0x391f6b = {}) {
-  if (!_0x391f6b || typeof _0x391f6b !== 'object' || Array['isArray'](_0x391f6b)) return {};
-  const _0x136580 = (Array['isArray'](_0x391f6b['fixedSlots']) ? _0x391f6b['fixedSlots'] : [])
-    ['map']((_0x3587e3 = {}) => ({
-      id: String(_0x3587e3['id'] || _0x3587e3['slotId'] || ''),
-      kind: String(_0x3587e3['kind'] || _0x3587e3['type'] || ''),
-      required: _0x3587e3['required'] === !![],
-      ...(_0x3587e3['showWhen'] ? { showWhen: _0x3587e3['showWhen'] } : {}),
+function summarizeInputSlots(minItems = {}) {
+  if (!minItems || typeof minItems !== 'object' || Array['isArray'](minItems)) return {};
+  const fixedSlots = (Array['isArray'](minItems['fixedSlots']) ? minItems['fixedSlots'] : [])
+    ['map']((required = {}) => ({
+      id: String(required['id'] || required['slotId'] || ''),
+      kind: String(required['kind'] || required['type'] || ''),
+      required: required['required'] === !![],
+      ...(required['showWhen'] ? { showWhen: required['showWhen'] } : {}),
     }))
-    ['filter']((_0x16ff35) => _0x16ff35['id']);
+    ['filter']((input) => input['id']);
   return {
-    ...(_0x136580['length'] > 0x0 ? { fixedSlots: _0x136580 } : {}),
-    ...(Array['isArray'](_0x391f6b['allowedKinds'])
-      ? { allowedKinds: normalizeStringArray(_0x391f6b['allowedKinds']) }
+    ...(fixedSlots['length'] > 0x0 ? { fixedSlots: fixedSlots } : {}),
+    ...(Array['isArray'](minItems['allowedKinds'])
+      ? { allowedKinds: normalizeStringArray(minItems['allowedKinds']) }
       : {}),
-    ...(_0x391f6b['minByKind'] && typeof _0x391f6b['minByKind'] === 'object'
-      ? { minByKind: { ..._0x391f6b['minByKind'] } }
+    ...(minItems['minByKind'] && typeof minItems['minByKind'] === 'object'
+      ? { minByKind: { ...minItems['minByKind'] } }
       : {}),
-    ...(_0x391f6b['maxByKind'] && typeof _0x391f6b['maxByKind'] === 'object'
-      ? { maxByKind: { ..._0x391f6b['maxByKind'] } }
+    ...(minItems['maxByKind'] && typeof minItems['maxByKind'] === 'object'
+      ? { maxByKind: { ...minItems['maxByKind'] } }
       : {}),
-    ...(_0x391f6b['minItems'] != null ? { minItems: _0x391f6b['minItems'] } : {}),
-    ...(_0x391f6b['maxItems'] != null ? { maxItems: _0x391f6b['maxItems'] } : {}),
-    ...(_0x391f6b['accepts'] ? { accepts: _0x391f6b['accepts'] } : {}),
+    ...(minItems['minItems'] != null ? { minItems: minItems['minItems'] } : {}),
+    ...(minItems['maxItems'] != null ? { maxItems: minItems['maxItems'] } : {}),
+    ...(minItems['accepts'] ? { accepts: minItems['accepts'] } : {}),
   };
 }
-function modelAcceptsInputKind(_0x28c3cb = {}, _0x300fc2 = '') {
-  const _0x10adf9 = normalizeAgentSearchText(_0x300fc2);
-  if (!_0x10adf9) return !![];
-  const _0x1a508f = new Set(normalizeStringArray(_0x28c3cb['allowedKinds'])['map'](normalizeAgentSearchText));
-  if (_0x1a508f['has'](_0x10adf9)) return !![];
-  if (Number(_0x28c3cb['maxByKind']?.[_0x10adf9]) > 0x0) return !![];
-  if (Number(_0x28c3cb['minByKind']?.[_0x10adf9]) > 0x0) return !![];
-  return (_0x28c3cb['fixedSlots'] || [])['some'](
-    (_0x55f3c5) => normalizeAgentSearchText(_0x55f3c5['kind']) === _0x10adf9,
+function modelAcceptsInputKind(options3 = {}, output = '') {
+  const agentSearchText = normalizeAgentSearchText(output);
+  if (!agentSearchText) return !![];
+  const map = new Set(normalizeStringArray(options3['allowedKinds'])['map'](normalizeAgentSearchText));
+  if (map['has'](agentSearchText)) return !![];
+  if (Number(options3['maxByKind']?.[agentSearchText]) > 0x0) return !![];
+  if (Number(options3['minByKind']?.[agentSearchText]) > 0x0) return !![];
+  return (options3['fixedSlots'] || [])['some'](
+    (value2) => normalizeAgentSearchText(value2['kind']) === agentSearchText,
   );
 }
-function summarizeModelField(_0x43f130 = {}) {
-  const _0x5c9622 = {
-    id: String(_0x43f130['id'] || _0x43f130['key'] || ''),
-    type: String(_0x43f130['type'] || ''),
-    required: _0x43f130['required'] === !![],
+function summarizeModelField(required2 = {}) {
+  const value3 = {
+    id: String(required2['id'] || required2['key'] || ''),
+    type: String(required2['type'] || ''),
+    required: required2['required'] === !![],
   };
-  for (const _0x1f5473 of ['label', 'default', 'min', 'max', 'step', 'placeholder', 'showWhen']) {
-    if (_0x43f130[_0x1f5473] !== undefined) _0x5c9622[_0x1f5473] = _0x43f130[_0x1f5473];
+  for (const value4 of ['label', 'default', 'min', 'max', 'step', 'placeholder', 'showWhen']) {
+    if (required2[value4] !== undefined) value3[value4] = required2[value4];
   }
   return (
-    Array['isArray'](_0x43f130['options']) &&
-      (_0x5c9622['options'] = _0x43f130['options']['slice'](0x0, 0x3c)['map']((_0x47692a) => {
-        if (!_0x47692a || typeof _0x47692a !== 'object') return _0x47692a;
+    Array['isArray'](required2['options']) &&
+      (value3['options'] = required2['options']['slice'](0x0, 0x3c)['map']((value5) => {
+        if (!value5 || typeof value5 !== 'object') return value5;
         return {
-          value: _0x47692a['value'],
-          ...(_0x47692a['label'] !== undefined ? { label: _0x47692a['label'] } : {}),
+          value: value5['value'],
+          ...(value5['label'] !== undefined ? { label: value5['label'] } : {}),
         };
       })),
-    _0x5c9622
+    value3
   );
 }
-function summarizeModel(_0x3353ed = {}) {
-  const _0xcf22b1 = (
-    Array['isArray'](_0x3353ed['uiSchema']?.['fields']) ? _0x3353ed['uiSchema']['fields'] : []
+function summarizeModel(options4 = {}) {
+  const fieldCount = (
+    Array['isArray'](options4['uiSchema']?.['fields']) ? options4['uiSchema']['fields'] : []
   )
     ['map'](summarizeModelField)
-    ['filter']((_0x285fe0) => _0x285fe0['id']);
+    ['filter']((value6) => value6['id']);
   return {
-    modelId: String(_0x3353ed['modelId'] || ''),
-    provider: String(_0x3353ed['provider'] || ''),
-    kind: String(_0x3353ed['kind'] || ''),
-    displayName: String(_0x3353ed['displayName'] || _0x3353ed['modelId'] || ''),
-    description: String(_0x3353ed['description'] || ''),
-    adapterType: String(_0x3353ed['adapterType'] || ''),
-    inputSlots: summarizeInputSlots(_0x3353ed['inputSlots']),
-    fieldCount: _0xcf22b1['length'],
-    uiSchema: { fields: _0xcf22b1 },
+    modelId: String(options4['modelId'] || ''),
+    provider: String(options4['provider'] || ''),
+    kind: String(options4['kind'] || ''),
+    displayName: String(options4['displayName'] || options4['modelId'] || ''),
+    description: String(options4['description'] || ''),
+    adapterType: String(options4['adapterType'] || ''),
+    inputSlots: summarizeInputSlots(options4['inputSlots']),
+    fieldCount: fieldCount['length'],
+    uiSchema: { fields: fieldCount },
   };
 }
 export function searchAgentModels({
@@ -199,47 +196,42 @@ export function searchAgentModels({
   kind: kind = '',
   provider: provider = '',
   inputKinds: inputKinds = [],
-  limit: _0x143ae3,
+  limit: limit2,
 } = {}) {
-  const _0x5f219a = normalizeAgentSearchText(kind),
-    _0x33ef36 = normalizeAgentSearchText(provider),
-    _0x167147 = new Set(normalizeStringArray(inputKinds)['map'](normalizeAgentSearchText)),
-    _0xd07847 = listModelManifests()
-      ['map']((_0x3e3c48, _0x91f432) => {
-        const _0xd8d578 = summarizeModel(_0x3e3c48),
-          _0x5f5d3f = [..._0x167147]['every']((_0xac4ff6) =>
-            modelAcceptsInputKind(_0xd8d578['inputSlots'], _0xac4ff6),
-          ),
-          _0x4bf16c =
-            (!_0x5f219a || normalizeAgentSearchText(_0xd8d578['kind']) === _0x5f219a) &&
-            (!_0x33ef36 || normalizeAgentSearchText(_0xd8d578['provider']) === _0x33ef36) &&
-            (_0x167147['size'] === 0x0 || _0x5f5d3f),
-          _0xc19fc1 = [
-            _0xd8d578['modelId'],
-            _0xd8d578['provider'],
-            _0xd8d578['kind'],
-            _0xd8d578['displayName'],
-            _0xd8d578['description'],
-            ..._0xd8d578['uiSchema']['fields']['map']((_0x50c92e) => _0x50c92e['id']),
+  const agentSearchText2 = normalizeAgentSearchText(kind),
+    agentSearchText3 = normalizeAgentSearchText(provider),
+    args = new Set(normalizeStringArray(inputKinds)['map'](normalizeAgentSearchText)),
+    totalMatched2 = listModelManifests()
+      ['map']((value7, index3) => {
+        const summary2 = summarizeModel(value7),
+          value8 = [...args]['every']((value9) => modelAcceptsInputKind(summary2['inputSlots'], value9)),
+          score =
+            (!agentSearchText2 || normalizeAgentSearchText(summary2['kind']) === agentSearchText2) &&
+            (!agentSearchText3 || normalizeAgentSearchText(summary2['provider']) === agentSearchText3) &&
+            (args['size'] === 0x0 || value8),
+          value10 = [
+            summary2['modelId'],
+            summary2['provider'],
+            summary2['kind'],
+            summary2['displayName'],
+            summary2['description'],
+            ...summary2['uiSchema']['fields']['map']((value11) => value11['id']),
           ]['join']('\x20');
         return {
-          summary: _0xd8d578,
-          index: _0x91f432,
-          score: _0x4bf16c
-            ? scoreHaystack(query, _0xc19fc1, [_0xd8d578['modelId'], _0xd8d578['displayName']])
-            : 0x0,
+          summary: summary2,
+          index: index3,
+          score: score ? scoreHaystack(query, value10, [summary2['modelId'], summary2['displayName']]) : 0x0,
         };
       })
-      ['filter']((_0xe80054) => _0xe80054['score'] > 0x0)
+      ['filter']((value12) => value12['score'] > 0x0)
       ['sort'](
-        (_0x144de7, _0x19841e) =>
-          _0x19841e['score'] - _0x144de7['score'] || _0x144de7['index'] - _0x19841e['index'],
+        (value13, value14) => value14['score'] - value13['score'] || value13['index'] - value14['index'],
       ),
-    _0x3820fa = _0xd07847['slice'](0x0, normalizeLimit(_0x143ae3));
+    modelIds = totalMatched2['slice'](0x0, normalizeLimit(limit2));
   return {
     query: String(query || '')['trim'](),
-    modelIds: _0x3820fa['map']((_0x4cddf1) => _0x4cddf1['summary']['modelId']),
-    models: _0x3820fa['map']((_0x25ce30) => _0x25ce30['summary']),
-    totalMatched: _0xd07847['length'],
+    modelIds: modelIds['map']((value15) => value15['summary']['modelId']),
+    models: modelIds['map']((value16) => value16['summary']),
+    totalMatched: totalMatched2['length'],
   };
 }

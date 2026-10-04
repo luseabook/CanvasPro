@@ -195,29 +195,29 @@ const RH_VIDEO_SCAIL_PANEL_EXTENSION = Object.freeze({
     }),
   ]);
 function createScailVideoModelManifest({
-  modelId: _0x406a60,
-  executionId: _0x589f4d,
-  displayName: _0x3b0d31,
-  description: _0x1068ae,
-  helpTooltip: _0x1976ae,
+  modelId: modelId,
+  executionId: executionId,
+  displayName: displayName,
+  description: description,
+  helpTooltip: helpTooltip,
   vip: vip = false,
   subscriptionAliases: subscriptionAliases = [],
   extraUiFields: extraUiFields = [],
 }) {
-  const _0x1abe86 = Object.freeze([...subscriptionAliases]),
-    _0x34aba6 = Object.freeze({
-      ...(_0x1abe86.length > 0 ? { vipAliases: _0x1abe86 } : {}),
+  const vipAliases = Object.freeze([...subscriptionAliases]),
+    extensions = Object.freeze({
+      ...(vipAliases.length > 0 ? { vipAliases: vipAliases } : {}),
       videoParameterPanel: RH_VIDEO_SCAIL_PANEL_EXTENSION,
     });
   return createRunningHubVideoModelManifest({
-    modelId: _0x406a60,
-    executionId: _0x589f4d,
-    displayName: _0x3b0d31,
-    description: _0x1068ae,
+    modelId: modelId,
+    executionId: executionId,
+    displayName: displayName,
+    description: description,
     vip: vip,
-    subscriptionAliases: _0x1abe86,
-    help: Object.freeze({ tooltip: _0x1976ae }),
-    extensions: _0x34aba6,
+    subscriptionAliases: vipAliases,
+    help: Object.freeze({ tooltip: helpTooltip }),
+    extensions: extensions,
     fixedAssetSlots: RH_VIDEO_SCAIL_FIXED_ASSET_SLOTS,
     inputSlots: {
       allowedKinds: ['text', 'image', 'video'],
@@ -229,15 +229,15 @@ function createScailVideoModelManifest({
   });
 }
 function createScailVideoExecutionManifest({
-  id: _0x1f7e87,
-  label: _0x4e54a5,
-  workflowId: _0x44f79a,
+  id: id,
+  label: label,
+  workflowId: workflowId,
   nodeInfoList: nodeInfoList = RH_VIDEO_SCAIL_NODE_INFO_LIST,
 }) {
   return createRunningHubVideoExecutionManifest({
-    id: _0x1f7e87,
-    label: _0x4e54a5,
-    workflowId: _0x44f79a,
+    id: id,
+    label: label,
+    workflowId: workflowId,
     submitMode: 'openapi-v2-ai-app',
     queryMode: 'openapi-v2-query',
     mapping: { nodeInfoList: nodeInfoList },

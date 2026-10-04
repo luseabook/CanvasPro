@@ -18,34 +18,34 @@ const DENSE_PAN_PREVIEW_RECONCILE_INTERVAL_MS = 0x60,
 function getWindowLike() {
   return typeof window !== 'undefined' ? window : globalThis;
 }
-function requestFrame(_0x2c3ce1) {
-  const _0x19678a = getWindowLike();
-  if (typeof _0x19678a?.['requestAnimationFrame'] === 'function')
-    return _0x19678a['requestAnimationFrame'](_0x2c3ce1);
-  return setTimeout(() => _0x2c3ce1(Date['now']()), 0x10);
+function requestFrame(handler) {
+  const windowLike = getWindowLike();
+  if (typeof windowLike?.['requestAnimationFrame'] === 'function')
+    return windowLike['requestAnimationFrame'](handler);
+  return setTimeout(() => handler(Date['now']()), 0x10);
 }
-function cancelFrame(_0xa65b51) {
-  const _0x2189ef = getWindowLike();
-  if (typeof _0x2189ef?.['cancelAnimationFrame'] === 'function') {
-    _0x2189ef['cancelAnimationFrame'](_0xa65b51);
+function cancelFrame(value) {
+  const windowLike2 = getWindowLike();
+  if (typeof windowLike2?.['cancelAnimationFrame'] === 'function') {
+    windowLike2['cancelAnimationFrame'](value);
     return;
   }
-  clearTimeout(_0xa65b51);
+  clearTimeout(value);
 }
-function normalizeViewport(_0x2114ce, _0x53c028 = null) {
-  const _0x21b104 = _0x2114ce && typeof _0x2114ce === 'object' ? _0x2114ce : {},
-    _0xd9a1e8 = _0x53c028 && typeof _0x53c028 === 'object' ? _0x53c028 : {},
-    _0x40169c = Number(_0x21b104['x']),
-    _0x1fe0ae = Number(_0x21b104['y']),
-    _0x1c954a = Number(_0x21b104['zoom']),
-    _0x500b4e = Number(_0xd9a1e8['x']),
-    _0x300377 = Number(_0xd9a1e8['y']),
-    _0x4ce6db = Number(_0xd9a1e8['zoom']),
-    _0x1cc297 = Number['isFinite'](_0x1c954a) ? _0x1c954a : Number['isFinite'](_0x4ce6db) ? _0x4ce6db : 0x1;
+function normalizeViewport(item, key = null) {
+  const box = item && typeof item === 'object' ? item : {},
+    box2 = key && typeof key === 'object' ? key : {},
+    index = Number(box['x']),
+    result = Number(box['y']),
+    data = Number(box['zoom']),
+    options = Number(box2['x']),
+    target = Number(box2['y']),
+    source = Number(box2['zoom']),
+    zoom = Number['isFinite'](data) ? data : Number['isFinite'](source) ? source : 0x1;
   return {
-    x: Number['isFinite'](_0x40169c) ? _0x40169c : Number['isFinite'](_0x500b4e) ? _0x500b4e : 0x0,
-    y: Number['isFinite'](_0x1fe0ae) ? _0x1fe0ae : Number['isFinite'](_0x300377) ? _0x300377 : 0x0,
-    zoom: _0x1cc297 > 0x0 ? _0x1cc297 : 0x1,
+    x: Number['isFinite'](index) ? index : Number['isFinite'](options) ? options : 0x0,
+    y: Number['isFinite'](result) ? result : Number['isFinite'](target) ? target : 0x0,
+    zoom: zoom > 0x0 ? zoom : 0x1,
   };
 }
 function nowMs() {
@@ -53,303 +53,307 @@ function nowMs() {
     ? performance['now']()
     : Date['now']();
 }
-function quantizeSigned(_0x25907b, _0x37c2bc) {
-  const _0x2caeaa = Math['max'](0x1, Number(_0x37c2bc) || 0x1);
-  return Math['trunc'](Number(_0x25907b || 0x0) / _0x2caeaa) * _0x2caeaa;
+function quantizeSigned(next, current) {
+  const entry = Math['max'](0x1, Number(current) || 0x1);
+  return Math['trunc'](Number(next || 0x0) / entry) * entry;
 }
-function getDensePanPreviewBucket(_0x4921f3, _0x40c15c) {
-  const _0x1fc2fe = Number(_0x4921f3?.['zoom']) || 0x1,
-    _0x4f5ef8 = Number(_0x40c15c) || 0x0;
-  if (_0x4f5ef8 < RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']) return null;
-  const _0x197b02 =
-      _0x1fc2fe <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
-      _0x4f5ef8 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'],
-    _0x2fef10 =
-      _0x1fc2fe <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
-      _0x4f5ef8 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'],
-    _0xa1d0a5 = _0x197b02 ? 0xc0 : _0x2fef10 ? 0x40 : DENSE_PAN_PREVIEW_HIGH_ZOOM_BUCKET_PX;
+function getDensePanPreviewBucket(box3, record) {
+  const payload = Number(box3?.['zoom']) || 0x1,
+    handle = Number(record) || 0x0;
+  if (handle < RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']) return null;
+  const state =
+      payload <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
+      handle >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'],
+    config =
+      payload <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
+      handle >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'],
+    bucketSize = state ? 0xc0 : config ? 0x40 : DENSE_PAN_PREVIEW_HIGH_ZOOM_BUCKET_PX;
   return {
     key:
-      quantizeSigned(_0x4921f3['x'], _0xa1d0a5) +
+      quantizeSigned(box3['x'], bucketSize) +
       ':' +
-      quantizeSigned(_0x4921f3['y'], _0xa1d0a5) +
+      quantizeSigned(box3['y'], bucketSize) +
       ':' +
-      _0x1fc2fe['toFixed'](0x3),
-    bucketSize: _0xa1d0a5,
+      payload['toFixed'](0x3),
+    bucketSize: bucketSize,
   };
 }
-function addNodeAndChildren(_0x5d4c5d, _0x4f6b7c, _0x53503d) {
-  if (!_0x4f6b7c || _0x5d4c5d['has'](_0x4f6b7c)) return;
-  _0x5d4c5d['add'](_0x4f6b7c);
-  const _0x498f92 = _0x53503d?.[_0x4f6b7c];
-  if (!_0x498f92) return;
-  const _0x3289ff = _0x498f92 instanceof Set ? _0x498f92 : Array['isArray'](_0x498f92) ? _0x498f92 : [];
-  for (const _0x314801 of _0x3289ff) {
-    addNodeAndChildren(_0x5d4c5d, _0x314801, _0x53503d);
+function addNodeAndChildren(map, enabled, scope) {
+  if (!enabled || map['has'](enabled)) return;
+  map['add'](enabled);
+  const enabled2 = scope?.[enabled];
+  if (!enabled2) return;
+  const input = enabled2 instanceof Set ? enabled2 : Array['isArray'](enabled2) ? enabled2 : [];
+  for (const output of input) {
+    addNodeAndChildren(map, output, scope);
   }
 }
 function collectActiveDragNodeIds({
-  dragContext: _0x4d239c,
-  selectedNodeIds: _0x4fc19c,
-  parentToChildren: _0x57e310,
+  dragContext: dragContext,
+  selectedNodeIds: selectedNodeIds,
+  parentToChildren: parentToChildren,
 } = {}) {
-  const _0x7d705e = new Set();
-  if (!_0x4d239c?.['isDragging'] || _0x4d239c['isCommittingDrag'] === !![]) return _0x7d705e;
-  const _0x676631 = _0x4d239c['targetNodeId'] || null,
-    _0x3457d5 = Array['isArray'](_0x4fc19c) ? _0x4fc19c : [],
-    _0x1926d9 = _0x676631 && _0x3457d5['includes'](_0x676631) ? _0x3457d5 : _0x676631 ? [_0x676631] : [];
-  for (const _0x2c908d of _0x1926d9) {
-    addNodeAndChildren(_0x7d705e, _0x2c908d, _0x57e310);
+  const value2 = new Set();
+  if (!dragContext?.['isDragging'] || dragContext['isCommittingDrag'] === !![]) return value2;
+  const value3 = dragContext['targetNodeId'] || null,
+    list = Array['isArray'](selectedNodeIds) ? selectedNodeIds : [],
+    value4 = value3 && list['includes'](value3) ? list : value3 ? [value3] : [];
+  for (const value5 of value4) {
+    addNodeAndChildren(value2, value5, parentToChildren);
   }
-  return _0x7d705e;
+  return value2;
 }
-function omitNodeIds(_0x1d6b2e, _0x30559d) {
-  if (!_0x30559d || _0x30559d['size'] === 0x0) return _0x1d6b2e;
-  const _0x502187 = {};
-  for (const [_0x2066d4, _0x4f2b94] of Object['entries'](_0x1d6b2e || {})) {
-    if (!_0x30559d['has'](_0x2066d4)) _0x502187[_0x2066d4] = _0x4f2b94;
+function omitNodeIds(value6, map2) {
+  if (!map2 || map2['size'] === 0x0) return value6;
+  const value7 = {};
+  for (const [value8, value9] of Object['entries'](value6 || {})) {
+    if (!map2['has'](value8)) value7[value8] = value9;
   }
-  return _0x502187;
+  return value7;
 }
 export function createRendererPanPreviewReconciler({
-  canvasEl: _0xe7957b,
-  svgWrapper: _0x126903,
-  getSnapshot: _0x389716,
-  hasPendingStoreRender: _0x71449a,
-  markBusy: _0x4e41cf,
-  renderViewport: _0x2caaad,
-  renderNodes: _0x24491c,
-  buildSelectionRelatedSets: _0xb593cc,
-  normalizeSelectionRelatedHighlightColor: _0xb5f614,
-  scheduleDeferredReconcile: _0x282dff,
+  canvasEl: canvasEl,
+  svgWrapper: svgWrapper,
+  getSnapshot: getSnapshot,
+  hasPendingStoreRender: hasPendingStoreRender,
+  markBusy: markBusy,
+  renderViewport: renderViewport,
+  renderNodes: renderNodes,
+  buildSelectionRelatedSets: buildSelectionRelatedSets,
+  normalizeSelectionRelatedHighlightColor: normalizeSelectionRelatedHighlightColor,
+  scheduleDeferredReconcile: scheduleDeferredReconcile,
   now: now = nowMs,
 } = {}) {
-  const _0x4c514c = getWindowLike(),
-    _0x2fc930 = isRendererRuntimeDiagnosticsEnabled();
-  let _0x16ea66 = null,
-    _0x22db26 = null,
-    _0x53bbcf = '',
-    _0x7956d4 = 0x0,
-    _0x32cec3 = null,
-    _0x383cac = null,
-    _0xc6f15d = 0x0;
-  function _0x40c463() {
-    (_0x16ea66 !== null && (cancelFrame(_0x16ea66), (_0x16ea66 = null)), (_0x22db26 = null));
+  const el = getWindowLike(),
+    isRendererRuntimeDiagnosticsEnabled2 = isRendererRuntimeDiagnosticsEnabled();
+  let requestFrame2 = null,
+    value10 = null,
+    value11 = '',
+    value12 = 0x0,
+    value13 = null,
+    value14 = null,
+    value15 = 0x0;
+  function run() {
+    (requestFrame2 !== null && (cancelFrame(requestFrame2), (requestFrame2 = null)), (value10 = null));
   }
-  function _0x40fbb2(_0x23eaee, _0x35fde3, { allowIdleViewportOnly: allowIdleViewportOnly = ![] } = {}) {
-    if (!_0x23eaee || !_0x35fde3) return null;
-    const _0x4c45cb = getInteractionRenderState(),
-      _0x56bf1b = readViewportInteractionState({ interactionState: _0x4c45cb }),
-      _0x24bced = _0x56bf1b['isViewportBusy']
-        ? _0x56bf1b
-        : readViewportInteractionState({ interactionState: _0x4c45cb, panPreviewActive: !![] });
+  function run2(snapshot, viewport, { allowIdleViewportOnly: allowIdleViewportOnly = ![] } = {}) {
+    if (!snapshot || !viewport) return null;
+    const interactionState = getInteractionRenderState(),
+      viewportInteractionState = readViewportInteractionState({ interactionState: interactionState }),
+      enabled3 = viewportInteractionState['isViewportBusy']
+        ? viewportInteractionState
+        : readViewportInteractionState({ interactionState: interactionState, panPreviewActive: !![] });
     if (
       !allowIdleViewportOnly &&
-      !_0x24bced['isPanning'] &&
-      !_0x24bced['isZooming'] &&
-      !_0x24bced['isViewportAnimating']
+      !enabled3['isPanning'] &&
+      !enabled3['isZooming'] &&
+      !enabled3['isViewportAnimating']
     )
       return null;
-    const _0x33ddb2 =
-        typeof _0x23eaee['_nodeCount'] === 'number'
-          ? _0x23eaee['_nodeCount']
-          : Object['keys'](_0x23eaee['nodes'] || {})['length'],
-      _0x4b5059 = _0x24bced['isViewportAnimating'] || (_0x24bced['isZooming'] && !_0x24bced['isPanning']),
-      _0x79fe5 = _0x24bced['isZooming'] && !_0x24bced['isPanning'] && !_0x24bced['isViewportAnimating'],
-      _0x3d3a86 = _0x24bced['isPanning'] && !_0x4b5059,
-      _0x5c0e20 = _0x3d3a86 ? getDensePanPreviewBucket(_0x35fde3, _0x33ddb2) : null;
-    let _0x458cc9 = ![];
-    if (_0x5c0e20 && _0x32cec3) {
+    const nodeCount =
+        typeof snapshot['_nodeCount'] === 'number'
+          ? snapshot['_nodeCount']
+          : Object['keys'](snapshot['nodes'] || {})['length'],
+      mode = enabled3['isViewportAnimating'] || (enabled3['isZooming'] && !enabled3['isPanning']),
+      enabled4 = enabled3['isZooming'] && !enabled3['isPanning'] && !enabled3['isViewportAnimating'],
+      value16 = enabled3['isPanning'] && !mode,
+      bucketKey = value16 ? getDensePanPreviewBucket(viewport, nodeCount) : null;
+    let enabled5 = ![];
+    if (bucketKey && value13) {
       if (
-        (_0x35fde3['zoom'] <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] ||
-          now() - _0x7956d4 < PAN_MEDIA_LOOKAHEAD_REFRESH_MS) &&
-        canReuseRendererViewportPreviewCoverage(_0x32cec3, {
-          viewport: _0x35fde3,
-          nodeCount: _0x33ddb2,
-          snapshot: _0x23eaee,
+        (viewport['zoom'] <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] ||
+          now() - value12 < PAN_MEDIA_LOOKAHEAD_REFRESH_MS) &&
+        canReuseRendererViewportPreviewCoverage(value13, {
+          viewport: viewport,
+          nodeCount: nodeCount,
+          snapshot: snapshot,
         })
       )
         return (
-          _0x2fc930 &&
+          isRendererRuntimeDiagnosticsEnabled2 &&
             recordRendererRuntimeDiagnostic({
               kind: 'pan-preview-coverage-reuse',
-              nodeCount: _0x33ddb2,
-              viewport: { ..._0x35fde3 },
+              nodeCount: nodeCount,
+              viewport: { ...viewport },
             }),
-          { skipped: !![], hasPendingStructuralOps: ![], priorityMediaWork: ![], nodeCount: _0x33ddb2 }
+          { skipped: !![], hasPendingStructuralOps: ![], priorityMediaWork: ![], nodeCount: nodeCount }
         );
-      ((_0x32cec3 = null), (_0x458cc9 = !![]));
-    } else !_0x5c0e20 && (_0x32cec3 = null);
-    if (_0x5c0e20) {
-      const _0x3f4fc9 = now();
+      ((value13 = null), (enabled5 = !![]));
+    } else !bucketKey && (value13 = null);
+    if (bucketKey) {
+      const now2 = now();
       if (
-        !_0x458cc9 &&
-        _0x5c0e20['key'] === _0x53bbcf &&
-        _0x3f4fc9 - _0x7956d4 < DENSE_PAN_PREVIEW_RECONCILE_INTERVAL_MS
+        !enabled5 &&
+        bucketKey['key'] === value11 &&
+        now2 - value12 < DENSE_PAN_PREVIEW_RECONCILE_INTERVAL_MS
       )
         return (
-          _0x2fc930 &&
+          isRendererRuntimeDiagnosticsEnabled2 &&
             recordRendererRuntimeDiagnostic({
               kind: 'pan-preview-reconcile-skip',
-              nodeCount: _0x33ddb2,
-              bucketKey: _0x5c0e20['key'],
+              nodeCount: nodeCount,
+              bucketKey: bucketKey['key'],
             }),
-          { skipped: !![], hasPendingStructuralOps: ![], nodeCount: _0x33ddb2 }
+          { skipped: !![], hasPendingStructuralOps: ![], nodeCount: nodeCount }
         );
-      ((_0x53bbcf = _0x5c0e20['key']), (_0x7956d4 = _0x3f4fc9));
-    } else ((_0x53bbcf = ''), (_0x7956d4 = 0x0));
-    (_0x4e41cf?.(), _0x2caaad?.(_0xe7957b, _0x35fde3, _0x23eaee['ui']?.['titleFollowsCanvasZoom'] === !![]));
-    if (_0x126903?.['style']?.['display'] === 'none') _0x126903['style']['display'] = '';
-    const _0x498938 = typeof now === 'function' ? now() : nowMs(),
-      _0x43d197 = _0x498938 - _0xc6f15d;
+      ((value11 = bucketKey['key']), (value12 = now2));
+    } else ((value11 = ''), (value12 = 0x0));
+    (markBusy?.(), renderViewport?.(canvasEl, viewport, snapshot['ui']?.['titleFollowsCanvasZoom'] === !![]));
+    if (svgWrapper?.['style']?.['display'] === 'none') svgWrapper['style']['display'] = '';
+    const value17 = typeof now === 'function' ? now() : nowMs(),
+      elapsedMs = value17 - value15;
     if (
-      _0x79fe5 &&
-      _0x383cac &&
-      _0x43d197 >= 0x0 &&
-      _0x43d197 < DENSE_ZOOM_PREVIEW_RECONCILE_INTERVAL_MS &&
-      canReuseRendererViewportPreviewCoverage(_0x383cac, {
-        viewport: _0x35fde3,
-        nodeCount: _0x33ddb2,
-        snapshot: _0x23eaee,
+      enabled4 &&
+      value14 &&
+      elapsedMs >= 0x0 &&
+      elapsedMs < DENSE_ZOOM_PREVIEW_RECONCILE_INTERVAL_MS &&
+      canReuseRendererViewportPreviewCoverage(value14, {
+        viewport: viewport,
+        nodeCount: nodeCount,
+        snapshot: snapshot,
       })
     )
       return (
-        _0x2fc930 &&
+        isRendererRuntimeDiagnosticsEnabled2 &&
           recordRendererRuntimeDiagnostic({
             kind: 'zoom-preview-reconcile-skip',
-            nodeCount: _0x33ddb2,
-            elapsedMs: _0x43d197,
-            viewport: { ..._0x35fde3 },
+            nodeCount: nodeCount,
+            elapsedMs: elapsedMs,
+            viewport: { ...viewport },
           }),
-        { skipped: !![], hasPendingStructuralOps: ![], priorityMediaWork: ![], nodeCount: _0x33ddb2 }
+        { skipped: !![], hasPendingStructuralOps: ![], priorityMediaWork: ![], nodeCount: nodeCount }
       );
-    !_0x79fe5 && ((_0x383cac = null), (_0xc6f15d = 0x0));
-    const _0x4f0a0b =
-        _0x23eaee['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+    !enabled4 && ((value14 = null), (value15 = 0x0));
+    const value18 =
+        snapshot['ui']?.['selectionRelatedHighlightEnabled'] === ![]
           ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
-          : _0xb593cc?.(_0x23eaee['selectedNodeIds'], _0x23eaee['edges']) || {
+          : buildSelectionRelatedSets?.(snapshot['selectedNodeIds'], snapshot['edges']) || {
               relatedNodeIds: new Set(),
               relatedEdgeIds: new Set(),
             },
-      _0x7e040 = _0xb5f614?.(_0x23eaee['ui']?.['selectionRelatedHighlightColor']),
-      _0x1f141a = collectActiveDragNodeIds({
-        dragContext: _0x4c45cb,
-        selectedNodeIds: _0x23eaee['selectedNodeIds'],
-        parentToChildren: _0x23eaee['_parentToChildren'],
+      value19 = normalizeSelectionRelatedHighlightColor?.(snapshot['ui']?.['selectionRelatedHighlightColor']),
+      activeDragNodeIds = collectActiveDragNodeIds({
+        dragContext: interactionState,
+        selectedNodeIds: snapshot['selectedNodeIds'],
+        parentToChildren: snapshot['_parentToChildren'],
       }),
-      _0x2a55f2 = omitNodeIds(_0x23eaee['nodes'], _0x1f141a),
-      _0x2831b2 = ![],
-      _0xad3d79 = ![],
-      _0x2d324a = !![],
-      _0x3e54a4 = _0x2fc930 ? nowMs() : 0x0,
-      _0x22ff35 = _0x2fc930 ? nowMs() : 0x0,
-      _0x2a4e9f = _0x24491c?.(
-        _0xe7957b,
-        _0x2a55f2,
-        _0x23eaee['selectedNodeIds'],
-        _0x4f0a0b['relatedNodeIds'],
-        _0x7e040,
-        _0x23eaee['connOverlay'],
-        _0x23eaee['pickConnectMode'],
-        _0x35fde3,
-        _0x23eaee['edges'],
-        _0x23eaee['_parentToChildren'],
-        _0x23eaee['ui'] && typeof _0x23eaee['ui']['showVideoMeta'] === 'boolean'
-          ? _0x23eaee['ui']['showVideoMeta']
+      omitNodeIds2 = omitNodeIds(snapshot['nodes'], activeDragNodeIds),
+      priorityMediaWork = ![],
+      viewportPriorityMediaOnly = ![],
+      previewOnly = !![],
+      value20 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0x0,
+      value21 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0x0,
+      value22 = renderNodes?.(
+        canvasEl,
+        omitNodeIds2,
+        snapshot['selectedNodeIds'],
+        value18['relatedNodeIds'],
+        value19,
+        snapshot['connOverlay'],
+        snapshot['pickConnectMode'],
+        viewport,
+        snapshot['edges'],
+        snapshot['_parentToChildren'],
+        snapshot['ui'] && typeof snapshot['ui']['showVideoMeta'] === 'boolean'
+          ? snapshot['ui']['showVideoMeta']
           : ![],
-        _0x23eaee,
+        snapshot,
         {
           deferParking: !![],
-          previewOnly: _0x2d324a,
-          mode: _0x4b5059 ? 'zoom-lod-preview' : 'pan-preview',
-          lockRasterParticipation: !_0x4b5059,
-          suspendNewMediaSrc: !_0xad3d79,
-          viewportPriorityMediaOnly: _0xad3d79,
+          previewOnly: previewOnly,
+          mode: mode ? 'zoom-lod-preview' : 'pan-preview',
+          lockRasterParticipation: !mode,
+          suspendNewMediaSrc: !viewportPriorityMediaOnly,
+          viewportPriorityMediaOnly: viewportPriorityMediaOnly,
         },
       );
-    _0x79fe5 && ((_0x383cac = _0x2a4e9f?.['previewCoverage'] || null), (_0xc6f15d = _0x498938));
-    _0x5c0e20 && (_0x32cec3 = _0x2a4e9f?.['previewCoverage'] || null);
-    if (_0x2fc930) {
-      const _0x123428 = nowMs();
+    enabled4 && ((value14 = value22?.['previewCoverage'] || null), (value15 = value17));
+    bucketKey && (value13 = value22?.['previewCoverage'] || null);
+    if (isRendererRuntimeDiagnosticsEnabled2) {
+      const renderNodesMs = nowMs();
       recordRendererRuntimeDiagnostic({
         kind: 'pan-preview-reconcile',
-        nodeCount: _0x33ddb2,
-        previewOnly: _0x2d324a,
-        priorityMediaWork: _0x2831b2,
-        renderNodesMs: _0x123428 - _0x22ff35,
-        durationMs: _0x123428 - _0x3e54a4,
-        viewport: { ..._0x35fde3 },
+        nodeCount: nodeCount,
+        previewOnly: previewOnly,
+        priorityMediaWork: priorityMediaWork,
+        renderNodesMs: renderNodesMs - value21,
+        durationMs: renderNodesMs - value20,
+        viewport: { ...viewport },
       });
     }
-    const _0x39fd83 = _0x2a4e9f?.['hasPendingStructuralOps'] === !![];
-    return { hasPendingStructuralOps: _0x39fd83, priorityMediaWork: _0x2831b2, nodeCount: _0x33ddb2 };
+    const hasPendingStructuralOps = value22?.['hasPendingStructuralOps'] === !![];
+    return {
+      hasPendingStructuralOps: hasPendingStructuralOps,
+      priorityMediaWork: priorityMediaWork,
+      nodeCount: nodeCount,
+    };
   }
-  function _0x699e46(_0x4fb092) {
-    _0x22db26 = _0x4fb092 ? { ..._0x4fb092 } : null;
-    if (_0x16ea66 !== null) return;
-    _0x16ea66 = requestFrame(() => {
-      _0x16ea66 = null;
-      if (_0x71449a?.()) {
-        const _0x330008 = _0x22db26;
-        _0x22db26 = null;
-        if (_0x330008) _0x699e46(_0x330008);
+  function run3(args) {
+    value10 = args ? { ...args } : null;
+    if (requestFrame2 !== null) return;
+    requestFrame2 = requestFrame(() => {
+      requestFrame2 = null;
+      if (hasPendingStoreRender?.()) {
+        const value23 = value10;
+        value10 = null;
+        if (value23) run3(value23);
         return;
       }
-      const _0x4e6e34 = _0x389716?.(),
-        _0xe37b9f = _0x22db26;
-      _0x22db26 = null;
-      if (!_0x4e6e34) return;
-      const _0x38e63 = normalizeViewport(_0xe37b9f || getViewportPanPreview(), _0x4e6e34['viewport']),
-        _0x20a1df = _0x40fbb2(_0x4e6e34, _0x38e63);
-      if (_0x20a1df?.['hasPendingStructuralOps']) _0x699e46(_0x38e63);
+      const enabled6 = getSnapshot?.(),
+        value24 = value10;
+      value10 = null;
+      if (!enabled6) return;
+      const viewport2 = normalizeViewport(value24 || getViewportPanPreview(), enabled6['viewport']),
+        hasPriorityMediaWork = run2(enabled6, viewport2);
+      if (hasPriorityMediaWork?.['hasPendingStructuralOps']) run3(viewport2);
       else
-        _0x20a1df &&
-          _0x20a1df['skipped'] !== !![] &&
-          _0x282dff?.(
+        hasPriorityMediaWork &&
+          hasPriorityMediaWork['skipped'] !== !![] &&
+          scheduleDeferredReconcile?.(
             resolveViewportInteractionReconcileDelay({
-              hasPriorityMediaWork: _0x20a1df['priorityMediaWork'] === !![],
-              fallbackDelayMs: getRendererStructuralReconcileDelayMs(_0x20a1df['nodeCount']),
+              hasPriorityMediaWork: hasPriorityMediaWork['priorityMediaWork'] === !![],
+              fallbackDelayMs: getRendererStructuralReconcileDelayMs(hasPriorityMediaWork['nodeCount']),
             }),
           );
     });
   }
-  const _0xeb7b5b = (_0x3fb8e5) => {
-    const _0x12745 = _0x3fb8e5?.['detail']?.['viewport'] || getViewportPanPreview() || null;
-    if (!_0x12745) return;
-    if (_0x71449a?.()) {
-      _0x699e46(_0x12745);
+  const value25 = (value26) => {
+    const enabled7 = value26?.['detail']?.['viewport'] || getViewportPanPreview() || null;
+    if (!enabled7) return;
+    if (hasPendingStoreRender?.()) {
+      run3(enabled7);
       return;
     }
-    _0x16ea66 !== null && (cancelFrame(_0x16ea66), (_0x16ea66 = null), (_0x22db26 = null));
-    const _0x2ad7a9 = _0x389716?.();
-    if (!_0x2ad7a9) return;
-    const _0x4846b4 = normalizeViewport(_0x12745, _0x2ad7a9['viewport']),
-      _0x15a7aa = _0x40fbb2(_0x2ad7a9, _0x4846b4);
-    if (_0x15a7aa?.['hasPendingStructuralOps']) _0x699e46(_0x4846b4);
+    requestFrame2 !== null && (cancelFrame(requestFrame2), (requestFrame2 = null), (value10 = null));
+    const enabled8 = getSnapshot?.();
+    if (!enabled8) return;
+    const viewport3 = normalizeViewport(enabled7, enabled8['viewport']),
+      hasPriorityMediaWork2 = run2(enabled8, viewport3);
+    if (hasPriorityMediaWork2?.['hasPendingStructuralOps']) run3(viewport3);
     else
-      _0x15a7aa &&
-        _0x15a7aa['skipped'] !== !![] &&
-        _0x282dff?.(
+      hasPriorityMediaWork2 &&
+        hasPriorityMediaWork2['skipped'] !== !![] &&
+        scheduleDeferredReconcile?.(
           resolveViewportInteractionReconcileDelay({
-            hasPriorityMediaWork: _0x15a7aa['priorityMediaWork'] === !![],
-            fallbackDelayMs: getRendererStructuralReconcileDelayMs(_0x15a7aa['nodeCount']),
+            hasPriorityMediaWork: hasPriorityMediaWork2['priorityMediaWork'] === !![],
+            fallbackDelayMs: getRendererStructuralReconcileDelayMs(hasPriorityMediaWork2['nodeCount']),
           }),
         );
   };
   return (
-    _0x4c514c?.['addEventListener']?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, _0xeb7b5b),
+    el?.['addEventListener']?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, value25),
     {
-      reconcileViewportOnly(_0x1195dd, _0x23bd05) {
-        return _0x40fbb2(_0x1195dd, _0x23bd05, { allowIdleViewportOnly: !![] });
+      reconcileViewportOnly(value27, value28) {
+        return run2(value27, value28, { allowIdleViewportOnly: !![] });
       },
       dispose() {
-        (_0x40c463(),
-          (_0x53bbcf = ''),
-          (_0x7956d4 = 0x0),
-          (_0x32cec3 = null),
-          (_0x383cac = null),
-          (_0xc6f15d = 0x0),
-          _0x4c514c?.['removeEventListener']?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, _0xeb7b5b));
+        (run(),
+          (value11 = ''),
+          (value12 = 0x0),
+          (value13 = null),
+          (value14 = null),
+          (value15 = 0x0),
+          el?.['removeEventListener']?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, value25));
       },
     }
   );

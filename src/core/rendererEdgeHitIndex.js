@@ -3,363 +3,332 @@ const DEFAULT_CELL_SIZE = 0x100,
   DEFAULT_MAX_SUBDIVISION_DEPTH = 0x8,
   DEFAULT_DISTANCE_SAMPLES = 0x20,
   DEFAULT_DISTANCE_REFINEMENTS = 0xe;
-function normalizeNumber(_0x21e388, _0x25239d = 0x0) {
-  const _0x4950a7 = Number(_0x21e388);
-  return Number['isFinite'](_0x4950a7) ? _0x4950a7 : _0x25239d;
+function normalizeNumber(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
 }
-function normalizeGeometry(_0x5df6b5) {
-  if (!_0x5df6b5) return null;
-  const _0x1c7aad = Array['isArray'](_0x5df6b5['hitPoints'])
-    ? _0x5df6b5['hitPoints']
-        ['map']((_0x500c85) => ({
-          x: normalizeNumber(_0x500c85?.['x'], Number['NaN']),
-          y: normalizeNumber(_0x500c85?.['y'], Number['NaN']),
+function normalizeGeometry(enabled) {
+  if (!enabled) return null;
+  const hitPoints = Array['isArray'](enabled['hitPoints'])
+    ? enabled['hitPoints']
+        ['map']((box) => ({
+          x: normalizeNumber(box?.['x'], Number['NaN']),
+          y: normalizeNumber(box?.['y'], Number['NaN']),
         }))
-        ['filter']((_0x4f2d20) => Number['isFinite'](_0x4f2d20['x']) && Number['isFinite'](_0x4f2d20['y']))
+        ['filter']((box2) => Number['isFinite'](box2['x']) && Number['isFinite'](box2['y']))
     : null;
   return {
-    pathStyle: String(_0x5df6b5['pathStyle'] || 'curve'),
-    startX: normalizeNumber(_0x5df6b5['startX']),
-    startY: normalizeNumber(_0x5df6b5['startY']),
-    control1X: normalizeNumber(_0x5df6b5['control1X']),
-    control1Y: normalizeNumber(_0x5df6b5['control1Y']),
-    control2X: normalizeNumber(_0x5df6b5['control2X']),
-    control2Y: normalizeNumber(_0x5df6b5['control2Y']),
-    endX: normalizeNumber(_0x5df6b5['endX']),
-    endY: normalizeNumber(_0x5df6b5['endY']),
-    hitPoints: _0x1c7aad && _0x1c7aad['length'] >= 0x2 ? _0x1c7aad : null,
+    pathStyle: String(enabled['pathStyle'] || 'curve'),
+    startX: normalizeNumber(enabled['startX']),
+    startY: normalizeNumber(enabled['startY']),
+    control1X: normalizeNumber(enabled['control1X']),
+    control1Y: normalizeNumber(enabled['control1Y']),
+    control2X: normalizeNumber(enabled['control2X']),
+    control2Y: normalizeNumber(enabled['control2Y']),
+    endX: normalizeNumber(enabled['endX']),
+    endY: normalizeNumber(enabled['endY']),
+    hitPoints: hitPoints && hitPoints['length'] >= 0x2 ? hitPoints : null,
   };
 }
-export function evaluateCubicBezier(_0x228092, _0x56874b) {
-  const _0x267537 = normalizeGeometry(_0x228092);
-  if (!_0x267537) return null;
-  const _0x535a62 = Math['min'](0x1, Math['max'](0x0, normalizeNumber(_0x56874b))),
-    _0xd5a05e = 0x1 - _0x535a62,
-    _0x9af4b3 = _0xd5a05e * _0xd5a05e,
-    _0x35aa9d = _0x535a62 * _0x535a62;
+export function evaluateCubicBezier(index, result) {
+  const geometry = normalizeGeometry(index);
+  if (!geometry) return null;
+  const data = Math['min'](0x1, Math['max'](0x0, normalizeNumber(result))),
+    options = 0x1 - data,
+    x = options * options,
+    target = data * data;
   return {
     x:
-      _0x9af4b3 * _0xd5a05e * _0x267537['startX'] +
-      0x3 * _0x9af4b3 * _0x535a62 * _0x267537['control1X'] +
-      0x3 * _0xd5a05e * _0x35aa9d * _0x267537['control2X'] +
-      _0x35aa9d * _0x535a62 * _0x267537['endX'],
+      x * options * geometry['startX'] +
+      0x3 * x * data * geometry['control1X'] +
+      0x3 * options * target * geometry['control2X'] +
+      target * data * geometry['endX'],
     y:
-      _0x9af4b3 * _0xd5a05e * _0x267537['startY'] +
-      0x3 * _0x9af4b3 * _0x535a62 * _0x267537['control1Y'] +
-      0x3 * _0xd5a05e * _0x35aa9d * _0x267537['control2Y'] +
-      _0x35aa9d * _0x535a62 * _0x267537['endY'],
+      x * options * geometry['startY'] +
+      0x3 * x * data * geometry['control1Y'] +
+      0x3 * options * target * geometry['control2Y'] +
+      target * data * geometry['endY'],
   };
 }
-function distanceSquaredAt(_0x4dd772, _0x266dac, _0x2da88f, _0x42b61f) {
-  const _0x105b3b = evaluateCubicBezier(_0x4dd772, _0x42b61f);
-  if (!_0x105b3b) return Number['POSITIVE_INFINITY'];
-  const _0x4f4040 = _0x105b3b['x'] - _0x266dac,
-    _0x2e6909 = _0x105b3b['y'] - _0x2da88f;
-  return _0x4f4040 * _0x4f4040 + _0x2e6909 * _0x2e6909;
+function distanceSquaredAt(source, next, current, entry) {
+  const box3 = evaluateCubicBezier(source, entry);
+  if (!box3) return Number['POSITIVE_INFINITY'];
+  const record = box3['x'] - next,
+    payload = box3['y'] - current;
+  return record * record + payload * payload;
 }
 export function distanceToCubicBezierSquared(
-  _0x446554,
-  _0x194cdb,
-  _0x499583,
+  handle,
+  state,
+  config,
   {
     samples: samples = DEFAULT_DISTANCE_SAMPLES,
     refinements: refinements = DEFAULT_DISTANCE_REFINEMENTS,
   } = {},
 ) {
-  const _0xaad6ea = normalizeNumber(_0x194cdb),
-    _0x5881ae = normalizeNumber(_0x499583),
-    _0x598c83 = Math['max'](0x8, Math['floor'](normalizeNumber(samples, 0x20)));
-  let _0x20b03c = 0x0,
-    _0x519d14 = Number['POSITIVE_INFINITY'];
-  for (let _0x74234a = 0x0; _0x74234a <= _0x598c83; _0x74234a += 0x1) {
-    const _0x3de3af = distanceSquaredAt(_0x446554, _0xaad6ea, _0x5881ae, _0x74234a / _0x598c83);
-    _0x3de3af < _0x519d14 && ((_0x519d14 = _0x3de3af), (_0x20b03c = _0x74234a));
+  const number = normalizeNumber(state),
+    number2 = normalizeNumber(config),
+    scope = Math['max'](0x8, Math['floor'](normalizeNumber(samples, 0x20)));
+  let input = 0x0,
+    output = Number['POSITIVE_INFINITY'];
+  for (let value2 = 0x0; value2 <= scope; value2 += 0x1) {
+    const distanceSquaredAt2 = distanceSquaredAt(handle, number, number2, value2 / scope);
+    distanceSquaredAt2 < output && ((output = distanceSquaredAt2), (input = value2));
   }
-  let _0x514413 = Math['max'](0x0, (_0x20b03c - 0x1) / _0x598c83),
-    _0x1d470f = Math['min'](0x1, (_0x20b03c + 0x1) / _0x598c83);
-  const _0x2a5527 = Math['max'](
-    0x0,
-    Math['floor'](normalizeNumber(refinements, DEFAULT_DISTANCE_REFINEMENTS)),
-  );
-  for (let _0x326a4b = 0x0; _0x326a4b < _0x2a5527; _0x326a4b += 0x1) {
-    const _0x132260 = _0x514413 + (_0x1d470f - _0x514413) / 0x3,
-      _0x4e6881 = _0x1d470f - (_0x1d470f - _0x514413) / 0x3;
-    distanceSquaredAt(_0x446554, _0xaad6ea, _0x5881ae, _0x132260) <=
-    distanceSquaredAt(_0x446554, _0xaad6ea, _0x5881ae, _0x4e6881)
-      ? (_0x1d470f = _0x4e6881)
-      : (_0x514413 = _0x132260);
+  let value3 = Math['max'](0x0, (input - 0x1) / scope),
+    value4 = Math['min'](0x1, (input + 0x1) / scope);
+  const value5 = Math['max'](0x0, Math['floor'](normalizeNumber(refinements, DEFAULT_DISTANCE_REFINEMENTS)));
+  for (let value6 = 0x0; value6 < value5; value6 += 0x1) {
+    const value7 = value3 + (value4 - value3) / 0x3,
+      value8 = value4 - (value4 - value3) / 0x3;
+    distanceSquaredAt(handle, number, number2, value7) <= distanceSquaredAt(handle, number, number2, value8)
+      ? (value4 = value8)
+      : (value3 = value7);
   }
-  return Math['min'](
-    _0x519d14,
-    distanceSquaredAt(_0x446554, _0xaad6ea, _0x5881ae, (_0x514413 + _0x1d470f) / 0x2),
-  );
+  return Math['min'](output, distanceSquaredAt(handle, number, number2, (value3 + value4) / 0x2));
 }
-function pointLineDistanceSquared(_0x1751b3, _0x8ee851, _0x20474c, _0x1b7e45, _0x1047e7, _0x189032) {
-  const _0x285db8 = _0x1047e7 - _0x20474c,
-    _0x376c5b = _0x189032 - _0x1b7e45,
-    _0x1f11eb = _0x285db8 * _0x285db8 + _0x376c5b * _0x376c5b;
-  if (_0x1f11eb <= Number['EPSILON']) {
-    const _0x20e6d8 = _0x1751b3 - _0x20474c,
-      _0x3250af = _0x8ee851 - _0x1b7e45;
-    return _0x20e6d8 * _0x20e6d8 + _0x3250af * _0x3250af;
+function pointLineDistanceSquared(value9, value10, value11, value12, value13, value14) {
+  const value15 = value13 - value11,
+    value16 = value14 - value12,
+    value17 = value15 * value15 + value16 * value16;
+  if (value17 <= Number['EPSILON']) {
+    const value18 = value9 - value11,
+      value19 = value10 - value12;
+    return value18 * value18 + value19 * value19;
   }
-  const _0x34ccf6 =
-    _0x376c5b * _0x1751b3 - _0x285db8 * _0x8ee851 + _0x1047e7 * _0x1b7e45 - _0x189032 * _0x20474c;
-  return (_0x34ccf6 * _0x34ccf6) / _0x1f11eb;
+  const value20 = value16 * value9 - value15 * value10 + value13 * value12 - value14 * value11;
+  return (value20 * value20) / value17;
 }
-function pointSegmentDistanceSquared(_0xc82f17, _0xdedc15, _0xddc98c, _0x441e39, _0x3a5f22, _0xc0caca) {
-  const _0x2f7402 = _0x3a5f22 - _0xddc98c,
-    _0x51a8cd = _0xc0caca - _0x441e39,
-    _0x21fa3c = _0x2f7402 * _0x2f7402 + _0x51a8cd * _0x51a8cd;
-  if (_0x21fa3c <= Number['EPSILON']) {
-    const _0x28ffd9 = _0xc82f17 - _0xddc98c,
-      _0x3164ec = _0xdedc15 - _0x441e39;
-    return _0x28ffd9 * _0x28ffd9 + _0x3164ec * _0x3164ec;
+function pointSegmentDistanceSquared(value21, value22, value23, value24, value25, value26) {
+  const value27 = value25 - value23,
+    value28 = value26 - value24,
+    value29 = value27 * value27 + value28 * value28;
+  if (value29 <= Number['EPSILON']) {
+    const value30 = value21 - value23,
+      value31 = value22 - value24;
+    return value30 * value30 + value31 * value31;
   }
-  const _0x4dfe1c = Math['max'](
+  const value32 = Math['max'](
       0x0,
-      Math['min'](
-        0x1,
-        ((_0xc82f17 - _0xddc98c) * _0x2f7402 + (_0xdedc15 - _0x441e39) * _0x51a8cd) / _0x21fa3c,
-      ),
+      Math['min'](0x1, ((value21 - value23) * value27 + (value22 - value24) * value28) / value29),
     ),
-    _0x2de274 = _0xddc98c + _0x4dfe1c * _0x2f7402,
-    _0x1a0350 = _0x441e39 + _0x4dfe1c * _0x51a8cd,
-    _0x1b04ad = _0xc82f17 - _0x2de274,
-    _0x3dd814 = _0xdedc15 - _0x1a0350;
-  return _0x1b04ad * _0x1b04ad + _0x3dd814 * _0x3dd814;
+    value33 = value23 + value32 * value27,
+    value34 = value24 + value32 * value28,
+    value35 = value21 - value33,
+    value36 = value22 - value34;
+  return value35 * value35 + value36 * value36;
 }
-export function distanceToPolylineSquared(_0x13f582, _0x52145d, _0x4bd10e) {
-  if (!Array['isArray'](_0x13f582) || _0x13f582['length'] < 0x2) return Number['POSITIVE_INFINITY'];
-  const _0x5f4918 = normalizeNumber(_0x52145d),
-    _0x24228f = normalizeNumber(_0x4bd10e);
-  let _0x4f3060 = Number['POSITIVE_INFINITY'];
-  for (let _0x1af055 = 0x1; _0x1af055 < _0x13f582['length']; _0x1af055 += 0x1) {
-    const _0x4a21c3 = _0x13f582[_0x1af055 - 0x1],
-      _0x3528d9 = _0x13f582[_0x1af055];
-    _0x4f3060 = Math['min'](
-      _0x4f3060,
+export function distanceToPolylineSquared(list, value37, value38) {
+  if (!Array['isArray'](list) || list['length'] < 0x2) return Number['POSITIVE_INFINITY'];
+  const number3 = normalizeNumber(value37),
+    number4 = normalizeNumber(value38);
+  let value39 = Number['POSITIVE_INFINITY'];
+  for (let value40 = 0x1; value40 < list['length']; value40 += 0x1) {
+    const box4 = list[value40 - 0x1],
+      box5 = list[value40];
+    value39 = Math['min'](
+      value39,
       pointSegmentDistanceSquared(
-        _0x5f4918,
-        _0x24228f,
-        normalizeNumber(_0x4a21c3?.['x']),
-        normalizeNumber(_0x4a21c3?.['y']),
-        normalizeNumber(_0x3528d9?.['x']),
-        normalizeNumber(_0x3528d9?.['y']),
+        number3,
+        number4,
+        normalizeNumber(box4?.['x']),
+        normalizeNumber(box4?.['y']),
+        normalizeNumber(box5?.['x']),
+        normalizeNumber(box5?.['y']),
       ),
     );
   }
-  return _0x4f3060;
+  return value39;
 }
-function getCurveFlatnessSquared(_0x408068) {
+function getCurveFlatnessSquared(value41) {
   return Math['max'](
     pointLineDistanceSquared(
-      _0x408068['control1X'],
-      _0x408068['control1Y'],
-      _0x408068['startX'],
-      _0x408068['startY'],
-      _0x408068['endX'],
-      _0x408068['endY'],
+      value41['control1X'],
+      value41['control1Y'],
+      value41['startX'],
+      value41['startY'],
+      value41['endX'],
+      value41['endY'],
     ),
     pointLineDistanceSquared(
-      _0x408068['control2X'],
-      _0x408068['control2Y'],
-      _0x408068['startX'],
-      _0x408068['startY'],
-      _0x408068['endX'],
-      _0x408068['endY'],
+      value41['control2X'],
+      value41['control2Y'],
+      value41['startX'],
+      value41['startY'],
+      value41['endX'],
+      value41['endY'],
     ),
   );
 }
-function midpoint(_0x156a40, _0x112a19) {
-  return (_0x156a40 + _0x112a19) / 0x2;
+function midpoint(value42, value43) {
+  return (value42 + value43) / 0x2;
 }
-function subdivideCurve(_0x2046da) {
-  const _0xc194d9 = midpoint(_0x2046da['startX'], _0x2046da['control1X']),
-    _0x558ee5 = midpoint(_0x2046da['startY'], _0x2046da['control1Y']),
-    _0x1b87f3 = midpoint(_0x2046da['control1X'], _0x2046da['control2X']),
-    _0x5ac9cd = midpoint(_0x2046da['control1Y'], _0x2046da['control2Y']),
-    _0xac647f = midpoint(_0x2046da['control2X'], _0x2046da['endX']),
-    _0x139b1f = midpoint(_0x2046da['control2Y'], _0x2046da['endY']),
-    _0x4b06cf = midpoint(_0xc194d9, _0x1b87f3),
-    _0x472b41 = midpoint(_0x558ee5, _0x5ac9cd),
-    _0xccddf4 = midpoint(_0x1b87f3, _0xac647f),
-    _0xaf155 = midpoint(_0x5ac9cd, _0x139b1f),
-    _0xc94293 = midpoint(_0x4b06cf, _0xccddf4),
-    _0x5a6de6 = midpoint(_0x472b41, _0xaf155);
+function subdivideCurve(startX) {
+  const control1X = midpoint(startX['startX'], startX['control1X']),
+    control1Y = midpoint(startX['startY'], startX['control1Y']),
+    midpoint2 = midpoint(startX['control1X'], startX['control2X']),
+    midpoint3 = midpoint(startX['control1Y'], startX['control2Y']),
+    control2X = midpoint(startX['control2X'], startX['endX']),
+    control2Y = midpoint(startX['control2Y'], startX['endY']),
+    control2X2 = midpoint(control1X, midpoint2),
+    control2Y2 = midpoint(control1Y, midpoint3),
+    control1X2 = midpoint(midpoint2, control2X),
+    control1Y2 = midpoint(midpoint3, control2Y),
+    endX = midpoint(control2X2, control1X2),
+    endY = midpoint(control2Y2, control1Y2);
   return [
     {
-      startX: _0x2046da['startX'],
-      startY: _0x2046da['startY'],
-      control1X: _0xc194d9,
-      control1Y: _0x558ee5,
-      control2X: _0x4b06cf,
-      control2Y: _0x472b41,
-      endX: _0xc94293,
-      endY: _0x5a6de6,
+      startX: startX['startX'],
+      startY: startX['startY'],
+      control1X: control1X,
+      control1Y: control1Y,
+      control2X: control2X2,
+      control2Y: control2Y2,
+      endX: endX,
+      endY: endY,
     },
     {
-      startX: _0xc94293,
-      startY: _0x5a6de6,
-      control1X: _0xccddf4,
-      control1Y: _0xaf155,
-      control2X: _0xac647f,
-      control2Y: _0x139b1f,
-      endX: _0x2046da['endX'],
-      endY: _0x2046da['endY'],
+      startX: endX,
+      startY: endY,
+      control1X: control1X2,
+      control1Y: control1Y2,
+      control2X: control2X,
+      control2Y: control2Y,
+      endX: startX['endX'],
+      endY: startX['endY'],
     },
   ];
 }
-function collectCurveBounds(_0x31e8ab, _0xb41861, _0x15de3e, _0x56786d, _0x52d9f4 = 0x0) {
-  if (_0x52d9f4 >= _0x56786d || getCurveFlatnessSquared(_0x31e8ab) <= _0x15de3e) {
-    _0xb41861['push']({
-      minX: Math['min'](
-        _0x31e8ab['startX'],
-        _0x31e8ab['control1X'],
-        _0x31e8ab['control2X'],
-        _0x31e8ab['endX'],
-      ),
-      minY: Math['min'](
-        _0x31e8ab['startY'],
-        _0x31e8ab['control1Y'],
-        _0x31e8ab['control2Y'],
-        _0x31e8ab['endY'],
-      ),
-      maxX: Math['max'](
-        _0x31e8ab['startX'],
-        _0x31e8ab['control1X'],
-        _0x31e8ab['control2X'],
-        _0x31e8ab['endX'],
-      ),
-      maxY: Math['max'](
-        _0x31e8ab['startY'],
-        _0x31e8ab['control1Y'],
-        _0x31e8ab['control2Y'],
-        _0x31e8ab['endY'],
-      ),
+function collectCurveBounds(value44, list2, value45, value46, value47 = 0x0) {
+  if (value47 >= value46 || getCurveFlatnessSquared(value44) <= value45) {
+    list2['push']({
+      minX: Math['min'](value44['startX'], value44['control1X'], value44['control2X'], value44['endX']),
+      minY: Math['min'](value44['startY'], value44['control1Y'], value44['control2Y'], value44['endY']),
+      maxX: Math['max'](value44['startX'], value44['control1X'], value44['control2X'], value44['endX']),
+      maxY: Math['max'](value44['startY'], value44['control1Y'], value44['control2Y'], value44['endY']),
     });
     return;
   }
-  const [_0x372069, _0x3344d6] = subdivideCurve(_0x31e8ab);
-  (collectCurveBounds(_0x372069, _0xb41861, _0x15de3e, _0x56786d, _0x52d9f4 + 0x1),
-    collectCurveBounds(_0x3344d6, _0xb41861, _0x15de3e, _0x56786d, _0x52d9f4 + 0x1));
+  const [value48, value49] = subdivideCurve(value44);
+  (collectCurveBounds(value48, list2, value45, value46, value47 + 0x1),
+    collectCurveBounds(value49, list2, value45, value46, value47 + 0x1));
 }
-function cellCoordinate(_0x3766b0, _0x586cc3) {
-  return Math['floor'](_0x3766b0 / _0x586cc3);
+function cellCoordinate(value50, value51) {
+  return Math['floor'](value50 / value51);
 }
-function cellKey(_0x1df09d, _0x501a4c) {
-  return _0x1df09d + ':' + _0x501a4c;
+function cellKey(value52, value53) {
+  return value52 + ':' + value53;
 }
 export function createEdgeHitSpatialIndex({
   cellSize: cellSize = DEFAULT_CELL_SIZE,
   subdivisionFlatness: subdivisionFlatness = DEFAULT_SUBDIVISION_FLATNESS,
   maxSubdivisionDepth: maxSubdivisionDepth = DEFAULT_MAX_SUBDIVISION_DEPTH,
 } = {}) {
-  const _0x379e6b = Math['max'](0x20, normalizeNumber(cellSize, 0x100)),
-    _0x5882d4 = Math['max'](0.5, normalizeNumber(subdivisionFlatness, 0x8)) ** 0x2,
-    _0x34cfa5 = Math['max'](0x1, Math['floor'](normalizeNumber(maxSubdivisionDepth, 0x8))),
-    _0x5f0a55 = new Map(),
-    _0x59b28e = new Map(),
-    _0x8a5624 = new Map();
-  function _0x49f408(_0xcfd817) {
-    const _0x527322 = _0x8a5624['get'](_0xcfd817);
-    if (_0x527322)
-      for (const _0x3fe3c0 of _0x527322) {
-        const _0x1019da = _0x5f0a55['get'](_0x3fe3c0);
-        _0x1019da?.['delete'](_0xcfd817);
-        if (_0x1019da?.['size'] === 0x0) _0x5f0a55['delete'](_0x3fe3c0);
+  const value54 = Math['max'](0x20, normalizeNumber(cellSize, 0x100)),
+    value55 = Math['max'](0.5, normalizeNumber(subdivisionFlatness, 0x8)) ** 0x2,
+    value56 = Math['max'](0x1, Math['floor'](normalizeNumber(maxSubdivisionDepth, 0x8))),
+    cellCount = new Map(),
+    edgeCount = new Map(),
+    map = new Map();
+  function remove(value57) {
+    const value58 = map['get'](value57);
+    if (value58)
+      for (const value59 of value58) {
+        const map2 = cellCount['get'](value59);
+        map2?.['delete'](value57);
+        if (map2?.['size'] === 0x0) cellCount['delete'](value59);
       }
-    return (_0x8a5624['delete'](_0xcfd817), _0x59b28e['delete'](_0xcfd817));
+    return (map['delete'](value57), edgeCount['delete'](value57));
   }
-  function _0x8e7457({ edgeId: _0x4d5e51, geometry: _0x4f6be9, order: order = 0x0 } = {}) {
-    const _0x1f8b53 = String(_0x4d5e51 || ''),
-      _0x54c894 = normalizeGeometry(_0x4f6be9);
-    if (!_0x1f8b53 || !_0x54c894) return ![];
-    _0x49f408(_0x1f8b53);
-    const _0x2397be = { edgeId: _0x1f8b53, geometry: _0x54c894, order: normalizeNumber(order) },
-      _0x515591 = [];
-    if (_0x54c894['hitPoints'])
-      for (let _0x3a7864 = 0x1; _0x3a7864 < _0x54c894['hitPoints']['length']; _0x3a7864 += 0x1) {
-        const _0x4de2ca = _0x54c894['hitPoints'][_0x3a7864 - 0x1],
-          _0x3625bc = _0x54c894['hitPoints'][_0x3a7864];
-        _0x515591['push']({
-          minX: Math['min'](_0x4de2ca['x'], _0x3625bc['x']),
-          minY: Math['min'](_0x4de2ca['y'], _0x3625bc['y']),
-          maxX: Math['max'](_0x4de2ca['x'], _0x3625bc['x']),
-          maxY: Math['max'](_0x4de2ca['y'], _0x3625bc['y']),
+  function upsert({ edgeId: edgeId, geometry: geometry2, order: order = 0x0 } = {}) {
+    const edgeId2 = String(edgeId || ''),
+      geometry3 = normalizeGeometry(geometry2);
+    if (!edgeId2 || !geometry3) return ![];
+    remove(edgeId2);
+    const value60 = { edgeId: edgeId2, geometry: geometry3, order: normalizeNumber(order) },
+      list3 = [];
+    if (geometry3['hitPoints'])
+      for (let value61 = 0x1; value61 < geometry3['hitPoints']['length']; value61 += 0x1) {
+        const box6 = geometry3['hitPoints'][value61 - 0x1],
+          box7 = geometry3['hitPoints'][value61];
+        list3['push']({
+          minX: Math['min'](box6['x'], box7['x']),
+          minY: Math['min'](box6['y'], box7['y']),
+          maxX: Math['max'](box6['x'], box7['x']),
+          maxY: Math['max'](box6['y'], box7['y']),
         });
       }
-    else collectCurveBounds(_0x54c894, _0x515591, _0x5882d4, _0x34cfa5);
-    const _0x3cb491 = new Set();
-    for (const _0x30da4f of _0x515591) {
-      const _0x488a3e = cellCoordinate(_0x30da4f['minX'], _0x379e6b),
-        _0x504607 = cellCoordinate(_0x30da4f['minY'], _0x379e6b),
-        _0x40ad45 = cellCoordinate(_0x30da4f['maxX'], _0x379e6b),
-        _0x2df183 = cellCoordinate(_0x30da4f['maxY'], _0x379e6b);
-      for (let _0x58db76 = _0x488a3e; _0x58db76 <= _0x40ad45; _0x58db76 += 0x1) {
-        for (let _0x269e58 = _0x504607; _0x269e58 <= _0x2df183; _0x269e58 += 0x1) {
-          const _0x45185 = cellKey(_0x58db76, _0x269e58);
-          let _0xcd31bc = _0x5f0a55['get'](_0x45185);
-          (!_0xcd31bc && ((_0xcd31bc = new Map()), _0x5f0a55['set'](_0x45185, _0xcd31bc)),
-            _0xcd31bc['set'](_0x1f8b53, _0x2397be),
-            _0x3cb491['add'](_0x45185));
+    else collectCurveBounds(geometry3, list3, value55, value56);
+    const value62 = new Set();
+    for (const value63 of list3) {
+      const cellCoordinate2 = cellCoordinate(value63['minX'], value54),
+        cellCoordinate3 = cellCoordinate(value63['minY'], value54),
+        cellCoordinate4 = cellCoordinate(value63['maxX'], value54),
+        cellCoordinate5 = cellCoordinate(value63['maxY'], value54);
+      for (let value64 = cellCoordinate2; value64 <= cellCoordinate4; value64 += 0x1) {
+        for (let value65 = cellCoordinate3; value65 <= cellCoordinate5; value65 += 0x1) {
+          const cellKey2 = cellKey(value64, value65);
+          let map3 = cellCount['get'](cellKey2);
+          (!map3 && ((map3 = new Map()), cellCount['set'](cellKey2, map3)),
+            map3['set'](edgeId2, value60),
+            value62['add'](cellKey2));
         }
       }
     }
-    return (_0x59b28e['set'](_0x1f8b53, _0x2397be), _0x8a5624['set'](_0x1f8b53, _0x3cb491), !![]);
+    return (edgeCount['set'](edgeId2, value60), map['set'](edgeId2, value62), !![]);
   }
-  function _0x3e3411(_0x482be1, _0xcfcf5, _0x1a629a = 0x0) {
-    const _0x28e5a3 = normalizeNumber(_0x482be1),
-      _0xd30ce7 = normalizeNumber(_0xcfcf5),
-      _0x1f1651 = Math['max'](0x0, normalizeNumber(_0x1a629a)),
-      _0x17d4f8 = cellCoordinate(_0x28e5a3 - _0x1f1651, _0x379e6b),
-      _0xc1b1d4 = cellCoordinate(_0xd30ce7 - _0x1f1651, _0x379e6b),
-      _0x1dd10d = cellCoordinate(_0x28e5a3 + _0x1f1651, _0x379e6b),
-      _0x318338 = cellCoordinate(_0xd30ce7 + _0x1f1651, _0x379e6b),
-      _0x29c6d5 = new Map();
-    for (let _0x566707 = _0x17d4f8; _0x566707 <= _0x1dd10d; _0x566707 += 0x1) {
-      for (let _0x26229b = _0xc1b1d4; _0x26229b <= _0x318338; _0x26229b += 0x1) {
-        const _0x601367 = _0x5f0a55['get'](cellKey(_0x566707, _0x26229b));
-        if (!_0x601367) continue;
-        for (const [_0x206e06, _0x5acac4] of _0x601367) {
-          _0x29c6d5['set'](_0x206e06, _0x5acac4);
+  function queryCandidates(value66, value67, value68 = 0x0) {
+    const number5 = normalizeNumber(value66),
+      number6 = normalizeNumber(value67),
+      value69 = Math['max'](0x0, normalizeNumber(value68)),
+      cellCoordinate6 = cellCoordinate(number5 - value69, value54),
+      cellCoordinate7 = cellCoordinate(number6 - value69, value54),
+      cellCoordinate8 = cellCoordinate(number5 + value69, value54),
+      cellCoordinate9 = cellCoordinate(number6 + value69, value54),
+      map4 = new Map();
+    for (let value70 = cellCoordinate6; value70 <= cellCoordinate8; value70 += 0x1) {
+      for (let value71 = cellCoordinate7; value71 <= cellCoordinate9; value71 += 0x1) {
+        const enabled2 = cellCount['get'](cellKey(value70, value71));
+        if (!enabled2) continue;
+        for (const [value72, value73] of enabled2) {
+          map4['set'](value72, value73);
         }
       }
     }
-    return Array['from'](_0x29c6d5['values']())['sort'](
-      (_0x4d27c9, _0x244e08) =>
-        _0x244e08['order'] - _0x4d27c9['order'] || _0x244e08['edgeId']['localeCompare'](_0x4d27c9['edgeId']),
+    return Array['from'](map4['values']())['sort'](
+      (value74, value75) =>
+        value75['order'] - value74['order'] || value75['edgeId']['localeCompare'](value74['edgeId']),
     );
   }
-  function _0x3f4391(_0x15ca02, _0xb11858, _0x304f95) {
-    const _0x4a0df5 = Math['max'](0x0, normalizeNumber(_0x304f95)) ** 0x2;
-    for (const _0xd05bcf of _0x3e3411(_0x15ca02, _0xb11858, _0x304f95)) {
-      const _0x5a92d9 = _0xd05bcf['geometry']['hitPoints']
-        ? distanceToPolylineSquared(_0xd05bcf['geometry']['hitPoints'], _0x15ca02, _0xb11858)
-        : distanceToCubicBezierSquared(_0xd05bcf['geometry'], _0x15ca02, _0xb11858);
-      if (_0x5a92d9 <= _0x4a0df5) return _0xd05bcf;
+  function hitTest(value76, value77, value78) {
+    const value79 = Math['max'](0x0, normalizeNumber(value78)) ** 0x2;
+    for (const value80 of queryCandidates(value76, value77, value78)) {
+      const value81 = value80['geometry']['hitPoints']
+        ? distanceToPolylineSquared(value80['geometry']['hitPoints'], value76, value77)
+        : distanceToCubicBezierSquared(value80['geometry'], value76, value77);
+      if (value81 <= value79) return value80;
     }
     return null;
   }
-  function _0x2d2c0a() {
-    (_0x5f0a55['clear'](), _0x59b28e['clear'](), _0x8a5624['clear']());
+  function clear() {
+    (cellCount['clear'](), edgeCount['clear'](), map['clear']());
   }
-  function _0x595f69() {
+  function getStats() {
     return {
-      edgeCount: _0x59b28e['size'],
-      cellCount: _0x5f0a55['size'],
-      membershipCount: Array['from'](_0x8a5624['values']())['reduce'](
-        (_0x1bcfec, _0x2c4ff6) => _0x1bcfec + _0x2c4ff6['size'],
+      edgeCount: edgeCount['size'],
+      cellCount: cellCount['size'],
+      membershipCount: Array['from'](map['values']())['reduce'](
+        (value82, value83) => value82 + value83['size'],
         0x0,
       ),
     };
   }
   return {
-    clear: _0x2d2c0a,
-    getStats: _0x595f69,
-    hitTest: _0x3f4391,
-    queryCandidates: _0x3e3411,
-    remove: _0x49f408,
-    upsert: _0x8e7457,
+    clear: clear,
+    getStats: getStats,
+    hitTest: hitTest,
+    queryCandidates: queryCandidates,
+    remove: remove,
+    upsert: upsert,
   };
 }

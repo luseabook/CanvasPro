@@ -14,101 +14,101 @@ const APIMART_DIMENSION_TARGET_PIXELS = Object.freeze({
   APIMART_DIMENSION_ALIGN = 8,
   APIMART_DIMENSION_MIN = 0x200,
   APIMART_DIMENSION_MAX = 0x2000;
-function parseRatioLabel(_0xc834d3) {
-  const [_0x36b173, _0x2b9f4a] = String(_0xc834d3 || '1:1').split(':'),
-    _0xa6f6c8 = Number.parseFloat(_0x36b173),
-    _0xb29903 = Number.parseFloat(_0x2b9f4a);
-  if (!(_0xa6f6c8 > 0 && _0xb29903 > 0)) return { w: 1, h: 1 };
-  return { w: _0xa6f6c8, h: _0xb29903 };
+function parseRatioLabel(value) {
+  const [item, key] = String(value || '1:1').split(':'),
+    w = Number.parseFloat(item),
+    h = Number.parseFloat(key);
+  if (!(w > 0 && h > 0)) return { w: 1, h: 1 };
+  return { w: w, h: h };
 }
-function alignDimension(_0x476bf6) {
-  const _0x5af423 = Math.round(Number(_0x476bf6 || 0) / APIMART_DIMENSION_ALIGN) * APIMART_DIMENSION_ALIGN;
-  return Math.max(APIMART_DIMENSION_MIN, Math.min(APIMART_DIMENSION_MAX, _0x5af423));
+function alignDimension(index) {
+  const result = Math.round(Number(index || 0) / APIMART_DIMENSION_ALIGN) * APIMART_DIMENSION_ALIGN;
+  return Math.max(APIMART_DIMENSION_MIN, Math.min(APIMART_DIMENSION_MAX, result));
 }
-function resolveDimensionsByResolutionAndRatio(_0x34043c, _0x50a3c4) {
-  const _0x4d706a = String(_0x34043c || '')
+function resolveDimensionsByResolutionAndRatio(data, options) {
+  const target = String(data || '')
       .trim()
       .toUpperCase(),
-    _0x42d963 =
-      APIMART_DIMENSION_TARGET_PIXELS[_0x4d706a] ||
+    source =
+      APIMART_DIMENSION_TARGET_PIXELS[target] ||
       APIMART_DIMENSION_TARGET_PIXELS[APIMART_DIMENSION_DEFAULT_RESOLUTION],
-    { w: _0x124820, h: _0x2e0598 } = parseRatioLabel(_0x50a3c4),
-    _0xe8a056 = _0x124820 / _0x2e0598,
-    _0x12e612 = Math.sqrt(_0x42d963 / _0xe8a056),
-    _0xbed81c = _0x12e612 * _0xe8a056;
-  return { width: alignDimension(_0xbed81c), height: alignDimension(_0x12e612) };
+    { w: w2, h: h2 } = parseRatioLabel(options),
+    next = w2 / h2,
+    current = Math.sqrt(source / next),
+    entry = current * next;
+  return { width: alignDimension(entry), height: alignDimension(current) };
 }
-function isApimartGptImage2Model(_0x1e1f58) {
-  const _0x171ad8 = String(_0x1e1f58 || '')
+function isApimartGptImage2Model(record) {
+  const payload = String(record || '')
     .trim()
     .toLowerCase();
-  return _0x171ad8 === 'apimart/gpt-image-2' || _0x171ad8 === 'gpt-image-2';
+  return payload === 'apimart/gpt-image-2' || payload === 'gpt-image-2';
 }
-function isApimartSeedanceVideoModel(_0x5afdbe) {
-  return String(_0x5afdbe || '')
+function isApimartSeedanceVideoModel(handle) {
+  return String(handle || '')
     .trim()
     .replace(/^apimart\//, '')
     .startsWith('doubao-seedance-');
 }
-function normalizeSeedanceVideoSize(_0x17f4dd) {
-  const _0x9c879 = String(_0x17f4dd || '').trim();
-  if (!_0x9c879) return '16:9';
-  if (_0x9c879 === '自适应' || _0x9c879.toLowerCase() === 'auto') return 'adaptive';
+function normalizeSeedanceVideoSize(state) {
+  const enabled = String(state || '').trim();
+  if (!enabled) return '16:9';
+  if (enabled === '自适应' || enabled.toLowerCase() === 'auto') return 'adaptive';
   if (
-    _0x9c879 === '1:1' ||
-    _0x9c879 === '3:4' ||
-    _0x9c879 === '16:9' ||
-    _0x9c879 === '4:3' ||
-    _0x9c879 === '9:16' ||
-    _0x9c879 === '21:9' ||
-    _0x9c879 === 'adaptive'
+    enabled === '1:1' ||
+    enabled === '3:4' ||
+    enabled === '16:9' ||
+    enabled === '4:3' ||
+    enabled === '9:16' ||
+    enabled === '21:9' ||
+    enabled === 'adaptive'
   )
-    return _0x9c879;
+    return enabled;
   return '16:9';
 }
-function normalizeSeedanceAspectRatio(_0x16b45b) {
-  const _0x55ef55 = String(_0x16b45b || '').trim();
+function normalizeSeedanceAspectRatio(config) {
+  const scope = String(config || '').trim();
   if (
-    _0x55ef55 === '1:1' ||
-    _0x55ef55 === '3:4' ||
-    _0x55ef55 === '16:9' ||
-    _0x55ef55 === '4:3' ||
-    _0x55ef55 === '9:16' ||
-    _0x55ef55 === '21:9'
+    scope === '1:1' ||
+    scope === '3:4' ||
+    scope === '16:9' ||
+    scope === '4:3' ||
+    scope === '9:16' ||
+    scope === '21:9'
   )
-    return _0x55ef55;
+    return scope;
   return '16:9';
 }
-function isPresentValue(_0x3d6cab) {
-  return _0x3d6cab !== undefined && _0x3d6cab !== null && String(_0x3d6cab).trim() !== '';
+function isPresentValue(input) {
+  return input !== undefined && input !== null && String(input).trim() !== '';
 }
-function normalizeGptImage2Resolution(_0x4a897d) {
-  const _0x42967a = String(_0x4a897d || '')
+function normalizeGptImage2Resolution(output) {
+  const value2 = String(output || '')
     .trim()
     .toUpperCase();
-  if (_0x42967a === '1K' || _0x42967a === '2K' || _0x42967a === '4K') return _0x42967a.toLowerCase();
+  if (value2 === '1K' || value2 === '2K' || value2 === '4K') return value2.toLowerCase();
   return '2k';
 }
-export function normalizeTextModel(_0x3a680e) {
-  if (_0x3a680e === 'apimart/gpt-5.4') return 'gpt-5.4-apimart';
-  if (String(_0x3a680e || '').startsWith('apimart/')) return String(_0x3a680e).replace(/^apimart\//, '');
-  return _0x3a680e;
+export function normalizeTextModel(value3) {
+  if (value3 === 'apimart/gpt-5.4') return 'gpt-5.4-apimart';
+  if (String(value3 || '').startsWith('apimart/')) return String(value3).replace(/^apimart\//, '');
+  return value3;
 }
-export function getTextProxyApiUrl(_0x5da880) {
-  return _0x5da880 + '/v1/chat/completions';
+export function getTextProxyApiUrl(value4) {
+  return value4 + '/v1/chat/completions';
 }
-export async function buildImageRequest(_0x36deb8, _0x26ce75, _0x1a3175) {
-  if (!_0x36deb8.model) throw new Error('未指定模型，无法发起图像生成请求');
-  const _0x57ca9c = _0x1a3175.getProviderConfig('apimart'),
-    _0x3f8cbe = normalizeApimartBaseUrl(_0x57ca9c.apiUrl),
-    _0x4039ae = _0x57ca9c.apiKey || _0x36deb8.apiKey;
-  if (!_0x4039ae) throw new Error('API Key 未配置，无法发起图像生成请求');
-  const _0x4bf212 = await _0x1a3175.processInputImages(_0x36deb8.inputUrls, _0x4039ae, {
+export async function buildImageRequest(model, prompt, value5) {
+  if (!model.model) throw new Error('未指定模型，无法发起图像生成请求');
+  const value6 = value5.getProviderConfig('apimart'),
+    apiUrl = normalizeApimartBaseUrl(value6.apiUrl),
+    apiKey = value6.apiKey || model.apiKey;
+  if (!apiKey) throw new Error('API Key 未配置，无法发起图像生成请求');
+  const list = await value5.processInputImages(model.inputUrls, apiKey, {
       applyInputQualityProfile: true,
       provider: 'apimart',
       strictUpload: true,
     }),
-    _0x3ee19d = {
+    value7 = {
       'apimart/nano-banana-2': 'gemini-3.1-flash-image-preview',
       'apimart/nano-banana-pro': 'gemini-3-pro-image-preview',
       'apimart/nano-banana-dot': 'gemini-2.5-flash-image-preview',
@@ -117,47 +117,47 @@ export async function buildImageRequest(_0x36deb8, _0x26ce75, _0x1a3175) {
       'apimart/seedream-4.5': 'doubao-seedance-4-5',
       'apimart/seedream-4.0': 'doubao-seedance-4-0',
     },
-    _0x50e561 = _0x3ee19d[_0x36deb8.model] || _0x36deb8.model.replace('apimart/', ''),
-    _0x562b3f =
-      _0x36deb8.model === 'apimart/seedream-4.0' ||
-      _0x36deb8.model === 'apimart/seedream-4.5' ||
-      _0x36deb8.model === 'apimart/seedream-5.0-lite';
-  let _0x3b5e19 = _0x36deb8.imageSize || '2K';
-  (_0x36deb8.model === 'apimart/seedream-4.5' || _0x36deb8.model === 'apimart/seedream-5.0-lite') &&
-    _0x3b5e19 === '1K' &&
-    (_0x3b5e19 = '2K');
-  _0x36deb8.model === 'apimart/seedream-5.0-lite' && _0x3b5e19 === '4K' && (_0x3b5e19 = '3K');
-  isApimartGptImage2Model(_0x36deb8.model) && (_0x3b5e19 = normalizeGptImage2Resolution(_0x3b5e19));
-  const _0x8cf5c = resolveProviderRatioPayload({
+    model2 = value7[model.model] || model.model.replace('apimart/', ''),
+    enabled2 =
+      model.model === 'apimart/seedream-4.0' ||
+      model.model === 'apimart/seedream-4.5' ||
+      model.model === 'apimart/seedream-5.0-lite';
+  let imageSize = model.imageSize || '2K';
+  (model.model === 'apimart/seedream-4.5' || model.model === 'apimart/seedream-5.0-lite') &&
+    imageSize === '1K' &&
+    (imageSize = '2K');
+  model.model === 'apimart/seedream-5.0-lite' && imageSize === '4K' && (imageSize = '3K');
+  isApimartGptImage2Model(model.model) && (imageSize = normalizeGptImage2Resolution(imageSize));
+  const providerRatioPayload = resolveProviderRatioPayload({
       provider: 'apimart',
-      model: _0x36deb8.model,
-      ratioLabel: _0x36deb8.resolvedRatioLabel || _0x36deb8.aspectRatio,
-      imageSize: _0x3b5e19,
-      suppressAspectRatio: _0x36deb8.suppressAspectRatio,
+      model: model.model,
+      ratioLabel: model.resolvedRatioLabel || model.aspectRatio,
+      imageSize: imageSize,
+      suppressAspectRatio: model.suppressAspectRatio,
     }),
-    _0x54bf3e = { model: _0x50e561, prompt: _0x26ce75, n: 1, ...(!_0x562b3f && { resolution: _0x3b5e19 }) };
-  if (!_0x36deb8.suppressAspectRatio && _0x8cf5c?.params?.size) {
-    if (_0x562b3f) {
-      const _0x58721c = resolveDimensionsByResolutionAndRatio(_0x3b5e19, _0x8cf5c.params.size);
-      ((_0x54bf3e.width = _0x58721c.width), (_0x54bf3e.height = _0x58721c.height));
-    } else _0x54bf3e.size = _0x8cf5c.params.size;
+    box = { model: model2, prompt: prompt, n: 1, ...(!enabled2 && { resolution: imageSize }) };
+  if (!model.suppressAspectRatio && providerRatioPayload?.params?.size) {
+    if (enabled2) {
+      const box2 = resolveDimensionsByResolutionAndRatio(imageSize, providerRatioPayload.params.size);
+      ((box.width = box2.width), (box.height = box2.height));
+    } else box.size = providerRatioPayload.params.size;
   }
   return (
-    _0x4bf212.length > 0 && (_0x54bf3e.image_urls = _0x4bf212),
+    list.length > 0 && (box.image_urls = list),
     {
       url: '/api/v2/proxy/image',
       headers: { 'Content-Type': 'application/json' },
-      body: { apiUrl: _0x3f8cbe + '/v1/images/generations', apiKey: _0x4039ae, ..._0x54bf3e },
+      body: { apiUrl: apiUrl + '/v1/images/generations', apiKey: apiKey, ...box },
     }
   );
 }
-export async function buildVideoRequest(_0x3428c6, _0x51aef0, _0x4ec97c) {
-  if (!_0x3428c6.model) throw new Error('未指定视频模型，无法发起视频生成请求');
-  const _0x4d6bf2 = _0x4ec97c.getProviderConfig('apimart'),
-    _0x2a5a29 = normalizeApimartBaseUrl(_0x4d6bf2.apiUrl),
-    _0xee6367 = _0x4d6bf2.apiKey || _0x3428c6.apiKey;
-  if (!_0xee6367) throw new Error('API Key 未配置（厂商：Apimart），无法发起视频生成请求');
-  const _0x13e3c2 = {
+export async function buildVideoRequest(duration, prompt2, value8) {
+  if (!duration.model) throw new Error('未指定视频模型，无法发起视频生成请求');
+  const value9 = value8.getProviderConfig('apimart'),
+    apiUrl2 = normalizeApimartBaseUrl(value9.apiUrl),
+    apiKey2 = value9.apiKey || duration.apiKey;
+  if (!apiKey2) throw new Error('API Key 未配置（厂商：Apimart），无法发起视频生成请求');
+  const value10 = {
       'apimart/luma-ray-v2': 'luma-ray-v2',
       'apimart/kling-v1-5': 'kling-v1-5-gen-video',
       'apimart/happyhorse-1.0': 'happyhorse-1.0',
@@ -169,160 +169,152 @@ export async function buildVideoRequest(_0x3428c6, _0x51aef0, _0x4ec97c) {
       'apimart/doubao-seedance-1-0-pro-fast': 'doubao-seedance-1-0-pro-fast',
       'apimart/doubao-seedance-1-0-pro-quality': 'doubao-seedance-1-0-pro-quality',
     },
-    _0x23120f = _0x13e3c2[_0x3428c6.model] || _0x3428c6.model.replace('apimart/', ''),
-    _0x14c95a = isApimartSeedanceVideoModel(_0x23120f),
-    _0x342706 = _0x23120f.startsWith('doubao-seedance-2.0'),
-    _0x806601 = isApimartSeedance2PrivateAvatarModel(_0x23120f),
-    _0x4192dc = _0x23120f === 'doubao-seedance-1-5-pro',
-    _0x3a392d = _0x23120f.startsWith('doubao-seedance-1-0-pro-'),
-    _0x45c7de = _0x23120f === 'doubao-seedance-1-0-pro-fast',
-    _0x2202c6 = [];
-  if (Array.isArray(_0x3428c6.videos)) _0x2202c6.push(..._0x3428c6.videos);
-  if (Array.isArray(_0x3428c6.videoUrls)) _0x2202c6.push(..._0x3428c6.videoUrls);
-  const _0x367ec4 = String(_0x3428c6.videoUrl || '').trim();
-  if (_0x367ec4) _0x2202c6.unshift(_0x367ec4);
-  const _0x124f0b = applyApimartPrivateAvatarAssetsToUrls(
-    Array.from(new Set(_0x2202c6.map((_0x28310c) => String(_0x28310c || '').trim()).filter(Boolean))),
-    _0x3428c6,
-    { sourceKind: 'video', enabled: _0x806601 },
+    model3 = value10[duration.model] || duration.model.replace('apimart/', ''),
+    isApimartSeedanceVideoModel2 = isApimartSeedanceVideoModel(model3),
+    enabled3 = model3.startsWith('doubao-seedance-2.0'),
+    enabled4 = isApimartSeedance2PrivateAvatarModel(model3),
+    value11 = model3 === 'doubao-seedance-1-5-pro',
+    value12 = model3.startsWith('doubao-seedance-1-0-pro-'),
+    value13 = model3 === 'doubao-seedance-1-0-pro-fast',
+    list2 = [];
+  if (Array.isArray(duration.videos)) list2.push(...duration.videos);
+  if (Array.isArray(duration.videoUrls)) list2.push(...duration.videoUrls);
+  const value14 = String(duration.videoUrl || '').trim();
+  if (value14) list2.unshift(value14);
+  const list3 = applyApimartPrivateAvatarAssetsToUrls(
+    Array.from(new Set(list2.map((item2) => String(item2 || '').trim()).filter(Boolean))),
+    duration,
+    { sourceKind: 'video', enabled: enabled4 },
   );
-  if (_0x14c95a && !_0x342706 && _0x124f0b.length > 0)
+  if (isApimartSeedanceVideoModel2 && !enabled3 && list3.length > 0)
     throw new Error('该 APIMart Seedance 模型暂不支持视频参考');
-  const _0x4e4337 =
-    _0x124f0b.length > 0 && (!_0x14c95a || _0x342706) && _0x4ec97c.processInputVideos
-      ? await _0x4ec97c.processInputVideos(_0x124f0b, _0xee6367, { provider: 'apimart', strictUpload: true })
+  const list4 =
+    list3.length > 0 && (!isApimartSeedanceVideoModel2 || enabled3) && value8.processInputVideos
+      ? await value8.processInputVideos(list3, apiKey2, { provider: 'apimart', strictUpload: true })
       : [];
-  if (_0x124f0b.length > 0 && _0x4e4337.length <= 0) throw new Error('APIMART 源视频上传失败');
-  const _0x317b7d = applyApimartPrivateAvatarAssetsToUrls(
+  if (list3.length > 0 && list4.length <= 0) throw new Error('APIMART 源视频上传失败');
+  const list5 = applyApimartPrivateAvatarAssetsToUrls(
     [
-      String(_0x3428c6.first || _0x3428c6.firstFrameUrl || '').trim(),
-      String(_0x3428c6.last || _0x3428c6.lastFrameUrl || '').trim(),
+      String(duration.first || duration.firstFrameUrl || '').trim(),
+      String(duration.last || duration.lastFrameUrl || '').trim(),
     ].filter(Boolean),
-    _0x3428c6,
-    { sourceKind: 'image', enabled: _0x806601 },
+    duration,
+    { sourceKind: 'image', enabled: enabled4 },
   );
-  let _0x1c1e1f = [];
-  if (_0x45c7de && _0x317b7d.length > 1)
-    throw new Error('Seedance 1.0 Pro Fast 不支持尾帧图，请切换 Quality 模型');
-  if (_0x14c95a && _0x317b7d.length > 0 && _0x4ec97c.processInputImages) {
-    const _0x3b8f69 = await _0x4ec97c.processInputImages(_0x317b7d, _0xee6367, {
+  let list6 = [];
+  if (value13 && list5.length > 1) throw new Error('Seedance 1.0 Pro Fast 不支持尾帧图，请切换 Quality 模型');
+  if (isApimartSeedanceVideoModel2 && list5.length > 0 && value8.processInputImages) {
+    const value15 = await value8.processInputImages(list5, apiKey2, {
         applyInputQualityProfile: true,
         provider: 'apimart',
         strictUpload: true,
       }),
-      _0x5a64fc = String(_0x3b8f69?.[0] || '').trim(),
-      _0x10228d = String(_0x3b8f69?.[1] || '').trim();
-    _0x1c1e1f = [
-      _0x5a64fc ? { url: _0x5a64fc, role: 'first_frame' } : null,
-      _0x10228d ? { url: _0x10228d, role: 'last_frame' } : null,
+      url = String(value15?.[0] || '').trim(),
+      url2 = String(value15?.[1] || '').trim();
+    list6 = [
+      url ? { url: url, role: 'first_frame' } : null,
+      url2 ? { url: url2, role: 'last_frame' } : null,
     ].filter(Boolean);
   }
-  const _0x3fdf63 = Array.isArray(_0x3428c6.images)
-      ? _0x3428c6.images
-      : Array.isArray(_0x3428c6.inputUrls)
-        ? _0x3428c6.inputUrls
+  const value16 = Array.isArray(duration.images)
+      ? duration.images
+      : Array.isArray(duration.inputUrls)
+        ? duration.inputUrls
         : [],
-    _0x552103 = applyApimartPrivateAvatarAssetsToUrls(_0x3fdf63, _0x3428c6, {
+    list7 = applyApimartPrivateAvatarAssetsToUrls(value16, duration, {
       sourceKind: 'image',
-      enabled: _0x806601,
+      enabled: enabled4,
     }),
-    _0x30a6b7 = _0x14c95a && _0x1c1e1f.length <= 0,
-    _0x524312 =
-      _0x30a6b7 && _0x552103.length > 0 && _0x4ec97c.processInputImages
-        ? await _0x4ec97c.processInputImages(_0x552103, _0xee6367, {
+    value17 = isApimartSeedanceVideoModel2 && list6.length <= 0,
+    list8 =
+      value17 && list7.length > 0 && value8.processInputImages
+        ? await value8.processInputImages(list7, apiKey2, {
             applyInputQualityProfile: true,
             provider: 'apimart',
             strictUpload: true,
           })
         : [],
-    _0x571e7b = [];
-  if (Array.isArray(_0x3428c6.audios)) _0x571e7b.push(..._0x3428c6.audios);
-  if (Array.isArray(_0x3428c6.audioUrls)) _0x571e7b.push(..._0x3428c6.audioUrls);
-  const _0x385c95 = String(_0x3428c6.audioUrl || '').trim();
-  if (_0x385c95) _0x571e7b.unshift(_0x385c95);
-  const _0x3ea5cf = applyApimartPrivateAvatarAssetsToUrls(
-    Array.from(new Set(_0x571e7b.map((_0xdc33e9) => String(_0xdc33e9 || '').trim()).filter(Boolean))),
-    _0x3428c6,
-    { sourceKind: 'audio', enabled: _0x806601 },
+    list9 = [];
+  if (Array.isArray(duration.audios)) list9.push(...duration.audios);
+  if (Array.isArray(duration.audioUrls)) list9.push(...duration.audioUrls);
+  const value18 = String(duration.audioUrl || '').trim();
+  if (value18) list9.unshift(value18);
+  const list10 = applyApimartPrivateAvatarAssetsToUrls(
+    Array.from(new Set(list9.map((item3) => String(item3 || '').trim()).filter(Boolean))),
+    duration,
+    { sourceKind: 'audio', enabled: enabled4 },
   );
-  if (_0x14c95a && !_0x342706 && _0x3ea5cf.length > 0)
+  if (isApimartSeedanceVideoModel2 && !enabled3 && list10.length > 0)
     throw new Error('该 APIMart Seedance 模型暂不支持音频参考');
-  const _0x30d867 =
-    _0x342706 && _0x3ea5cf.length > 0 && _0x4ec97c.processInputAudios
-      ? await _0x4ec97c.processInputAudios(_0x3ea5cf, _0xee6367, { provider: 'apimart', strictUpload: true })
+  const list11 =
+    enabled3 && list10.length > 0 && value8.processInputAudios
+      ? await value8.processInputAudios(list10, apiKey2, { provider: 'apimart', strictUpload: true })
       : [];
-  if (_0x14c95a && _0x3ea5cf.length > 0 && _0x30d867.length <= 0) throw new Error('APIMART 源音频上传失败');
-  if (_0x14c95a) {
-    const _0x38d81a = {
-      model: _0x23120f,
-      prompt: _0x51aef0,
-      duration: _0x3428c6.duration || 5,
-      resolution: _0x3428c6.resolution || (_0x3a392d ? '1080p' : '720p'),
+  if (isApimartSeedanceVideoModel2 && list10.length > 0 && list11.length <= 0)
+    throw new Error('APIMART 源音频上传失败');
+  if (isApimartSeedanceVideoModel2) {
+    const args = {
+      model: model3,
+      prompt: prompt2,
+      duration: duration.duration || 5,
+      resolution: duration.resolution || (value12 ? '1080p' : '720p'),
     };
-    _0x342706
-      ? (_0x38d81a.size = normalizeSeedanceVideoSize(_0x3428c6.aspectRatio || _0x3428c6.size))
-      : (_0x38d81a.aspect_ratio = normalizeSeedanceAspectRatio(
-          _0x3428c6.aspectRatio || _0x3428c6.aspect_ratio,
-        ));
-    if (isPresentValue(_0x3428c6.seed)) _0x38d81a.seed = _0x3428c6.seed;
-    _0x4192dc && (_0x3428c6.audio === true || _0x3428c6.generateAudio === true) && (_0x38d81a.audio = true);
-    _0x4192dc && _0x3428c6.camerafixed === true && (_0x38d81a.camerafixed = true);
-    if (_0x1c1e1f.length > 0) _0x38d81a.image_with_roles = _0x1c1e1f;
+    enabled3
+      ? (args.size = normalizeSeedanceVideoSize(duration.aspectRatio || duration.size))
+      : (args.aspect_ratio = normalizeSeedanceAspectRatio(duration.aspectRatio || duration.aspect_ratio));
+    if (isPresentValue(duration.seed)) args.seed = duration.seed;
+    value11 && (duration.audio === true || duration.generateAudio === true) && (args.audio = true);
+    value11 && duration.camerafixed === true && (args.camerafixed = true);
+    if (list6.length > 0) args.image_with_roles = list6;
     else {
-      if (_0x524312.length > 0) {
-        const _0x30dcb0 = _0x342706 ? 9 : _0x4192dc ? 2 : 1;
-        _0x38d81a.image_urls = _0x524312.slice(0, _0x30dcb0);
+      if (list8.length > 0) {
+        const value19 = enabled3 ? 9 : value11 ? 2 : 1;
+        args.image_urls = list8.slice(0, value19);
       }
     }
     return (
-      _0x342706 &&
-        _0x1c1e1f.length <= 0 &&
-        _0x4e4337.length > 0 &&
-        (_0x38d81a.video_urls = _0x4e4337.slice(0, 3)),
-      _0x342706 &&
-        _0x1c1e1f.length <= 0 &&
-        _0x30d867.length > 0 &&
-        (_0x38d81a.audio_urls = _0x30d867.slice(0, 3)),
+      enabled3 && list6.length <= 0 && list4.length > 0 && (args.video_urls = list4.slice(0, 3)),
+      enabled3 && list6.length <= 0 && list11.length > 0 && (args.audio_urls = list11.slice(0, 3)),
       {
         url: '/api/v2/proxy/image',
         headers: { 'Content-Type': 'application/json' },
-        body: { apiUrl: _0x2a5a29 + '/v1/videos/generations', apiKey: _0xee6367, ..._0x38d81a },
+        body: { apiUrl: apiUrl2 + '/v1/videos/generations', apiKey: apiKey2, ...args },
       }
     );
   }
-  let _0x4aa6bf = '';
-  if (_0x4e4337.length > 0) _0x4aa6bf = String(_0x4e4337[0] || '').trim();
+  let enabled5 = '';
+  if (list4.length > 0) enabled5 = String(list4[0] || '').trim();
   else {
-    if (_0x367ec4 && _0x4ec97c.processInputVideos) {
-      const _0x13c427 = await _0x4ec97c.processInputVideos([_0x367ec4], _0xee6367, {
+    if (value14 && value8.processInputVideos) {
+      const value20 = await value8.processInputVideos([value14], apiKey2, {
         provider: 'apimart',
         strictUpload: true,
       });
-      _0x4aa6bf = String(_0x13c427?.[0] || '').trim();
-      if (!_0x4aa6bf) throw new Error('APIMART 源视频上传失败');
+      enabled5 = String(value20?.[0] || '').trim();
+      if (!enabled5) throw new Error('APIMART 源视频上传失败');
     }
   }
-  const _0x8335a0 =
-      _0x3428c6.inputUrls && _0x3428c6.inputUrls.length > 0 && _0x4ec97c.processInputImages
-        ? await _0x4ec97c.processInputImages(_0x3428c6.inputUrls, _0xee6367, {
+  const list12 =
+      duration.inputUrls && duration.inputUrls.length > 0 && value8.processInputImages
+        ? await value8.processInputImages(duration.inputUrls, apiKey2, {
             applyInputQualityProfile: true,
             provider: 'apimart',
             strictUpload: true,
           })
         : [],
-    _0x3ccb1c = {
-      model: _0x23120f,
-      prompt: _0x51aef0,
-      size: _0x3428c6.aspectRatio || '16:9',
-      quality: _0x3428c6.videoSize || 'standard',
+    args2 = {
+      model: model3,
+      prompt: prompt2,
+      size: duration.aspectRatio || '16:9',
+      quality: duration.videoSize || 'standard',
     };
-  if (_0x3428c6.duration) _0x3ccb1c.duration = _0x3428c6.duration;
-  if (_0x3428c6.resolution) _0x3ccb1c.resolution = _0x3428c6.resolution;
-  if (_0x4aa6bf) _0x3ccb1c.video_url = _0x4aa6bf;
-  if (_0x8335a0.length > 0) _0x3ccb1c.image_urls = _0x8335a0;
+  if (duration.duration) args2.duration = duration.duration;
+  if (duration.resolution) args2.resolution = duration.resolution;
+  if (enabled5) args2.video_url = enabled5;
+  if (list12.length > 0) args2.image_urls = list12;
   return {
     url: '/api/v2/proxy/image',
     headers: { 'Content-Type': 'application/json' },
-    body: { apiUrl: _0x2a5a29 + '/v1/videos/generations', apiKey: _0xee6367, ..._0x3ccb1c },
+    body: { apiUrl: apiUrl2 + '/v1/videos/generations', apiKey: apiKey2, ...args2 },
   };
 }

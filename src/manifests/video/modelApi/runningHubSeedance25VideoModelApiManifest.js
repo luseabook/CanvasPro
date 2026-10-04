@@ -20,7 +20,7 @@ import {
 } from './vendorVideoModelApiShared.js';
 const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     -0x1,
-    ...Array['from']({ length: 0x1b }, (_0xbd9c62, _0x35a43d) => _0x35a43d + 0x4),
+    ...Array['from']({ length: 0x1b }, (value, item) => item + 0x4),
   ]),
   RUNNINGHUB_SEEDANCE_2_5_OUTPUT_FORMAT_FIELD = Object['freeze']({
     id: 'outputFormat',
@@ -55,10 +55,10 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     defaultValue: ![],
   }),
   RUNNINGHUB_SEEDANCE_2_5_FIXED_INPUT_SLOTS = Object['freeze'](
-    RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS['map']((_0x497a61) =>
-      _0x497a61['id'] === 'referenceAudio'
-        ? Object['freeze']({ ..._0x497a61, description: '全能参考模式的参考音频，可单独使用' })
-        : _0x497a61,
+    RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS['map']((args) =>
+      args['id'] === 'referenceAudio'
+        ? Object['freeze']({ ...args, description: '全能参考模式的参考音频，可单独使用' })
+        : args,
     ),
   ),
   RUNNINGHUB_SEEDANCE_2_5_INPUT_SLOTS = createVideoInputSlots({

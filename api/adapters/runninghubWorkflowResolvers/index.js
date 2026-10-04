@@ -3,123 +3,147 @@ const RUNNINGHUB_WORKFLOW_PAYLOAD_RESOLVERS = Object.freeze({
   runninghubBerniniVideoReplaceV1: resolveRunningHubBerniniVideoReplaceV1Payload,
   runninghubVideoMatting: resolveRunningHubVideoMattingPayload,
 });
-export function getRunningHubWorkflowPayloadResolver(_0x26f451) {
-  const _0x4cba9d = String(_0x26f451 || '').trim();
-  return RUNNINGHUB_WORKFLOW_PAYLOAD_RESOLVERS[_0x4cba9d] || null;
+export function getRunningHubWorkflowPayloadResolver(value) {
+  const item = String(value || '').trim();
+  return RUNNINGHUB_WORKFLOW_PAYLOAD_RESOLVERS[item] || null;
 }
 async function resolveRunningHubVideoV54Payload({
-  executionManifest: _0x4083c7,
-  payload: _0x322620,
-  finalPrompt: _0x5acbbb,
-  apiKey: _0x97a0da,
-  ctx: _0x3754ab,
-  helpers: _0x5c783b,
+  executionManifest: executionManifest,
+  payload: payload,
+  finalPrompt: finalPrompt,
+  apiKey: apiKey,
+  ctx: ctx,
+  helpers: helpers,
 }) {
-  const _0x5bcabc = _0x4083c7.mapping || {},
-    _0x34c309 = [],
+  const fieldName = executionManifest.mapping || {},
+    nodeInfoList = [],
     {
-      buildOpenApiVideoWorkflowRequest: _0x263ff2,
-      getMappedValue: _0x1a7011,
-      normalizeRhVideoResolution: _0x238116,
-      pushManifestNode: _0x310acc,
-      resolveRunningHubFirstImageInput: _0x2bff84,
-      resolveRunningHubOptionalVideoInput: _0x1b3d54,
-      resolveRunningHubVideoInput: _0x119e2d,
-      sourceVideoMissingMessage: _0x2abd06,
-      sourceVideoUploadFailedMessage: _0x182a6b,
-    } = _0x5c783b,
-    _0x1bf5e6 = String(_0x5acbbb || '').trim() || '4K，高质量';
-  (_0x310acc(_0x34c309, _0x5bcabc.promptNode, _0x1bf5e6),
-    _0x310acc(
-      _0x34c309,
-      _0x5bcabc.characterIntegrationNode,
-      _0x322620.characterIntegration === true ? 'true' : 'false',
+      buildOpenApiVideoWorkflowRequest: buildOpenApiVideoWorkflowRequest,
+      getMappedValue: getMappedValue,
+      normalizeRhVideoResolution: normalizeRhVideoResolution,
+      pushManifestNode: pushManifestNode,
+      resolveRunningHubFirstImageInput: resolveRunningHubFirstImageInput,
+      resolveRunningHubOptionalVideoInput: resolveRunningHubOptionalVideoInput,
+      resolveRunningHubVideoInput: resolveRunningHubVideoInput,
+      sourceVideoMissingMessage: sourceVideoMissingMessage,
+      sourceVideoUploadFailedMessage: sourceVideoUploadFailedMessage,
+    } = helpers,
+    key = String(finalPrompt || '').trim() || '4K，高质量';
+  (pushManifestNode(nodeInfoList, fieldName.promptNode, key),
+    pushManifestNode(
+      nodeInfoList,
+      fieldName.characterIntegrationNode,
+      payload.characterIntegration === true ? 'true' : 'false',
     ));
-  const _0x1b79ae = String(_0x322620.controlMode || '').trim(),
-    _0x4438e7 = _0x1a7011(_0x1b79ae, _0x5bcabc.controlModeNode, '0');
-  (_0x310acc(_0x34c309, _0x5bcabc.controlModeNode, _0x4438e7),
-    _0x310acc(_0x34c309, _0x5bcabc.resolutionNode, _0x238116(_0x322620.rhVideoResolution)));
-  const _0x32293d = Number(_0x322620.frameRate ?? _0x322620.rhVideoFps),
-    _0x467782 = Number.isFinite(_0x32293d) ? Math.trunc(_0x32293d) : 24;
-  _0x310acc(_0x34c309, _0x5bcabc.fpsNode, _0x467782);
-  const _0x34c904 = Number(_0x322620.frameCount ?? _0x322620.rhVideoFrames),
-    _0x207de2 = Number.isFinite(_0x34c904) ? Math.max(0, Math.trunc(_0x34c904)) : 77;
-  _0x310acc(_0x34c309, _0x5bcabc.sourceVideoNode, _0x207de2, {
-    fieldName: _0x5bcabc.sourceVideoNode?.frameCountFieldName,
+  const index = String(payload.controlMode || '').trim(),
+    result = getMappedValue(index, fieldName.controlModeNode, '0');
+  (pushManifestNode(nodeInfoList, fieldName.controlModeNode, result),
+    pushManifestNode(
+      nodeInfoList,
+      fieldName.resolutionNode,
+      normalizeRhVideoResolution(payload.rhVideoResolution),
+    ));
+  const data = Number(payload.frameRate ?? payload.rhVideoFps),
+    options = Number.isFinite(data) ? Math.trunc(data) : 24;
+  pushManifestNode(nodeInfoList, fieldName.fpsNode, options);
+  const target = Number(payload.frameCount ?? payload.rhVideoFrames),
+    source = Number.isFinite(target) ? Math.max(0, Math.trunc(target)) : 77;
+  pushManifestNode(nodeInfoList, fieldName.sourceVideoNode, source, {
+    fieldName: fieldName.sourceVideoNode?.frameCountFieldName,
   });
-  const _0x1c39ab = await _0x119e2d(_0x322620, _0x97a0da, {
-    missingMessage: _0x2abd06,
-    uploadFailedMessage: _0x182a6b,
+  const next = await resolveRunningHubVideoInput(payload, apiKey, {
+    missingMessage: sourceVideoMissingMessage,
+    uploadFailedMessage: sourceVideoUploadFailedMessage,
   });
-  _0x310acc(_0x34c309, _0x5bcabc.sourceVideoNode, _0x1c39ab);
-  const _0x1d1a0b = await _0x2bff84(_0x322620, _0x97a0da, _0x3754ab);
-  _0x1d1a0b && _0x310acc(_0x34c309, _0x5bcabc.refImageNode, _0x1d1a0b);
-  const _0x306ede = await _0x1b3d54(_0x322620, _0x97a0da, 'maskVideoUrl');
-  _0x306ede && _0x310acc(_0x34c309, _0x5bcabc.maskVideoNode, _0x306ede);
-  const _0x4724c2 = await _0x2bff84(_0x322620, _0x97a0da, _0x3754ab, { field: 'firstFrameUrl' });
-  _0x4724c2 &&
-    (_0x310acc(_0x34c309, _0x5bcabc.firstFrameNode, _0x4724c2),
-    _0x310acc(_0x34c309, _0x5bcabc.firstFrameEnabledNode, _0x5bcabc.firstFrameEnabledNode?.value ?? '1'));
-  const _0x19eb29 = String(_0x322620.specialMode || _0x322620.rhSpecialMode || ''),
-    _0x5e1747 = _0x19eb29 === 'cameraMove',
-    _0x3f4f76 = !_0x5e1747 && _0x322620.subtractSubject === true;
-  _0x3f4f76 &&
-    _0x310acc(_0x34c309, _0x5bcabc.subtractSubjectNode, _0x5bcabc.subtractSubjectNode?.value ?? 'true');
-  const _0x3cef95 = !_0x5e1747 && (_0x306ede || _0x3f4f76);
-  if (_0x3cef95) {
-    const _0x43f8ff = Number(_0x322620.maskExpansion),
-      _0x3d0f05 = Number.isFinite(_0x43f8ff) ? _0x43f8ff : (_0x5bcabc.maskExpansionNode?.defaultValue ?? 25);
-    (_0x310acc(_0x34c309, _0x5bcabc.maskExpansionNode, _0x3d0f05),
-      _0x310acc(
-        _0x34c309,
-        _0x5bcabc.maskRectNode,
-        _0x322620.maskRect === true
-          ? (_0x5bcabc.maskRectNode?.trueValue ?? '1')
-          : (_0x5bcabc.maskRectNode?.falseValue ?? '0'),
+  pushManifestNode(nodeInfoList, fieldName.sourceVideoNode, next);
+  const current = await resolveRunningHubFirstImageInput(payload, apiKey, ctx);
+  current && pushManifestNode(nodeInfoList, fieldName.refImageNode, current);
+  const entry = await resolveRunningHubOptionalVideoInput(payload, apiKey, 'maskVideoUrl');
+  entry && pushManifestNode(nodeInfoList, fieldName.maskVideoNode, entry);
+  const record = await resolveRunningHubFirstImageInput(payload, apiKey, ctx, { field: 'firstFrameUrl' });
+  record &&
+    (pushManifestNode(nodeInfoList, fieldName.firstFrameNode, record),
+    pushManifestNode(
+      nodeInfoList,
+      fieldName.firstFrameEnabledNode,
+      fieldName.firstFrameEnabledNode?.value ?? '1',
+    ));
+  const handle = String(payload.specialMode || payload.rhSpecialMode || ''),
+    enabled = handle === 'cameraMove',
+    state = !enabled && payload.subtractSubject === true;
+  state &&
+    pushManifestNode(
+      nodeInfoList,
+      fieldName.subtractSubjectNode,
+      fieldName.subtractSubjectNode?.value ?? 'true',
+    );
+  const config = !enabled && (entry || state);
+  if (config) {
+    const scope = Number(payload.maskExpansion),
+      input = Number.isFinite(scope) ? scope : (fieldName.maskExpansionNode?.defaultValue ?? 25);
+    (pushManifestNode(nodeInfoList, fieldName.maskExpansionNode, input),
+      pushManifestNode(
+        nodeInfoList,
+        fieldName.maskRectNode,
+        payload.maskRect === true
+          ? (fieldName.maskRectNode?.trueValue ?? '1')
+          : (fieldName.maskRectNode?.falseValue ?? '0'),
       ),
-      _0x310acc(_0x34c309, _0x5bcabc.maskParamsEnabledNode, _0x5bcabc.maskParamsEnabledNode?.value ?? '1'));
+      pushManifestNode(
+        nodeInfoList,
+        fieldName.maskParamsEnabledNode,
+        fieldName.maskParamsEnabledNode?.value ?? '1',
+      ));
   }
-  (_0x19eb29 === 'longVideoOverlay' || _0x19eb29 === 'cameraMove') &&
-    _0x310acc(_0x34c309, _0x5bcabc.specialModeNode, _0x1a7011(_0x19eb29, _0x5bcabc.specialModeNode, ''));
-  _0x19eb29 === 'longVideoOverlay' &&
-    _0x310acc(_0x34c309, _0x5bcabc.longVideoOverlayNode, _0x5bcabc.longVideoOverlayNode?.value ?? '1');
-  const _0x5ee2df = Number(_0x322620.breastJiggle ?? _0x322620.rhBreastJiggle ?? 0),
-    _0x109369 = Number.isFinite(_0x5ee2df) ? Math.max(0, Math.min(1, Math.round(_0x5ee2df * 20) / 20)) : 0;
+  (handle === 'longVideoOverlay' || handle === 'cameraMove') &&
+    pushManifestNode(
+      nodeInfoList,
+      fieldName.specialModeNode,
+      getMappedValue(handle, fieldName.specialModeNode, ''),
+    );
+  handle === 'longVideoOverlay' &&
+    pushManifestNode(
+      nodeInfoList,
+      fieldName.longVideoOverlayNode,
+      fieldName.longVideoOverlayNode?.value ?? '1',
+    );
+  const output = Number(payload.breastJiggle ?? payload.rhBreastJiggle ?? 0),
+    count = Number.isFinite(output) ? Math.max(0, Math.min(1, Math.round(output * 20) / 20)) : 0;
   return (
-    _0x109369 > 0 &&
-      (_0x310acc(_0x34c309, _0x5bcabc.breastJiggleNode, Number(_0x109369.toFixed(2))),
-      _0x310acc(
-        _0x34c309,
-        _0x5bcabc.breastJiggleEnabledNode,
-        _0x5bcabc.breastJiggleEnabledNode?.value ?? 'true',
+    count > 0 &&
+      (pushManifestNode(nodeInfoList, fieldName.breastJiggleNode, Number(count.toFixed(2))),
+      pushManifestNode(
+        nodeInfoList,
+        fieldName.breastJiggleEnabledNode,
+        fieldName.breastJiggleEnabledNode?.value ?? 'true',
       )),
-    _0x263ff2({
-      executionManifest: _0x4083c7,
-      payload: _0x322620,
-      apiKey: _0x97a0da,
-      nodeInfoList: _0x34c309,
+    buildOpenApiVideoWorkflowRequest({
+      executionManifest: executionManifest,
+      payload: payload,
+      apiKey: apiKey,
+      nodeInfoList: nodeInfoList,
     })
   );
 }
-function normalizeBerniniInputMode(_0x3913e3) {
-  const _0x4513b0 = String(_0x3913e3 || '').trim();
-  return ['none', 'image', 'video', 'videoImage', 'videoVideo'].includes(_0x4513b0) ? _0x4513b0 : 'none';
+function normalizeBerniniInputMode(value2) {
+  const value3 = String(value2 || '').trim();
+  return ['none', 'image', 'video', 'videoImage', 'videoVideo'].includes(value3) ? value3 : 'none';
 }
-function resolveBerniniFunctionForMode(_0xcd19cc, _0x2adc8a = '') {
-  const _0x41c4cd = {
+function resolveBerniniFunctionForMode(value4, value5 = '') {
+  const value6 = {
       none: ['t2v'],
       image: ['i2v', 'r2v'],
       video: ['v2v', 'mv2v'],
       videoImage: ['vi2v', 'rv2v', 'vrc2v'],
       videoVideo: ['ads2v'],
     },
-    _0x808b94 = normalizeBerniniInputMode(_0xcd19cc),
-    _0x3a7314 = _0x41c4cd[_0x808b94] || _0x41c4cd.none,
-    _0x23541d = String(_0x2adc8a || '').trim();
-  return _0x3a7314.includes(_0x23541d) ? _0x23541d : _0x3a7314[0];
+    berniniInputMode = normalizeBerniniInputMode(value4),
+    list = value6[berniniInputMode] || value6.none,
+    value7 = String(value5 || '').trim();
+  return list.includes(value7) ? value7 : list[0];
 }
-function resolveBerniniModeValue(_0x14ddf3, _0x52b238 = '') {
-  const _0x5625a5 = {
+function resolveBerniniModeValue(value8, value9 = '') {
+  const value10 = {
     t2v: '0',
     i2v: '1',
     v2v: '2',
@@ -130,217 +154,225 @@ function resolveBerniniModeValue(_0x14ddf3, _0x52b238 = '') {
     vrc2v: '7',
     mv2v: '8',
   };
-  return _0x5625a5[resolveBerniniFunctionForMode(_0x14ddf3, _0x52b238)] || '0';
+  return value10[resolveBerniniFunctionForMode(value8, value9)] || '0';
 }
-function normalizeBerniniResolutionBase(_0x54d799) {
-  const _0x5912ea = Number(_0x54d799);
-  return [0x340, 0x400, 0x500, 0x5a0].includes(_0x5912ea) ? _0x5912ea : 0x340;
+function normalizeBerniniResolutionBase(value11) {
+  const value12 = Number(value11);
+  return [0x340, 0x400, 0x500, 0x5a0].includes(value12) ? value12 : 0x340;
 }
-function parseBerniniAspectRatio(_0x3d0056) {
-  const _0x29b872 = String(_0x3d0056 || '16:9').trim(),
-    _0x15e4bc = _0x29b872.toLowerCase();
-  if (_0x29b872 === '自适应' || _0x15e4bc === 'auto' || _0x15e4bc === 'adaptive')
+function parseBerniniAspectRatio(value13) {
+  const value14 = String(value13 || '16:9').trim(),
+    value15 = value14.toLowerCase();
+  if (value14 === '自适应' || value15 === 'auto' || value15 === 'adaptive')
     return { widthRatio: 16, heightRatio: 9 };
-  const [_0x4ed65e, _0x3ebafd] = _0x29b872.split(':'),
-    _0x260b7c = Number(_0x4ed65e),
-    _0x56ba0 = Number(_0x3ebafd);
-  if (_0x260b7c > 0 && _0x56ba0 > 0) return { widthRatio: _0x260b7c, heightRatio: _0x56ba0 };
+  const [value16, value17] = value14.split(':'),
+    widthRatio = Number(value16),
+    heightRatio = Number(value17);
+  if (widthRatio > 0 && heightRatio > 0) return { widthRatio: widthRatio, heightRatio: heightRatio };
   return { widthRatio: 16, heightRatio: 9 };
 }
-function resolveBerniniAspectRatioValue(_0x5a7a70 = {}) {
-  const _0x599e04 =
-      _0x5a7a70.rhBerniniAspectRatio ??
-      _0x5a7a70.generationParams?.rhBerniniAspectRatio ??
-      _0x5a7a70.resolvedRatioLabel ??
-      _0x5a7a70.aspectRatio,
-    _0x1f9e99 = String(_0x599e04 || '').trim(),
-    _0x29b69e = _0x1f9e99.toLowerCase();
-  if (_0x1f9e99 === '自适应' || _0x29b69e === 'auto' || _0x29b69e === 'adaptive')
-    return _0x5a7a70.resolvedRatioLabel || _0x5a7a70.aspectRatio || '16:9';
-  return _0x599e04;
+function resolveBerniniAspectRatioValue(options2 = {}) {
+  const value18 =
+      options2.rhBerniniAspectRatio ??
+      options2.generationParams?.rhBerniniAspectRatio ??
+      options2.resolvedRatioLabel ??
+      options2.aspectRatio,
+    value19 = String(value18 || '').trim(),
+    value20 = value19.toLowerCase();
+  if (value19 === '自适应' || value20 === 'auto' || value20 === 'adaptive')
+    return options2.resolvedRatioLabel || options2.aspectRatio || '16:9';
+  return value18;
 }
-function roundBerniniDimensionToEight(_0x485815) {
-  return Math.max(8, Math.round(Number(_0x485815 || 0) / 8) * 8);
+function roundBerniniDimensionToEight(value21) {
+  return Math.max(8, Math.round(Number(value21 || 0) / 8) * 8);
 }
-function resolveBerniniDimensions({ resolutionBase: _0x55afad, aspectRatio: _0x4bc5c8 } = {}) {
-  const _0x4cbf09 = normalizeBerniniResolutionBase(_0x55afad),
-    { widthRatio: _0xd4936b, heightRatio: _0x48b35a } = parseBerniniAspectRatio(_0x4bc5c8);
-  if (_0xd4936b >= _0x48b35a)
-    return { width: _0x4cbf09, height: roundBerniniDimensionToEight((_0x4cbf09 * _0x48b35a) / _0xd4936b) };
-  return { width: roundBerniniDimensionToEight((_0x4cbf09 * _0xd4936b) / _0x48b35a), height: _0x4cbf09 };
+function resolveBerniniDimensions({ resolutionBase: resolutionBase, aspectRatio: aspectRatio } = {}) {
+  const width = normalizeBerniniResolutionBase(resolutionBase),
+    { widthRatio: widthRatio2, heightRatio: heightRatio2 } = parseBerniniAspectRatio(aspectRatio);
+  if (widthRatio2 >= heightRatio2)
+    return { width: width, height: roundBerniniDimensionToEight((width * heightRatio2) / widthRatio2) };
+  return { width: roundBerniniDimensionToEight((width * widthRatio2) / heightRatio2), height: width };
 }
 async function resolveRunningHubBerniniVideoReplaceV1Payload({
-  executionManifest: _0x512193,
-  payload: _0x5ba832,
-  finalPrompt: _0x1e35ad,
-  apiKey: _0x5dfb8a,
-  ctx: _0x595a1f,
-  helpers: _0x1c5266,
+  executionManifest: executionManifest2,
+  payload: payload2,
+  finalPrompt: finalPrompt2,
+  apiKey: apiKey2,
+  ctx: ctx2,
+  helpers: helpers2,
 }) {
-  const _0x49404a = _0x512193.mapping || {},
-    _0x157434 = [],
+  const value22 = executionManifest2.mapping || {},
+    nodeInfoList2 = [],
     {
-      buildOpenApiVideoWorkflowRequest: _0x1eb863,
-      pushManifestNode: _0x401f7e,
-      resolveRunningHubFirstImageInput: _0x5ad108,
-      resolveRunningHubOptionalVideoInput: _0x5e7a7c,
-      resolveRunningHubVideoInput: _0x246d08,
-    } = _0x1c5266;
-  let _0x3d693d = '';
-  (String(_0x5ba832.videoUrl || '').trim() || _0x5ba832.videoFile) &&
-    (_0x3d693d = await _0x246d08(_0x5ba832, _0x5dfb8a, {
+      buildOpenApiVideoWorkflowRequest: buildOpenApiVideoWorkflowRequest2,
+      pushManifestNode: pushManifestNode2,
+      resolveRunningHubFirstImageInput: resolveRunningHubFirstImageInput2,
+      resolveRunningHubOptionalVideoInput: resolveRunningHubOptionalVideoInput2,
+      resolveRunningHubVideoInput: resolveRunningHubVideoInput2,
+    } = helpers2;
+  let enabled2 = '';
+  (String(payload2.videoUrl || '').trim() || payload2.videoFile) &&
+    (enabled2 = await resolveRunningHubVideoInput2(payload2, apiKey2, {
       missingMessage: '请接入源视频',
       uploadFailedMessage: '源视频上传失败',
     }));
-  const _0x5b219f = await _0x5ad108(_0x5ba832, _0x5dfb8a, _0x595a1f, {
+  const value23 = await resolveRunningHubFirstImageInput2(payload2, apiKey2, ctx2, {
       required: false,
       missingMessage: '请接入参考图像',
     }),
-    _0x504ba1 = await _0x5e7a7c(_0x5ba832, _0x5dfb8a, 'referenceVideoUrl'),
-    _0x1f6a53 = _0x3d693d
-      ? _0x504ba1
+    value24 = await resolveRunningHubOptionalVideoInput2(payload2, apiKey2, 'referenceVideoUrl'),
+    value25 = enabled2
+      ? value24
         ? 'videoVideo'
-        : _0x5b219f
+        : value23
           ? 'videoImage'
           : 'video'
-      : _0x5b219f
+      : value23
         ? 'image'
         : 'none';
-  if (_0x504ba1 && !_0x3d693d) throw new Error('参考视频需要同时接入源视频');
-  const _0x279680 = resolveBerniniModeValue(
-      _0x1f6a53,
-      _0x5ba832.rhBerniniFunction ?? _0x5ba832.generationParams?.rhBerniniFunction,
+  if (value24 && !enabled2) throw new Error('参考视频需要同时接入源视频');
+  const berniniModeValue = resolveBerniniModeValue(
+      value25,
+      payload2.rhBerniniFunction ?? payload2.generationParams?.rhBerniniFunction,
     ),
-    _0x2fca5f = resolveBerniniDimensions({
+    box = resolveBerniniDimensions({
       resolutionBase:
-        _0x5ba832.rhVideoResolution ??
-        _0x5ba832.generationParams?.rhVideoResolution ??
-        _0x5ba832.rhBerniniResolutionBase ??
-        _0x5ba832.generationParams?.rhBerniniResolutionBase,
-      aspectRatio: resolveBerniniAspectRatioValue(_0x5ba832),
+        payload2.rhVideoResolution ??
+        payload2.generationParams?.rhVideoResolution ??
+        payload2.rhBerniniResolutionBase ??
+        payload2.generationParams?.rhBerniniResolutionBase,
+      aspectRatio: resolveBerniniAspectRatioValue(payload2),
     });
-  _0x3d693d && _0x401f7e(_0x157434, _0x49404a.sourceVideoNode, _0x3d693d);
-  _0x5b219f && _0x1f6a53 !== 'videoVideo' && _0x401f7e(_0x157434, _0x49404a.refImageNode, _0x5b219f);
-  _0x401f7e(_0x157434, _0x49404a.modeNode, _0x279680);
-  const _0x3cdfc6 = Number(_0x5ba832.rhVideoFps ?? _0x49404a.fpsNode?.value),
-    _0x3fcbad = Number.isFinite(_0x3cdfc6) ? Math.trunc(_0x3cdfc6) : 24;
-  _0x401f7e(_0x157434, _0x49404a.fpsNode, String(_0x3fcbad));
-  const _0x233b31 = Number(_0x5ba832.rhVideoFrames ?? _0x49404a.framesNode?.value),
-    _0x575c73 = Number.isFinite(_0x233b31) ? Math.max(0, Math.trunc(_0x233b31)) : 121;
+  enabled2 && pushManifestNode2(nodeInfoList2, value22.sourceVideoNode, enabled2);
+  value23 && value25 !== 'videoVideo' && pushManifestNode2(nodeInfoList2, value22.refImageNode, value23);
+  pushManifestNode2(nodeInfoList2, value22.modeNode, berniniModeValue);
+  const value26 = Number(payload2.rhVideoFps ?? value22.fpsNode?.value),
+    value27 = Number.isFinite(value26) ? Math.trunc(value26) : 24;
+  pushManifestNode2(nodeInfoList2, value22.fpsNode, String(value27));
+  const value28 = Number(payload2.rhVideoFrames ?? value22.framesNode?.value),
+    value29 = Number.isFinite(value28) ? Math.max(0, Math.trunc(value28)) : 121;
   return (
-    _0x401f7e(_0x157434, _0x49404a.framesNode, String(_0x575c73)),
-    _0x401f7e(_0x157434, _0x49404a.widthNode, _0x2fca5f.width),
-    _0x401f7e(_0x157434, _0x49404a.heightNode, _0x2fca5f.height),
-    _0x401f7e(_0x157434, _0x49404a.promptNode, _0x1e35ad || ''),
-    _0x1f6a53 === 'videoVideo' && _0x401f7e(_0x157434, _0x49404a.referenceVideoNode, _0x504ba1),
-    _0x1eb863({
-      executionManifest: _0x512193,
-      payload: _0x5ba832,
-      apiKey: _0x5dfb8a,
-      nodeInfoList: _0x157434,
+    pushManifestNode2(nodeInfoList2, value22.framesNode, String(value29)),
+    pushManifestNode2(nodeInfoList2, value22.widthNode, box.width),
+    pushManifestNode2(nodeInfoList2, value22.heightNode, box.height),
+    pushManifestNode2(nodeInfoList2, value22.promptNode, finalPrompt2 || ''),
+    value25 === 'videoVideo' && pushManifestNode2(nodeInfoList2, value22.referenceVideoNode, value24),
+    buildOpenApiVideoWorkflowRequest2({
+      executionManifest: executionManifest2,
+      payload: payload2,
+      apiKey: apiKey2,
+      nodeInfoList: nodeInfoList2,
     })
   );
 }
 async function resolveRunningHubVideoMattingPayload({
-  executionManifest: _0x39c377,
-  payload: _0x4b3dc2,
-  apiKey: _0x155a16,
-  ctx: _0x447e75,
-  helpers: _0x672b26,
+  executionManifest: executionManifest3,
+  payload: payload3,
+  apiKey: apiKey3,
+  ctx: ctx3,
+  helpers: helpers3,
 }) {
-  const _0x6e2bf3 = _0x39c377.mapping || {},
-    _0x291c68 = [],
+  const appId = executionManifest3.mapping || {},
+    nodeInfoList3 = [],
     {
-      buildTaskCreateVideoWorkflowRequest: _0x45db75,
-      normalizeRhVideoFps: _0x1efb7f,
-      normalizeRhVideoResolution: _0x4626d7,
-      normalizeVideoMattingMaskModeIndex: _0x1b8de9,
-      pushManifestNode: _0x434f9f,
-    } = _0x672b26,
-    _0x2094b3 = String(_0x4b3dc2.maskImageDataUrl || '').trim(),
-    _0x5c4218 = String(_0x4b3dc2.videoUrl || '').trim();
-  if (!_0x5c4218) throw new Error('请接入源视频');
-  const _0x272881 = _0x447e75.processInputVideos;
-  if (typeof _0x272881 !== 'function') throw new Error('缺少 RunningHUB 视频上传能力');
-  const _0x57bc33 = await _0x272881([_0x5c4218], _0x155a16),
-    _0x218bb3 = String(_0x57bc33?.[0] || '').trim();
-  if (!_0x218bb3) throw new Error('源视频上传失败');
-  if (_0x2094b3) {
-    const _0x481c8e = _0x447e75.processInputImages;
-    if (typeof _0x481c8e !== 'function') throw new Error('缺少 RunningHUB 图片上传能力');
-    const _0xd0135d = await _0x481c8e([_0x2094b3], _0x155a16, { compress: false, provider: 'runninghub' }),
-      _0x3504c3 = String(_0xd0135d?.[0] || '').trim();
-    if (!_0x3504c3) throw new Error('擦除遮罩上传失败');
-    const _0x29485e = Number(_0x4b3dc2.sourceFrameCount ?? _0x4b3dc2.frameCount),
-      _0x599ae2 = Number.isFinite(_0x29485e) ? Math.max(1, Math.trunc(_0x29485e)) : 1;
-    (_0x434f9f(_0x291c68, _0x6e2bf3.maskVideoNode, _0x218bb3),
-      _0x434f9f(_0x291c68, _0x6e2bf3.maskFrameCapNode, String(_0x599ae2)),
-      _0x434f9f(
-        _0x291c68,
-        _0x6e2bf3.maskFpsNode,
-        String(_0x1efb7f(_0x4b3dc2.rhVideoFps ?? _0x4b3dc2.frameRate)),
+      buildTaskCreateVideoWorkflowRequest: buildTaskCreateVideoWorkflowRequest,
+      normalizeRhVideoFps: normalizeRhVideoFps,
+      normalizeRhVideoResolution: normalizeRhVideoResolution2,
+      normalizeVideoMattingMaskModeIndex: normalizeVideoMattingMaskModeIndex,
+      pushManifestNode: pushManifestNode3,
+    } = helpers3,
+    value30 = String(payload3.maskImageDataUrl || '').trim(),
+    enabled3 = String(payload3.videoUrl || '').trim();
+  if (!enabled3) throw new Error('请接入源视频');
+  const run = ctx3.processInputVideos;
+  if (typeof run !== 'function') throw new Error('缺少 RunningHUB 视频上传能力');
+  const value31 = await run([enabled3], apiKey3),
+    enabled4 = String(value31?.[0] || '').trim();
+  if (!enabled4) throw new Error('源视频上传失败');
+  if (value30) {
+    const run2 = ctx3.processInputImages;
+    if (typeof run2 !== 'function') throw new Error('缺少 RunningHUB 图片上传能力');
+    const value32 = await run2([value30], apiKey3, { compress: false, provider: 'runninghub' }),
+      enabled5 = String(value32?.[0] || '').trim();
+    if (!enabled5) throw new Error('擦除遮罩上传失败');
+    const value33 = Number(payload3.sourceFrameCount ?? payload3.frameCount),
+      value34 = Number.isFinite(value33) ? Math.max(1, Math.trunc(value33)) : 1;
+    (pushManifestNode3(nodeInfoList3, appId.maskVideoNode, enabled4),
+      pushManifestNode3(nodeInfoList3, appId.maskFrameCapNode, String(value34)),
+      pushManifestNode3(
+        nodeInfoList3,
+        appId.maskFpsNode,
+        String(normalizeRhVideoFps(payload3.rhVideoFps ?? payload3.frameRate)),
       ),
-      _0x434f9f(
-        _0x291c68,
-        _0x6e2bf3.maskResolutionNode,
-        String(_0x4626d7(_0x4b3dc2.rhVideoResolution, 0x400)),
+      pushManifestNode3(
+        nodeInfoList3,
+        appId.maskResolutionNode,
+        String(normalizeRhVideoResolution2(payload3.rhVideoResolution, 0x400)),
       ),
-      _0x434f9f(_0x291c68, _0x6e2bf3.maskImageNode, _0x3504c3));
-    const _0x56d751 = _0x4b3dc2.rhInstanceType === 'plus' ? 'plus' : 'default';
+      pushManifestNode3(nodeInfoList3, appId.maskImageNode, enabled5));
+    const instanceType = payload3.rhInstanceType === 'plus' ? 'plus' : 'default';
     return {
       url: '/api/v2/video/matting/run',
       headers: { 'Content-Type': 'application/json' },
       body: {
-        apiKey: _0x155a16,
-        appId: _0x6e2bf3.maskAppId,
-        nodeInfoList: _0x291c68,
-        instanceType: _0x56d751,
+        apiKey: apiKey3,
+        appId: appId.maskAppId,
+        nodeInfoList: nodeInfoList3,
+        instanceType: instanceType,
         usePersonalQueue: 'false',
       },
-      adapterTrace: { source: 'manifest', executionId: _0x39c377.id, modelId: _0x4b3dc2.model },
+      adapterTrace: { source: 'manifest', executionId: executionManifest3.id, modelId: payload3.model },
       isAsync: true,
       taskIdPath: 'taskId',
       useOpenapiQuery: true,
       pollUrlBuilder: () => 'https://www.runninghub.cn/openapi/v2/query',
-      resultExtractor: (_0x11cfea) =>
-        _0x11cfea.status === 'COMPLETED' && Array.isArray(_0x11cfea.results)
-          ? _0x11cfea.results.map((_0x37d9d5) => _0x37d9d5.videoUrl || _0x37d9d5.url).filter(Boolean)
+      resultExtractor: (response) =>
+        response.status === 'COMPLETED' && Array.isArray(response.results)
+          ? response.results.map((response2) => response2.videoUrl || response2.url).filter(Boolean)
           : [],
     };
   }
-  _0x434f9f(_0x291c68, _0x6e2bf3.noMaskVideoNode, _0x218bb3);
-  const _0x394171 = _0x4b3dc2.frameRate || _0x4b3dc2.rhVideoFps;
-  if (_0x394171) _0x434f9f(_0x291c68, _0x6e2bf3.noMaskFpsNode, String(_0x394171));
-  _0x4b3dc2.rhVideoResolution !== undefined &&
-    _0x4b3dc2.rhVideoResolution !== null &&
-    _0x434f9f(_0x291c68, _0x6e2bf3.noMaskResolutionNode, String(_0x4626d7(_0x4b3dc2.rhVideoResolution)));
-  const _0x49f846 = _0x4b3dc2.pos_points ?? _0x4b3dc2.positive ?? '',
-    _0xa64dcc = _0x4b3dc2.neg_points ?? _0x4b3dc2.negative ?? '';
-  (_0x434f9f(
-    _0x291c68,
-    _0x6e2bf3.positiveNode,
-    Array.isArray(_0x49f846) ? JSON.stringify(_0x49f846) : String(_0x49f846 || ''),
+  pushManifestNode3(nodeInfoList3, appId.noMaskVideoNode, enabled4);
+  const value35 = payload3.frameRate || payload3.rhVideoFps;
+  if (value35) pushManifestNode3(nodeInfoList3, appId.noMaskFpsNode, String(value35));
+  payload3.rhVideoResolution !== undefined &&
+    payload3.rhVideoResolution !== null &&
+    pushManifestNode3(
+      nodeInfoList3,
+      appId.noMaskResolutionNode,
+      String(normalizeRhVideoResolution2(payload3.rhVideoResolution)),
+    );
+  const value36 = payload3.pos_points ?? payload3.positive ?? '',
+    value37 = payload3.neg_points ?? payload3.negative ?? '';
+  (pushManifestNode3(
+    nodeInfoList3,
+    appId.positiveNode,
+    Array.isArray(value36) ? JSON.stringify(value36) : String(value36 || ''),
   ),
-    _0x434f9f(
-      _0x291c68,
-      _0x6e2bf3.negativeNode,
-      Array.isArray(_0xa64dcc) ? JSON.stringify(_0xa64dcc) : String(_0xa64dcc || ''),
+    pushManifestNode3(
+      nodeInfoList3,
+      appId.negativeNode,
+      Array.isArray(value37) ? JSON.stringify(value37) : String(value37 || ''),
     ));
-  const _0x5628f3 = _0x4b3dc2.frameRate || _0x4b3dc2.rhVideoFps || _0x4b3dc2.fps,
-    _0xde5efd =
-      Number.isFinite(_0x4b3dc2.timeSec) && Number.isFinite(Number(_0x5628f3))
-        ? Math.max(0, Math.round(Number(_0x4b3dc2.timeSec) * Number(_0x5628f3)))
-        : _0x4b3dc2.frame_index !== undefined && _0x4b3dc2.frame_index !== null
-          ? _0x4b3dc2.frame_index
+  const value38 = payload3.frameRate || payload3.rhVideoFps || payload3.fps,
+    value39 =
+      Number.isFinite(payload3.timeSec) && Number.isFinite(Number(value38))
+        ? Math.max(0, Math.round(Number(payload3.timeSec) * Number(value38)))
+        : payload3.frame_index !== undefined && payload3.frame_index !== null
+          ? payload3.frame_index
           : 0;
   return (
-    _0x434f9f(_0x291c68, _0x6e2bf3.frameIndexNode, String(_0xde5efd)),
-    _0x434f9f(_0x291c68, _0x6e2bf3.maskModeNode, _0x1b8de9(_0x4b3dc2.rhMaskMode)),
-    _0x45db75({
-      executionManifest: _0x39c377,
-      payload: _0x4b3dc2,
-      apiKey: _0x155a16,
-      nodeInfoList: _0x291c68,
+    pushManifestNode3(nodeInfoList3, appId.frameIndexNode, String(value39)),
+    pushManifestNode3(
+      nodeInfoList3,
+      appId.maskModeNode,
+      normalizeVideoMattingMaskModeIndex(payload3.rhMaskMode),
+    ),
+    buildTaskCreateVideoWorkflowRequest({
+      executionManifest: executionManifest3,
+      payload: payload3,
+      apiKey: apiKey3,
+      nodeInfoList: nodeInfoList3,
     })
   );
 }

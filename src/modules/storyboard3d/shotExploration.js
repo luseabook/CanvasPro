@@ -1,1 +1,374 @@
-import{deriveStoryboard3DCameraOptics}from'./cameraShotSystem.js';const DEFAULT_SIZE=Object['freeze']({'character':[0.65,1.8,0.5],'prop':[0x1,0x1,0x1]}),SHOT_PROFILES=Object["freeze"]([{'shotSize':"EST",'distanceScale':4.2,'focalLength':0x1c},{'shotSize':'ELS','distanceScale':3.3,'focalLength':0x23},{'shotSize':'LS','distanceScale':2.6,'focalLength':0x23},{'shotSize':'MLS','distanceScale':2.1,'focalLength':0x32},{'shotSize':"MED",'distanceScale':1.65,'focalLength':0x32},{'shotSize':"MCU",'distanceScale':1.3,'focalLength':0x41},{'shotSize':'CU','distanceScale':1.05,'focalLength':0x55},{'shotSize':"ECU",'distanceScale':0.82,'focalLength':0x64}]),AZIMUTH_SAMPLES=Object['freeze']([0x0,-0x2d,0x2d,-0x5a,0x5a,-0x87,0x87,0xb4]),ELEVATION_SAMPLES=Object['freeze']([0x0,0x12,-0xc,0x23]);function finite(_0x4a45ec,_0x36598e=0x0){const _0x177519=Number(_0x4a45ec);return Number["isFinite"](_0x177519)?_0x177519:_0x36598e;}function clamp(_0x450eed,_0x2cdb5d,_0x188e53){return Math["min"](_0x188e53,Math["max"](_0x2cdb5d,_0x450eed));}function vector3(_0x30acd8,_0x1037b1=[0x0,0x0,0x0]){if(Array['isArray'](_0x30acd8))return[finite(_0x30acd8[0x0],_0x1037b1[0x0]),finite(_0x30acd8[0x1],_0x1037b1[0x1]),finite(_0x30acd8[0x2],_0x1037b1[0x2])];return[finite(_0x30acd8?.['x'],_0x1037b1[0x0]),finite(_0x30acd8?.['y'],_0x1037b1[0x1]),finite(_0x30acd8?.['z'],_0x1037b1[0x2])];}function add3(_0x16cf94,_0x329ae9){return[_0x16cf94[0x0]+_0x329ae9[0x0],_0x16cf94[0x1]+_0x329ae9[0x1],_0x16cf94[0x2]+_0x329ae9[0x2]];}function subtract3(_0x291605,_0x5487f4){return[_0x291605[0x0]-_0x5487f4[0x0],_0x291605[0x1]-_0x5487f4[0x1],_0x291605[0x2]-_0x5487f4[0x2]];}function scale3(_0x3000cc,_0x565527){return _0x3000cc["map"](_0x1a6bdc=>_0x1a6bdc*_0x565527);}function dot3(_0x26012c,_0x4e505a){return _0x26012c[0x0]*_0x4e505a[0x0]+_0x26012c[0x1]*_0x4e505a[0x1]+_0x26012c[0x2]*_0x4e505a[0x2];}function cross3(_0xcdfa5c,_0x3836e1){return[_0xcdfa5c[0x1]*_0x3836e1[0x2]-_0xcdfa5c[0x2]*_0x3836e1[0x1],_0xcdfa5c[0x2]*_0x3836e1[0x0]-_0xcdfa5c[0x0]*_0x3836e1[0x2],_0xcdfa5c[0x0]*_0x3836e1[0x1]-_0xcdfa5c[0x1]*_0x3836e1[0x0]];}function length3(_0x3b73d8){return Math["hypot"](_0x3b73d8[0x0],_0x3b73d8[0x1],_0x3b73d8[0x2]);}function normalize3(_0x58b63b,_0x39c918=[0x0,0x0,0x1]){const _0x27cd2c=length3(_0x58b63b);return _0x27cd2c>1e-8?scale3(_0x58b63b,0x1/_0x27cd2c):[..._0x39c918];}function degreesToRadians(_0x168d9d){return _0x168d9d*Math['PI']/0xb4;}function boundsFromMinMax(_0x15e29d,_0x5e4041){return{'min':_0x15e29d,'max':_0x5e4041,'center':_0x15e29d["map"]((_0x18e9eb,_0x5d3173)=>(_0x18e9eb+_0x5e4041[_0x5d3173])/0x2),'size':_0x5e4041["map"]((_0x320d64,_0xcdcd50)=>_0x320d64-_0x15e29d[_0xcdcd50])};}function mergeBounds(_0x19bb43){if(_0x19bb43["length"]===0x0)return null;const _0x1b126e=[..._0x19bb43[0x0]["min"]],_0x26b7d9=[..._0x19bb43[0x0]['max']];return _0x19bb43["slice"](0x1)["forEach"](_0x43909c=>{for(let _0x1eb9f5=0x0;_0x1eb9f5<0x3;_0x1eb9f5+=0x1){_0x1b126e[_0x1eb9f5]=Math["min"](_0x1b126e[_0x1eb9f5],_0x43909c["min"][_0x1eb9f5]),_0x26b7d9[_0x1eb9f5]=Math["max"](_0x26b7d9[_0x1eb9f5],_0x43909c["max"][_0x1eb9f5]);}}),boundsFromMinMax(_0x1b126e,_0x26b7d9);}function objectBounds(_0x3228e9){const _0x175139=vector3(_0x3228e9?.["transform"]?.["position"]),_0x172977=vector3(_0x3228e9?.["transform"]?.['scale'],[0x1,0x1,0x1])['map'](Math["abs"]),_0x5306d5=_0x3228e9?.["worldBounds"]?.['min'],_0x3aefca=_0x3228e9?.['worldBounds']?.["max"];if(_0x5306d5&&_0x3aefca){const _0x3ff83f=vector3(_0x5306d5),_0x356952=vector3(_0x3aefca);return boundsFromMinMax(_0x3ff83f["map"]((_0x569f06,_0x2d5b9e)=>Math['min'](_0x569f06,_0x356952[_0x2d5b9e])),_0x356952["map"]((_0x274ff8,_0x4a52b6)=>Math["max"](_0x274ff8,_0x3ff83f[_0x4a52b6])));}const _0x35b976=vector3(_0x3228e9?.["dimensions"]||_0x3228e9?.["bounds"]?.['size'],DEFAULT_SIZE[_0x3228e9?.["type"]]||DEFAULT_SIZE["prop"]),_0x167c40=_0x35b976["map"]((_0x3d1e91,_0x245b9c)=>Math["max"](0.01,Math["abs"](_0x3d1e91*_0x172977[_0x245b9c]))),_0x3fd400=scale3(_0x167c40,0.5);return boundsFromMinMax(subtract3(_0x175139,_0x3fd400),add3(_0x175139,_0x3fd400));}function boundsCorners(_0x56d59c){const _0x583eb0=[];for(const _0xe8f29b of[_0x56d59c["min"][0x0],_0x56d59c['max'][0x0]]){for(const _0x2fc0a8 of[_0x56d59c["min"][0x1],_0x56d59c["max"][0x1]]){for(const _0x5beff6 of[_0x56d59c["min"][0x2],_0x56d59c["max"][0x2]])_0x583eb0['push']([_0xe8f29b,_0x2fc0a8,_0x5beff6]);}}return _0x583eb0;}function cameraBasis(_0x19e8d1){const _0x16622c=vector3(_0x19e8d1['position']),_0x2322c3=vector3(_0x19e8d1["target"],[0x0,1.2,0x0]),_0x4375da=normalize3(subtract3(_0x2322c3,_0x16622c),[0x0,0x0,-0x1]),_0xd71de=Math["abs"](_0x4375da[0x1])>0.98?[0x0,0x0,0x1]:[0x0,0x1,0x0],_0x2fd9c1=normalize3(cross3(_0x4375da,_0xd71de),[0x1,0x0,0x0]),_0x594d3c=normalize3(cross3(_0x2fd9c1,_0x4375da),[0x0,0x1,0x0]);return{'position':_0x16622c,'forward':_0x4375da,'right':_0x2fd9c1,'up':_0x594d3c};}function projectPoint(_0x32d804,_0x531976){const _0x42e058=cameraBasis(_0x531976),_0x2a249a=subtract3(_0x32d804,_0x42e058["position"]),_0x2a584b=dot3(_0x2a249a,_0x42e058["forward"]);if(_0x2a584b<=Math['max'](0.001,finite(_0x531976["near"],0.1)))return null;const _0x3e3837=deriveStoryboard3DCameraOptics(_0x531976),_0x30abc4=Math["tan"](degreesToRadians(_0x3e3837["verticalFov"])/0x2),_0x459b1c=Math["tan"](degreesToRadians(_0x3e3837["horizontalFov"])/0x2);return{'x':dot3(_0x2a249a,_0x42e058["right"])/(_0x2a584b*_0x459b1c),'y':dot3(_0x2a249a,_0x42e058['up'])/(_0x2a584b*_0x30abc4),'depth':_0x2a584b};}function segmentIntersectsBounds(_0x8907e3,_0x3a1096,_0x1ff9f7){const _0x85d2c2=subtract3(_0x3a1096,_0x8907e3);let _0x8c1832=0x0,_0x5e78f7=0x1;for(let _0x319f44=0x0;_0x319f44<0x3;_0x319f44+=0x1){if(Math["abs"](_0x85d2c2[_0x319f44])<1e-8){if(_0x8907e3[_0x319f44]<_0x1ff9f7["min"][_0x319f44]||_0x8907e3[_0x319f44]>_0x1ff9f7['max'][_0x319f44])return![];continue;}const _0x304fef=0x1/_0x85d2c2[_0x319f44];let _0x7fd3eb=(_0x1ff9f7["min"][_0x319f44]-_0x8907e3[_0x319f44])*_0x304fef,_0x526166=(_0x1ff9f7["max"][_0x319f44]-_0x8907e3[_0x319f44])*_0x304fef;if(_0x7fd3eb>_0x526166)[_0x7fd3eb,_0x526166]=[_0x526166,_0x7fd3eb];_0x8c1832=Math["max"](_0x8c1832,_0x7fd3eb),_0x5e78f7=Math["min"](_0x5e78f7,_0x526166);if(_0x8c1832>_0x5e78f7)return![];}return _0x8c1832>0.001&&_0x8c1832<0.98;}function resolveShotAngle(_0x25895d,_0x426d25,_0x4650f7){if(_0x4650f7)return "overShoulder";if(_0x426d25>=0x20)return "top";if(_0x426d25>=0xe)return'high';if(_0x426d25<=-0x8)return "low";const _0x2abf63=Math["abs"](_0x25895d);if(_0x2abf63>=0x96)return'rear';if(_0x2abf63>=0x46&&_0x2abf63<=0x6e)return "profile";return "eye";}function candidateSimilarity(_0x3e7405,_0x3978e9){const _0x324b10=vector3(_0x3e7405["camera"]["position"]),_0x2a90f6=vector3(_0x3978e9["camera"]["position"]),_0x13b67d=vector3(_0x3e7405['camera']["target"]),_0x5c3e40=normalize3(subtract3(_0x324b10,_0x13b67d)),_0x4d8b5f=normalize3(subtract3(_0x2a90f6,_0x13b67d)),_0x396165=(clamp(dot3(_0x5c3e40,_0x4d8b5f),-0x1,0x1)+0x1)/0x2,_0x485021=Math["abs"](_0x3e7405["camera"]["focalLength"]-_0x3978e9["camera"]["focalLength"]),_0x24ce8d=0x1-clamp(_0x485021/0x64,0x0,0x1),_0x5b3a80=_0x3e7405["shotSize"]===_0x3978e9["shotSize"]?0x1:0x0;return _0x396165*0.58+_0x24ce8d*0.27+_0x5b3a80*0.15;}export function identifyStoryboard3DSubjects(_0x1e55a7,{subjectIds:_0x26a46f}={}){const _0xb857a7=(Array['isArray'](_0x1e55a7?.['objects'])?_0x1e55a7['objects']:[])["filter"](_0x1f8262=>_0x1f8262?.["visible"]!==![]&&!["light","camera","group"]["includes"](_0x1f8262?.["type"])),_0xd9764=new Set((Array['isArray'](_0x26a46f)?_0x26a46f:[])["map"](String)),_0x1623cb=_0xd9764["size"]>0x0?_0xb857a7["filter"](_0x21d17f=>_0xd9764["has"](String(_0x21d17f['id']))):[],_0x2b64e9=_0xb857a7["filter"](_0x2142c5=>_0x2142c5['type']==='character'),_0x4f7a43=_0x1623cb["length"]>0x0?_0x1623cb:_0x2b64e9["length"]>0x0?_0x2b64e9:_0xb857a7;return _0x4f7a43["map"](_0x4f688b=>({'id':String(_0x4f688b['id']||''),'type':_0x4f688b["type"],'bounds':objectBounds(_0x4f688b)}));}export function computeStoryboard3DSubjectBounds(_0x2afb8b,_0x142a0b={}){const _0x49977b=identifyStoryboard3DSubjects(_0x2afb8b,_0x142a0b),_0x58d3fa=mergeBounds(_0x49977b['map'](_0x19dcc6=>_0x19dcc6["bounds"]));return _0x58d3fa?{..._0x58d3fa,'subjectIds':_0x49977b['map'](_0x41e339=>_0x41e339['id'])}:null;}export function evaluateStoryboard3DFraming(_0x1e9861,_0x432adf){if(!_0x432adf)return{'outOfFrameRatio':0x1,'headroom':0x0,'centerOffset':0x1,'projectedBounds':null};const _0x53e7a5=boundsCorners(_0x432adf)["map"](_0x289896=>projectPoint(_0x289896,_0x1e9861))["filter"](Boolean);if(_0x53e7a5['length']===0x0)return{'outOfFrameRatio':0x1,'headroom':0x0,'centerOffset':0x1,'projectedBounds':null};const _0x20b5c8=Math["min"](..._0x53e7a5["map"](_0x31452f=>_0x31452f['x'])),_0x465cd3=Math["max"](..._0x53e7a5['map'](_0x3c19b0=>_0x3c19b0['x'])),_0x264ba9=Math["min"](..._0x53e7a5["map"](_0x63bc6=>_0x63bc6['y'])),_0x1b5386=Math["max"](..._0x53e7a5["map"](_0x182bcd=>_0x182bcd['y'])),_0x1e2d0f=_0x53e7a5["filter"](_0x15549c=>Math["abs"](_0x15549c['x'])>0x1||Math["abs"](_0x15549c['y'])>0x1)["length"],_0x6a71f8=(_0x20b5c8+_0x465cd3)/0x2,_0x2097c4=(_0x264ba9+_0x1b5386)/0x2;return{'outOfFrameRatio':_0x1e2d0f/_0x53e7a5['length'],'headroom':0x1-_0x1b5386,'centerOffset':Math["hypot"](_0x6a71f8,_0x2097c4),'projectedBounds':{'minX':_0x20b5c8,'maxX':_0x465cd3,'minY':_0x264ba9,'maxY':_0x1b5386}};}export function estimateStoryboard3DOcclusion(_0x172bb2,_0x2d183d,_0x15decf=[]){if(!Array["isArray"](_0x2d183d)||_0x2d183d["length"]===0x0)return 0x1;const _0x3c2a77=vector3(_0x172bb2?.["position"]);let _0x3f5886=0x0;return _0x2d183d["forEach"](_0x523436=>{const _0x1514f0=_0x523436["bounds"]["center"],_0x14bc03=_0x15decf['some'](_0x2ea2a9=>_0x2ea2a9['id']!==_0x523436['id']&&segmentIntersectsBounds(_0x3c2a77,_0x1514f0,_0x2ea2a9["bounds"]));if(_0x14bc03)_0x3f5886+=0x1;}),_0x3f5886/_0x2d183d["length"];}export function scoreStoryboard3DShotCandidate(_0x4af240,{framing:_0x42e095,occlusionRatio:occlusionRatio=0x0}={}){const _0x50f380=_0x42e095||evaluateStoryboard3DFraming(_0x4af240["camera"],_0x4af240["subjectBounds"]),_0x5108b5=0x1-clamp(_0x50f380["outOfFrameRatio"],0x0,0x1),_0x56e6a6=0x1-clamp(Math["abs"](_0x50f380["headroom"]-0.12)/0.7,0x0,0x1),_0x33853b=0x1-clamp(_0x50f380['centerOffset']/1.2,0x0,0x1),_0x4afd6c=0x1-clamp(occlusionRatio,0x0,0x1),_0x30d2c6=Math["round"](clamp(_0x5108b5*0.43+_0x4afd6c*0.28+_0x56e6a6*0.17+_0x33853b*0.12,0x0,0x1)*0x3e8)/0x3e8,_0x54ea2d=[];if(_0x5108b5>=0.9)_0x54ea2d["push"]('subjects-in-frame');else{if(_0x5108b5<0.5)_0x54ea2d["push"]("subjects-out-of-frame");}if(_0x4afd6c>=0.9)_0x54ea2d["push"]("low-occlusion");else{if(_0x4afd6c<0.6)_0x54ea2d["push"]("high-occlusion");}if(_0x56e6a6>=0.75)_0x54ea2d['push']("balanced-headroom");if(_0x33853b>=0.78)_0x54ea2d["push"]('balanced-composition');return{'score':_0x30d2c6,'reasons':_0x54ea2d,'metrics':{..._0x50f380,'occlusionRatio':occlusionRatio}};}export function deduplicateStoryboard3DShotCandidates(_0x528bb2,{similarityThreshold:similarityThreshold=0.91}={}){const _0x23f805=[...Array["isArray"](_0x528bb2)?_0x528bb2:[]]["sort"]((_0x3b8f7e,_0x1022a4)=>_0x1022a4["score"]-_0x3b8f7e["score"]||String(_0x3b8f7e['id'])["localeCompare"](String(_0x1022a4['id']))),_0xb691be=[];return _0x23f805['forEach'](_0x134afd=>{!_0xb691be["some"](_0x6c8109=>candidateSimilarity(_0x134afd,_0x6c8109)>=similarityThreshold)&&_0xb691be["push"](_0x134afd);}),_0xb691be;}export function selectDiverseStoryboard3DShotCandidates(_0x5c80a3,_0x54aa40=0x9){const _0x3f6b74=[...Array["isArray"](_0x5c80a3)?_0x5c80a3:[]],_0x125e48=[],_0x53ec18=Math["max"](0x0,Math["round"](finite(_0x54aa40,0x9)));while(_0x125e48["length"]<_0x53ec18&&_0x3f6b74["length"]>0x0){let _0x58b98f=0x0,_0x4fa7a6=-Infinity;_0x3f6b74['forEach']((_0x471dbc,_0x904773)=>{const _0x1263ec=_0x125e48["length"]===0x0?0x0:Math["max"](..._0x125e48["map"](_0x337e51=>candidateSimilarity(_0x471dbc,_0x337e51))),_0x3b60c1=0x1-_0x1263ec,_0x277a7d=_0x471dbc['score']*0.72+_0x3b60c1*0.28;(_0x277a7d>_0x4fa7a6||_0x277a7d===_0x4fa7a6&&String(_0x471dbc['id'])<String(_0x3f6b74[_0x58b98f]['id']))&&(_0x58b98f=_0x904773,_0x4fa7a6=_0x277a7d);}),_0x125e48['push'](_0x3f6b74["splice"](_0x58b98f,0x1)[0x0]);}return _0x125e48;}export function generateStoryboard3DShotCandidates(_0xc9c704,{count:count=0x9,subjectIds:_0x5e3e35,shotSizes:_0x375bae,variation:variation=0x0}={}){const _0xe270bc=identifyStoryboard3DSubjects(_0xc9c704,{'subjectIds':_0x5e3e35}),_0x328f08=mergeBounds(_0xe270bc["map"](_0x2793d8=>_0x2793d8["bounds"]));if(!_0x328f08)return[];const _0x33cd99=(Array["isArray"](_0xc9c704?.["objects"])?_0xc9c704['objects']:[])["filter"](_0xcfe6e=>_0xcfe6e?.["visible"]!==![]&&!["light","camera",'group']["includes"](_0xcfe6e?.['type']))["map"](_0x3efe7a=>({'id':String(_0x3efe7a['id']||''),'bounds':objectBounds(_0x3efe7a)})),_0x285242=new Set(Array["isArray"](_0x375bae)&&_0x375bae["length"]>0x0?_0x375bae:SHOT_PROFILES['map'](_0xc3d07=>_0xc3d07["shotSize"])),_0x392a7d=Math['max'](0x1,_0x328f08['size'][0x0],_0x328f08["size"][0x1],_0x328f08["size"][0x2]),_0x52daca=Math['round'](finite(variation,0x0))*0x7,_0x3bdcef=[];let _0x32cbe5=0x0;SHOT_PROFILES['filter'](_0x2655d1=>_0x285242["has"](_0x2655d1["shotSize"]))["forEach"]((_0x2df642,_0x4441df)=>{AZIMUTH_SAMPLES["forEach"]((_0x1f5990,_0x2acb58)=>{const _0x520f24=ELEVATION_SAMPLES[(_0x4441df+_0x2acb58+Math["abs"](_0x52daca))%ELEVATION_SAMPLES["length"]],_0x1f70e7=_0x1f5990+_0x52daca,_0xbef7c9=degreesToRadians(_0x1f70e7),_0x75532f=degreesToRadians(_0x520f24),_0x14b0da=_0x392a7d*_0x2df642["distanceScale"]*(0x1+(_0x4441df+_0x2acb58)%0x3*0.08),_0x361f7e=_0x14b0da*Math['cos'](_0x75532f),_0x121efd=[_0x328f08['center'][0x0]+Math['sin'](_0xbef7c9)*_0x361f7e,_0x328f08['center'][0x1]+Math["sin"](_0x75532f)*_0x14b0da,_0x328f08["center"][0x2]+Math["cos"](_0xbef7c9)*_0x361f7e],_0x5d26be=[..._0x328f08["center"]],_0x58e6e8={'position':_0x121efd,'target':_0x5d26be,'focalLength':_0x2df642["focalLength"],'near':0.1,'far':Math["max"](0x3e8,_0x14b0da*0x14),'aspectRatio':"16:9"},_0xcba475=evaluateStoryboard3DFraming(_0x58e6e8,_0x328f08),_0xd40dc9=estimateStoryboard3DOcclusion(_0x58e6e8,_0xe270bc,_0x33cd99),_0x39de9c=_0xe270bc["length"]>=0x2&&Math["abs"](_0x1f70e7)>=0x19&&Math['abs'](_0x1f70e7)<=0x3c&&_0x2df642["shotSize"]==="MCU",_0x4d3e2c=scoreStoryboard3DShotCandidate({'camera':_0x58e6e8,'subjectBounds':_0x328f08},{'framing':_0xcba475,'occlusionRatio':_0xd40dc9});_0x3bdcef["push"]({'id':'candidate-'+variation+'-'+_0x32cbe5,'camera':_0x58e6e8,'score':_0x4d3e2c["score"],'shotSize':_0x2df642["shotSize"],'shotAngle':resolveShotAngle(_0x1f70e7,_0x520f24,_0x39de9c),'reasons':_0x4d3e2c['reasons'],'metrics':_0x4d3e2c["metrics"],'subjectIds':_0xe270bc['map'](_0x48477e=>_0x48477e['id'])}),_0x32cbe5+=0x1;});});const _0xe9979f=deduplicateStoryboard3DShotCandidates(_0x3bdcef);return selectDiverseStoryboard3DShotCandidates(_0xe9979f,count);}
+import { deriveStoryboard3DCameraOptics } from './cameraShotSystem.js';
+const DEFAULT_SIZE = Object['freeze']({ character: [0.65, 1.8, 0.5], prop: [0x1, 0x1, 0x1] }),
+  SHOT_PROFILES = Object['freeze']([
+    { shotSize: 'EST', distanceScale: 4.2, focalLength: 0x1c },
+    { shotSize: 'ELS', distanceScale: 3.3, focalLength: 0x23 },
+    { shotSize: 'LS', distanceScale: 2.6, focalLength: 0x23 },
+    { shotSize: 'MLS', distanceScale: 2.1, focalLength: 0x32 },
+    { shotSize: 'MED', distanceScale: 1.65, focalLength: 0x32 },
+    { shotSize: 'MCU', distanceScale: 1.3, focalLength: 0x41 },
+    { shotSize: 'CU', distanceScale: 1.05, focalLength: 0x55 },
+    { shotSize: 'ECU', distanceScale: 0.82, focalLength: 0x64 },
+  ]),
+  AZIMUTH_SAMPLES = Object['freeze']([0x0, -0x2d, 0x2d, -0x5a, 0x5a, -0x87, 0x87, 0xb4]),
+  ELEVATION_SAMPLES = Object['freeze']([0x0, 0x12, -0xc, 0x23]);
+function finite(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
+}
+function clamp(index, result, data) {
+  return Math['min'](data, Math['max'](result, index));
+}
+function vector3(box, options = [0x0, 0x0, 0x0]) {
+  if (Array['isArray'](box))
+    return [finite(box[0x0], options[0x0]), finite(box[0x1], options[0x1]), finite(box[0x2], options[0x2])];
+  return [
+    finite(box?.['x'], options[0x0]),
+    finite(box?.['y'], options[0x1]),
+    finite(box?.['z'], options[0x2]),
+  ];
+}
+function add3(target, source) {
+  return [target[0x0] + source[0x0], target[0x1] + source[0x1], target[0x2] + source[0x2]];
+}
+function subtract3(next, current) {
+  return [next[0x0] - current[0x0], next[0x1] - current[0x1], next[0x2] - current[0x2]];
+}
+function scale3(entry, record) {
+  return entry['map']((payload) => payload * record);
+}
+function dot3(handle, state) {
+  return handle[0x0] * state[0x0] + handle[0x1] * state[0x1] + handle[0x2] * state[0x2];
+}
+function cross3(config, scope) {
+  return [
+    config[0x1] * scope[0x2] - config[0x2] * scope[0x1],
+    config[0x2] * scope[0x0] - config[0x0] * scope[0x2],
+    config[0x0] * scope[0x1] - config[0x1] * scope[0x0],
+  ];
+}
+function length3(input) {
+  return Math['hypot'](input[0x0], input[0x1], input[0x2]);
+}
+function normalize3(output, args = [0x0, 0x0, 0x1]) {
+  const length32 = length3(output);
+  return length32 > 1e-8 ? scale3(output, 0x1 / length32) : [...args];
+}
+function degreesToRadians(value2) {
+  return (value2 * Math['PI']) / 0xb4;
+}
+function boundsFromMinMax(value3, value4) {
+  return {
+    min: value3,
+    max: value4,
+    center: value3['map']((value5, value6) => (value5 + value4[value6]) / 0x2),
+    size: value4['map']((value7, value8) => value7 - value3[value8]),
+  };
+}
+function mergeBounds(args2) {
+  if (args2['length'] === 0x0) return null;
+  const value9 = [...args2[0x0]['min']],
+    value10 = [...args2[0x0]['max']];
+  return (
+    args2['slice'](0x1)['forEach']((value11) => {
+      for (let count2 = 0x0; count2 < 0x3; count2 += 0x1) {
+        ((value9[count2] = Math['min'](value9[count2], value11['min'][count2])),
+          (value10[count2] = Math['max'](value10[count2], value11['max'][count2])));
+      }
+    }),
+    boundsFromMinMax(value9, value10)
+  );
+}
+function objectBounds(value12) {
+  const vector32 = vector3(value12?.['transform']?.['position']),
+    vector33 = vector3(value12?.['transform']?.['scale'], [0x1, 0x1, 0x1])['map'](Math['abs']),
+    value13 = value12?.['worldBounds']?.['min'],
+    value14 = value12?.['worldBounds']?.['max'];
+  if (value13 && value14) {
+    const vector34 = vector3(value13),
+      vector35 = vector3(value14);
+    return boundsFromMinMax(
+      vector34['map']((value15, value16) => Math['min'](value15, vector35[value16])),
+      vector35['map']((value17, value18) => Math['max'](value17, vector34[value18])),
+    );
+  }
+  const vector36 = vector3(
+      value12?.['dimensions'] || value12?.['bounds']?.['size'],
+      DEFAULT_SIZE[value12?.['type']] || DEFAULT_SIZE['prop'],
+    ),
+    value19 = vector36['map']((value20, value21) =>
+      Math['max'](0.01, Math['abs'](value20 * vector33[value21])),
+    ),
+    scale32 = scale3(value19, 0.5);
+  return boundsFromMinMax(subtract3(vector32, scale32), add3(vector32, scale32));
+}
+function boundsCorners(value22) {
+  const list = [];
+  for (const value23 of [value22['min'][0x0], value22['max'][0x0]]) {
+    for (const value24 of [value22['min'][0x1], value22['max'][0x1]]) {
+      for (const value25 of [value22['min'][0x2], value22['max'][0x2]])
+        list['push']([value23, value24, value25]);
+    }
+  }
+  return list;
+}
+function cameraBasis(value26) {
+  const vector37 = vector3(value26['position']),
+    vector38 = vector3(value26['target'], [0x0, 1.2, 0x0]),
+    v3 = normalize3(subtract3(vector38, vector37), [0x0, 0x0, -0x1]),
+    value27 = Math['abs'](v3[0x1]) > 0.98 ? [0x0, 0x0, 0x1] : [0x0, 0x1, 0x0],
+    v32 = normalize3(cross3(v3, value27), [0x1, 0x0, 0x0]),
+    v33 = normalize3(cross3(v32, v3), [0x0, 0x1, 0x0]);
+  return { position: vector37, forward: v3, right: v32, up: v33 };
+}
+function projectPoint(value28, value29) {
+  const cameraBasis2 = cameraBasis(value29),
+    subtract32 = subtract3(value28, cameraBasis2['position']),
+    dot32 = dot3(subtract32, cameraBasis2['forward']);
+  if (dot32 <= Math['max'](0.001, finite(value29['near'], 0.1))) return null;
+  const storyboard3DCameraOptics = deriveStoryboard3DCameraOptics(value29),
+    value30 = Math['tan'](degreesToRadians(storyboard3DCameraOptics['verticalFov']) / 0x2),
+    value31 = Math['tan'](degreesToRadians(storyboard3DCameraOptics['horizontalFov']) / 0x2);
+  return {
+    x: dot3(subtract32, cameraBasis2['right']) / (dot32 * value31),
+    y: dot3(subtract32, cameraBasis2['up']) / (dot32 * value30),
+    depth: dot32,
+  };
+}
+function segmentIntersectsBounds(value32, value33, value34) {
+  const subtract33 = subtract3(value33, value32);
+  let count3 = 0x0,
+    value35 = 0x1;
+  for (let count4 = 0x0; count4 < 0x3; count4 += 0x1) {
+    if (Math['abs'](subtract33[count4]) < 1e-8) {
+      if (value32[count4] < value34['min'][count4] || value32[count4] > value34['max'][count4]) return ![];
+      continue;
+    }
+    const value36 = 0x1 / subtract33[count4];
+    let value37 = (value34['min'][count4] - value32[count4]) * value36,
+      value38 = (value34['max'][count4] - value32[count4]) * value36;
+    if (value37 > value38) [value37, value38] = [value38, value37];
+    ((count3 = Math['max'](count3, value37)), (value35 = Math['min'](value35, value38)));
+    if (count3 > value35) return ![];
+  }
+  return count3 > 0.001 && count3 < 0.98;
+}
+function resolveShotAngle(value39, count5, value40) {
+  if (value40) return 'overShoulder';
+  if (count5 >= 0x20) return 'top';
+  if (count5 >= 0xe) return 'high';
+  if (count5 <= -0x8) return 'low';
+  const count6 = Math['abs'](value39);
+  if (count6 >= 0x96) return 'rear';
+  if (count6 >= 0x46 && count6 <= 0x6e) return 'profile';
+  return 'eye';
+}
+function candidateSimilarity(value41, value42) {
+  const vector39 = vector3(value41['camera']['position']),
+    vector310 = vector3(value42['camera']['position']),
+    vector311 = vector3(value41['camera']['target']),
+    v34 = normalize3(subtract3(vector39, vector311)),
+    v35 = normalize3(subtract3(vector310, vector311)),
+    value43 = (clamp(dot3(v34, v35), -0x1, 0x1) + 0x1) / 0x2,
+    value44 = Math['abs'](value41['camera']['focalLength'] - value42['camera']['focalLength']),
+    value45 = 0x1 - clamp(value44 / 0x64, 0x0, 0x1),
+    value46 = value41['shotSize'] === value42['shotSize'] ? 0x1 : 0x0;
+  return value43 * 0.58 + value45 * 0.27 + value46 * 0.15;
+}
+export function identifyStoryboard3DSubjects(value47, { subjectIds: subjectIds } = {}) {
+  const value48 = (Array['isArray'](value47?.['objects']) ? value47['objects'] : [])['filter'](
+      (value49) =>
+        value49?.['visible'] !== ![] && !['light', 'camera', 'group']['includes'](value49?.['type']),
+    ),
+    value50 = new Set((Array['isArray'](subjectIds) ? subjectIds : [])['map'](String)),
+    value51 =
+      value50['size'] > 0x0 ? value48['filter']((value52) => value50['has'](String(value52['id']))) : [],
+    value53 = value48['filter']((value54) => value54['type'] === 'character'),
+    value55 = value51['length'] > 0x0 ? value51 : value53['length'] > 0x0 ? value53 : value48;
+  return value55['map']((value56) => ({
+    id: String(value56['id'] || ''),
+    type: value56['type'],
+    bounds: objectBounds(value56),
+  }));
+}
+export function computeStoryboard3DSubjectBounds(value57, value58 = {}) {
+  const list2 = identifyStoryboard3DSubjects(value57, value58),
+    args3 = mergeBounds(list2['map']((value59) => value59['bounds']));
+  return args3 ? { ...args3, subjectIds: list2['map']((value60) => value60['id']) } : null;
+}
+export function evaluateStoryboard3DFraming(value61, enabled) {
+  if (!enabled) return { outOfFrameRatio: 0x1, headroom: 0x0, centerOffset: 0x1, projectedBounds: null };
+  const list3 = boundsCorners(enabled)
+    ['map']((value62) => projectPoint(value62, value61))
+    ['filter'](Boolean);
+  if (list3['length'] === 0x0)
+    return { outOfFrameRatio: 0x1, headroom: 0x0, centerOffset: 0x1, projectedBounds: null };
+  const value63 = Math['min'](...list3['map']((box2) => box2['x'])),
+    value64 = Math['max'](...list3['map']((box3) => box3['x'])),
+    value65 = Math['min'](...list3['map']((box4) => box4['y'])),
+    value66 = Math['max'](...list3['map']((box5) => box5['y'])),
+    value67 = list3['filter']((box6) => Math['abs'](box6['x']) > 0x1 || Math['abs'](box6['y']) > 0x1)[
+      'length'
+    ],
+    value68 = (value63 + value64) / 0x2,
+    value69 = (value65 + value66) / 0x2;
+  return {
+    outOfFrameRatio: value67 / list3['length'],
+    headroom: 0x1 - value66,
+    centerOffset: Math['hypot'](value68, value69),
+    projectedBounds: { minX: value63, maxX: value64, minY: value65, maxY: value66 },
+  };
+}
+export function estimateStoryboard3DOcclusion(value70, value71, list4 = []) {
+  if (!Array['isArray'](value71) || value71['length'] === 0x0) return 0x1;
+  const vector312 = vector3(value70?.['position']);
+  let value72 = 0x0;
+  return (
+    value71['forEach']((value73) => {
+      const value74 = value73['bounds']['center'],
+        value75 = list4['some'](
+          (value76) =>
+            value76['id'] !== value73['id'] && segmentIntersectsBounds(vector312, value74, value76['bounds']),
+        );
+      if (value75) value72 += 0x1;
+    }),
+    value72 / value71['length']
+  );
+}
+export function scoreStoryboard3DShotCandidate(
+  value77,
+  { framing: framing, occlusionRatio: occlusionRatio = 0x0 } = {},
+) {
+  const args4 = framing || evaluateStoryboard3DFraming(value77['camera'], value77['subjectBounds']),
+    count7 = 0x1 - clamp(args4['outOfFrameRatio'], 0x0, 0x1),
+    count8 = 0x1 - clamp(Math['abs'](args4['headroom'] - 0.12) / 0.7, 0x0, 0x1),
+    count9 = 0x1 - clamp(args4['centerOffset'] / 1.2, 0x0, 0x1),
+    count10 = 0x1 - clamp(occlusionRatio, 0x0, 0x1),
+    value78 =
+      Math['round'](clamp(count7 * 0.43 + count10 * 0.28 + count8 * 0.17 + count9 * 0.12, 0x0, 0x1) * 0x3e8) /
+      0x3e8,
+    list5 = [];
+  if (count7 >= 0.9) list5['push']('subjects-in-frame');
+  else {
+    if (count7 < 0.5) list5['push']('subjects-out-of-frame');
+  }
+  if (count10 >= 0.9) list5['push']('low-occlusion');
+  else {
+    if (count10 < 0.6) list5['push']('high-occlusion');
+  }
+  if (count8 >= 0.75) list5['push']('balanced-headroom');
+  if (count9 >= 0.78) list5['push']('balanced-composition');
+  return { score: value78, reasons: list5, metrics: { ...args4, occlusionRatio: occlusionRatio } };
+}
+export function deduplicateStoryboard3DShotCandidates(
+  value79,
+  { similarityThreshold: similarityThreshold = 0.91 } = {},
+) {
+  const list6 = [...(Array['isArray'](value79) ? value79 : [])]['sort'](
+      (value80, value81) =>
+        value81['score'] - value80['score'] || String(value80['id'])['localeCompare'](String(value81['id'])),
+    ),
+    enabled2 = [];
+  return (
+    list6['forEach']((value82) => {
+      !enabled2['some']((value83) => candidateSimilarity(value82, value83) >= similarityThreshold) &&
+        enabled2['push'](value82);
+    }),
+    enabled2
+  );
+}
+export function selectDiverseStoryboard3DShotCandidates(value84, value85 = 0x9) {
+  const list7 = [...(Array['isArray'](value84) ? value84 : [])],
+    list8 = [],
+    value86 = Math['max'](0x0, Math['round'](finite(value85, 0x9)));
+  while (list8['length'] < value86 && list7['length'] > 0x0) {
+    let value87 = 0x0,
+      value88 = -Infinity;
+    (list7['forEach']((value89, value90) => {
+      const value91 =
+          list8['length'] === 0x0
+            ? 0x0
+            : Math['max'](...list8['map']((value92) => candidateSimilarity(value89, value92))),
+        value93 = 0x1 - value91,
+        value94 = value89['score'] * 0.72 + value93 * 0.28;
+      (value94 > value88 || (value94 === value88 && String(value89['id']) < String(list7[value87]['id']))) &&
+        ((value87 = value90), (value88 = value94));
+    }),
+      list8['push'](list7['splice'](value87, 0x1)[0x0]));
+  }
+  return list8;
+}
+export function generateStoryboard3DShotCandidates(
+  value95,
+  { count: count = 0x9, subjectIds: subjectIds2, shotSizes: shotSizes, variation: variation = 0x0 } = {},
+) {
+  const list9 = identifyStoryboard3DSubjects(value95, { subjectIds: subjectIds2 }),
+    args5 = mergeBounds(list9['map']((value96) => value96['bounds']));
+  if (!args5) return [];
+  const value97 = (Array['isArray'](value95?.['objects']) ? value95['objects'] : [])
+      ['filter'](
+        (value98) =>
+          value98?.['visible'] !== ![] && !['light', 'camera', 'group']['includes'](value98?.['type']),
+      )
+      ['map']((value99) => ({ id: String(value99['id'] || ''), bounds: objectBounds(value99) })),
+    value100 = new Set(
+      Array['isArray'](shotSizes) && shotSizes['length'] > 0x0
+        ? shotSizes
+        : SHOT_PROFILES['map']((value101) => value101['shotSize']),
+    ),
+    value102 = Math['max'](0x1, args5['size'][0x0], args5['size'][0x1], args5['size'][0x2]),
+    value103 = Math['round'](finite(variation, 0x0)) * 0x7,
+    value104 = [];
+  let value105 = 0x0;
+  SHOT_PROFILES['filter']((value106) => value100['has'](value106['shotSize']))['forEach'](
+    (value107, value108) => {
+      AZIMUTH_SAMPLES['forEach']((value109, value110) => {
+        const value111 =
+            ELEVATION_SAMPLES[(value108 + value110 + Math['abs'](value103)) % ELEVATION_SAMPLES['length']],
+          value112 = value109 + value103,
+          radians = degreesToRadians(value112),
+          radians2 = degreesToRadians(value111),
+          value113 = value102 * value107['distanceScale'] * (0x1 + ((value108 + value110) % 0x3) * 0.08),
+          value114 = value113 * Math['cos'](radians2),
+          value115 = [
+            args5['center'][0x0] + Math['sin'](radians) * value114,
+            args5['center'][0x1] + Math['sin'](radians2) * value113,
+            args5['center'][0x2] + Math['cos'](radians) * value114,
+          ],
+          value116 = [...args5['center']],
+          value117 = {
+            position: value115,
+            target: value116,
+            focalLength: value107['focalLength'],
+            near: 0.1,
+            far: Math['max'](0x3e8, value113 * 0x14),
+            aspectRatio: '16:9',
+          },
+          evaluateStoryboard3DFraming2 = evaluateStoryboard3DFraming(value117, args5),
+          estimateStoryboard3DOcclusion2 = estimateStoryboard3DOcclusion(value117, list9, value97),
+          value118 =
+            list9['length'] >= 0x2 &&
+            Math['abs'](value112) >= 0x19 &&
+            Math['abs'](value112) <= 0x3c &&
+            value107['shotSize'] === 'MCU',
+          scoreStoryboard3DShotCandidate2 = scoreStoryboard3DShotCandidate(
+            { camera: value117, subjectBounds: args5 },
+            { framing: evaluateStoryboard3DFraming2, occlusionRatio: estimateStoryboard3DOcclusion2 },
+          );
+        (value104['push']({
+          id: 'candidate-' + variation + '-' + value105,
+          camera: value117,
+          score: scoreStoryboard3DShotCandidate2['score'],
+          shotSize: value107['shotSize'],
+          shotAngle: resolveShotAngle(value112, value111, value118),
+          reasons: scoreStoryboard3DShotCandidate2['reasons'],
+          metrics: scoreStoryboard3DShotCandidate2['metrics'],
+          subjectIds: list9['map']((value119) => value119['id']),
+        }),
+          (value105 += 0x1));
+      });
+    },
+  );
+  const deduplicateStoryboard3DShotCandidates2 = deduplicateStoryboard3DShotCandidates(value104);
+  return selectDiverseStoryboard3DShotCandidates(deduplicateStoryboard3DShotCandidates2, count);
+}

@@ -67,258 +67,259 @@ const MODEL_PARAMS_MEMORY_KEY = 'generationParamsByModel',
     'source-video': ['rhInstanceType', 'rhVideoFps', 'rhVideoResolution', 'rhMaskMode'],
     'storyboard-script': ['model', 'provider'],
   };
-function isPlainObject(_0x40aa43) {
-  return !!_0x40aa43 && typeof _0x40aa43 === 'object' && !Array.isArray(_0x40aa43);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array.isArray(enabled);
 }
-function hasUsableValue(_0x2cdbd2) {
-  if (_0x2cdbd2 === null || _0x2cdbd2 === undefined) return false;
-  if (typeof _0x2cdbd2 === 'string') return _0x2cdbd2.trim().length > 0;
-  if (typeof _0x2cdbd2 === 'number') return Number.isFinite(_0x2cdbd2);
-  if (typeof _0x2cdbd2 === 'boolean') return true;
+function hasUsableValue(value) {
+  if (value === null || value === undefined) return false;
+  if (typeof value === 'string') return value.trim().length > 0;
+  if (typeof value === 'number') return Number.isFinite(value);
+  if (typeof value === 'boolean') return true;
   return false;
 }
-function toModuleKey(_0x2d2d68) {
-  return NODE_MODULE_KEY_MAP[String(_0x2d2d68 || '').trim()] || '';
+function toModuleKey(item) {
+  return NODE_MODULE_KEY_MAP[String(item || '').trim()] || '';
 }
-function ensureModuleRecord(_0x21c705, _0x41524a) {
-  return (!isPlainObject(_0x21c705[_0x41524a]) && (_0x21c705[_0x41524a] = {}), _0x21c705[_0x41524a]);
+function ensureModuleRecord(key, index) {
+  return (!isPlainObject(key[index]) && (key[index] = {}), key[index]);
 }
-function hasOwnField(_0x39059a, _0x559b31) {
-  return !!_0x39059a && Object.prototype.hasOwnProperty.call(_0x39059a, _0x559b31);
+function hasOwnField(enabled2, result) {
+  return !!enabled2 && Object.prototype.hasOwnProperty.call(enabled2, result);
 }
-function isSchemaMemoryNodeType(_0x507b89) {
-  return NODE_MODEL_PARAMS_MEMORY_TYPES.has(String(_0x507b89 || '').trim());
+function isSchemaMemoryNodeType(data) {
+  return NODE_MODEL_PARAMS_MEMORY_TYPES.has(String(data || '').trim());
 }
-function getPlainParams(_0x38bb08) {
-  return isPlainObject(_0x38bb08) ? { ..._0x38bb08 } : {};
+function getPlainParams(args) {
+  return isPlainObject(args) ? { ...args } : {};
 }
-function hasModelManifest(_0x4736f4) {
-  return !!getModelManifest(_0x4736f4);
+function hasModelManifest(options) {
+  return !!getModelManifest(options);
 }
-function resolveSchemaModelId(_0x26cf5c, _0x42c2c6 = '') {
-  const _0x49d71d = String(_0x26cf5c || '').trim();
-  if (!_0x49d71d) return '';
-  if (hasModelManifest(_0x49d71d)) return _0x49d71d;
+function resolveSchemaModelId(target, providerHint = '') {
+  const enabled3 = String(target || '').trim();
+  if (!enabled3) return '';
+  if (hasModelManifest(enabled3)) return enabled3;
   try {
-    const _0x2dbf4d =
-        resolveModelExecution(_0x49d71d, { providerHint: _0x42c2c6 }) || resolveModelExecution(_0x49d71d),
-      _0x3ec50d = String(_0x2dbf4d?.canonicalModelId || _0x2dbf4d?.modelManifest?.modelId || '').trim();
-    return _0x3ec50d && hasModelManifest(_0x3ec50d) ? _0x3ec50d : '';
+    const modelExecution =
+        resolveModelExecution(enabled3, { providerHint: providerHint }) || resolveModelExecution(enabled3),
+      source = String(
+        modelExecution?.canonicalModelId || modelExecution?.modelManifest?.modelId || '',
+      ).trim();
+    return source && hasModelManifest(source) ? source : '';
   } catch {
     return '';
   }
 }
-function resolveNodeSchemaModelId(_0x19fc7c = {}) {
-  const _0x4ee418 = String(_0x19fc7c?.provider || '').trim(),
-    _0x4fb7a0 =
-      String(_0x19fc7c?.type || '').trim() === 'ai-audio'
-        ? [_0x19fc7c?.model, _0x19fc7c?.audioWorkflowKey]
-        : [_0x19fc7c?.model];
-  for (const _0x3d2760 of _0x4fb7a0) {
-    const _0x35a215 = resolveSchemaModelId(_0x3d2760, _0x4ee418);
-    if (_0x35a215) return _0x35a215;
+function resolveNodeSchemaModelId(options2 = {}) {
+  const next = String(options2?.provider || '').trim(),
+    current =
+      String(options2?.type || '').trim() === 'ai-audio'
+        ? [options2?.model, options2?.audioWorkflowKey]
+        : [options2?.model];
+  for (const entry of current) {
+    const schemaModelId = resolveSchemaModelId(entry, next);
+    if (schemaModelId) return schemaModelId;
   }
   return '';
 }
-function getSchemaFieldIds(_0x449b40) {
-  const _0x43049d = getModelManifest(_0x449b40)?.uiSchema?.fields;
+function getSchemaFieldIds(record) {
+  const modelManifest = getModelManifest(record)?.uiSchema?.fields;
   return new Set(
-    (Array.isArray(_0x43049d) ? _0x43049d : [])
-      .map((_0x30b275) => String(_0x30b275?.id || '').trim())
+    (Array.isArray(modelManifest) ? modelManifest : [])
+      .map((item2) => String(item2?.id || '').trim())
       .filter(Boolean),
   );
 }
-function sanitizeSchemaParams(_0x112e93, _0x137ffc = {}, _0x3e1356 = {}) {
-  const _0x490999 = resolveSchemaModelId(_0x112e93);
-  if (!_0x490999) return {};
-  const _0x87281 = getSchemaFieldIds(_0x490999);
-  if (!_0x87281.size) return {};
-  const _0x1de637 = getPlainParams(_0x137ffc),
-    _0x4ec882 = sanitizeModelUiSchemaParams(_0x490999, _0x1de637, {
-      includeDefaults: _0x3e1356.includeDefaults === true,
+function sanitizeSchemaParams(payload, handle = {}, includeDefaults = {}) {
+  const schemaModelId2 = resolveSchemaModelId(payload);
+  if (!schemaModelId2) return {};
+  const map = getSchemaFieldIds(schemaModelId2);
+  if (!map.size) return {};
+  const plainParams = getPlainParams(handle),
+    sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(schemaModelId2, plainParams, {
+      includeDefaults: includeDefaults.includeDefaults === true,
     }),
-    _0x3cd032 = {};
-  for (const [_0x1c738b, _0x1cbd17] of Object.entries(_0x4ec882)) {
-    if (!_0x87281.has(_0x1c738b)) continue;
-    if (!hasUsableValue(_0x1cbd17)) continue;
-    _0x3cd032[_0x1c738b] = _0x1cbd17;
+    state = {};
+  for (const [config, scope] of Object.entries(sanitizeModelUiSchemaParams2)) {
+    if (!map.has(config)) continue;
+    if (!hasUsableValue(scope)) continue;
+    state[config] = scope;
   }
-  return _0x3cd032;
+  return state;
 }
-function sanitizeModelParamsMemoryRecord(_0x40f0a6) {
-  if (!isPlainObject(_0x40f0a6)) return {};
-  const _0x473d61 = {};
-  for (const [_0x56ccd, _0x24185f] of Object.entries(_0x40f0a6)) {
-    const _0x5a43b7 = resolveSchemaModelId(_0x56ccd);
-    if (!_0x5a43b7) continue;
-    const _0x440e2f = sanitizeSchemaParams(_0x5a43b7, _0x24185f, { includeDefaults: false });
-    if (Object.keys(_0x440e2f).length > 0) _0x473d61[_0x5a43b7] = _0x440e2f;
+function sanitizeModelParamsMemoryRecord(input) {
+  if (!isPlainObject(input)) return {};
+  const output = {};
+  for (const [value2, value3] of Object.entries(input)) {
+    const schemaModelId3 = resolveSchemaModelId(value2);
+    if (!schemaModelId3) continue;
+    const sanitizeSchemaParams2 = sanitizeSchemaParams(schemaModelId3, value3, { includeDefaults: false });
+    if (Object.keys(sanitizeSchemaParams2).length > 0) output[schemaModelId3] = sanitizeSchemaParams2;
   }
-  return _0x473d61;
+  return output;
 }
-function getModelParamsMemory(_0x5aee0b, _0x20355d) {
-  const _0x23911e = isPlainObject(_0x5aee0b?.[MODEL_PARAMS_MEMORY_KEY])
-    ? _0x5aee0b[MODEL_PARAMS_MEMORY_KEY]
+function getModelParamsMemory(value4, value5) {
+  const isPlainObject2 = isPlainObject(value4?.[MODEL_PARAMS_MEMORY_KEY])
+    ? value4[MODEL_PARAMS_MEMORY_KEY]
     : {};
-  return getPlainParams(_0x23911e[_0x20355d]);
+  return getPlainParams(isPlainObject2[value5]);
 }
-function pickSchemaFieldValues(_0x5ef215, _0x6f861b) {
-  const _0x578113 = {};
-  if (!isPlainObject(_0x5ef215) || !_0x6f861b?.size) return _0x578113;
-  for (const _0x5d0204 of _0x6f861b) {
-    if (!hasOwnField(_0x5ef215, _0x5d0204)) continue;
-    const _0x140e15 = _0x5ef215[_0x5d0204];
-    if (!hasUsableValue(_0x140e15)) continue;
-    _0x578113[_0x5d0204] = _0x140e15;
+function pickSchemaFieldValues(value6, enabled4) {
+  const value7 = {};
+  if (!isPlainObject(value6) || !enabled4?.size) return value7;
+  for (const value8 of enabled4) {
+    if (!hasOwnField(value6, value8)) continue;
+    const value9 = value6[value8];
+    if (!hasUsableValue(value9)) continue;
+    value7[value8] = value9;
   }
-  return _0x578113;
+  return value7;
 }
-function mergeModelParamMemory(_0x269922, _0x145712, _0xc1a143) {
-  const _0x92b71b = resolveSchemaModelId(_0x145712);
-  if (!_0x92b71b) return false;
-  const _0x6443ad = sanitizeSchemaParams(_0x92b71b, _0xc1a143, { includeDefaults: false });
-  if (Object.keys(_0x6443ad).length === 0) return false;
-  !isPlainObject(_0x269922[MODEL_PARAMS_MEMORY_KEY]) && (_0x269922[MODEL_PARAMS_MEMORY_KEY] = {});
-  const _0x349ff4 = getPlainParams(_0x269922[MODEL_PARAMS_MEMORY_KEY][_0x92b71b]),
-    _0xbbe7bc = { ..._0x349ff4, ..._0x6443ad },
-    _0x339276 = JSON.stringify(_0x349ff4) !== JSON.stringify(_0xbbe7bc);
-  return (_0x339276 && (_0x269922[MODEL_PARAMS_MEMORY_KEY][_0x92b71b] = _0xbbe7bc), _0x339276);
+function mergeModelParamMemory(value10, value11, value12) {
+  const schemaModelId4 = resolveSchemaModelId(value11);
+  if (!schemaModelId4) return false;
+  const args2 = sanitizeSchemaParams(schemaModelId4, value12, { includeDefaults: false });
+  if (Object.keys(args2).length === 0) return false;
+  !isPlainObject(value10[MODEL_PARAMS_MEMORY_KEY]) && (value10[MODEL_PARAMS_MEMORY_KEY] = {});
+  const args3 = getPlainParams(value10[MODEL_PARAMS_MEMORY_KEY][schemaModelId4]),
+    value13 = { ...args3, ...args2 },
+    value14 = JSON.stringify(args3) !== JSON.stringify(value13);
+  return (value14 && (value10[MODEL_PARAMS_MEMORY_KEY][schemaModelId4] = value13), value14);
 }
-function applyModelScopedParamsToNodeData(_0xbfcc51, _0x116d23, _0x38eea5, _0x2830b4) {
-  if (!isSchemaMemoryNodeType(_0x2830b4)) return _0x116d23;
-  const _0xfce973 = resolveNodeSchemaModelId(_0x116d23);
-  if (!_0xfce973) return _0x116d23;
-  const _0x266e83 = getSchemaFieldIds(_0xfce973);
-  if (!_0x266e83.size) return _0x116d23;
-  const _0x2b5189 = pickSchemaFieldValues(_0x38eea5, _0x266e83),
-    _0x3cadbd = getModelParamsMemory(_0x38eea5, _0xfce973),
-    _0x3472be = getPlainParams(getPlainParams(_0xbfcc51?.[MODEL_PARAMS_MEMORY_KEY])[_0xfce973]),
-    _0x294fd6 = pickSchemaFieldValues(_0xbfcc51, _0x266e83),
-    _0x51a4f2 = getPlainParams(_0xbfcc51?.generationParams),
-    _0x436c79 =
-      Object.keys(_0x2b5189).length > 0 ||
-      Object.keys(_0x3cadbd).length > 0 ||
-      Object.keys(_0x3472be).length > 0 ||
-      Object.keys(_0x51a4f2).length > 0;
-  if (!_0x436c79) return _0x116d23;
-  const _0x1d231f = sanitizeSchemaParams(
-    _0xfce973,
-    { ..._0x2b5189, ..._0x3cadbd, ..._0x3472be, ..._0x294fd6, ..._0x51a4f2 },
+function applyModelScopedParamsToNodeData(value15, args4, value16, value17) {
+  if (!isSchemaMemoryNodeType(value17)) return args4;
+  const nodeSchemaModelId = resolveNodeSchemaModelId(args4);
+  if (!nodeSchemaModelId) return args4;
+  const schemaFieldIds = getSchemaFieldIds(nodeSchemaModelId);
+  if (!schemaFieldIds.size) return args4;
+  const args5 = pickSchemaFieldValues(value16, schemaFieldIds),
+    args6 = getModelParamsMemory(value16, nodeSchemaModelId),
+    args7 = getPlainParams(getPlainParams(value15?.[MODEL_PARAMS_MEMORY_KEY])[nodeSchemaModelId]),
+    args8 = pickSchemaFieldValues(value15, schemaFieldIds),
+    args9 = getPlainParams(value15?.generationParams),
+    enabled5 =
+      Object.keys(args5).length > 0 ||
+      Object.keys(args6).length > 0 ||
+      Object.keys(args7).length > 0 ||
+      Object.keys(args9).length > 0;
+  if (!enabled5) return args4;
+  const args10 = sanitizeSchemaParams(
+    nodeSchemaModelId,
+    { ...args5, ...args6, ...args7, ...args8, ...args9 },
     { includeDefaults: true },
   );
-  if (Object.keys(_0x1d231f).length === 0) return _0x116d23;
-  const _0x5e2401 = getPlainParams(_0x116d23.generationParams),
-    _0xf216e6 = getPlainParams(_0x116d23[MODEL_PARAMS_MEMORY_KEY]);
+  if (Object.keys(args10).length === 0) return args4;
+  const args11 = getPlainParams(args4.generationParams),
+    args12 = getPlainParams(args4[MODEL_PARAMS_MEMORY_KEY]);
   return {
-    ..._0x116d23,
-    generationParams: { ..._0x5e2401, ..._0x1d231f },
-    [MODEL_PARAMS_MEMORY_KEY]: { ..._0xf216e6, [_0xfce973]: _0x1d231f },
+    ...args4,
+    generationParams: { ...args11, ...args10 },
+    [MODEL_PARAMS_MEMORY_KEY]: { ...args12, [nodeSchemaModelId]: args10 },
   };
 }
-function captureModelScopedParamsFromPatch(_0x2712b5, _0x12408f, _0x56cecc, _0x4b9d5c) {
-  if (!isSchemaMemoryNodeType(_0x2712b5)) return false;
-  let _0x4a6db8 = false;
-  const _0x13c84a = sanitizeModelParamsMemoryRecord(_0x56cecc?.[MODEL_PARAMS_MEMORY_KEY]);
-  for (const [_0x155430, _0x3bb0ef] of Object.entries(_0x13c84a)) {
-    if (mergeModelParamMemory(_0x4b9d5c, _0x155430, _0x3bb0ef)) _0x4a6db8 = true;
+function captureModelScopedParamsFromPatch(value18, args13, args14, value19) {
+  if (!isSchemaMemoryNodeType(value18)) return false;
+  let value20 = false;
+  const sanitizeModelParamsMemoryRecord2 = sanitizeModelParamsMemoryRecord(args14?.[MODEL_PARAMS_MEMORY_KEY]);
+  for (const [value21, value22] of Object.entries(sanitizeModelParamsMemoryRecord2)) {
+    if (mergeModelParamMemory(value19, value21, value22)) value20 = true;
   }
-  const _0x5a3f3f = resolveNodeSchemaModelId({ ..._0x12408f, ..._0x56cecc });
-  if (!_0x5a3f3f) return _0x4a6db8;
-  const _0x5d6e82 = getSchemaFieldIds(_0x5a3f3f);
-  if (!_0x5d6e82.size) return _0x4a6db8;
-  const _0x3fd22f = getPlainParams(_0x56cecc?.generationParams);
-  return (mergeModelParamMemory(_0x4b9d5c, _0x5a3f3f, _0x3fd22f) && (_0x4a6db8 = true), _0x4a6db8);
+  const nodeSchemaModelId2 = resolveNodeSchemaModelId({ ...args13, ...args14 });
+  if (!nodeSchemaModelId2) return value20;
+  const schemaFieldIds2 = getSchemaFieldIds(nodeSchemaModelId2);
+  if (!schemaFieldIds2.size) return value20;
+  const plainParams2 = getPlainParams(args14?.generationParams);
+  return (mergeModelParamMemory(value19, nodeSchemaModelId2, plainParams2) && (value20 = true), value20);
 }
-export function sanitizeFeatureSelectionsRecord(_0x4b0ef3) {
-  if (!isPlainObject(_0x4b0ef3)) return {};
-  const _0x39c2f3 = {};
-  for (const [_0x47e392, _0xc829dc] of Object.entries(_0x4b0ef3)) {
-    if (!isPlainObject(_0xc829dc)) continue;
-    const _0x5b97da = {};
-    for (const [_0x597a62, _0xa7fdb4] of Object.entries(_0xc829dc)) {
-      if (_0x597a62 === MODEL_PARAMS_MEMORY_KEY) {
-        if (!NODE_MODEL_PARAMS_MEMORY_TYPES.has(String(_0x47e392 || ''))) continue;
-        const _0x1ee262 = sanitizeModelParamsMemoryRecord(_0xa7fdb4);
-        Object.keys(_0x1ee262).length > 0 && (_0x5b97da[MODEL_PARAMS_MEMORY_KEY] = _0x1ee262);
+export function sanitizeFeatureSelectionsRecord(value23) {
+  if (!isPlainObject(value23)) return {};
+  const value24 = {};
+  for (const [value25, value26] of Object.entries(value23)) {
+    if (!isPlainObject(value26)) continue;
+    const value27 = {};
+    for (const [value28, value29] of Object.entries(value26)) {
+      if (value28 === MODEL_PARAMS_MEMORY_KEY) {
+        if (!NODE_MODEL_PARAMS_MEMORY_TYPES.has(String(value25 || ''))) continue;
+        const sanitizeModelParamsMemoryRecord3 = sanitizeModelParamsMemoryRecord(value29);
+        Object.keys(sanitizeModelParamsMemoryRecord3).length > 0 &&
+          (value27[MODEL_PARAMS_MEMORY_KEY] = sanitizeModelParamsMemoryRecord3);
         continue;
       }
-      if (!hasUsableValue(_0xa7fdb4)) continue;
-      _0x5b97da[String(_0x597a62)] = _0xa7fdb4;
+      if (!hasUsableValue(value29)) continue;
+      value27[String(value28)] = value29;
     }
-    if (Object.keys(_0x5b97da).length > 0) _0x39c2f3[String(_0x47e392)] = _0x5b97da;
+    if (Object.keys(value27).length > 0) value24[String(value25)] = value27;
   }
-  return _0x39c2f3;
+  return value24;
 }
-export function applyFeatureSelectionsToNodeData(_0x9146ee, _0x2e1235) {
-  if (!isPlainObject(_0x9146ee)) return _0x9146ee;
-  const _0x46f9b9 = String(_0x9146ee.type || '').trim(),
-    _0x703a8b = toModuleKey(_0x46f9b9);
-  if (!_0x703a8b) return _0x9146ee;
-  const _0xd7b09a = NODE_DEFAULT_SELECTIONS[_0x46f9b9] || {},
-    _0xeb6c0 = NODE_MEMORY_SELECTION_FIELDS[_0x46f9b9] || [],
-    _0x445776 = isPlainObject(_0x2e1235?.[_0x703a8b]) ? _0x2e1235[_0x703a8b] : {},
-    _0x4ac9d0 = { ..._0x9146ee };
-  for (const _0x3b6065 of _0xeb6c0) {
-    if (hasOwnField(_0x9146ee, _0x3b6065)) continue;
-    if (!hasUsableValue(_0x445776[_0x3b6065])) continue;
-    _0x4ac9d0[_0x3b6065] = _0x445776[_0x3b6065];
+export function applyFeatureSelectionsToNodeData(args15, value30) {
+  if (!isPlainObject(args15)) return args15;
+  const value31 = String(args15.type || '').trim(),
+    toModuleKey2 = toModuleKey(value31);
+  if (!toModuleKey2) return args15;
+  const value32 = NODE_DEFAULT_SELECTIONS[value31] || {},
+    value33 = NODE_MEMORY_SELECTION_FIELDS[value31] || [],
+    isPlainObject3 = isPlainObject(value30?.[toModuleKey2]) ? value30[toModuleKey2] : {},
+    value34 = { ...args15 };
+  for (const value35 of value33) {
+    if (hasOwnField(args15, value35)) continue;
+    if (!hasUsableValue(isPlainObject3[value35])) continue;
+    value34[value35] = isPlainObject3[value35];
   }
-  for (const [_0x435046, _0x201cb2] of Object.entries(_0xd7b09a)) {
-    if (hasOwnField(_0x9146ee, _0x435046)) continue;
-    if (hasUsableValue(_0x4ac9d0[_0x435046])) continue;
-    _0x4ac9d0[_0x435046] = _0x201cb2;
+  for (const [value36, value37] of Object.entries(value32)) {
+    if (hasOwnField(args15, value36)) continue;
+    if (hasUsableValue(value34[value36])) continue;
+    value34[value36] = value37;
   }
-  const _0x5f55eb = hasOwnField(_0x9146ee, 'model'),
-    _0xdc8882 = hasOwnField(_0x9146ee, 'audioWorkflowKey');
-  if (_0x46f9b9 === 'ai-audio' && _0x5f55eb && !_0xdc8882 && hasUsableValue(_0x4ac9d0.model)) {
-    const _0x50ad40 = String(_0x4ac9d0.model).trim();
-    (_0x50ad40 === 'indextts2_clone' || _0x50ad40 === 'voice_convert') &&
-      (_0x4ac9d0.audioWorkflowKey = _0x50ad40);
+  const hasOwnField2 = hasOwnField(args15, 'model'),
+    hasOwnField3 = hasOwnField(args15, 'audioWorkflowKey');
+  if (value31 === 'ai-audio' && hasOwnField2 && !hasOwnField3 && hasUsableValue(value34.model)) {
+    const value38 = String(value34.model).trim();
+    (value38 === 'indextts2_clone' || value38 === 'voice_convert') && (value34.audioWorkflowKey = value38);
   }
-  _0x46f9b9 === 'ai-audio' &&
-    _0xdc8882 &&
-    !_0x5f55eb &&
-    hasUsableValue(_0x4ac9d0.audioWorkflowKey) &&
-    (_0x4ac9d0.model = String(_0x4ac9d0.audioWorkflowKey).trim());
-  if (!hasUsableValue(_0x4ac9d0.audioWorkflowKey) && hasUsableValue(_0x4ac9d0.model)) {
-    const _0x312463 = String(_0x4ac9d0.model).trim();
-    (_0x312463 === 'indextts2_clone' || _0x312463 === 'voice_convert') &&
-      (_0x4ac9d0.audioWorkflowKey = _0x312463);
+  value31 === 'ai-audio' &&
+    hasOwnField3 &&
+    !hasOwnField2 &&
+    hasUsableValue(value34.audioWorkflowKey) &&
+    (value34.model = String(value34.audioWorkflowKey).trim());
+  if (!hasUsableValue(value34.audioWorkflowKey) && hasUsableValue(value34.model)) {
+    const value39 = String(value34.model).trim();
+    (value39 === 'indextts2_clone' || value39 === 'voice_convert') && (value34.audioWorkflowKey = value39);
   }
   return (
-    !hasUsableValue(_0x4ac9d0.model) &&
-      hasUsableValue(_0x4ac9d0.audioWorkflowKey) &&
-      (_0x4ac9d0.model = String(_0x4ac9d0.audioWorkflowKey).trim()),
-    applyModelScopedParamsToNodeData(_0x9146ee, _0x4ac9d0, _0x445776, _0x46f9b9)
+    !hasUsableValue(value34.model) &&
+      hasUsableValue(value34.audioWorkflowKey) &&
+      (value34.model = String(value34.audioWorkflowKey).trim()),
+    applyModelScopedParamsToNodeData(args15, value34, isPlainObject3, value31)
   );
 }
-export function captureFeatureSelectionsFromNodePatch(_0x49488e, _0x41cd1e, _0x3936ae) {
-  const _0x20f12a = String(_0x49488e?.type || '').trim(),
-    _0x56929d = toModuleKey(_0x20f12a);
-  if (!_0x56929d || !isPlainObject(_0x41cd1e) || !isPlainObject(_0x3936ae)) return false;
-  const _0x1bf22e = NODE_MEMORY_SELECTION_FIELDS[_0x20f12a] || [],
-    _0x421a02 = ensureModuleRecord(_0x3936ae, _0x56929d);
-  let _0x1bb7ab = false;
-  for (const _0x52162b of _0x1bf22e) {
-    if (!Object.prototype.hasOwnProperty.call(_0x41cd1e, _0x52162b)) continue;
-    const _0x2a9379 = _0x41cd1e[_0x52162b];
-    if (!hasUsableValue(_0x2a9379)) continue;
-    if (_0x421a02[_0x52162b] === _0x2a9379) continue;
-    ((_0x421a02[_0x52162b] = _0x2a9379), (_0x1bb7ab = true));
+export function captureFeatureSelectionsFromNodePatch(value40, value41, value42) {
+  const value43 = String(value40?.type || '').trim(),
+    toModuleKey3 = toModuleKey(value43);
+  if (!toModuleKey3 || !isPlainObject(value41) || !isPlainObject(value42)) return false;
+  const value44 = NODE_MEMORY_SELECTION_FIELDS[value43] || [],
+    moduleRecord = ensureModuleRecord(value42, toModuleKey3);
+  let value45 = false;
+  for (const value46 of value44) {
+    if (!Object.prototype.hasOwnProperty.call(value41, value46)) continue;
+    const value47 = value41[value46];
+    if (!hasUsableValue(value47)) continue;
+    if (moduleRecord[value46] === value47) continue;
+    ((moduleRecord[value46] = value47), (value45 = true));
   }
   if (
-    Object.prototype.hasOwnProperty.call(_0x41cd1e, 'model') &&
-    !Object.prototype.hasOwnProperty.call(_0x41cd1e, 'audioWorkflowKey') &&
-    _0x20f12a === 'ai-audio' &&
-    hasUsableValue(_0x41cd1e.model)
+    Object.prototype.hasOwnProperty.call(value41, 'model') &&
+    !Object.prototype.hasOwnProperty.call(value41, 'audioWorkflowKey') &&
+    value43 === 'ai-audio' &&
+    hasUsableValue(value41.model)
   ) {
-    const _0x2d3cc3 = String(_0x41cd1e.model).trim();
-    (_0x2d3cc3 === 'indextts2_clone' || _0x2d3cc3 === 'voice_convert') &&
-      _0x421a02.audioWorkflowKey !== _0x2d3cc3 &&
-      ((_0x421a02.audioWorkflowKey = _0x2d3cc3), (_0x1bb7ab = true));
+    const value48 = String(value41.model).trim();
+    (value48 === 'indextts2_clone' || value48 === 'voice_convert') &&
+      moduleRecord.audioWorkflowKey !== value48 &&
+      ((moduleRecord.audioWorkflowKey = value48), (value45 = true));
   }
   return (
-    captureModelScopedParamsFromPatch(_0x20f12a, _0x49488e, _0x41cd1e, _0x421a02) && (_0x1bb7ab = true),
-    _0x1bb7ab
+    captureModelScopedParamsFromPatch(value43, value40, value41, moduleRecord) && (value45 = true),
+    value45
   );
 }

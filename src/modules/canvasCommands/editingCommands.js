@@ -6,63 +6,63 @@ import { buildCollageNodeDataFromSelection, isCollageImageNode } from '../collag
 import { calculateGroupNodeBounds } from '../groupNodeLayout.js';
 import { calcSafeSpawnPosNearNode } from '../nodeSpawn.js';
 import { createCanvasCommandError } from './commandRegistry.js';
-function getState(_0x2fb862) {
-  return _0x2fb862['store']?.['getStateRaw']?.() || _0x2fb862['store']?.['getState']?.() || {};
+function getState(value) {
+  return value['store']?.['getStateRaw']?.() || value['store']?.['getState']?.() || {};
 }
-function getStore(_0x4edc47) {
-  return _0x4edc47['graphStore'] || _0x4edc47['store'];
+function getStore(item) {
+  return item['graphStore'] || item['store'];
 }
-function normalizeIds(_0x16c1c8 = {}, _0x362187 = {}, { min: min = 0x1 } = {}) {
-  const _0x55c0c6 = getState(_0x362187),
-    _0xc1f51e =
-      Array['isArray'](_0x16c1c8['ids']) && _0x16c1c8['ids']['length'] > 0x0
-        ? _0x16c1c8['ids']
-        : _0x16c1c8['nodeId']
-          ? [_0x16c1c8['nodeId']]
-          : _0x55c0c6['selectedNodeIds'] || [],
-    _0x22d5d6 = [],
-    _0x107719 = new Set();
-  for (const _0x499a51 of _0xc1f51e) {
-    const _0x59cfbb = String(_0x499a51 || '')['trim']();
-    if (!_0x59cfbb || _0x107719['has'](_0x59cfbb) || !_0x55c0c6['nodes']?.[_0x59cfbb]) continue;
-    (_0x107719['add'](_0x59cfbb), _0x22d5d6['push'](_0x59cfbb));
+function normalizeIds(options = {}, key = {}, { min: min = 0x1 } = {}) {
+  const state = getState(key),
+    index =
+      Array['isArray'](options['ids']) && options['ids']['length'] > 0x0
+        ? options['ids']
+        : options['nodeId']
+          ? [options['nodeId']]
+          : state['selectedNodeIds'] || [],
+    list = [],
+    map = new Set();
+  for (const result of index) {
+    const enabled = String(result || '')['trim']();
+    if (!enabled || map['has'](enabled) || !state['nodes']?.[enabled]) continue;
+    (map['add'](enabled), list['push'](enabled));
   }
-  if (_0x22d5d6['length'] < min)
+  if (list['length'] < min)
     throw createCanvasCommandError(
       'MISSING_NODE_ID',
       'Canvas command requires at least ' + min + '\x20existing\x20node' + (min === 0x1 ? '' : 's') + '.',
     );
-  return _0x22d5d6;
+  return list;
 }
-function validateIds(_0x124a82, _0x364cbb, _0x569502) {
+function validateIds(args, data, target) {
   try {
-    return { args: { ..._0x124a82, ids: normalizeIds(_0x124a82, _0x364cbb, _0x569502) } };
-  } catch (_0x29aed4) {
+    return { args: { ...args, ids: normalizeIds(args, data, target) } };
+  } catch (errorCode) {
     return {
       ok: ![],
-      errorCode: _0x29aed4['errorCode'] || 'INVALID_NODE_IDS',
-      message: _0x29aed4['message'],
-      details: _0x29aed4['details'],
+      errorCode: errorCode['errorCode'] || 'INVALID_NODE_IDS',
+      message: errorCode['message'],
+      details: errorCode['details'],
     };
   }
 }
-function getClipboardApi(_0x571624) {
+function getClipboardApi(getClipboard2) {
   return {
-    getClipboard: _0x571624['clipboard']?.['getClipboard'] || getClipboard,
-    getClipboardGraph: _0x571624['clipboard']?.['getClipboardGraph'] || getClipboardGraph,
-    setClipboard: _0x571624['clipboard']?.['setClipboard'] || setClipboard,
+    getClipboard: getClipboard2['clipboard']?.['getClipboard'] || getClipboard,
+    getClipboardGraph: getClipboard2['clipboard']?.['getClipboardGraph'] || getClipboardGraph,
+    setClipboard: getClipboard2['clipboard']?.['setClipboard'] || setClipboard,
   };
 }
-function translate(_0x395259, _0x3794fc, _0x3291ae) {
-  const _0x4a2f22 = _0x395259['translate']?.(_0x3794fc);
-  return _0x4a2f22 && _0x4a2f22 !== _0x3794fc ? _0x4a2f22 : _0x3291ae;
+function translate(source, next, current) {
+  const entry = source['translate']?.(next);
+  return entry && entry !== next ? entry : current;
 }
-function showToast(_0x1cbaeb, _0x4d3bec, _0x478445) {
-  const _0x4ce9bb = _0x1cbaeb['showToast'] || _0x1cbaeb['windowObject']?.['showToast'];
-  _0x4ce9bb?.(_0x4d3bec, _0x478445);
+function showToast(record, payload, handle) {
+  const config = record['showToast'] || record['windowObject']?.['showToast'];
+  config?.(payload, handle);
 }
-export function registerEditingCommands(_0x305510) {
-  (_0x305510['register']({
+export function registerEditingCommands(scope) {
+  (scope['register']({
     id: 'node.group',
     description: 'Wrap\x20canvas\x20nodes\x20in\x20a\x20group\x20node.',
     riskLevel: 'safe',
@@ -76,38 +76,33 @@ export function registerEditingCommands(_0x305510) {
       selectionFallback: !![],
     },
     returnSchema: { aliasFields: ['groupId', 'nodeId', 'ids'] },
-    validate(_0x4f1dd6 = {}, _0x31f0d2 = {}) {
-      return validateIds(_0x4f1dd6, _0x31f0d2, { min: 0x1 });
+    validate(options2 = {}, input = {}) {
+      return validateIds(options2, input, { min: 0x1 });
     },
-    execute(_0x59d217, _0x2eb027) {
-      const _0x1c073e = getState(_0x2eb027),
-        _0x1d08fe = getStore(_0x2eb027),
-        _0x172155 = _0x59d217['ids']['map']((_0x19039b) => _0x1c073e['nodes'][_0x19039b])['filter'](Boolean),
-        _0x52a3c4 = calculateGroupNodeBounds(_0x172155),
-        _0x25990b = generateId('group'),
-        _0x1d7ad3 = {
-          id: _0x25990b,
+    execute(ids, store) {
+      const state2 = getState(store),
+        store2 = getStore(store),
+        output = ids['ids']['map']((value2) => state2['nodes'][value2])['filter'](Boolean),
+        args2 = calculateGroupNodeBounds(output),
+        id = generateId('group'),
+        node = {
+          id: id,
           type: 'group',
-          ..._0x52a3c4,
-          name:
-            String(_0x59d217['name'] || '')['trim']() ||
-            translate(_0x2eb027, 'groupNode.defaultName', 'New group'),
+          ...args2,
+          name: String(ids['name'] || '')['trim']() || translate(store, 'groupNode.defaultName', 'New group'),
           color: 'var(--indigo)',
         },
-        _0x22feaa = () => {
-          (_0x1d08fe?.['addNode']?.(_0x1d7ad3),
-            _0x1d08fe?.['groupNodes']?.(_0x59d217['ids'], _0x25990b),
-            _0x1d08fe?.['setSelectedNodes']?.([_0x25990b]));
+        handler = () => {
+          (store2?.['addNode']?.(node),
+            store2?.['groupNodes']?.(ids['ids'], id),
+            store2?.['setSelectedNodes']?.([id]));
         };
-      if (typeof _0x1d08fe?.['batch'] === 'function') _0x1d08fe['batch'](_0x22feaa);
-      else _0x22feaa();
-      return (
-        _0x2eb027['commit']?.(),
-        { groupId: _0x25990b, nodeId: _0x25990b, ids: _0x59d217['ids'], node: _0x1d7ad3 }
-      );
+      if (typeof store2?.['batch'] === 'function') store2['batch'](handler);
+      else handler();
+      return (store['commit']?.(), { groupId: id, nodeId: id, ids: ids['ids'], node: node });
     },
   }),
-    _0x305510['register']({
+    scope['register']({
       id: 'node.ungroup',
       description: 'Remove group shells while preserving their child nodes.',
       riskLevel: 'safe',
@@ -121,44 +116,44 @@ export function registerEditingCommands(_0x305510) {
         selectionFallback: !![],
       },
       returnSchema: { aliasFields: ['groupIds', 'childIds'] },
-      validate(_0x2d4cb1 = {}, _0x5adca5 = {}) {
-        const _0x55cc13 = validateIds(_0x2d4cb1, _0x5adca5, { min: 0x1 });
-        if (_0x55cc13['ok'] === ![]) return _0x55cc13;
-        const _0x426647 = getState(_0x5adca5),
-          _0x171b4a = _0x55cc13['args']['ids']['filter'](
-            (_0x54e700) => String(_0x426647['nodes']?.[_0x54e700]?.['type'] || '') === 'group',
+      validate(options3 = {}, value3 = {}) {
+        const response = validateIds(options3, value3, { min: 0x1 });
+        if (response['ok'] === ![]) return response;
+        const state3 = getState(value3),
+          ids2 = response['args']['ids']['filter'](
+            (value4) => String(state3['nodes']?.[value4]?.['type'] || '') === 'group',
           );
-        if (_0x171b4a['length'] === 0x0)
+        if (ids2['length'] === 0x0)
           return {
             ok: ![],
             errorCode: 'GROUP_NOT_FOUND',
             message: 'node.ungroup\x20requires\x20at\x20least\x20one\x20group\x20node.',
           };
-        return { args: { ..._0x55cc13['args'], ids: _0x171b4a } };
+        return { args: { ...response['args'], ids: ids2 } };
       },
-      execute(_0xea6ef4, _0x4bd2f4) {
-        const _0x25ac10 = getState(_0x4bd2f4),
-          _0x12cb21 = getStore(_0x4bd2f4),
-          _0x4cd57f = new Set(_0xea6ef4['ids']),
-          _0x39650b = Object['values'](_0x25ac10['nodes'] || {})
-            ['filter']((_0x43f3f7) => _0x4cd57f['has'](String(_0x43f3f7?.['parentId'] || '')))
-            ['map']((_0x1fbcce) => _0x1fbcce['id']),
-          _0x1fe3c6 = () => {
-            _0x39650b['length'] > 0x0 && typeof _0x12cb21?.['groupNodes'] === 'function'
-              ? _0x12cb21['groupNodes'](_0x39650b, null)
-              : _0x39650b['forEach']((_0x4fd671) =>
-                  _0x12cb21?.['updateNodeData']?.(_0x4fd671, { parentId: undefined }),
+      execute(groupIds, store3) {
+        const state4 = getState(store3),
+          store4 = getStore(store3),
+          map2 = new Set(groupIds['ids']),
+          childIds = Object['values'](state4['nodes'] || {})
+            ['filter']((value5) => map2['has'](String(value5?.['parentId'] || '')))
+            ['map']((value6) => value6['id']),
+          handler2 = () => {
+            childIds['length'] > 0x0 && typeof store4?.['groupNodes'] === 'function'
+              ? store4['groupNodes'](childIds, null)
+              : childIds['forEach']((value7) =>
+                  store4?.['updateNodeData']?.(value7, { parentId: undefined }),
                 );
-            _0x12cb21?.['deleteNodes']?.(_0xea6ef4['ids']);
-            if (typeof _0x12cb21?.['clearSelection'] === 'function') _0x12cb21['clearSelection']();
-            else _0x12cb21?.['setSelectedNodes']?.([]);
+            store4?.['deleteNodes']?.(groupIds['ids']);
+            if (typeof store4?.['clearSelection'] === 'function') store4['clearSelection']();
+            else store4?.['setSelectedNodes']?.([]);
           };
-        if (typeof _0x12cb21?.['batch'] === 'function') _0x12cb21['batch'](_0x1fe3c6);
-        else _0x1fe3c6();
-        return (_0x4bd2f4['commit']?.(), { groupIds: _0xea6ef4['ids'], childIds: _0x39650b });
+        if (typeof store4?.['batch'] === 'function') store4['batch'](handler2);
+        else handler2();
+        return (store3['commit']?.(), { groupIds: groupIds['ids'], childIds: childIds });
       },
     }),
-    _0x305510['register']({
+    scope['register']({
       id: 'clipboard.copy',
       description: 'Copy\x20selected\x20canvas\x20nodes\x20and\x20their\x20internal\x20edges.',
       riskLevel: 'safe',
@@ -172,86 +167,86 @@ export function registerEditingCommands(_0x305510) {
         selectionFallback: !![],
       },
       returnSchema: { aliasFields: ['ids', 'nodeCount', 'edgeCount'] },
-      validate(_0x1b3887 = {}, _0x11ae52 = {}) {
-        return validateIds(_0x1b3887, _0x11ae52, { min: 0x1 });
+      validate(options4 = {}, value8 = {}) {
+        return validateIds(options4, value8, { min: 0x1 });
       },
-      execute(_0x1e6c39, _0xabaebf) {
-        const _0x26114a = getState(_0xabaebf),
-          _0xe45ca0 = buildClipboardGraphSnapshot({
-            nodesById: _0x26114a['nodes'],
-            edgesById: _0x26114a['edges'],
-            selectedIds: _0x1e6c39['ids'],
-            sanitizeNode(_0x157b5b) {
-              return stripImageGenerationRuntimeState(_0x157b5b);
+      execute(selectedIds, value9) {
+        const nodesById = getState(value9),
+          edges2 = buildClipboardGraphSnapshot({
+            nodesById: nodesById['nodes'],
+            edgesById: nodesById['edges'],
+            selectedIds: selectedIds['ids'],
+            sanitizeNode(value10) {
+              return stripImageGenerationRuntimeState(value10);
             },
           });
         return (
-          getClipboardApi(_0xabaebf)['setClipboard'](_0xe45ca0['nodes'], { edges: _0xe45ca0['edges'] }),
+          getClipboardApi(value9)['setClipboard'](edges2['nodes'], { edges: edges2['edges'] }),
           {
-            ids: _0xe45ca0['nodes']['map']((_0x425005) => _0x425005['id']),
-            nodeCount: _0xe45ca0['nodes']['length'],
-            edgeCount: _0xe45ca0['edges']['length'],
+            ids: edges2['nodes']['map']((value11) => value11['id']),
+            nodeCount: edges2['nodes']['length'],
+            edgeCount: edges2['edges']['length'],
           }
         );
       },
     }),
-    _0x305510['register']({
+    scope['register']({
       id: 'clipboard.paste',
       description: 'Paste the internal canvas clipboard at a world position.',
       riskLevel: 'confirm',
       argsSchema: { properties: { x: { type: 'number' }, y: { type: 'number' } } },
       capabilitySchema: { reads: ['clipboard'], writes: ['nodes', 'edges', 'selection'] },
       returnSchema: { aliasFields: ['ids', 'nodeIds', 'edgeIds', 'idMap'] },
-      execute(_0x53bb4b = {}, _0x55b58c) {
-        const _0x3fd08d = getClipboardApi(_0x55b58c),
-          _0x308496 = _0x3fd08d['getClipboardGraph'](),
-          _0x2e217a = _0x308496?.['nodes']?.['length'] ? _0x308496['nodes'] : _0x3fd08d['getClipboard']();
-        if (!Array['isArray'](_0x2e217a) || _0x2e217a['length'] === 0x0)
+      execute(x = {}, store5) {
+        const clipboardApi = getClipboardApi(store5),
+          graph = clipboardApi['getClipboardGraph'](),
+          nodes2 = graph?.['nodes']?.['length'] ? graph['nodes'] : clipboardApi['getClipboard']();
+        if (!Array['isArray'](nodes2) || nodes2['length'] === 0x0)
           return { ids: [], nodeIds: [], edgeIds: [], idMap: {} };
-        const _0x46b8a0 = Date['now'](),
-          _0x12db72 = Math['random']()['toString'](0x24)['slice'](0x2, 0x5),
-          _0x295605 = prepareClipboardGraphPaste({
-            graph: _0x308496 || { schemaVersion: 0x1, nodes: _0x2e217a, edges: [] },
-            x: _0x53bb4b['x'],
-            y: _0x53bb4b['y'],
-            generateNodeId(_0x205d41, _0x5e79fe) {
+        const value12 = Date['now'](),
+          value13 = Math['random']()['toString'](0x24)['slice'](0x2, 0x5),
+          ids3 = prepareClipboardGraphPaste({
+            graph: graph || { schemaVersion: 0x1, nodes: nodes2, edges: [] },
+            x: x['x'],
+            y: x['y'],
+            generateNodeId(value14, value15) {
               return (
-                String(_0x205d41 || 'node')['split']('_copy_')[0x0] +
+                String(value14 || 'node')['split']('_copy_')[0x0] +
                 '_copy_' +
-                _0x46b8a0 +
+                value12 +
                 '_' +
-                _0x12db72 +
-                _0x5e79fe
+                value13 +
+                value15
               );
             },
             generateEdgeId() {
               return generateId('edge');
             },
-            sanitizeNode(_0x2e0209) {
-              return stripImageGenerationRuntimeState(_0x2e0209);
+            sanitizeNode(value16) {
+              return stripImageGenerationRuntimeState(value16);
             },
           }),
-          _0x2f9da2 = getStore(_0x55b58c),
-          _0x1f7f83 = () => {
-            (_0x295605['nodes']['forEach']((_0x3df0ff) => _0x2f9da2?.['addNode']?.(_0x3df0ff)),
-              _0x295605['edges']['length'] > 0x0 &&
-                (typeof _0x2f9da2?.['updateEdgesBatch'] === 'function'
-                  ? _0x2f9da2['updateEdgesBatch']([], _0x295605['edges'])
-                  : _0x295605['edges']['forEach']((_0x43c0dd) => _0x2f9da2?.['addEdge']?.(_0x43c0dd))),
-              _0x2f9da2?.['setSelectedNodes']?.(_0x295605['newIds']));
+          store6 = getStore(store5),
+          handler3 = () => {
+            (ids3['nodes']['forEach']((value17) => store6?.['addNode']?.(value17)),
+              ids3['edges']['length'] > 0x0 &&
+                (typeof store6?.['updateEdgesBatch'] === 'function'
+                  ? store6['updateEdgesBatch']([], ids3['edges'])
+                  : ids3['edges']['forEach']((value18) => store6?.['addEdge']?.(value18))),
+              store6?.['setSelectedNodes']?.(ids3['newIds']));
           };
-        if (typeof _0x2f9da2?.['batch'] === 'function') _0x2f9da2['batch'](_0x1f7f83);
-        else _0x1f7f83();
-        if (_0x295605['nodes']['length'] > 0x0) _0x55b58c['commit']?.();
+        if (typeof store6?.['batch'] === 'function') store6['batch'](handler3);
+        else handler3();
+        if (ids3['nodes']['length'] > 0x0) store5['commit']?.();
         return {
-          ids: _0x295605['newIds'],
-          nodeIds: _0x295605['newIds'],
-          edgeIds: _0x295605['edges']['map']((_0x57a974) => _0x57a974['id']),
-          idMap: _0x295605['idMap'],
+          ids: ids3['newIds'],
+          nodeIds: ids3['newIds'],
+          edgeIds: ids3['edges']['map']((value19) => value19['id']),
+          idMap: ids3['idMap'],
         };
       },
     }),
-    _0x305510['register']({
+    scope['register']({
       id: 'collage.createFromSelection',
       description: 'Create a collage node from selected image nodes.',
       riskLevel: 'safe',
@@ -265,64 +260,57 @@ export function registerEditingCommands(_0x305510) {
         selectionFallback: !![],
       },
       returnSchema: { aliasFields: ['nodeId', 'sourceNodeIds'] },
-      validate(_0x8afca = {}, _0x9d987e = {}) {
-        const _0x4cb21a = validateIds(_0x8afca, _0x9d987e, { min: 0x1 });
-        if (_0x4cb21a['ok'] === ![]) return _0x4cb21a;
-        const _0x11dfa2 = getState(_0x9d987e),
-          _0x2d870c = _0x4cb21a['args']['ids']
-            ['map']((_0x5d5d2a) => _0x11dfa2['nodes']?.[_0x5d5d2a])
+      validate(options5 = {}, value20 = {}) {
+        const response2 = validateIds(options5, value20, { min: 0x1 });
+        if (response2['ok'] === ![]) return response2;
+        const state5 = getState(value20),
+          imageNodeIds = response2['args']['ids']
+            ['map']((value21) => state5['nodes']?.[value21])
             ['filter'](isCollageImageNode);
-        if (_0x2d870c['length'] === 0x0)
+        if (imageNodeIds['length'] === 0x0)
           return {
             ok: ![],
             errorCode: 'NO_COLLAGE_IMAGES',
             message: translate(
-              _0x9d987e,
+              value20,
               'canvasInteraction.grids.noImages',
               'No usable image nodes were selected.',
             ),
           };
         return {
-          args: { ..._0x4cb21a['args'], imageNodeIds: _0x2d870c['map']((_0x5c22f0) => _0x5c22f0['id']) },
+          args: { ...response2['args'], imageNodeIds: imageNodeIds['map']((value22) => value22['id']) },
         };
       },
-      execute(_0x36e6f8, _0x25f137) {
-        const _0x45149f = getState(_0x25f137),
-          _0x381f41 = _0x36e6f8['imageNodeIds']
-            ['map']((_0x1c96eb) => _0x45149f['nodes'][_0x1c96eb])
+      execute(sourceNodeIds, store7) {
+        const state6 = getState(store7),
+          nodes3 = sourceNodeIds['imageNodeIds']
+            ['map']((value23) => state6['nodes'][value23])
             ['filter'](Boolean),
-          _0x39550b = generateId('collage'),
-          _0x1c1040 = buildCollageNodeDataFromSelection({
-            id: _0x39550b,
-            nodes: _0x381f41,
-            name: translate(_0x25f137, 'canvasInteraction.grids.collageName', 'Collage'),
+          id2 = generateId('collage'),
+          box = buildCollageNodeDataFromSelection({
+            id: id2,
+            nodes: nodes3,
+            name: translate(store7, 'canvasInteraction.grids.collageName', 'Collage'),
           });
-        if (!_0x1c1040)
+        if (!box)
           throw createCanvasCommandError(
             'COLLAGE_BOUNDS_FAILED',
-            translate(_0x25f137, 'canvasInteraction.grids.boundsFailed', 'Unable to create collage bounds.'),
+            translate(store7, 'canvasInteraction.grids.boundsFailed', 'Unable to create collage bounds.'),
           );
-        const _0x618691 = calcSafeSpawnPosNearNode(
-            _0x45149f['nodes'] || {},
-            _0x1c1040,
-            _0x1c1040['width'],
-            _0x1c1040['height'],
-          ),
-          _0x3ff947 = { ..._0x1c1040, x: _0x618691['x'], y: _0x618691['y'] },
-          _0x10eb5c = getStore(_0x25f137);
-        (_0x10eb5c?.['addNode']?.(_0x3ff947),
-          _0x10eb5c?.['setSelectedNodes']?.([_0x39550b]),
-          _0x25f137['commit']?.());
-        const _0x1e9f98 = () => _0x25f137['focusNodes']?.([..._0x36e6f8['imageNodeIds'], _0x39550b]);
-        if (typeof _0x25f137['scheduleFrame'] === 'function') _0x25f137['scheduleFrame'](_0x1e9f98);
-        else _0x1e9f98();
+        const x2 = calcSafeSpawnPosNearNode(state6['nodes'] || {}, box, box['width'], box['height']),
+          node2 = { ...box, x: x2['x'], y: x2['y'] },
+          store8 = getStore(store7);
+        (store8?.['addNode']?.(node2), store8?.['setSelectedNodes']?.([id2]), store7['commit']?.());
+        const run = () => store7['focusNodes']?.([...sourceNodeIds['imageNodeIds'], id2]);
+        if (typeof store7['scheduleFrame'] === 'function') store7['scheduleFrame'](run);
+        else run();
         return (
           showToast(
-            _0x25f137,
-            translate(_0x25f137, 'canvasInteraction.grids.created', 'Collage created.'),
+            store7,
+            translate(store7, 'canvasInteraction.grids.created', 'Collage created.'),
             'success',
           ),
-          { nodeId: _0x39550b, sourceNodeIds: _0x36e6f8['imageNodeIds'], node: _0x3ff947 }
+          { nodeId: id2, sourceNodeIds: sourceNodeIds['imageNodeIds'], node: node2 }
         );
       },
     }));

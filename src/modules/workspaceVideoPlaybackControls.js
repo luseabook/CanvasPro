@@ -1,18 +1,16 @@
-function escapeHtml(_0x385875) {
-  return String(_0x385875 ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replace'](/&/g, '&amp;')
     ['replace'](/</g, '&lt;')
     ['replace'](/>/g, '&gt;')
     ['replace'](/"/g, '&quot;')
     ['replace'](/'/g, '&#39;');
 }
-function renderAttributes(_0x62e691 = {}) {
-  return Object['entries'](_0x62e691 || {})
-    ['filter'](([, _0xd16da0]) => _0xd16da0 !== ![] && _0xd16da0 != null)
-    ['map'](([_0x4139fb, _0x1fb3d4]) =>
-      _0x1fb3d4 === !![]
-        ? escapeHtml(_0x4139fb)
-        : escapeHtml(_0x4139fb) + '=\x22' + escapeHtml(_0x1fb3d4) + '\x22',
+function renderAttributes(options = {}) {
+  return Object['entries'](options || {})
+    ['filter'](([, item]) => item !== ![] && item != null)
+    ['map'](([key, index]) =>
+      index === !![] ? escapeHtml(key) : escapeHtml(key) + '=\x22' + escapeHtml(index) + '\x22',
     )
     ['join']('\x20');
 }
@@ -22,129 +20,124 @@ const PLAY_ICON =
     '<svg class="story-video-pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"></path></svg>',
   HIGH_VOLUME_ICON =
     '<svg\x20width=\x2217\x22\x20height=\x2217\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M11\x205\x206\x209H2v6h4l5\x204z\x22></path><path\x20d=\x22M15.5\x208.5a5\x205\x200\x200\x201\x200\x207\x22></path><path\x20d=\x22M18\x206a8.5\x208.5\x200\x200\x201\x200\x2012\x22></path></svg>';
-function clampVolume(_0x269386, _0x24e085 = 0x0) {
-  const _0x551cf6 = Number(_0x269386);
-  if (!Number['isFinite'](_0x551cf6)) return _0x24e085;
-  return Math['min'](0x1, Math['max'](0x0, _0x551cf6));
+function clampVolume(result, data = 0x0) {
+  const target = Number(result);
+  if (!Number['isFinite'](target)) return data;
+  return Math['min'](0x1, Math['max'](0x0, target));
 }
-function resolveVolumeMediaElements(_0x5831a1) {
-  const _0x34f664 = typeof _0x5831a1 === 'function' ? _0x5831a1() : [];
-  return Array['from'](new Set(Array['isArray'](_0x34f664) ? _0x34f664 : []))['filter'](
-    (_0x3f7efd) => _0x3f7efd && typeof _0x3f7efd === 'object',
+function resolveVolumeMediaElements(handler) {
+  const source = typeof handler === 'function' ? handler() : [];
+  return Array['from'](new Set(Array['isArray'](source) ? source : []))['filter'](
+    (next) => next && typeof next === 'object',
   );
 }
 export function bindWorkspaceVideoVolumeControls({
-  volumeSlider: _0x29e67c,
-  volumeToggle: _0x5c30aa,
+  volumeSlider: volumeSlider,
+  volumeToggle: volumeToggle,
   getMediaElements: getMediaElements = () => [],
   defaultVolume: defaultVolume = 0x1,
-  getToggleLabel: _0x4ef798,
-  onChange: _0x316fa9,
+  getToggleLabel: getToggleLabel,
+  onChange: onChange,
 } = {}) {
-  let _0x25a1b0 = ![];
-  const _0x5e859d = resolveVolumeMediaElements(getMediaElements),
-    _0x11b8ba = _0x5e859d['find'](
-      (_0x45d11c) => _0x45d11c['muted'] !== !![] && clampVolume(_0x45d11c['volume']) > 0x0,
-    ),
-    _0x1efb7e = _0x5e859d['find']((_0x3f6f1) => clampVolume(_0x3f6f1['volume']) > 0x0),
-    _0x40df48 = clampVolume(Number(_0x29e67c?.['value']) / 0x64);
-  let _0x37f677 =
-    clampVolume(
-      _0x11b8ba?.['volume'] ?? _0x1efb7e?.['volume'] ?? _0x40df48,
-      clampVolume(defaultVolume, 0x1),
-    ) ||
+  let current = ![];
+  const list = resolveVolumeMediaElements(getMediaElements),
+    entry = list['find']((record) => record['muted'] !== !![] && clampVolume(record['volume']) > 0x0),
+    payload = list['find']((handle) => clampVolume(handle['volume']) > 0x0),
+    clampVolume2 = clampVolume(Number(volumeSlider?.['value']) / 0x64);
+  let clampVolume3 =
+    clampVolume(entry?.['volume'] ?? payload?.['volume'] ?? clampVolume2, clampVolume(defaultVolume, 0x1)) ||
     clampVolume(defaultVolume, 0x1) ||
     0x1;
-  const _0x36f6fb = () => {
-      const _0x21640c = resolveVolumeMediaElements(getMediaElements),
-        _0x4a972a = _0x21640c['find'](
-          (_0x5c9d95) => _0x5c9d95['muted'] !== !![] && clampVolume(_0x5c9d95['volume']) > 0x0,
+  const run = () => {
+      const mediaElements = resolveVolumeMediaElements(getMediaElements),
+        volume = mediaElements['find'](
+          (state) => state['muted'] !== !![] && clampVolume(state['volume']) > 0x0,
         );
-      return { mediaElements: _0x21640c, volume: _0x4a972a ? clampVolume(_0x4a972a['volume']) : 0x0 };
+      return { mediaElements: mediaElements, volume: volume ? clampVolume(volume['volume']) : 0x0 };
     },
-    _0x57e19e = () => {
-      if (_0x25a1b0) return;
-      const _0x1c3c16 = _0x36f6fb(),
-        _0x3e70ad = _0x1c3c16['mediaElements']['length'] > 0x0 ? _0x1c3c16['volume'] : _0x40df48;
-      if (_0x3e70ad > 0x0) _0x37f677 = _0x3e70ad;
-      const _0x5004b6 = Math['round'](_0x3e70ad * 0x64),
-        _0x34689e = _0x5004b6 === 0x0;
-      _0x29e67c &&
-        ((_0x29e67c['value'] = String(_0x5004b6)),
-        _0x29e67c['style']?.['setProperty']?.('--story-video-volume-progress', _0x5004b6 + '%'),
-        _0x29e67c['setAttribute']?.('aria-valuetext', _0x5004b6 + '%'));
-      (_0x5c30aa?.['classList']?.['toggle']?.('is-muted', _0x34689e),
-        _0x5c30aa?.['setAttribute']?.('aria-pressed', String(_0x34689e)));
-      if (typeof _0x4ef798 === 'function') {
-        const _0x28f947 = String(_0x4ef798(_0x34689e) || '')['trim']();
-        if (_0x28f947) _0x5c30aa?.['setAttribute']?.('aria-label', _0x28f947);
+    sync = () => {
+      if (current) return;
+      const config = run(),
+        count = config['mediaElements']['length'] > 0x0 ? config['volume'] : clampVolume2;
+      if (count > 0x0) clampVolume3 = count;
+      const count2 = Math['round'](count * 0x64),
+        scope = count2 === 0x0;
+      volumeSlider &&
+        ((volumeSlider['value'] = String(count2)),
+        volumeSlider['style']?.['setProperty']?.('--story-video-volume-progress', count2 + '%'),
+        volumeSlider['setAttribute']?.('aria-valuetext', count2 + '%'));
+      (volumeToggle?.['classList']?.['toggle']?.('is-muted', scope),
+        volumeToggle?.['setAttribute']?.('aria-pressed', String(scope)));
+      if (typeof getToggleLabel === 'function') {
+        const input = String(getToggleLabel(scope) || '')['trim']();
+        if (input) volumeToggle?.['setAttribute']?.('aria-label', input);
       }
     },
-    _0x1cbf29 = () => {
-      (_0x57e19e(), _0x316fa9?.());
+    handler2 = () => {
+      (sync(), onChange?.());
     },
-    _0x3cdfb2 = (_0x5ac385) => {
-      if (_0x25a1b0) return ![];
-      const _0x4d8a77 = clampVolume(Number(_0x5ac385) / 0x64);
-      if (_0x4d8a77 > 0x0) _0x37f677 = _0x4d8a77;
-      for (const _0x140275 of resolveVolumeMediaElements(getMediaElements)) {
-        ((_0x140275['volume'] = _0x4d8a77), (_0x140275['muted'] = ![]));
+    setVolumePercent = (output) => {
+      if (current) return ![];
+      const clampVolume4 = clampVolume(Number(output) / 0x64);
+      if (clampVolume4 > 0x0) clampVolume3 = clampVolume4;
+      for (const value2 of resolveVolumeMediaElements(getMediaElements)) {
+        ((value2['volume'] = clampVolume4), (value2['muted'] = ![]));
       }
-      return (_0x1cbf29(), !![]);
+      return (handler2(), !![]);
     },
-    _0x181843 = () => {
-      if (_0x25a1b0) return ![];
-      const _0xe99191 = _0x36f6fb();
-      if (_0xe99191['volume'] > 0x0) {
-        _0x37f677 = _0xe99191['volume'];
-        for (const _0x2f86ca of _0xe99191['mediaElements']) _0x2f86ca['muted'] = !![];
+    toggleMuted = () => {
+      if (current) return ![];
+      const value3 = run();
+      if (value3['volume'] > 0x0) {
+        clampVolume3 = value3['volume'];
+        for (const value4 of value3['mediaElements']) value4['muted'] = !![];
       } else {
-        const _0x132d73 = _0x37f677 || 0x1;
-        for (const _0x4ab32c of _0xe99191['mediaElements']) {
-          ((_0x4ab32c['volume'] = _0x132d73), (_0x4ab32c['muted'] = ![]));
+        const value5 = clampVolume3 || 0x1;
+        for (const value6 of value3['mediaElements']) {
+          ((value6['volume'] = value5), (value6['muted'] = ![]));
         }
       }
-      return (_0x1cbf29(), !![]);
+      return (handler2(), !![]);
     },
-    _0xbcbc8e = (_0x57b96e) => {
-      (_0x57b96e?.['stopPropagation']?.(),
-        _0x3cdfb2(_0x57b96e?.['currentTarget']?.['value'] ?? _0x29e67c?.['value']));
+    value7 = (event) => {
+      (event?.['stopPropagation']?.(),
+        setVolumePercent(event?.['currentTarget']?.['value'] ?? volumeSlider?.['value']));
     },
-    _0x41e8ba = (_0x22a470) => {
-      (_0x22a470?.['preventDefault']?.(), _0x22a470?.['stopPropagation']?.(), _0x181843());
+    value8 = (event2) => {
+      (event2?.['preventDefault']?.(), event2?.['stopPropagation']?.(), toggleMuted());
     };
   return (
-    _0x29e67c?.['addEventListener']?.('input', _0xbcbc8e),
-    _0x5c30aa?.['addEventListener']?.('click', _0x41e8ba),
-    _0x57e19e(),
+    volumeSlider?.['addEventListener']?.('input', value7),
+    volumeToggle?.['addEventListener']?.('click', value8),
+    sync(),
     Object['freeze']({
-      sync: _0x57e19e,
-      setVolumePercent: _0x3cdfb2,
-      toggleMuted: _0x181843,
+      sync: sync,
+      setVolumePercent: setVolumePercent,
+      toggleMuted: toggleMuted,
       dispose() {
-        if (_0x25a1b0) return;
-        ((_0x25a1b0 = !![]),
-          _0x29e67c?.['removeEventListener']?.('input', _0xbcbc8e),
-          _0x5c30aa?.['removeEventListener']?.('click', _0x41e8ba));
+        if (current) return;
+        ((current = !![]),
+          volumeSlider?.['removeEventListener']?.('input', value7),
+          volumeToggle?.['removeEventListener']?.('click', value8));
       },
     })
   );
 }
-function applyElementAttributes(_0x5c4b72, _0x10ee3b = {}) {
-  for (const [_0x38f712, _0x177553] of Object['entries'](_0x10ee3b || {})) {
-    if (_0x177553 === ![] || _0x177553 == null) continue;
-    _0x5c4b72['setAttribute'](_0x38f712, _0x177553 === !![] ? '' : String(_0x177553));
+function applyElementAttributes(el, value9 = {}) {
+  for (const [value10, value11] of Object['entries'](value9 || {})) {
+    if (value11 === ![] || value11 == null) continue;
+    el['setAttribute'](value10, value11 === !![] ? '' : String(value11));
   }
 }
-function setDisabled(_0x1f145d, _0x1fb565) {
-  _0x1f145d['disabled'] = _0x1fb565 === !![];
-  if (_0x1fb565) _0x1f145d['setAttribute']('disabled', '');
+function setDisabled(el2, value12) {
+  el2['disabled'] = value12 === !![];
+  if (value12) el2['setAttribute']('disabled', '');
 }
-function appendElementSlot(_0x2f82b1, _0x3de316) {
-  const _0x3ad4ae = Array['isArray'](_0x3de316) ? _0x3de316 : [_0x3de316];
-  for (const _0x5a5bfa of _0x3ad4ae) {
-    if (!_0x5a5bfa || typeof _0x5a5bfa !== 'object') continue;
-    _0x2f82b1['appendChild'](_0x5a5bfa);
+function appendElementSlot(el3, value13) {
+  const value14 = Array['isArray'](value13) ? value13 : [value13];
+  for (const enabled of value14) {
+    if (!enabled || typeof enabled !== 'object') continue;
+    el3['appendChild'](enabled);
   }
 }
 export function renderWorkspaceVideoPlaybackControls({
@@ -166,30 +159,30 @@ export function renderWorkspaceVideoPlaybackControls({
   volumeToggleLabel: volumeToggleLabel = '静音' + label,
   slots: slots = {},
 } = {}) {
-  const _0x1bebf8 = ['video-controls', 'story-video-controls', className]['filter'](Boolean)['join']('\x20'),
-    _0x3175e7 = renderAttributes(controlsAttributes),
-    _0x582336 = renderAttributes(playAttributes),
-    _0x3bc9cc = renderAttributes(currentTimeAttributes),
-    _0x4d401c = renderAttributes(progressAttributes),
-    _0x41b675 = renderAttributes(progressFillAttributes),
-    _0x16f42f = renderAttributes(totalTimeAttributes),
-    _0x578b4e = renderAttributes(volumeAttributes),
-    _0x5ebc80 = renderAttributes(volumeToggleAttributes),
-    _0x55200e = disabled ? ' disabled' : '',
-    _0x24d557 = disabled ? '-1' : '0',
-    _0x1a50e9 = playTitle ? ' title="' + escapeHtml(playTitle) + '\x22' : '';
+  const value15 = ['video-controls', 'story-video-controls', className]['filter'](Boolean)['join']('\x20'),
+    renderAttributes2 = renderAttributes(controlsAttributes),
+    renderAttributes3 = renderAttributes(playAttributes),
+    renderAttributes4 = renderAttributes(currentTimeAttributes),
+    renderAttributes5 = renderAttributes(progressAttributes),
+    renderAttributes6 = renderAttributes(progressFillAttributes),
+    renderAttributes7 = renderAttributes(totalTimeAttributes),
+    renderAttributes8 = renderAttributes(volumeAttributes),
+    renderAttributes9 = renderAttributes(volumeToggleAttributes),
+    value16 = disabled ? ' disabled' : '',
+    value17 = disabled ? '-1' : '0',
+    value18 = playTitle ? ' title="' + escapeHtml(playTitle) + '\x22' : '';
   return (
     '<div class="' +
-    escapeHtml(_0x1bebf8) +
+    escapeHtml(value15) +
     '\x22' +
-    (_0x3175e7 ? '\x20' + _0x3175e7 : '') +
+    (renderAttributes2 ? '\x20' + renderAttributes2 : '') +
     '>\n    <button type="button" class="video-play-btn story-video-play-btn"' +
-    (_0x582336 ? '\x20' + _0x582336 : '') +
+    (renderAttributes3 ? '\x20' + renderAttributes3 : '') +
     ' aria-label="' +
     escapeHtml(playLabel) +
     '\x22' +
-    _0x1a50e9 +
-    _0x55200e +
+    value18 +
+    value16 +
     '>\n      ' +
     PLAY_ICON +
     '\x0a\x20\x20\x20\x20\x20\x20' +
@@ -197,42 +190,42 @@ export function renderWorkspaceVideoPlaybackControls({
     '\n    </button>\n    ' +
     (slots['afterPlay'] || '') +
     '\x0a\x20\x20\x20\x20<span\x20class=\x22video-time-current\x22' +
-    (_0x3bc9cc ? '\x20' + _0x3bc9cc : '') +
+    (renderAttributes4 ? '\x20' + renderAttributes4 : '') +
     '>0:00</span>\n    <div class="media-progress-bar"' +
-    (_0x4d401c ? '\x20' + _0x4d401c : '') +
+    (renderAttributes5 ? '\x20' + renderAttributes5 : '') +
     ' role="slider" aria-disabled="' +
     disabled +
     '\x22\x20tabindex=\x22' +
-    _0x24d557 +
+    value17 +
     '" aria-label="' +
     escapeHtml(progressLabel) +
     '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">\n      <div class="media-progress-fill"' +
-    (_0x41b675 ? '\x20' + _0x41b675 : '') +
+    (renderAttributes6 ? '\x20' + renderAttributes6 : '') +
     '><div class="media-progress-knob"></div></div>\n    </div>\n    <span class="video-time-total"' +
-    (_0x16f42f ? '\x20' + _0x16f42f : '') +
+    (renderAttributes7 ? '\x20' + renderAttributes7 : '') +
     '>0:00</span>\n    ' +
     (slots['beforeVolume'] || '') +
     '\x0a\x20\x20\x20\x20<div\x20class=\x22story-video-volume-control\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-video-volume-toggle\x22' +
-    (_0x5ebc80 ? '\x20' + _0x5ebc80 : '') +
+    (renderAttributes9 ? '\x20' + renderAttributes9 : '') +
     ' aria-label="' +
     escapeHtml(volumeToggleLabel) +
     '\x22\x20aria-pressed=\x22false\x22' +
-    _0x55200e +
+    value16 +
     '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
     HIGH_VOLUME_ICON +
     '\n      </button>\n      <input type="range" class="story-video-volume-slider"' +
-    (_0x578b4e ? '\x20' + _0x578b4e : '') +
+    (renderAttributes8 ? '\x20' + renderAttributes8 : '') +
     ' min="0" max="100" step="1" value="100" aria-label="' +
     escapeHtml(volumeLabel) +
     '\x22\x20aria-valuetext=\x22100%\x22' +
-    _0x55200e +
+    value16 +
     '>\n    </div>\n    ' +
     (slots['afterVolume'] || '') +
     '\n  </div>'
   );
 }
 export function createWorkspaceVideoPlaybackControls(
-  _0x7e9e7,
+  el4,
   {
     className: className = '',
     label: label = '视频',
@@ -253,87 +246,87 @@ export function createWorkspaceVideoPlaybackControls(
     slots: slots = {},
   } = {},
 ) {
-  if (!_0x7e9e7?.['createElement']) return null;
-  const _0x594039 = _0x7e9e7['createElement']('div');
-  ((_0x594039['className'] = ['video-controls', 'story-video-controls', className]
+  if (!el4?.['createElement']) return null;
+  const root = el4['createElement']('div');
+  ((root['className'] = ['video-controls', 'story-video-controls', className]
     ['filter'](Boolean)
     ['join']('\x20')),
-    applyElementAttributes(_0x594039, controlsAttributes));
-  const _0x4b819f = _0x7e9e7['createElement']('button');
-  ((_0x4b819f['type'] = 'button'),
-    (_0x4b819f['className'] = 'video-play-btn\x20story-video-play-btn'),
-    (_0x4b819f['innerHTML'] = '' + PLAY_ICON + PAUSE_ICON),
-    _0x4b819f['setAttribute']('aria-label', playLabel));
-  if (playTitle) _0x4b819f['setAttribute']('title', playTitle);
-  (applyElementAttributes(_0x4b819f, playAttributes), setDisabled(_0x4b819f, disabled));
-  const _0x23339b = _0x7e9e7['createElement']('span');
-  ((_0x23339b['className'] = 'video-time-current'),
-    (_0x23339b['textContent'] = '0:00'),
-    applyElementAttributes(_0x23339b, currentTimeAttributes));
-  const _0x576bea = _0x7e9e7['createElement']('div');
-  ((_0x576bea['className'] = 'media-progress-bar'),
-    _0x576bea['setAttribute']('role', 'slider'),
-    _0x576bea['setAttribute']('aria-disabled', String(disabled === !![])),
-    _0x576bea['setAttribute']('tabindex', disabled ? '-1' : '0'),
-    _0x576bea['setAttribute']('aria-label', progressLabel),
-    _0x576bea['setAttribute']('aria-valuemin', '0'),
-    _0x576bea['setAttribute']('aria-valuemax', '100'),
-    _0x576bea['setAttribute']('aria-valuenow', '0'),
-    applyElementAttributes(_0x576bea, progressAttributes));
-  const _0x7db81d = _0x7e9e7['createElement']('div');
-  ((_0x7db81d['className'] = 'media-progress-fill'),
-    applyElementAttributes(_0x7db81d, progressFillAttributes));
-  const _0x1977d0 = _0x7e9e7['createElement']('div');
-  ((_0x1977d0['className'] = 'media-progress-knob'),
-    _0x7db81d['appendChild'](_0x1977d0),
-    _0x576bea['appendChild'](_0x7db81d));
-  const _0xb162dd = _0x7e9e7['createElement']('span');
-  ((_0xb162dd['className'] = 'video-time-total'),
-    (_0xb162dd['textContent'] = '0:00'),
-    applyElementAttributes(_0xb162dd, totalTimeAttributes));
-  const _0x2c1e4e = _0x7e9e7['createElement']('div');
-  _0x2c1e4e['className'] = 'story-video-volume-control';
-  const _0x19209f = _0x7e9e7['createElement']('button');
-  ((_0x19209f['type'] = 'button'),
-    (_0x19209f['className'] = 'story-video-volume-toggle'),
-    (_0x19209f['innerHTML'] = HIGH_VOLUME_ICON),
-    _0x19209f['setAttribute']('aria-label', volumeToggleLabel),
-    _0x19209f['setAttribute']('aria-pressed', 'false'),
-    applyElementAttributes(_0x19209f, volumeToggleAttributes),
-    setDisabled(_0x19209f, disabled));
-  const _0x49c142 = _0x7e9e7['createElement']('input');
+    applyElementAttributes(root, controlsAttributes));
+  const playButton = el4['createElement']('button');
+  ((playButton['type'] = 'button'),
+    (playButton['className'] = 'video-play-btn\x20story-video-play-btn'),
+    (playButton['innerHTML'] = '' + PLAY_ICON + PAUSE_ICON),
+    playButton['setAttribute']('aria-label', playLabel));
+  if (playTitle) playButton['setAttribute']('title', playTitle);
+  (applyElementAttributes(playButton, playAttributes), setDisabled(playButton, disabled));
+  const currentTime = el4['createElement']('span');
+  ((currentTime['className'] = 'video-time-current'),
+    (currentTime['textContent'] = '0:00'),
+    applyElementAttributes(currentTime, currentTimeAttributes));
+  const progress = el4['createElement']('div');
+  ((progress['className'] = 'media-progress-bar'),
+    progress['setAttribute']('role', 'slider'),
+    progress['setAttribute']('aria-disabled', String(disabled === !![])),
+    progress['setAttribute']('tabindex', disabled ? '-1' : '0'),
+    progress['setAttribute']('aria-label', progressLabel),
+    progress['setAttribute']('aria-valuemin', '0'),
+    progress['setAttribute']('aria-valuemax', '100'),
+    progress['setAttribute']('aria-valuenow', '0'),
+    applyElementAttributes(progress, progressAttributes));
+  const progressFill = el4['createElement']('div');
+  ((progressFill['className'] = 'media-progress-fill'),
+    applyElementAttributes(progressFill, progressFillAttributes));
+  const progressKnob = el4['createElement']('div');
+  ((progressKnob['className'] = 'media-progress-knob'),
+    progressFill['appendChild'](progressKnob),
+    progress['appendChild'](progressFill));
+  const totalTime = el4['createElement']('span');
+  ((totalTime['className'] = 'video-time-total'),
+    (totalTime['textContent'] = '0:00'),
+    applyElementAttributes(totalTime, totalTimeAttributes));
+  const volumeControl = el4['createElement']('div');
+  volumeControl['className'] = 'story-video-volume-control';
+  const volumeToggle2 = el4['createElement']('button');
+  ((volumeToggle2['type'] = 'button'),
+    (volumeToggle2['className'] = 'story-video-volume-toggle'),
+    (volumeToggle2['innerHTML'] = HIGH_VOLUME_ICON),
+    volumeToggle2['setAttribute']('aria-label', volumeToggleLabel),
+    volumeToggle2['setAttribute']('aria-pressed', 'false'),
+    applyElementAttributes(volumeToggle2, volumeToggleAttributes),
+    setDisabled(volumeToggle2, disabled));
+  const volume2 = el4['createElement']('input');
   return (
-    (_0x49c142['type'] = 'range'),
-    (_0x49c142['className'] = 'story-video-volume-slider'),
-    (_0x49c142['min'] = '0'),
-    (_0x49c142['max'] = '100'),
-    (_0x49c142['step'] = '1'),
-    (_0x49c142['value'] = '100'),
-    _0x49c142['setAttribute']('aria-label', volumeLabel),
-    _0x49c142['setAttribute']('aria-valuetext', '100%'),
-    applyElementAttributes(_0x49c142, volumeAttributes),
-    setDisabled(_0x49c142, disabled),
-    _0x2c1e4e['appendChild'](_0x19209f),
-    _0x2c1e4e['appendChild'](_0x49c142),
-    _0x594039['appendChild'](_0x4b819f),
-    appendElementSlot(_0x594039, slots['afterPlay']),
-    _0x594039['appendChild'](_0x23339b),
-    _0x594039['appendChild'](_0x576bea),
-    _0x594039['appendChild'](_0xb162dd),
-    appendElementSlot(_0x594039, slots['beforeVolume']),
-    _0x594039['appendChild'](_0x2c1e4e),
-    appendElementSlot(_0x594039, slots['afterVolume']),
+    (volume2['type'] = 'range'),
+    (volume2['className'] = 'story-video-volume-slider'),
+    (volume2['min'] = '0'),
+    (volume2['max'] = '100'),
+    (volume2['step'] = '1'),
+    (volume2['value'] = '100'),
+    volume2['setAttribute']('aria-label', volumeLabel),
+    volume2['setAttribute']('aria-valuetext', '100%'),
+    applyElementAttributes(volume2, volumeAttributes),
+    setDisabled(volume2, disabled),
+    volumeControl['appendChild'](volumeToggle2),
+    volumeControl['appendChild'](volume2),
+    root['appendChild'](playButton),
+    appendElementSlot(root, slots['afterPlay']),
+    root['appendChild'](currentTime),
+    root['appendChild'](progress),
+    root['appendChild'](totalTime),
+    appendElementSlot(root, slots['beforeVolume']),
+    root['appendChild'](volumeControl),
+    appendElementSlot(root, slots['afterVolume']),
     {
-      root: _0x594039,
-      playButton: _0x4b819f,
-      currentTime: _0x23339b,
-      progress: _0x576bea,
-      progressFill: _0x7db81d,
-      progressKnob: _0x1977d0,
-      totalTime: _0xb162dd,
-      volumeControl: _0x2c1e4e,
-      volumeToggle: _0x19209f,
-      volume: _0x49c142,
+      root: root,
+      playButton: playButton,
+      currentTime: currentTime,
+      progress: progress,
+      progressFill: progressFill,
+      progressKnob: progressKnob,
+      totalTime: totalTime,
+      volumeControl: volumeControl,
+      volumeToggle: volumeToggle2,
+      volume: volume2,
     }
   );
 }

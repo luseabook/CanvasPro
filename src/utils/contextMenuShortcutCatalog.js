@@ -1,10 +1,10 @@
 import { SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED } from '../config/productFeatures.js';
 
-const createShortcut = (_0x458877, _0x3f387e, { hidden: hidden = ![], disabled: disabled = ![] } = {}) =>
+const createShortcut = (label, group, { hidden: hidden = ![], disabled: disabled = ![] } = {}) =>
     Object['freeze']({
-      label: _0x458877,
+      label: label,
       keys: Object['freeze']([]),
-      group: _0x3f387e,
+      group: group,
       contextMenuOnly: !![],
       ...(hidden ? { hidden: !![] } : {}),
       ...(disabled ? { disabled: !![] } : {}),
@@ -14,8 +14,8 @@ const createShortcut = (_0x458877, _0x3f387e, { hidden: hidden = ![], disabled: 
   PROJECT_GROUP = '右键菜单·项目与工作区',
   FEATURE_GROUP = '右键菜单·功能面板',
   WEB_GROUP = '右键菜单·网页预览',
-  createWorkflowShortcut = (_0x2cc7ce) =>
-    createShortcut(_0x2cc7ce, FEATURE_GROUP, {
+  createWorkflowShortcut = (value) =>
+    createShortcut(value, FEATURE_GROUP, {
       hidden: !SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED,
       disabled: !SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED,
     });
@@ -148,6 +148,6 @@ export const CONTEXT_MENU_SHORTCUTS = Object['freeze']({
 
 export const CONTEXT_MENU_SHORTCUT_IDS = Object['freeze'](Object['keys'](CONTEXT_MENU_SHORTCUTS));
 
-export function isContextMenuShortcut(_0x51c11c) {
-  return Object['prototype']['hasOwnProperty']['call'](CONTEXT_MENU_SHORTCUTS, String(_0x51c11c || ''));
+export function isContextMenuShortcut(item) {
+  return Object['prototype']['hasOwnProperty']['call'](CONTEXT_MENU_SHORTCUTS, String(item || ''));
 }

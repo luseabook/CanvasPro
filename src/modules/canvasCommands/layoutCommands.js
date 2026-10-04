@@ -13,86 +13,79 @@ import { createCanvasCommandError } from './commandRegistry.js';
 const ALIGN_MODES = new Set(['left', 'h-center', 'right', 'top', 'v-center', 'bottom']),
   DISTRIBUTE_AXES = new Set(['horizontal', 'vertical']),
   MOVE_NEAR_PLACEMENTS = new Set(['left', 'right', 'top', 'bottom']);
-function getState(_0x239def) {
-  return _0x239def.store?.getStateRaw?.() || _0x239def.store?.getState?.() || {};
+function getState(value) {
+  return value.store?.getStateRaw?.() || value.store?.getState?.() || {};
 }
-function normalizeNodeIds(_0x4ba26b = {}, _0x18ec3f = {}, { min: min = 2 } = {}) {
-  const _0x342363 = getState(_0x18ec3f),
-    _0x2191a1 = _0x342363.nodes || {},
-    _0x44ea96 =
-      Array.isArray(_0x4ba26b.ids) && _0x4ba26b.ids.length > 0
-        ? _0x4ba26b.ids
-        : _0x342363.selectedNodeIds || [],
-    _0x2e4043 = [],
-    _0x2cbb4d = new Set();
-  for (const _0x5218c6 of _0x44ea96) {
-    const _0x48f2a9 = String(_0x5218c6 || '').trim();
-    if (!_0x48f2a9 || _0x2cbb4d.has(_0x48f2a9)) continue;
-    if (!_0x2191a1[_0x48f2a9])
-      throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + _0x48f2a9, {
-        nodeId: _0x48f2a9,
+function normalizeNodeIds(options = {}, item = {}, { min: min = 2 } = {}) {
+  const state = getState(item),
+    enabled = state.nodes || {},
+    key = Array.isArray(options.ids) && options.ids.length > 0 ? options.ids : state.selectedNodeIds || [],
+    list = [],
+    map = new Set();
+  for (const index of key) {
+    const nodeId = String(index || '').trim();
+    if (!nodeId || map.has(nodeId)) continue;
+    if (!enabled[nodeId])
+      throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + nodeId, {
+        nodeId: nodeId,
       });
-    (_0x2e4043.push(_0x48f2a9), _0x2cbb4d.add(_0x48f2a9));
+    (list.push(nodeId), map.add(nodeId));
   }
-  if (_0x2e4043.length < min)
+  if (list.length < min)
     throw createCanvasCommandError('INSUFFICIENT_NODES', 'At least ' + min + ' canvas node(s) are required.');
-  return _0x2e4043;
+  return list;
 }
-function normalizeGap(_0x25712c, _0x4f01cc) {
-  if (_0x25712c === undefined || _0x25712c === null || _0x25712c === '') {
-    const _0x141074 = Number(_0x4f01cc.ui?.alignDistributeGap);
-    return Number.isFinite(_0x141074) && _0x141074 >= 0 ? _0x141074 : undefined;
+function normalizeGap(result, data) {
+  if (result === undefined || result === null || result === '') {
+    const count = Number(data.ui?.alignDistributeGap);
+    return Number.isFinite(count) && count >= 0 ? count : undefined;
   }
-  const _0x5651fd = Number(_0x25712c);
-  if (!Number.isFinite(_0x5651fd) || _0x5651fd < 0)
+  const count2 = Number(result);
+  if (!Number.isFinite(count2) || count2 < 0)
     throw createCanvasCommandError(
       'INVALID_DISTRIBUTE_GAP',
       'layout.distribute gap must be a non-negative number.',
     );
-  return _0x5651fd;
+  return count2;
 }
-function normalizeOptionalGap(_0x5b52fb, _0x330008 = 40) {
-  if (_0x5b52fb === undefined || _0x5b52fb === null || _0x5b52fb === '') return _0x330008;
-  const _0x49d975 = Number(_0x5b52fb);
-  if (!Number.isFinite(_0x49d975) || _0x49d975 < 0)
+function normalizeOptionalGap(target, source = 40) {
+  if (target === undefined || target === null || target === '') return source;
+  const count3 = Number(target);
+  if (!Number.isFinite(count3) || count3 < 0)
     throw createCanvasCommandError('INVALID_LAYOUT_GAP', 'Layout gap must be a non-negative number.');
-  return _0x49d975;
+  return count3;
 }
-function normalizePositiveInteger(_0x3cbf60, _0x3d3bad) {
-  if (_0x3cbf60 === undefined || _0x3cbf60 === null || _0x3cbf60 === '') return _0x3d3bad;
-  const _0x507005 = Number(_0x3cbf60);
-  if (!Number.isFinite(_0x507005) || _0x507005 <= 0)
+function normalizePositiveInteger(next, current) {
+  if (next === undefined || next === null || next === '') return current;
+  const count4 = Number(next);
+  if (!Number.isFinite(count4) || count4 <= 0)
     throw createCanvasCommandError(
       'INVALID_LAYOUT_COLUMNS',
       'layout.arrangeGrid columns must be a positive number.',
     );
-  return Math.trunc(_0x507005);
+  return Math.trunc(count4);
 }
-function applyTargetPositions(_0x5d20d4, _0x44ae6f) {
-  const _0x50548a = getState(_0x5d20d4),
-    _0x471cad = buildNodeOffsetPlan(_0x50548a.nodes || {}, _0x44ae6f),
-    _0x5dfa42 = Object.keys(_0x471cad);
-  if (_0x5dfa42.length === 0) return _0x5dfa42;
-  const _0x251676 = _0x5d20d4.store || _0x5d20d4.graphStore,
-    _0x1babe4 = () => _0x251676?.moveNodesByOffsets?.(_0x471cad);
-  return (
-    typeof _0x251676?.batch === 'function' ? _0x251676.batch(_0x1babe4) : _0x1babe4(),
-    _0x5d20d4.commit?.(),
-    _0x5dfa42
-  );
+function applyTargetPositions(store, entry) {
+  const state2 = getState(store),
+    nodeOffsetPlan = buildNodeOffsetPlan(state2.nodes || {}, entry),
+    list2 = Object.keys(nodeOffsetPlan);
+  if (list2.length === 0) return list2;
+  const record = store.store || store.graphStore,
+    handler = () => record?.moveNodesByOffsets?.(nodeOffsetPlan);
+  return (typeof record?.batch === 'function' ? record.batch(handler) : handler(), store.commit?.(), list2);
 }
-function getAlignableItems(_0xbe5e63, _0x17c7c1) {
-  const _0x3192b2 = getState(_0xbe5e63),
-    _0x318605 = getAlignableSelectionNodes(_0x3192b2.nodes || {}, _0x17c7c1);
-  if (_0x318605.length < 2)
+function getAlignableItems(payload, handle) {
+  const state3 = getState(payload),
+    list3 = getAlignableSelectionNodes(state3.nodes || {}, handle);
+  if (list3.length < 2)
     throw createCanvasCommandError(
       'INSUFFICIENT_ALIGNABLE_NODES',
       'At least two alignable canvas nodes are required.',
     );
-  return _0x318605;
+  return list3;
 }
-export function registerLayoutCommands(_0x3a7276) {
-  (_0x3a7276.register({
+export function registerLayoutCommands(config) {
+  (config.register({
     id: 'layout.align',
     description: 'Align canvas nodes.',
     riskLevel: 'safe',
@@ -106,36 +99,36 @@ export function registerLayoutCommands(_0x3a7276) {
     },
     capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: true },
     returnSchema: { aliasFields: ['ids', 'movedIds', 'mode'] },
-    validate(_0x483e0c = {}, _0x27c6d0 = {}) {
-      const _0x2e68b6 = String(_0x483e0c.mode || '').trim();
-      if (!ALIGN_MODES.has(_0x2e68b6))
+    validate(options2 = {}, scope = {}) {
+      const mode = String(options2.mode || '').trim();
+      if (!ALIGN_MODES.has(mode))
         return {
           ok: false,
           errorCode: 'INVALID_ALIGN_MODE',
-          message: 'Unsupported layout.align mode: ' + (_0x2e68b6 || '(empty)'),
+          message: 'Unsupported layout.align mode: ' + (mode || '(empty)'),
         };
       try {
-        return { args: { ids: normalizeNodeIds(_0x483e0c, _0x27c6d0), mode: _0x2e68b6 } };
-      } catch (_0x535062) {
+        return { args: { ids: normalizeNodeIds(options2, scope), mode: mode } };
+      } catch (errorCode) {
         return {
           ok: false,
-          errorCode: _0x535062.errorCode || 'INVALID_ALIGN_SELECTION',
-          message: _0x535062.message,
+          errorCode: errorCode.errorCode || 'INVALID_ALIGN_SELECTION',
+          message: errorCode.message,
         };
       }
     },
-    execute(_0x180787, _0x77c6a1) {
-      const _0x5d0907 = getAlignableItems(_0x77c6a1, _0x180787.ids),
-        _0x460332 = computeSelectionBounds(_0x5d0907),
-        _0x1d96a7 = computeAlignTargets(_0x5d0907, _0x180787.mode, _0x460332);
+    execute(ids, input) {
+      const alignableItems = getAlignableItems(input, ids.ids),
+        selectionBounds = computeSelectionBounds(alignableItems),
+        alignTargets = computeAlignTargets(alignableItems, ids.mode, selectionBounds);
       return {
-        ids: _0x180787.ids,
-        movedIds: applyTargetPositions(_0x77c6a1, _0x1d96a7),
-        mode: _0x180787.mode,
+        ids: ids.ids,
+        movedIds: applyTargetPositions(input, alignTargets),
+        mode: ids.mode,
       };
     },
   }),
-    _0x3a7276.register({
+    config.register({
       id: 'layout.distribute',
       description: 'Distribute canvas nodes.',
       riskLevel: 'safe',
@@ -155,43 +148,43 @@ export function registerLayoutCommands(_0x3a7276) {
         selectionFallback: true,
       },
       returnSchema: { aliasFields: ['ids', 'movedIds', 'axis', 'gap'] },
-      validate(_0x36190e = {}, _0x36b8b1 = {}) {
-        const _0x12e505 = String(_0x36190e.axis || '').trim();
-        if (!DISTRIBUTE_AXES.has(_0x12e505))
+      validate(options3 = {}, output = {}) {
+        const axis = String(options3.axis || '').trim();
+        if (!DISTRIBUTE_AXES.has(axis))
           return {
             ok: false,
             errorCode: 'INVALID_DISTRIBUTE_AXIS',
-            message: 'Unsupported layout.distribute axis: ' + (_0x12e505 || '(empty)'),
+            message: 'Unsupported layout.distribute axis: ' + (axis || '(empty)'),
           };
         try {
-          const _0x5c3e1f = getState(_0x36b8b1);
+          const state4 = getState(output);
           return {
             args: {
-              ids: normalizeNodeIds(_0x36190e, _0x36b8b1),
-              axis: _0x12e505,
-              gap: normalizeGap(_0x36190e.gap, _0x5c3e1f),
+              ids: normalizeNodeIds(options3, output),
+              axis: axis,
+              gap: normalizeGap(options3.gap, state4),
             },
           };
-        } catch (_0x349300) {
+        } catch (errorCode2) {
           return {
             ok: false,
-            errorCode: _0x349300.errorCode || 'INVALID_DISTRIBUTE_SELECTION',
-            message: _0x349300.message,
+            errorCode: errorCode2.errorCode || 'INVALID_DISTRIBUTE_SELECTION',
+            message: errorCode2.message,
           };
         }
       },
-      execute(_0x200f12, _0x11257f) {
-        const _0xb894da = getAlignableItems(_0x11257f, _0x200f12.ids),
-          _0x35c610 = computeDistributeTargets(_0xb894da, _0x200f12.axis, _0x200f12.gap);
+      execute(ids2, value2) {
+        const alignableItems2 = getAlignableItems(value2, ids2.ids),
+          distributeTargets = computeDistributeTargets(alignableItems2, ids2.axis, ids2.gap);
         return {
-          ids: _0x200f12.ids,
-          movedIds: applyTargetPositions(_0x11257f, _0x35c610),
-          axis: _0x200f12.axis,
-          gap: _0x200f12.gap,
+          ids: ids2.ids,
+          movedIds: applyTargetPositions(value2, distributeTargets),
+          axis: ids2.axis,
+          gap: ids2.gap,
         };
       },
     }),
-    _0x3a7276.register({
+    config.register({
       id: 'layout.arrangeRow',
       description: 'Arrange canvas nodes in a row.',
       riskLevel: 'safe',
@@ -206,34 +199,34 @@ export function registerLayoutCommands(_0x3a7276) {
       },
       capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: true },
       returnSchema: { aliasFields: ['ids', 'movedIds', 'gap'] },
-      validate(_0x2e07c9 = {}, _0x5563c6 = {}) {
+      validate(options4 = {}, value3 = {}) {
         try {
           return {
             args: {
-              ids: normalizeNodeIds(_0x2e07c9, _0x5563c6),
-              gap: normalizeOptionalGap(_0x2e07c9.gap, 40),
-              align: String(_0x2e07c9.align || 'top').trim(),
+              ids: normalizeNodeIds(options4, value3),
+              gap: normalizeOptionalGap(options4.gap, 40),
+              align: String(options4.align || 'top').trim(),
             },
           };
-        } catch (_0x3ebd2c) {
+        } catch (errorCode3) {
           return {
             ok: false,
-            errorCode: _0x3ebd2c.errorCode || 'INVALID_ARRANGE_ROW',
-            message: _0x3ebd2c.message,
+            errorCode: errorCode3.errorCode || 'INVALID_ARRANGE_ROW',
+            message: errorCode3.message,
           };
         }
       },
-      execute(_0x4b34f8, _0x11d0a6) {
-        const _0x48df74 = getAlignableItems(_0x11d0a6, _0x4b34f8.ids),
-          _0x381370 = computeArrangeRowTargets(_0x48df74, { gap: _0x4b34f8.gap, align: _0x4b34f8.align });
+      execute(gap, value4) {
+        const alignableItems3 = getAlignableItems(value4, gap.ids),
+          arrangeRowTargets = computeArrangeRowTargets(alignableItems3, { gap: gap.gap, align: gap.align });
         return {
-          ids: _0x4b34f8.ids,
-          movedIds: applyTargetPositions(_0x11d0a6, _0x381370),
-          gap: _0x4b34f8.gap,
+          ids: gap.ids,
+          movedIds: applyTargetPositions(value4, arrangeRowTargets),
+          gap: gap.gap,
         };
       },
     }),
-    _0x3a7276.register({
+    config.register({
       id: 'layout.arrangeColumn',
       description: 'Arrange canvas nodes in a column.',
       riskLevel: 'safe',
@@ -248,34 +241,37 @@ export function registerLayoutCommands(_0x3a7276) {
       },
       capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: true },
       returnSchema: { aliasFields: ['ids', 'movedIds', 'gap'] },
-      validate(_0x2279e9 = {}, _0x442df6 = {}) {
+      validate(options5 = {}, value5 = {}) {
         try {
           return {
             args: {
-              ids: normalizeNodeIds(_0x2279e9, _0x442df6),
-              gap: normalizeOptionalGap(_0x2279e9.gap, 40),
-              align: String(_0x2279e9.align || 'left').trim(),
+              ids: normalizeNodeIds(options5, value5),
+              gap: normalizeOptionalGap(options5.gap, 40),
+              align: String(options5.align || 'left').trim(),
             },
           };
-        } catch (_0x3d5644) {
+        } catch (errorCode4) {
           return {
             ok: false,
-            errorCode: _0x3d5644.errorCode || 'INVALID_ARRANGE_COLUMN',
-            message: _0x3d5644.message,
+            errorCode: errorCode4.errorCode || 'INVALID_ARRANGE_COLUMN',
+            message: errorCode4.message,
           };
         }
       },
-      execute(_0x33b5cd, _0x440a94) {
-        const _0xf739ac = getAlignableItems(_0x440a94, _0x33b5cd.ids),
-          _0x4606ed = computeArrangeColumnTargets(_0xf739ac, { gap: _0x33b5cd.gap, align: _0x33b5cd.align });
+      execute(gap2, value6) {
+        const alignableItems4 = getAlignableItems(value6, gap2.ids),
+          arrangeColumnTargets = computeArrangeColumnTargets(alignableItems4, {
+            gap: gap2.gap,
+            align: gap2.align,
+          });
         return {
-          ids: _0x33b5cd.ids,
-          movedIds: applyTargetPositions(_0x440a94, _0x4606ed),
-          gap: _0x33b5cd.gap,
+          ids: gap2.ids,
+          movedIds: applyTargetPositions(value6, arrangeColumnTargets),
+          gap: gap2.gap,
         };
       },
     }),
-    _0x3a7276.register({
+    config.register({
       id: 'layout.arrangeGrid',
       description: 'Arrange canvas nodes in a grid.',
       riskLevel: 'safe',
@@ -292,41 +288,41 @@ export function registerLayoutCommands(_0x3a7276) {
       },
       capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: true },
       returnSchema: { aliasFields: ['ids', 'movedIds', 'columns', 'gapX', 'gapY'] },
-      validate(_0x25fd46 = {}, _0x5f20f9 = {}) {
+      validate(options6 = {}, value7 = {}) {
         try {
           return {
             args: {
-              ids: normalizeNodeIds(_0x25fd46, _0x5f20f9),
-              columns: normalizePositiveInteger(_0x25fd46.columns, undefined),
-              gapX: normalizeOptionalGap(_0x25fd46.gapX ?? _0x25fd46.gap, 40),
-              gapY: normalizeOptionalGap(_0x25fd46.gapY ?? _0x25fd46.gap, 40),
+              ids: normalizeNodeIds(options6, value7),
+              columns: normalizePositiveInteger(options6.columns, undefined),
+              gapX: normalizeOptionalGap(options6.gapX ?? options6.gap, 40),
+              gapY: normalizeOptionalGap(options6.gapY ?? options6.gap, 40),
             },
           };
-        } catch (_0x2e8243) {
+        } catch (errorCode5) {
           return {
             ok: false,
-            errorCode: _0x2e8243.errorCode || 'INVALID_ARRANGE_GRID',
-            message: _0x2e8243.message,
+            errorCode: errorCode5.errorCode || 'INVALID_ARRANGE_GRID',
+            message: errorCode5.message,
           };
         }
       },
-      execute(_0x4e0070, _0x5eae64) {
-        const _0x821bb0 = getAlignableItems(_0x5eae64, _0x4e0070.ids),
-          _0x421bee = computeArrangeGridTargets(_0x821bb0, {
-            columns: _0x4e0070.columns,
-            gapX: _0x4e0070.gapX,
-            gapY: _0x4e0070.gapY,
+      execute(columns, value8) {
+        const alignableItems5 = getAlignableItems(value8, columns.ids),
+          arrangeGridTargets = computeArrangeGridTargets(alignableItems5, {
+            columns: columns.columns,
+            gapX: columns.gapX,
+            gapY: columns.gapY,
           });
         return {
-          ids: _0x4e0070.ids,
-          movedIds: applyTargetPositions(_0x5eae64, _0x421bee),
-          columns: _0x4e0070.columns,
-          gapX: _0x4e0070.gapX,
-          gapY: _0x4e0070.gapY,
+          ids: columns.ids,
+          movedIds: applyTargetPositions(value8, arrangeGridTargets),
+          columns: columns.columns,
+          gapX: columns.gapX,
+          gapY: columns.gapY,
         };
       },
     }),
-    _0x3a7276.register({
+    config.register({
       id: 'layout.moveNearNode',
       description: 'Move canvas nodes near another node.',
       riskLevel: 'safe',
@@ -344,66 +340,64 @@ export function registerLayoutCommands(_0x3a7276) {
       },
       capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: true },
       returnSchema: { aliasFields: ['ids', 'anchorId', 'movedIds', 'placement', 'gap'] },
-      validate(_0x465172 = {}, _0x425355 = {}) {
-        const _0x5533f3 = String(_0x465172.anchorId || _0x465172.targetId || '').trim(),
-          _0x29a559 = String(_0x465172.placement || 'right').trim();
-        if (!MOVE_NEAR_PLACEMENTS.has(_0x29a559))
+      validate(options7 = {}, value9 = {}) {
+        const anchorId = String(options7.anchorId || options7.targetId || '').trim(),
+          placement = String(options7.placement || 'right').trim();
+        if (!MOVE_NEAR_PLACEMENTS.has(placement))
           return {
             ok: false,
             errorCode: 'INVALID_MOVE_NEAR_PLACEMENT',
-            message: 'Unsupported layout.moveNearNode placement: ' + (_0x29a559 || '(empty)'),
+            message: 'Unsupported layout.moveNearNode placement: ' + (placement || '(empty)'),
           };
         try {
-          const _0x2c415c = normalizeNodeIds(_0x465172, _0x425355, { min: 1 }).filter(
-            (_0x2ea228) => _0x2ea228 !== _0x5533f3,
-          );
-          if (!_0x5533f3)
+          const ids3 = normalizeNodeIds(options7, value9, { min: 1 }).filter((item2) => item2 !== anchorId);
+          if (!anchorId)
             throw createCanvasCommandError(
               'MISSING_ANCHOR_NODE_ID',
               'layout.moveNearNode requires anchorId.',
             );
-          if (!getState(_0x425355).nodes?.[_0x5533f3])
-            throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + _0x5533f3);
-          if (_0x2c415c.length === 0)
+          if (!getState(value9).nodes?.[anchorId])
+            throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + anchorId);
+          if (ids3.length === 0)
             throw createCanvasCommandError(
               'INSUFFICIENT_NODES',
               'layout.moveNearNode requires at least one movable node.',
             );
           return {
             args: {
-              ids: _0x2c415c,
-              anchorId: _0x5533f3,
-              placement: _0x29a559,
-              gap: normalizeOptionalGap(_0x465172.gap, 40),
+              ids: ids3,
+              anchorId: anchorId,
+              placement: placement,
+              gap: normalizeOptionalGap(options7.gap, 40),
             },
           };
-        } catch (_0x52fa9a) {
+        } catch (errorCode6) {
           return {
             ok: false,
-            errorCode: _0x52fa9a.errorCode || 'INVALID_MOVE_NEAR_NODE',
-            message: _0x52fa9a.message,
+            errorCode: errorCode6.errorCode || 'INVALID_MOVE_NEAR_NODE',
+            message: errorCode6.message,
           };
         }
       },
-      execute(_0xea7e3b, _0x2ff5e9) {
-        const _0x5bb464 = getState(_0x2ff5e9),
-          _0x9101e1 = getAlignableSelectionNodes(_0x5bb464.nodes || {}, _0xea7e3b.ids),
-          [_0x539178] = getAlignableSelectionNodes(_0x5bb464.nodes || {}, [_0xea7e3b.anchorId]);
-        if (!_0x539178 || _0x9101e1.length === 0)
+      execute(placement2, value10) {
+        const state5 = getState(value10),
+          list4 = getAlignableSelectionNodes(state5.nodes || {}, placement2.ids),
+          [enabled2] = getAlignableSelectionNodes(state5.nodes || {}, [placement2.anchorId]);
+        if (!enabled2 || list4.length === 0)
           throw createCanvasCommandError(
             'INSUFFICIENT_ALIGNABLE_NODES',
             'layout.moveNearNode requires alignable nodes.',
           );
-        const _0x258421 = computeMoveNearNodeTargets(_0x9101e1, _0x539178, {
-          placement: _0xea7e3b.placement,
-          gap: _0xea7e3b.gap,
+        const moveNearNodeTargets = computeMoveNearNodeTargets(list4, enabled2, {
+          placement: placement2.placement,
+          gap: placement2.gap,
         });
         return {
-          ids: _0xea7e3b.ids,
-          anchorId: _0xea7e3b.anchorId,
-          movedIds: applyTargetPositions(_0x2ff5e9, _0x258421),
-          placement: _0xea7e3b.placement,
-          gap: _0xea7e3b.gap,
+          ids: placement2.ids,
+          anchorId: placement2.anchorId,
+          movedIds: applyTargetPositions(value10, moveNearNodeTargets),
+          placement: placement2.placement,
+          gap: placement2.gap,
         };
       },
     }));

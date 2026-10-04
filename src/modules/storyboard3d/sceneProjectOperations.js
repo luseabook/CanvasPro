@@ -1,1 +1,393 @@
-import{cloneStoryboard3DProject,createDefaultStoryboard3DEnvironment}from'./projectModel.js';import{normalizeStoryboard3DCameraState,replaceStoryboard3DShotCamera}from'./cameraShotSystem.js';import{remapStoryboard3DAnimationObjectIds}from'./shotAnimation.js';export const STORYBOARD_3D_ENVIRONMENT_PRESETS=Object["freeze"]({'empty':Object["freeze"]({...createDefaultStoryboard3DEnvironment("empty")}),'outdoor':Object["freeze"]({...createDefaultStoryboard3DEnvironment("outdoor"),'groundSize':0xc8,'backgroundColor':'#8fb5d9'}),'indoor':Object['freeze']({...createDefaultStoryboard3DEnvironment("indoor"),'groundSize':0x32,'backgroundColor':"#24262b"}),'studio':Object["freeze"]({...createDefaultStoryboard3DEnvironment("studio"),'groundSize':0x1e,'backgroundColor':"#15161a"})});function finite(_0x29f65f,_0x56d555=0x0){const _0x429de2=Number(_0x29f65f);return Number["isFinite"](_0x429de2)?_0x429de2:_0x56d555;}function clamp(_0x4edfed,_0x2795f4,_0x3e8763){return Math["min"](_0x3e8763,Math["max"](_0x2795f4,_0x4edfed));}function normalizeName(_0x1829d7){return String(_0x1829d7||'')["trim"]();}function resolveNow(_0x360720,_0x5c0c30){return Math['max'](0x0,finite(_0x5c0c30,finite(_0x360720?.["updatedAt"],0x0)));}function collectProjectIds(_0x51dd7f){const _0x268ed2=new Set();if(_0x51dd7f?.['id'])_0x268ed2["add"](String(_0x51dd7f['id']));return(Array["isArray"](_0x51dd7f?.["scenes"])?_0x51dd7f["scenes"]:[])["forEach"](_0x2bb393=>{if(_0x2bb393?.['id'])_0x268ed2['add'](String(_0x2bb393['id']));(Array["isArray"](_0x2bb393?.["objects"])?_0x2bb393["objects"]:[])["forEach"](_0x5a34db=>{if(_0x5a34db?.['id'])_0x268ed2['add'](String(_0x5a34db['id']));}),(Array["isArray"](_0x2bb393?.["shots"])?_0x2bb393["shots"]:[])["forEach"](_0x36ce8b=>{if(_0x36ce8b?.['id'])_0x268ed2['add'](String(_0x36ce8b['id']));});}),_0x268ed2;}function createUniqueId({prefix:_0x4837c7,sourceId:_0x199bbf,usedIds:_0x5a7d68,idFactory:_0x47c38}){if(typeof _0x47c38==="function"){let _0x4cd28c=0x0;while(_0x4cd28c<0x3e8){const _0x6e7f34=normalizeName(_0x47c38(_0x4837c7));if(_0x6e7f34&&!_0x5a7d68["has"](_0x6e7f34))return _0x5a7d68['add'](_0x6e7f34),_0x6e7f34;_0x4cd28c+=0x1;}throw new Error("Unable to create a unique "+_0x4837c7+'\x20id');}const _0x531c7a=(normalizeName(_0x199bbf)||_0x4837c7)+"-copy";let _0x19a9e9=_0x531c7a,_0xe01c2=0x2;while(_0x5a7d68["has"](_0x19a9e9)){_0x19a9e9=_0x531c7a+'-'+_0xe01c2,_0xe01c2+=0x1;}return _0x5a7d68["add"](_0x19a9e9),_0x19a9e9;}function cloneSceneWithNewIds(_0x5f0a1e,{usedIds:_0x2c16eb,idFactory:_0x2f7159,name:_0x1ffeba,now:_0x1c1485,identityMap:_0x3cde5f}={}){const _0x1ffa13=cloneStoryboard3DProject(_0x5f0a1e),_0x7324ca=String(_0x1ffa13['id']||"scene"),_0x20074d=createUniqueId({'prefix':"scene",'sourceId':_0x7324ca,'usedIds':_0x2c16eb,'idFactory':_0x2f7159}),_0x1e8240=new Map(),_0x3b46db=new Map();_0x1ffa13['id']=_0x20074d,_0x1ffa13['name']=normalizeName(_0x1ffeba)||(_0x1ffa13["name"]||"Scene")+" Copy",_0x1ffa13["objects"]=(Array['isArray'](_0x1ffa13["objects"])?_0x1ffa13["objects"]:[])['map'](_0x5ee26c=>{const _0x11e5be=String(_0x5ee26c['id']||_0x5ee26c["type"]||"object"),_0x537a6c=createUniqueId({'prefix':_0x5ee26c["type"]||"object",'sourceId':_0x11e5be,'usedIds':_0x2c16eb,'idFactory':_0x2f7159});return _0x1e8240["set"](_0x11e5be,_0x537a6c),{..._0x5ee26c,'id':_0x537a6c};}),_0x1ffa13["objects"]=_0x1ffa13['objects']["map"](_0x4f18cf=>({..._0x4f18cf,..._0x4f18cf["parentId"]&&_0x1e8240['has'](String(_0x4f18cf['parentId']))?{'parentId':_0x1e8240['get'](String(_0x4f18cf["parentId"]))}:{},...Array["isArray"](_0x4f18cf["attachmentIds"])?{'attachmentIds':_0x4f18cf["attachmentIds"]["map"](_0x18784b=>_0x1e8240["get"](String(_0x18784b))||String(_0x18784b))}:{}})),_0x1ffa13["shots"]=(Array["isArray"](_0x1ffa13["shots"])?_0x1ffa13["shots"]:[])["map"]((_0x59db8b,_0x64ac91)=>{const _0x253acd=String(_0x59db8b['id']||'shot-'+(_0x64ac91+0x1)),_0x2ba4a9=createUniqueId({'prefix':"shot",'sourceId':_0x253acd,'usedIds':_0x2c16eb,'idFactory':_0x2f7159});return _0x3b46db["set"](_0x253acd,_0x2ba4a9),{..._0x59db8b,'id':_0x2ba4a9,'sceneId':_0x20074d,..._0x59db8b["animation"]?{'animation':remapStoryboard3DAnimationObjectIds(_0x59db8b['animation'],_0x1e8240)}:{},..._0x59db8b["cameraId"]?{'cameraId':_0x1e8240["get"](String(_0x59db8b["cameraId"]))||String(_0x59db8b["cameraId"])}:{},'order':_0x64ac91,'createdAt':_0x1c1485,'updatedAt':_0x1c1485};}),_0x1ffa13["activeShotId"]=_0x3b46db["get"](String(_0x1ffa13["activeShotId"]||''))||_0x1ffa13['shots'][0x0]?.['id']||'';const _0x6ebb42=new Map([[_0x7324ca,_0x20074d],..._0x1e8240,..._0x3b46db]);if(_0x1ffa13["generatedLayers"])_0x1ffa13["generatedLayers"]=remapDirectorIdentities(_0x1ffa13['generatedLayers'],_0x6ebb42);if(_0x1ffa13["directorSettings"])_0x1ffa13["directorSettings"]=remapDirectorIdentities(_0x1ffa13['directorSettings'],_0x6ebb42);if(_0x3cde5f){for(const [_0x1034b2,_0x88db2b]of _0x6ebb42)_0x3cde5f["set"](_0x1034b2,_0x88db2b);}return _0x1ffa13;}function remapDirectorIdentities(_0x30974b,_0x3543e5){if(typeof _0x30974b==="string")return _0x3543e5["get"](_0x30974b)||_0x30974b;if(Array["isArray"](_0x30974b))return _0x30974b['map'](_0x227f45=>remapDirectorIdentities(_0x227f45,_0x3543e5));if(_0x30974b&&typeof _0x30974b==='object')return Object["fromEntries"](Object['entries'](_0x30974b)["map"](([_0x5e07c6,_0x237450])=>[_0x3543e5["get"](_0x5e07c6)||_0x5e07c6,remapDirectorIdentities(_0x237450,_0x3543e5)]));return _0x30974b;}function updateProject(_0x1bf64b,_0x44cf62,_0xa2eb0f){const _0x147d9b=cloneStoryboard3DProject(_0x1bf64b),_0xe59d27=_0x44cf62(_0x147d9b)!==![];if(_0xe59d27)_0x147d9b["updatedAt"]=resolveNow(_0x1bf64b,_0xa2eb0f);return _0x147d9b;}function findScene(_0x189cef,_0x32b82){return(Array['isArray'](_0x189cef?.["scenes"])?_0x189cef["scenes"]:[])["find"](_0x16cb1f=>_0x16cb1f['id']===_0x32b82);}function findShot(_0x47974f,_0x490276){return(Array["isArray"](_0x47974f?.["shots"])?_0x47974f["shots"]:[])["find"](_0x38a740=>_0x38a740['id']===_0x490276);}function stableCameraSignature(_0x22cda8){const _0x73bae4=normalizeStoryboard3DCameraState(_0x22cda8);return JSON["stringify"]([_0x73bae4["position"],_0x73bae4['target'],_0x73bae4["focalLength"],_0x73bae4["near"],_0x73bae4["far"],_0x73bae4["aspectRatio"]]);}export function saveStoryboard3DProjectAsCopy(_0x33bbea,{id:_0x2381dc,name:_0x2286a1,now:_0x16fc11,idFactory:_0x445277}={}){const _0x2d2124=cloneStoryboard3DProject(_0x33bbea),_0x347905=resolveNow(_0x2d2124,_0x16fc11),_0x54887a=collectProjectIds(_0x2d2124),_0x40cf2=String(_0x2d2124['id']||"project"),_0x25e0ef=normalizeName(_0x2381dc)||createUniqueId({'prefix':"project",'sourceId':_0x40cf2,'usedIds':_0x54887a,'idFactory':_0x445277}),_0x3e5b09=new Map(),_0x4ef962=new Map([[_0x40cf2,_0x25e0ef]]),_0xf9d4b8=(Array["isArray"](_0x2d2124["scenes"])?_0x2d2124['scenes']:[])["map"](_0x1b70bf=>{const _0x30ac5a=cloneSceneWithNewIds(_0x1b70bf,{'usedIds':_0x54887a,'idFactory':_0x445277,'name':_0x1b70bf["name"],'now':_0x347905,'identityMap':_0x4ef962});return _0x3e5b09['set'](String(_0x1b70bf['id']),_0x30ac5a['id']),_0x30ac5a;});return{..._0x2d2124,'id':_0x25e0ef,'name':normalizeName(_0x2286a1)||(_0x2d2124["name"]||"3D Storyboard")+" Copy",'scenes':_0xf9d4b8,..._0x2d2124['recycleBin']?{'recycleBin':remapDirectorIdentities(_0x2d2124['recycleBin'],_0x4ef962)}:{},..._0x2d2124['generationJobs']?{'generationJobs':remapDirectorIdentities(_0x2d2124["generationJobs"],_0x4ef962)["map"](_0x6c530f=>_0x6c530f['status']==="running"?{..._0x6c530f,'status':"failed",'message':"此任务运行于原项目，副本不重复提交。"}:_0x6c530f)}:{},'activeSceneId':_0x3e5b09['get'](String(_0x2d2124['activeSceneId']||''))||_0xf9d4b8[0x0]?.['id']||'','createdAt':_0x347905,'updatedAt':_0x347905};}export function renameStoryboard3DScene(_0x37b575,_0x6ce88e,_0xb2e97e,{now:_0x432db8}={}){const _0x5f1cec=normalizeName(_0xb2e97e);return updateProject(_0x37b575,_0x263158=>{const _0x4438cd=findScene(_0x263158,_0x6ce88e);if(!_0x4438cd||!_0x5f1cec||_0x4438cd["name"]===_0x5f1cec)return![];return _0x4438cd["name"]=_0x5f1cec,!![];},_0x432db8);}export function duplicateStoryboard3DScene(_0x1d234d,_0x4ac27e,{name:_0x202064,now:_0xd97711,idFactory:_0x22bf0a}={}){const _0x3217ce=resolveNow(_0x1d234d,_0xd97711),_0x3fcf58=collectProjectIds(_0x1d234d);return updateProject(_0x1d234d,_0x2b968d=>{const _0x1fdf2a=_0x2b968d["scenes"]["findIndex"](_0x26a1a8=>_0x26a1a8['id']===_0x4ac27e);if(_0x1fdf2a<0x0)return![];const _0x4ab01e=cloneSceneWithNewIds(_0x2b968d['scenes'][_0x1fdf2a],{'usedIds':_0x3fcf58,'idFactory':_0x22bf0a,'name':_0x202064,'now':_0x3217ce});return _0x2b968d["scenes"]['splice'](_0x1fdf2a+0x1,0x0,_0x4ab01e),_0x2b968d['activeSceneId']=_0x4ab01e['id'],!![];},_0x3217ce);}export function deleteStoryboard3DScene(_0x4d7f87,_0x474682,{now:_0x54342b}={}){return updateProject(_0x4d7f87,_0xd67db8=>{if(!Array['isArray'](_0xd67db8["scenes"])||_0xd67db8["scenes"]["length"]<=0x1)return![];const _0x5bce6a=_0xd67db8["scenes"]["findIndex"](_0x117960=>_0x117960['id']===_0x474682);if(_0x5bce6a<0x0)return![];return _0xd67db8["scenes"]["splice"](_0x5bce6a,0x1),_0xd67db8["activeSceneId"]===_0x474682&&(_0xd67db8["activeSceneId"]=_0xd67db8["scenes"][Math["min"](_0x5bce6a,_0xd67db8["scenes"]["length"]-0x1)]['id']),!![];},_0x54342b);}export function reorderStoryboard3DScene(_0x51b28f,_0x24eece,_0x2e83e5,{now:_0x6175a8}={}){return updateProject(_0x51b28f,_0x7a0a9a=>{const _0x3c9ab0=_0x7a0a9a["scenes"]["findIndex"](_0x7bf4b4=>_0x7bf4b4['id']===_0x24eece);if(_0x3c9ab0<0x0)return![];const _0x502082=clamp(Math["round"](finite(_0x2e83e5,_0x3c9ab0)),0x0,_0x7a0a9a["scenes"]['length']-0x1);if(_0x502082===_0x3c9ab0)return![];const [_0x434bb5]=_0x7a0a9a["scenes"]["splice"](_0x3c9ab0,0x1);return _0x7a0a9a["scenes"]["splice"](_0x502082,0x0,_0x434bb5),!![];},_0x6175a8);}export function applyStoryboard3DEnvironmentPreset(_0xda32e8,_0x42c2d4,_0x4195de,{overrides:overrides={},now:_0x2f6360}={}){const _0x2dab83=STORYBOARD_3D_ENVIRONMENT_PRESETS[_0x4195de];if(!_0x2dab83)throw new Error('Unsupported\x203D\x20environment\x20preset:\x20'+_0x4195de);return updateProject(_0xda32e8,_0xb438f9=>{const _0x41476b=findScene(_0xb438f9,_0x42c2d4);if(!_0x41476b)return![];return _0x41476b['environment']={...cloneStoryboard3DProject(_0x2dab83),...overrides&&typeof overrides==="object"?overrides:{},'type':_0x2dab83["type"],'groundSize':Math['max'](0x1,finite(overrides?.["groundSize"],_0x2dab83["groundSize"])),'showGrid':overrides?.["showGrid"]!==![],'showOutline':overrides?.["showOutline"]!==![],'enableShadows':overrides?.["enableShadows"]!==![]},!normalizeName(_0x41476b["environment"]["backgroundColor"])&&delete _0x41476b["environment"]["backgroundColor"],!![];},_0x2f6360);}export function replaceStoryboard3DShotFromCurrentView(_0x20007f,{sceneId:_0x148348,shotId:_0x19f662,camera:_0xc64851,subjectBounds:_0x1b5a94,subjectForward:_0x4fa1ba,compositionHint:_0x41a264,now:_0x1e4409}={}){const _0x2c80d4=resolveNow(_0x20007f,_0x1e4409);return updateProject(_0x20007f,_0x44dd98=>{const _0x4bfa16=_0x44dd98["scenes"]['findIndex'](_0x1b4bf5=>_0x1b4bf5['id']===_0x148348);if(_0x4bfa16<0x0||!findShot(_0x44dd98["scenes"][_0x4bfa16],_0x19f662))return![];const _0x5e750d=replaceStoryboard3DShotCamera(_0x44dd98["scenes"][_0x4bfa16],_0x19f662,_0xc64851,{'subjectBounds':_0x1b5a94,'subjectForward':_0x4fa1ba,'compositionHint':_0x41a264,'now':_0x2c80d4}),_0x2b5497=findShot(_0x5e750d,_0x19f662);if(_0x2b5497)delete _0x2b5497['thumbnailUrl'];return _0x44dd98["scenes"][_0x4bfa16]=_0x5e750d,!![];},_0x2c80d4);}export function createStoryboard3DShotThumbnailToken(_0x5d7202,_0x2b4cf7){if(!_0x5d7202||!_0x2b4cf7?.['id']||!_0x2b4cf7?.["camera"])throw new Error('A\x20scene\x20id\x20and\x20persisted\x20shot\x20camera\x20are\x20required');return{'kind':"storyboard3d-shot-thumbnail-token",'version':0x1,'sceneId':String(_0x5d7202),'shotId':String(_0x2b4cf7['id']),'cameraSignature':stableCameraSignature(_0x2b4cf7["camera"]),'shotUpdatedAt':Math["max"](0x0,finite(_0x2b4cf7["updatedAt"],0x0))};}export function applyStoryboard3DShotThumbnail(_0x37b742,_0x15aa35,_0x41fcac,{now:_0x59717b}={}){const _0x22b109=cloneStoryboard3DProject(_0x37b742);if(_0x15aa35?.["kind"]!=="storyboard3d-shot-thumbnail-token"||_0x15aa35?.['version']!==0x1)return{'project':_0x22b109,'applied':![],'reason':"invalid-token"};const _0x633e1a=findScene(_0x22b109,_0x15aa35["sceneId"]),_0x4eb5e5=findShot(_0x633e1a,_0x15aa35["shotId"]);if(!_0x4eb5e5)return{'project':_0x22b109,'applied':![],'reason':"shot-not-found"};if(stableCameraSignature(_0x4eb5e5["camera"])!==_0x15aa35["cameraSignature"]||Math["max"](0x0,finite(_0x4eb5e5["updatedAt"],0x0))!==_0x15aa35["shotUpdatedAt"])return{'project':_0x22b109,'applied':![],'reason':"stale-token"};const _0x1b2dd0=normalizeName(_0x41fcac);if(!_0x1b2dd0)return{'project':_0x22b109,'applied':![],'reason':"invalid-thumbnail"};return _0x4eb5e5['thumbnailUrl']=_0x1b2dd0,_0x4eb5e5['updatedAt']=resolveNow(_0x37b742,_0x59717b),_0x22b109['updatedAt']=_0x4eb5e5["updatedAt"],{'project':_0x22b109,'applied':!![],'reason':'applied'};}
+import { cloneStoryboard3DProject, createDefaultStoryboard3DEnvironment } from './projectModel.js';
+import { normalizeStoryboard3DCameraState, replaceStoryboard3DShotCamera } from './cameraShotSystem.js';
+import { remapStoryboard3DAnimationObjectIds } from './shotAnimation.js';
+export const STORYBOARD_3D_ENVIRONMENT_PRESETS = Object['freeze']({
+  empty: Object['freeze']({ ...createDefaultStoryboard3DEnvironment('empty') }),
+  outdoor: Object['freeze']({
+    ...createDefaultStoryboard3DEnvironment('outdoor'),
+    groundSize: 0xc8,
+    backgroundColor: '#8fb5d9',
+  }),
+  indoor: Object['freeze']({
+    ...createDefaultStoryboard3DEnvironment('indoor'),
+    groundSize: 0x32,
+    backgroundColor: '#24262b',
+  }),
+  studio: Object['freeze']({
+    ...createDefaultStoryboard3DEnvironment('studio'),
+    groundSize: 0x1e,
+    backgroundColor: '#15161a',
+  }),
+});
+function finite(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
+}
+function clamp(index, result, data) {
+  return Math['min'](data, Math['max'](result, index));
+}
+function normalizeName(options) {
+  return String(options || '')['trim']();
+}
+function resolveNow(target, source) {
+  return Math['max'](0x0, finite(source, finite(target?.['updatedAt'], 0x0)));
+}
+function collectProjectIds(next) {
+  const current = new Set();
+  if (next?.['id']) current['add'](String(next['id']));
+  return (
+    (Array['isArray'](next?.['scenes']) ? next['scenes'] : [])['forEach']((entry) => {
+      if (entry?.['id']) current['add'](String(entry['id']));
+      ((Array['isArray'](entry?.['objects']) ? entry['objects'] : [])['forEach']((record) => {
+        if (record?.['id']) current['add'](String(record['id']));
+      }),
+        (Array['isArray'](entry?.['shots']) ? entry['shots'] : [])['forEach']((payload) => {
+          if (payload?.['id']) current['add'](String(payload['id']));
+        }));
+    }),
+    current
+  );
+}
+function createUniqueId({ prefix: prefix, sourceId: sourceId, usedIds: usedIds, idFactory: idFactory }) {
+  if (typeof idFactory === 'function') {
+    let count = 0x0;
+    while (count < 0x3e8) {
+      const name = normalizeName(idFactory(prefix));
+      if (name && !usedIds['has'](name)) return (usedIds['add'](name), name);
+      count += 0x1;
+    }
+    throw new Error('Unable to create a unique ' + prefix + '\x20id');
+  }
+  const handle = (normalizeName(sourceId) || prefix) + '-copy';
+  let state = handle,
+    config = 0x2;
+  while (usedIds['has'](state)) {
+    ((state = handle + '-' + config), (config += 0x1));
+  }
+  return (usedIds['add'](state), state);
+}
+function cloneSceneWithNewIds(
+  scope,
+  { usedIds: usedIds2, idFactory: idFactory2, name: name2, now: now, identityMap: identityMap } = {},
+) {
+  const error = cloneStoryboard3DProject(scope),
+    input = String(error['id'] || 'scene'),
+    uniqueId = createUniqueId({ prefix: 'scene', sourceId: input, usedIds: usedIds2, idFactory: idFactory2 }),
+    map = new Map(),
+    args = new Map();
+  ((error['id'] = uniqueId),
+    (error['name'] = normalizeName(name2) || (error['name'] || 'Scene') + ' Copy'),
+    (error['objects'] = (Array['isArray'](error['objects']) ? error['objects'] : [])['map']((args2) => {
+      const output = String(args2['id'] || args2['type'] || 'object'),
+        uniqueId2 = createUniqueId({
+          prefix: args2['type'] || 'object',
+          sourceId: output,
+          usedIds: usedIds2,
+          idFactory: idFactory2,
+        });
+      return (map['set'](output, uniqueId2), { ...args2, id: uniqueId2 });
+    })),
+    (error['objects'] = error['objects']['map']((args3) => ({
+      ...args3,
+      ...(args3['parentId'] && map['has'](String(args3['parentId']))
+        ? { parentId: map['get'](String(args3['parentId'])) }
+        : {}),
+      ...(Array['isArray'](args3['attachmentIds'])
+        ? {
+            attachmentIds: args3['attachmentIds']['map'](
+              (value2) => map['get'](String(value2)) || String(value2),
+            ),
+          }
+        : {}),
+    }))),
+    (error['shots'] = (Array['isArray'](error['shots']) ? error['shots'] : [])['map']((args4, value3) => {
+      const value4 = String(args4['id'] || 'shot-' + (value3 + 0x1)),
+        uniqueId3 = createUniqueId({
+          prefix: 'shot',
+          sourceId: value4,
+          usedIds: usedIds2,
+          idFactory: idFactory2,
+        });
+      return (
+        args['set'](value4, uniqueId3),
+        {
+          ...args4,
+          id: uniqueId3,
+          sceneId: uniqueId,
+          ...(args4['animation']
+            ? { animation: remapStoryboard3DAnimationObjectIds(args4['animation'], map) }
+            : {}),
+          ...(args4['cameraId']
+            ? { cameraId: map['get'](String(args4['cameraId'])) || String(args4['cameraId']) }
+            : {}),
+          order: value3,
+          createdAt: now,
+          updatedAt: now,
+        }
+      );
+    })),
+    (error['activeShotId'] =
+      args['get'](String(error['activeShotId'] || '')) || error['shots'][0x0]?.['id'] || ''));
+  const value5 = new Map([[input, uniqueId], ...map, ...args]);
+  if (error['generatedLayers'])
+    error['generatedLayers'] = remapDirectorIdentities(error['generatedLayers'], value5);
+  if (error['directorSettings'])
+    error['directorSettings'] = remapDirectorIdentities(error['directorSettings'], value5);
+  if (identityMap) {
+    for (const [value6, value7] of value5) identityMap['set'](value6, value7);
+  }
+  return error;
+}
+function remapDirectorIdentities(list, value8) {
+  if (typeof list === 'string') return value8['get'](list) || list;
+  if (Array['isArray'](list)) return list['map']((value9) => remapDirectorIdentities(value9, value8));
+  if (list && typeof list === 'object')
+    return Object['fromEntries'](
+      Object['entries'](list)['map'](([value10, value11]) => [
+        value8['get'](value10) || value10,
+        remapDirectorIdentities(value11, value8),
+      ]),
+    );
+  return list;
+}
+function updateProject(value12, handler, value13) {
+  const cloneStoryboard3DProject2 = cloneStoryboard3DProject(value12),
+    value14 = handler(cloneStoryboard3DProject2) !== ![];
+  if (value14) cloneStoryboard3DProject2['updatedAt'] = resolveNow(value12, value13);
+  return cloneStoryboard3DProject2;
+}
+function findScene(value15, value16) {
+  return (Array['isArray'](value15?.['scenes']) ? value15['scenes'] : [])['find'](
+    (value17) => value17['id'] === value16,
+  );
+}
+function findShot(value18, value19) {
+  return (Array['isArray'](value18?.['shots']) ? value18['shots'] : [])['find'](
+    (value20) => value20['id'] === value19,
+  );
+}
+function stableCameraSignature(value21) {
+  const event = normalizeStoryboard3DCameraState(value21);
+  return JSON['stringify']([
+    event['position'],
+    event['target'],
+    event['focalLength'],
+    event['near'],
+    event['far'],
+    event['aspectRatio'],
+  ]);
+}
+export function saveStoryboard3DProjectAsCopy(
+  value22,
+  { id: id, name: name3, now: now2, idFactory: idFactory3 } = {},
+) {
+  const args5 = cloneStoryboard3DProject(value22),
+    now3 = resolveNow(args5, now2),
+    projectIds = collectProjectIds(args5),
+    value23 = String(args5['id'] || 'project'),
+    name4 =
+      normalizeName(id) ||
+      createUniqueId({ prefix: 'project', sourceId: value23, usedIds: projectIds, idFactory: idFactory3 }),
+    map2 = new Map(),
+    value24 = new Map([[value23, name4]]),
+    value25 = (Array['isArray'](args5['scenes']) ? args5['scenes'] : [])['map']((value26) => {
+      const cloneSceneWithNewIds2 = cloneSceneWithNewIds(value26, {
+        usedIds: projectIds,
+        idFactory: idFactory3,
+        name: value26['name'],
+        now: now3,
+        identityMap: value24,
+      });
+      return (map2['set'](String(value26['id']), cloneSceneWithNewIds2['id']), cloneSceneWithNewIds2);
+    });
+  return {
+    ...args5,
+    id: name4,
+    name: normalizeName(name3) || (args5['name'] || '3D Storyboard') + ' Copy',
+    scenes: value25,
+    ...(args5['recycleBin'] ? { recycleBin: remapDirectorIdentities(args5['recycleBin'], value24) } : {}),
+    ...(args5['generationJobs']
+      ? {
+          generationJobs: remapDirectorIdentities(args5['generationJobs'], value24)['map']((response) =>
+            response['status'] === 'running'
+              ? { ...response, status: 'failed', message: '此任务运行于原项目，副本不重复提交。' }
+              : response,
+          ),
+        }
+      : {}),
+    activeSceneId: map2['get'](String(args5['activeSceneId'] || '')) || value25[0x0]?.['id'] || '',
+    createdAt: now3,
+    updatedAt: now3,
+  };
+}
+export function renameStoryboard3DScene(value27, value28, value29, { now: now4 } = {}) {
+  const name5 = normalizeName(value29);
+  return updateProject(
+    value27,
+    (value30) => {
+      const scene = findScene(value30, value28);
+      if (!scene || !name5 || scene['name'] === name5) return ![];
+      return ((scene['name'] = name5), !![]);
+    },
+    now4,
+  );
+}
+export function duplicateStoryboard3DScene(
+  value31,
+  value32,
+  { name: name6, now: now5, idFactory: idFactory4 } = {},
+) {
+  const now6 = resolveNow(value31, now5),
+    projectIds2 = collectProjectIds(value31);
+  return updateProject(
+    value31,
+    (value33) => {
+      const count2 = value33['scenes']['findIndex']((value34) => value34['id'] === value32);
+      if (count2 < 0x0) return ![];
+      const cloneSceneWithNewIds3 = cloneSceneWithNewIds(value33['scenes'][count2], {
+        usedIds: projectIds2,
+        idFactory: idFactory4,
+        name: name6,
+        now: now6,
+      });
+      return (
+        value33['scenes']['splice'](count2 + 0x1, 0x0, cloneSceneWithNewIds3),
+        (value33['activeSceneId'] = cloneSceneWithNewIds3['id']),
+        !![]
+      );
+    },
+    now6,
+  );
+}
+export function deleteStoryboard3DScene(value35, value36, { now: now7 } = {}) {
+  return updateProject(
+    value35,
+    (value37) => {
+      if (!Array['isArray'](value37['scenes']) || value37['scenes']['length'] <= 0x1) return ![];
+      const count3 = value37['scenes']['findIndex']((value38) => value38['id'] === value36);
+      if (count3 < 0x0) return ![];
+      return (
+        value37['scenes']['splice'](count3, 0x1),
+        value37['activeSceneId'] === value36 &&
+          (value37['activeSceneId'] =
+            value37['scenes'][Math['min'](count3, value37['scenes']['length'] - 0x1)]['id']),
+        !![]
+      );
+    },
+    now7,
+  );
+}
+export function reorderStoryboard3DScene(value39, value40, value41, { now: now8 } = {}) {
+  return updateProject(
+    value39,
+    (value42) => {
+      const count4 = value42['scenes']['findIndex']((value43) => value43['id'] === value40);
+      if (count4 < 0x0) return ![];
+      const clamp2 = clamp(Math['round'](finite(value41, count4)), 0x0, value42['scenes']['length'] - 0x1);
+      if (clamp2 === count4) return ![];
+      const [value44] = value42['scenes']['splice'](count4, 0x1);
+      return (value42['scenes']['splice'](clamp2, 0x0, value44), !![]);
+    },
+    now8,
+  );
+}
+export function applyStoryboard3DEnvironmentPreset(
+  value45,
+  value46,
+  value47,
+  { overrides: overrides = {}, now: now9 } = {},
+) {
+  const enabled = STORYBOARD_3D_ENVIRONMENT_PRESETS[value47];
+  if (!enabled) throw new Error('Unsupported\x203D\x20environment\x20preset:\x20' + value47);
+  return updateProject(
+    value45,
+    (value48) => {
+      const scene2 = findScene(value48, value46);
+      if (!scene2) return ![];
+      return (
+        (scene2['environment'] = {
+          ...cloneStoryboard3DProject(enabled),
+          ...(overrides && typeof overrides === 'object' ? overrides : {}),
+          type: enabled['type'],
+          groundSize: Math['max'](0x1, finite(overrides?.['groundSize'], enabled['groundSize'])),
+          showGrid: overrides?.['showGrid'] !== ![],
+          showOutline: overrides?.['showOutline'] !== ![],
+          enableShadows: overrides?.['enableShadows'] !== ![],
+        }),
+        !normalizeName(scene2['environment']['backgroundColor']) &&
+          delete scene2['environment']['backgroundColor'],
+        !![]
+      );
+    },
+    now9,
+  );
+}
+export function replaceStoryboard3DShotFromCurrentView(
+  value49,
+  {
+    sceneId: sceneId,
+    shotId: shotId,
+    camera: camera,
+    subjectBounds: subjectBounds,
+    subjectForward: subjectForward,
+    compositionHint: compositionHint,
+    now: now10,
+  } = {},
+) {
+  const now11 = resolveNow(value49, now10);
+  return updateProject(
+    value49,
+    (value50) => {
+      const count5 = value50['scenes']['findIndex']((value51) => value51['id'] === sceneId);
+      if (count5 < 0x0 || !findShot(value50['scenes'][count5], shotId)) return ![];
+      const replaceStoryboard3DShotCamera2 = replaceStoryboard3DShotCamera(
+          value50['scenes'][count5],
+          shotId,
+          camera,
+          {
+            subjectBounds: subjectBounds,
+            subjectForward: subjectForward,
+            compositionHint: compositionHint,
+            now: now11,
+          },
+        ),
+        shot = findShot(replaceStoryboard3DShotCamera2, shotId);
+      if (shot) delete shot['thumbnailUrl'];
+      return ((value50['scenes'][count5] = replaceStoryboard3DShotCamera2), !![]);
+    },
+    now11,
+  );
+}
+export function createStoryboard3DShotThumbnailToken(enabled2, enabled3) {
+  if (!enabled2 || !enabled3?.['id'] || !enabled3?.['camera'])
+    throw new Error('A\x20scene\x20id\x20and\x20persisted\x20shot\x20camera\x20are\x20required');
+  return {
+    kind: 'storyboard3d-shot-thumbnail-token',
+    version: 0x1,
+    sceneId: String(enabled2),
+    shotId: String(enabled3['id']),
+    cameraSignature: stableCameraSignature(enabled3['camera']),
+    shotUpdatedAt: Math['max'](0x0, finite(enabled3['updatedAt'], 0x0)),
+  };
+}
+export function applyStoryboard3DShotThumbnail(value52, value53, value54, { now: now12 } = {}) {
+  const cloneStoryboard3DProject3 = cloneStoryboard3DProject(value52);
+  if (value53?.['kind'] !== 'storyboard3d-shot-thumbnail-token' || value53?.['version'] !== 0x1)
+    return { project: cloneStoryboard3DProject3, applied: ![], reason: 'invalid-token' };
+  const scene3 = findScene(cloneStoryboard3DProject3, value53['sceneId']),
+    shot2 = findShot(scene3, value53['shotId']);
+  if (!shot2) return { project: cloneStoryboard3DProject3, applied: ![], reason: 'shot-not-found' };
+  if (
+    stableCameraSignature(shot2['camera']) !== value53['cameraSignature'] ||
+    Math['max'](0x0, finite(shot2['updatedAt'], 0x0)) !== value53['shotUpdatedAt']
+  )
+    return { project: cloneStoryboard3DProject3, applied: ![], reason: 'stale-token' };
+  const name7 = normalizeName(value54);
+  if (!name7) return { project: cloneStoryboard3DProject3, applied: ![], reason: 'invalid-thumbnail' };
+  return (
+    (shot2['thumbnailUrl'] = name7),
+    (shot2['updatedAt'] = resolveNow(value52, now12)),
+    (cloneStoryboard3DProject3['updatedAt'] = shot2['updatedAt']),
+    { project: cloneStoryboard3DProject3, applied: !![], reason: 'applied' }
+  );
+}

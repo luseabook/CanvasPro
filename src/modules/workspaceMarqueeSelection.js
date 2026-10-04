@@ -1,293 +1,285 @@
 export const WORKSPACE_MARQUEE_DRAG_THRESHOLD = 0x5;
-function normalizeCoordinate(_0x3054c1) {
-  const _0x4a0d88 = Number(_0x3054c1);
-  return Number['isFinite'](_0x4a0d88) ? _0x4a0d88 : 0x0;
+function normalizeCoordinate(value) {
+  const item = Number(value);
+  return Number['isFinite'](item) ? item : 0x0;
 }
-function normalizeSelector(_0x165152) {
-  return String(_0x165152 || '')['trim']();
+function normalizeSelector(key) {
+  return String(key || '')['trim']();
 }
-function clamp(_0x316112, _0x2cc6aa, _0x22a801) {
-  return Math['max'](_0x2cc6aa, Math['min'](_0x22a801, _0x316112));
+function clamp(index, result, data) {
+  return Math['max'](result, Math['min'](data, index));
 }
 export function hasWorkspaceMarqueeDrag(
-  _0x466632,
-  _0x185d64,
-  _0x410c14,
-  _0x1c6e0d,
-  _0x2775f8 = WORKSPACE_MARQUEE_DRAG_THRESHOLD,
+  options,
+  target,
+  source,
+  next,
+  current = WORKSPACE_MARQUEE_DRAG_THRESHOLD,
 ) {
-  const _0x26a122 = normalizeCoordinate(_0x410c14) - normalizeCoordinate(_0x466632),
-    _0x5eceb2 = normalizeCoordinate(_0x1c6e0d) - normalizeCoordinate(_0x185d64);
-  return Math['hypot'](_0x26a122, _0x5eceb2) >= Math['max'](0x0, normalizeCoordinate(_0x2775f8));
+  const coordinate = normalizeCoordinate(source) - normalizeCoordinate(options),
+    coordinate2 = normalizeCoordinate(next) - normalizeCoordinate(target);
+  return Math['hypot'](coordinate, coordinate2) >= Math['max'](0x0, normalizeCoordinate(current));
 }
-export function createWorkspaceMarqueeRect(_0x20647a, _0x19ea34, _0x229115, _0x22a8d6, _0x3d33dd = null) {
-  let _0x4dad71 = normalizeCoordinate(_0x20647a),
-    _0x329f70 = normalizeCoordinate(_0x19ea34),
-    _0x2a1edf = normalizeCoordinate(_0x229115),
-    _0x491a97 = normalizeCoordinate(_0x22a8d6);
-  if (_0x3d33dd) {
-    const _0x54d21b = normalizeCoordinate(_0x3d33dd['left']),
-      _0x173c89 = normalizeCoordinate(_0x3d33dd['top']),
-      _0x188e1e = Math['max'](_0x54d21b, normalizeCoordinate(_0x3d33dd['right'])),
-      _0x54d3f8 = Math['max'](_0x173c89, normalizeCoordinate(_0x3d33dd['bottom']));
-    ((_0x4dad71 = clamp(_0x4dad71, _0x54d21b, _0x188e1e)),
-      (_0x2a1edf = clamp(_0x2a1edf, _0x54d21b, _0x188e1e)),
-      (_0x329f70 = clamp(_0x329f70, _0x173c89, _0x54d3f8)),
-      (_0x491a97 = clamp(_0x491a97, _0x173c89, _0x54d3f8)));
+export function createWorkspaceMarqueeRect(entry, record, payload, handle, box = null) {
+  let coordinate3 = normalizeCoordinate(entry),
+    coordinate4 = normalizeCoordinate(record),
+    coordinate5 = normalizeCoordinate(payload),
+    coordinate6 = normalizeCoordinate(handle);
+  if (box) {
+    const coordinate7 = normalizeCoordinate(box['left']),
+      coordinate8 = normalizeCoordinate(box['top']),
+      state = Math['max'](coordinate7, normalizeCoordinate(box['right'])),
+      config = Math['max'](coordinate8, normalizeCoordinate(box['bottom']));
+    ((coordinate3 = clamp(coordinate3, coordinate7, state)),
+      (coordinate5 = clamp(coordinate5, coordinate7, state)),
+      (coordinate4 = clamp(coordinate4, coordinate8, config)),
+      (coordinate6 = clamp(coordinate6, coordinate8, config)));
   }
-  const _0x424cb0 = Math['min'](_0x4dad71, _0x2a1edf),
-    _0xd51337 = Math['min'](_0x329f70, _0x491a97),
-    _0x3b576d = Math['max'](_0x4dad71, _0x2a1edf),
-    _0xee0d16 = Math['max'](_0x329f70, _0x491a97);
+  const left = Math['min'](coordinate3, coordinate5),
+    top = Math['min'](coordinate4, coordinate6),
+    right = Math['max'](coordinate3, coordinate5),
+    bottom = Math['max'](coordinate4, coordinate6);
   return {
-    left: _0x424cb0,
-    top: _0xd51337,
-    right: _0x3b576d,
-    bottom: _0xee0d16,
-    width: _0x3b576d - _0x424cb0,
-    height: _0xee0d16 - _0xd51337,
+    left: left,
+    top: top,
+    right: right,
+    bottom: bottom,
+    width: right - left,
+    height: bottom - top,
   };
 }
-export function doesWorkspaceMarqueeIntersect(_0x1f2fdb, _0x79fbff) {
-  if (!_0x1f2fdb || !_0x79fbff) return ![];
+export function doesWorkspaceMarqueeIntersect(box2, box3) {
+  if (!box2 || !box3) return ![];
   return !(
-    normalizeCoordinate(_0x79fbff['right']) < normalizeCoordinate(_0x1f2fdb['left']) ||
-    normalizeCoordinate(_0x79fbff['left']) > normalizeCoordinate(_0x1f2fdb['right']) ||
-    normalizeCoordinate(_0x79fbff['bottom']) < normalizeCoordinate(_0x1f2fdb['top']) ||
-    normalizeCoordinate(_0x79fbff['top']) > normalizeCoordinate(_0x1f2fdb['bottom'])
+    normalizeCoordinate(box3['right']) < normalizeCoordinate(box2['left']) ||
+    normalizeCoordinate(box3['left']) > normalizeCoordinate(box2['right']) ||
+    normalizeCoordinate(box3['bottom']) < normalizeCoordinate(box2['top']) ||
+    normalizeCoordinate(box3['top']) > normalizeCoordinate(box2['bottom'])
   );
 }
-export function resolveWorkspaceMarqueeSelection(
-  _0x480e7e = [],
-  _0x212050 = [],
-  { additive: additive = ![] } = {},
-) {
-  const _0x41ce6f = new Set(
-    additive && Array['isArray'](_0x212050)
-      ? _0x212050['map']((_0x4241ab) => String(_0x4241ab ?? '')['trim']())['filter'](Boolean)
+export function resolveWorkspaceMarqueeSelection(list = [], list2 = [], { additive: additive = ![] } = {}) {
+  const args = new Set(
+    additive && Array['isArray'](list2)
+      ? list2['map']((scope) => String(scope ?? '')['trim']())['filter'](Boolean)
       : [],
   );
   return (
-    (Array['isArray'](_0x480e7e) ? _0x480e7e : [])
-      ['map']((_0x10d650) => String(_0x10d650 ?? '')['trim']())
+    (Array['isArray'](list) ? list : [])
+      ['map']((input) => String(input ?? '')['trim']())
       ['filter'](Boolean)
-      ['forEach']((_0x591508) => _0x41ce6f['add'](_0x591508)),
-    [..._0x41ce6f]
+      ['forEach']((output) => args['add'](output)),
+    [...args]
   );
 }
 export function createWorkspaceMarqueeSelectionController({
-  root: _0x3e0afc,
-  documentObject: _0xef9fa2,
-  windowObject: _0x2fea08,
-  getConfig: _0x13030a,
-  surfaceSelector: _0x5d8e4b,
+  root: root,
+  documentObject: documentObject,
+  windowObject: windowObject,
+  getConfig: getConfig,
+  surfaceSelector: surfaceSelector,
   resolveSurface: resolveSurface = null,
   blockedControlSelector: blockedControlSelector = '',
   overlayClassName: overlayClassName = '',
-  itemSelector: _0x119678,
-  getItemId: _0x3b4613,
+  itemSelector: itemSelector,
+  getItemId: getItemId,
   hitClassName: hitClassName = 'is-marquee-hit',
   rootClassName: rootClassName = 'is-marquee-selecting',
   dragThreshold: dragThreshold = WORKSPACE_MARQUEE_DRAG_THRESHOLD,
   onActivate: onActivate = null,
   onCommit: onCommit = null,
 } = {}) {
-  if (!_0x3e0afc || !_0xef9fa2 || !_0x2fea08 || typeof _0x13030a !== 'function')
+  if (!root || !documentObject || !windowObject || typeof getConfig !== 'function')
     throw new Error('workspace marquee selection controller dependencies are incomplete');
-  const _0x3a4b8d = normalizeSelector(_0x5d8e4b),
-    _0x4d7e94 = normalizeSelector(blockedControlSelector),
-    _0x5a5d94 = normalizeSelector(overlayClassName),
-    _0x5a21fd = normalizeSelector(_0x119678),
-    _0x4ddda1 = normalizeSelector(hitClassName),
-    _0x294887 = normalizeSelector(rootClassName),
-    _0x5ebc77 = typeof _0x3b4613 === 'function' ? _0x3b4613 : null;
-  if (!_0x3a4b8d) throw new Error('workspace marquee selection surfaceSelector is required');
-  if (!_0x5a21fd || !_0x5ebc77)
+  const selector = normalizeSelector(surfaceSelector),
+    selector2 = normalizeSelector(blockedControlSelector),
+    baseOverlayClassName = normalizeSelector(overlayClassName),
+    selector3 = normalizeSelector(itemSelector),
+    selector4 = normalizeSelector(hitClassName),
+    selector5 = normalizeSelector(rootClassName),
+    enabled = typeof getItemId === 'function' ? getItemId : null;
+  if (!selector) throw new Error('workspace marquee selection surfaceSelector is required');
+  if (!selector3 || !enabled)
     throw new Error('workspace marquee selection itemSelector and getItemId are required');
-  let _0x4793ae = null,
-    _0x4af8ec = ![];
-  const _0x26d81d = () => {
-      const _0x36ddfc =
-          typeof _0x3e0afc['querySelectorAll'] === 'function' ? _0x3e0afc : _0x4793ae?.['surface'],
-        _0x76c089 = _0x4793ae?.['itemSelector'] || _0x5a21fd,
-        _0x11a32d = _0x4793ae?.['hitClassName'] || _0x4ddda1;
-      _0x76c089 &&
-        _0x11a32d &&
-        _0x36ddfc?.['querySelectorAll']?.(_0x76c089)['forEach']((_0x1a6f14) =>
-          _0x1a6f14['classList']['remove'](_0x11a32d),
-        );
-      _0x4793ae?.['overlay']?.['remove']?.();
-      const _0x9c5c27 = _0x4793ae?.['rootClassName'] || _0x294887;
-      if (_0x9c5c27) _0x3e0afc['classList']['remove'](_0x9c5c27);
+  let value2 = null,
+    enabled2 = ![];
+  const run = () => {
+      const el = typeof root['querySelectorAll'] === 'function' ? root : value2?.['surface'],
+        value3 = value2?.['itemSelector'] || selector3,
+        value4 = value2?.['hitClassName'] || selector4;
+      value3 &&
+        value4 &&
+        el?.['querySelectorAll']?.(value3)['forEach']((el2) => el2['classList']['remove'](value4));
+      value2?.['overlay']?.['remove']?.();
+      const value5 = value2?.['rootClassName'] || selector5;
+      if (value5) root['classList']['remove'](value5);
     },
-    _0x2efa61 = (_0x2102c8) => {
-      const _0x8bc8cf = _0x4793ae;
-      if (!_0x8bc8cf || _0x8bc8cf['pointerId'] !== _0x2102c8['pointerId']) return ![];
+    update = (event) => {
+      const event2 = value2;
+      if (!event2 || event2['pointerId'] !== event['pointerId']) return ![];
       if (
-        !_0x8bc8cf['active'] &&
+        !event2['active'] &&
         !hasWorkspaceMarqueeDrag(
-          _0x8bc8cf['startX'],
-          _0x8bc8cf['startY'],
-          _0x2102c8['clientX'],
-          _0x2102c8['clientY'],
-          _0x8bc8cf['dragThreshold'],
+          event2['startX'],
+          event2['startY'],
+          event['clientX'],
+          event['clientY'],
+          event2['dragThreshold'],
         )
       )
         return ![];
-      if (!_0x8bc8cf['active']) {
-        ((_0x8bc8cf['active'] = !![]),
-          (_0x8bc8cf['overlay'] = _0xef9fa2['createElement']('div')),
-          (_0x8bc8cf['overlay']['className'] = [
-            _0x8bc8cf['baseOverlayClassName'],
-            _0x8bc8cf['overlayClassName'],
-          ]
+      if (!event2['active']) {
+        ((event2['active'] = !![]),
+          (event2['overlay'] = documentObject['createElement']('div')),
+          (event2['overlay']['className'] = [event2['baseOverlayClassName'], event2['overlayClassName']]
             ['filter'](Boolean)
             ['join']('\x20')),
-          _0x8bc8cf['overlay']['setAttribute']('aria-hidden', 'true'),
-          _0x3e0afc['appendChild'](_0x8bc8cf['overlay']));
-        if (_0x8bc8cf['rootClassName']) _0x3e0afc['classList']['add'](_0x8bc8cf['rootClassName']);
+          event2['overlay']['setAttribute']('aria-hidden', 'true'),
+          root['appendChild'](event2['overlay']));
+        if (event2['rootClassName']) root['classList']['add'](event2['rootClassName']);
         onActivate?.();
         try {
-          _0x3e0afc['setPointerCapture']?.(_0x2102c8['pointerId']);
+          root['setPointerCapture']?.(event['pointerId']);
         } catch {}
       }
-      (_0x2102c8['preventDefault'](), _0x2102c8['stopPropagation']());
-      const _0x24423c = createWorkspaceMarqueeRect(
-        _0x8bc8cf['startX'],
-        _0x8bc8cf['startY'],
-        _0x2102c8['clientX'],
-        _0x2102c8['clientY'],
-        _0x8bc8cf['surface']['getBoundingClientRect'](),
+      (event['preventDefault'](), event['stopPropagation']());
+      const left2 = createWorkspaceMarqueeRect(
+        event2['startX'],
+        event2['startY'],
+        event['clientX'],
+        event['clientY'],
+        event2['surface']['getBoundingClientRect'](),
       );
-      Object['assign'](_0x8bc8cf['overlay']['style'], {
-        left: _0x24423c['left'] + 'px',
-        top: _0x24423c['top'] + 'px',
-        width: _0x24423c['width'] + 'px',
-        height: _0x24423c['height'] + 'px',
+      Object['assign'](event2['overlay']['style'], {
+        left: left2['left'] + 'px',
+        top: left2['top'] + 'px',
+        width: left2['width'] + 'px',
+        height: left2['height'] + 'px',
       });
-      const _0x5cb875 = [];
+      const list3 = [];
       return (
-        _0x8bc8cf['surface']['querySelectorAll'](_0x8bc8cf['itemSelector'])['forEach']((_0x30bdf0) => {
-          const _0xec8868 = doesWorkspaceMarqueeIntersect(_0x24423c, _0x30bdf0['getBoundingClientRect']());
-          _0x8bc8cf['hitClassName'] && _0x30bdf0['classList']['toggle'](_0x8bc8cf['hitClassName'], _0xec8868);
-          if (_0xec8868) _0x5cb875['push'](String(_0x8bc8cf['getItemId'](_0x30bdf0) || '')['trim']());
+        event2['surface']['querySelectorAll'](event2['itemSelector'])['forEach']((el3) => {
+          const doesWorkspaceMarqueeIntersect2 = doesWorkspaceMarqueeIntersect(
+            left2,
+            el3['getBoundingClientRect'](),
+          );
+          event2['hitClassName'] &&
+            el3['classList']['toggle'](event2['hitClassName'], doesWorkspaceMarqueeIntersect2);
+          if (doesWorkspaceMarqueeIntersect2) list3['push'](String(event2['getItemId'](el3) || '')['trim']());
         }),
-        (_0x8bc8cf['hitIds'] = _0x5cb875['filter'](Boolean)),
+        (event2['hitIds'] = list3['filter'](Boolean)),
         !![]
       );
     },
-    _0x491920 = (_0x44e44b, { cancelled: cancelled = ![] } = {}) => {
-      const _0x9527bd = _0x4793ae;
-      if (!_0x9527bd || _0x9527bd['pointerId'] !== _0x44e44b['pointerId']) return ![];
-      if (_0x9527bd['active'] && !cancelled) _0x2efa61(_0x44e44b);
-      const _0x5e9ee3 = _0x9527bd['active'] && !cancelled,
-        _0xc399a2 = _0x5e9ee3
-          ? resolveWorkspaceMarqueeSelection(_0x9527bd['hitIds'], _0x9527bd['initialSelectedIds'], {
-              additive: _0x9527bd['additive'],
+    finish = (event3, { cancelled: cancelled = ![] } = {}) => {
+      const additive2 = value2;
+      if (!additive2 || additive2['pointerId'] !== event3['pointerId']) return ![];
+      if (additive2['active'] && !cancelled) update(event3);
+      const enabled3 = additive2['active'] && !cancelled,
+        value6 = enabled3
+          ? resolveWorkspaceMarqueeSelection(additive2['hitIds'], additive2['initialSelectedIds'], {
+              additive: additive2['additive'],
             })
           : [];
-      (_0x26d81d(), (_0x4793ae = null));
+      (run(), (value2 = null));
       try {
-        _0x3e0afc['hasPointerCapture']?.(_0x44e44b['pointerId']) &&
-          _0x3e0afc['releasePointerCapture'](_0x44e44b['pointerId']);
+        root['hasPointerCapture']?.(event3['pointerId']) &&
+          root['releasePointerCapture'](event3['pointerId']);
       } catch {}
-      if (!_0x5e9ee3) return ![];
+      if (!enabled3) return ![];
       return (
-        _0x44e44b['preventDefault'](),
-        _0x44e44b['stopPropagation'](),
-        (_0x4af8ec = !![]),
-        _0x2fea08['setTimeout'](() => {
-          _0x4af8ec = ![];
+        event3['preventDefault'](),
+        event3['stopPropagation'](),
+        (enabled2 = !![]),
+        windowObject['setTimeout'](() => {
+          enabled2 = ![];
         }, 0x0),
-        _0x9527bd['commit'](_0xc399a2),
-        onCommit?.(_0xc399a2),
+        additive2['commit'](value6),
+        onCommit?.(value6),
         !![]
       );
     },
-    _0xdee925 = () => {
-      const _0x58d684 = _0x4793ae;
-      (_0x26d81d(), (_0x4793ae = null));
-      if (!_0x58d684) return ![];
+    cancel = () => {
+      const event4 = value2;
+      (run(), (value2 = null));
+      if (!event4) return ![];
       try {
-        _0x3e0afc['hasPointerCapture']?.(_0x58d684['pointerId']) &&
-          _0x3e0afc['releasePointerCapture'](_0x58d684['pointerId']);
+        root['hasPointerCapture']?.(event4['pointerId']) &&
+          root['releasePointerCapture'](event4['pointerId']);
       } catch {}
       return !![];
     },
-    _0x1f32e4 = (_0x3552b1) => _0x2efa61(_0x3552b1),
-    _0x49d723 = (_0x5d6d82) => _0x491920(_0x5d6d82),
-    _0x1162ba = (_0x38a575) => _0x491920(_0x38a575, { cancelled: !![] });
+    value7 = (value8) => update(value8),
+    value9 = (value10) => finish(value10),
+    value11 = (value12) => finish(value12, { cancelled: !![] });
   return (
-    _0x2fea08['addEventListener']?.('pointermove', _0x1f32e4, !![]),
-    _0x2fea08['addEventListener']?.('pointerup', _0x49d723, !![]),
-    _0x2fea08['addEventListener']?.('pointercancel', _0x1162ba, !![]),
+    windowObject['addEventListener']?.('pointermove', value7, !![]),
+    windowObject['addEventListener']?.('pointerup', value9, !![]),
+    windowObject['addEventListener']?.('pointercancel', value11, !![]),
     {
-      begin(_0x344040) {
+      begin(pointerId) {
         if (
-          _0x344040['button'] !== 0x0 ||
-          _0x344040['isPrimary'] === ![] ||
-          (_0x344040['pointerType'] && _0x344040['pointerType'] !== 'mouse')
+          pointerId['button'] !== 0x0 ||
+          pointerId['isPrimary'] === ![] ||
+          (pointerId['pointerType'] && pointerId['pointerType'] !== 'mouse')
         )
           return ![];
-        const _0x4161bd = resolveSurface
-          ? resolveSurface(_0x344040)
-          : _0x344040['target']['closest']?.(_0x3a4b8d);
-        if (!_0x4161bd || !_0x3e0afc['contains'](_0x4161bd)) return ![];
-        const _0x4c17c3 = _0x13030a(_0x4161bd);
+        const surface = resolveSurface
+          ? resolveSurface(pointerId)
+          : pointerId['target']['closest']?.(selector);
+        if (!surface || !root['contains'](surface)) return ![];
+        const commit = getConfig(surface);
         if (
-          !_0x4c17c3?.['enabled'] ||
-          typeof _0x4c17c3['commit'] !== 'function' ||
-          _0x4c17c3['canBegin']?.(_0x344040) === ![]
+          !commit?.['enabled'] ||
+          typeof commit['commit'] !== 'function' ||
+          commit['canBegin']?.(pointerId) === ![]
         )
           return ![];
-        const _0x1389e3 = normalizeSelector(_0x4c17c3['blockedControlSelector'] ?? _0x4d7e94),
-          _0x5c4bc4 = normalizeSelector(_0x4c17c3['itemSelector'] || _0x5a21fd),
-          _0x45c4d5 = typeof _0x4c17c3['getItemId'] === 'function' ? _0x4c17c3['getItemId'] : _0x5ebc77,
-          _0x2d35ee = _0x1389e3 ? _0x344040['target']['closest']?.(_0x1389e3) : null;
-        if (_0x2d35ee && !_0x2d35ee['matches']?.(_0x5c4bc4)) return ![];
+        const selector6 = normalizeSelector(commit['blockedControlSelector'] ?? selector2),
+          itemSelector2 = normalizeSelector(commit['itemSelector'] || selector3),
+          getItemId2 = typeof commit['getItemId'] === 'function' ? commit['getItemId'] : enabled,
+          enabled4 = selector6 ? pointerId['target']['closest']?.(selector6) : null;
+        if (enabled4 && !enabled4['matches']?.(itemSelector2)) return ![];
         return (
-          _0xdee925(),
-          (_0x4793ae = {
-            pointerId: _0x344040['pointerId'],
-            startX: Number(_0x344040['clientX']) || 0x0,
-            startY: Number(_0x344040['clientY']) || 0x0,
+          cancel(),
+          (value2 = {
+            pointerId: pointerId['pointerId'],
+            startX: Number(pointerId['clientX']) || 0x0,
+            startY: Number(pointerId['clientY']) || 0x0,
             additive:
-              typeof _0x4c17c3['additive'] === 'boolean'
-                ? _0x4c17c3['additive']
-                : _0x344040['shiftKey'] === !![] ||
-                  _0x344040['ctrlKey'] === !![] ||
-                  _0x344040['metaKey'] === !![],
-            initialSelectedIds: Array['isArray'](_0x4c17c3['selectedIds'])
-              ? [..._0x4c17c3['selectedIds']]
-              : [],
+              typeof commit['additive'] === 'boolean'
+                ? commit['additive']
+                : pointerId['shiftKey'] === !![] ||
+                  pointerId['ctrlKey'] === !![] ||
+                  pointerId['metaKey'] === !![],
+            initialSelectedIds: Array['isArray'](commit['selectedIds']) ? [...commit['selectedIds']] : [],
             hitIds: [],
             active: ![],
             overlay: null,
-            baseOverlayClassName: _0x5a5d94,
-            overlayClassName: normalizeSelector(_0x4c17c3['overlayClassName']),
-            itemSelector: _0x5c4bc4,
-            hitClassName: normalizeSelector(_0x4c17c3['hitClassName'] ?? _0x4ddda1),
-            rootClassName: normalizeSelector(_0x4c17c3['rootClassName'] ?? _0x294887),
-            getItemId: _0x45c4d5,
-            dragThreshold: Math['max'](0x0, normalizeCoordinate(_0x4c17c3['dragThreshold'] ?? dragThreshold)),
-            surface: _0x4161bd,
-            commit: _0x4c17c3['commit'],
+            baseOverlayClassName: baseOverlayClassName,
+            overlayClassName: normalizeSelector(commit['overlayClassName']),
+            itemSelector: itemSelector2,
+            hitClassName: normalizeSelector(commit['hitClassName'] ?? selector4),
+            rootClassName: normalizeSelector(commit['rootClassName'] ?? selector5),
+            getItemId: getItemId2,
+            dragThreshold: Math['max'](0x0, normalizeCoordinate(commit['dragThreshold'] ?? dragThreshold)),
+            surface: surface,
+            commit: commit['commit'],
           }),
           !![]
         );
       },
-      update: _0x2efa61,
-      finish: _0x491920,
-      cancel: _0xdee925,
-      consumeClick(_0x54f2a5) {
-        if (!_0x4af8ec) return ![];
-        return ((_0x4af8ec = ![]), _0x54f2a5['preventDefault'](), _0x54f2a5['stopPropagation'](), !![]);
+      update: update,
+      finish: finish,
+      cancel: cancel,
+      consumeClick(event5) {
+        if (!enabled2) return ![];
+        return ((enabled2 = ![]), event5['preventDefault'](), event5['stopPropagation'](), !![]);
       },
       destroy() {
-        (_0xdee925(),
-          _0x2fea08['removeEventListener']?.('pointermove', _0x1f32e4, !![]),
-          _0x2fea08['removeEventListener']?.('pointerup', _0x49d723, !![]),
-          _0x2fea08['removeEventListener']?.('pointercancel', _0x1162ba, !![]));
+        (cancel(),
+          windowObject['removeEventListener']?.('pointermove', value7, !![]),
+          windowObject['removeEventListener']?.('pointerup', value9, !![]),
+          windowObject['removeEventListener']?.('pointercancel', value11, !![]));
       },
     }
   );

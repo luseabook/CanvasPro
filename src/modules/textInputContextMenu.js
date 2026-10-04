@@ -9,251 +9,247 @@ function getWindow() {
 function getDocument() {
   return globalThis.document || null;
 }
-function textInputContextMenuText(_0x568d78, _0x5338fb = {}) {
-  return t('textInputContextMenu.' + _0x568d78, _0x5338fb);
+function textInputContextMenuText(value, item = {}) {
+  return t('textInputContextMenu.' + value, item);
 }
-function isInputElement(_0x57d12c) {
-  return String(_0x57d12c?.tagName || '').toUpperCase() === 'INPUT';
+function isInputElement(key) {
+  return String(key?.tagName || '').toUpperCase() === 'INPUT';
 }
-function isTextAreaElement(_0x4e7e17) {
-  return String(_0x4e7e17?.tagName || '').toUpperCase() === 'TEXTAREA';
+function isTextAreaElement(index) {
+  return String(index?.tagName || '').toUpperCase() === 'TEXTAREA';
 }
-function isContentEditableElement(_0x14c1b2) {
+function isContentEditableElement(result) {
   return (
-    _0x14c1b2?.isContentEditable === true ||
-    String(_0x14c1b2?.getAttribute?.('contenteditable') || '').toLowerCase() === 'true' ||
-    String(_0x14c1b2?.contentEditable || '').toLowerCase() === 'true'
+    result?.isContentEditable === true ||
+    String(result?.getAttribute?.('contenteditable') || '').toLowerCase() === 'true' ||
+    String(result?.contentEditable || '').toLowerCase() === 'true'
   );
 }
-function isWritableTextInput(_0x27b4a2) {
-  if (!isInputElement(_0x27b4a2)) return false;
-  const _0x16e3f0 = String(_0x27b4a2.type || '').toLowerCase();
-  return TEXT_INPUT_TYPES.has(_0x16e3f0) && !_0x27b4a2.disabled && !_0x27b4a2.readOnly;
+function isWritableTextInput(el) {
+  if (!isInputElement(el)) return false;
+  const data = String(el.type || '').toLowerCase();
+  return TEXT_INPUT_TYPES.has(data) && !el.disabled && !el.readOnly;
 }
-function isWritableTextArea(_0x45956d) {
-  return isTextAreaElement(_0x45956d) && !_0x45956d.disabled && !_0x45956d.readOnly;
+function isWritableTextArea(el2) {
+  return isTextAreaElement(el2) && !el2.disabled && !el2.readOnly;
 }
-export function getEditableTextTarget(_0x124695) {
-  if (!_0x124695) return null;
-  const _0x398dc3 = _0x124695.closest?.("input, textarea, [contenteditable='true']") || _0x124695;
-  if (isWritableTextInput(_0x398dc3) || isWritableTextArea(_0x398dc3) || isContentEditableElement(_0x398dc3))
-    return _0x398dc3;
+export function getEditableTextTarget(el3) {
+  if (!el3) return null;
+  const options = el3.closest?.("input, textarea, [contenteditable='true']") || el3;
+  if (isWritableTextInput(options) || isWritableTextArea(options) || isContentEditableElement(options))
+    return options;
   return null;
 }
-export function isEditableTextTargetInGroupedNode(_0x1776fe, _0x5e6f58 = {}) {
-  const _0x57594 = getEditableTextTarget(_0x1776fe);
-  if (!_0x57594) return false;
-  const _0x1bbc8a = _0x57594.closest?.('.v2-node'),
-    _0x1fdd07 = String(_0x1bbc8a?.dataset?.nodeId || _0x1bbc8a?.id || '').trim();
-  if (!_0x1fdd07) return false;
-  const _0x3f1f21 = _0x5e6f58?.[_0x1fdd07],
-    _0x2217b5 = String(_0x3f1f21?.parentId || '').trim();
-  if (!_0x2217b5) return false;
-  return _0x5e6f58?.[_0x2217b5]?.type === 'group';
+export function isEditableTextTargetInGroupedNode(target, source = {}) {
+  const el4 = getEditableTextTarget(target);
+  if (!el4) return false;
+  const el5 = el4.closest?.('.v2-node'),
+    enabled = String(el5?.dataset?.nodeId || el5?.id || '').trim();
+  if (!enabled) return false;
+  const next = source?.[enabled],
+    enabled2 = String(next?.parentId || '').trim();
+  if (!enabled2) return false;
+  return source?.[enabled2]?.type === 'group';
 }
 function closeTextInputContextMenu() {
   getDocument()
     ?.querySelectorAll?.(MENU_SELECTOR)
-    ?.forEach((_0xb61821) => _0xb61821.remove());
+    ?.forEach((el6) => el6.remove());
 }
-function dispatchInputEvent(_0xfbae4d) {
-  const _0x4292e2 = _0xfbae4d?.ownerDocument?.defaultView || getWindow(),
-    _0x43bf79 = _0x4292e2?.InputEvent || _0x4292e2?.Event || globalThis.Event;
-  if (typeof _0x43bf79 !== 'function' || typeof _0xfbae4d?.dispatchEvent !== 'function') return;
-  _0xfbae4d.dispatchEvent(new _0x43bf79('input', { bubbles: true }));
+function dispatchInputEvent(current) {
+  const entry = current?.ownerDocument?.defaultView || getWindow(),
+    handler = entry?.InputEvent || entry?.Event || globalThis.Event;
+  if (typeof handler !== 'function' || typeof current?.dispatchEvent !== 'function') return;
+  current.dispatchEvent(new handler('input', { bubbles: true }));
 }
-function clampSelection(_0x241dc0, _0x38b86c) {
-  const _0x45a974 = Number(_0x241dc0);
-  if (!Number.isFinite(_0x45a974)) return _0x38b86c;
-  return Math.max(0, Math.min(_0x38b86c, _0x45a974));
+function clampSelection(record, payload) {
+  const handle = Number(record);
+  if (!Number.isFinite(handle)) return payload;
+  return Math.max(0, Math.min(payload, handle));
 }
-function setFieldSelection(_0x46fac0, _0x5d7c96, _0x39f294) {
-  if (typeof _0x46fac0?.setSelectionRange !== 'function') return;
+function setFieldSelection(state, config, scope) {
+  if (typeof state?.setSelectionRange !== 'function') return;
   try {
-    _0x46fac0.setSelectionRange(_0x5d7c96, _0x39f294);
+    state.setSelectionRange(config, scope);
   } catch {}
 }
-export function captureEditableSelection(_0x11b2a1) {
-  if (isWritableTextInput(_0x11b2a1) || isWritableTextArea(_0x11b2a1)) {
-    const _0x79806c = String(_0x11b2a1.value || '').length;
+export function captureEditableSelection(el7) {
+  if (isWritableTextInput(el7) || isWritableTextArea(el7)) {
+    const input = String(el7.value || '').length;
     return {
       kind: 'field',
-      start: clampSelection(_0x11b2a1.selectionStart, _0x79806c),
-      end: clampSelection(_0x11b2a1.selectionEnd, _0x79806c),
+      start: clampSelection(el7.selectionStart, input),
+      end: clampSelection(el7.selectionEnd, input),
     };
   }
-  const _0x191a3d = _0x11b2a1?.ownerDocument?.defaultView || getWindow(),
-    _0x3851c4 = _0x191a3d?.getSelection?.();
-  if (!_0x3851c4 || _0x3851c4.rangeCount === 0) return null;
-  const _0x23c09c = _0x3851c4.getRangeAt(0),
-    _0x258579 = _0x23c09c.commonAncestorContainer;
-  if (!_0x11b2a1.contains?.(_0x258579)) return null;
-  return { kind: 'contenteditable', range: _0x23c09c.cloneRange() };
+  const dom = el7?.ownerDocument?.defaultView || getWindow(),
+    enabled3 = dom?.getSelection?.();
+  if (!enabled3 || enabled3.rangeCount === 0) return null;
+  const range = enabled3.getRangeAt(0),
+    output = range.commonAncestorContainer;
+  if (!el7.contains?.(output)) return null;
+  return { kind: 'contenteditable', range: range.cloneRange() };
 }
-function restoreEditableSelection(_0x2599cc, _0x25edce) {
-  if (!_0x25edce) return;
-  if (_0x25edce.kind === 'field') {
-    (_0x2599cc.focus?.({ preventScroll: true }),
-      setFieldSelection(_0x2599cc, _0x25edce.start, _0x25edce.end));
+function restoreEditableSelection(el8, enabled4) {
+  if (!enabled4) return;
+  if (enabled4.kind === 'field') {
+    (el8.focus?.({ preventScroll: true }), setFieldSelection(el8, enabled4.start, enabled4.end));
     return;
   }
-  if (_0x25edce.kind !== 'contenteditable' || !_0x25edce.range) return;
-  _0x2599cc.focus?.({ preventScroll: true });
-  const _0x2ff151 = _0x2599cc?.ownerDocument?.defaultView || getWindow(),
-    _0x396263 = _0x2ff151?.getSelection?.();
-  if (!_0x396263) return;
-  (_0x396263.removeAllRanges(), _0x396263.addRange(_0x25edce.range));
+  if (enabled4.kind !== 'contenteditable' || !enabled4.range) return;
+  el8.focus?.({ preventScroll: true });
+  const dom2 = el8?.ownerDocument?.defaultView || getWindow(),
+    enabled5 = dom2?.getSelection?.();
+  if (!enabled5) return;
+  (enabled5.removeAllRanges(), enabled5.addRange(enabled4.range));
 }
-function insertTextIntoField(_0x1957a7, _0x436e71, _0x126193) {
-  const _0xc20c1c = String(_0x1957a7.value || ''),
-    _0x26ed81 = clampSelection(_0x126193?.start ?? _0x1957a7.selectionStart, _0xc20c1c.length),
-    _0x246c1d = clampSelection(_0x126193?.end ?? _0x1957a7.selectionEnd, _0xc20c1c.length);
-  _0x1957a7.focus?.({ preventScroll: true });
-  if (typeof _0x1957a7.setRangeText === 'function')
+function insertTextIntoField(el9, list, value2) {
+  const list2 = String(el9.value || ''),
+    clampSelection2 = clampSelection(value2?.start ?? el9.selectionStart, list2.length),
+    clampSelection3 = clampSelection(value2?.end ?? el9.selectionEnd, list2.length);
+  el9.focus?.({ preventScroll: true });
+  if (typeof el9.setRangeText === 'function')
     try {
-      _0x1957a7.setRangeText(_0x436e71, _0x26ed81, _0x246c1d, 'end');
-    } catch (_0x347249) {
-      _0x1957a7.value = _0xc20c1c.slice(0, _0x26ed81) + _0x436e71 + _0xc20c1c.slice(_0x246c1d);
-      const _0x460f53 = _0x26ed81 + _0x436e71.length;
-      setFieldSelection(_0x1957a7, _0x460f53, _0x460f53);
+      el9.setRangeText(list, clampSelection2, clampSelection3, 'end');
+    } catch (value3) {
+      el9.value = list2.slice(0, clampSelection2) + list + list2.slice(clampSelection3);
+      const value4 = clampSelection2 + list.length;
+      setFieldSelection(el9, value4, value4);
     }
   else {
-    _0x1957a7.value = _0xc20c1c.slice(0, _0x26ed81) + _0x436e71 + _0xc20c1c.slice(_0x246c1d);
-    const _0x5153a2 = _0x26ed81 + _0x436e71.length;
-    setFieldSelection(_0x1957a7, _0x5153a2, _0x5153a2);
+    el9.value = list2.slice(0, clampSelection2) + list + list2.slice(clampSelection3);
+    const value5 = clampSelection2 + list.length;
+    setFieldSelection(el9, value5, value5);
   }
-  return (dispatchInputEvent(_0x1957a7), true);
+  return (dispatchInputEvent(el9), true);
 }
-function insertTextIntoContentEditable(_0x311d96, _0x541c6a, _0x43d909) {
-  const _0x1360db = _0x311d96?.ownerDocument || getDocument();
-  (_0x311d96.focus?.({ preventScroll: true }), restoreEditableSelection(_0x311d96, _0x43d909));
-  if (typeof _0x1360db?.execCommand === 'function')
+function insertTextIntoContentEditable(el10, value6, value7) {
+  const dom3 = el10?.ownerDocument || getDocument();
+  (el10.focus?.({ preventScroll: true }), restoreEditableSelection(el10, value7));
+  if (typeof dom3?.execCommand === 'function')
     try {
-      if (_0x1360db.execCommand('insertText', false, _0x541c6a)) return true;
+      if (dom3.execCommand('insertText', false, value6)) return true;
     } catch {}
-  const _0x330bb2 = _0x1360db?.defaultView || getWindow(),
-    _0x2b7560 = _0x330bb2?.getSelection?.();
-  if (_0x2b7560 && _0x2b7560.rangeCount > 0) {
-    const _0x28ba63 = _0x2b7560.getRangeAt(0);
-    _0x28ba63.deleteContents();
-    const _0x1e05c4 = _0x1360db.createTextNode(String(_0x541c6a || ''));
-    (_0x28ba63.insertNode(_0x1e05c4),
-      _0x28ba63.setStartAfter(_0x1e05c4),
-      _0x28ba63.collapse(true),
-      _0x2b7560.removeAllRanges(),
-      _0x2b7560.addRange(_0x28ba63));
+  const dom4 = dom3?.defaultView || getWindow(),
+    value8 = dom4?.getSelection?.();
+  if (value8 && value8.rangeCount > 0) {
+    const value9 = value8.getRangeAt(0);
+    value9.deleteContents();
+    const value10 = dom3.createTextNode(String(value6 || ''));
+    (value9.insertNode(value10),
+      value9.setStartAfter(value10),
+      value9.collapse(true),
+      value8.removeAllRanges(),
+      value8.addRange(value9));
   } else
-    typeof _0x311d96.appendChild === 'function' && _0x1360db?.createTextNode
-      ? _0x311d96.appendChild(_0x1360db.createTextNode(String(_0x541c6a || '')))
-      : (_0x311d96.textContent = '' + (_0x311d96.textContent || '') + _0x541c6a);
-  return (dispatchInputEvent(_0x311d96), true);
+    typeof el10.appendChild === 'function' && dom3?.createTextNode
+      ? el10.appendChild(dom3.createTextNode(String(value6 || '')))
+      : (el10.textContent = '' + (el10.textContent || '') + value6);
+  return (dispatchInputEvent(el10), true);
 }
-export function insertPlainTextIntoEditable(_0x118651, _0x34178a, _0x332e62 = null) {
-  const _0x221507 = getEditableTextTarget(_0x118651);
-  if (!_0x221507 || typeof _0x34178a !== 'string') return false;
-  if (isWritableTextInput(_0x221507) || isWritableTextArea(_0x221507))
-    return insertTextIntoField(_0x221507, _0x34178a, _0x332e62);
-  if (isContentEditableElement(_0x221507))
-    return insertTextIntoContentEditable(_0x221507, _0x34178a, _0x332e62);
+export function insertPlainTextIntoEditable(value11, value12, value13 = null) {
+  const editableTextTarget = getEditableTextTarget(value11);
+  if (!editableTextTarget || typeof value12 !== 'string') return false;
+  if (isWritableTextInput(editableTextTarget) || isWritableTextArea(editableTextTarget))
+    return insertTextIntoField(editableTextTarget, value12, value13);
+  if (isContentEditableElement(editableTextTarget))
+    return insertTextIntoContentEditable(editableTextTarget, value12, value13);
   return false;
 }
 async function readClipboardText() {
-  const _0x5076b9 = globalThis.navigator?.clipboard?.readText;
-  if (typeof _0x5076b9 !== 'function') return null;
-  return _0x5076b9.call(globalThis.navigator.clipboard);
+  const value14 = globalThis.navigator?.clipboard?.readText;
+  if (typeof value14 !== 'function') return null;
+  return value14.call(globalThis.navigator.clipboard);
 }
-export async function pasteTextIntoEditableFromClipboard(_0x2f4755, _0x2a7e0a) {
-  let _0x390881 = null;
+export async function pasteTextIntoEditableFromClipboard(value15, value16) {
+  let clipboardText = null;
   try {
-    _0x390881 = await readClipboardText();
-  } catch (_0x101d5a) {
+    clipboardText = await readClipboardText();
+  } catch (value17) {
     return (getWindow()?.showToast?.(textInputContextMenuText('clipboardReadFailed'), 'error'), false);
   }
-  if (typeof _0x390881 !== 'string')
+  if (typeof clipboardText !== 'string')
     return (getWindow()?.showToast?.(textInputContextMenuText('clipboardUnsupported'), 'error'), false);
-  if (!_0x390881)
+  if (!clipboardText)
     return (getWindow()?.showToast?.(textInputContextMenuText('clipboardEmpty'), 'warn'), false);
-  return insertPlainTextIntoEditable(_0x2f4755, _0x390881, _0x2a7e0a);
+  return insertPlainTextIntoEditable(value15, clipboardText, value16);
 }
-function placeMenu(_0x267d67, _0x400404, _0x1e7c78) {
-  const _0x4db862 = getDocument(),
-    _0x3b4b35 = getWindow();
-  _0x4db862?.body?.appendChild(_0x267d67);
-  const _0x1d30d9 = _0x267d67.offsetWidth || 180,
-    _0x13e2fb = _0x267d67.offsetHeight || 44,
-    _0x4ef9c9 = _0x3b4b35 && _0x400404 + _0x1d30d9 > _0x3b4b35.innerWidth ? _0x400404 - _0x1d30d9 : _0x400404,
-    _0x1bcb27 =
-      _0x3b4b35 && _0x1e7c78 + _0x13e2fb > _0x3b4b35.innerHeight ? _0x1e7c78 - _0x13e2fb : _0x1e7c78;
-  ((_0x267d67.style.left = Math.max(0, _0x4ef9c9) + 'px'),
-    (_0x267d67.style.top = Math.max(0, _0x1bcb27) + 'px'));
+function placeMenu(el11, value18, value19) {
+  const dom5 = getDocument(),
+    window = getWindow();
+  dom5?.body?.appendChild(el11);
+  const value20 = el11.offsetWidth || 180,
+    value21 = el11.offsetHeight || 44,
+    value22 = window && value18 + value20 > window.innerWidth ? value18 - value20 : value18,
+    value23 = window && value19 + value21 > window.innerHeight ? value19 - value21 : value19;
+  ((el11.style.left = Math.max(0, value22) + 'px'), (el11.style.top = Math.max(0, value23) + 'px'));
 }
 export function showTextInputContextMenu({
-  target: _0x5887e6,
-  screenX: _0x99b5b4,
-  screenY: _0x11aa67,
-  snapshot: _0x38a984,
+  target: target2,
+  screenX: screenX,
+  screenY: screenY,
+  snapshot: snapshot,
 }) {
-  const _0x319eba = getDocument();
-  if (!_0x319eba?.createElement) return;
-  const _0xfae8e = _0x38a984 === undefined ? captureEditableSelection(_0x5887e6) : _0x38a984;
+  const el12 = getDocument();
+  if (!el12?.createElement) return;
+  const value24 = snapshot === undefined ? captureEditableSelection(target2) : snapshot;
   (closeTextInputContextMenu(),
-    _0x319eba.querySelectorAll?.('.v2-canvas-ctx-menu')?.forEach((_0x557b10) => _0x557b10.remove()));
-  const _0x260975 = _0x319eba.createElement('div');
-  _0x260975.className = 'v2-canvas-ctx-menu v2-text-input-context-menu';
-  const _0x4715be = _0x319eba.createElement('div');
-  _0x4715be.className = 'v2-menu-row v2-menu-row-split';
-  const _0x1c2a79 = _0x319eba.createElement('span');
-  ((_0x1c2a79.textContent = textInputContextMenuText('pasteText')), _0x4715be.appendChild(_0x1c2a79));
-  const _0xa7562e = _0x319eba.createElement('span');
-  ((_0xa7562e.className = 'v2-menu-kbd'),
-    (_0xa7562e.textContent = 'Ctrl V'),
-    _0x4715be.appendChild(_0xa7562e),
-    _0x4715be.addEventListener('pointerdown', async (_0x35e3d5) => {
-      (_0x35e3d5.preventDefault(),
-        _0x35e3d5.stopPropagation(),
-        _0x260975.remove(),
-        restoreEditableSelection(_0x5887e6, _0xfae8e),
-        await pasteTextIntoEditableFromClipboard(_0x5887e6, _0xfae8e));
+    el12.querySelectorAll?.('.v2-canvas-ctx-menu')?.forEach((el13) => el13.remove()));
+  const el14 = el12.createElement('div');
+  el14.className = 'v2-canvas-ctx-menu v2-text-input-context-menu';
+  const el15 = el12.createElement('div');
+  el15.className = 'v2-menu-row v2-menu-row-split';
+  const el16 = el12.createElement('span');
+  ((el16.textContent = textInputContextMenuText('pasteText')), el15.appendChild(el16));
+  const el17 = el12.createElement('span');
+  ((el17.className = 'v2-menu-kbd'),
+    (el17.textContent = 'Ctrl V'),
+    el15.appendChild(el17),
+    el15.addEventListener('pointerdown', async (event) => {
+      (event.preventDefault(),
+        event.stopPropagation(),
+        el14.remove(),
+        restoreEditableSelection(target2, value24),
+        await pasteTextIntoEditableFromClipboard(target2, value24));
     }),
-    _0x260975.appendChild(_0x4715be),
-    placeMenu(_0x260975, _0x99b5b4, _0x11aa67));
-  const _0x211960 = (_0x37efc2) => {
-      if (_0x260975.contains(_0x37efc2.target)) return;
-      (_0x260975.remove(),
-        _0x319eba.removeEventListener('pointerdown', _0x211960, true),
-        _0x319eba.removeEventListener('keydown', _0x5871c3, true));
+    el14.appendChild(el15),
+    placeMenu(el14, screenX, screenY));
+  const value25 = (event2) => {
+      if (el14.contains(event2.target)) return;
+      (el14.remove(),
+        el12.removeEventListener('pointerdown', value25, true),
+        el12.removeEventListener('keydown', value26, true));
     },
-    _0x5871c3 = (_0xa0ea9c) => {
-      if (_0xa0ea9c.key !== 'Escape') return;
-      (_0x260975.remove(),
-        _0x319eba.removeEventListener('pointerdown', _0x211960, true),
-        _0x319eba.removeEventListener('keydown', _0x5871c3, true));
+    value26 = (event3) => {
+      if (event3.key !== 'Escape') return;
+      (el14.remove(),
+        el12.removeEventListener('pointerdown', value25, true),
+        el12.removeEventListener('keydown', value26, true));
     };
   getWindow()?.requestAnimationFrame?.(() => {
-    (_0x319eba.addEventListener('pointerdown', _0x211960, true),
-      _0x319eba.addEventListener('keydown', _0x5871c3, true));
+    (el12.addEventListener('pointerdown', value25, true), el12.addEventListener('keydown', value26, true));
   });
 }
-export function initTextInputContextMenu(_0x4ee9a6 = getDocument()) {
-  if (!_0x4ee9a6?.addEventListener) return () => {};
-  const _0x298321 = (_0x12d235) => {
-    if (_0x12d235.defaultPrevented) return;
-    const _0x22d7c7 = getEditableTextTarget(_0x12d235.target);
-    if (!_0x22d7c7) return;
-    (_0x12d235.preventDefault(), _0x12d235.stopPropagation());
-    const _0x3cf874 = captureEditableSelection(_0x22d7c7);
-    (_0x22d7c7.focus?.({ preventScroll: true }),
+export function initTextInputContextMenu(el18 = getDocument()) {
+  if (!el18?.addEventListener) return () => {};
+  const value27 = (screenX2) => {
+    if (screenX2.defaultPrevented) return;
+    const target3 = getEditableTextTarget(screenX2.target);
+    if (!target3) return;
+    (screenX2.preventDefault(), screenX2.stopPropagation());
+    const snapshot2 = captureEditableSelection(target3);
+    (target3.focus?.({ preventScroll: true }),
       showTextInputContextMenu({
-        target: _0x22d7c7,
-        screenX: _0x12d235.clientX || 0,
-        screenY: _0x12d235.clientY || 0,
-        snapshot: _0x3cf874,
+        target: target3,
+        screenX: screenX2.clientX || 0,
+        screenY: screenX2.clientY || 0,
+        snapshot: snapshot2,
       }));
   };
   return (
-    _0x4ee9a6.addEventListener('contextmenu', _0x298321),
+    el18.addEventListener('contextmenu', value27),
     () => {
-      (_0x4ee9a6.removeEventListener('contextmenu', _0x298321), closeTextInputContextMenu());
+      (el18.removeEventListener('contextmenu', value27), closeTextInputContextMenu());
     }
   );
 }

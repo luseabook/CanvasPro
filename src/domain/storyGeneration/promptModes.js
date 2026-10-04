@@ -33,45 +33,45 @@ export const STORY_PROMPT_MODE_OPTIONS = Object['freeze']([
     rules: 'minimax-h3-multimodal-story',
   }),
 ]);
-function normalizeText(_0x3e71a9) {
-  return String(_0x3e71a9 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-export function normalizeStoryPromptMode(_0x503467, { allowDeveloperModes: allowDeveloperModes = ![] } = {}) {
-  const _0x29ec7d = normalizeText(_0x503467)['toLowerCase']();
+export function normalizeStoryPromptMode(item, { allowDeveloperModes: allowDeveloperModes = ![] } = {}) {
+  const text = normalizeText(item)['toLowerCase']();
   return STORY_PROMPT_MODE_OPTIONS['some'](
-    (_0x1d60f3) => _0x1d60f3['value'] === _0x29ec7d && (_0x1d60f3['enabled'] || allowDeveloperModes),
+    (el) => el['value'] === text && (el['enabled'] || allowDeveloperModes),
   )
-    ? _0x29ec7d
+    ? text
     : STORY_PROMPT_MODE_SEEDANCE_2_0;
 }
-export function getStoryPromptModeLabel(_0x131e0d) {
-  const _0x484285 = normalizeText(_0x131e0d)['toLowerCase']();
+export function getStoryPromptModeLabel(key) {
+  const text2 = normalizeText(key)['toLowerCase']();
   return (
-    STORY_PROMPT_MODE_OPTIONS['find']((_0x590b96) => _0x590b96['value'] === _0x484285)?.['label'] ||
+    STORY_PROMPT_MODE_OPTIONS['find']((el2) => el2['value'] === text2)?.['label'] ||
     STORY_PROMPT_MODE_OPTIONS[0x0]['label']
   );
 }
-export function isStorySeedance25PromptMode(_0x1af15c) {
-  return normalizeText(_0x1af15c)['toLowerCase']() === STORY_PROMPT_MODE_SEEDANCE_2_5;
+export function isStorySeedance25PromptMode(index) {
+  return normalizeText(index)['toLowerCase']() === STORY_PROMPT_MODE_SEEDANCE_2_5;
 }
-export function isStoryWan30PromptMode(_0x1cb157) {
-  return normalizeText(_0x1cb157)['toLowerCase']() === STORY_PROMPT_MODE_WAN_3_0;
+export function isStoryWan30PromptMode(result) {
+  return normalizeText(result)['toLowerCase']() === STORY_PROMPT_MODE_WAN_3_0;
 }
-export function isStoryMinimaxH3PromptMode(_0x236324) {
-  return normalizeText(_0x236324)['toLowerCase']() === STORY_PROMPT_MODE_MINIMAX_H3;
+export function isStoryMinimaxH3PromptMode(data) {
+  return normalizeText(data)['toLowerCase']() === STORY_PROMPT_MODE_MINIMAX_H3;
 }
-export function isStoryContinuousTimelinePromptMode(_0x318723) {
-  return isStorySeedance25PromptMode(_0x318723) || isStoryWan30PromptMode(_0x318723);
+export function isStoryContinuousTimelinePromptMode(options) {
+  return isStorySeedance25PromptMode(options) || isStoryWan30PromptMode(options);
 }
-export function resolveStoryPromptModeDefaultVideoModelId(_0x37b603) {
-  const _0x4e7591 = normalizeText(_0x37b603)['toLowerCase']();
+export function resolveStoryPromptModeDefaultVideoModelId(target) {
+  const text3 = normalizeText(target)['toLowerCase']();
   return (
     {
       [STORY_PROMPT_MODE_SEEDANCE_2_0]: STORY_PROMPT_MODE_SEEDANCE_2_0_DEFAULT_VIDEO_MODEL_ID,
       [STORY_PROMPT_MODE_SEEDANCE_2_5]: STORY_PROMPT_MODE_SEEDANCE_2_5_DEFAULT_VIDEO_MODEL_ID,
       [STORY_PROMPT_MODE_WAN_3_0]: STORY_PROMPT_MODE_WAN_3_0_DEFAULT_VIDEO_MODEL_ID,
       [STORY_PROMPT_MODE_MINIMAX_H3]: STORY_PROMPT_MODE_MINIMAX_H3_DEFAULT_VIDEO_MODEL_ID,
-    }[_0x4e7591] || ''
+    }[text3] || ''
   );
 }
 const STORY_MINIMAX_H3_REFERENCE_TAG_LABELS = Object['freeze']({
@@ -89,35 +89,35 @@ const STORY_MINIMAX_H3_REFERENCE_TAG_LABELS = Object['freeze']({
     overall_soundscape: 'overall_soundscape',
     non_diegetic_music: 'non_diegetic_music',
   });
-function formatStoryMinimaxH3DetailedBody(_0xd12a38 = '') {
-  const _0xf888dc = String(_0xd12a38 || '')['trim'](),
-    _0x453113 = /\[Shot\s+\d+\](?:\s+At\s+\d{2}:\d{2}\.\d{3}，镜头切换为新镜头。)?/gu,
-    _0x105473 = [..._0xf888dc['matchAll'](_0x453113)];
-  if (!_0x105473['length']) return _0xf888dc;
-  const _0x34ac8d = _0xf888dc['slice'](0x0, _0x105473[0x0]['index'])['trim'](),
-    _0x1f9657 = _0x105473['map']((_0x4faff6, _0x1d3979) => {
-      const _0x59a0f5 = Number(_0x4faff6['index']) + _0x4faff6[0x0]['length'],
-        _0x37307f = _0x105473[_0x1d3979 + 0x1]?.['index'] ?? _0xf888dc['length'],
-        _0x22b590 = _0xf888dc['slice'](_0x59a0f5, _0x37307f)
+function formatStoryMinimaxH3DetailedBody(source = '') {
+  const list = String(source || '')['trim'](),
+    next = /\[Shot\s+\d+\](?:\s+At\s+\d{2}:\d{2}\.\d{3}，镜头切换为新镜头。)?/gu,
+    list2 = [...list['matchAll'](next)];
+  if (!list2['length']) return list;
+  const current = list['slice'](0x0, list2[0x0]['index'])['trim'](),
+    args = list2['map']((entry, record) => {
+      const payload = Number(entry['index']) + entry[0x0]['length'],
+        handle = list2[record + 0x1]?.['index'] ?? list['length'],
+        state = list['slice'](payload, handle)
           ['trim']()
           ['replace'](
             /[ \t]+(?=(?:<Subject \d+>|角色[^\s]+|说话人) \(S\d+\) (?:说|以画外音说)：<d>)/gu,
             '\x0a',
           )
           ['replace'](new RegExp('[ \\t]+(?=' + STORY_MINIMAX_H3_DIEGETIC_SOUND_LABEL + '：)', 'gu'), '\x0a');
-      return [_0x4faff6[0x0], _0x22b590]['filter'](Boolean)['join']('\x0a');
+      return [entry[0x0], state]['filter'](Boolean)['join']('\x0a');
     });
-  return [_0x34ac8d, ..._0x1f9657]['filter'](Boolean)['join']('\x0a\x0a');
+  return [current, ...args]['filter'](Boolean)['join']('\x0a\x0a');
 }
-export function formatStoryMinimaxH3PromptLayout(_0x80a95b = '') {
-  return String(_0x80a95b || '')['replace'](
+export function formatStoryMinimaxH3PromptLayout(config = '') {
+  return String(config || '')['replace'](
     /(^|\n)(detailed_description|integrated_multimodal_description):[ \t]*\n?([\s\S]*?)(?=\n+overall_soundscape:)/u,
-    (_0x512a9f, _0x15c1b2, _0x2e3f15, _0x4b394d) =>
-      '' + _0x15c1b2 + _0x2e3f15 + ':\x0a' + formatStoryMinimaxH3DetailedBody(_0x4b394d),
+    (scope, input, output, value2) =>
+      '' + input + output + ':\x0a' + formatStoryMinimaxH3DetailedBody(value2),
   );
 }
-export function normalizeStoryMinimaxH3OfficialTags(_0x14194a = '') {
-  const _0x3176fc = String(_0x14194a || '')
+export function normalizeStoryMinimaxH3OfficialTags(value3 = '') {
+  const value4 = String(value3 || '')
     ['replace'](/&(?:amp;)?lt;|&#0*60;|&#x0*3c;|＜/giu, '<')
     ['replace'](/&(?:amp;)?gt;|&#0*62;|&#x0*3e;|＞/giu, '>')
     ['replace'](/&(?:amp;)?nbsp;|&#0*160;|&#x0*a0;/giu, '\x20')
@@ -126,121 +126,119 @@ export function normalizeStoryMinimaxH3OfficialTags(_0x14194a = '') {
     ['replace'](/同步声音\s*[：:]/gu, STORY_MINIMAX_H3_DIEGETIC_SOUND_LABEL + '：')
     ['replace'](
       /<\s*(Subject|Picture|Video|Audio)\s+(\d+)\s*>/giu,
-      (_0x5b07a3, _0x10cadb, _0x1d6aff) =>
-        '<' + STORY_MINIMAX_H3_REFERENCE_TAG_LABELS[_0x10cadb['toLowerCase']()] + '\x20' + _0x1d6aff + '>',
+      (value5, value6, value7) =>
+        '<' + STORY_MINIMAX_H3_REFERENCE_TAG_LABELS[value6['toLowerCase']()] + '\x20' + value7 + '>',
     )
     ['replace'](/(<Subject \d+>)(?=[（(\u3400-\u9fff])/gu, '$1 ')
-    ['replace'](/<\s*(\/?)\s*d\s*>/giu, (_0x54eb73, _0x1090c5) => '<' + (_0x1090c5 ? '/' : '') + 'd>')
-    ['replace'](
-      /<\s*(scenetrans|cutoff)\s*>/giu,
-      (_0x53b5ce, _0x5e2402) => '<' + _0x5e2402['toLowerCase']() + '>',
-    )
-    ['replace'](/\[\s*Shot\s+(\d+)\s*\]/giu, (_0x2ce0d0, _0x4548f6) => '[Shot\x20' + _0x4548f6 + ']')
+    ['replace'](/<\s*(\/?)\s*d\s*>/giu, (value8, value9) => '<' + (value9 ? '/' : '') + 'd>')
+    ['replace'](/<\s*(scenetrans|cutoff)\s*>/giu, (value10, value11) => '<' + value11['toLowerCase']() + '>')
+    ['replace'](/\[\s*Shot\s+(\d+)\s*\]/giu, (value12, value13) => '[Shot\x20' + value13 + ']')
     ['replace'](/\[\s*Chinese\s*\]/giu, '[Chinese]')
     ['replace'](/\[\s*reference\s+generation\s*\]/giu, '[reference\x20generation]')
-    ['replace'](/[（(]\s*S\s*(\d+)\s*[）)]/giu, (_0x257b47, _0x556abd) => '(S' + _0x556abd + ')')
+    ['replace'](/[（(]\s*S\s*(\d+)\s*[）)]/giu, (value14, value15) => '(S' + value15 + ')')
     ['replace'](/(\(S\d+\))(?=[\u3400-\u9fff])/gu, '$1 ')
     ['replace'](
       /(^|\n)([\t ]*)(?:#{1,6}[\t ]*|\*{1,2})?(subject[\s_-]*definitions|summary|retention[\s_-]*analysis|detailed[\s_-]*description|integrated[\s_-]*multimodal[\s_-]*description|overall[\s_-]*soundscape|non[\s_-]*diegetic[\s_-]*music)\s*[:：](?:\*{1,2})?/giu,
-      (_0x1947da, _0x1d8bf2, _0x1ccfe9, _0x4d8434) => {
-        const _0x5c33f0 =
-          STORY_MINIMAX_H3_SECTION_LABELS[_0x4d8434['toLowerCase']()['replace'](/[\s-]+/gu, '_')];
-        return '' + _0x1d8bf2 + _0x1ccfe9 + _0x5c33f0 + ':';
+      (value16, value17, value18, value19) => {
+        const value20 = STORY_MINIMAX_H3_SECTION_LABELS[value19['toLowerCase']()['replace'](/[\s-]+/gu, '_')];
+        return '' + value17 + value18 + value20 + ':';
       },
     )
     ['replace'](/(<Subject \d+>[^\n:]*:\s*)fully_preserved\b/giu, '$1fully_preserved')
     ['replace'](/(<Audio \d+>\s*:\s*)reference\b/giu, '$1reference')
     ['replace'](/(\[Shot \d+\]\s+)At\b/giu, '$1At');
-  return formatStoryMinimaxH3PromptLayout(_0x3176fc);
+  return formatStoryMinimaxH3PromptLayout(value4);
 }
-function convertStoryMinimaxH3ReferencePromptToT2VA(_0x4440e1 = '') {
-  const _0x2912e1 = String(_0x4440e1 || ''),
-    _0x5ae81e = _0x2912e1['match'](
+function convertStoryMinimaxH3ReferencePromptToT2VA(value21 = '') {
+  const value22 = String(value21 || ''),
+    enabled = value22['match'](
       /(?:^|\n\n)detailed_description:\s*([\s\S]*?)\n\noverall_soundscape:/u,
     )?.[0x1]?.['trim'](),
-    _0x22c61d = _0x2912e1['match'](
+    enabled2 = value22['match'](
       /(?:^|\n\n)overall_soundscape:\s*([\s\S]*?)\n\nnon_diegetic_music:/u,
     )?.[0x1]?.['trim'](),
-    _0x56c850 = _0x2912e1['match'](/(?:^|\n\n)non_diegetic_music:\s*([\s\S]*)$/u)?.[0x1]?.['trim']();
-  if (!_0x5ae81e || !_0x22c61d || !_0x56c850) return _0x2912e1;
-  const _0x5aa851 = new Map(),
-    _0x306819 = _0x2912e1['match'](/^subject_definitions:\s*([\s\S]*?)\n\nsummary:/u)?.[0x1] || '';
+    enabled3 = value22['match'](/(?:^|\n\n)non_diegetic_music:\s*([\s\S]*)$/u)?.[0x1]?.['trim']();
+  if (!enabled || !enabled2 || !enabled3) return value22;
+  const map = new Map(),
+    args2 = value22['match'](/^subject_definitions:\s*([\s\S]*?)\n\nsummary:/u)?.[0x1] || '';
   [
     /<Subject\s+(\d+)>\s+是(?:角色|场景|环境|道具)\s+([^，；\n]+)/gu,
     /<Subject\s+(\d+)>\s+is\s+the\s+(?:character|environment|prop)\s+([^,;\n]+)/gu,
-  ]['forEach']((_0x17e5ed) => {
-    [..._0x306819['matchAll'](_0x17e5ed)]['forEach']((_0x4ac3ab) => {
-      _0x5aa851['set'](_0x4ac3ab[0x1], _0x4ac3ab[0x2]['trim']());
+  ]['forEach']((value23) => {
+    [...args2['matchAll'](value23)]['forEach']((value24) => {
+      map['set'](value24[0x1], value24[0x2]['trim']());
     });
   });
-  const _0x5ed46d = _0x5ae81e['replace'](
+  const value25 = enabled['replace'](
     /<Subject\s+(\d+)>/gu,
-    (_0x5a9a7c, _0x4b6494) => _0x5aa851['get'](_0x4b6494) || '参考主体\x20' + _0x4b6494,
+    (value26, value27) => map['get'](value27) || '参考主体\x20' + value27,
   );
   return formatStoryMinimaxH3PromptLayout(
     [
-      'integrated_multimodal_description:\n' + _0x5ed46d,
-      'overall_soundscape:\x0a' + _0x22c61d,
-      'non_diegetic_music:\n' + _0x56c850,
+      'integrated_multimodal_description:\n' + value25,
+      'overall_soundscape:\x0a' + enabled2,
+      'non_diegetic_music:\n' + enabled3,
     ]['join']('\x0a\x0a'),
   );
 }
-export function serializeStoryPromptForMode(_0x56d51a = '', _0x2a687c = '') {
-  const _0x5850dc = String(_0x56d51a || '');
-  if (isStoryMinimaxH3PromptMode(_0x2a687c)) {
-    let _0x3ec65e = normalizeStoryMinimaxH3OfficialTags(_0x5850dc)
+export function serializeStoryPromptForMode(value28 = '', value29 = '') {
+  const value30 = String(value28 || '');
+  if (isStoryMinimaxH3PromptMode(value29)) {
+    let storyMinimaxH3OfficialTags = normalizeStoryMinimaxH3OfficialTags(value30)
       ['replace'](/@(?:图片|图像)(\d+)/gu, '<Picture $1>')
       ['replace'](/@视频(\d+)/gu, '<Video\x20$1>')
       ['replace'](/@(?:声音|音频)(\d+)/gu, '<Audio $1>');
-    if (!/<(?:Picture|Video)\s+\d+>/u['test'](_0x3ec65e))
-      return convertStoryMinimaxH3ReferencePromptToT2VA(_0x3ec65e['replace'](/<Audio\s+\d+>/gu, ''));
-    const _0x13645e = new Map();
-    _0x3ec65e['split']('\x0a')['forEach']((_0x486770) => {
-      const _0x31d267 = _0x486770['match'](/<Subject\s+(\d+)>/u)?.[0x1];
-      if (!_0x31d267) return;
-      [..._0x486770['matchAll'](/<Audio\s+(\d+)>/gu)]['forEach']((_0x1c90b0) => {
-        _0x13645e['set'](_0x1c90b0[0x1], _0x31d267);
+    if (!/<(?:Picture|Video)\s+\d+>/u['test'](storyMinimaxH3OfficialTags))
+      return convertStoryMinimaxH3ReferencePromptToT2VA(
+        storyMinimaxH3OfficialTags['replace'](/<Audio\s+\d+>/gu, ''),
+      );
+    const list3 = new Map();
+    storyMinimaxH3OfficialTags['split']('\x0a')['forEach']((args3) => {
+      const enabled4 = args3['match'](/<Subject\s+(\d+)>/u)?.[0x1];
+      if (!enabled4) return;
+      [...args3['matchAll'](/<Audio\s+(\d+)>/gu)]['forEach']((value31) => {
+        list3['set'](value31[0x1], enabled4);
       });
     });
-    if (!_0x13645e['size']) return _0x3ec65e;
-    const _0xda8427 = [],
-      _0x321af3 = [],
-      _0x53a3b0 = [];
+    if (!list3['size']) return storyMinimaxH3OfficialTags;
+    const list4 = [],
+      list5 = [],
+      list6 = [];
     return (
-      _0x13645e['forEach']((_0x3eb0a1, _0xa17b68) => {
-        const _0x358a77 = _0x3ec65e['match'](
-            new RegExp('<Subject\\s+' + _0x3eb0a1 + '>\x5cs+\x5c((S\x5cd+)\x5c)', 'u'),
+      list3['forEach']((value32, value33) => {
+        const value34 = storyMinimaxH3OfficialTags['match'](
+            new RegExp('<Subject\\s+' + value32 + '>\x5cs+\x5c((S\x5cd+)\x5c)', 'u'),
           )?.[0x1],
-          _0xa07818 = '<Subject ' + _0x3eb0a1 + '>' + (_0x358a77 ? '\x20(' + _0x358a77 + ')' : '');
-        (_0xda8427['push']('<Audio ' + _0xa17b68 + '> 是 ' + _0xa07818 + ' 的声线、语气与说话方式参考。'),
-          _0x321af3['push'](
+          value35 = '<Subject ' + value32 + '>' + (value34 ? '\x20(' + value34 + ')' : '');
+        (list4['push']('<Audio ' + value33 + '> 是 ' + value35 + ' 的声线、语气与说话方式参考。'),
+          list5['push'](
             '<Audio\x20' +
-              _0xa17b68 +
+              value33 +
               '>: reference - <Audio ' +
-              _0xa17b68 +
+              value33 +
               '>\x20为\x20' +
-              _0xa07818 +
+              value35 +
               ' 提供声线、语气与说话方式参考。',
           ),
-          _0x53a3b0['push'](_0xa07818 + ' 的 <Audio ' + _0xa17b68 + '>'));
+          list6['push'](value35 + ' 的 <Audio ' + value33 + '>'));
       }),
-      (_0x3ec65e = _0x3ec65e['replace'](
+      (storyMinimaxH3OfficialTags = storyMinimaxH3OfficialTags['replace'](
         /\n\nsummary:/u,
-        '\x0a' + _0xda8427['join']('\x0a') + '\x0a\x0asummary:',
+        '\x0a' + list4['join']('\x0a') + '\x0a\x0asummary:',
       )
         ['replace'](
           /\n\nretention_analysis:/u,
-          ' 目标还使用' + _0x53a3b0['join']('、') + '。\n\nretention_analysis:',
+          ' 目标还使用' + list6['join']('、') + '。\n\nretention_analysis:',
         )
         ['replace'](
           /\n\ndetailed_description:/u,
-          '\x0a' + _0x321af3['join']('\x0a') + '\n\ndetailed_description:',
+          '\x0a' + list5['join']('\x0a') + '\n\ndetailed_description:',
         )),
-      _0x3ec65e
+      storyMinimaxH3OfficialTags
     );
   }
-  if (!isStoryWan30PromptMode(_0x2a687c)) return _0x5850dc;
-  return _0x5850dc['replace'](/@图片(\d+)/gu, '图$1')
+  if (!isStoryWan30PromptMode(value29)) return value30;
+  return value30['replace'](/@图片(\d+)/gu, '图$1')
     ['replace'](/@视频(\d+)/gu, '视频$1')
     ['replace'](/@(?:声音|音频)(\d+)/gu, '音频$1');
 }
