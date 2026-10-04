@@ -5,6 +5,7 @@
 
 
 - 2026-10-04（154 批·接线第 5 小样）：升代授权目录 gain≥2 干净件 13 取 11（AssetManager、sceneNodeActions、shortcuts、ImageCrop/FreeAngle/Matting、agent 两件、imageAnnotate/rendering、SourceAudioNode、textGenerationResultRenderer，改名 3999、导出面 0 丢弃），孤立 313→**291**（累计 77；483 口径 445/1238，imageAnnotate 组清零）。resultRenderModule（7）与 previewControlsModule（1）回滚；desktopProjectFileStore 5 例 stash 复核为 HEAD 既有环境失败。全量 11185/11184/0 零失败。
+- 2026-10-04（155 批）：干净件 gain≥1 清尾 21 取 17（textToolbar、WebPreviewNode、CanvasTabManager、GenerationHistoryFileManager、canvasNodeFlows、canvasCommands 2 件、clipboard、imagePreview、EdgeController、nodeResizePreview、settings 2 件、textInputContextMenu、ui/rendererUiEvents、services 2 件），孤立 291→**272**（累计 96；483 口径 437）。SourceImageNode、mediaPlaybackRecovery、keying/removeAction 共 7 例回滚。全量 11185/11182/3 基线一致。
 - 2026-10-04（153 批·接线第 4 小样）：升代授权目录干净件 7 取 4（MediaClipNode、PanoramaSceneNode、SettingsManager、appPanels，改名 1759、导出面不变），孤立 341→**313**（累计 55；483 口径 461/1238，canvasShortcuts 与 tutorials 清零）。DragController（10 例）、videoToolbar（3）、nodePromptShared（1，aigenImage 连带）行为回归回滚。教训：目录测试须含全部下游子目录。全量 11185/11181/4，回滚后名单与基线一致。
 - 2026-10-04（152 批·接线第 3 小样）：升代 api 干净件 10 取 3（imageUploadApi、runninghubWorkflowApi、sceneDetectionApi，落地件改名 231、导出面 0 丢弃），再接通孤立 4 件（368 口径 345→341；483 口径 api 组 4→2 为 472/1238）。7 件行为回归回滚：ModelApiManifestNormalizer 50 例、aiImageApi 38、aiVideoApi 9、resolvers/index 7、aiTextApi 6、providerConnectionTestApi 6、aiAudioApi 1——api 域新代含密集真实行为变化，回归密度远高于 core/commands。全量 11185/11182/3 与基线逐条一致。
 

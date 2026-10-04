@@ -6,7 +6,7 @@
 > 最后更新：2026-09-29 · 已提交并推送 `master` 至 `4c3bc6c`；随后按用户要求停用跟踪。124a–f 的提交曾推 `origin/port/batches-1-122a`，该分支 2026-09-28 经用户授权本地与 origin 双删（3c3b3ae 可恢复）。
 > 第 125k/125l 清零 `src/modules` 直属层；第 126/127 批实测孤岛 483/1238、未落地 771、首波过闸门 260。
 > 第 128–141 批落地首波 135 件 510 例（132 清零 `src/modules` 候选、136 清零 `src/core`、137–141 清 `src/components`，回归 7426/7383/43；130 发现 `core/math.js` 死循环）——见 `docs/b126-reachability.md`、`docs/b127-porting-backlog.md`（§11）。
-> 已落：第 119–125l 批 168 件，128–141 又落 135 件，全部未接线。原未落地 771，**现已清零**（第 142 批复算：镜像范围 1754 件仓库 0 缺失、闸门 MISSING_TOTAL=0）；余 **269 个未接线孤立模块**（§7.6；第 150–156 批接线 99 件）。
+> 已落：第 119–125l 批 168 件，128–141 又落 135 件，全部未接线。原未落地 771，**现已清零**（第 142 批复算：镜像范围 1754 件仓库 0 缺失、闸门 MISSING_TOTAL=0）；余 **201 个未接线孤立模块**（§7.6；第 150–157 批接线 167 件）。
 
 ## 0. 现状速览
 
@@ -18,7 +18,7 @@
 - **必须清楚的偏差**：第 84 批以来的新增移植多数是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
   - 增量台账（`docs/tracking/orphans.md`）**已由第 126 批实测重算**：**483 个入口不可达 / 1238 个非测试 JS 模块**（断链 0；重算方法与在用触达分析见 `docs/b126-reachability.md`）。第 150 批接线后重算 **474 / 1238**。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
-- **下一步**：移植欠账**已清零**（第 142 批复算：镜像范围 1754 件仓库 0 缺失、首波 326 件闸门 `MISSING_TOTAL=0`，66 件受阻件随既有件升代一并解阻）。剩余 **269 个未接线孤立模块**（第 150–156 批已接 99 件），接线方案见 `docs/porting-closure-and-wiring-plan.md`；接线须改在用文件，需用户授权后开工。
+- **下一步**：移植欠账**已清零**（第 142 批复算：镜像范围 1754 件仓库 0 缺失、首波 326 件闸门 `MISSING_TOTAL=0`，66 件受阻件随既有件升代一并解阻）。剩余 **201 个未接线孤立模块**（第 150–157 批已接 167 件），接线方案见 `docs/porting-closure-and-wiring-plan.md`；接线须改在用文件，需用户授权后开工。
   - 125a–125l 的逐件清单见对应专题；远端 master 是否推送须用户另行选择（会触发发布路径），不自行推。
 - **变更记录**：当前已暂停。用户要求恢复前，不再运行跟踪命令或自动监视；机制原文见 §12。
 
@@ -184,8 +184,8 @@ node tools/tracking/track.mjs --status
 | api sweep | 791 / 791 / 0（135 复跑未变）；证据 `b131-api-raw.tap` |
 | electron sweep | 1649 / 1648 / 1（R14 第 17 批遗留） |
 | 静态检查 | 本批 10 个源与同名测试 `node --check` 20/20 通过；Python 文件都能 `ast.parse`（2026-09-25 镜像离线检查）。124g/124h 至 141 新增源与同名测试逐批通过 |
-| 孤立模块 | 第 126/130 批口径 **483 / 1238**（断链 0）；第 150–155 批接线后 **437 / 1238**（imageAnnotate 组清零）。完整清单见 `docs/tracking/orphans.md`，方法见 `docs/b126-reachability.md` |
-| 移植欠账 | 第 127 批实测原欠账 **771**；第 128–141 批落首波 135 件（510 例）。**第 142 批复算已清零**：镜像范围 1754 件仓库 0 缺失、首波闸门 `MISSING_TOTAL=0`。剩余 **269 个未接线孤立模块**（第 150–156 批接 99 件），方案见 `docs/porting-closure-and-wiring-plan.md` |
+| 孤立模块 | 第 126/130 批口径 **483 / 1238**（断链 0）；第 150–157 批接线后 **403 / 1238**（imageAnnotate 组清零）。完整清单见 `docs/tracking/orphans.md`，方法见 `docs/b126-reachability.md` |
+| 移植欠账 | 第 127 批实测原欠账 **771**；第 128–141 批落首波 135 件（510 例）。**第 142 批复算已清零**：镜像范围 1754 件仓库 0 缺失、首波闸门 `MISSING_TOTAL=0`。剩余 **201 个未接线孤立模块**（第 150–157 批接 167 件），方案见 `docs/porting-closure-and-wiring-plan.md` |
 | 变更记录 | `docs/tracking/changes/2026-09.md`（基线 #0001 纳入 1824 个文件）；最新编号用 `track.mjs --status` 查看 |
 | 台账 | `docs/implementation-handoff.md`，1 325 173 B / 1773 行，**已冻结**（§8 第 3 条） |
 
@@ -234,7 +234,7 @@ node tools/tracking/track.mjs --status
 
 ### 7.2 之后的纯新增队列
 
-1. **全仓移植欠账（第 142 批复算，替代第 127 批口径）**：原未落地 **771 件，现已清零** —— 镜像范围（`api/ src/ vendor/ main.js`）**1754 件非测试模块在仓库 0 缺失**，首波 326 件重跑闸门 **`MISSING_TOTAL=0`**，原 66 件受阻件随既有件升代一并解阻；循环 0、断链 0、解析失败 0。**真正的剩余是接线**：可达性重算 scope 1992 / 可达 1723 / **孤立 269**。接线方案见 `docs/porting-closure-and-wiring-plan.md`。
+1. **全仓移植欠账（第 142 批复算，替代第 127 批口径）**：原未落地 **771 件，现已清零** —— 镜像范围（`api/ src/ vendor/ main.js`）**1754 件非测试模块在仓库 0 缺失**，首波 326 件重跑闸门 **`MISSING_TOTAL=0`**，原 66 件受阻件随既有件升代一并解阻；循环 0、断链 0、解析失败 0。**真正的剩余是接线**：可达性重算 scope 1992 / 可达 1791 / **孤立 201**。接线方案见 `docs/porting-closure-and-wiring-plan.md`。
    - 已落（第 119–125l 批共 168 件）：`api/story-generation/` 23、`storyWorkspace` 27、`collaboration` 24、`app` 13、`personReplacement` 25、`runninghubAiApp` 6、`panoramaSceneNode` 9、9 个目录 16、`src/modules` 直属 47、OK 队列 69（13/13/10/10/10/10/3）；逐件清单见 §6 引言与各期专题，均未接线。
    - 旧「OK 队列可落件余 0」只是 `src/modules` **直属**一层的清零（125l 达成），不代表全仓无件可落；现行队列一律以 §7.6 为准。
 2. **下一段队列**：继续按首波推进（`src/components` 11 → `src/manifests` 20），沿用 §4 单批工序；第 128–141 批专题按 `src-modules-batch128.md`、`src-core-batch133.md`、`src-components-batch137.md` 及后续编号。130 批发现 `core/math.js` 死循环缺陷，修复须单独授权。
@@ -366,9 +366,9 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-04（156 批·manifests 层侦察）：11 件纯新增候选全过机械工序，闭包对 modelRegistry + vendorVideoModelApiManifests 已在批内闭合、裸导入全通过。但 10/11 属规格变更型——接通 0.7.16 模型 manifest 后 api 域 67 例断言 0.4.12 旧规格失败（baseline 1000/1000 全绿）。最终只落 `api/errors/ErrorParser.js`（+3 解析器、0 失败），孤立 272→**269**（累计 99）；全量 11185/11182/3 零回归。余 10 件待裁决是否采纳 0.7.16 模型规格。
+- 2026-10-04（157 批·脏件批）：27 件脏件全过机械工序，27 件全落地后 70 例失败 → 逐件归因＋补测，回滚 12 件（taskOrchestrationModule 与 AIGenAudioNode 各 12、SourceVideoNode 8、modelApiResolvers 7、projectLifecycle 6 等），**落地 15 件**。孤立 269→**201**（接通 80，含 renderer 12 个 renderer* 与 agent 15 件；另 12 件被 0.7.16 淘汰转孤立）。483 口径 403/1238。全量 11185/11182/3 零回归。
 
-- 2026-10-04（155 批）：干净件 gain≥1 清尾 21 取 17（textToolbar、WebPreviewNode、CanvasTabManager、GenerationHistoryFileManager、canvasNodeFlows、canvasCommands 2 件、clipboard、imagePreview、EdgeController、nodeResizePreview、settings 2 件、textInputContextMenu、ui/rendererUiEvents、services 2 件），孤立 291→**272**（累计 96；483 口径 437）。SourceImageNode、mediaPlaybackRecovery、keying/removeAction 共 7 例回滚。全量 11185/11182/3 基线一致。
+- 2026-10-04（156 批·manifests 层侦察）：11 件纯新增候选全过机械工序，闭包对 modelRegistry + vendorVideoModelApiManifests 已在批内闭合、裸导入全通过。但 10/11 属规格变更型——接通 0.7.16 模型 manifest 后 api 域 67 例断言 0.4.12 旧规格失败（baseline 1000/1000 全绿）。最终只落 `api/errors/ErrorParser.js`（+3 解析器、0 失败），孤立 272→**269**（累计 99）；全量 11185/11182/3 零回归。余 10 件待裁决是否采纳 0.7.16 模型规格。
 
 ## 12. 变更记录机制（全自动）
 

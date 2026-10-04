@@ -1,466 +1,558 @@
-import { MediaTaskHistoryPanel } from './MediaTaskHistoryPanel.js';
-import { createMediaTaskRecoveryPanel } from './mediaTaskRecoveryCanvas.js';
-import { createMediaTaskListRefresh } from './mediaTaskRecoveryModel.js';
 import { registerSidebarSubmenu } from './sidebarSubmenuController.js';
 import { pickResultLocalPath } from '../utils/localMediaPath.js';
-import { GENERATION_TASK_CENTER_EVENT } from './generationTaskCenterEvents.js';
-import { cancelDreaminaVideoQueueTask } from '../../api/dreaminaGenApi.js';
+import {
+  GENERATION_TASK_CENTER_EVENT,
+  listGenerationTaskCenterUpdates,
+} from './generationTaskCenterEvents.js';
+import { ACTIVE_TASK_STATUSES, TERMINAL_TASK_STATUSES, pruneTaskCenterRecords } from './taskCenterModel.js';
+import { createTaskCardView, syncTaskElements } from './taskCenterListView.js';
+import { resolveTaskCenterThumbnail } from './taskCenterThumbnail.js';
+import { createTaskCenterMediaController } from './taskCenterMediaController.js';
+import { executeTaskCenterAction } from './taskCenterActions.js';
+import { getProviderTaskConsoleUrl } from '../config/providerTaskConsole.js';
+import appStore from '../core/stores/appStore.js';
+import { cancelTask } from '../core/generationTaskRuntime.js';
 import { onLocaleChange, t } from '../i18n/index.js';
-const TERMINAL_STATUSES = new Set(['complete', 'failed', 'cancelled']),
-  ACTIVE_STATUSES = new Set(['waiting', 'processing']),
-  MAX_TASKS = 120;
+import { desktopBridge } from '../services/desktopBridge.js';
+import { showContextMenu } from './interaction/contextMenuPresenter.js';
+import { createTaskStatusFeedback } from './taskStatusFeedback.js';
+const MAX_TASKS = 0x78;
 function el(value, item = '', key = '') {
-  const el2 = document.createElement(value);
-  if (item) el2.className = item;
-  if (key) el2.textContent = key;
+  const el2 = document['createElement'](value);
+  if (item) el2['className'] = item;
+  if (key) el2['textContent'] = key;
   return el2;
 }
 function taskCenterText(index, result = {}) {
   return t('taskCenter.' + index, result);
 }
-function normalizeTask(cancellable = {}) {
-  const taskId = String(cancellable.taskId || '').trim();
-  if (!taskId) return null;
+function normalizeTask(navigation = {}) {
+  const taskId2 = String(navigation['taskId'] || '')['trim']();
+  if (!taskId2) return null;
   return {
-    taskId: taskId,
-    nodeId: String(cancellable.nodeId || '').trim(),
-    assetId: String(cancellable.assetId || '').trim(),
-    kind: String(cancellable.kind || '').trim(),
-    source: String(cancellable.source || '').trim() || 'mediaTask',
-    status: String(cancellable.status || '').trim() || 'waiting',
-    progress: Math.max(0, Math.min(1, Number(cancellable.progress || 0) || 0)),
-    message: String(cancellable.message || '').trim(),
-    error: String(cancellable.error || '').trim(),
-    cancellable: cancellable.cancellable === true,
-    result: cancellable.result && typeof cancellable.result === 'object' ? cancellable.result : null,
-    createdAt: Number(cancellable.createdAt || 0) || Date.now(),
-    startedAt: Number(cancellable.startedAt || 0) || 0,
-    finishedAt: Number(cancellable.finishedAt || 0) || 0,
-    updatedAt: Date.now(),
+    taskId: taskId2,
+    title: String(navigation['title'] || ''),
+    provider: String(navigation['provider'] || ''),
+    providerProfileId: String(navigation['providerProfileId'] || ''),
+    modelId: String(navigation['modelId'] || ''),
+    adapterType: String(navigation['adapterType'] || ''),
+    projectId: String(navigation['projectId'] || ''),
+    canvasId: String(navigation['canvasId'] || ''),
+    projectTitle: String(navigation['projectTitle'] || ''),
+    navigation: navigation['navigation'] || null,
+    nodeId: String(navigation['nodeId'] || '')['trim'](),
+    assetId: String(navigation['assetId'] || '')['trim'](),
+    kind: String(navigation['kind'] || '')['trim'](),
+    source: String(navigation['source'] || '')['trim']() || 'mediaTask',
+    status: String(navigation['status'] || '')['trim']() || 'waiting',
+    progress:
+      navigation['progress'] == null
+        ? null
+        : Math['max'](0x0, Math['min'](0x1, Number(navigation['progress']) || 0x0)),
+    message: String(navigation['message'] || '')['trim'](),
+    error: String(navigation['error'] || '')['trim'](),
+    remoteTaskId: String(navigation['remoteTaskId'] || '')['trim'](),
+    cancellable: navigation['cancellable'] === !![],
+    result: navigation['result'] && typeof navigation['result'] === 'object' ? navigation['result'] : null,
+    thumbnail: navigation['thumbnail'] || null,
+    createdAt:
+      Number(navigation['createdAt'] || 0x0) ||
+      (ACTIVE_TASK_STATUSES['has'](navigation['status']) ? Date['now']() : 0x0),
+    startedAt: Number(navigation['startedAt'] || 0x0) || 0x0,
+    finishedAt: Number(navigation['finishedAt'] || 0x0) || 0x0,
+    updatedAt: Date['now'](),
   };
 }
 function getTaskLabel(data) {
-  if (data === 'storySequenceExport') return '镜头顺序渲染（本地）';
-  const enabled = String(data || '').trim();
+  const enabled = String(data || '')['trim']();
   if (!enabled) return taskCenterText('taskKinds.mediaTask');
   const options = 'taskCenter.taskKinds.' + enabled,
     t2 = t(options);
   return t2 === options ? taskCenterText('taskKinds.mediaTask') : t2;
 }
 function getStatusLabel(target) {
-  const enabled2 = String(target || '').trim();
+  const enabled2 = String(target || '')['trim']();
   if (!enabled2) return taskCenterText('statuses.fallback');
   const source = 'taskCenter.statuses.' + enabled2,
     t3 = t(source);
   return t3 === source ? taskCenterText('statuses.fallback') : t3;
 }
-function formatPercent(next) {
-  return Math.round(Math.max(0, Math.min(1, Number(next) || 0)) * 100) + '%';
-}
-function formatDuration(current) {
-  const entry = Math.max(0, Math.floor(Number(current || 0) / 0x3e8)),
-    count = Math.floor(entry / 60),
-    record = entry % 60;
-  if (count <= 0) return record + 's';
-  return count + 'm ' + String(record).padStart(2, '0') + 's';
+function formatDuration(next) {
+  const current = Math['max'](0x0, Math['floor'](Number(next || 0x0) / 0x3e8)),
+    count = Math['floor'](current / 0x3c),
+    entry = current % 0x3c;
+  if (count <= 0x0) return entry + 's';
+  return count + 'm\x20' + String(entry)['padStart'](0x2, '0') + 's';
 }
 function getTaskDuration(response) {
-  const enabled3 = Number(response.startedAt || response.createdAt || 0) || 0,
-    enabled4 = Number(response.finishedAt || 0) || (ACTIVE_STATUSES.has(response.status) ? Date.now() : 0);
+  const enabled3 = Number(response['startedAt'] || response['createdAt'] || 0x0) || 0x0,
+    enabled4 =
+      Number(response['finishedAt'] || 0x0) ||
+      (ACTIVE_TASK_STATUSES['has'](response['status']) ? Date['now']() : 0x0);
   if (!enabled3 || !enabled4) return '';
   return formatDuration(enabled4 - enabled3);
 }
-function getResultLocalPath(payload) {
-  return pickResultLocalPath(payload);
+function getResultLocalPath(record) {
+  return pickResultLocalPath(record);
 }
 function sortTasks(args) {
-  const handle = { processing: 0, waiting: 1, failed: 2, complete: 3, cancelled: 4 };
-  return [...args].sort((response2, response3) => {
-    const state = handle[response2.status] ?? 9,
-      config = handle[response3.status] ?? 9;
-    if (state !== config) return state - config;
-    return (
-      Number(response3.updatedAt || response3.createdAt || 0) -
-      Number(response2.updatedAt || response2.createdAt || 0)
-    );
+  const payload = { processing: 0x0, waiting: 0x1, failed: 0x2, complete: 0x3, cancelled: 0x4 };
+  return [...args]['sort']((response2, response3) => {
+    const handle = payload[response2['status']] ?? 0x9,
+      state = payload[response3['status']] ?? 0x9;
+    if (handle !== state) return handle - state;
+    return Number(response3['createdAt'] || 0x0) - Number(response2['createdAt'] || 0x0);
   });
 }
 function getElectronMediaTaskApi() {
-  const enabled5 = globalThis.window?.electronAPI?.mediaTask;
-  if (!enabled5 || typeof enabled5 !== 'object') return null;
-  return enabled5;
+  return desktopBridge['mediaTask']['isAvailable']() ? desktopBridge['mediaTask'] : null;
 }
 export class TaskCenterManager {
-  constructor() {
-    ((this.panel = null),
-      (this.listEl = null),
-      (this.summaryEl = null),
-      (this.titleEl = null),
-      (this.clearBtn = null),
-      (this.badgeEl = null),
-      (this.tasks = new Map()),
-      (this.renderTimer = 0),
-      (this.clockTimer = 0),
-      (this.unsubscribe = null),
-      (this.unsubscribeGenerationTasks = null),
-      (this.unsubscribeLocale = null),
-      this.initPanel(),
-      this.initRecoveryPanel(),
-      this.bindLocaleChange(),
-      this.bindMediaTasks(),
-      this.bindGenerationTasks());
+  constructor({
+    generationCancelTask: generationCancelTask = cancelTask,
+    generationStore: generationStore = appStore,
+    contextMenuPresenter: contextMenuPresenter = showContextMenu,
+  } = {}) {
+    ((this['generationCancelTask'] = generationCancelTask),
+      (this['generationStore'] = generationStore),
+      (this['contextMenuPresenter'] = contextMenuPresenter),
+      (this['contextMenuSession'] = null),
+      (this['panel'] = null),
+      (this['listEl'] = null),
+      (this['summaryEl'] = null),
+      (this['titleEl'] = null),
+      (this['clearBtn'] = null),
+      (this['badgeEl'] = null),
+      (this['tasks'] = new Map()),
+      (this['statusFeedback'] = createTaskStatusFeedback()),
+      (this['cardViews'] = new Map()),
+      (this['sectionViews'] = new Map()),
+      (this['pendingActions'] = new Set()),
+      (this['renderTimer'] = 0x0),
+      (this['clockTimer'] = 0x0),
+      (this['unsubscribe'] = null),
+      (this['unsubscribeGenerationTasks'] = null),
+      (this['unsubscribeLocale'] = null),
+      this['initPanel'](),
+      this['bindLocaleChange'](),
+      this['bindMediaTasks'](),
+      this['bindGenerationTasks']());
   }
   ['initPanel']() {
-    const button = document.getElementById('btnTasks');
-    this.badgeEl = document.getElementById('taskCenterBadge');
-    const el3 = document.querySelector('.sidebar-floating') || document.body;
-    ((this.panel = el('div', 'v2-task-center-panel')),
-      this.panel.setAttribute('aria-label', taskCenterText('ariaLabel')));
+    const button = document['getElementById']('btnTasks');
+    this['badgeEl'] = document['getElementById']('taskCenterBadge');
+    const el3 = document['querySelector']('.sidebar-floating') || document['body'];
+    ((this['panel'] = el('div', 'v2-task-center-panel canvas-toolbar-panel-surface')),
+      this['panel']['setAttribute']('aria-label', taskCenterText('ariaLabel')));
     const el4 = el('div', 'v2-task-center-header');
-    ((this.titleEl = el('div', 'v2-task-center-title', taskCenterText('title'))),
-      (this.clearBtn = el('button', 'v2-task-center-action', taskCenterText('clearDone'))),
-      (this.clearBtn.type = 'button'),
-      (this.clearBtn.dataset.taskAction = 'clear-terminal'),
-      el4.append(this.titleEl, this.clearBtn),
-      (this.summaryEl = el('div', 'v2-task-center-summary')),
-      (this.listEl = el('div', 'v2-task-center-list')),
-      this.panel.append(el4, this.summaryEl, this.listEl),
-      el3.appendChild(this.panel),
+    ((this['titleEl'] = el('div', 'v2-task-center-title', taskCenterText('title'))),
+      (this['clearBtn'] = el('button', 'v2-task-center-action', taskCenterText('clearDone'))),
+      (this['clearBtn']['type'] = 'button'),
+      (this['clearBtn']['dataset']['taskAction'] = 'clear-terminal'),
+      el4['append'](this['titleEl'], this['clearBtn']),
+      (this['summaryEl'] = el('div', 'v2-task-center-summary')),
+      (this['listEl'] = el('div', 'v2-task-center-list')),
+      (this['mediaController'] = createTaskCenterMediaController(this['listEl'])),
+      this['panel']['append'](el4, this['summaryEl'], this['listEl']),
+      el3['appendChild'](this['panel']),
       button &&
         registerSidebarSubmenu({
           key: 'tasks',
           button: button,
-          panel: this.panel,
-          open: () => this.show(),
-          close: () => this.hide(),
-          isOpen: () => this.panel.classList.contains('show'),
+          panel: this['panel'],
+          open: () => this['show'](),
+          close: () => this['hide'](),
+          isOpen: () => this['panel']['classList']['contains']('show'),
         }),
-      this.panel.addEventListener('click', (scope) => this.handleClick(scope)),
-      this.render());
+      this['panel']['addEventListener']('click', (config) => this['handleClick'](config)),
+      this['panel']['addEventListener']('contextmenu', (scope) => this['handleContextMenu'](scope)),
+      this['panel']['addEventListener']('wheel', (input) => this['handleWheel'](input), {
+        passive: ![],
+      }),
+      this['render']());
   }
-  initRecoveryPanel() {
-    this.mediaTaskReader = createMediaTaskListRefresh({
-      api: getElectronMediaTaskApi(),
-      onTask: (task) => this.upsertTask(task, { silent: true }),
-      onComplete: () => this.scheduleRender(),
-    });
-    this.recoveryPanel = createMediaTaskRecoveryPanel({
-      api: getElectronMediaTaskApi(),
-      refresh: () => this.mediaTaskReader.refresh(),
-    });
-    this.panel.insertBefore(this.recoveryPanel.el, this.listEl);
-    this.historyPanel = new MediaTaskHistoryPanel({
-      api: getElectronMediaTaskApi()?.history,
-      createRecoveryPanel: createMediaTaskRecoveryPanel,
-    });
-    this.panel.insertBefore(this.historyPanel.el, this.listEl);
+  ['handleWheel'](event) {
+    (event['stopPropagation'](), event['stopImmediatePropagation']?.());
+    if (!this['listEl'] || this['listEl']['contains'](event['target'])) return;
+    const enabled5 = Number(event['deltaY'] || 0x0);
+    if (!enabled5) return;
+    const enabled6 =
+      Number(this['listEl']['scrollHeight'] || 0x0) > Number(this['listEl']['clientHeight'] || 0x0);
+    if (!enabled6) return;
+    (event['preventDefault']?.(),
+      (this['listEl']['scrollTop'] = Math['max'](
+        0x0,
+        Number(this['listEl']['scrollTop'] || 0x0) + enabled5,
+      )));
   }
   ['bindLocaleChange']() {
-    this.unsubscribeLocale = onLocaleChange(() => {
-      this.render();
+    this['unsubscribeLocale'] = onLocaleChange(() => {
+      this['render']();
     });
   }
   ['bindMediaTasks']() {
     const electronMediaTaskApi = getElectronMediaTaskApi();
     if (!electronMediaTaskApi) {
-      this.render();
+      this['render']();
       return;
     }
-    const initialLookupSequence = this.recoveryPanel.sequence;
-    (typeof electronMediaTaskApi.onUpdate === 'function' &&
-      (this.unsubscribe = electronMediaTaskApi.onUpdate((input) => {
-        this.mediaTaskReader.noteEvent(input || {});
-        this.upsertTask(input || {});
+    const map = new Set();
+    let enabled7 = !![];
+    (typeof electronMediaTaskApi['onUpdate'] === 'function' &&
+      (this['unsubscribe'] = electronMediaTaskApi['onUpdate']((output) => {
+        if (enabled7 && output?.['taskId']) map['add'](output['taskId']);
+        this['upsertTask'](output || {});
       })),
-      typeof electronMediaTaskApi.list === 'function' &&
-        this.mediaTaskReader.refresh().catch(() => {
-          if (this.recoveryPanel.sequence === initialLookupSequence) {
-            this.recoveryPanel.message.textContent =
-              '初次宿主列表读取失败，状态待核对；可手动刷新。不自动重发任务。';
-          }
-        }));
+      typeof electronMediaTaskApi['list'] === 'function'
+        ? electronMediaTaskApi['list']({ limit: MAX_TASKS })
+            ['then']((list) => {
+              if (!Array['isArray'](list)) return;
+              (list['forEach']((value2) => {
+                if (!map['has'](value2['taskId'])) this['upsertTask'](value2, { silent: !![] });
+              }),
+                this['scheduleRender']());
+            })
+            ['catch'](() => {})
+            ['finally'](() => {
+              ((enabled7 = ![]), map['clear']());
+            })
+        : (enabled7 = ![]));
   }
   ['bindGenerationTasks']() {
-    if (!globalThis.window?.addEventListener) return;
-    const output = (value2) => {
-      this.upsertTask({ ...(value2?.detail || {}), source: 'generation' });
+    if (!globalThis['window']?.['addEventListener']) return;
+    const value3 = (source2) => {
+      this['upsertTask']({
+        ...(source2?.['detail'] || {}),
+        source: source2?.['detail']?.['source'] || 'generation',
+      });
     };
-    (window.addEventListener(GENERATION_TASK_CENTER_EVENT, output),
-      (this.unsubscribeGenerationTasks = () => {
-        window.removeEventListener(GENERATION_TASK_CENTER_EVENT, output);
+    (window['addEventListener'](GENERATION_TASK_CENTER_EVENT, value3),
+      listGenerationTaskCenterUpdates()['forEach']((value4) =>
+        this['upsertTask'](value4, { silent: !![] }),
+      ),
+      (this['unsubscribeGenerationTasks'] = () => {
+        window['removeEventListener'](GENERATION_TASK_CENTER_EVENT, value3);
       }));
   }
   ['show']() {
-    (this.panel?.classList.add('show'),
-      document.getElementById('btnTasks')?.classList.add('active'),
-      this.render(),
-      this.startClock());
+    (this['panel']?.['classList']['add']('show'),
+      this['mediaController']?.['setVisible'](!![]),
+      document['getElementById']('btnTasks')?.['classList']['add']('active'),
+      this['render'](),
+      this['startClock']());
   }
   ['hide']() {
-    this.recoveryPanel?.suspend();
-    this.historyPanel?.suspend();
-    this.mediaTaskReader?.invalidate();
-    (this.panel?.classList.remove('show'),
-      document.getElementById('btnTasks')?.classList.remove('active'),
-      this.stopClock());
+    (this['closeContextMenu'](),
+      this['mediaController']?.['setVisible'](![]),
+      this['panel']?.['classList']['remove']('show'),
+      document['getElementById']('btnTasks')?.['classList']['remove']('active'),
+      this['stopClock']());
+    if (this['renderTimer']) window['cancelAnimationFrame']?.(this['renderTimer']);
+    this['renderTimer'] = 0x0;
   }
   ['startClock']() {
-    if (this.clockTimer) return;
-    this.clockTimer = window.setInterval(() => {
-      if (!this.hasActiveTasks()) {
-        this.stopClock();
+    if (this['clockTimer']) return;
+    this['clockTimer'] = window['setInterval'](() => {
+      if (!this['hasActiveTasks']()) {
+        this['stopClock']();
         return;
       }
-      this.render();
+      this['render']();
     }, 0x3e8);
   }
   ['stopClock']() {
-    if (!this.clockTimer) return;
-    (window.clearInterval(this.clockTimer), (this.clockTimer = 0));
+    if (!this['clockTimer']) return;
+    (window['clearInterval'](this['clockTimer']), (this['clockTimer'] = 0x0));
+  }
+  ['closeContextMenu']() {
+    (this['contextMenuSession']?.['close']?.(),
+      (this['contextMenuSession'] = null),
+      (this['contextMenuTaskId'] = ''));
   }
   ['hasActiveTasks']() {
-    return [...this.tasks.values()].some((response4) => ACTIVE_STATUSES.has(response4.status));
+    return [...this['tasks']['values']()]['some']((response4) =>
+      ACTIVE_TASK_STATUSES['has'](response4['status']),
+    );
   }
   ['retireDuplicateGenerationTasks'](response5) {
     if (
-      response5?.source !== 'generation' ||
-      response5.kind !== 'dreaminaVideo' ||
-      !response5.nodeId ||
-      !ACTIVE_STATUSES.has(response5.status)
+      response5?.['source'] !== 'generation' ||
+      response5['kind'] !== 'dreaminaVideo' ||
+      !response5['nodeId'] ||
+      !ACTIVE_TASK_STATUSES['has'](response5['status'])
     )
       return;
-    for (const [value3, message] of this.tasks.entries()) {
-      if (value3 === response5.taskId) continue;
-      message?.source === 'generation' &&
-        message.kind === 'dreaminaVideo' &&
-        message.nodeId === response5.nodeId &&
-        ACTIVE_STATUSES.has(message.status) &&
-        this.tasks.set(value3, {
+    for (const [value5, message] of this['tasks']['entries']()) {
+      if (value5 === response5['taskId']) continue;
+      message?.['source'] === 'generation' &&
+        message['kind'] === 'dreaminaVideo' &&
+        message['nodeId'] === response5['nodeId'] &&
+        message['canvasId'] === response5['canvasId'] &&
+        message['projectId'] === response5['projectId'] &&
+        ACTIVE_TASK_STATUSES['has'](message['status']) &&
+        (this['tasks']['set'](value5, {
           ...message,
           status: 'complete',
-          progress: 1,
-          message: message.message || 'Replaced by latest task',
-          finishedAt: message.finishedAt || Date.now(),
-          updatedAt: Date.now(),
-        });
+          progress: 0x1,
+          message: message['message'] || 'Replaced by latest task',
+          finishedAt: message['finishedAt'] || Date['now'](),
+          updatedAt: Date['now'](),
+        }),
+        this['statusFeedback']?.['observe'](this['tasks']['get'](value5), message, { silent: !![] }));
     }
   }
-  ['upsertTask'](value4, { silent: silent = false } = {}) {
-    const response6 = normalizeTask(value4);
-    if (!response6) return;
-    this.retireDuplicateGenerationTasks(response6);
-    const value5 = this.tasks.get(response6.taskId);
-    (this.tasks.set(response6.taskId, { ...(value5 || {}), ...response6, updatedAt: Date.now() }),
-      this.trimTasks());
-    if (!silent) this.scheduleRender();
-    if (ACTIVE_STATUSES.has(response6.status)) this.startClock();
+  ['upsertTask'](createdAt, { silent: silent = ![] } = {}) {
+    const response6 = this['tasks']['get'](createdAt?.['taskId']),
+      response7 = normalizeTask({
+        ...response6,
+        ...createdAt,
+        createdAt: createdAt?.['createdAt'] || response6?.['createdAt'],
+        finishedAt: createdAt?.['finishedAt'] || response6?.['finishedAt'],
+      });
+    if (!response7) return;
+    if (ACTIVE_TASK_STATUSES['has'](response7['status'])) {
+      response7['finishedAt'] = 0x0;
+      if (response6 && TERMINAL_TASK_STATUSES['has'](response6['status']) && !createdAt['createdAt'])
+        response7['createdAt'] = Date['now']();
+    }
+    if (TERMINAL_TASK_STATUSES['has'](response7['status']) && !response7['finishedAt'])
+      response7['finishedAt'] = Date['now']();
+    this['retireDuplicateGenerationTasks'](response7);
+    const response8 = this['tasks']['get'](response7['taskId']);
+    if (
+      response8 &&
+      this['contextMenuTaskId'] === response7['taskId'] &&
+      (response8['status'] !== response7['status'] || response8['cancellable'] !== response7['cancellable'])
+    )
+      this['closeContextMenu']();
+    (this['tasks']['set'](response7['taskId'], {
+      ...(response8 || {}),
+      ...response7,
+      updatedAt: Date['now'](),
+    }),
+      this['statusFeedback']?.['observe'](response7, response6, { silent: silent }),
+      this['trimTasks']());
+    if (!silent) this['scheduleRender']();
+    if (ACTIVE_TASK_STATUSES['has'](response7['status']) && this['panel']?.['classList']['contains']('show'))
+      this['startClock']();
   }
   ['trimTasks']() {
-    if (this.tasks.size <= MAX_TASKS) return;
-    const list = sortTasks([...this.tasks.values()]).slice(0, MAX_TASKS);
-    this.tasks = new Map(list.map((item2) => [item2.taskId, item2]));
+    if (this['tasks']['size'] <= MAX_TASKS) return;
+    const list2 = pruneTaskCenterRecords([...this['tasks']['values']()], MAX_TASKS);
+    this['tasks'] = new Map(list2['map']((value6) => [value6['taskId'], value6]));
   }
   ['scheduleRender']() {
-    if (this.renderTimer) return;
-    this.renderTimer = window.requestAnimationFrame(() => {
-      ((this.renderTimer = 0), this.render());
+    if (!this['panel']?.['classList']['contains']('show')) {
+      this['updateBadge']();
+      return;
+    }
+    if (this['renderTimer']) return;
+    this['renderTimer'] = window['requestAnimationFrame'](() => {
+      ((this['renderTimer'] = 0x0), this['render']());
     });
   }
   ['getTaskGroups']() {
-    const active = sortTasks([...this.tasks.values()]);
+    const active = sortTasks([...this['tasks']['values']()]);
     return {
-      active: active.filter((response7) => ACTIVE_STATUSES.has(response7.status)),
-      failed: active.filter((response8) => response8.status === 'failed'),
-      done: active.filter((response9) => response9.status === 'complete' || response9.status === 'cancelled'),
+      active: active['filter']((response9) => ACTIVE_TASK_STATUSES['has'](response9['status'])),
+      failed: active['filter']((response10) => response10['status'] === 'failed'),
+      done: active['filter'](
+        (response11) => TERMINAL_TASK_STATUSES['has'](response11['status']) && response11['status'] !== 'failed',
+      ),
     };
   }
-  ['updateBadge'](value6) {
-    const count2 = value6.active.length;
-    if (!this.badgeEl) return;
-    ((this.badgeEl.hidden = count2 <= 0), (this.badgeEl.textContent = count2 > 99 ? '99+' : String(count2)));
+  ['updateBadge'](value7) {
+    const count2 = value7
+      ? value7['active']['length']
+      : [...this['tasks']['values']()]['filter']((response12) =>
+          ACTIVE_TASK_STATUSES['has'](response12['status']),
+        )['length'];
+    if (!this['badgeEl']) return;
+    if (this['badgeEl']['hidden'] !== count2 <= 0x0) this['badgeEl']['hidden'] = count2 <= 0x0;
+    const value8 = count2 > 0x63 ? '99+' : String(count2);
+    if (this['badgeEl']['textContent'] !== value8) this['badgeEl']['textContent'] = value8;
   }
   ['render']() {
-    if (!this.listEl || !this.summaryEl) return;
-    const electronMediaTaskApi2 = getElectronMediaTaskApi(),
-      active2 = this.getTaskGroups();
-    this.updateBadge(active2);
-    const failed = active2.failed.length,
-      done = active2.done.length,
-      count3 = active2.active.length + failed + done;
-    this.panel?.setAttribute('aria-label', taskCenterText('ariaLabel'));
-    if (this.clearBtn) this.clearBtn.textContent = taskCenterText('clearDone');
-    if (this.titleEl) this.titleEl.textContent = taskCenterText('title');
-    this.summaryEl.textContent =
-      electronMediaTaskApi2 || count3 > 0
-        ? taskCenterText('summary', { active: active2.active.length, failed: failed, done: done })
-        : taskCenterText('unavailableSummary');
-    if (this.clearBtn) this.clearBtn.hidden = done + failed <= 0;
-    this.listEl.replaceChildren();
-    if (!electronMediaTaskApi2 && count3 <= 0) {
-      this.listEl.appendChild(el('div', 'v2-task-center-empty', taskCenterText('unavailable')));
+    if (!this['listEl'] || !this['summaryEl']) return;
+    if (!this['panel']?.['classList']['contains']('show')) {
+      this['updateBadge']();
       return;
     }
-    if (count3 === 0) {
-      this.listEl.appendChild(el('div', 'v2-task-center-empty', taskCenterText('empty')));
-      return;
+    const active2 = this['getTaskGroups']();
+    this['updateBadge'](active2);
+    const failed = active2['failed']['length'],
+      done = active2['done']['length'];
+    this['panel']?.['setAttribute']('aria-label', taskCenterText('ariaLabel'));
+    if (this['clearBtn']) this['clearBtn']['textContent'] = taskCenterText('clearDone');
+    if (this['titleEl']) this['titleEl']['textContent'] = taskCenterText('title');
+    this['summaryEl']['textContent'] = taskCenterText('summary', {
+      active: active2['active']['length'],
+      failed: failed,
+      done: done,
+    });
+    if (this['clearBtn']) this['clearBtn']['hidden'] = done + failed <= 0x0;
+    const list3 = [];
+    for (const [value9, list4] of Object['entries'](active2)) {
+      if (!list4['length']) {
+        const el5 = this['sectionViews']['get'](value9);
+        if (el5) syncTaskElements(el5, [el5['children'][0x0]]);
+        continue;
+      }
+      let el6 = this['sectionViews']['get'](value9);
+      (!el6 &&
+        ((el6 = el('section', 'v2-task-center-section')),
+        el6['appendChild'](el('div', 'v2-task-center-section-title')),
+        this['sectionViews']['set'](value9, el6)),
+        (el6['children'][0x0]['textContent'] = taskCenterText('sections.' + value9)),
+        syncTaskElements(el6, [
+          el6['children'][0x0],
+          ...list4['map']((value10) => this['renderTaskCard'](value10)),
+        ]),
+        list3['push'](el6));
     }
-    (active2.active.length &&
-      this.listEl.appendChild(this.renderSection(taskCenterText('sections.active'), active2.active)),
-      active2.failed.length &&
-        this.listEl.appendChild(this.renderSection(taskCenterText('sections.failed'), active2.failed)),
-      active2.done.length &&
-        this.listEl.appendChild(
-          this.renderSection(taskCenterText('sections.done'), active2.done.slice(0, 40)),
-        ));
+    !list3['length'] &&
+      ((this['emptyEl'] ||= el('div', 'v2-task-center-empty')),
+      (this['emptyEl']['textContent'] = taskCenterText('empty')),
+      list3['push'](this['emptyEl']));
+    syncTaskElements(this['listEl'], list3);
+    for (const value11 of this['cardViews']['keys']()) {
+      if (!this['tasks']['has'](value11)) this['cardViews']['delete'](value11);
+    }
+    this['mediaController']?.['sync'](this['cardViews']['values']());
   }
-  ['renderSection'](value7, list2) {
-    const el5 = el('section', 'v2-task-center-section');
+  ['renderTaskCard'](title) {
+    let taskCardView = this['cardViews']['get'](title['taskId']);
+    !taskCardView &&
+      ((taskCardView = createTaskCardView(title['taskId'])),
+      this['cardViews']['set'](title['taskId'], taskCardView));
+    const duration = getTaskDuration(title),
+      actions = [],
+      handler = (id, value12, args2 = {}) =>
+        actions['push']({
+          id: id,
+          label: this['pendingActions']['has'](title['taskId'] + ':' + id)
+            ? taskCenterText('pendingAction')
+            : taskCenterText(value12),
+          pending: this['pendingActions']['has'](title['taskId'] + ':' + id),
+          ...args2,
+        });
+    if (ACTIVE_TASK_STATUSES['has'](title['status']) && title['cancellable'])
+      handler('cancel', 'actions.cancel', { danger: !![] });
+    if (title['navigation']) handler('locate', 'actions.locate');
+    if (getProviderTaskConsoleUrl(title)) handler('api-console', 'actions.apiConsole');
+    if (title['remoteTaskId']) handler('copy-task-id', 'actions.copyTaskId');
+    const localPath2 = getResultLocalPath(title['result']);
+    if (localPath2) handler('reveal', 'actions.reveal', { localPath: localPath2 });
+    if (title['error']) handler('copy-error', 'actions.copyError');
+    const thumbnail =
+      title['status'] === 'complete'
+        ? title['thumbnail'] || resolveTaskCenterThumbnail(title['result'], title['kind'])
+        : null;
     return (
-      el5.appendChild(el('div', 'v2-task-center-section-title', value7)),
-      list2.forEach((item3) => el5.appendChild(this.renderTaskCard(item3))),
-      el5
+      taskCardView['update']({
+        title: title['title'] || getTaskLabel(title['kind']),
+        context: [title['projectTitle'], title['provider'], title['modelId']]
+          ['filter'](Boolean)
+          ['join']('\x20·\x20'),
+        meta: [
+          title['message'] || getStatusLabel(title['status']),
+          duration ? taskCenterText('duration', { duration: duration }) : '',
+        ]
+          ['filter'](Boolean)
+          ['join'](' · '),
+        status: title['status'],
+        statusLabel: getStatusLabel(title['status']),
+        active: ACTIVE_TASK_STATUSES['has'](title['status']),
+        progress: title['progress'],
+        error: title['error'],
+        remoteId: title['remoteTaskId'],
+        actions: actions,
+        thumbnail: thumbnail,
+        thumbnailLabel: thumbnail ? taskCenterText('resultPreview', { count: thumbnail['count'] }) : '',
+      }),
+      taskCardView['card']
     );
   }
-  ['renderTaskCard'](error) {
-    const el6 = el('article', 'v2-task-card');
-    el6.dataset.taskId = error.taskId;
-    const el7 = el('div', 'v2-task-card-header'),
-      el8 = el('div', 'v2-task-card-main');
-    el8.appendChild(el('div', 'v2-task-card-title', getTaskLabel(error.kind)));
-    const duration = getTaskDuration(error),
-      value8 = [
-        error.message || getStatusLabel(error.status),
-        duration ? taskCenterText('duration', { duration: duration }) : '',
-      ]
-        .filter(Boolean)
-        .join(' · ');
-    el8.appendChild(el('div', 'v2-task-card-meta', value8));
-    const el9 = el('span', 'v2-task-status v2-task-status--' + error.status, getStatusLabel(error.status));
-    (el7.append(el8, el9), el6.appendChild(el7));
-    if ((error.status === 'waiting' || error.status === 'processing') && error.cancellable === true) {
-      const el10 = el('div', 'v2-task-progress'),
-        el11 = el('div', 'v2-task-progress-fill');
-      ((el11.style.width = formatPercent(error.status === 'waiting' ? 0 : error.progress)),
-        el10.appendChild(el11),
-        el6.appendChild(el10));
-    }
-    error.error && el6.appendChild(el('div', 'v2-task-card-error', error.error));
-    const value9 = this.renderTaskActions(error);
-    if (value9.childElementCount > 0) el6.appendChild(value9);
-    return el6;
+  ['handleClick'](event2) {
+    const taskId3 = event2['target']['closest']('[data-task-action]');
+    if (!taskId3 || taskId3['disabled']) return;
+    (event2['preventDefault'](), event2['stopPropagation']());
+    const value13 = taskId3['dataset']['taskAction'] || '';
+    this['runTaskAction'](value13, {
+      taskId: taskId3['dataset']['taskId'] || '',
+      localPath: taskId3['dataset']['localPath'] || '',
+    });
   }
-  ['renderTaskActions'](response10) {
-    const el12 = el('div', 'v2-task-card-actions');
-    if (
-      (response10.status === 'waiting' || response10.status === 'processing') &&
-      response10.cancellable === true
-    ) {
-      const el13 = el(
-        'button',
-        'v2-task-card-action v2-task-card-action--danger',
-        taskCenterText('actions.cancel'),
-      );
-      ((el13.type = 'button'),
-        (el13.dataset.taskAction = 'cancel'),
-        (el13.dataset.taskId = response10.taskId),
-        el12.appendChild(el13));
-    }
-    if (response10.source === 'mediaTask') {
-      const lookup = el('button', 'v2-task-card-action', '查找 / 取回');
-      lookup.type = 'button';
-      lookup.dataset.taskAction = 'lookup-local';
-      lookup.dataset.taskId = response10.taskId;
-      el12.appendChild(lookup);
-    }
-    const resultLocalPath = getResultLocalPath(response10.result);
-    if (resultLocalPath) {
-      const el14 = el('button', 'v2-task-card-action', taskCenterText('actions.reveal'));
-      ((el14.type = 'button'),
-        (el14.dataset.taskAction = 'reveal'),
-        (el14.dataset.localPath = resultLocalPath),
-        el12.appendChild(el14));
-    }
-    if (response10.error) {
-      const el15 = el('button', 'v2-task-card-action', taskCenterText('actions.copyError'));
-      ((el15.type = 'button'),
-        (el15.dataset.taskAction = 'copy-error'),
-        (el15.dataset.taskId = response10.taskId),
-        el12.appendChild(el15));
-    }
-    return el12;
-  }
-  ['handleClick'](event) {
-    const el16 = event.target.closest('[data-task-action]');
-    if (!el16) return;
-    (event.preventDefault(), event.stopPropagation());
-    const value10 = el16.dataset.taskAction || '';
-    if (value10 === 'lookup-local') {
-      void this.recoveryPanel.lookup(el16.dataset.taskId || '');
-      return;
-    }
-    if (value10 === 'clear-terminal') {
-      this.mediaTaskReader?.invalidate();
-      for (const [value11, response11] of this.tasks.entries()) {
-        if (TERMINAL_STATUSES.has(response11.status)) this.tasks.delete(value11);
-      }
-      this.render();
-      return;
-    }
-    if (value10 === 'cancel') {
-      const taskId2 = el16.dataset.taskId || '',
-        args2 = this.tasks.get(taskId2);
-      if (args2?.source === 'generation' && args2.kind === 'dreaminaVideo') {
-        void cancelDreaminaVideoQueueTask(taskId2)
-          .then(() => {
-            this.upsertTask({
-              ...args2,
-              status: 'cancelled',
-              progress: 0,
-              message: taskCenterText('cancelledMessage'),
-              error: '',
-              finishedAt: Date.now(),
-            });
-          })
-          .catch((error2) => {
-            window.showToast?.(error2?.message || taskCenterText('cancelFailed'), 'error');
-          });
-        return;
-      }
-      void getElectronMediaTaskApi()
-        ?.cancel?.({ taskId: taskId2 })
-        .catch((error3) => {
-          window.showToast?.(error3?.message || taskCenterText('cancelFailed'), 'error');
-        });
-      return;
-    }
-    if (value10 === 'reveal') {
-      const localPath = el16.dataset.localPath || '';
-      void globalThis.window?.electronAPI?.showItemInFolder?.({ localPath: localPath })?.catch((error4) => {
-        window.showToast?.(error4?.message || taskCenterText('revealFailed'), 'error');
+  ['handleContextMenu'](event3) {
+    const ownerElement = event3['target']?.['closest']?.('.v2-task-card');
+    if (!ownerElement || !this['panel']?.['contains']?.(ownerElement)) return;
+    const taskId4 = String(ownerElement['dataset']['taskId'] || ''),
+      response13 = this['tasks']['get'](taskId4);
+    if (!response13) return;
+    const list5 = [];
+    ACTIVE_TASK_STATUSES['has'](response13['status']) &&
+      response13['cancellable'] === !![] &&
+      list5['push']({
+        label: taskCenterText('actions.cancel'),
+        icon: 'cancel',
+        danger: !![],
+        shortcutActionId: 'context-task-cancel',
+        action: () => this['runTaskAction']('cancel', { taskId: taskId4 }),
       });
-      return;
-    }
-    if (value10 === 'copy-error') {
-      const value12 = this.tasks.get(el16.dataset.taskId || ''),
-        text = value12?.error || '';
-      if (!text) return;
-      const value13 = globalThis.window?.electronAPI?.clipboard,
-        enabled6 =
-          typeof value13?.writeText === 'function'
-            ? value13.writeText({ text: text })
-            : globalThis.navigator?.clipboard?.writeText?.(text);
-      if (!enabled6) {
-        window.showToast?.(taskCenterText('copyFailed'), 'error');
-        return;
+    const localPath3 = getResultLocalPath(response13['result']);
+    localPath3 &&
+      list5['push']({
+        label: taskCenterText('actions.reveal'),
+        icon: 'reveal',
+        shortcutActionId: 'context-task-reveal',
+        disabled: !desktopBridge['shell']['canShowItemInFolder'](),
+        action: () => this['runTaskAction']('reveal', { localPath: localPath3 }),
+      });
+    response13['error'] &&
+      list5['push']({
+        label: taskCenterText('actions.copyError'),
+        icon: 'copy',
+        shortcutActionId: 'context-task-copy-error',
+        action: () => this['runTaskAction']('copy-error', { taskId: taskId4 }),
+      });
+    if (!list5['length']) return;
+    (event3['preventDefault'](),
+      event3['stopPropagation'](),
+      this['closeContextMenu'](),
+      (this['contextMenuTaskId'] = taskId4),
+      (this['contextMenuSession'] = this['contextMenuPresenter'](
+        event3['clientX'],
+        event3['clientY'],
+        list5,
+        { ensureItemIcons: !![], ownerElement: ownerElement, ownerRoot: this['panel'] },
+      )));
+  }
+  ['runTaskAction'](value14, { taskId: taskId = '', localPath: localPath = '' } = {}) {
+    if (value14 === 'clear-terminal') {
+      this['closeContextMenu']();
+      for (const [value15, response14] of this['tasks']) {
+        if (TERMINAL_TASK_STATUSES['has'](response14['status'])) this['tasks']['delete'](value15);
       }
-      void Promise.resolve(enabled6)
-        .then(() => window.showToast?.(taskCenterText('copySuccess'), 'success'))
-        .catch(() => window.showToast?.(taskCenterText('copyFailed'), 'error'));
+      return (this['render'](), Promise['resolve']());
     }
+    const value16 = taskId + ':' + value14;
+    if (this['pendingActions']['has'](value16)) return Promise['resolve']();
+    return (
+      this['pendingActions']['add'](value16),
+      this['render'](),
+      executeTaskCenterAction(this, value14, this['tasks']['get'](taskId), localPath, taskCenterText)
+        ['catch']((error) =>
+          window['showToast']?.(error?.['message'] || taskCenterText('actionFailed'), 'error'),
+        )
+        ['finally'](() => {
+          (this['pendingActions']['delete'](value16), this['render']());
+        })
+    );
   }
 }
-export function initTaskCenterManager() {
-  if (globalThis.window?.__aiCanvasTaskCenterManager) return globalThis.window.__aiCanvasTaskCenterManager;
-  const taskCenterManager = new TaskCenterManager();
-  return ((globalThis.window.__aiCanvasTaskCenterManager = taskCenterManager), taskCenterManager);
+export function initTaskCenterManager(options2 = {}) {
+  if (globalThis['window']?.['__aiCanvasTaskCenterManager'])
+    return globalThis['window']['__aiCanvasTaskCenterManager'];
+  const taskCenterManager = new TaskCenterManager(options2);
+  return ((globalThis['window']['__aiCanvasTaskCenterManager'] = taskCenterManager), taskCenterManager);
 }

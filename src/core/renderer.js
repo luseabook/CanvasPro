@@ -1,25 +1,27 @@
 import { isNodeType } from '../modules/registry.js';
-import { getRefKindByNodeType, hasNodeTypeBetaBadge, normalizeNodeType } from '../modules/nodeMeta.js';
-import { getDragContext } from './interaction.js';
+import { createRendererPresentationSubscription } from './rendererPresentationSubscription.js';
+import { hasNodeTypeBetaBadge, normalizeNodeType } from '../modules/nodeMeta.js';
+import { getInteractionRenderState } from './interaction.js';
 import { getViewportPanPreview } from './viewportPanPreview.js';
-import { getAlignableSelectionNodes, computeSelectionBounds } from './math.js';
+import { createRendererPanPreviewReconciler } from './rendererPanPreviewReconcile.js';
+import { readViewportInteractionState } from './viewportInteractionState.js';
 import {
   isPerfProbeEnabled,
   recordEdgeRedrawSample,
   recordRenderFrameSample,
+  recordRendererNodeLifecycleSample,
 } from '../modules/perf/perfProbe.js';
 import {
   buildVirtualizationCandidateSets,
   createRendererStructuralBudget,
+  ensureRendererExactVisiblePreviewCandidates,
   getRendererStructuralReconcileDelayMs,
   isNodeInsideViewportPadding,
   RENDERER_VIRTUALIZATION_CONFIG,
+  resolveRendererLowZoomMountLimit,
 } from './rendererVirtualization.js';
-import {
-  clearRendererSpatialIndexCache,
-  collectVirtualizedRenderNodes,
-  getCachedRendererSpatialIndex,
-} from './rendererSpatialIndex.js';
+import { createRendererFramePlan } from './rendererFramePlan.js';
+import { clearRendererSpatialIndexCache, collectVirtualizedRenderNodes } from './rendererSpatialIndex.js';
 import {
   buildFullEdgeRenderSignature,
   clearCachedEdgeVisibilityIndex,
@@ -30,19 +32,13 @@ import {
 import { createRendererEdgeLayer } from './rendererEdgeLayer.js';
 import { normalizeConnectionLineStyle } from './edgePathGeometry.js';
 import { installNodeResizeGeometryPreviewer } from './rendererResizePreview.js';
-import { getAIGenerationDefaultSizeByType } from '../services/fileService.js';
 import { buildGroupOutputMembershipSignature } from '../modules/groupDynamicOutput.js';
-import { getMediaComposeButtonLabel, getSelectedMediaComposeKind } from '../modules/mediaComposeSelection.js';
-import { getSelectedSyncPlayableVideoCount } from '../modules/videoSyncPlayback.js';
-import {
-  createContextMenuEl,
-  createPickConnectBannerEl,
-  renderContextMenu,
-  renderPickConnectBanner,
-} from './rendererOverlays.js';
+import { syncRendererBridge } from './rendererBridge.js';
+import { createPickConnectBannerEl, renderPickConnectBanner } from './rendererOverlays.js';
+import { createRendererSelectionOverlay } from './rendererSelectionOverlay.js';
+import { createRendererMediaPresentationCoordinator } from './rendererMediaPresentationCoordinator.js';
 import { createRendererInteractionGraceController } from './rendererInteractionGrace.js';
-import { createRendererPresentationSubscription } from './rendererPresentationSubscription.js';
-import { createRendererFramePlan } from './rendererFramePlan.js';
+import { createRendererVisibleAudioSurfaceHydrationPass } from './rendererDeferredMedia.js';
 import {
   cancelRendererFastPreviewMediaPreloads,
   createRendererFastPreviewLayer,
@@ -54,12 +50,47 @@ import {
   syncRendererFastPreviewAfterNodeRender,
 } from './rendererFastPreviewContinuation.js';
 import { createFastPreviewReleaseScheduler } from './rendererFastPreviewRelease.js';
-import { createRendererMediaPresentationCoordinator } from './rendererMediaPresentationCoordinator.js';
 import { createRendererSourceVideoSlotLifecycle } from './rendererSourceVideoSlotLifecycle.js';
 import { resolveRendererVideoMediaLeaseKey } from './rendererVideoMediaResidency.js';
-import { syncRendererBridge } from './rendererBridge.js';
-import { resolveModelProvider } from '../manifests/index.js';
-import { syncNodeMediaLodMode } from './rendererNodeMediaLod.js';
+import { cancelCanvasVisibleMediaWarmupPreloads } from './canvasMediaWarmup.js';
+import { buildRendererVirtualizationSignature } from './rendererVirtualizationSignature.js';
+import { consumeRendererNodeDragCommitHint } from './rendererCommitHints.js';
+import {
+  createHeavyMediaPreviewOnlyDecider,
+  createHeavyMediaUpdateFrameBudget,
+  getRendererStructuralBudgetOptions,
+  resolveViewportInteractionReconcileDelay,
+  shouldDeferDenseStructuralEdgeRender,
+  shouldDeferHeavyMediaForInteractionGrace,
+  shouldDeferHeavyMediaMount,
+  shouldDeferHeavyMediaUpdate,
+  shouldForceDeferActiveNodeDetails,
+  shouldForceDeferRelatedVideoDetails,
+  shouldHydratePriorityMediaDuringViewportInteraction,
+  shouldHydrateVideoMediaImmediately,
+  shouldKeepHiddenHeavyMediaUpdatePending,
+  shouldPauseViewportMediaForInteractionGrace,
+  shouldPrepareDenseStructuralEdgeFollowup,
+  shouldQueueNodeDetailHydration,
+  shouldUseDenseStructuralEdgeOnlyFollowup,
+} from './rendererInteractionRenderPolicy.js';
+import {
+  applyRendererLowZoomRealVideoCandidates,
+  resolveRendererLowZoomRealVideoNodeIds,
+  shouldDeferInitialVideoMediaOnMount,
+  syncRendererPendingSourceVideoActivationIds,
+} from './rendererPriorityMediaWork.js';
+import {
+  applyRendererFullEligibleImageCandidates,
+  collectFullEligibleVisibleImageNodeIds,
+  prioritizeFullEligibleVisibleImageNodes,
+  syncNodeMediaLodMode,
+} from './rendererNodeMediaLod.js';
+import {
+  createRendererNodeLifecycleStats,
+  recordRendererLifecycleDuration,
+  recordRendererLifecycleSkippedUpdate,
+} from './rendererNodeLifecyclePerf.js';
 import { buildRendererNodeSignature } from './rendererNodeSignature.js';
 import { syncNodeResultClass } from './rendererNodeResultState.js';
 import { syncNodeMediaMetricsDataset } from '../modules/nodeMediaMetrics.js';
@@ -68,114 +99,203 @@ import {
   disposePreparedRendererNodeRuntime,
   prepareRendererNodeRuntime,
 } from './rendererNodeRuntimeFactory.js';
+import { createRendererNodeTimerController } from './rendererNodeTimerController.js';
+import {
+  buildRendererDragTargetSet,
+  buildSelectedNodeRankMap,
+  clearRendererNodeLabelTooltip,
+  formatRendererNodeLabelText,
+  formatVideoMetaText,
+  getRendererDefaultNodeLabel,
+  getRendererGroupColorWithOpacity,
+  getRendererNodeLabelKind,
+  getRendererNodeZIndex,
+  setRendererNodeLabelContent,
+  shouldSkipInitialMediaNodeUpdate,
+  syncRendererFastPreviewPresentationOwner,
+  syncRendererNodeDragTransform,
+  syncRendererNodePresentationZIndex,
+} from './rendererNodePresentation.js';
+import { createRendererSelectionFastPath } from './rendererSelectionFastPath.js';
+import {
+  clearRendererViewportMediaPreloadPause,
+  syncRendererViewportMediaPreloadPause,
+} from './rendererViewportMediaPreloadPause.js';
+import { renderViewport } from './rendererViewportTransform.js';
+import {
+  createRendererViewportPreviewCoverage,
+  RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG,
+  shouldPrepareRendererViewportPreviewCoverage,
+} from './rendererViewportPreviewCoverage.js';
+import { createRendererViewportJumpDetector } from './rendererViewportJumpDetector.js';
 import {
   createRendererMediaRuntimePreparer,
   shouldPrebuildRendererMediaRuntime,
 } from './rendererMediaRuntimePreparer.js';
-import { shouldDeferInitialVideoMediaOnMount } from './rendererPriorityMediaWork.js';
 import {
+  installRendererRuntimeDiagnosticAccess,
   isRendererRuntimeDiagnosticsEnabled,
   recordRendererRuntimeDiagnostic,
 } from './rendererRuntimeDiagnostics.js';
-import {
-  buildRendererDragTargetSet,
-  buildSelectedNodeRankMap,
-  getRendererDefaultNodeLabel,
-  getRendererNodeZIndex,
-  shouldSkipInitialMediaNodeUpdate,
-  syncRendererFastPreviewPresentationOwner,
-} from './rendererNodePresentation.js';
+import { resolveGenerationUiState } from './generationTaskUiState.js';
+import { getRendererPickerNodeTypes } from './rendererPickerCatalog.js';
 import { t } from '../i18n/index.js';
-import { setCanvasMediaSchedulerPaused } from '../modules/canvasMediaScheduler.js';
-let _schedulePreparedMediaRuntimeCommit = null;
+import {
+  resolveCanvasVideoDisplayUrl,
+  resolveCanvasVideoPosterUrl,
+} from '../services/canvasMediaLocalService.js';
+export { buildRendererVirtualizationSignature };
+export { formatVideoMetaText };
 const _componentMap = new Map(),
   _nodeRuntimeBridge = createRendererNodeRuntimeBridge({
-    getInstance: (value) => _componentMap.get(value),
+    getInstance: (value) => _componentMap['get'](value),
   }),
   _nodeDataSnapshotMap = new Map(),
-  _wrapperMap = new Map();
-let _msHiddenNodeIds = new Set();
-const _multiSelectRenderCache = {
-    geometrySig: '',
-    runBtnDisabled: null,
-    resetBtnVisible: null,
-    composeBtnVisible: null,
-    composeBtnKind: '',
-  },
-  _alignPanelRenderCache = { centerSig: '', buttonStateSig: '' },
+  _sourceVideoSourceKeySnapshotMap = new Map(),
+  _pendingSourceVideoActivationIds = new Set();
+let _sourceVideoActivationRev = null,
+  _sourceVideoActivationNodesRef = null,
+  _resetSelectionFastPath = null;
+const _wrapperMap = new Map(),
+  _nodeTimerController = createRendererNodeTimerController({
+    getWrapper: (item) => _wrapperMap['get'](item),
+  }),
   _mountedNodeIds = new Set(),
   _parkedNodeIds = new Set(),
   _parkedWrapperMap = new Map(),
+  _selectionOverlay = createRendererSelectionOverlay({
+    getWrapper: (key) => _wrapperMap['get'](key) || _parkedWrapperMap['get'](key) || null,
+    isMounted: (index) => _mountedNodeIds['has'](index),
+  }),
+  _fastPreviewLifecycle = createRendererFastPreviewLifecycleTracker(),
   _pendingNodeDataMap = new Map(),
   _nodeTypeSnapshotMap = new Map(),
   _nodePinReasons = new Map(),
-  _rendererInteractionGrace = createRendererInteractionGraceController({
-    delayMs: RENDERER_VIRTUALIZATION_CONFIG.parkAfterInteractionDelayMs,
-    getDragContext: getDragContext,
-    onBusyStateChange: setCanvasMediaSchedulerPaused,
+  MANIFEST_MODEL_NODE_TYPES = new Set(['ai-image', 'ai-text', 'ai-video', 'ai-audio']);
+let _rendererRuntimeDiagnosticRenderState = { previewOnly: ![], viewportBusy: ![] };
+const _rendererRuntimeDiagnosticsEnabled = isRendererRuntimeDiagnosticsEnabled();
+installRendererRuntimeDiagnosticAccess((nodeId) => {
+  const rendererMediaDeferred = _componentMap['get'](nodeId),
+    wrapperVideoCount = _wrapperMap['get'](nodeId);
+  return {
+    nodeId: nodeId,
+    mounted: _mountedNodeIds['has'](nodeId),
+    parked: _parkedNodeIds['has'](nodeId),
+    rendererMediaDeferred: rendererMediaDeferred?.['_rendererMediaDeferred'] === !![],
+    pinReasons: Array['from'](_nodePinReasons['get'](nodeId) || []),
+    wrapperVideoCount: wrapperVideoCount?.['querySelectorAll']?.('video')?.['length'] || 0x0,
+    ..._rendererRuntimeDiagnosticRenderState,
+  };
+});
+const _rendererInteractionGrace = createRendererInteractionGraceController({
+  delayMs: RENDERER_VIRTUALIZATION_CONFIG['parkAfterInteractionDelayMs'],
+  getDragContext: getInteractionRenderState,
+});
+let _schedulePreparedMediaRuntimeCommit = null;
+const _rendererMediaRuntimePreparer = createRendererMediaRuntimePreparer({
+    isInteractionBusy: _rendererInteractionGrace['isBusy'],
+    onPrepared: ({ nodeId: nodeId2, durationMs: durationMs }) => {
+      (_rendererRuntimeDiagnosticsEnabled &&
+        recordRendererRuntimeDiagnostic({
+          kind: 'renderer-media-runtime-prepared',
+          nodeId: nodeId2,
+          durationMs: durationMs,
+        }),
+        _schedulePreparedMediaRuntimeCommit?.());
+    },
+    onPrepareError: ({ nodeId: nodeId3, error: error }) => {
+      console['warn']('[Renderer] media runtime prebuild failed:', nodeId3, error);
+    },
   }),
-  _fastPreviewLifecycle = createRendererFastPreviewLifecycleTracker(),
   _sourceVideoSlotLifecycle = createRendererSourceVideoSlotLifecycle({
-    getNode: (item) => _currentSnapshot?.nodes?.[item],
-    getWrapper: (key) => _wrapperMap.get(key),
-    releasePreview: (index) => _fastPreviewLayer.releaseNode(index),
-    forgetScheduledRelease: (result) => _fastPreviewRelease.forget(result),
+    getNode: (result) => _currentSnapshot?.['nodes']?.[result],
+    getWrapper: (data) => _wrapperMap['get'](data),
+    releasePreview: (options) => _fastPreviewLayer['releaseNode'](options),
+    forgetScheduledRelease: (target) => _fastPreviewRelease['forget'](target),
   }),
   _fastPreviewLayer = createRendererFastPreviewLayer({
-    getWrapper: (data) => _wrapperMap.get(data),
-    isMounted: (options) => _mountedNodeIds.has(options),
-    resolveMediaPresentationReady: _sourceVideoSlotLifecycle.resolveMediaPresentationReady,
+    getWrapper: (source) => _wrapperMap['get'](source),
+    isMounted: (next) => _mountedNodeIds['has'](next),
+    resolveMediaPresentationReady: _sourceVideoSlotLifecycle['resolveMediaPresentationReady'],
     onPresentationOwnerChanged: ({ active: active, wrapper: wrapper }) => {
       syncRendererFastPreviewPresentationOwner(wrapper, active);
     },
     onMediaPresented: () => {
-      if (_rendererInteractionGrace.isBusy()) return;
+      if (_rendererInteractionGrace['isBusy']()) return;
       _schedulePreparedMediaRuntimeCommit?.();
     },
   }),
   _fastPreviewContinuation = createRendererFastPreviewContinuationController({
-    sync: (...args) => _fastPreviewLayer.sync(...args),
+    sync: (...args) => _fastPreviewLayer['sync'](...args),
   }),
   _fastPreviewRelease = createFastPreviewReleaseScheduler({
-    getWrapper: (target) => _wrapperMap.get(target),
-    hasPreview: (source) => _fastPreviewLayer.hasNodePreview(source),
-    isMounted: (next) => _mountedNodeIds.has(next),
-    isInteractionBusy: _rendererInteractionGrace.isBusy,
-    resolveMediaPresentationReady: _sourceVideoSlotLifecycle.resolveMediaPresentationReady,
-    releasePreview: (current) => _fastPreviewLayer.releaseNode(current),
+    getWrapper: (current) => _wrapperMap['get'](current),
+    hasPreview: (entry) => _fastPreviewLayer['hasNodePreview'](entry),
+    isMounted: (record) => _mountedNodeIds['has'](record),
+    isInteractionBusy: _rendererInteractionGrace['isBusy'],
+    resolveMediaPresentationReady: _sourceVideoSlotLifecycle['resolveMediaPresentationReady'],
+    releasePreview: (payload) => _fastPreviewLayer['releaseNode'](payload),
   }),
   _rasterPreviewCoordinator = createRendererRasterPreviewCoordinator({
-    isDomMediaPresented: (entry, record) => _fastPreviewLayer.isNodePresentationReady(entry, record),
-    onRasterHandoffFrame: _fastPreviewLayer.stageRasterHandoffFrame,
-    onRasterMediaClaimed: (payload) => {
-      _fastPreviewContinuation.excludeNodes(payload);
-      for (const handle of payload) _fastPreviewLayer.removeNode(handle, { collect: false });
+    isDomMediaPresented: (handle, state) =>
+      _fastPreviewLayer['isNodePresentationReady'](handle, state),
+    onRasterHandoffFrame: _fastPreviewLayer['stageRasterHandoffFrame'],
+    onRasterMediaClaimed: (config) => {
+      _fastPreviewContinuation['excludeNodes'](config);
+      for (const scope of config) _fastPreviewLayer['removeNode'](scope, { collect: ![] });
     },
     onMediaPresented: () => {
-      if (_rendererInteractionGrace.isBusy()) return;
+      if (_rendererInteractionGrace['isBusy']()) return;
       _schedulePreparedMediaRuntimeCommit?.();
     },
-  }),
+  });
+function _markRasterMediaInteractionBusy() {
+  (_rendererInteractionGrace['markBusy'](), _rasterPreviewCoordinator['setMediaLoadingBusy'](!![]));
+}
+function _releaseRasterMediaInteractionBusy() {
+  (_rasterPreviewCoordinator['setMediaLoadingBusy'](![]), _schedulePreparedMediaRuntimeCommit?.());
+}
+const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 0x2,
+  RENDERER_VIDEO_MEDIA_RESIDENCY_PADDING = 0x78,
+  RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_MS = 0x258,
+  RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_LIMIT = 0x3,
+  RENDERER_FULL_SURFACE_RELEASE_BATCH_SIZE = 0xc,
+  RENDERER_FULL_SURFACE_RELEASE_FRAME_BUDGET_MS = 0x4,
+  VISIBLE_VIDEO_STRUCTURAL_RECONCILE_DELAY_MS = 0x0,
   _mediaPresentation = createRendererMediaPresentationCoordinator({
-    getNode: (state) => _currentSnapshot?.nodes?.[state],
-    getComponent: (config) => _componentMap.get(config),
-    getWrapper: (scope) => _wrapperMap.get(scope),
-    getParkedWrapper: (input) => _parkedWrapperMap.get(input),
-    getWrappers: () => _wrapperMap.values(),
-    getParkedWrappers: () => _parkedWrapperMap.values(),
-    isMounted: (output) => _mountedNodeIds.has(output),
-    isInteractionBusy: _rendererInteractionGrace.isBusy,
-    isPinned: (value2) => _getNodePinSet(value2, false)?.size > 0,
-    isSelected: (value3) => {
-      const list = _currentSnapshot?.selectedNodeIds;
-      return Array.isArray(list) ? list.includes(value3) : list?.has?.(value3) === true;
+    getNode: (input) => _currentSnapshot?.['nodes']?.[input],
+    getComponent: (output) => _componentMap['get'](output),
+    getWrapper: (value2) => _wrapperMap['get'](value2),
+    getParkedWrapper: (value3) => _parkedWrapperMap['get'](value3),
+    getWrappers: () => _wrapperMap['values'](),
+    getParkedWrappers: () => _parkedWrapperMap['values'](),
+    isMounted: (value4) => _mountedNodeIds['has'](value4),
+    isInteractionBusy: _rendererInteractionGrace['isBusy'],
+    isPinned: (value5) => _getNodePinSet(value5, ![])?.['size'] > 0x0,
+    isSelected: (value6) => {
+      const list = _currentSnapshot?.['selectedNodeIds'];
+      return Array['isArray'](list)
+        ? list['includes'](value6)
+        : list?.['has']?.(value6) === !![];
     },
     preview: _fastPreviewLayer,
     previewRelease: _fastPreviewRelease,
     videoSlots: _sourceVideoSlotLifecycle,
-    batchSize: 2,
-    presentedMediaLeaseMs: 600,
-    maxRetainedPresentedMedia: 3,
+    batchSize: RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE,
+    presentedMediaLeaseMs: RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_MS,
+    maxRetainedPresentedMedia: RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_LIMIT,
+    onHydrateDiagnostic: _rendererRuntimeDiagnosticsEnabled
+      ? (args2) => recordRendererRuntimeDiagnostic({ kind: 'renderer-media-hydrate', ...args2 })
+      : null,
+    onParkSuspendDiagnostic: _rendererRuntimeDiagnosticsEnabled
+      ? (args3) =>
+          recordRendererRuntimeDiagnostic({
+            kind: 'video-media-suspend',
+            reason: 'park',
+            suspended: !![],
+            ...args3,
+          })
+      : null,
   }),
   {
     media: _rendererDeferredMedia,
@@ -183,307 +303,228 @@ const _multiSelectRenderCache = {
     residency: _videoMediaResidency,
     videoBackpressure: _videoHydrationBackpressure,
   } = _mediaPresentation,
+  _viewportJumpDetector = createRendererViewportJumpDetector(),
   _edgeLayer = createRendererEdgeLayer({
     getContainerSize: _getEdgeContainerSize,
     nowMs: _nowMs,
     recordRedrawSample: recordEdgeRedrawSample,
   }),
-  _edgeDomCache = _edgeLayer.getDomCache(),
+  _edgeDomCache = _edgeLayer['getDomCache'](),
   _nodeToEdgeIds = new Map(),
   _incomingEdgeIdsByTarget = new Map(),
-  SELECTION_RELATED_HIGHLIGHT_COLORS = Object.freeze([
-    'white',
-    'blue',
-    'green',
-    'cyan',
-    'purple',
-    'red',
-    'yellow',
-  ]);
-const _rendererMediaRuntimePreparer = createRendererMediaRuntimePreparer({
-  isInteractionBusy: _rendererInteractionGrace.isBusy,
-  onPrepared: ({ nodeId, durationMs }) => {
-    (isRendererRuntimeDiagnosticsEnabled() &&
-      recordRendererRuntimeDiagnostic({
-        kind: 'renderer-media-runtime-prepared',
-        nodeId,
-        durationMs,
-      }),
-      _schedulePreparedMediaRuntimeCommit?.());
-  },
-  onPrepareError: ({ nodeId, error }) => {
-    console.error('[Renderer] media runtime prepare failed:', nodeId, error);
-  },
-});
-let _edgeIndexRev = -1,
-  _edgeEntriesRev = -1,
+  FULL_ELIGIBLE_VISIBLE_IMAGE_RECONCILE_DELAY_MS = 0x0,
+  FULL_ELIGIBLE_VISIBLE_IMAGE_SETTLED_BUDGET_DELAY_MS = 0xdc,
+  HIGH_ZOOM_STALE_WARMUP_PRELOAD_CANCEL_PRIORITY_LIMIT = 0x96,
+  HIGH_ZOOM_STALE_FAST_PREVIEW_PRELOAD_CANCEL_PRIORITY_LIMIT = 0x50,
+  HIGH_ZOOM_STALE_PRELOAD_CANCEL_THROTTLE_MS = 0xdc,
+  VIEWPORT_INTERACTION_PRELOAD_CANCEL_THROTTLE_MS = 0xb4,
+  VIEWPORT_INTERACTION_WARMUP_CANCEL_PRIORITY_LIMIT = 0x96,
+  VIEWPORT_INTERACTION_FAST_PREVIEW_CANCEL_PRIORITY_LIMIT = 0x50;
+let _lastHighZoomStalePreloadCancelAt = 0x0,
+  _lastViewportInteractionPreloadCancelAt = 0x0,
+  _lastViewportJumpAt = 0x0;
+const SELECTION_RELATED_HIGHLIGHT_COLORS = Object['freeze']([
+  'white',
+  'blue',
+  'green',
+  'cyan',
+  'purple',
+  'red',
+  'yellow',
+]);
+function cancelStaleLowPriorityPreloadsForHighZoom(value7) {
+  if (value7 !== !![]) return;
+  const value8 =
+    typeof performance !== 'undefined' && performance && typeof performance['now'] === 'function'
+      ? performance['now']()
+      : Date['now']();
+  if (
+    _lastHighZoomStalePreloadCancelAt > 0x0 &&
+    value8 - _lastHighZoomStalePreloadCancelAt < HIGH_ZOOM_STALE_PRELOAD_CANCEL_THROTTLE_MS
+  )
+    return;
+  ((_lastHighZoomStalePreloadCancelAt = value8),
+    cancelCanvasVisibleMediaWarmupPreloads({
+      includeActive: ![],
+      belowPriority: HIGH_ZOOM_STALE_WARMUP_PRELOAD_CANCEL_PRIORITY_LIMIT,
+      reason: 'high zoom viewport media priority',
+    }),
+    cancelRendererFastPreviewMediaPreloads({
+      includeActive: ![],
+      belowPriority: HIGH_ZOOM_STALE_FAST_PREVIEW_PRELOAD_CANCEL_PRIORITY_LIMIT,
+      reason: 'high zoom viewport media priority',
+    }));
+}
+function cancelQueuedViewportInteractionPreloads(value9) {
+  if (value9 !== !![]) return;
+  const value10 =
+    typeof performance !== 'undefined' && performance && typeof performance['now'] === 'function'
+      ? performance['now']()
+      : Date['now']();
+  if (
+    _lastViewportInteractionPreloadCancelAt > 0x0 &&
+    value10 - _lastViewportInteractionPreloadCancelAt < VIEWPORT_INTERACTION_PRELOAD_CANCEL_THROTTLE_MS
+  )
+    return;
+  ((_lastViewportInteractionPreloadCancelAt = value10),
+    cancelCanvasVisibleMediaWarmupPreloads({
+      includeActive: ![],
+      belowPriority: VIEWPORT_INTERACTION_WARMUP_CANCEL_PRIORITY_LIMIT,
+      reason: 'viewport interaction',
+    }),
+    cancelRendererFastPreviewMediaPreloads({
+      includeActive: ![],
+      belowPriority: VIEWPORT_INTERACTION_FAST_PREVIEW_CANCEL_PRIORITY_LIMIT,
+      reason: 'viewport interaction',
+    }));
+}
+function isViewportPriorityImageNode({
+  node: node,
+  nodeId: nodeId4,
+  mountCandidateIds: mountCandidateIds,
+  viewport: viewport,
+  containerW: containerW,
+  containerH: containerH,
+  isSelected: isSelected,
+  isSelectionRelated: isSelectionRelated,
+} = {}) {
+  if (!nodeId4 || !isNodeType(node, ['source-image', 'ai-image'])) return ![];
+  if (!mountCandidateIds?.['has']?.(nodeId4)) return ![];
+  if (isSelected || isSelectionRelated) return !![];
+  return _isNodeVisible(node, viewport, containerW, containerH);
+}
+function isRendererMediaRuntimeInteractionPriority({
+  nodeId: nodeId5,
+  isSelected: isSelected2,
+  isSelectionRelated: isSelectionRelated2,
+  dragTargets: dragTargets,
+  connOverlay: connOverlay,
+  pickMode: pickMode,
+} = {}) {
+  if (!nodeId5) return ![];
+  return !!(
+    isSelected2 ||
+    isSelectionRelated2 ||
+    dragTargets?.['has']?.(nodeId5) ||
+    connOverlay?.['srcId'] === nodeId5 ||
+    connOverlay?.['hoverId'] === nodeId5 ||
+    pickMode?.['sourceNodeId'] === nodeId5 ||
+    pickMode?.['hoverNodeId'] === nodeId5
+  );
+}
+let _edgeIndexRev = -0x1,
+  _edgeEntriesRev = -0x1,
   _edgeEntriesSource = null,
   _edgeEntriesCache = [],
   _cachedContainerWidth = null,
   _cachedContainerHeight = null,
   _lastFullEdgeRenderSignature = '',
-  _edgeDomClearedSinceLastFull = false,
+  _edgeDomClearedSinceLastFull = ![],
   _lastVirtualCandidateSignature = '',
   _lastVirtualCandidateResult = null,
   _containerSizeSourceEl = null,
   _containerResizeObserver = null,
   _containerResizeHandler = null,
-  _timerRafId = null,
-  _currentSnapshot = null,
-  _runningTimers = new Set(),
-  _lastTimerSyncRev = -1;
-const MANIFEST_MODEL_NODE_TYPES = new Set(['ai-image', 'ai-text', 'ai-video', 'ai-audio']);
-export function refreshManifestModelNodeUis() {
-  const refreshedNodeIds = [],
-    remountedNodeIds = [];
-  for (const [value4, value5] of [..._componentMap.entries()]) {
-    const enabled = _currentSnapshot?.nodes?.[value4];
-    if (!enabled || !MANIFEST_MODEL_NODE_TYPES.has(normalizeNodeType(enabled.type))) continue;
-    if (typeof value5?.refreshModelRegistryUi === 'function')
-      try {
-        (value5.refreshModelRegistryUi(), refreshedNodeIds.push(value4));
-        continue;
-      } catch (value6) {
-        console.warn('[Renderer] refresh model registry UI failed:', value6);
-      }
-    (_destroyNode(value4), remountedNodeIds.push(value4));
-  }
-  return { refreshedNodeIds: refreshedNodeIds, remountedNodeIds: remountedNodeIds };
-}
-function _hideTimer(value7) {
-  const value8 = _wrapperMap.get(value7),
-    el = value8?.__v2_timer_el;
-  if (!el) return;
-  el.textContent = '';
-  if (el.style.display !== 'none') el.style.display = 'none';
-}
-function _cancelTimerLoopIfNeeded() {
-  (_timerRafId !== null && typeof cancelAnimationFrame === 'function' && cancelAnimationFrame(_timerRafId),
-    (_timerRafId = null));
-}
-function _ensureTimerLoopActive() {
-  if (_runningTimers.size === 0) return;
-  _timerRafId === null &&
-    typeof requestAnimationFrame === 'function' &&
-    (_timerRafId = requestAnimationFrame(_updateTimers));
-}
-function _hasResolvedMediaValue(enabled2, list2) {
+  _currentSnapshot = null;
+function _getNodePinSet(value11, value12 = ![]) {
+  let enabled = _nodePinReasons['get'](value11);
   return (
-    !!enabled2 &&
-    typeof enabled2 === 'object' &&
-    list2.some((item2) => !!String(enabled2?.[item2] || '').trim())
-  );
-}
-function _isResolvedSourceMediaNode(value9) {
-  if (isNodeType(value9, 'source-audio'))
-    return _hasResolvedMediaValue(value9, ['src', 'audioUrl', 'localPath', 'resultUrl']);
-  if (
-    !isNodeType(value9, 'source-video') ||
-    !!String(value9?.rhTaskId || value9?.asyncTaskId || value9?.dreaminaSubmitId || '').trim() ||
-    value9?.rhTaskRecovering === true ||
-    value9?.asyncTaskRecovering === true ||
-    value9?.dreaminaTaskRecovering === true
-  )
-    return false;
-  const list3 = Array.isArray(value9?.videos) ? value9.videos : [];
-  return (
-    _hasResolvedMediaValue(value9, [
-      'src',
-      'videoUrl',
-      'localPath',
-      'displayLocalPath',
-      'originalLocalPath',
-      'resultUrl',
-      'capturePreviewUrl',
-    ]) ||
-    list3.some((item3) =>
-      _hasResolvedMediaValue(item3, [
-        'url',
-        'videoUrl',
-        'localPath',
-        'displayLocalPath',
-        'originalLocalPath',
-        'resultUrl',
-        'sourceUrl',
-      ]),
-    )
-  );
-}
-function _isRunningTimerNode(value10) {
-  return !!(
-    value10?.generationStartTime &&
-    value10.generationDuration == null &&
-    !_isResolvedSourceMediaNode(value10)
-  );
-}
-function _syncRunningTimerForNode(value11, value12, { hide: hide = false } = {}) {
-  if (_isRunningTimerNode(value12)) {
-    (_runningTimers.add(value11), _ensureTimerLoopActive());
-    return;
-  }
-  if (_runningTimers.delete(value11) && hide) _hideTimer(value11);
-  else hide && _hideTimer(value11);
-  _runningTimers.size === 0 && _cancelTimerLoopIfNeeded();
-}
-function _updateTimers() {
-  if (!_currentSnapshot || _runningTimers.size === 0) {
-    _timerRafId = null;
-    return;
-  }
-  const list4 = [];
-  for (const value13 of _runningTimers) {
-    const enabled3 = _currentSnapshot.nodes?.[value13];
-    if (
-      !enabled3 ||
-      !enabled3.generationStartTime ||
-      enabled3.generationDuration != null ||
-      _isResolvedSourceMediaNode(enabled3)
-    ) {
-      list4.push(value13);
-      continue;
-    }
-    const value14 = _wrapperMap.get(value13),
-      el2 = value14?.__v2_timer_el;
-    if (el2) {
-      const value15 = Date.now() - enabled3.generationStartTime;
-      el2.textContent = _formatNodeTimerText(enabled3, value15);
-      if (el2.style.display === 'none') el2.style.display = '';
-    }
-  }
-  list4.length > 0 &&
-    list4.forEach((item4) => {
-      (_runningTimers.delete(item4), _hideTimer(item4));
-    });
-  if (_runningTimers.size === 0) {
-    _timerRafId = null;
-    return;
-  }
-  _timerRafId = requestAnimationFrame(_updateTimers);
-}
-function _syncRunningTimers(value16) {
-  const value17 = Number.isFinite(value16?._persistRev)
-    ? value16._persistRev
-    : Number.isFinite(value16?._nodeCount)
-      ? value16._nodeCount
-      : 0;
-  if (value17 === _lastTimerSyncRev) return;
-  _lastTimerSyncRev = value17;
-  const value18 = value16?.nodes || {};
-  for (const value19 of Array.from(_runningTimers)) {
-    _syncRunningTimerForNode(value19, value18[value19], { hide: true });
-  }
-  for (const [value20, value21] of Object.entries(value18)) {
-    if (!_isRunningTimerNode(value21)) continue;
-    const enabled4 = String(value21?.id || value20 || '').trim();
-    if (!enabled4) continue;
-    _syncRunningTimerForNode(enabled4, value21);
-  }
-  _ensureTimerLoopActive();
-}
-function _clearRunningTimerState() {
-  (_cancelTimerLoopIfNeeded(), _runningTimers.clear(), (_lastTimerSyncRev = -1), (_currentSnapshot = null));
-}
-function _getNodePinSet(value22, value23 = false) {
-  let enabled5 = _nodePinReasons.get(value22);
-  return (
-    !enabled5 && value23 && ((enabled5 = new Set()), _nodePinReasons.set(value22, enabled5)),
-    enabled5 || null
+    !enabled && value12 && ((enabled = new Set()), _nodePinReasons['set'](value11, enabled)),
+    enabled || null
   );
 }
 function _getPinnedNodeIds() {
-  const value24 = new Set();
-  for (const [value25, value26] of _nodePinReasons.entries()) {
-    value26 && value26.size > 0 && value24.add(value25);
+  const value13 = new Set();
+  for (const [value14, value15] of _nodePinReasons['entries']()) {
+    value15 && value15['size'] > 0x0 && value13['add'](value14);
   }
-  return value24;
+  return value13;
 }
-function _clearNodePin(value27) {
-  _nodePinReasons.delete(value27);
+function _clearNodePin(value16) {
+  _nodePinReasons['delete'](value16);
 }
-function _clearAnchoredUiForNode(enabled6) {
-  if (!enabled6) return;
-  const value28 = _componentMap.get(enabled6);
-  value28 && typeof value28.highlightCell === 'function' && value28.highlightCell(-1);
+function _clearAnchoredUiForNode(enabled2) {
+  if (!enabled2) return;
+  const value17 = _componentMap['get'](enabled2);
+  value17 && typeof value17['highlightCell'] === 'function' && value17['highlightCell'](-0x1);
 }
-function _resolveVideoMediaLeaseKey(value29, value30) {
-  const value31 = _sourceVideoSlotLifecycle.isManagedNode(value29)
-    ? _sourceVideoSlotLifecycle.read(value29)
+function _resolveVideoMediaLeaseKey(value18, value19) {
+  const value20 = _sourceVideoSlotLifecycle['isManagedNode'](value18)
+    ? _sourceVideoSlotLifecycle['read'](value18)
     : null;
-  return resolveRendererVideoMediaLeaseKey(value30, value31);
+  return resolveRendererVideoMediaLeaseKey(value19, value20);
 }
-function _parkNode(value32) {
-  const el3 = _wrapperMap.get(value32);
-  if (!el3) return null;
-  _sourceVideoSlotLifecycle.isManagedNode(value32) &&
-    (_sourceVideoSlotLifecycle.syncVisibility(value32, 'far'),
-    _sourceVideoSlotLifecycle.setResidency(value32, 'parked'));
+function _parkNode(value21) {
+  const el = _wrapperMap['get'](value21);
+  if (!el) return null;
+  _sourceVideoSlotLifecycle['isManagedNode'](value21) &&
+    (_sourceVideoSlotLifecycle['syncVisibility'](value21, 'far'),
+    _sourceVideoSlotLifecycle['setResidency'](value21, 'parked'));
+  (_mediaPresentation['forgetHydration'](value21), _nodeTimerController['hideNode'](value21));
+  el['isConnected'] && el['remove']();
+  const value22 = _componentMap['get'](value21);
+  let retainPresentedMedia = ![];
+  try {
+    retainPresentedMedia = value22?.['hasPresentedRendererMedia']?.() === !![];
+  } catch {}
   return (
-    _mediaPresentation.forgetHydration(value32),
-    _syncRunningTimerForNode(value32, null, { hide: true }),
-    el3.isConnected && el3.remove(),
-    _videoMediaResidency.park(value32, {
-      retainPresentedMedia: (() => {
-        const value33 = _componentMap.get(value32);
-        try {
-          return value33?.hasPresentedRendererMedia?.() === true;
-        } catch {
-          return false;
-        }
-      })(),
-      leaseKey: _resolveVideoMediaLeaseKey(value32, _currentSnapshot?.nodes?.[value32]),
+    _videoMediaResidency['park'](value21, {
+      retainPresentedMedia: retainPresentedMedia,
+      leaseKey: _resolveVideoMediaLeaseKey(value21, _currentSnapshot?.['nodes']?.[value21]),
     }),
-    _mountedNodeIds.delete(value32),
-    _parkedNodeIds.add(value32),
-    _parkedWrapperMap.set(value32, el3),
-    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(value32)),
-    _clearAnchoredUiForNode(value32),
-    _nodeRuntimeBridge.unregister(value32),
+    _mountedNodeIds['delete'](value21),
+    _parkedNodeIds['add'](value21),
+    _parkedWrapperMap['set'](value21, el),
+    _fastPreviewLifecycle['record'](_nodeTypeSnapshotMap['get'](value21)),
+    _clearAnchoredUiForNode(value21),
+    _nodeRuntimeBridge['unregister'](value21),
+    el
+  );
+}
+function _mountNode(value23, el2) {
+  const el3 = _wrapperMap['get'](value23);
+  if (!el3) return null;
+  return (
+    _videoMediaResidency['unpark'](value23),
+    !el3['isConnected'] && el2['appendChild'](el3),
+    _parkedWrapperMap['delete'](value23),
+    _parkedNodeIds['delete'](value23),
+    _mountedNodeIds['add'](value23),
+    _sourceVideoSlotLifecycle['setResidency'](value23, 'mounted'),
+    _fastPreviewLifecycle['record'](_nodeTypeSnapshotMap['get'](value23)),
+    _nodeRuntimeBridge['register'](value23),
     el3
   );
 }
-function _mountNode(value34, el4) {
-  const el5 = _wrapperMap.get(value34);
-  if (!el5) return null;
-  return (
-    _videoMediaResidency.unpark(value34),
-    !el5.isConnected && el4.appendChild(el5),
-    _parkedWrapperMap.delete(value34),
-    _parkedNodeIds.delete(value34),
-    _mountedNodeIds.add(value34),
-    _sourceVideoSlotLifecycle.setResidency(value34, 'mounted'),
-    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(value34)),
-    _nodeRuntimeBridge.register(value34),
-    el5
-  );
+function _flushMountBatch(el4, enabled3) {
+  if (!el4 || !enabled3) return;
+  if (enabled3['childNodes'] && enabled3['childNodes']['length'] === 0x0) return;
+  el4['appendChild'](enabled3);
 }
-function _flushMountBatch(el6, enabled7) {
-  if (!el6 || !enabled7) return;
-  if (enabled7.childNodes && enabled7.childNodes.length === 0) return;
-  el6.appendChild(enabled7);
-}
-function _destroyNode(value35) {
-  (_rendererMediaRuntimePreparer.forget(value35),
-    _mediaPresentation.forget(value35),
-    _syncRunningTimerForNode(value35, null, { hide: true }));
-  const value36 = _componentMap.get(value35);
+function _destroyNode(value24) {
+  (_rendererMediaRuntimePreparer['forget'](value24),
+    _mediaPresentation['forget'](value24),
+    _nodeTimerController['hideNode'](value24));
+  const value25 = _componentMap['get'](value24);
   try {
-    value36 && typeof value36.unmount === 'function' && value36.unmount();
+    value25 && typeof value25['unmount'] === 'function' && value25['unmount']();
   } catch {}
-  const el7 = _wrapperMap.get(value35) || _parkedWrapperMap.get(value35);
-  (el7 && el7.isConnected && el7.remove(),
-    _componentMap.delete(value35),
-    _nodeDataSnapshotMap.delete(value35),
-    _wrapperMap.delete(value35),
-    _mountedNodeIds.delete(value35),
-    _parkedNodeIds.delete(value35),
-    _parkedWrapperMap.delete(value35),
-    _pendingNodeDataMap.delete(value35),
-    _nodeTypeSnapshotMap.delete(value35),
-    _nodeRuntimeBridge.unregister(value35),
-    _sourceVideoSlotLifecycle.isManagedNode(value35) && _sourceVideoSlotLifecycle.forget(value35),
-    _clearNodePin(value35),
-    _fastPreviewLayer.discardNode(value35),
-    _fastPreviewContinuation.excludeNodes([value35]));
+  const el5 = _wrapperMap['get'](value24) || _parkedWrapperMap['get'](value24);
+  (el5 && el5['isConnected'] && el5['remove'](),
+    _componentMap['delete'](value24),
+    _nodeDataSnapshotMap['delete'](value24),
+    _sourceVideoSourceKeySnapshotMap['delete'](value24),
+    _pendingSourceVideoActivationIds['delete'](value24),
+    _wrapperMap['delete'](value24),
+    _mountedNodeIds['delete'](value24),
+    _parkedNodeIds['delete'](value24),
+    _parkedWrapperMap['delete'](value24),
+    _pendingNodeDataMap['delete'](value24),
+    _nodeTypeSnapshotMap['delete'](value24),
+    _nodeRuntimeBridge['unregister'](value24),
+    _sourceVideoSlotLifecycle['isManagedNode'](value24) && _sourceVideoSlotLifecycle['forget'](value24),
+    _clearNodePin(value24),
+    _fastPreviewLayer['discardNode'](value24));
 }
 function _syncRendererBridge() {
   syncRendererBridge(typeof window === 'undefined' ? null : window, {
@@ -491,1794 +532,2677 @@ function _syncRendererBridge() {
     wrapperMap: _wrapperMap,
     mountedNodeIds: _mountedNodeIds,
     nodeToEdgeIds: _nodeToEdgeIds,
-    getEdgeLayerStats: _edgeLayer.getStats,
-    hitTestEdgeAtScreenPoint: _edgeLayer.hitTestEdgeAtScreenPoint,
-    prepareDynamicEdges: _edgeLayer.prepareDynamicEdges,
-    setEdgeInteractionHighlight: _edgeLayer.setActiveEdge,
-    setHoveredEdge: _edgeLayer.setHoveredEdge,
+    getEdgeLayerStats: _edgeLayer['getStats'],
+    hitTestEdgeAtScreenPoint: _edgeLayer['hitTestEdgeAtScreenPoint'],
+    prepareDynamicEdges: _edgeLayer['prepareDynamicEdges'],
+    setEdgeInteractionHighlight: _edgeLayer['setActiveEdge'],
+    setHoveredEdge: _edgeLayer['setHoveredEdge'],
     markViewportInteractionBusy: _markRasterMediaInteractionBusy,
     releaseViewportInteractionBusy: _releaseRasterMediaInteractionBusy,
-    captureRasterPreviewNode: _rasterPreviewCoordinator.captureNodeFrame,
-    excludeRasterPreviewNode: _rasterPreviewCoordinator.excludeNode,
-    syncFastPreviewDragProxy: _fastPreviewLayer.syncNodeDragPreview,
-    releaseFastPreviewForPlayback(enabled8) {
-      if (!enabled8) return false;
-      if (_sourceVideoSlotLifecycle.isManagedNode(enabled8)) return false;
-      const enabled9 = _fastPreviewLayer.releaseNode(enabled8) === true;
-      if (!enabled9) return false;
-      const el8 = _wrapperMap.get(enabled8);
+    captureRasterPreviewNode: _rasterPreviewCoordinator['captureNodeFrame'],
+    excludeRasterPreviewNode: _rasterPreviewCoordinator['excludeNode'],
+    syncFastPreviewDragProxy: _fastPreviewLayer['syncNodeDragPreview'],
+    releaseFastPreviewForPlayback(enabled4) {
+      if (!enabled4) return ![];
+      if (_sourceVideoSlotLifecycle['isManagedNode'](enabled4)) return ![];
+      const enabled5 = _fastPreviewLayer['releaseNode'](enabled4) === !![];
+      if (!enabled5) return ![];
+      const el6 = _wrapperMap['get'](enabled4);
       return (
-        el8?.dataset && (el8.dataset.fastPreviewReleasedForPlayback = '1'),
-        _fastPreviewRelease.forget(enabled8),
-        true
+        el6?.['dataset'] && (el6['dataset']['fastPreviewReleasedForPlayback'] = '1'),
+        _fastPreviewRelease['forget'](enabled4),
+        !![]
       );
     },
-    prepareMediaSlotSource(value37, value38, value39 = {}) {
-      return _sourceVideoSlotLifecycle.prepareSource(value37, value38, value39);
+    prepareMediaSlotSource(value26, value27, value28 = {}) {
+      return _sourceVideoSlotLifecycle['prepareSource'](value26, value27, value28);
     },
-    reportMediaSlotFrame: _sourceVideoSlotLifecycle.reportFrame,
-    pinNode(enabled10, value40 = 'src/ui/') {
-      if (!enabled10) return;
-      const _getNodePinSet2 = _getNodePinSet(enabled10, true);
-      _getNodePinSet2.add(String(value40 || 'src/ui/'));
+    reportMediaSlotFrame: _sourceVideoSlotLifecycle['reportFrame'],
+    pinNode(nodeId6, value29 = 'src/ui/') {
+      if (!nodeId6) return;
+      const _getNodePinSet2 = _getNodePinSet(nodeId6, !![]);
+      (_getNodePinSet2['add'](String(value29 || 'src/ui/')),
+        _rendererRuntimeDiagnosticsEnabled &&
+          recordRendererRuntimeDiagnostic({
+            kind: 'renderer-node-pin',
+            nodeId: nodeId6,
+            reason: String(value29 || 'src/ui/'),
+            pinReasons: Array['from'](_getNodePinSet2),
+          }));
     },
-    unpinNode(enabled11, value41 = 'src/ui/') {
-      if (!enabled11) return;
-      const map = _getNodePinSet(enabled11, false);
+    unpinNode(nodeId7, value30 = 'src/ui/') {
+      if (!nodeId7) return;
+      const map = _getNodePinSet(nodeId7, ![]);
       if (!map) return;
-      (map.delete(String(value41 || 'src/ui/')), map.size === 0 && _nodePinReasons.delete(enabled11));
+      (map['delete'](String(value30 || 'src/ui/')),
+        map['size'] === 0x0 &&
+          (_nodePinReasons['delete'](nodeId7), _schedulePreparedMediaRuntimeCommit?.()),
+        _rendererRuntimeDiagnosticsEnabled &&
+          recordRendererRuntimeDiagnostic({
+            kind: 'renderer-node-unpin',
+            nodeId: nodeId7,
+            reason: String(value30 || 'src/ui/'),
+            pinReasons: Array['from'](map),
+          }));
     },
   });
 }
-function _markRasterMediaInteractionBusy() {
-  (_rendererInteractionGrace.markBusy(), _rasterPreviewCoordinator.setMediaLoadingBusy(true));
-}
-function _releaseRasterMediaInteractionBusy() {
-  (_rasterPreviewCoordinator.setMediaLoadingBusy(false), _schedulePreparedMediaRuntimeCommit?.());
-}
-function _rebuildEdgeIndex(value42) {
-  (_nodeToEdgeIds.clear(), _incomingEdgeIdsByTarget.clear());
-  for (const enabled12 of Object.values(value42 || {})) {
-    if (!enabled12) continue;
-    const value43 = enabled12.sourceId,
-      value44 = enabled12.targetId;
-    if (value43) {
-      let enabled13 = _nodeToEdgeIds.get(value43);
-      (!enabled13 && ((enabled13 = new Set()), _nodeToEdgeIds.set(value43, enabled13)),
-        enabled13.add(enabled12.id));
+function _rebuildEdgeIndex(value31) {
+  (_nodeToEdgeIds['clear'](), _incomingEdgeIdsByTarget['clear']());
+  for (const enabled6 of value31 || []) {
+    if (!enabled6) continue;
+    const value32 = enabled6['sourceId'],
+      value33 = enabled6['targetId'];
+    if (value32) {
+      let enabled7 = _nodeToEdgeIds['get'](value32);
+      (!enabled7 && ((enabled7 = new Set()), _nodeToEdgeIds['set'](value32, enabled7)),
+        enabled7['add'](enabled6['id']));
     }
-    if (value44) {
-      let enabled14 = _nodeToEdgeIds.get(value44);
-      !enabled14 && ((enabled14 = new Set()), _nodeToEdgeIds.set(value44, enabled14));
-      enabled14.add(enabled12.id);
-      let list5 = _incomingEdgeIdsByTarget.get(value44);
-      (!list5 && ((list5 = []), _incomingEdgeIdsByTarget.set(value44, list5)), list5.push(enabled12.id));
+    if (value33) {
+      let enabled8 = _nodeToEdgeIds['get'](value33);
+      !enabled8 && ((enabled8 = new Set()), _nodeToEdgeIds['set'](value33, enabled8));
+      enabled8['add'](enabled6['id']);
+      let list2 = _incomingEdgeIdsByTarget['get'](value33);
+      (!list2 && ((list2 = []), _incomingEdgeIdsByTarget['set'](value33, list2)),
+        list2['push'](enabled6['id']));
     }
   }
 }
-function _ensureEdgeIndex(value45, value46) {
-  const value47 = typeof value46 === 'number' ? value46 : 0;
-  if (value47 === _edgeIndexRev) return;
-  (_rebuildEdgeIndex(value45), (_edgeIndexRev = value47));
+function _ensureEdgeIndex(value34, value35) {
+  const value36 = typeof value35 === 'number' ? value35 : 0x0;
+  if (value36 === _edgeIndexRev) return;
+  const value37 = value34 || {},
+    value38 = Object['values'](value37);
+  (_rebuildEdgeIndex(value38),
+    (_edgeIndexRev = value36),
+    (_edgeEntriesCache = value38),
+    (_edgeEntriesRev = value36),
+    (_edgeEntriesSource = value37));
 }
-function _getEdgeEntries(value48, value49) {
-  const value50 = typeof value49 === 'number',
-    value51 = value50 ? value49 : 0,
-    value52 = value50
-      ? value51 === _edgeEntriesRev
-      : value51 === _edgeEntriesRev && value48 === _edgeEntriesSource;
-  if (value52) return _edgeEntriesCache;
+function _getEdgeEntries(value39, value40) {
+  const value41 = typeof value40 === 'number',
+    value42 = value41 ? value40 : 0x0,
+    value43 = value41
+      ? value42 === _edgeEntriesRev
+      : value42 === _edgeEntriesRev && value39 === _edgeEntriesSource;
+  if (value43) return _edgeEntriesCache;
   return (
-    (_edgeEntriesCache = Object.values(value48 || {})),
-    (_edgeEntriesRev = value51),
-    (_edgeEntriesSource = value48 || null),
+    (_edgeEntriesCache = Object['values'](value39 || {})),
+    (_edgeEntriesRev = value42),
+    (_edgeEntriesSource = value39 || null),
     _edgeEntriesCache
   );
 }
-function _buildSelectionRelatedSets(value53, value54) {
-  const map2 = value53 instanceof Set ? value53 : new Set(Array.isArray(value53) ? value53 : []),
+function _buildSelectionRelatedSets(value44, value45) {
+  const map2 =
+      value44 instanceof Set ? value44 : new Set(Array['isArray'](value44) ? value44 : []),
     relatedNodeIds = new Set(),
     relatedEdgeIds = new Set();
-  if (map2.size === 0) return { relatedNodeIds: relatedNodeIds, relatedEdgeIds: relatedEdgeIds };
-  for (const value55 of map2) {
-    const enabled15 = _nodeToEdgeIds.get(value55);
-    if (!enabled15) continue;
-    for (const enabled16 of enabled15) {
-      if (!enabled16 || relatedEdgeIds.has(enabled16)) continue;
-      const enabled17 = value54?.[enabled16];
-      if (!enabled17?.id) continue;
-      const value56 = enabled17.sourceId,
-        value57 = enabled17.targetId,
-        enabled18 = map2.has(value56),
-        enabled19 = map2.has(value57);
-      if (!enabled18 && !enabled19) continue;
-      relatedEdgeIds.add(enabled17.id);
-      if (value56 && !enabled18) relatedNodeIds.add(value56);
-      if (value57 && !enabled19) relatedNodeIds.add(value57);
+  if (map2['size'] === 0x0) return { relatedNodeIds: relatedNodeIds, relatedEdgeIds: relatedEdgeIds };
+  for (const value46 of map2) {
+    const enabled9 = _nodeToEdgeIds['get'](value46);
+    if (!enabled9) continue;
+    for (const enabled10 of enabled9) {
+      if (!enabled10 || relatedEdgeIds['has'](enabled10)) continue;
+      const enabled11 = value45?.[enabled10];
+      if (!enabled11?.['id']) continue;
+      const value47 = enabled11['sourceId'],
+        value48 = enabled11['targetId'],
+        enabled12 = map2['has'](value47),
+        enabled13 = map2['has'](value48);
+      if (!enabled12 && !enabled13) continue;
+      relatedEdgeIds['add'](enabled11['id']);
+      if (value47 && !enabled12) relatedNodeIds['add'](value47);
+      if (value48 && !enabled13) relatedNodeIds['add'](value48);
     }
   }
   return { relatedNodeIds: relatedNodeIds, relatedEdgeIds: relatedEdgeIds };
 }
-function _normalizeSelectionRelatedHighlightColor(value58) {
-  const value59 = String(value58 || '').trim();
-  return SELECTION_RELATED_HIGHLIGHT_COLORS.includes(value59) ? value59 : 'white';
+function _normalizeSelectionRelatedHighlightColor(value49) {
+  const value50 = String(value49 || '')['trim']();
+  return SELECTION_RELATED_HIGHLIGHT_COLORS['includes'](value50) ? value50 : 'white';
 }
-function _syncContainerSizeCache(value60 = _containerSizeSourceEl) {
-  const el9 = value60 || _containerSizeSourceEl || null,
-    value61 = el9 ? Number(el9.clientWidth) : Number(window.innerWidth),
-    value62 = el9 ? Number(el9.clientHeight) : Number(window.innerHeight);
+function _syncContainerSizeCache(value51 = _containerSizeSourceEl) {
+  const el7 = value51 || _containerSizeSourceEl || null,
+    value52 = el7 ? Number(el7['clientWidth']) : Number(window['innerWidth']),
+    value53 = el7 ? Number(el7['clientHeight']) : Number(window['innerHeight']);
   return (
-    (_cachedContainerWidth = Number.isFinite(value61) ? value61 : Number(window.innerWidth)),
-    (_cachedContainerHeight = Number.isFinite(value62) ? value62 : Number(window.innerHeight)),
+    (_cachedContainerWidth = Number['isFinite'](value52) ? value52 : Number(window['innerWidth'])),
+    (_cachedContainerHeight = Number['isFinite'](value53) ? value53 : Number(window['innerHeight'])),
     { width: _cachedContainerWidth, height: _cachedContainerHeight }
   );
 }
 function _nowMs() {
-  return typeof performance !== 'undefined' && typeof performance.now === 'function'
-    ? performance.now()
-    : Date.now();
+  return typeof performance !== 'undefined' && typeof performance['now'] === 'function'
+    ? performance['now']()
+    : Date['now']();
 }
 function _hasCachedContainerSize() {
-  return Number.isFinite(_cachedContainerWidth) && Number.isFinite(_cachedContainerHeight);
+  return Number['isFinite'](_cachedContainerWidth) && Number['isFinite'](_cachedContainerHeight);
 }
-function _getCachedContainerSize(value63 = _containerSizeSourceEl, timer = {}) {
-  const value64 = value63 || _containerSizeSourceEl || null,
-    enabled20 = typeof ResizeObserver === 'function' && !!_containerResizeObserver,
-    value65 =
-      timer?.refresh === true ||
+function _getCachedContainerSize(value54 = _containerSizeSourceEl, timer = {}) {
+  const value55 = value54 || _containerSizeSourceEl || null,
+    enabled14 = typeof ResizeObserver === 'function' && !!_containerResizeObserver,
+    value56 =
+      timer?.['refresh'] === !![] ||
       !_hasCachedContainerSize() ||
-      !enabled20 ||
-      (value64 && _containerSizeSourceEl && value64 !== _containerSizeSourceEl);
-  if (value65) return _syncContainerSizeCache(value64);
+      !enabled14 ||
+      (value55 && _containerSizeSourceEl && value55 !== _containerSizeSourceEl);
+  if (value56) return _syncContainerSizeCache(value55);
   return { width: _cachedContainerWidth, height: _cachedContainerHeight };
 }
-function _getEdgeContainerSize(value66) {
+function _getEdgeContainerSize(value57) {
   const _nowMs2 = _nowMs(),
-    box = _getCachedContainerSize(value66 || _containerSizeSourceEl),
+    box = _getCachedContainerSize(_containerSizeSourceEl || value57),
     _nowMs3 = _nowMs();
   return {
-    containerW: Number.isFinite(box.width) ? box.width : 0,
-    containerH: Number.isFinite(box.height) ? box.height : 0,
-    layoutReadMs: Math.max(0, _nowMs3 - _nowMs2),
+    containerW: Number['isFinite'](box['width']) ? box['width'] : 0x0,
+    containerH: Number['isFinite'](box['height']) ? box['height'] : 0x0,
+    layoutReadMs: Math['max'](0x0, _nowMs3 - _nowMs2),
   };
 }
-function _invalidateFullEdgeRenderSignature({ clearedDom: clearedDom = false } = {}) {
-  ((_lastFullEdgeRenderSignature = ''), clearedDom && (_edgeDomClearedSinceLastFull = true));
+function _invalidateFullEdgeRenderSignature({ clearedDom: clearedDom = ![] } = {}) {
+  ((_lastFullEdgeRenderSignature = ''), clearedDom && (_edgeDomClearedSinceLastFull = !![]));
 }
-function _normalizeSignaturePart(list6) {
-  if (list6 === null || list6 === undefined) return null;
-  if (typeof list6 === 'number') return Number.isFinite(list6) ? list6 : null;
-  if (typeof list6 === 'boolean') return list6;
-  if (typeof list6 === 'string') return list6;
-  if (Array.isArray(list6)) return list6.map((item5) => _normalizeSignaturePart(item5));
-  if (typeof list6 === 'object') {
-    const value67 = {};
-    for (const value68 of Object.keys(list6).sort()) {
-      value67[value68] = _normalizeSignaturePart(list6[value68]);
-    }
-    return value67;
-  }
-  return String(list6);
-}
-function _buildVirtualizationCandidateSignature({
-  snapshotRev: snapshotRev,
-  nodeCount: nodeCount,
-  viewport: viewport,
-  selectedNodeIds: selectedNodeIds,
-  connOverlay: connOverlay,
-  pickConnectMode: pickConnectMode,
-  dragContext: dragContext,
-  pinnedNodeIds: pinnedNodeIds,
-  containerW: containerW,
-  containerH: containerH,
-} = {}) {
-  const selectedNodeIds2 = Array.from(
-      selectedNodeIds instanceof Set
-        ? selectedNodeIds
-        : Array.isArray(selectedNodeIds)
-          ? selectedNodeIds
-          : [],
-    )
-      .map((item6) => String(item6))
-      .sort(),
-    pinnedNodeIds2 = Array.from(
-      pinnedNodeIds instanceof Set ? pinnedNodeIds : Array.isArray(pinnedNodeIds) ? pinnedNodeIds : [],
-    )
-      .map((item7) => String(item7))
-      .sort();
-  return JSON.stringify(
-    _normalizeSignaturePart({
-      snapshotRev: snapshotRev,
-      nodeCount: nodeCount,
-      viewport: {
-        x: Number.isFinite(viewport?.x) ? viewport.x : 0,
-        y: Number.isFinite(viewport?.y) ? viewport.y : 0,
-        zoom: Number.isFinite(viewport?.zoom) ? viewport.zoom : 1,
-      },
-      selectedNodeIds: selectedNodeIds2,
-      connOverlay: { srcId: connOverlay?.srcId ?? null, hoverId: connOverlay?.hoverId ?? null },
-      pickConnectMode: {
-        active: !!pickConnectMode?.active,
-        sourceNodeId: pickConnectMode?.sourceNodeId ?? null,
-        hoverNodeId: pickConnectMode?.hoverNodeId ?? null,
-        handleDirection: pickConnectMode?.handleDirection ?? null,
-      },
-      dragContext: {
-        isDragging: !!dragContext?.isDragging,
-        targetNodeId: dragContext?.targetNodeId ?? null,
-        pendingDx: Number.isFinite(dragContext?.pendingDx) ? dragContext.pendingDx : 0,
-        pendingDy: Number.isFinite(dragContext?.pendingDy) ? dragContext.pendingDy : 0,
-      },
-      pinnedNodeIds: pinnedNodeIds2,
-      containerW: Number.isFinite(containerW) ? containerW : 0,
-      containerH: Number.isFinite(containerH) ? containerH : 0,
-    }),
-  );
-}
-export function buildRendererVirtualizationSignature(options2 = {}) {
-  return _buildVirtualizationCandidateSignature(options2);
-}
-function _notifyVirtualizationProbe(value69) {
-  const enabled21 = typeof window !== 'undefined' ? window.__rendererVirtualizationProbe : null;
-  if (!enabled21 || typeof enabled21.onCandidateSignatureEvaluated !== 'function') return;
+function _notifyVirtualizationProbe(value58) {
+  const enabled15 = typeof window !== 'undefined' ? window['__rendererVirtualizationProbe'] : null;
+  if (!enabled15 || typeof enabled15['onCandidateSignatureEvaluated'] !== 'function') return;
   try {
-    enabled21.onCandidateSignatureEvaluated(value69);
+    enabled15['onCandidateSignatureEvaluated'](value58);
   } catch {}
 }
-function _collectMovedNodeIds(value70, value71) {
-  const map3 = new Set(value70.selectedNodeIds || []),
-    value72 = value71?.targetNodeId || null;
-  if (value72) map3.add(value72);
-  const value73 = value70._parentToChildren || {},
-    list7 = Array.from(map3);
-  for (let value74 = 0; value74 < list7.length; value74++) {
-    const value75 = list7[value74],
-      enabled22 = value73[value75];
-    if (!enabled22 || enabled22.size === 0) continue;
-    for (const value76 of enabled22) {
-      !map3.has(value76) && (map3.add(value76), list7.push(value76));
+function _collectMovedNodeIds(state2, value59) {
+  const map3 = new Set(state2['selectedNodeIds'] || []),
+    value60 = value59?.['targetNodeId'] || null;
+  if (value60) map3['add'](value60);
+  const value61 = state2['_parentToChildren'] || {},
+    list3 = Array['from'](map3);
+  for (let value62 = 0x0; value62 < list3['length']; value62++) {
+    const value63 = list3[value62],
+      enabled16 = value61[value63];
+    if (!enabled16 || enabled16['size'] === 0x0) continue;
+    for (const value64 of enabled16) {
+      !map3['has'](value64) && (map3['add'](value64), list3['push'](value64));
     }
   }
   return map3;
 }
-function _resolveDragRenderOffset(value77, enabled23) {
-  if (!enabled23?.isDragging) return null;
-  const movedNodeIds = _collectMovedNodeIds(value77, enabled23);
-  if (!movedNodeIds || movedNodeIds.size === 0) return null;
+function _resolveDragRenderOffset(value65, enabled17) {
+  if (!enabled17?.['isDragging']) return null;
+  const movedNodeIds = _collectMovedNodeIds(value65, enabled17);
+  if (!movedNodeIds || movedNodeIds['size'] === 0x0) return null;
   return {
     movedNodeIds: movedNodeIds,
-    dx: Number.isFinite(enabled23.pendingDx) ? enabled23.pendingDx : 0,
-    dy: Number.isFinite(enabled23.pendingDy) ? enabled23.pendingDy : 0,
+    dx: Number['isFinite'](enabled17['pendingDx']) ? enabled17['pendingDx'] : 0x0,
+    dy: Number['isFinite'](enabled17['pendingDy']) ? enabled17['pendingDy'] : 0x0,
   };
-}
-function _v2FormatNodeLabelText(value78) {
-  const list8 = String(value78 || '').trim();
-  if (!list8) return '';
-  const value79 = /^[\x00-\x7F]*$/.test(list8);
-  if (value79 && list8.length > 20) return list8.slice(0, 20) + '...';
-  return list8;
-}
-function _v2GetNodeLabelKind(value80) {
-  const refKindByNodeType = getRefKindByNodeType(value80);
-  if (
-    refKindByNodeType === 'text' ||
-    refKindByNodeType === 'image' ||
-    refKindByNodeType === 'video' ||
-    refKindByNodeType === 'audio'
-  )
-    return refKindByNodeType;
-  return '';
-}
-function _v2ClearNodeLabelTooltip(el10) {
-  if (!el10) return;
-  const run = (value81, value82 = '') => {
-    if (typeof el10.removeAttribute === 'function') el10.removeAttribute(value81);
-    else el10.attributes && typeof el10.attributes.delete === 'function' && el10.attributes.delete(value81);
-    value82 && el10.dataset && value82 in el10.dataset && delete el10.dataset[value82];
-  };
-  run('title');
-  if ('title' in el10) el10.title = '';
-  (run('data-tooltip', 'tooltip'),
-    run('data-tooltip-right', 'tooltipRight'),
-    run('data-tooltip-source', 'tooltipSource'),
-    run('data-native-title', 'nativeTitle'));
-}
-function _v2SetNodeLabelContent(
-  el11,
-  {
-    labelKind: labelKind,
-    displayLabelText: displayLabelText,
-    defaultName: defaultName,
-    isBeta: isBeta,
-    fullLabelText: fullLabelText,
-  },
-) {
-  if (!el11) return;
-  _v2ClearNodeLabelTooltip(el11);
-  const list9 = [];
-  if (labelKind) {
-    const el12 = document.createElement('span');
-    ((el12.className = 'node-label-icon'),
-      el12.setAttribute('aria-hidden', 'true'),
-      (el12.dataset.labelKind = labelKind),
-      (el12.textContent = labelKind === 'text' ? 'T' : ''),
-      list9.push(el12));
-  }
-  const el13 = document.createElement('span');
-  ((el13.className = 'node-label-text'),
-    (el13.textContent = displayLabelText || defaultName),
-    list9.push(el13));
-  if (isBeta) {
-    const el14 = document.createElement('span');
-    ((el14.className = 'v2-node-beta-pill'),
-      (el14.textContent = 'Beta'),
-      list9.push(el14),
-      (el11.dataset.betaLabel = fullLabelText));
-  } else {
-    if ('betaLabel' in el11.dataset) delete el11.dataset.betaLabel;
-  }
-  el11.replaceChildren(...list9);
-}
-function _v2EscapeHtml(value83) {
-  return String(value83 || '').replace(/[&<>"']/g, (value84) => {
-    if (value84 === '&') return '&amp;';
-    if (value84 === '<') return '&lt;';
-    if (value84 === '>') return '&gt;';
-    if (value84 === '"') return '&quot;';
-    return '&#39;';
-  });
-}
-function _getDreaminaTimerPhaseTitle(enabled24) {
-  if (!enabled24 || !isNodeType(enabled24, 'ai-video')) return '';
-  const modelProvider =
-    resolveModelProvider(enabled24.model, enabled24.provider, { allowPrefixInference: false }) === 'dreamina';
-  if (!modelProvider) return '';
-  const value85 = String(enabled24.dreaminaTaskPhase || '')
-      .trim()
-      .toLowerCase(),
-    value86 = String(enabled24.dreaminaTaskStatus || '')
-      .trim()
-      .toLowerCase();
-  if (value85 === 'failed' || value86 === 'failed') return t('coreUi.renderer.dreaminaPhase.failed');
-  if (value85 === 'syncing') return t('coreUi.renderer.dreaminaPhase.syncing');
-  if (value85 === 'queued') return t('coreUi.renderer.dreaminaPhase.queued');
-  if (value85 === 'generating') return t('coreUi.renderer.dreaminaPhase.generating');
-  if (value85 === 'done') return t('coreUi.renderer.dreaminaPhase.done');
-  const value87 = String(enabled24.dreaminaTaskLabel || '').trim();
-  return value87 || '';
-}
-function _formatNodeTimerText(value88, value89) {
-  const value90 = Math.max(0, Number(value89) || 0),
-    value91 = Math.floor(value90 / 0x3e8),
-    value92 = Math.floor((value90 % 0x3e8) / 100),
-    value93 = value91 + '.' + value92 + 's',
-    _getDreaminaTimerPhaseTitle2 = _getDreaminaTimerPhaseTitle(value88);
-  return _getDreaminaTimerPhaseTitle2 ? _getDreaminaTimerPhaseTitle2 + ' · ' + value93 : value93;
-}
-export function formatVideoMetaText({ fps: fps, frames: frames, width: width, height: height } = {}) {
-  const count = Number(fps),
-    count2 = Number(frames);
-  if (!Number.isFinite(count) || count <= 0 || !Number.isFinite(count2) || count2 <= 0) return '';
-  const fps2 =
-      Math.abs(count - Math.round(count)) < 0.01
-        ? String(Math.round(count))
-        : String(Number(count.toFixed(2))),
-    count3 = Number(width),
-    count4 = Number(height),
-    enabled25 = Number.isFinite(count3) && count3 > 0 && Number.isFinite(count4) && count4 > 0,
-    t2 = t('coreUi.renderer.videoMeta.framesFps', { frames: Math.round(count2), fps: fps2 });
-  if (!enabled25) return t2;
-  return Math.round(count3) + '×' + Math.round(count4) + ' · ' + t2;
-}
-function _getGroupColorWithOpacity(value94, value95) {
-  const enabled26 = value94.match(/var\(--([^)]+)\)/);
-  if (!enabled26) return value94;
-  const value96 = enabled26[1];
-  return 'var(--' + value96 + '-' + value95 + ')';
 }
 export function clearRendererCache() {
-  _rendererMediaRuntimePreparer.clear();
-  console.log('[Renderer] 执行全盘物理清盘...');
-  const value97 = new Set([
-    ..._componentMap.keys(),
-    ..._wrapperMap.keys(),
-    ..._parkedWrapperMap.keys(),
+  (_rendererMediaRuntimePreparer['clear'](), console['log']('[Renderer] 执行全盘物理清盘...'));
+  const value66 = new Set([
+    ..._componentMap['keys'](),
+    ..._wrapperMap['keys'](),
+    ..._parkedWrapperMap['keys'](),
     ..._mountedNodeIds,
     ..._parkedNodeIds,
   ]);
-  for (const value98 of value97) {
-    _destroyNode(value98);
+  for (const value67 of value66) {
+    _destroyNode(value67);
   }
   (_clearRenderedEdgesFromDocument(),
-    _msHiddenNodeIds.clear(),
-    (_multiSelectRenderCache.geometrySig = ''),
-    (_multiSelectRenderCache.runBtnDisabled = null),
-    (_multiSelectRenderCache.resetBtnVisible = null),
-    (_multiSelectRenderCache.composeBtnVisible = null),
-    (_multiSelectRenderCache.composeBtnKind = ''),
-    (_alignPanelRenderCache.centerSig = ''),
-    (_alignPanelRenderCache.buttonStateSig = ''),
-    _edgeLayer.reset(),
-    clearCachedEdgeVisibilityIndex(),
-    _nodeToEdgeIds.clear(),
-    _incomingEdgeIdsByTarget.clear(),
-    (_edgeIndexRev = -1),
-    (_edgeEntriesRev = -1),
+    _edgeLayer['reset'](),
+    _selectionOverlay['reset'](),
+    _nodeToEdgeIds['clear'](),
+    _incomingEdgeIdsByTarget['clear'](),
+    (_edgeIndexRev = -0x1),
+    (_edgeEntriesRev = -0x1),
     (_edgeEntriesSource = null),
     (_edgeEntriesCache = []),
+    clearCachedEdgeVisibilityIndex(),
     (_cachedContainerWidth = null),
     (_cachedContainerHeight = null),
     (_lastFullEdgeRenderSignature = ''),
-    (_edgeDomClearedSinceLastFull = false),
+    (_edgeDomClearedSinceLastFull = ![]),
     (_lastVirtualCandidateSignature = ''),
     (_lastVirtualCandidateResult = null),
+    _fastPreviewContinuation['reset'](),
+    _fastPreviewLifecycle['reset'](),
+    _sourceVideoSlotLifecycle['reset'](),
+    _sourceVideoSourceKeySnapshotMap['clear'](),
+    _pendingSourceVideoActivationIds['clear'](),
+    (_sourceVideoActivationRev = null),
+    (_sourceVideoActivationNodesRef = null),
     clearRendererSpatialIndexCache(),
+    _resetSelectionFastPath?.(),
     (_containerSizeSourceEl = null),
-    _rendererInteractionGrace.reset(),
-    _nodePinReasons.clear(),
-    _pendingNodeDataMap.clear(),
-    _nodeTypeSnapshotMap.clear(),
-    _mediaPresentation.clear(),
-    _sourceVideoSlotLifecycle.reset(),
-    _fastPreviewContinuation.reset(),
-    _fastPreviewLifecycle.reset(),
-    _fastPreviewLayer.clear(),
-    _rasterPreviewCoordinator.reset(),
-    cancelRendererFastPreviewMediaPreloads({ includeActive: true, reason: 'renderer-cache-clear' }),
-    _clearRunningTimerState());
+    _rendererInteractionGrace['reset'](),
+    _viewportJumpDetector['reset'](),
+    (_lastViewportJumpAt = 0x0),
+    clearRendererViewportMediaPreloadPause(),
+    _nodePinReasons['clear'](),
+    _pendingNodeDataMap['clear'](),
+    _nodeTypeSnapshotMap['clear'](),
+    _mediaPresentation['clear'](),
+    _fastPreviewLayer['clear'](),
+    _rasterPreviewCoordinator['reset'](),
+    _nodeTimerController['clear'](),
+    (_currentSnapshot = null));
 }
-((window._edgeDomCache = _edgeDomCache), _syncRendererBridge());
-function _isNodeVisible(value99, value100, value101, value102, value103 = 0, value104 = 0) {
-  return isNodeInsideViewportPadding(value99, value100, value101, value102, 200, value103, value104);
+export function refreshManifestModelNodeUis() {
+  const refreshedNodeIds = [],
+    remountedNodeIds = [];
+  for (const [value68, value69] of [..._componentMap['entries']()]) {
+    const enabled18 = _currentSnapshot?.['nodes']?.[value68];
+    if (!enabled18 || !MANIFEST_MODEL_NODE_TYPES['has'](normalizeNodeType(enabled18['type']))) continue;
+    if (typeof value69?.['refreshModelRegistryUi'] === 'function')
+      try {
+        (value69['refreshModelRegistryUi'](), refreshedNodeIds['push'](value68));
+        continue;
+      } catch (value70) {
+        console['warn']('[Renderer] refresh model registry UI failed:', value70);
+      }
+    (_destroyNode(value68), remountedNodeIds['push'](value68));
+  }
+  return { refreshedNodeIds: refreshedNodeIds, remountedNodeIds: remountedNodeIds };
 }
-function _renderCullingOnly(value105, value106, value107, value108 = {}) {
-  const enabled27 = value108?.hideInvisible !== false,
-    { width: width2, height: height2 } = _getCachedContainerSize(value105.parentElement || value105);
-  for (const value109 of Object.values(value106 || {})) {
-    const el15 = _wrapperMap.get(value109.id);
-    if (!el15 || !el15.isConnected) continue;
-    const _isNodeVisible2 = _isNodeVisible(value109, value107, width2, height2);
+((window['_edgeDomCache'] = _edgeDomCache), _syncRendererBridge());
+function _isNodeVisible(value71, value72, value73, value74, value75 = 0x0, value76 = 0x0) {
+  return isNodeInsideViewportPadding(value71, value72, value73, value74, 0xc8, value75, value76);
+}
+function _renderCullingOnly(value77, value78, value79, value80 = {}) {
+  const enabled19 = value80?.['hideInvisible'] !== ![],
+    { width: width, height: height } = _getCachedContainerSize(
+      value77['parentElement'] || value77,
+    );
+  for (const value81 of _mountedNodeIds) {
+    const enabled20 = value78?.[value81];
+    if (!enabled20) continue;
+    const el8 = _wrapperMap['get'](value81);
+    if (!el8 || !el8['isConnected'] || el8['classList']?.['contains']?.('is-dragging'))
+      continue;
+    const _isNodeVisible2 = _isNodeVisible(enabled20, value79, width, height);
     if (!_isNodeVisible2) {
-      if (!enabled27) continue;
-      _syncRunningTimerForNode(value109.id, null, { hide: true });
-      if (el15.style.display !== 'none') el15.style.display = 'none';
+      if (!enabled19) continue;
+      _nodeTimerController['hideNode'](value81);
+      if (el8['style']['display'] !== 'none') el8['style']['display'] = 'none';
     } else {
-      _syncRunningTimerForNode(value109.id, value109);
-      if (el15.style.display === 'none') el15.style.display = '';
+      _nodeTimerController['trackNode'](value81, enabled20);
+      if (el8['style']['display'] === 'none') el8['style']['display'] = '';
     }
   }
 }
-export function initRenderer(el16, el17, value110) {
-  ((el17.style.transformOrigin = '0 0'),
-    (el17.style.position = 'absolute'),
-    (el17.style.top = '0'),
-    (el17.style.left = '0'));
-  const el18 = _createSvgLayer();
-  el17.prepend(el18);
-  const value111 = el18.querySelector('svg');
-  ((_containerSizeSourceEl = el17.parentElement || el16), _syncContainerSizeCache(_containerSizeSourceEl));
+export function initRenderer(containerEl, canvasEl, value82) {
+  ((canvasEl['style']['transformOrigin'] = '0 0'),
+    (canvasEl['style']['position'] = 'absolute'),
+    (canvasEl['style']['top'] = '0'),
+    (canvasEl['style']['left'] = '0'));
+  const svgWrapper = _createSvgLayer();
+  canvasEl['prepend'](svgWrapper);
+  const svgEl = svgWrapper['querySelector']('svg');
+  ((_containerSizeSourceEl = canvasEl['parentElement'] || containerEl),
+    _syncContainerSizeCache(_containerSizeSourceEl));
   typeof ResizeObserver === 'function' &&
     _containerSizeSourceEl &&
     ((_containerResizeObserver = new ResizeObserver(() => {
       _syncContainerSizeCache(_containerSizeSourceEl);
     })),
-    _containerResizeObserver.observe(_containerSizeSourceEl));
-  const el19 = _createPickerEl();
-  el16.appendChild(el19);
-  const el20 = createPickConnectBannerEl();
-  el16.appendChild(el20);
-  const el21 = _createMultiSelectBoxEl(value110);
-  el17.appendChild(el21);
-  const el22 = _createAlignCenterPanelEl();
-  el17.appendChild(el22);
-  const el23 = _createSelectionRectEl();
-  el16.appendChild(el23);
-  const el24 = createContextMenuEl();
-  (el16.appendChild(el24), _syncRendererBridge());
-  const _presentationSubscription = createRendererPresentationSubscription({
-    onSnapshot: (value112) => {
-      _currentSnapshot = value112;
+    _containerResizeObserver['observe'](_containerSizeSourceEl));
+  const el9 = _createPickerEl();
+  containerEl['appendChild'](el9);
+  const el10 = createPickConnectBannerEl();
+  (containerEl['appendChild'](el10), _selectionOverlay['mount'](canvasEl));
+  const el11 = _createSelectionRectEl();
+  (containerEl['appendChild'](el11), _syncRendererBridge());
+  const hasPendingRender = createRendererPresentationSubscription({
+    onSnapshot: (value83) => {
+      _currentSnapshot = value83;
     },
-    render: (value112) => {
-      (_syncRunningTimers(value112), run2(value112));
+    flushSelection: (value84) => rendererSelectionFastPath['flushSelectionOnlySnapshot'](value84),
+    render: (value85) => {
+      (_nodeTimerController['syncSnapshot'](value85), run(value85));
     },
     onSuspend: () => {
-      (run3(), _rendererMediaRuntimePreparer.pause(), _mediaPresentation.pause());
+      (run2(),
+        rendererSelectionFastPath['reset'](),
+        _rendererMediaRuntimePreparer['pause'](),
+        _mediaPresentation['pause'](),
+        _nodeTimerController['clear'](),
+        cancelCanvasVisibleMediaWarmupPreloads());
     },
     onResume: () => {
-      (_mediaPresentation.resume(), _rendererMediaRuntimePreparer.resume());
+      (_mediaPresentation['resume'](), _rendererMediaRuntimePreparer['resume']());
     },
   });
-  let value113 = -1,
-    value114 = -1,
-    count5 = 0,
+  let value86 = -0x1,
+    value87 = -0x1,
+    value88 = -0x1;
+  const run3 = (value89, value90) =>
+    Number['isFinite'](value89?.['_nodeMembershipRev']) ? value89['_nodeMembershipRev'] : value90;
+  let count = 0x0,
     setTimeout2 = null,
-    requestAnimationFrame2 = null;
-  function run3() {
-    (setTimeout2 !== null && (clearTimeout(setTimeout2), (setTimeout2 = null)),
-      requestAnimationFrame2 !== null &&
-        (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = null)));
+    requestAnimationFrame2 = null,
+    value91 = !![],
+    enabled21 = ![],
+    value92 = null;
+  function run4(enabled22, enabled23, mode, framePlan) {
+    if (!enabled22 || !enabled23) return null;
+    const value93 =
+      enabled22['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+        ? { relatedNodeIds: new Set() }
+        : _buildSelectionRelatedSets(enabled22['selectedNodeIds'], enabled22['edges']);
+    return _renderNodes(
+      canvasEl,
+      enabled22['nodes'],
+      enabled22['selectedNodeIds'],
+      value93['relatedNodeIds'],
+      _normalizeSelectionRelatedHighlightColor(enabled22['ui']?.['selectionRelatedHighlightColor']),
+      enabled22['connOverlay'],
+      enabled22['pickConnectMode'],
+      enabled23,
+      enabled22['edges'],
+      enabled22['_parentToChildren'],
+      enabled22['ui']?.['showVideoMeta'] === !![],
+      enabled22,
+      { deferParking: !![], mode: mode, viewportPriorityMediaOnly: !![], framePlan: framePlan },
+    );
   }
-  function run4(value115 = RENDERER_VIRTUALIZATION_CONFIG.settleDelayMs) {
-    if (!_presentationSubscription.isActive()) return;
-    (run3(),
+  function run2() {
+    (setTimeout2 !== null && (clearTimeout(setTimeout2), (setTimeout2 = null)),
+      requestAnimationFrame2 !== null && (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = null)));
+  }
+  function scheduleDeferredReconcile(
+    value94 = RENDERER_VIRTUALIZATION_CONFIG['settleDelayMs'],
+    { bypassInteractionGrace: bypassInteractionGrace = ![], edgeOnlySnapshot: edgeOnlySnapshot = null } = {},
+  ) {
+    run2();
+    if (!hasPendingRender['isActive']()) return;
+    ((value91 = edgeOnlySnapshot === null),
       (setTimeout2 = setTimeout(
         () => {
           setTimeout2 = null;
           if (requestAnimationFrame2 !== null) return;
           requestAnimationFrame2 = requestAnimationFrame(() => {
             requestAnimationFrame2 = null;
-            if (_presentationSubscription.hasPendingFrame()) return;
-            if (!_currentSnapshot) return;
-            if (_rendererInteractionGrace.isBusy()) {
-              run4(value115);
+            if (hasPendingRender['hasPendingFrame']()) {
+              scheduleDeferredReconcile(value94, {
+                bypassInteractionGrace: bypassInteractionGrace,
+                edgeOnlySnapshot: edgeOnlySnapshot,
+              });
               return;
             }
-            run2(_currentSnapshot);
+            if (!_currentSnapshot) return;
+            if (!bypassInteractionGrace && _rendererInteractionGrace['isBusy']()) {
+              scheduleDeferredReconcile(value94, {
+                bypassInteractionGrace: bypassInteractionGrace,
+                edgeOnlySnapshot: edgeOnlySnapshot,
+              });
+              return;
+            }
+            run(_currentSnapshot, {
+              skipNodesForDenseEdgeFollowup:
+                edgeOnlySnapshot !== null && _currentSnapshot === edgeOnlySnapshot,
+            });
           });
         },
-        Math.max(0, value115),
+        Math['max'](0x0, value94),
       )));
   }
-  const _schedulePreparedMediaRuntimeCommitForRenderer = () => run4(0);
-  _schedulePreparedMediaRuntimeCommit = _schedulePreparedMediaRuntimeCommitForRenderer;
+  const value95 = () => {
+    if (requestAnimationFrame2 !== null && value91) return;
+    scheduleDeferredReconcile(0x0);
+  };
+  _schedulePreparedMediaRuntimeCommit = value95;
+  const rendererSelectionFastPath = createRendererSelectionFastPath({
+      ensureEdgeIndex: _ensureEdgeIndex,
+      buildSelectionRelatedSets: _buildSelectionRelatedSets,
+      hasPendingRender: hasPendingRender['hasPendingFrame'],
+      cancelPendingRender: hasPendingRender['cancelPending'],
+      setCurrentSnapshot: (value96) => {
+        ((_currentSnapshot = value96), hasPendingRender['clearPendingSnapshot']());
+      },
+      consumeViewport: (value97) => _viewportJumpDetector['consume'](value97),
+      flushSelectionUpdate: (value98, value99) => run5(value98, value99),
+      renderAffectedEdges: (value100, pathStyle, value101) => {
+        if (value100['size'] === 0x0 || pathStyle['ui']?.['connectionLinesVisible'] === ![]) return;
+        _renderEdgesByIds(
+          svgEl,
+          value100,
+          pathStyle['edges'] || {},
+          pathStyle['nodes'] || {},
+          pathStyle['viewport'],
+          containerEl,
+          null,
+          value101,
+          { pathStyle: pathStyle['ui']?.['connectionLineStyle'] },
+        );
+      },
+      renderSelectionOverlays: (value102) => {
+        _selectionOverlay['render'](value102);
+      },
+    }),
+    value103 = () => rendererSelectionFastPath['reset']();
+  _resetSelectionFastPath = value103;
+  const rendererPanPreviewReconciler = createRendererPanPreviewReconciler({
+    canvasEl: canvasEl,
+    svgWrapper: svgWrapper,
+    getSnapshot: () => _currentSnapshot,
+    hasPendingStoreRender: hasPendingRender['hasPendingFrame'],
+    markBusy: _rendererInteractionGrace['markBusy'],
+    renderViewport: renderViewport,
+    renderNodes: _renderNodes,
+    buildSelectionRelatedSets: _buildSelectionRelatedSets,
+    normalizeSelectionRelatedHighlightColor: _normalizeSelectionRelatedHighlightColor,
+    scheduleDeferredReconcile: scheduleDeferredReconcile,
+  });
   installNodeResizeGeometryPreviewer(
     typeof window === 'undefined' ? null : window,
     () => _currentSnapshot,
     _ensureEdgeIndex,
     _nodeToEdgeIds,
-    (value116, value117, value118) =>
-      _renderEdgesByIds(value111, value116, value118.edges || {}, value117, value118.viewport, el16),
-  );
-  function run5(nodes) {
-    const value119 =
-        typeof nodes._nodeCount === 'number' ? nodes._nodeCount : Object.keys(nodes.nodes || {}).length,
-      edgesRev = typeof nodes._edgesRev === 'number' ? nodes._edgesRev : 0,
-      value120 = edgesRev !== value114;
-    (value119 !== value113 || value120) &&
-      ((value113 = value119),
-      (value114 = edgesRev),
-      _cleanupNodes(el17, nodes.nodes),
-      _cleanupEdges(value111, nodes.edges));
-    _ensureEdgeIndex(nodes.edges, edgesRev);
-    const relatedEdgeIds2 =
-        nodes.ui?.selectionRelatedHighlightEnabled === false
-          ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
-          : _buildSelectionRelatedSets(nodes.selectedNodeIds, nodes.edges),
-      _normalizeSelectionRelatedHighlightColor2 = _normalizeSelectionRelatedHighlightColor(
-        nodes.ui?.selectionRelatedHighlightColor,
+    (value104, value105, pathStyle2) =>
+      _renderEdgesByIds(
+        svgEl,
+        value104,
+        pathStyle2['edges'] || {},
+        value105,
+        pathStyle2['viewport'],
+        containerEl,
+        null,
+        null,
+        { pathStyle: pathStyle2['ui']?.['connectionLineStyle'] },
       ),
-      deferParking = _rendererInteractionGrace.getRemainingMs(),
-      { hasPendingStructuralOps: hasPendingStructuralOps, deferredParkCount: deferredParkCount = 0 } =
-        _renderNodes(
-          el17,
-          nodes.nodes,
-          nodes.selectedNodeIds,
-          relatedEdgeIds2.relatedNodeIds,
-          _normalizeSelectionRelatedHighlightColor2,
-          nodes.connOverlay,
-          nodes.pickConnectMode,
-          nodes.viewport,
-          nodes.edges,
-          nodes._parentToChildren,
-          nodes.ui && typeof nodes.ui.showVideoMeta === 'boolean' ? nodes.ui.showVideoMeta : false,
-          nodes,
-          { deferParking: deferParking > 0 },
-        ),
-      value121 = nodes.edges || {},
-      edgeEntries = _getEdgeEntries(value121, edgesRev),
-      value122 = edgeEntries.length,
-      el25 = document.documentElement,
-      enabled28 = value122 >= MANY_EDGES_THRESHOLD;
-    if (enabled28) !el25.classList.contains('has-many-edges') && el25.classList.add('has-many-edges');
-    else el25.classList.contains('has-many-edges') && el25.classList.remove('has-many-edges');
-    const dragContext2 = getDragContext(),
-      dragOffsetCtx = _resolveDragRenderOffset(nodes, dragContext2),
-      enabled29 = nodes.ui?.connectionLinesVisible !== false,
-      edgePathStyle = normalizeConnectionLineStyle(nodes.ui?.connectionLineStyle);
+  );
+  function run6(viewport2, renderMode = 'steady', framePlan2, { skipNodes: skipNodes = ![] } = {}) {
+    const nodeCount = Number['isFinite'](framePlan2?.['nodeCount'])
+        ? framePlan2['nodeCount']
+        : typeof viewport2['_nodeCount'] === 'number'
+          ? viewport2['_nodeCount']
+          : Object['keys'](viewport2['nodes'] || {})['length'],
+      value106 = run3(viewport2, nodeCount),
+      edgesRev = typeof viewport2['_edgesRev'] === 'number' ? viewport2['_edgesRev'] : 0x0,
+      geometryRev = Number['isFinite'](viewport2['_nodeGeometryRev'])
+        ? viewport2['_nodeGeometryRev']
+        : Number['isFinite'](viewport2['_persistRev'])
+          ? viewport2['_persistRev']
+          : nodeCount,
+      edgesRevChanged = edgesRev !== value88,
+      nodeStructureChanged = nodeCount !== value86 || value106 !== value87,
+      value107 =
+        skipNodes || (value92 === viewport2 && renderMode === 'steady' && !nodeStructureChanged && !edgesRevChanged);
+    value92 !== null && (value92 = null);
+    (nodeStructureChanged || edgesRevChanged) &&
+      ((value86 = nodeCount),
+      (value87 = value106),
+      (value88 = edgesRev),
+      _cleanupNodes(canvasEl, viewport2['nodes']),
+      _cleanupEdges(svgEl, viewport2['edges']));
+    _ensureEdgeIndex(viewport2['edges'], edgesRev);
+    const relatedEdgeIds2 =
+        viewport2['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+          ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
+          : _buildSelectionRelatedSets(viewport2['selectedNodeIds'], viewport2['edges']),
+      _normalizeSelectionRelatedHighlightColor2 = _normalizeSelectionRelatedHighlightColor(
+        viewport2['ui']?.['selectionRelatedHighlightColor'],
+      ),
+      remainingMs = _rendererInteractionGrace['getRemainingMs'](),
+      needed = shouldDeferHeavyMediaForInteractionGrace({
+        remainingMs: remainingMs,
+        viewport: viewport2['viewport'],
+        nodeCount: nodeCount,
+        hasPriorityMediaWork: ![],
+      }),
+      hasPriorityMediaWork = framePlan2?.['hasPriorityMediaWork']?.({ needed: needed }) === !![],
+      deferHeavyMediaMount = shouldDeferHeavyMediaForInteractionGrace({
+        remainingMs: remainingMs,
+        viewport: viewport2['viewport'],
+        nodeCount: nodeCount,
+        hasPriorityMediaWork: hasPriorityMediaWork,
+      }),
+      value108 = viewport2['edges'] || {},
+      edgeEntries = _getEdgeEntries(value108, edgesRev),
+      edgeCount = edgeEntries['length'],
+      connectionLinesVisible = viewport2['ui']?.['connectionLinesVisible'] !== ![],
+      deferInitialRasterPlanning = shouldDeferDenseStructuralEdgeRender({
+        renderMode: renderMode,
+        nodeStructureChanged: nodeStructureChanged,
+        edgesRevChanged: edgesRevChanged,
+        nodeCount: nodeCount,
+        edgeCount: edgeCount,
+        connectionLinesVisible: connectionLinesVisible,
+      }),
+      deferDenseStructuralEdgeRender = deferInitialRasterPlanning || enabled21;
+    if (deferInitialRasterPlanning) enabled21 = !![];
+    else enabled21 && (enabled21 = ![]);
+    const {
+        hasPendingStructuralOps: hasPendingStructuralOps,
+        deferredParkCount: deferredParkCount = 0x0,
+        hasPendingVisibleVideoMounts: hasPendingVisibleVideoMounts = ![],
+        hasPendingFullEligibleVisibleImageMounts: hasPendingFullEligibleVisibleImageMounts = ![],
+      } = value107
+        ? {
+            hasPendingStructuralOps: ![],
+            deferredParkCount: 0x0,
+            hasPendingVisibleVideoMounts: ![],
+            hasPendingFullEligibleVisibleImageMounts: ![],
+          }
+        : _renderNodes(
+            canvasEl,
+            viewport2['nodes'],
+            viewport2['selectedNodeIds'],
+            relatedEdgeIds2['relatedNodeIds'],
+            _normalizeSelectionRelatedHighlightColor2,
+            viewport2['connOverlay'],
+            viewport2['pickConnectMode'],
+            viewport2['viewport'],
+            viewport2['edges'],
+            viewport2['_parentToChildren'],
+            viewport2['ui'] && typeof viewport2['ui']['showVideoMeta'] === 'boolean'
+              ? viewport2['ui']['showVideoMeta']
+              : ![],
+            viewport2,
+            {
+              mode: renderMode,
+              deferHeavyMediaMount: deferHeavyMediaMount,
+              deferParking: remainingMs > 0x0,
+              fullImageSettleReady:
+                _lastViewportJumpAt <= 0x0 ||
+                _nowMs() - _lastViewportJumpAt >= FULL_ELIGIBLE_VISIBLE_IMAGE_SETTLED_BUDGET_DELAY_MS,
+              deferInitialRasterPlanning: deferInitialRasterPlanning,
+              framePlan: framePlan2,
+            },
+          ),
+      el12 = document['documentElement'],
+      isManyEdges = edgeCount >= MANY_EDGES_THRESHOLD;
+    if (isManyEdges)
+      !el12['classList']['contains']('has-many-edges') &&
+        el12['classList']['add']('has-many-edges');
+    else
+      el12['classList']['contains']('has-many-edges') &&
+        el12['classList']['remove']('has-many-edges');
+    const interactionRenderState = getInteractionRenderState(),
+      dragOffsetCtx = _resolveDragRenderOffset(viewport2, interactionRenderState),
+      edgePathStyle = normalizeConnectionLineStyle(viewport2['ui']?.['connectionLineStyle']);
     let containerW2 = null,
       cachedEdgeGeometrySignature = '',
       cachedEdgeVisibilityIndex = null;
     function geometrySignature() {
-      if (!enabled28) return '';
-      if (!cachedEdgeGeometrySignature)
-        cachedEdgeGeometrySignature = getCachedEdgeGeometrySignature(edgeEntries, nodes.nodes, {
-          edgesRev: edgesRev,
-          geometryRev: 0,
-        });
-      return cachedEdgeGeometrySignature;
+      if (!isManyEdges) return '';
+      return (
+        !cachedEdgeGeometrySignature &&
+          (cachedEdgeGeometrySignature = getCachedEdgeGeometrySignature(edgeEntries, viewport2['nodes'], {
+            edgesRev: edgesRev,
+            geometryRev: geometryRev,
+          })),
+        cachedEdgeGeometrySignature
+      );
     }
     function edgeVisibilityIndex() {
-      if (!enabled29 || !enabled28) return null;
-      if (!cachedEdgeVisibilityIndex)
-        cachedEdgeVisibilityIndex = getCachedEdgeVisibilityIndex(edgeEntries, nodes.nodes, {
-          edgesRev: edgesRev,
-          geometryRev: 0,
-          geometrySignature: geometrySignature(),
-        });
-      return cachedEdgeVisibilityIndex;
+      if (!connectionLinesVisible || !isManyEdges) return null;
+      return (
+        !cachedEdgeVisibilityIndex &&
+          (cachedEdgeVisibilityIndex = getCachedEdgeVisibilityIndex(edgeEntries, viewport2['nodes'], {
+            edgesRev: edgesRev,
+            geometryRev: geometryRev,
+            geometrySignature: geometrySignature(),
+          })),
+        cachedEdgeVisibilityIndex
+      );
     }
-    function run6(enabled30 = false) {
-      !containerW2 && (containerW2 = _getEdgeContainerSize(el16));
+    function run7(enabled24 = ![]) {
+      !containerW2 && (containerW2 = _getEdgeContainerSize(containerEl));
       const renderSignature = buildFullEdgeRenderSignature({
         edgeEntries: edgeEntries,
-        nodes: nodes.nodes,
-        viewport: nodes.viewport,
+        nodes: viewport2['nodes'],
+        viewport: viewport2['viewport'],
         dragOffsetCtx: dragOffsetCtx,
-        relatedEdgeIds: relatedEdgeIds2.relatedEdgeIds,
-        containerW: containerW2.containerW,
-        containerH: containerW2.containerH,
+        relatedEdgeIds: relatedEdgeIds2['relatedEdgeIds'],
+        containerW: containerW2['containerW'],
+        containerH: containerW2['containerH'],
         edgesRev: edgesRev,
-        geometryRev: 0,
+        geometryRev: geometryRev,
         geometrySignature: geometrySignature(),
         edgePathStyle: edgePathStyle,
       });
-      if (!enabled30 && renderSignature === _lastFullEdgeRenderSignature) return null;
+      if (!enabled24 && renderSignature === _lastFullEdgeRenderSignature) return null;
       return {
         containerSize: containerW2,
         renderSignature: renderSignature,
-        geometryRevisionKey: 'edges:' + edgesRev + ':geometry:0',
+        geometryRevisionKey: 'edges:' + edgesRev + '|nodes:' + geometryRev,
         pathStyle: edgePathStyle,
       };
     }
-    if (!enabled29) _clearRenderedEdges(value111);
+    if (deferDenseStructuralEdgeRender)
+      (_invalidateFullEdgeRenderSignature(),
+        shouldPrepareDenseStructuralEdgeFollowup({
+          deferDenseStructuralFrame: deferInitialRasterPlanning,
+          deferDenseStructuralEdgeRender: deferDenseStructuralEdgeRender,
+          connectionLinesVisible: connectionLinesVisible,
+          isManyEdges: isManyEdges,
+        }) && edgeVisibilityIndex());
     else {
-      if (value120) {
-        if (value120) _ensureEdgeIndex(nodes.edges, edgesRev);
-        const args2 = run6(true);
-        _renderEdges(
-          value111,
-          value121,
-          nodes.nodes,
-          nodes.viewport,
-          el16,
-          dragOffsetCtx,
-          relatedEdgeIds2.relatedEdgeIds,
-          edgeEntries,
-          'edges-rev-changed',
-          { ...args2, edgeVisibilityIndex: edgeVisibilityIndex() },
-        );
-      } else {
-        if (dragContext2.isDragging) {
-          _ensureEdgeIndex(nodes.edges, edgesRev);
-          const enabled31 = dragOffsetCtx?.movedNodeIds || _collectMovedNodeIds(nodes, dragContext2),
-            value123 = new Set();
-          for (const value124 of enabled31) {
-            const enabled32 = _nodeToEdgeIds.get(value124);
-            if (!enabled32) continue;
-            for (const value125 of enabled32) value123.add(value125);
-          }
-          if (value123.size > 0)
-            _renderEdgesByIds(
-              value111,
-              value123,
-              value121,
-              nodes.nodes,
-              nodes.viewport,
-              el16,
-              dragOffsetCtx,
-              relatedEdgeIds2.relatedEdgeIds,
-              { containerSize: containerW2 || null, pathStyle: edgePathStyle },
-            );
-          else {
-            if (!enabled31 || enabled31.size === 0) {
-              const args3 = run6(false);
-              args3 &&
-                _renderEdges(
-                  value111,
-                  value121,
-                  nodes.nodes,
-                  nodes.viewport,
-                  el16,
-                  dragOffsetCtx,
-                  relatedEdgeIds2.relatedEdgeIds,
-                  edgeEntries,
-                  'drag-related-edges-unavailable',
-                  { ...args3, edgeVisibilityIndex: edgeVisibilityIndex() },
-                );
-            }
-          }
+      if (!connectionLinesVisible) _clearRenderedEdges(svgEl);
+      else {
+        if (edgesRevChanged) {
+          if (edgesRevChanged) _ensureEdgeIndex(viewport2['edges'], edgesRev);
+          const args4 = run7(!![]);
+          _renderEdges(
+            svgEl,
+            value108,
+            viewport2['nodes'],
+            viewport2['viewport'],
+            containerEl,
+            dragOffsetCtx,
+            relatedEdgeIds2['relatedEdgeIds'],
+            edgeEntries,
+            'edges-rev-changed',
+            { ...args4, edgeVisibilityIndex: edgeVisibilityIndex() },
+          );
         } else {
-          const args4 = run6(false);
-          args4 &&
-            _renderEdges(
-              value111,
-              value121,
-              nodes.nodes,
-              nodes.viewport,
-              el16,
-              dragOffsetCtx,
-              relatedEdgeIds2.relatedEdgeIds,
-              edgeEntries,
-              'steady',
-              { ...args4, edgeVisibilityIndex: edgeVisibilityIndex() },
-            );
+          if (interactionRenderState['isDragging']) {
+            _ensureEdgeIndex(viewport2['edges'], edgesRev);
+            const enabled25 = dragOffsetCtx?.['movedNodeIds'] || _collectMovedNodeIds(viewport2, interactionRenderState),
+              value109 = new Set();
+            for (const value110 of enabled25) {
+              const enabled26 = _nodeToEdgeIds['get'](value110);
+              if (!enabled26) continue;
+              for (const value111 of enabled26) value109['add'](value111);
+            }
+            if (value109['size'] > 0x0)
+              _renderEdgesByIds(
+                svgEl,
+                value109,
+                value108,
+                viewport2['nodes'],
+                viewport2['viewport'],
+                containerEl,
+                dragOffsetCtx,
+                relatedEdgeIds2['relatedEdgeIds'],
+                { containerSize: containerW2 || null, pathStyle: edgePathStyle },
+              );
+            else {
+              if (!enabled25 || enabled25['size'] === 0x0) {
+                const args5 = run7(![]);
+                args5 &&
+                  _renderEdges(
+                    svgEl,
+                    value108,
+                    viewport2['nodes'],
+                    viewport2['viewport'],
+                    containerEl,
+                    dragOffsetCtx,
+                    relatedEdgeIds2['relatedEdgeIds'],
+                    edgeEntries,
+                    'drag-related-edges-unavailable',
+                    { ...args5, edgeVisibilityIndex: edgeVisibilityIndex() },
+                  );
+              }
+            }
+          } else {
+            const args6 = run7(![]);
+            args6 &&
+              _renderEdges(
+                svgEl,
+                value108,
+                viewport2['nodes'],
+                viewport2['viewport'],
+                containerEl,
+                dragOffsetCtx,
+                relatedEdgeIds2['relatedEdgeIds'],
+                edgeEntries,
+                'steady',
+                { ...args6, edgeVisibilityIndex: edgeVisibilityIndex() },
+              );
+          }
         }
       }
     }
-    (_renderPicker(el19, nodes.picker, value110),
-      _renderSelectionRect(el23, nodes.selectionBox),
-      _renderMultiSelectBox(
-        el21,
-        nodes.selectedNodeIds,
-        nodes.nodes,
-        nodes.viewport,
-        nodes.ui?.imageVideoNodeResizeEnabled === true,
-      ),
-      _renderAlignCenterPanel(el22, nodes.selectedNodeIds, nodes.nodes, nodes.ui),
-      renderContextMenu(el24, nodes.contextMenu),
-      renderPickConnectBanner(el20, nodes.pickConnectMode));
-    if (hasPendingStructuralOps) run4(getRendererStructuralReconcileDelayMs(value119));
-    else deferredParkCount > 0 && deferParking > 0 && run4(deferParking + 16);
+    (_renderPicker(el9, viewport2['picker'], value82),
+      _renderSelectionRect(el11, viewport2['selectionBox']),
+      _selectionOverlay['render'](viewport2),
+      renderPickConnectBanner(el10, viewport2['pickConnectMode']));
+    if (deferDenseStructuralEdgeRender) {
+      const edgeOnlySnapshot2 = shouldUseDenseStructuralEdgeOnlyFollowup({
+        deferDenseStructuralFrame: deferInitialRasterPlanning,
+        deferDenseStructuralEdgeRender: deferDenseStructuralEdgeRender,
+        hasPendingStructuralOps: hasPendingStructuralOps,
+      });
+      ((value92 = edgeOnlySnapshot2 ? viewport2 : null),
+        scheduleDeferredReconcile(0x0, { bypassInteractionGrace: !![], edgeOnlySnapshot: edgeOnlySnapshot2 ? viewport2 : null }));
+    } else {
+      if (hasPendingStructuralOps) {
+        const rendererLowZoomMountLimit =
+          resolveRendererLowZoomMountLimit({ viewport: viewport2['viewport'], nodeCount: nodeCount }) > 0x0;
+        scheduleDeferredReconcile(
+          Math['min'](
+            getRendererStructuralReconcileDelayMs(nodeCount),
+            hasPendingVisibleVideoMounts
+              ? VISIBLE_VIDEO_STRUCTURAL_RECONCILE_DELAY_MS
+              : hasPendingFullEligibleVisibleImageMounts
+                ? FULL_ELIGIBLE_VISIBLE_IMAGE_RECONCILE_DELAY_MS
+                : rendererLowZoomMountLimit
+                  ? 0x168
+                  : 0x60,
+          ),
+          { bypassInteractionGrace: hasPendingFullEligibleVisibleImageMounts === !![] },
+        );
+      } else remainingMs > 0x0 && scheduleDeferredReconcile(remainingMs + 0x10);
+    }
+    rendererSelectionFastPath['rememberRenderedSnapshot'](viewport2);
   }
-  function run2(enabled33) {
-    if (!_presentationSubscription.isActive() || !enabled33) return;
+  function run(snapshot, { skipNodesForDenseEdgeFollowup: skipNodesForDenseEdgeFollowup = ![] } = {}) {
+    if (!snapshot || !hasPendingRender['isActive']()) return;
     const isPerfProbeEnabled2 = isPerfProbeEnabled(),
-      value126 =
-        isPerfProbeEnabled2 && typeof performance !== 'undefined' && typeof performance.now === 'function'
-          ? performance.now()
-          : 0;
-    let mode = 'steady';
+      value112 =
+        isPerfProbeEnabled2 && typeof performance !== 'undefined' && typeof performance['now'] === 'function'
+          ? performance['now']()
+          : 0x0;
+    let mode2 = 'steady';
     try {
-      const dragContext3 = getDragContext(),
-        enabled34 = typeof document !== 'undefined' ? document.body?.classList : null,
-        value127 = !!enabled34?.contains?.('is-panning'),
-        value128 = !!enabled34?.contains?.('is-viewport-animating'),
-        value129 = !!enabled34?.contains?.('is-zooming'),
-        value130 =
-          typeof enabled33._nodeCount === 'number'
-            ? enabled33._nodeCount
-            : Object.keys(enabled33.nodes || {}).length,
-        value131 = typeof enabled33._edgesRev === 'number' ? enabled33._edgesRev : 0,
-        value132 =
-          (dragContext3.isDragging || dragContext3.isDraggingCell) && dragContext3.isCommittingDrag !== true,
-        enabled35 = value132 && (value130 !== value113 || value131 !== value114),
-        value133 =
-          dragContext3.isPanning || dragContext3.assistPanActive
-            ? getViewportPanPreview() || enabled33.viewport
-            : enabled33.viewport;
-      value128 ||
-      dragContext3.isPanning ||
-      dragContext3.assistPanActive ||
-      value127 ||
-      value132 ||
-      value129 ||
-      enabled35
-        ? _rendererMediaRuntimePreparer.pause()
-        : _rendererMediaRuntimePreparer.resume();
-      _renderViewport(el17, value133, enabled33.ui?.titleFollowsCanvasZoom === true);
-      if (value128) {
-        (_rendererInteractionGrace.markBusy(), (mode = 'viewport-animating'));
-        if (el18.style.display === 'none') el18.style.display = '';
-        run4();
+      const interactionState = getInteractionRenderState(),
+        viewportPanPreview = getViewportPanPreview(),
+        viewportInteractionState = readViewportInteractionState({ interactionState: interactionState }),
+        interactionActive =
+          viewportPanPreview && !viewportInteractionState['isViewportBusy']
+            ? readViewportInteractionState({ interactionState: interactionState, panPreviewActive: !![] })
+            : viewportInteractionState,
+        nodeCount2 =
+          typeof snapshot['_nodeCount'] === 'number'
+            ? snapshot['_nodeCount']
+            : Object['keys'](snapshot['nodes'] || {})['length'],
+        value113 = run3(snapshot, nodeCount2),
+        value114 = typeof snapshot['_edgesRev'] === 'number' ? snapshot['_edgesRev'] : 0x0,
+        value115 =
+          (interactionState['isDragging'] || interactionState['isDraggingCell']) && interactionState['isCommittingDrag'] !== !![],
+        enabled27 = nodeCount2 !== value86 || value113 !== value87,
+        enabled28 = value115 && (enabled27 || value114 !== value88),
+        value116 = !interactionActive['isViewportBusy'] && _viewportJumpDetector['consume'](snapshot['viewport']);
+      (interactionActive['isViewportBusy'] || value115 || value116) && _rendererMediaRuntimePreparer['pause']();
+      const remainingMs2 = _rendererInteractionGrace['getRemainingMs'](),
+        viewport3 = interactionActive['isViewportBusy'] ? viewportPanPreview || snapshot['viewport'] : snapshot['viewport'];
+      let value117 = null;
+      const run8 = () => {
+          return (
+            (value117 ||= createRendererFramePlan({
+              snapshot: snapshot,
+              viewport: viewport3,
+              containerRect: _getCachedContainerSize(_containerSizeSourceEl),
+              nodeCount: nodeCount2,
+            })),
+            value117
+          );
+        },
+        value118 =
+          interactionActive['isViewportBusy'] !== !![] &&
+          value116 !== !![] &&
+          shouldPauseViewportMediaForInteractionGrace({
+            remainingMs: remainingMs2,
+            viewport: snapshot['viewport'],
+            nodeCount: nodeCount2,
+            hasPriorityMediaWork: ![],
+          }),
+        hasPriorityMediaWork2 = value118 ? run8()['hasPriorityMediaWork']() : ![],
+        value119 =
+          interactionActive['isViewportBusy'] ||
+          value116 ||
+          shouldPauseViewportMediaForInteractionGrace({
+            remainingMs: remainingMs2,
+            viewport: snapshot['viewport'],
+            nodeCount: nodeCount2,
+            hasPriorityMediaWork: hasPriorityMediaWork2,
+          });
+      (syncRendererViewportMediaPreloadPause(value119), cancelQueuedViewportInteractionPreloads(value119));
+      const shouldHydratePriorityMediaDuringViewportInteraction2 = shouldHydratePriorityMediaDuringViewportInteraction({
+          interactionActive:
+            interactionActive['isViewportAnimating'] || interactionActive['isPanning'] || interactionActive['isZooming'],
+          hasPriorityMediaWork: hasPriorityMediaWork2,
+        }),
+        viewportInteractionReconcileDelay = resolveViewportInteractionReconcileDelay({ hasPriorityMediaWork: hasPriorityMediaWork2 });
+      renderViewport(canvasEl, viewport3, snapshot['ui']?.['titleFollowsCanvasZoom'] === !![]);
+      if (interactionActive['isViewportAnimating']) {
+        (_rendererInteractionGrace['markBusy'](),
+          (mode2 = shouldHydratePriorityMediaDuringViewportInteraction2 ? 'viewport-animating-priority-media' : 'viewport-animating'));
+        if (svgWrapper['style']['display'] === 'none') svgWrapper['style']['display'] = '';
+        shouldHydratePriorityMediaDuringViewportInteraction2 && run4(snapshot, viewport3, mode2, run8());
+        scheduleDeferredReconcile(viewportInteractionReconcileDelay);
         return;
       }
-      if (dragContext3.isPanning || dragContext3.assistPanActive || value127) {
-        (_rendererInteractionGrace.markBusy(), (mode = 'panning'));
-        const value134 = performance.now();
-        value134 - count5 > 80 && ((count5 = value134), _renderCullingOnly(el17, enabled33.nodes, value133));
-        if (el18.style.display === 'none') el18.style.display = '';
-        run4();
+      if (interactionActive['isPanning']) {
+        (_rendererInteractionGrace['markBusy'](), (mode2 = 'panning'));
+        const value120 = performance['now']();
+        value120 - count > 0x50 &&
+          ((count = value120), _renderCullingOnly(canvasEl, snapshot['nodes'], viewport3));
+        if (svgWrapper['style']['display'] === 'none') svgWrapper['style']['display'] = '';
+        scheduleDeferredReconcile(viewportInteractionReconcileDelay);
         return;
       }
-      if (value132 && !enabled35) {
-        (_rendererInteractionGrace.markBusy(), (mode = 'dragging'));
-        if (el18.style.display === 'none') el18.style.display = '';
-        run4();
+      if (value115 && !enabled28) {
+        (_rendererInteractionGrace['markBusy'](), (mode2 = 'dragging'));
+        if (svgWrapper['style']['display'] === 'none') svgWrapper['style']['display'] = '';
+        scheduleDeferredReconcile();
         return;
       }
-      if (value129) {
-        (_rendererInteractionGrace.markBusy(), (mode = 'zooming'));
-        if (el18.style.display === 'none') el18.style.display = '';
-        run4();
+      if (interactionActive['isZooming']) {
+        (_rendererInteractionGrace['markBusy'](),
+          (mode2 = shouldHydratePriorityMediaDuringViewportInteraction2 ? 'zooming-priority-media' : 'zooming'));
+        if (svgWrapper['style']['display'] === 'none') svgWrapper['style']['display'] = '';
+        shouldHydratePriorityMediaDuringViewportInteraction2 && run4(snapshot, viewport3, mode2, run8());
+        scheduleDeferredReconcile(viewportInteractionReconcileDelay);
         return;
       }
-      enabled35
-        ? (_rendererInteractionGrace.markBusy(), (mode = 'dragging-structural'))
-        : (run3(), _rendererInteractionGrace.markIdle());
-      if (el18.style.display === 'none') el18.style.display = '';
-      (run5(enabled33), !enabled35 && _mediaPresentation.resume());
+      if (consumeRendererNodeDragCommitHint() && !enabled27 && value114 === value88) {
+        ((mode2 = 'drag-commit-deferred'), _rendererInteractionGrace['markBusy']());
+        if (svgWrapper['style']['display'] === 'none') svgWrapper['style']['display'] = '';
+        scheduleDeferredReconcile(RENDERER_VIRTUALIZATION_CONFIG['dragCommitReconcileDelayMs']);
+        return;
+      }
+      if (enabled28) (_rendererInteractionGrace['markBusy'](), (mode2 = 'dragging-structural'));
+      else
+        value116
+          ? (_rendererInteractionGrace['markBusy'](),
+            (mode2 = 'viewport-jump'),
+            (_lastViewportJumpAt = _nowMs()),
+            run2())
+          : (run2(), _rendererInteractionGrace['markIdle']());
+      if (svgWrapper['style']['display'] === 'none') svgWrapper['style']['display'] = '';
+      (run6(
+        snapshot,
+        skipNodesForDenseEdgeFollowup ? 'dense-edge-followup' : mode2,
+        skipNodesForDenseEdgeFollowup ? null : run8(),
+        { skipNodes: skipNodesForDenseEdgeFollowup },
+      ),
+        !enabled28 && (_mediaPresentation['resume'](), _rendererMediaRuntimePreparer['resume']()));
     } finally {
-      if (
-        isPerfProbeEnabled2 &&
-        typeof performance !== 'undefined' &&
-        typeof performance.now === 'function'
-      ) {
-        const nodeCount2 =
-          typeof enabled33._nodeCount === 'number'
-            ? enabled33._nodeCount
-            : Object.keys(enabled33.nodes || {}).length;
+      if (isPerfProbeEnabled2 && typeof performance !== 'undefined' && typeof performance['now'] === 'function') {
+        const nodeCount3 =
+          typeof snapshot['_nodeCount'] === 'number'
+            ? snapshot['_nodeCount']
+            : Object['keys'](snapshot['nodes'] || {})['length'];
         recordRenderFrameSample({
-          mode: mode,
-          durationMs: performance.now() - value126,
-          nodeCount: nodeCount2,
-          edgeCount: Object.keys(enabled33.edges || {}).length,
-          mountedNodeCount: _mountedNodeIds.size,
-          parkedNodeCount: _parkedNodeIds.size,
-          ..._fastPreviewLayer.getStats(),
+          mode: mode2,
+          durationMs: performance['now']() - value112,
+          nodeCount: nodeCount3,
+          edgeCount: Object['keys'](snapshot['edges'] || {})['length'],
+          mountedNodeCount: _mountedNodeIds['size'],
+          parkedNodeCount: _parkedNodeIds['size'],
+          ..._fastPreviewLayer['getStats'](),
         });
       }
     }
   }
-  function flushNode(enabled36) {
-    if (!enabled36) return false;
-    const pickMode = _currentSnapshot,
-      node = pickMode?.nodes?.[enabled36];
-    if (!node) return false;
-    const enabled37 = _componentMap.get(enabled36),
-      el26 = _wrapperMap.get(enabled36);
-    if (!enabled37 || typeof enabled37.update !== 'function') return false;
-    if (!_mountedNodeIds.has(enabled36) || !el26?.isConnected) return false;
-    const map4 = new Set(pickMode.selectedNodeIds || []),
-      isSelected = map4.has(enabled36),
-      map5 = _buildSelectionRelatedSets(map4, pickMode.edges || {}).relatedNodeIds,
-      isSelectionRelated = !isSelected && map5.has(enabled36),
-      inEdgeSig = _getIncomingEdgeSignature(enabled36, pickMode.edges || {}, pickMode.nodes || {}),
-      mediaLodMode = syncNodeMediaLodMode(el26, node, pickMode.viewport),
+  function flushNode(enabled29) {
+    if (!enabled29 || !hasPendingRender['isActive']()) return ![];
+    const pickMode2 = _currentSnapshot,
+      node2 = pickMode2?.['nodes']?.[enabled29];
+    if (!node2) return ![];
+    const enabled30 = _componentMap['get'](enabled29),
+      el13 = _wrapperMap['get'](enabled29);
+    if (!enabled30 || typeof enabled30['update'] !== 'function') return ![];
+    if (!_mountedNodeIds['has'](enabled29) || !el13?.['isConnected']) return ![];
+    const map4 = new Set(pickMode2['selectedNodeIds'] || []),
+      isSelected3 = map4['has'](enabled29),
+      map5 = _buildSelectionRelatedSets(map4, pickMode2['edges'] || {})['relatedNodeIds'],
+      isSelectionRelated3 = !isSelected3 && map5['has'](enabled29),
+      inEdgeSig = _getIncomingEdgeSignature(enabled29, pickMode2['edges'] || {}, pickMode2['nodes'] || {}),
+      mediaLodMode2 = syncNodeMediaLodMode(el13, node2, pickMode2['viewport']),
       rendererNodeSignature = buildRendererNodeSignature({
-        node: node,
+        node: node2,
         inEdgeSig: inEdgeSig,
-        pickMode: pickMode.pickConnectMode,
-        isSelected: isSelected,
-        isSelectionRelated: isSelectionRelated,
-        showVideoMeta: pickMode.ui?.showVideoMeta === true,
-        viewport: pickMode.viewport,
-        mediaLodMode: mediaLodMode,
+        pickMode: pickMode2['pickConnectMode'],
+        isSelected: isSelected3,
+        isSelectionRelated: isSelectionRelated3,
+        showVideoMeta: pickMode2['ui']?.['showVideoMeta'] === !![],
+        viewport: pickMode2['viewport'],
+        mediaLodMode: mediaLodMode2,
       });
     return (
-      _pendingNodeDataMap.delete(enabled36),
-      _nodeDataSnapshotMap.set(enabled36, rendererNodeSignature),
-      enabled37.update(node),
-      true
+      _pendingNodeDataMap['delete'](enabled29),
+      _nodeDataSnapshotMap['set'](enabled29, rendererNodeSignature),
+      enabled30['update'](node2),
+      !![]
     );
   }
-  function flushNodes(value135) {
-    const list10 = Array.isArray(value135) ? value135 : [value135];
-    let value136 = false;
-    for (const value137 of new Set(list10.filter(Boolean))) {
-      value136 = flushNode(value137) || value136;
+  function flushNodes(value121) {
+    const list4 = Array['isArray'](value121) ? value121 : [value121];
+    let value122 = ![];
+    for (const value123 of new Set(list4['filter'](Boolean))) {
+      value122 = flushNode(value123) || value122;
     }
-    return value136;
+    return value122;
+  }
+  function flushSelection(value124, value125 = {}) {
+    if (!hasPendingRender['isActive']()) return ![];
+    if (value125?.['settleInteraction'] === !![]) {
+      const edges = _currentSnapshot;
+      if (edges && edges['ui']?.['connectionLinesVisible'] !== ![]) {
+        const relatedEdgeIds3 =
+            edges['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+              ? { relatedEdgeIds: new Set() }
+              : _buildSelectionRelatedSets(edges['selectedNodeIds'] || [], edges['edges'] || {}),
+          value126 = _edgeLayer['settleDynamicEdges']({
+            svgEl: svgEl,
+            edges: edges['edges'] || {},
+            nodes: edges['nodes'] || {},
+            viewport: edges['viewport'],
+            containerEl: containerEl,
+            relatedEdgeIds: relatedEdgeIds3['relatedEdgeIds'],
+            options: { pathStyle: edges['ui']?.['connectionLineStyle'] },
+          });
+        if (value126['mutated']) _invalidateFullEdgeRenderSignature();
+      }
+      return run5(value124);
+    }
+    if (
+      rendererSelectionFastPath['flushSelectionOnlySnapshot'](_currentSnapshot, {
+        allowPendingRaf: !![],
+        cancelPendingRaf: !![],
+      })
+    )
+      return !![];
+    return run5(value124);
+  }
+  function run5(enabled31, skipInstanceUpdate2 = {}) {
+    if (!enabled31) return ![];
+    const parentToChildren = _currentSnapshot,
+      enabled32 = parentToChildren?.['nodes'] || {};
+    if (!parentToChildren || !enabled32) return ![];
+    const list5 = Array['isArray'](enabled31) ? enabled31 : [enabled31],
+      value127 = Array['isArray'](parentToChildren['selectedNodeIds']) ? parentToChildren['selectedNodeIds'] : [],
+      selectedNodeSet = new Set(value127),
+      selectedNodeRankMap = buildSelectedNodeRankMap(value127),
+      value128 = parentToChildren['edges'] || {},
+      value129 = typeof parentToChildren['_edgesRev'] === 'number' ? parentToChildren['_edgesRev'] : 0x0;
+    _ensureEdgeIndex(value128, value129);
+    const value130 =
+        parentToChildren['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+          ? { relatedNodeIds: new Set() }
+          : _buildSelectionRelatedSets(selectedNodeSet, value128),
+      relatedNodeIds2 = value130['relatedNodeIds'] || new Set(),
+      relatedHighlightColor = _normalizeSelectionRelatedHighlightColor(
+        parentToChildren['ui']?.['selectionRelatedHighlightColor'],
+      ),
+      viewport4 = parentToChildren['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 },
+      { width: width2, height: height2 } = _getCachedContainerSize(
+        canvasEl['parentElement'] || canvasEl,
+      ),
+      dragContext = getInteractionRenderState(),
+      dragTargets2 = buildRendererDragTargetSet({
+        dragContext: dragContext,
+        selectedNodeSet: selectedNodeSet,
+        parentToChildren: parentToChildren['_parentToChildren'] || {},
+      }),
+      showVideoMeta =
+        parentToChildren['ui'] && typeof parentToChildren['ui']['showVideoMeta'] === 'boolean'
+          ? parentToChildren['ui']['showVideoMeta']
+          : ![];
+    let value131 = ![];
+    for (const nodeId8 of new Set(list5['filter'](Boolean))) {
+      const node3 = enabled32[nodeId8],
+        wrapperEl = _wrapperMap['get'](nodeId8);
+      if (!node3 || !_mountedNodeIds['has'](nodeId8) || !wrapperEl?.['isConnected']) continue;
+      const isSelected4 = selectedNodeSet['has'](nodeId8),
+        isSelectionRelated4 = !isSelected4 && relatedNodeIds2['has'](nodeId8),
+        inEdgeSig2 = _getIncomingEdgeSignature(nodeId8, value128, enabled32),
+        mediaLodMode3 = syncNodeMediaLodMode(wrapperEl, node3, viewport4),
+        signature = buildRendererNodeSignature({
+          node: node3,
+          inEdgeSig: inEdgeSig2,
+          pickMode: parentToChildren['pickConnectMode'],
+          isSelected: isSelected4,
+          isSelectionRelated: isSelectionRelated4,
+          showVideoMeta: showVideoMeta,
+          viewport: viewport4,
+          mediaLodMode: mediaLodMode3,
+        });
+      _syncMountedNodePresentation({
+        wrapperEl: wrapperEl,
+        node: node3,
+        nodeId: nodeId8,
+        selectedNodeSet: selectedNodeSet,
+        selectedNodeRankMap: selectedNodeRankMap,
+        connOverlay: parentToChildren['connOverlay'],
+        pickMode: parentToChildren['pickConnectMode'],
+        viewport: viewport4,
+        containerW: width2,
+        containerH: height2,
+        dragContext: dragContext,
+        dragTargets: dragTargets2,
+        showVideoMeta: showVideoMeta,
+        relatedNodeIds: relatedNodeIds2,
+        relatedHighlightColor: relatedHighlightColor,
+        inEdgeSig: inEdgeSig2,
+        signature: signature,
+        mediaLodMode: mediaLodMode3,
+        skipInstanceUpdate: skipInstanceUpdate2?.['skipInstanceUpdate'] !== ![],
+      });
+      if (
+        shouldHydrateVideoMediaImmediately({
+          node: node3,
+          nodeId: nodeId8,
+          isSelected: isSelected4,
+          isSelectionRelated: isSelectionRelated4,
+          dragTargets: dragTargets2,
+          connOverlay: parentToChildren['connOverlay'],
+          pickMode: parentToChildren['pickConnectMode'],
+        })
+      ) {
+        if (_componentMap['get'](nodeId8)?.['_rendererMediaDeferred'] === !![])
+          _videoHydrationBackpressure['markPriorityWork']();
+        _rendererDeferredMedia['hydrateNow'](nodeId8);
+      }
+      value131 = !![];
+    }
+    return value131;
   }
   typeof window !== 'undefined' &&
-    ((window.v2Renderer = window.v2Renderer || {}),
-    Object.assign(window.v2Renderer, { flushNode: flushNode, flushNodes: flushNodes }));
-  _presentationSubscription.connect(value110);
-  const value138 = () => {
-    (_presentationSubscription.dispose(),
-      _rendererMediaRuntimePreparer.clear(),
-      _schedulePreparedMediaRuntimeCommit === _schedulePreparedMediaRuntimeCommitForRenderer &&
-        (_schedulePreparedMediaRuntimeCommit = null),
-      run3(),
-      _containerResizeObserver && (_containerResizeObserver.disconnect(), (_containerResizeObserver = null)),
+    ((window['v2Renderer'] = window['v2Renderer'] || {}),
+    Object['assign'](window['v2Renderer'], {
+      flushNode: flushNode,
+      flushNodes: flushNodes,
+      flushSelection: flushSelection,
+    }));
+  hasPendingRender['connect'](value82);
+  const value132 = () => {
+    (hasPendingRender['dispose'](),
+      rendererSelectionFastPath['reset'](),
+      _resetSelectionFastPath === value103 && (_resetSelectionFastPath = null),
+      run2(),
+      rendererPanPreviewReconciler['dispose'](),
+      _rendererMediaRuntimePreparer['clear'](),
+      _schedulePreparedMediaRuntimeCommit === value95 && (_schedulePreparedMediaRuntimeCommit = null),
+      _fastPreviewContinuation['reset'](),
+      _containerResizeObserver &&
+        (_containerResizeObserver['disconnect'](), (_containerResizeObserver = null)),
       (_containerResizeHandler = null),
       (_containerSizeSourceEl = null),
-      _mediaPresentation.clear(),
-      _sourceVideoSlotLifecycle.reset(),
-      _rasterPreviewCoordinator.reset(),
-      _clearRunningTimerState(),
-      el18?.remove?.(),
-      el19?.remove?.(),
-      el20?.remove?.(),
-      el21?.remove?.(),
-      el22?.remove?.(),
-      el23?.remove?.(),
-      el24?.remove?.());
+      _mediaPresentation['clear'](),
+      _sourceVideoSourceKeySnapshotMap['clear'](),
+      _pendingSourceVideoActivationIds['clear'](),
+      (_sourceVideoActivationRev = null),
+      (_sourceVideoActivationNodesRef = null),
+      _nodeTimerController['clear'](),
+      (_currentSnapshot = null),
+      clearRendererViewportMediaPreloadPause(),
+      svgWrapper?.['remove']?.(),
+      el9?.['remove']?.(),
+      el10?.['remove']?.(),
+      _selectionOverlay['unmount'](),
+      el11?.['remove']?.());
   };
-  value138.setPresentationActive = _presentationSubscription.setActive;
-  return value138;
+  return ((value132['setPresentationActive'] = hasPendingRender['setActive']), value132);
 }
-function _renderViewport(el27, box2, value139 = false) {
-  !el27._willChangeSet && ((el27.style.willChange = 'transform'), (el27._willChangeSet = true));
-  const value140 = '0 0';
-  el27.style.transformOrigin !== value140 && (el27.style.transformOrigin = value140);
-  const value141 = 'translate3d(' + box2.x + 'px, ' + box2.y + 'px, 0) scale(' + box2.zoom + ')';
-  (el27._lastTransform !== value141 && ((el27.style.transform = value141), (el27._lastTransform = value141)),
-    _syncZoomCssVars(box2.zoom, value139));
-}
-let _lastZoomInv = null,
-  _lastZoomInvRaw = null,
-  _lastNodeLabelComp = null,
-  _lastNodeLabelCompAt = 0;
-function _syncZoomCssVars(value142, value143 = false) {
-  const el28 = typeof document !== 'undefined' ? document.documentElement : null;
-  if (!el28) return;
-  const el29 = typeof document !== 'undefined' && document && document.body ? document.body : null,
-    value144 =
-      typeof performance !== 'undefined' && performance && typeof performance.now === 'function'
-        ? performance.now()
-        : Date.now(),
-    value145 = 0.2 + 0.05 * 1.8,
-    count6 = typeof value142 === 'number' && isFinite(value142) ? value142 : 1,
-    value146 = count6 > 0 ? count6 : 1,
-    value147 = Math.min(1 / value146, 1 / value145),
-    value148 = 1 / value146,
-    value149 = count6 > 0 ? Math.pow(1 / count6, 0.35) : 1,
-    value150 = value143 === true ? Math.min(value149, 1.6) : 1;
-  _lastZoomInv !== value147 && ((_lastZoomInv = value147), el28.style.setProperty('--zoom-inv', value147));
-  _lastZoomInvRaw !== value148 &&
-    ((_lastZoomInvRaw = value148), el28.style.setProperty('--zoom-inv-raw', value148));
-  const value151 = value143 === true && !!(el29 && el29.classList.contains('is-zooming'));
-  if (value151 && value144 - _lastNodeLabelCompAt < 120 && _lastNodeLabelComp !== null) return;
-  (_lastNodeLabelComp !== value150 &&
-    ((_lastNodeLabelComp = value150), el28.style.setProperty('--node-label-comp', value150)),
-    (_lastNodeLabelCompAt = value144));
-}
-function _buildGroupOutputOrderSignature(value152, value153) {
-  const list11 = [],
-    value154 = Array.isArray(value152?.groupOutputSourceOrder)
-      ? value152.groupOutputSourceOrder.map((item8) => String(item8 || '').trim()).join('>')
+function _buildGroupOutputOrderSignature(value133, value134) {
+  const list6 = [],
+    value135 = Array['isArray'](value133?.['groupOutputSourceOrder'])
+      ? value133['groupOutputSourceOrder']
+          ['map']((value136) => String(value136 || '')['trim']())
+          ['join']('>')
       : '';
-  if (value154) list11.push('global:' + value154);
-  const value155 = String(value153 || '').trim(),
-    value156 = value152?.groupOutputSourceOrderByTarget,
-    value157 =
-      value155 &&
-      value156 &&
-      typeof value156 === 'object' &&
-      !Array.isArray(value156) &&
-      Array.isArray(value156[value155])
-        ? value156[value155].map((item9) => String(item9 || '').trim()).join('>')
+  if (value135) list6['push']('global:' + value135);
+  const value137 = String(value134 || '')['trim'](),
+    value138 = value133?.['groupOutputSourceOrderByTarget'],
+    value139 =
+      value137 &&
+      value138 &&
+      typeof value138 === 'object' &&
+      !Array['isArray'](value138) &&
+      Array['isArray'](value138[value137])
+        ? value138[value137]['map']((value140) => String(value140 || '')['trim']())['join']('>')
         : '';
-  if (value157) list11.push('target:' + value157);
-  return list11.join('|');
+  if (value139) list6['push']('target:' + value139);
+  return list6['join']('|');
 }
-function _getIncomingEdgeSignature(value158, value159, value160) {
-  const list12 = [],
-    value161 = String(value160?.[value158]?.parentId || '').trim(),
-    list13 = [['direct', value158]];
-  if (value161 && isNodeType(value160?.[value161], 'group')) list13.push(['shared:' + value161, value161]);
-  for (const [value162, value163] of list13) {
-    for (const value164 of _incomingEdgeIdsByTarget.get(value163) || []) {
-      const enabled38 = value159?.[value164];
-      if (!enabled38 || enabled38.targetId !== value163) continue;
-      const value165 = value160?.[enabled38.sourceId],
-        value166 = typeof value165?._bizRev === 'number' ? value165._bizRev : 0,
-        value167 = String(enabled38.refSlot || ''),
-        _buildGroupOutputOrderSignature2 = _buildGroupOutputOrderSignature(enabled38, value158);
-      list12.push(
-        value162 +
+function _getIncomingEdgeSignature(value141, value142, value143) {
+  const list7 = [],
+    value144 = String(value143?.[value141]?.['parentId'] || '')['trim'](),
+    list8 = [['direct', value141]];
+  if (value144 && isNodeType(value143?.[value144], 'group'))
+    list8['push'](['shared:' + value144, value144]);
+  for (const [value145, value146] of list8) {
+    for (const value147 of _incomingEdgeIdsByTarget['get'](value146) || []) {
+      const enabled33 = value142?.[value147];
+      if (!enabled33 || enabled33['targetId'] !== value146) continue;
+      const value148 = value143?.[enabled33['sourceId']],
+        value149 = typeof value148?.['_bizRev'] === 'number' ? value148['_bizRev'] : 0x0,
+        value150 = String(enabled33['refSlot'] || ''),
+        _buildGroupOutputOrderSignature2 = _buildGroupOutputOrderSignature(enabled33, value141);
+      list7['push'](
+        value145 +
           ':' +
-          enabled38.id +
+          enabled33['id'] +
           ':' +
-          enabled38.sourceId +
+          enabled33['sourceId'] +
           ':' +
-          value167 +
+          value150 +
           ':' +
-          value166 +
+          value149 +
           ':' +
-          buildGroupOutputMembershipSignature(value165, value160) +
+          buildGroupOutputMembershipSignature(value148, value143) +
           ':' +
           _buildGroupOutputOrderSignature2,
       );
     }
   }
-  return list12.join(',');
+  return list7['join'](',');
 }
-function isRendererMediaRuntimeInteractionPriority({
-  nodeId: nodeId2,
-  isSelected: isSelected2,
-  isSelectionRelated: isSelectionRelated2,
-  dragTargets: dragTargets,
-  connOverlay: connOverlay2,
-  pickMode: pickMode2,
-} = {}) {
-  if (!nodeId2) return false;
-  return !!(
-    isSelected2 ||
-    isSelectionRelated2 ||
-    dragTargets?.has?.(nodeId2) ||
-    connOverlay2?.srcId === nodeId2 ||
-    connOverlay2?.hoverId === nodeId2 ||
-    pickMode2?.sourceNodeId === nodeId2 ||
-    pickMode2?.hoverNodeId === nodeId2
-  );
-}
-function _collectExactVisiblePreviewNodeIds(canvasEl) {
-  const el30 = canvasEl?.querySelector?.('.v2-fast-preview-layer');
-  if (!el30) return new Set();
-  const value168 = new Set();
-  for (const el31 of el30.children || []) {
-    const value169 = String(el31?.dataset?.nodeId || '').trim();
-    if (value169 && el31?.dataset?.hasMedia === '1') value168.add(value169);
-  }
-  return value168;
-}
-function _registerNodeRuntime(enabled39) {
-  if (!enabled39?.nodeId || !enabled39.wrapperEl || !enabled39.instance) return null;
-  const el32 = document.getElementById(enabled39.nodeId);
+function _registerNodeRuntime(enabled34) {
+  if (!enabled34?.['nodeId'] || !enabled34['wrapperEl'] || !enabled34['instance']) return null;
+  const el14 = document['getElementById'](enabled34['nodeId']);
   return (
-    el32 && el32 !== enabled39.wrapperEl && !_wrapperMap.has(enabled39.nodeId) && el32.remove(),
-    _componentMap.set(enabled39.nodeId, enabled39.instance),
-    _wrapperMap.set(enabled39.nodeId, enabled39.wrapperEl),
-    _nodeTypeSnapshotMap.set(enabled39.nodeId, enabled39.canonicalType),
-    enabled39
+    el14 &&
+      el14 !== enabled34['wrapperEl'] &&
+      !_wrapperMap['has'](enabled34['nodeId']) &&
+      el14['remove'](),
+    _componentMap['set'](enabled34['nodeId'], enabled34['instance']),
+    _wrapperMap['set'](enabled34['nodeId'], enabled34['wrapperEl']),
+    _nodeTypeSnapshotMap['set'](enabled34['nodeId'], enabled34['canonicalType']),
+    enabled34
   );
 }
-function _createNodeRuntime(
-  node2,
-  selectedNodeSet,
-  selectedNodeRankMap,
-  dragContext4,
-  dragTargets2,
-  options3 = {},
-) {
+function _createNodeRuntime(node4, selectedNodeSet2, selectedNodeRankMap2, dragContext2, dragTargets3, options2 = {}) {
   return _registerNodeRuntime(
     prepareRendererNodeRuntime({
-      node: node2,
-      selectedNodeSet: selectedNodeSet,
-      selectedNodeRankMap: selectedNodeRankMap,
-      dragContext: dragContext4,
-      dragTargets: dragTargets2,
-      options: options3,
+      node: node4,
+      selectedNodeSet: selectedNodeSet2,
+      selectedNodeRankMap: selectedNodeRankMap2,
+      dragContext: dragContext2,
+      dragTargets: dragTargets3,
+      options: options2,
     }),
   );
 }
-function _ensureVideoMetaEl(el33, value170) {
-  if (!el33.__v2_video_meta_el) {
-    const el34 = document.createElement('div');
-    ((el34.className = 'node-video-meta'),
-      (el34.dataset.nodeId = value170),
-      (el34.dataset.visible = '0'),
-      (el34.textContent = ''),
-      el33.appendChild(el34),
-      (el33.__v2_video_meta_el = el34));
+function _ensureVideoMetaEl(el15, value151) {
+  if (!el15['__v2_video_meta_el']) {
+    const el16 = document['createElement']('div');
+    ((el16['className'] = 'node-video-meta'),
+      (el16['dataset']['nodeId'] = value151),
+      (el16['dataset']['visible'] = '0'),
+      (el16['textContent'] = ''),
+      el15['appendChild'](el16),
+      (el15['__v2_video_meta_el'] = el16));
   }
 }
-function _syncMountedNodePresentation({
-  wrapperEl: wrapperEl,
-  node: node3,
-  nodeId: nodeId3,
-  selectedNodeSet: selectedNodeSet2,
-  selectedNodeRankMap: selectedNodeRankMap2,
-  connOverlay: connOverlay3,
+function _buildNodePresentationStableKey({
+  node: node5,
+  nodeId: nodeId9,
+  signature: signature2,
+  visible: visible,
+  isSelected: isSelected5,
+  isSelectionRelated: isSelectionRelated5,
+  relatedHighlightColor: relatedHighlightColor2,
+  connOverlay: connOverlay2,
   pickMode: pickMode3,
-  viewport: viewport2,
+  showVideoMeta: showVideoMeta2,
+  focused: focused,
+} = {}) {
+  const value152 = connOverlay2?.['srcId'] === nodeId9 ? '1' : '0',
+    value153 = connOverlay2?.['hoverId'] === nodeId9 ? '1' : '0',
+    value154 = connOverlay2?.['invalidNodeIds']?.['includes']?.(nodeId9) ? '1' : '0',
+    value155 = pickMode3?.['active'] && pickMode3['sourceNodeId'] === nodeId9 ? '1' : '0',
+    value156 = pickMode3?.['active'] && pickMode3['hoverNodeId'] === nodeId9 ? '1' : '0',
+    value157 =
+      showVideoMeta2 && isNodeType(node5, ['source-video', 'ai-video'])
+        ? [
+            node5?.['videoFps'] || '',
+            node5?.['videoFrameCount'] || '',
+            node5?.['videoWidth'] || '',
+            node5?.['videoHeight'] || '',
+          ]['join'](',')
+        : '';
+  return [
+    signature2 || '',
+    visible ? '1' : '0',
+    isSelected5 ? '1' : '0',
+    isSelectionRelated5 ? '1' : '0',
+    relatedHighlightColor2 || '',
+    value152,
+    value153,
+    value154,
+    String(connOverlay2?.['side'] || ''),
+    value155,
+    value156,
+    String(pickMode3?.['handleDirection'] || ''),
+    showVideoMeta2 ? '1' : '0',
+    value157,
+    node5?.['generationStartTime'] || '',
+    node5?.['generationDuration'] ?? '',
+    resolveGenerationUiState(node5),
+    focused ? '1' : '0',
+  ]['join']('|');
+}
+function _syncMountedNodePresentation({
+  wrapperEl: wrapperEl2,
+  node: node6,
+  nodeId: nodeId10,
+  selectedNodeSet: selectedNodeSet3,
+  selectedNodeRankMap: selectedNodeRankMap3,
+  connOverlay: connOverlay3,
+  pickMode: pickMode4,
+  viewport: viewport5,
   containerW: containerW3,
   containerH: containerH2,
-  dragContext: dragContext5,
-  dragTargets: dragTargets3,
-  showVideoMeta: showVideoMeta,
-  relatedNodeIds: relatedNodeIds2,
-  relatedHighlightColor: relatedHighlightColor,
-  inEdgeSig: inEdgeSig2,
-  signature: signature,
-  skipInstanceUpdate: skipInstanceUpdate = false,
+  dragContext: dragContext3,
+  dragTargets: dragTargets4,
+  showVideoMeta: showVideoMeta3,
+  relatedNodeIds: relatedNodeIds3,
+  relatedHighlightColor: relatedHighlightColor3,
+  inEdgeSig: inEdgeSig3,
+  signature: signature3,
+  mediaLodMode: mediaLodMode = null,
+  skipInstanceUpdate: skipInstanceUpdate = ![],
+  deferInstanceUpdate: deferInstanceUpdate = ![],
+  mountedThisFrame: mountedThisFrame = ![],
+  lifecycleStats: lifecycleStats = null,
+  allowActiveDetailHydration: allowActiveDetailHydration = !![],
 }) {
-  const value171 = node3.x + ',' + node3.y + ',' + node3.width + ',' + node3.height,
-    value172 = wrapperEl._posKey !== value171,
-    value173 = dragContext5?.isDragging && dragTargets3 && dragTargets3.has(nodeId3),
-    value174 = value173 ? (Number.isFinite(dragContext5.pendingDx) ? dragContext5.pendingDx : 0) : 0,
-    value175 = value173 ? (Number.isFinite(dragContext5.pendingDy) ? dragContext5.pendingDy : 0) : 0,
-    _isNodeVisible3 = _isNodeVisible(node3, viewport2, containerW3, containerH2, value174, value175),
-    value176 = _componentMap.get(nodeId3);
-  (syncNodeMediaLodMode(wrapperEl, node3, viewport2), syncNodeMediaMetricsDataset(wrapperEl, node3));
-  value172 &&
-    ((wrapperEl._posKey = value171),
-    (!dragTargets3 || !dragTargets3.has(nodeId3)) &&
-      (wrapperEl.style.transform = 'translate(' + node3.x + 'px, ' + node3.y + 'px)'),
-    (wrapperEl.style.width = node3.width + 'px'),
-    (wrapperEl.style.height = node3.height + 'px'));
-  isNodeType(node3, ['source-video', 'ai-video']) && _ensureVideoMetaEl(wrapperEl, nodeId3);
-  dragContext5.isDragging
-    ? dragTargets3 &&
-      dragTargets3.has(nodeId3) &&
-      (dragContext5.hasMoved || !dragContext5.wasSelectedOnDown) &&
-      wrapperEl.classList.add('is-ui-hidden')
-    : wrapperEl.classList.remove('is-ui-hidden');
-  if (!_isNodeVisible3) {
-    value176 &&
-      typeof value176.syncSelectionState === 'function' &&
-      value176.syncSelectionState({ selected: false, singleSelected: false, visible: false });
-    _syncRunningTimerForNode(nodeId3, null, { hide: true });
-    wrapperEl.style.display !== 'none' && (wrapperEl.style.display = 'none');
-    value176?.update &&
+  let deferredUpdate = ![],
+    didUpdate = ![];
+  const value158 =
+      node6['x'] + ',' + node6['y'] + ',' + node6['width'] + ',' + node6['height'],
+    positionChanged = wrapperEl2['_posKey'] !== value158,
+    active2 = dragContext3?.['isDragging'] && dragTargets4 && dragTargets4['has'](nodeId10),
+    offsetX = active2 ? (Number['isFinite'](dragContext3['pendingDx']) ? dragContext3['pendingDx'] : 0x0) : 0x0,
+    offsetY = active2 ? (Number['isFinite'](dragContext3['pendingDy']) ? dragContext3['pendingDy'] : 0x0) : 0x0,
+    visible2 = _isNodeVisible(node6, viewport5, containerW3, containerH2, offsetX, offsetY),
+    value159 = _componentMap['get'](nodeId10);
+  mediaLodMode === null && syncNodeMediaLodMode(wrapperEl2, node6, viewport5);
+  positionChanged &&
+    ((wrapperEl2['_posKey'] = value158),
+    (wrapperEl2['style']['width'] = node6['width'] + 'px'),
+    (wrapperEl2['style']['height'] = node6['height'] + 'px'));
+  syncRendererNodeDragTransform(wrapperEl2, node6, {
+    active: active2,
+    offsetX: offsetX,
+    offsetY: offsetY,
+    positionChanged: positionChanged,
+  });
+  isNodeType(node6, ['source-video', 'ai-video']) && _ensureVideoMetaEl(wrapperEl2, nodeId10);
+  const value160 = dragContext3['isDragging'] === !![] && dragTargets4?.['has']?.(nodeId10) === !![];
+  value160 ? wrapperEl2['classList']['add']('is-dragging') : wrapperEl2['classList']['remove']('is-dragging');
+  value160 && (dragContext3['hasMoved'] || !dragContext3['wasSelectedOnDown'])
+    ? wrapperEl2['classList']['add']('is-ui-hidden')
+    : wrapperEl2['classList']['remove']('is-ui-hidden');
+  const isSelected6 = selectedNodeSet3['has'](nodeId10),
+    isSelectionRelated6 = !isSelected6 && relatedNodeIds3?.['has'](nodeId10);
+  if (!visible2) {
+    value159 &&
+      typeof value159['syncSelectionState'] === 'function' &&
+      value159['syncSelectionState']({ selected: ![], singleSelected: ![], visible: ![] });
+    _nodeTimerController['hideNode'](nodeId10);
+    wrapperEl2['style']['display'] !== 'none' && (wrapperEl2['style']['display'] = 'none');
+    if (
+      value159?.['update'] &&
       !skipInstanceUpdate &&
-      signature !== _nodeDataSnapshotMap.get(nodeId3) &&
-      (_nodeDataSnapshotMap.set(nodeId3, signature), value176.update(node3));
-    return;
+      signature3 !== _nodeDataSnapshotMap['get'](nodeId10)
+    ) {
+      const shouldKeepHiddenHeavyMediaUpdatePending2 = shouldKeepHiddenHeavyMediaUpdatePending({
+        node: node6,
+        nodeId: nodeId10,
+        isSelected: isSelected6,
+        dragTargets: dragTargets4,
+      });
+      if (deferInstanceUpdate || shouldKeepHiddenHeavyMediaUpdatePending2)
+        (_pendingNodeDataMap['set'](nodeId10, { node: node6, signature: signature3 }),
+          recordRendererLifecycleSkippedUpdate(lifecycleStats));
+      else {
+        _nodeDataSnapshotMap['set'](nodeId10, signature3);
+        const value161 = lifecycleStats ? _nowMs() : 0x0;
+        (value159['update'](node6),
+          (didUpdate = !![]),
+          lifecycleStats &&
+            recordRendererLifecycleDuration(
+              lifecycleStats,
+              'update',
+              node6,
+              _nowMs() - value161,
+              'hidden',
+            ));
+      }
+    } else
+      value159?.['update'] &&
+        skipInstanceUpdate &&
+        signature3 !== _nodeDataSnapshotMap['get'](nodeId10) &&
+        recordRendererLifecycleSkippedUpdate(lifecycleStats);
+    return { deferredUpdate: deferredUpdate, didUpdate: didUpdate };
   }
-  wrapperEl.style.display === 'none' && (wrapperEl.style.display = '');
-  const isSelected3 = selectedNodeSet2.has(nodeId3),
-    value177 = !isSelected3 && relatedNodeIds2?.has(nodeId3),
-    value178 = wrapperEl.classList.contains('selected');
-  isSelected3 !== value178 &&
-    (isSelected3
-      ? wrapperEl.classList.add('selected', 'v2-selected')
-      : (wrapperEl.classList.remove('selected', 'v2-selected'), (wrapperEl.style.outline = '')));
-  if (value177) {
-    wrapperEl.classList.add('selection-related');
-    const value179 =
-      'selection-related-color-' + _normalizeSelectionRelatedHighlightColor(relatedHighlightColor);
-    for (const value180 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
-      const value181 = 'selection-related-color-' + value180;
-      if (value181 !== value179) wrapperEl.classList.remove(value181);
-    }
-    wrapperEl.classList.add(value179);
-  } else {
-    wrapperEl.classList.remove('selection-related');
-    for (const value182 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
-      wrapperEl.classList.remove('selection-related-color-' + value182);
-    }
-  }
-  _nodeDetailHydration.isNodeDetailActive({
-    node: node3,
-    nodeId: nodeId3,
-    isSelected: isSelected3,
-    connOverlay: connOverlay3,
-    pickMode: pickMode3,
-    relatedNodeIds: relatedNodeIds2,
-  }) && _nodeDetailHydration.hydrateNodeDetails(nodeId3, wrapperEl);
-  value176 &&
-    typeof value176.syncSelectionState === 'function' &&
-    value176.syncSelectionState({
-      selected: isSelected3,
-      singleSelected: selectedNodeSet2.size === 1,
-      visible: true,
+  wrapperEl2['style']['display'] === 'none' && (wrapperEl2['style']['display'] = '');
+  const focused2 =
+      typeof document !== 'undefined' &&
+      !!document['activeElement'] &&
+      wrapperEl2['contains'](document['activeElement']),
+    _buildNodePresentationStableKey2 = _buildNodePresentationStableKey({
+      node: node6,
+      nodeId: nodeId10,
+      signature: signature3,
+      visible: visible2,
+      isSelected: isSelected6,
+      isSelectionRelated: isSelectionRelated6,
+      relatedHighlightColor: relatedHighlightColor3,
+      connOverlay: connOverlay3,
+      pickMode: pickMode4,
+      showVideoMeta: showVideoMeta3,
+      focused: focused2,
     });
-  const rendererNodeZIndex = getRendererNodeZIndex(
-    node3,
-    isSelected3,
-    selectedNodeRankMap2?.get?.(nodeId3) ?? -1,
-    {
-      isFocused:
-        typeof document !== 'undefined' &&
-        !!document.activeElement &&
-        wrapperEl.contains(document.activeElement),
-    },
-  );
-  wrapperEl.style.zIndex !== rendererNodeZIndex && (wrapperEl.style.zIndex = rendererNodeZIndex);
-  if (isNodeType(node3, 'group')) {
-    const value183 = node3.color || 'var(--indigo)',
-      _getGroupColorWithOpacity2 = _getGroupColorWithOpacity(value183, '60'),
-      _getGroupColorWithOpacity3 = _getGroupColorWithOpacity(value183, '05');
-    (wrapperEl.style.borderColor !== _getGroupColorWithOpacity2 &&
-      (wrapperEl.style.borderColor = _getGroupColorWithOpacity2),
-      wrapperEl.style.backgroundColor !== _getGroupColorWithOpacity3 &&
-        (wrapperEl.style.backgroundColor = _getGroupColorWithOpacity3),
-      wrapperEl.style.getPropertyValue('--current-group-color') !== value183 &&
-        wrapperEl.style.setProperty('--current-group-color', value183));
+  if (
+    !mountedThisFrame &&
+    !active2 &&
+    wrapperEl2['dataset']?.['detailStage'] !== 'deferred' &&
+    _nodeDataSnapshotMap['get'](nodeId10) === signature3 &&
+    wrapperEl2['_presentationStableKey'] === _buildNodePresentationStableKey2
+  )
+    return { deferredUpdate: ![], didUpdate: ![] };
+  ((wrapperEl2['_presentationStableKey'] = _buildNodePresentationStableKey2), syncNodeMediaMetricsDataset(wrapperEl2, node6));
+  const shouldForceDeferActiveNodeDetails2 = shouldForceDeferActiveNodeDetails({
+      nodeId: nodeId10,
+      dragContext: dragContext3,
+      dragTargets: dragTargets4,
+    }),
+    value162 = wrapperEl2['classList']['contains']('selected');
+  isSelected6 !== value162 &&
+    (isSelected6
+      ? wrapperEl2['classList']['add']('selected', 'v2-selected')
+      : (wrapperEl2['classList']['remove']('selected', 'v2-selected'), (wrapperEl2['style']['outline'] = '')));
+  if (isSelectionRelated6) {
+    wrapperEl2['classList']['add']('selection-related');
+    const value163 = 'selection-related-color-' + _normalizeSelectionRelatedHighlightColor(relatedHighlightColor3);
+    for (const value164 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
+      const value165 = 'selection-related-color-' + value164;
+      if (value165 !== value163) wrapperEl2['classList']['remove'](value165);
+    }
+    wrapperEl2['classList']['add'](value163);
+  } else {
+    wrapperEl2['classList']['remove']('selection-related');
+    for (const value166 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
+      wrapperEl2['classList']['remove']('selection-related-color-' + value166);
+    }
   }
-  const el35 = wrapperEl.__v2_name_el,
-    nodeType = normalizeNodeType(node3.type),
-    labelKind2 = el35 ? _v2GetNodeLabelKind(nodeType) : '';
-  if (el35) {
-    if (labelKind2) {
-      if (el35.dataset.labelKind !== labelKind2) el35.dataset.labelKind = labelKind2;
-    } else 'labelKind' in el35.dataset && delete el35.dataset.labelKind;
+  if (
+    allowActiveDetailHydration !== ![] &&
+    !shouldForceDeferActiveNodeDetails2 &&
+    _nodeDetailHydration['isNodeDetailActive']({
+      node: node6,
+      nodeId: nodeId10,
+      isSelected: isSelected6,
+      connOverlay: connOverlay3,
+      pickMode: pickMode4,
+      relatedNodeIds: relatedNodeIds3,
+    })
+  ) {
+    if (
+      isNodeType(node6, ['source-video', 'ai-video', 'video']) &&
+      wrapperEl2?.['dataset']?.['detailStage'] === 'deferred'
+    )
+      _videoHydrationBackpressure['markPriorityWork']();
+    _nodeDetailHydration['hydrateNodeDetails'](nodeId10, wrapperEl2);
   }
-  if (el35 && el35.contentEditable !== 'true') {
-    const defaultName2 = getRendererDefaultNodeLabel(node3),
-      isBeta2 = hasNodeTypeBetaBadge(nodeType),
-      fullLabelText2 = node3.name || defaultName2,
-      displayLabelText2 = _v2FormatNodeLabelText(fullLabelText2);
-    ((el35.dataset.fullName = fullLabelText2),
-      (el35.dataset.isBeta = isBeta2 ? '1' : '0'),
-      _v2ClearNodeLabelTooltip(el35));
-    const el36 = el35.querySelector('.node-label-icon'),
-      el37 = el35.querySelector('.node-label-text'),
-      value184 = displayLabelText2 || defaultName2,
-      value185 = el36?.dataset.labelKind || '';
-    (value185 !== labelKind2 ||
-      el37?.textContent !== value184 ||
-      (isBeta2 ? el35.dataset.betaLabel !== fullLabelText2 : 'betaLabel' in el35.dataset)) &&
-      _v2SetNodeLabelContent(el35, {
-        labelKind: labelKind2,
-        displayLabelText: displayLabelText2,
-        defaultName: defaultName2,
-        isBeta: isBeta2,
-        fullLabelText: fullLabelText2,
+  value159 &&
+    typeof value159['syncSelectionState'] === 'function' &&
+    value159['syncSelectionState']({
+      selected: isSelected6,
+      singleSelected: selectedNodeSet3['size'] === 0x1,
+      visible: !![],
+    });
+  const rendererNodeZIndex = getRendererNodeZIndex(node6, isSelected6, selectedNodeRankMap3?.['get']?.(nodeId10) ?? -0x1, {
+    isFocused: focused2,
+  });
+  syncRendererNodePresentationZIndex(wrapperEl2, rendererNodeZIndex);
+  if (isNodeType(node6, 'group')) {
+    const value167 = node6['color'] || 'var(--indigo)',
+      rendererGroupColorWithOpacity = getRendererGroupColorWithOpacity(value167, '60'),
+      rendererGroupColorWithOpacity2 = getRendererGroupColorWithOpacity(value167, '05');
+    (wrapperEl2['style']['borderColor'] !== rendererGroupColorWithOpacity && (wrapperEl2['style']['borderColor'] = rendererGroupColorWithOpacity),
+      wrapperEl2['style']['backgroundColor'] !== rendererGroupColorWithOpacity2 &&
+        (wrapperEl2['style']['backgroundColor'] = rendererGroupColorWithOpacity2),
+      wrapperEl2['style']['getPropertyValue']('--current-group-color') !== value167 &&
+        wrapperEl2['style']['setProperty']('--current-group-color', value167));
+  }
+  const el17 = wrapperEl2['__v2_name_el'],
+    nodeType = normalizeNodeType(node6['type']),
+    labelKind = el17 ? getRendererNodeLabelKind(nodeType) : '';
+  if (el17) {
+    if (labelKind) {
+      if (el17['dataset']['labelKind'] !== labelKind) el17['dataset']['labelKind'] = labelKind;
+    } else 'labelKind' in el17['dataset'] && delete el17['dataset']['labelKind'];
+  }
+  if (el17 && el17['contentEditable'] !== 'true') {
+    const defaultName = getRendererDefaultNodeLabel(node6),
+      isBeta = hasNodeTypeBetaBadge(nodeType),
+      fullLabelText = node6['name'] || defaultName,
+      displayLabelText = formatRendererNodeLabelText(fullLabelText);
+    ((el17['dataset']['fullName'] = fullLabelText),
+      (el17['dataset']['isBeta'] = isBeta ? '1' : '0'),
+      clearRendererNodeLabelTooltip(el17));
+    const el18 = el17['querySelector']('.node-label-icon'),
+      el19 = el17['querySelector']('.node-label-text'),
+      value168 = displayLabelText || defaultName,
+      value169 = el18?.['dataset']['labelKind'] || '';
+    (value169 !== labelKind ||
+      el19?.['textContent'] !== value168 ||
+      (isBeta ? el17['dataset']['betaLabel'] !== fullLabelText : 'betaLabel' in el17['dataset'])) &&
+      setRendererNodeLabelContent(el17, {
+        labelKind: labelKind,
+        displayLabelText: displayLabelText,
+        defaultName: defaultName,
+        isBeta: isBeta,
+        fullLabelText: fullLabelText,
       });
   }
-  const el38 = wrapperEl.__v2_timer_el;
-  if (el38) {
-    let _formatNodeTimerText2 = '',
-      value186 = false;
-    const _isResolvedSourceMediaNode2 = _isResolvedSourceMediaNode(node3);
-    if (!_isResolvedSourceMediaNode2 && node3.generationStartTime && node3.generationDuration == null) {
-      const value187 = Date.now() - node3.generationStartTime;
-      ((_formatNodeTimerText2 = _formatNodeTimerText(node3, value187)), (value186 = true));
-    } else
-      !_isResolvedSourceMediaNode2 &&
-        typeof node3.generationDuration === 'number' &&
-        ((_formatNodeTimerText2 = _formatNodeTimerText(node3, node3.generationDuration)), (value186 = true));
-    value186
-      ? (el38.textContent !== _formatNodeTimerText2 && (el38.textContent = _formatNodeTimerText2),
-        (el38.style.color = isSelected3 ? 'var(--text-primary)' : 'var(--white-40)'),
-        el38.style.display === 'none' && (el38.style.display = ''))
-      : (el38.textContent && (el38.textContent = ''),
-        el38.style.display !== 'none' && (el38.style.display = 'none'));
-  }
-  _syncRunningTimerForNode(nodeId3, node3);
-  const el39 = wrapperEl.__v2_video_meta_el;
-  if (el39) {
-    if (!showVideoMeta) {
-      if (el39.dataset.visible !== '0') el39.dataset.visible = '0';
+  _nodeTimerController['renderNode'](nodeId10, node6, { selected: isSelected6 });
+  const el20 = wrapperEl2['__v2_video_meta_el'];
+  if (el20) {
+    if (!showVideoMeta3) {
+      if (el20['dataset']['visible'] !== '0') el20['dataset']['visible'] = '0';
     } else {
-      const fps3 = Number(node3.videoFps),
-        frames2 = Number(node3.videoFrameCount),
-        width3 = Number(node3.videoWidth),
-        height3 = Number(node3.videoHeight),
-        value188 = Number.isFinite(fps3) && fps3 > 0 && Number.isFinite(frames2) && frames2 > 0,
-        value189 = value188 ? '1' : '0';
-      el39.dataset.visible !== value189 && (el39.dataset.visible = value189);
-      if (value188) {
+      const fps = Number(node6['videoFps']),
+        frames = Number(node6['videoFrameCount']),
+        width3 = Number(node6['videoWidth']),
+        height3 = Number(node6['videoHeight']),
+        enabled35 =
+          Number['isFinite'](fps) &&
+          fps > 0x0 &&
+          Number['isFinite'](frames) &&
+          frames > 0x0,
+        value170 = enabled35 ? '1' : '0';
+      el20['dataset']['visible'] !== value170 && (el20['dataset']['visible'] = value170);
+      if (!enabled35 && typeof value159?.['requestVideoMetaForNodeInfo'] === 'function')
+        void value159['requestVideoMetaForNodeInfo'](node6);
+      if (enabled35) {
         const formatVideoMetaText2 = formatVideoMetaText({
-          fps: fps3,
-          frames: frames2,
+          fps: fps,
+          frames: frames,
           width: width3,
           height: height3,
         });
-        el39.textContent !== formatVideoMetaText2 && (el39.textContent = formatVideoMetaText2);
+        el20['textContent'] !== formatVideoMetaText2 && (el20['textContent'] = formatVideoMetaText2);
       }
     }
   }
-  if (value176?.update && signature !== _nodeDataSnapshotMap.get(nodeId3)) {
-    _nodeDataSnapshotMap.set(nodeId3, signature);
-    if (!skipInstanceUpdate) value176.update(node3);
-  }
-  const value190 = pickMode3 && pickMode3.active && nodeId3 === pickMode3.sourceNodeId,
-    isNodeType2 = isNodeType(node3, 'storyboard') && node3.isEditing;
-  if ((connOverlay3 && connOverlay3.srcId) || value190 || isNodeType2) {
-    if (nodeId3 === connOverlay3?.srcId || value190 || isNodeType2)
-      (wrapperEl.classList.add('conn-src'), wrapperEl.classList.remove('conn-invalid'));
+  if (value159?.['update'] && signature3 !== _nodeDataSnapshotMap['get'](nodeId10)) {
+    if (skipInstanceUpdate) _nodeDataSnapshotMap['set'](nodeId10, signature3);
     else
-      connOverlay3?.invalidNodeIds?.includes(nodeId3)
-        ? (wrapperEl.classList.add('conn-invalid'), wrapperEl.classList.remove('conn-src'))
-        : wrapperEl.classList.remove('conn-invalid', 'conn-src');
-  } else wrapperEl.classList.remove('conn-invalid', 'conn-src');
-  if (value190 || isNodeType2)
-    (wrapperEl.style.setProperty(
-      'box-shadow',
-      '0 0 0 2px var(--white-70), 0 0 20px 0 var(--white-40)',
-      'important',
-    ),
-      wrapperEl.style.setProperty('border-radius', '16px', 'important'));
-  else
-    wrapperEl.style.getPropertyPriority('box-shadow') === 'important' &&
-      (wrapperEl.style.removeProperty('box-shadow'), wrapperEl.style.removeProperty('border-radius'));
-  const value191 = pickMode3 && pickMode3.active && pickMode3.hoverNodeId === nodeId3;
-  if ((connOverlay3 && connOverlay3.hoverId === nodeId3) || value191) {
-    if (!wrapperEl.classList.contains('conn-hoverTarget')) {
-      wrapperEl.classList.add('conn-hoverTarget');
-      const value192 = window.getComputedStyle(wrapperEl).borderRadius;
-      let count7 = parseFloat(value192);
-      if (isNaN(count7) || count7 <= 0) count7 = 16;
-      wrapperEl.style.setProperty('--hover-br', count7 + 4 + 'px');
+      deferInstanceUpdate
+        ? ((deferredUpdate = !![]), recordRendererLifecycleSkippedUpdate(lifecycleStats))
+        : _nodeDataSnapshotMap['set'](nodeId10, signature3);
+    if (!skipInstanceUpdate && !deferInstanceUpdate) {
+      const value171 = lifecycleStats ? _nowMs() : 0x0;
+      (value159['update'](node6), (didUpdate = !![]));
+      if (lifecycleStats) {
+        const breakdown = value159?.['_lastUpdatePerfBreakdown'] || null;
+        recordRendererLifecycleDuration(
+          lifecycleStats,
+          'update',
+          node6,
+          _nowMs() - value171,
+          'visible',
+          { breakdown: breakdown },
+        );
+      }
+    } else skipInstanceUpdate && recordRendererLifecycleSkippedUpdate(lifecycleStats);
+  }
+  const value172 = pickMode4 && pickMode4['active'] && nodeId10 === pickMode4['sourceNodeId'],
+    isNodeType2 = isNodeType(node6, 'storyboard') && node6['isEditing'];
+  if ((connOverlay3 && connOverlay3['srcId']) || value172 || isNodeType2) {
+    if (nodeId10 === connOverlay3?.['srcId'] || value172 || isNodeType2)
+      (wrapperEl2['classList']['add']('conn-src'), wrapperEl2['classList']['remove']('conn-invalid'));
+    else
+      connOverlay3?.['invalidNodeIds']?.['includes'](nodeId10)
+        ? (wrapperEl2['classList']['add']('conn-invalid'), wrapperEl2['classList']['remove']('conn-src'))
+        : wrapperEl2['classList']['remove']('conn-invalid', 'conn-src');
+  } else wrapperEl2['classList']['remove']('conn-invalid', 'conn-src');
+  wrapperEl2['classList']['toggle']('is-source-highlighted', Boolean(value172 || isNodeType2));
+  const value173 = pickMode4 && pickMode4['active'] && pickMode4['hoverNodeId'] === nodeId10;
+  if ((connOverlay3 && connOverlay3['hoverId'] === nodeId10) || value173) {
+    if (!wrapperEl2['classList']['contains']('conn-hoverTarget')) {
+      wrapperEl2['classList']['add']('conn-hoverTarget');
+      const value174 = window['getComputedStyle'](wrapperEl2)['borderRadius'];
+      let count2 = parseFloat(value174);
+      if (isNaN(count2) || count2 <= 0x0) count2 = 0x10;
+      wrapperEl2['style']['setProperty']('--hover-br', count2 + 0x4 + 'px');
     }
-    let value193 = false;
-    if (connOverlay3 && connOverlay3.side === 'left') value193 = true;
-    else value191 && pickMode3 && pickMode3.handleDirection === 'left' && (value193 = true);
-    value193
-      ? (wrapperEl.classList.add('conn-hover-output'), wrapperEl.classList.remove('conn-hover-input'))
-      : (wrapperEl.classList.add('conn-hover-input'), wrapperEl.classList.remove('conn-hover-output'));
+    let value175 = ![];
+    if (connOverlay3 && connOverlay3['side'] === 'left') value175 = !![];
+    else value173 && pickMode4 && pickMode4['handleDirection'] === 'left' && (value175 = !![]);
+    value175
+      ? (wrapperEl2['classList']['add']('conn-hover-output'),
+        wrapperEl2['classList']['remove']('conn-hover-input'))
+      : (wrapperEl2['classList']['add']('conn-hover-input'),
+        wrapperEl2['classList']['remove']('conn-hover-output'));
   } else
-    wrapperEl.classList.contains('conn-hoverTarget') &&
-      (wrapperEl.classList.remove('conn-hoverTarget', 'conn-hover-input', 'conn-hover-output'),
-      wrapperEl.style.removeProperty('--hover-br'));
-  syncNodeResultClass(wrapperEl, node3, isNodeType);
+    wrapperEl2['classList']['contains']('conn-hoverTarget') &&
+      (wrapperEl2['classList']['remove']('conn-hoverTarget', 'conn-hover-input', 'conn-hover-output'),
+      wrapperEl2['style']['removeProperty']('--hover-br'));
+  return (
+    syncNodeResultClass(wrapperEl2, node6, isNodeType),
+    { deferredUpdate: deferredUpdate, didUpdate: didUpdate }
+  );
 }
-function _renderNodes(
-  canvasEl,
-  nodes2,
-  selectedNodeIds3,
-  relatedNodeIds3,
-  relatedHighlightColor2,
+function _renderNodesImpl(
+  canvasEl2,
+  nodes,
+  selectedNodeIds,
+  relatedNodeIds4,
+  relatedHighlightColor4,
   connOverlay4,
-  value194,
-  value195,
-  value196,
-  value197,
-  value198,
-  snapshot = null,
-  deferInitialPlanning = {},
+  value176,
+  value177,
+  value178,
+  value179,
+  value180,
+  snapshot2 = null,
+  interactionBusy = {},
 ) {
-  const pickConnectMode2 = value194,
-    viewport3 = value195 || { x: 0, y: 0, zoom: 1 },
-    value199 = value196 || {},
-    parentToChildren = value197 || {},
-    showVideoMeta2 = value198 !== false,
-    value200 = deferInitialPlanning?.deferParking === true,
-    dragContext6 = getDragContext(),
-    selectedNodeSet3 = selectedNodeIds3 instanceof Set ? selectedNodeIds3 : new Set(selectedNodeIds3 || []),
-    selectedNodeRankMap3 = buildSelectedNodeRankMap(selectedNodeIds3),
+  const pickConnectMode = value176,
+    viewport6 = value177 || { x: 0x0, y: 0x0, zoom: 0x1 },
+    value181 = value178 || {},
+    parentToChildren2 = value179 || {},
+    showVideoMeta4 = value180 !== ![],
+    value182 = interactionBusy?.['deferParking'] === !![],
+    dragContext4 = getInteractionRenderState(),
+    selectedNodeSet4 = selectedNodeIds instanceof Set ? selectedNodeIds : new Set(selectedNodeIds || []),
+    selectedNodeRankMap4 = buildSelectedNodeRankMap(selectedNodeIds),
     activeNodeIds = buildRendererDragTargetSet({
-      dragContext: dragContext6,
-      selectedNodeSet: selectedNodeSet3,
-      parentToChildren: parentToChildren,
+      dragContext: dragContext4,
+      selectedNodeSet: selectedNodeSet4,
+      parentToChildren: parentToChildren2,
     }),
-    interactionBusy = _rendererInteractionGrace.isBusy(),
-    { width: width4, height: height4 } = _getCachedContainerSize(canvasEl.parentElement || canvasEl),
-    nodeCount3 = Number.isFinite(snapshot?._nodeCount)
-      ? snapshot._nodeCount
-      : Object.keys(nodes2 || {}).length,
-    snapshotRev2 = Number.isFinite(snapshot?._persistRev) ? snapshot._persistRev : nodeCount3,
-    pinnedNodeIds3 = _getPinnedNodeIds(),
-    spatialIndex = getCachedRendererSpatialIndex(nodes2, {
-      snapshotRev: snapshotRev2,
-      nodeCount: nodeCount3,
-      denseNodeCount: RENDERER_VIRTUALIZATION_CONFIG.denseNodeCount,
-    }),
-    signature2 = _buildVirtualizationCandidateSignature({
-      snapshotRev: snapshotRev2,
-      nodeCount: nodeCount3,
-      viewport: viewport3,
-      selectedNodeIds: selectedNodeIds3,
+    value183 = _rendererRuntimeDiagnosticsEnabled ? _nowMs() : 0x0,
+    value184 = interactionBusy?.['framePlan'] || null,
+    { width: width4, height: height4 } =
+      value184?.['containerRect'] || _getCachedContainerSize(canvasEl2['parentElement'] || canvasEl2),
+    nodeCount4 = Number['isFinite'](value184?.['nodeCount'])
+      ? value184['nodeCount']
+      : Number['isFinite'](snapshot2?.['_nodeCount'])
+        ? snapshot2['_nodeCount']
+        : Object['keys'](nodes || {})['length'],
+    snapshotRev = Number['isFinite'](snapshot2?.['_nodesRev'])
+      ? snapshot2['_nodesRev']
+      : Number['isFinite'](snapshot2?.['_persistRev'])
+        ? snapshot2['_persistRev']
+        : nodeCount4,
+    value185 = Number['isFinite'](snapshot2?.['_sourceVideoRev'])
+      ? snapshot2['_sourceVideoRev']
+      : Number['isFinite'](snapshot2?.['_persistRev'])
+        ? snapshot2['_persistRev']
+        : null,
+    enabled36 = interactionBusy?.['deferInitialRasterPlanning'] === !![],
+    pinnedNodeIds = _getPinnedNodeIds(),
+    value186 =
+      value184 ||
+      createRendererFramePlan({
+        snapshot: snapshot2,
+        nodes: nodes,
+        viewport: viewport6,
+        containerRect: { width: width4, height: height4 },
+        nodeCount: nodeCount4,
+      }),
+    spatialIndex = value186['getSpatialIndex'](),
+    signature4 = buildRendererVirtualizationSignature({
+      snapshotRev: snapshotRev,
+      nodeCount: nodeCount4,
+      viewport: viewport6,
+      selectedNodeIds: selectedNodeIds,
       connOverlay: connOverlay4,
-      pickConnectMode: pickConnectMode2,
-      dragContext: dragContext6,
-      pinnedNodeIds: pinnedNodeIds3,
+      pickConnectMode: pickConnectMode,
+      dragContext: dragContext4,
+      pinnedNodeIds: pinnedNodeIds,
       containerW: width4,
       containerH: height4,
     });
-  let mountCandidateIds = _lastVirtualCandidateResult;
-  const cacheHit = signature2 === _lastVirtualCandidateSignature && !!mountCandidateIds;
+  let virtualizationResult = _lastVirtualCandidateResult;
+  const cacheHit = signature4 === _lastVirtualCandidateSignature && !!virtualizationResult;
   !cacheHit &&
-    ((mountCandidateIds = buildVirtualizationCandidateSets({
-      nodes: nodes2,
+    ((virtualizationResult = buildVirtualizationCandidateSets({
+      nodes: nodes,
       spatialIndex: spatialIndex,
-      viewport: viewport3,
+      viewport: viewport6,
       containerWidth: width4,
       containerHeight: height4,
-      selectedNodeIds: selectedNodeIds3,
+      selectedNodeIds: selectedNodeIds,
       connOverlay: connOverlay4,
-      pickConnectMode: pickConnectMode2,
-      dragContext: dragContext6,
-      parentToChildren: parentToChildren,
-      pinnedNodeIds: pinnedNodeIds3,
+      pickConnectMode: pickConnectMode,
+      dragContext: dragContext4,
+      parentToChildren: parentToChildren2,
+      pinnedNodeIds: pinnedNodeIds,
       mountedNodeIds: _mountedNodeIds,
     })),
-    (_lastVirtualCandidateSignature = signature2),
-    (_lastVirtualCandidateResult = mountCandidateIds));
-  const rendererFramePlan = createRendererFramePlan({
-      snapshot: snapshot,
-      nodes: nodes2,
-      viewport: viewport3,
-      containerRect: { width: width4, height: height4 },
-      nodeCount: nodeCount3,
-      geometryRev: snapshotRev2,
-    }),
-    mountCandidateIds2 = rendererFramePlan.buildScenePlan({
-      mountCandidateIds: mountCandidateIds.mountCandidateIds,
-      previewCandidateIds: mountCandidateIds.previewCandidateIds,
-      parkCandidateIds: mountCandidateIds.parkCandidateIds,
-      selectedNodeIds: selectedNodeSet3,
-      activeNodeIds: activeNodeIds,
-      keepAliveNodeIds: mountCandidateIds.keepAliveNodeIds,
-      mountedNodeIds: _mountedNodeIds,
-      includeParkIds: false,
-      deferInitialPlanning: deferInitialPlanning?.deferInitialRasterPlanning === true,
-    });
-  mountCandidateIds = {
-    ...mountCandidateIds,
-    mountCandidateIds: mountCandidateIds2.fullSurfaceIds,
-    previewCandidateIds: mountCandidateIds2.presentationSurfaceIds,
-    parkCandidateIds: mountCandidateIds2.fullSurfaceReleaseIds,
-    scenePlan: mountCandidateIds2,
-  };
-  const freezeRasterSurface = _rasterPreviewCoordinator.sync({
-    canvasEl: canvasEl,
-    nodes: nodes2,
-    scenePlan: mountCandidateIds2,
-    selectedNodeIds: selectedNodeSet3,
-    dragNodeIds: activeNodeIds,
-    connOverlay: connOverlay4,
-    pickConnectMode: pickConnectMode2,
-    viewport: viewport3,
-    viewportBusy: interactionBusy,
+    (_lastVirtualCandidateSignature = signature4),
+    (_lastVirtualCandidateResult = virtualizationResult));
+  virtualizationResult = ensureRendererExactVisiblePreviewCandidates({
+    virtualizationResult: virtualizationResult,
+    nodes: nodes,
+    spatialIndex: spatialIndex,
+    viewport: viewport6,
     containerWidth: width4,
     containerHeight: height4,
-    mediaLoadingBusy: interactionBusy,
-    freezeRasterSurface: interactionBusy,
-    lockRasterParticipation: deferInitialPlanning?.lockRasterParticipation === true,
-    deferInitialPlanning: deferInitialPlanning?.deferInitialRasterPlanning === true,
-    releaseFullSurface(value201) {
-      const el40 = _wrapperMap.get(value201);
-      if (!el40?.style || el40.classList?.contains?.('is-dragging')) return;
-      el40.style.display = 'none';
-      _syncRunningTimerForNode(value201, null, { hide: true });
-    },
+    nodeCount: nodeCount4,
   });
-  _notifyVirtualizationProbe({
-    signature: signature2,
-    cacheHit: cacheHit,
-    snapshotRev: snapshotRev2,
-    containerW: width4,
-    containerH: height4,
-    spatialIndex: !!spatialIndex,
-    nodeCount: nodeCount3,
-    mountCandidateCount: mountCandidateIds.mountCandidateIds?.size || 0,
-    previewCandidateCount: mountCandidateIds.previewCandidateIds?.size || 0,
-    parkCandidateCount: mountCandidateIds.parkCandidateIds?.size || 0,
-    keepAliveCount: mountCandidateIds.keepAliveNodeIds?.size || 0,
+  const scanNodes =
+    value185 === null ||
+    _sourceVideoActivationNodesRef !== nodes ||
+    _sourceVideoActivationRev !== value185;
+  !enabled36 &&
+    (syncRendererPendingSourceVideoActivationIds({
+      nodes: nodes,
+      sourceKeysByNodeId: _sourceVideoSourceKeySnapshotMap,
+      pendingNodeIds: _pendingSourceVideoActivationIds,
+      scanNodes: scanNodes,
+      isPresented: (value187, value188) => {
+        const value189 = _sourceVideoSlotLifecycle['read'](value187);
+        return value189['surface'] === 'media' && value189['sourceKey'] === value188;
+      },
+    }),
+    scanNodes && ((_sourceVideoActivationRev = value185), (_sourceVideoActivationNodesRef = nodes)));
+  const lowZoomRealVideoNodeIds = resolveRendererLowZoomRealVideoNodeIds({
+    nodes: nodes,
+    candidateNodeIds: virtualizationResult['previewCandidateIds'],
+    selectedNodeIds: selectedNodeIds,
+    priorityNodeIds: _pendingSourceVideoActivationIds,
+    viewport: viewport6,
+    nodeCount: nodeCount4,
+    containerWidth: width4,
+    containerHeight: height4,
   });
-  const { mountCandidateIds: mountCandidateIds3 } = mountCandidateIds,
-    isPreviewCandidate = freezeRasterSurface.domPreviewCandidateIds || mountCandidateIds.previewCandidateIds,
-    mediaSourceOwnerIds = freezeRasterSurface.domPreviewMediaSourceOwnerIds || new Set(),
-    requiredImmediateMediaSourceOwnerIds = new Set([
-      ...mediaSourceOwnerIds,
-      ...[...mountCandidateIds2.exactVisibleGenerationBusyIds].filter(
-        (item10) => !mountCandidateIds2.fullSurfaceIds.has(item10) || !_mountedNodeIds.has(item10),
-      ),
-    ]),
-    map6 = freezeRasterSurface.releasableFullSurfaceIds || mountCandidateIds.parkCandidateIds,
-    virtualizedRenderNodes = collectVirtualizedRenderNodes({
-      nodes: nodes2,
-      virtualizationResult: mountCandidateIds,
-      spatialIndex: spatialIndex,
+  virtualizationResult = applyRendererLowZoomRealVideoCandidates(virtualizationResult, lowZoomRealVideoNodeIds);
+  const fullEligibleVisibleImageNodeIds = enabled36
+    ? new Set()
+    : collectFullEligibleVisibleImageNodeIds({
+        nodes: nodes,
+        candidateNodeIds: virtualizationResult['previewCandidateIds'],
+        viewport: viewport6,
+        isVisible: (value190) =>
+          isNodeInsideViewportPadding(value190, viewport6, width4, height4, 0x0),
+        getPreviousMode: (value191) =>
+          String(_wrapperMap['get'](value191)?.['dataset']?.['mediaLodMode'] || '')['trim'](),
+        interactionBusy:
+          interactionBusy?.['viewportBusy'] === !![] ||
+          interactionBusy?.['previewOnly'] === !![] ||
+          _rendererInteractionGrace['isBusy'](),
+      });
+  virtualizationResult = applyRendererFullEligibleImageCandidates(virtualizationResult, fullEligibleVisibleImageNodeIds);
+  const mountCandidateIds2 = value186['buildScenePlan']({
+      mountCandidateIds: virtualizationResult['mountCandidateIds'],
+      previewCandidateIds: virtualizationResult['previewCandidateIds'],
+      parkCandidateIds: virtualizationResult['parkCandidateIds'],
+      selectedNodeIds: selectedNodeSet4,
+      activeNodeIds: activeNodeIds,
+      keepAliveNodeIds: virtualizationResult['keepAliveNodeIds'],
       mountedNodeIds: _mountedNodeIds,
-      viewport: viewport3,
+      fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds,
+      includeParkIds: ![],
+      deferInitialPlanning: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+    }),
+    value192 = signature4 + '|scene:' + mountCandidateIds2['surfaceSignature'],
+    { plannedFullEligibleVisibleImageNodeIds: plannedFullEligibleVisibleImageNodeIds } = mountCandidateIds2;
+  ((virtualizationResult = {
+    ...virtualizationResult,
+    mountCandidateIds: mountCandidateIds2['fullSurfaceIds'],
+    previewCandidateIds: mountCandidateIds2['presentationSurfaceIds'],
+    parkCandidateIds: mountCandidateIds2['fullSurfaceReleaseIds'],
+    scenePlan: mountCandidateIds2,
+  }),
+    _notifyVirtualizationProbe({
+      signature: signature4,
+      cacheHit: cacheHit,
+      snapshotRev: snapshotRev,
+      containerW: width4,
+      containerH: height4,
+      spatialIndex: !!spatialIndex,
+      nodeCount: nodeCount4,
+      mountCandidateCount: virtualizationResult['mountCandidateIds']?.['size'] || 0x0,
+      previewCandidateCount: virtualizationResult['previewCandidateIds']?.['size'] || 0x0,
+      parkCandidateCount: virtualizationResult['parkCandidateIds']?.['size'] || 0x0,
+      keepAliveCount: virtualizationResult['keepAliveNodeIds']?.['size'] || 0x0,
+      scenePressure: mountCandidateIds2['pressure'],
+      sceneFullSurfaceBudget: mountCandidateIds2['fullSurfaceBudget'],
+      sceneFullSurfaceCount: mountCandidateIds2['fullSurfaceIds']['size'],
+      sceneProxySurfaceCount: mountCandidateIds2['proxySurfaceIds']['size'],
+    }));
+  _rendererRuntimeDiagnosticsEnabled &&
+    recordRendererRuntimeDiagnostic({
+      kind: 'renderer-virtualization',
+      mode: interactionBusy?.['mode'] || 'steady',
+      cacheHit: cacheHit,
+      nodeCount: nodeCount4,
+      mountCandidateCount: virtualizationResult['mountCandidateIds']?.['size'] || 0x0,
+      previewCandidateCount: virtualizationResult['previewCandidateIds']?.['size'] || 0x0,
+      parkCandidateCount: virtualizationResult['parkCandidateIds']?.['size'] || 0x0,
+      fullEligibleVisibleImageCount: fullEligibleVisibleImageNodeIds['size'],
+      plannedFullEligibleVisibleImageCount: plannedFullEligibleVisibleImageNodeIds['size'],
+      scenePressure: mountCandidateIds2['pressure'],
+      sceneFullSurfaceBudget: mountCandidateIds2['fullSurfaceBudget'],
+      sceneFullSurfaceCount: mountCandidateIds2['fullSurfaceIds']['size'],
+      sceneProxySurfaceCount: mountCandidateIds2['proxySurfaceIds']['size'],
+      fullImageSettleReady: interactionBusy?.['fullImageSettleReady'] === !![],
+      durationMs: _nowMs() - value183,
+      viewport: { ...viewport6 },
+    });
+  const { mountCandidateIds: mountCandidateIds3 } = virtualizationResult;
+  let { parkCandidateIds: parkCandidateIds } = virtualizationResult;
+  interactionBusy?.['viewportPriorityMediaOnly'] !== !![] && _rendererMediaRuntimePreparer['prune'](mountCandidateIds3);
+  const candidateNodeIds = virtualizationResult['previewCandidateIds'] || mountCandidateIds3,
+    fullEligiblePreviewImageNodeIds = enabled36
+      ? new Set()
+      : collectFullEligibleVisibleImageNodeIds({
+          nodes: nodes,
+          candidateNodeIds: candidateNodeIds,
+          viewport: viewport6,
+          isVisible: () => !![],
+          getPreviousMode: (value193) =>
+            String(_wrapperMap['get'](value193)?.['dataset']?.['mediaLodMode'] || '')['trim'](),
+          interactionBusy:
+            interactionBusy?.['viewportBusy'] === !![] ||
+            interactionBusy?.['previewOnly'] === !![] ||
+            _rendererInteractionGrace['isBusy'](),
+        }),
+    viewportBusy =
+      interactionBusy?.['viewportBusy'] === !![] ||
+      interactionBusy?.['deferParking'] === !![] ||
+      interactionBusy?.['deferHeavyMediaMount'] === !![] ||
+      _rendererInteractionGrace['isBusy'](),
+    mediaLoadingBusy = viewportBusy || interactionBusy?.['previewOnly'] === !![],
+    suppressNewMedia =
+      viewportBusy && resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0x0,
+    freezeActive = _rasterPreviewCoordinator['sync']({
+      canvasEl: canvasEl2,
+      nodes: nodes,
+      scenePlan: mountCandidateIds2,
+      selectedNodeIds: selectedNodeSet4,
+      dragNodeIds: activeNodeIds,
+      connOverlay: connOverlay4,
+      pickConnectMode: pickConnectMode,
+      viewport: viewport6,
+      viewportBusy: viewportBusy,
       containerWidth: width4,
       containerHeight: height4,
+      mediaLoadingBusy: mediaLoadingBusy,
+      freezeRasterSurface: viewportBusy,
+      lockRasterParticipation: interactionBusy?.['lockRasterParticipation'] === !![],
+      deferInitialPlanning: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+      releaseFullSurface(value194) {
+        const el21 = _wrapperMap['get'](value194);
+        if (!el21?.['style'] || el21['classList']?.['contains']?.('is-dragging')) return;
+        ((el21['style']['display'] = 'none'), _nodeTimerController['hideNode'](value194));
+      },
     }),
-    rendererStructuralBudget = createRendererStructuralBudget(),
-    exactVisiblePreviewNodeIds = _collectExactVisiblePreviewNodeIds(canvasEl);
-  _rendererMediaRuntimePreparer.prune(mountCandidateIds3);
-  let hasPendingStructuralOps2 = false,
-    deferredParkCount2 = 0,
-    enabled40 = null;
-  for (const node4 of virtualizedRenderNodes) {
-    if (!node4?.id) continue;
-    const nodeId4 = node4.id;
-    let wrapperEl2 = _wrapperMap.get(nodeId4),
-      instance = _componentMap.get(nodeId4),
-      deferDetailsOnMount = false;
-    const nodeType2 = normalizeNodeType(node4.type),
-      value202 = _nodeTypeSnapshotMap.get(nodeId4);
-    wrapperEl2 &&
-      instance &&
-      value202 &&
-      value202 !== nodeType2 &&
-      (_destroyNode(nodeId4), (wrapperEl2 = null), (instance = null));
-    const isSelected4 = selectedNodeSet3.has(nodeId4),
-      isSelectionRelated3 = !isSelected4 && relatedNodeIds3?.has?.(nodeId4),
-      enabled41 = _mountedNodeIds.has(nodeId4) && !!wrapperEl2?.isConnected;
-    _sourceVideoSlotLifecycle.isManagedNode(nodeId4) &&
-      _sourceVideoSlotLifecycle.syncViewportVisibility(nodeId4, {
-        isSelected: isSelected4,
-        isPreviewCandidate: isPreviewCandidate.has(nodeId4),
-        isVisible: _isNodeVisible(node4, viewport3, width4, height4),
-      });
-    const value203 = _sourceVideoSlotLifecycle.shouldRetainPresentedSurface(nodeId4),
-      enabled42 = mountCandidateIds3.has(nodeId4) || value203 || (enabled41 && !map6.has(nodeId4));
-    let value204 = false;
-    if (!enabled42) {
-      if (wrapperEl2 && instance) {
-        const enabled43 = _pendingNodeDataMap.get(nodeId4);
-        (!enabled43 || enabled43.node !== node4) &&
-          _pendingNodeDataMap.set(nodeId4, { node: node4, signature: null });
+    suspendNewMediaSrc =
+      interactionBusy?.['suspendNewMediaSrc'] === !![] || (freezeActive['freezeActive'] === !![] && mediaLoadingBusy);
+  parkCandidateIds = freezeActive['releasableFullSurfaceIds'];
+  const { domPreviewCandidateIds: domPreviewCandidateIds, domPreviewMediaSourceOwnerIds: domPreviewMediaSourceOwnerIds } = freezeActive,
+    args7 = [...mountCandidateIds2['exactVisibleGenerationBusyIds']]['filter'](
+      (value195) => !mountCandidateIds2['fullSurfaceIds']['has'](value195) || !_mountedNodeIds['has'](value195),
+    ),
+    requiredImmediateMediaSourceOwnerIds = new Set([...domPreviewMediaSourceOwnerIds, ...args7]);
+  isPerfProbeEnabled() &&
+    (canvasEl2['__aicanvasPerfRasterCoordinatorStats'] = {
+      claimedRasterNodeIds: [...freezeActive['rasterIds']],
+      domPreviewCandidateNodeIds: [...domPreviewCandidateIds],
+      domPreviewMediaSourceOwnerNodeIds: [...domPreviewMediaSourceOwnerIds],
+      freezeActive: freezeActive['freezeActive'] === !![],
+      viewportBusyForPreview: viewportBusy,
+      viewportBusyOption: interactionBusy?.['viewportBusy'] === !![],
+      deferParkingOption: interactionBusy?.['deferParking'] === !![],
+      deferHeavyMediaMountOption: interactionBusy?.['deferHeavyMediaMount'] === !![],
+      interactionGraceBusy: _rendererInteractionGrace['isBusy'](),
+      policy: { ...(freezeActive['policy']?.['stats'] || {}) },
+    });
+  const candidateSignature = value192 + '|raster:' + freezeActive['signature'],
+    previewCandidateIds =
+      mountCandidateIds2['exactVisibleGenerationBusyIds']['size'] > 0x0
+        ? new Set([...domPreviewCandidateIds, ...mountCandidateIds2['exactVisibleGenerationBusyIds']])
+        : domPreviewCandidateIds;
+  cancelStaleLowPriorityPreloadsForHighZoom(suppressNewMedia);
+  if (interactionBusy?.['previewOnly'] === !![]) {
+    _fastPreviewContinuation['reset']();
+    const visibleNodeCount = mountCandidateIds2['exactVisibleIds']['size'];
+    let rasterVisibleNodeCount = 0x0;
+    if (
+      visibleNodeCount > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount'] &&
+      visibleNodeCount <= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxRasterAssistedVisibleNodeCount']
+    )
+      for (const value196 of mountCandidateIds2['exactVisibleIds']) {
+        freezeActive['rasterIds']['has'](value196) && (rasterVisibleNodeCount += 0x1);
       }
-      if (enabled41 && map6.has(nodeId4)) {
-        if (value200) {
-          deferredParkCount2 += 1;
+    const previewCoverageEligible = shouldPrepareRendererViewportPreviewCoverage({
+        viewport: viewport6,
+        nodeCount: nodeCount4,
+        visibleNodeCount: visibleNodeCount,
+        rasterVisibleNodeCount: rasterVisibleNodeCount,
+      }),
+      requiredImmediateCreateLimit =
+        previewCoverageEligible && visibleNodeCount > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount'];
+    _fastPreviewLayer['sync'](canvasEl2, nodes, previewCandidateIds, selectedNodeSet4, {
+      connOverlay: connOverlay4,
+      pickConnectMode: pickConnectMode,
+      nodeCount: nodeCount4,
+      viewport: viewport6,
+      containerWidth: width4,
+      containerHeight: height4,
+      freezeRasterSurface: freezeActive['freezeActive'] === !![],
+      previewOnly: !![],
+      deferVisibleMediaSrc: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+      suppressNewMedia: suppressNewMedia,
+      mediaSourceOwnerIds: domPreviewMediaSourceOwnerIds,
+      requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds,
+      requiredImmediateCreateLimit: requiredImmediateCreateLimit
+        ? RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['rasterAssistedImmediateCreateLimit']
+        : undefined,
+      viewportBusy: viewportBusy,
+      dragContext: dragContext4,
+      dragTargets: activeNodeIds,
+      suspendNewMediaSrc: suspendNewMediaSrc,
+      fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds,
+      fullEligiblePreviewImageNodeIds: fullEligiblePreviewImageNodeIds,
+    });
+    let previewCoverageCreated = null,
+      ready = ![],
+      presentedNodeCount = 0x0,
+      missingExactVisibleNodeCount = [];
+    if (previewCoverageEligible) {
+      const presentedNodeIds = new Set();
+      for (const value197 of mountCandidateIds2['presentationSurfaceIds']) {
+        const el22 = _wrapperMap['get'](value197),
+          value198 =
+            _mountedNodeIds['has'](value197) &&
+            el22 &&
+            el22['isConnected'] !== ![] &&
+            el22['style']?.['display'] !== 'none';
+        (value198 ||
+          freezeActive['rasterIds']['has'](value197) ||
+          _fastPreviewLayer['hasNodePreview'](value197)) &&
+          presentedNodeIds['add'](value197);
+      }
+      ((missingExactVisibleNodeCount = [...mountCandidateIds2['exactVisibleIds']]['filter']((value199) => !presentedNodeIds['has'](value199))),
+        (ready = missingExactVisibleNodeCount['length'] === 0x0),
+        (presentedNodeCount = presentedNodeIds['size']),
+        (previewCoverageCreated = createRendererViewportPreviewCoverage({
+          viewport: viewport6,
+          containerWidth: width4,
+          containerHeight: height4,
+          padding: mountCandidateIds2['padding']['preview'],
+          nodeCount: nodeCount4,
+          snapshot: snapshot2,
+          spatialIndex: spatialIndex,
+          presentedNodeIds: presentedNodeIds,
+          ready: ready,
+        })));
+    }
+    return (
+      isPerfProbeEnabled() &&
+        (canvasEl2['__aicanvasPerfViewportPreviewCoverageStats'] = {
+          exactVisibleNodeCount: visibleNodeCount,
+          rasterVisibleNodeCount: rasterVisibleNodeCount,
+          previewCoverageEligible: previewCoverageEligible,
+          previewCoverageReady: ready,
+          previewCoverageCreated: previewCoverageCreated !== null,
+          presentedNodeCount: presentedNodeCount,
+          missingExactVisibleNodeCount: missingExactVisibleNodeCount['length'],
+          missingExactVisibleNodeTypes: missingExactVisibleNodeCount['reduce']((value200, value201) => {
+            const value202 = String(nodes?.[value201]?.['type'] || 'unknown');
+            return ((value200[value202] = Number(value200[value202] || 0x0) + 0x1), value200);
+          }, {}),
+        }),
+      {
+        hasPendingStructuralOps: ![],
+        deferredParkCount: 0x0,
+        hasPendingVisibleVideoMounts: ![],
+        hasPendingFullEligibleVisibleImageMounts: ![],
+        previewCoverage: previewCoverageCreated,
+      }
+    );
+  }
+  const renderNodeCount = prioritizeFullEligibleVisibleImageNodes(
+      collectVirtualizedRenderNodes({
+        nodes: nodes,
+        virtualizationResult: virtualizationResult,
+        spatialIndex: spatialIndex,
+        mountedNodeIds: _mountedNodeIds,
+        viewport: viewport6,
+        containerWidth: width4,
+        containerHeight: height4,
+      }),
+      fullEligibleVisibleImageNodeIds,
+    ),
+    pendingFullEligibleVisibleImageCount = Array['from'](plannedFullEligibleVisibleImageNodeIds)['filter']((value203) => !_mountedNodeIds['has'](value203))[
+      'length'
+    ],
+    lifecycleStats2 = isPerfProbeEnabled()
+      ? createRendererNodeLifecycleStats({
+          mode: interactionBusy?.['mode'] || 'steady',
+          nodeCount: nodeCount4,
+          renderNodeCount: renderNodeCount['length'],
+          mountCandidateCount: mountCandidateIds3['size'],
+          parkCandidateCount: parkCandidateIds['size'],
+          viewportBusy: viewportBusy,
+        })
+      : null,
+    rendererStructuralBudget = createRendererStructuralBudget(
+      getRendererStructuralBudgetOptions({
+        viewportBusy: viewportBusy,
+        cacheHit: cacheHit,
+        dragContext: dragContext4,
+        fullEligibleVisibleImageCount: plannedFullEligibleVisibleImageNodeIds['size'],
+        fullImageSettleReady: interactionBusy?.['fullImageSettleReady'] === !![],
+        nodeCount: nodeCount4,
+        pendingFullEligibleVisibleImageCount: pendingFullEligibleVisibleImageCount,
+        renderMode: interactionBusy?.['mode'] || 'steady',
+        viewport: viewport6,
+      }),
+    ),
+    rendererStructuralBudget2 = createRendererStructuralBudget({
+      batchSize: RENDERER_FULL_SURFACE_RELEASE_BATCH_SIZE,
+      frameBudgetMs: RENDERER_FULL_SURFACE_RELEASE_FRAME_BUDGET_MS,
+    });
+  let hasPendingStructuralOps2 = ![],
+    deferredParkCount2 = 0x0,
+    enabled37 = null;
+  const heavyMediaUpdateFrameBudget = createHeavyMediaUpdateFrameBudget({ nodeCount: nodeCount4, now: _nowMs });
+  let hasPendingVisibleVideoMounts2 = ![],
+    hasPendingFullEligibleVisibleImageMounts2 = ![],
+    mountedHeavyMediaThisFrame = ![],
+    updatedHeavyMediaThisFrame = ![],
+    hasPendingStructuralVideoMounts = ![];
+  const value204 = nodeCount4 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'],
+    handler = createHeavyMediaPreviewOnlyDecider({
+      viewport: viewport6,
+      nodeCount: nodeCount4,
+      lowZoomRealVideoNodeIds: lowZoomRealVideoNodeIds,
+      fullEligibleVisibleImageNodeIds: plannedFullEligibleVisibleImageNodeIds,
+    }),
+    handler2 = createRendererVisibleAudioSurfaceHydrationPass({
+      viewport: viewport6,
+      nodeCount: nodeCount4,
+      deferredMedia: _rendererDeferredMedia,
+    });
+  for (const node7 of renderNodeCount) {
+    if (!node7?.['id']) continue;
+    const nodeId11 = node7['id'];
+    let wrapperEl3 = _wrapperMap['get'](nodeId11),
+      instance = _componentMap['get'](nodeId11),
+      deferMediaOnMount = ![];
+    const nodeType2 = normalizeNodeType(node7['type']),
+      isNodeType3 = isNodeType(node7, 'source-video');
+    isNodeType3 &&
+      _sourceVideoSlotLifecycle['syncViewportVisibility'](nodeId11, {
+        isSelected: selectedNodeSet4['has'](nodeId11),
+        isPreviewCandidate: candidateNodeIds['has'](nodeId11),
+        isVisible: _isNodeVisible(node7, viewport6, width4, height4),
+      });
+    const value205 = _nodeTypeSnapshotMap['get'](nodeId11);
+    wrapperEl3 &&
+      instance &&
+      value205 &&
+      value205 !== nodeType2 &&
+      (_destroyNode(nodeId11), (wrapperEl3 = null), (instance = null));
+    const enabled38 = _mountedNodeIds['has'](nodeId11) && !!wrapperEl3?.['isConnected'],
+      value206 = _sourceVideoSlotLifecycle['shouldRetainPresentedSurface'](nodeId11),
+      enabled39 = value206 || mountCandidateIds3['has'](nodeId11) || (enabled38 && !parkCandidateIds['has'](nodeId11));
+    let mountedThisFrame2 = ![],
+      value207 = ![];
+    if (!enabled39) {
+      if (wrapperEl3 && instance) {
+        const enabled40 = _pendingNodeDataMap['get'](nodeId11);
+        (!enabled40 || enabled40['node'] !== node7) &&
+          _pendingNodeDataMap['set'](nodeId11, { node: node7, signature: null });
+      }
+      if (enabled38 && parkCandidateIds['has'](nodeId11)) {
+        if (value182) {
+          deferredParkCount2 += 0x1;
           continue;
         }
-        rendererStructuralBudget.hasBudget()
-          ? (_parkNode(nodeId4), rendererStructuralBudget.consume())
-          : (hasPendingStructuralOps2 = true);
+        if (rendererStructuralBudget2['hasBudget']()) {
+          const value208 = lifecycleStats2 ? _nowMs() : 0x0;
+          (_parkNode(nodeId11),
+            lifecycleStats2 &&
+              recordRendererLifecycleDuration(lifecycleStats2, 'park', node7, _nowMs() - value208, 'park'),
+            rendererStructuralBudget2['consume']());
+        } else hasPendingStructuralOps2 = !![];
       }
       continue;
     }
-    if (!instance || !wrapperEl2) {
-      if (!rendererStructuralBudget.hasBudget()) {
-        hasPendingStructuralOps2 = true;
-        continue;
-      }
-      deferDetailsOnMount = _nodeDetailHydration.shouldDeferNodeDetails({
-        node: node4,
-        nodeId: nodeId4,
-        isSelected: isSelected4,
-        connOverlay: connOverlay4,
-        pickMode: pickConnectMode2,
-        relatedNodeIds: relatedNodeIds3,
-        viewport: viewport3,
-        mountCandidateCount: mountCandidateIds3.size,
+    const isSelected7 = selectedNodeSet4['has'](nodeId11),
+      isSelectionRelated7 = !isSelected7 && relatedNodeIds4?.['has']?.(nodeId11),
+      isNodeType4 = isNodeType(node7, ['source-video', 'ai-video', 'video']),
+      isVisibleVideoMediaNode = isNodeType4 && _isNodeVisible(node7, viewport6, width4, height4);
+    if (isNodeType4) {
+      const withinResidency =
+        lowZoomRealVideoNodeIds['has'](nodeId11) ||
+        resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0x0;
+      _videoMediaResidency['sync'](nodeId11, {
+        withinResidency:
+          withinResidency &&
+          isNodeInsideViewportPadding(
+            node7,
+            viewport6,
+            width4,
+            height4,
+            RENDERER_VIDEO_MEDIA_RESIDENCY_PADDING,
+          ),
+        leaseKey: _resolveVideoMediaLeaseKey(nodeId11, node7),
       });
-      const deferMediaOnMount =
-          deferDetailsOnMount ||
-          shouldDeferInitialVideoMediaOnMount({
-            node: node4,
-            nodeId: nodeId4,
-            isSelected: isSelected4,
-            isSelectionRelated: isSelectionRelated3,
-            dragTargets: activeNodeIds,
-            nodeCount: nodeCount3,
-            mountCandidateCount: mountCandidateIds3.size,
-          }),
-        runtimeOptions = {
-          deferDetailsOnMount: deferDetailsOnMount,
-          deferMediaOnMount,
-          eagerVideoPreviewOnMount: false,
-        },
-        runtimeVariant = [
-          deferDetailsOnMount ? 'details-deferred' : 'details-live',
-          deferMediaOnMount ? 'media-deferred' : 'media-live',
-          'eager-live',
-        ].join('|'),
-        hasPreparedRuntime = _rendererMediaRuntimePreparer.hasPrepared(nodeId4, node4, runtimeVariant),
-        interactionPriority = isRendererMediaRuntimeInteractionPriority({
-          nodeId: nodeId4,
-          isSelected: isSelected4,
-          isSelectionRelated: isSelectionRelated3,
+    }
+    const enabled41 = isVisibleVideoMediaNode && !!resolveCanvasVideoDisplayUrl(node7);
+    if (interactionBusy?.['viewportPriorityMediaOnly'] === !![] && !enabled41) continue;
+    const value209 = lowZoomRealVideoNodeIds['has'](nodeId11),
+      shouldHydrateVideoMediaImmediately2 = shouldHydrateVideoMediaImmediately({
+        node: node7,
+        nodeId: nodeId11,
+        isSelected: isSelected7,
+        isSelectionRelated: isSelectionRelated7,
+        dragTargets: activeNodeIds,
+        connOverlay: connOverlay4,
+        pickMode: pickConnectMode,
+      }),
+      shouldForceDeferRelatedVideoDetails2 = shouldForceDeferRelatedVideoDetails({
+        node: node7,
+        nodeId: nodeId11,
+        isSelected: isSelected7,
+        isSelectionRelated: isSelectionRelated7,
+        dragTargets: activeNodeIds,
+        viewport: viewport6,
+        mountCandidateCount: mountCandidateIds3['size'],
+        nodeCount: nodeCount4,
+        options: interactionBusy,
+      }),
+      isViewportPriorityImageNode2 = isViewportPriorityImageNode({
+        node: node7,
+        nodeId: nodeId11,
+        mountCandidateIds: mountCandidateIds3,
+        viewport: viewport6,
+        containerW: width4,
+        containerH: height4,
+        isSelected: isSelected7,
+        isSelectionRelated: isSelectionRelated7,
+      }),
+      enabled42 = plannedFullEligibleVisibleImageNodeIds['has'](nodeId11);
+    if (!instance || !wrapperEl3) {
+      if (
+        handler({
+          node: node7,
+          nodeId: nodeId11,
+          isSelected: isSelected7,
+          isSelectionRelated: isSelectionRelated7,
+          isVisibleVideoMediaNode: isVisibleVideoMediaNode,
           dragTargets: activeNodeIds,
           connOverlay: connOverlay4,
-          pickMode: pickConnectMode2,
+          pickMode: pickConnectMode,
+          viewport: viewport6,
+          nodeCount: nodeCount4,
+        })
+      )
+        continue;
+      if (
+        !enabled42 &&
+        shouldDeferHeavyMediaMount({
+          node: node7,
+          nodeId: nodeId11,
+          isSelected: isSelected7,
+          isSelectionRelated: isSelectionRelated7,
+          dragTargets: activeNodeIds,
+          connOverlay: connOverlay4,
+          pickMode: pickConnectMode,
+          options: interactionBusy,
+        })
+      ) {
+        hasPendingStructuralOps2 = !![];
+        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+        continue;
+      }
+      if (
+        !enabled42 &&
+        heavyMediaUpdateFrameBudget['shouldDefer']({
+          node: node7,
+          nodeId: nodeId11,
+          isSelected: isSelected7,
+          isSelectionRelated: isSelectionRelated7,
+          dragTargets: activeNodeIds,
+          connOverlay: connOverlay4,
+          pickMode: pickConnectMode,
+        })
+      ) {
+        hasPendingStructuralOps2 = !![];
+        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+        continue;
+      }
+      if (value204 && isNodeType4 && mountedHeavyMediaThisFrame && !shouldHydrateVideoMediaImmediately2) {
+        ((hasPendingStructuralOps2 = !![]), (hasPendingStructuralVideoMounts = !![]));
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+        continue;
+      }
+      const enabled43 = rendererStructuralBudget['hasBudget']();
+      if (!enabled43 && !shouldHydrateVideoMediaImmediately2) {
+        hasPendingStructuralOps2 = !![];
+        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+        continue;
+      }
+      const deferDetailsOnMount = _nodeDetailHydration['shouldDeferNodeDetails']({
+          node: node7,
+          nodeId: nodeId11,
+          isSelected: isSelected7,
+          connOverlay: connOverlay4,
+          pickMode: pickConnectMode,
+          relatedNodeIds: relatedNodeIds4,
+          viewport: viewport6,
+          mountCandidateCount: mountCandidateIds3['size'],
+          nodeCount: nodeCount4,
+          forceDeferActiveNodeDetails:
+            shouldForceDeferActiveNodeDetails({
+              nodeId: nodeId11,
+              dragContext: dragContext4,
+              dragTargets: activeNodeIds,
+            }) ||
+            (interactionBusy?.['viewportPriorityMediaOnly'] === !![] && isNodeType3 && !shouldHydrateVideoMediaImmediately2) ||
+            shouldForceDeferRelatedVideoDetails2,
         }),
-        shouldPrebuildRuntime = shouldPrebuildRendererMediaRuntime({
-          node: node4,
-          nodeCount: nodeCount3,
-          veryDenseNodeCount: RENDERER_VIRTUALIZATION_CONFIG.veryDenseNodeCount,
-          hasExactVisiblePreview: exactVisiblePreviewNodeIds.has(nodeId4),
-          interactionBusy,
-          interactionPriority,
-          deferMediaOnMount,
-          viewportPriorityMediaOnly: false,
+        eagerVideoPreviewOnMount = ![],
+        shouldDeferInitialVideoMediaOnMount2 = shouldDeferInitialVideoMediaOnMount({
+          node: node7,
+          nodeId: nodeId11,
+          isSelected: isSelected7,
+          isSelectionRelated: isSelectionRelated7,
+          dragTargets: activeNodeIds,
+          nodeCount: nodeCount4,
+          mountCandidateCount: mountCandidateIds3['size'],
+        });
+      ((deferMediaOnMount = (deferDetailsOnMount || shouldDeferInitialVideoMediaOnMount2) && !eagerVideoPreviewOnMount),
+        (value207 =
+          deferMediaOnMount && (!deferDetailsOnMount || isVisibleVideoMediaNode) && (!isNodeType4 || !resolveCanvasVideoPosterUrl(node7))));
+      const args8 = {
+          deferDetailsOnMount: deferDetailsOnMount,
+          deferMediaOnMount: deferMediaOnMount,
+          eagerVideoPreviewOnMount: eagerVideoPreviewOnMount,
+        },
+        variant = [
+          deferDetailsOnMount ? 'details-deferred' : 'details-ready',
+          deferMediaOnMount ? 'media-deferred' : 'media-ready',
+          eagerVideoPreviewOnMount ? 'video-eager' : 'video-lazy',
+        ]['join']('|'),
+        enabled44 = _rendererMediaRuntimePreparer['hasPrepared'](nodeId11, node7, variant),
+        interactionPriority = isRendererMediaRuntimeInteractionPriority({
+          nodeId: nodeId11,
+          isSelected: isSelected7,
+          isSelectionRelated: isSelectionRelated7,
+          dragTargets: activeNodeIds,
+          connOverlay: connOverlay4,
+          pickMode: pickConnectMode,
+        }),
+        shouldPrebuildRendererMediaRuntime2 = shouldPrebuildRendererMediaRuntime({
+          node: node7,
+          nodeCount: nodeCount4,
+          veryDenseNodeCount: RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'],
+          hasExactVisiblePreview: domPreviewCandidateIds['has'](nodeId11) && domPreviewMediaSourceOwnerIds['has'](nodeId11),
+          interactionBusy: viewportBusy,
+          interactionPriority: interactionPriority,
+          deferMediaOnMount: deferMediaOnMount,
+          eagerVideoPreviewOnMount: eagerVideoPreviewOnMount,
+          viewportPriorityMediaOnly: interactionBusy?.['viewportPriorityMediaOnly'] === !![],
           idlePreparationSupported: typeof requestIdleCallback === 'function',
         });
-      if (!hasPreparedRuntime && shouldPrebuildRuntime) {
-        _rendererMediaRuntimePreparer.enqueue({
-          nodeId: nodeId4,
-          version: node4,
-          variant: runtimeVariant,
-          isValid: () => _currentSnapshot?.nodes?.[nodeId4] === node4 && !_componentMap.has(nodeId4),
+      if (!enabled44 && shouldPrebuildRendererMediaRuntime2) {
+        (_rendererMediaRuntimePreparer['enqueue']({
+          nodeId: nodeId11,
+          version: node7,
+          variant: variant,
+          isValid: () =>
+            _currentSnapshot?.['nodes']?.[nodeId11] === node7 && !_componentMap['has'](nodeId11),
           prepare: () =>
             prepareRendererNodeRuntime({
-              node: node4,
-              selectedNodeSet: selectedNodeSet3,
-              selectedNodeRankMap: selectedNodeRankMap3,
-              dragContext: dragContext6,
+              node: node7,
+              selectedNodeSet: selectedNodeSet4,
+              selectedNodeRankMap: selectedNodeRankMap4,
+              dragContext: dragContext4,
               dragTargets: activeNodeIds,
-              options: { ...runtimeOptions, prebuildOffscreen: true },
+              options: { ...args8, prebuildOffscreen: !![] },
             }),
           dispose: disposePreparedRendererNodeRuntime,
-        });
+        }),
+          (hasPendingStructuralOps2 = !![]));
+        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
         continue;
       }
-      !hasPreparedRuntime && !shouldPrebuildRuntime && _rendererMediaRuntimePreparer.forget(nodeId4);
-      const preparedRuntime = hasPreparedRuntime
-          ? _rendererMediaRuntimePreparer.take(nodeId4, node4, runtimeVariant)
-          : null,
-        registeredRuntime = preparedRuntime
-          ? _registerNodeRuntime(preparedRuntime)
-          : _createNodeRuntime(
-              node4,
-              selectedNodeSet3,
-              selectedNodeRankMap3,
-              dragContext6,
-              activeNodeIds,
-              runtimeOptions,
-            );
-      if (!registeredRuntime) {
-        preparedRuntime && disposePreparedRendererNodeRuntime(preparedRuntime);
-        hasPendingStructuralOps2 = true;
+      !enabled44 && !shouldPrebuildRendererMediaRuntime2 && _rendererMediaRuntimePreparer['forget'](nodeId11);
+      if (isVisibleVideoMediaNode && !shouldHydrateVideoMediaImmediately2 && !_videoHydrationBackpressure['tryAcquire']()) {
+        hasPendingStructuralOps2 = hasPendingStructuralVideoMounts = hasPendingVisibleVideoMounts2 = !![];
         continue;
       }
-      ({ wrapperEl: wrapperEl2, instance: instance } = registeredRuntime);
-      (!enabled40 && (enabled40 = document.createDocumentFragment()),
-        _mountNode(nodeId4, enabled40),
-        (value204 = true),
-        rendererStructuralBudget.consume());
+      const value210 = lifecycleStats2 ? _nowMs() : 0x0,
+        value211 = enabled44 ? _rendererMediaRuntimePreparer['take'](nodeId11, node7, variant) : null;
+      ({ wrapperEl: wrapperEl3, instance: instance } = value211
+        ? _registerNodeRuntime(value211)
+        : _createNodeRuntime(node7, selectedNodeSet4, selectedNodeRankMap4, dragContext4, activeNodeIds, args8));
+      lifecycleStats2 &&
+        recordRendererLifecycleDuration(
+          lifecycleStats2,
+          'create',
+          node7,
+          _nowMs() - value210,
+          value211 ? 'commit-prepared-runtime' : deferMediaOnMount ? 'create-deferred-media' : 'create',
+        );
+      !enabled37 && (enabled37 = document['createDocumentFragment']());
+      (_mountNode(nodeId11, enabled37), (mountedThisFrame2 = !![]), heavyMediaUpdateFrameBudget['consume'](node7));
+      if (shouldHydrateVideoMediaImmediately2) _videoHydrationBackpressure['markPriorityWork']();
+      if (isNodeType4) mountedHeavyMediaThisFrame = !![];
+      if (enabled43) rendererStructuralBudget['consume']();
     } else {
-      if (!enabled41) {
-        if (!rendererStructuralBudget.hasBudget()) {
-          hasPendingStructuralOps2 = true;
+      if (!enabled38) {
+        if (
+          !enabled42 &&
+          heavyMediaUpdateFrameBudget['shouldDefer']({
+            node: node7,
+            nodeId: nodeId11,
+            isSelected: isSelected7,
+            isSelectionRelated: isSelectionRelated7,
+            dragTargets: activeNodeIds,
+            connOverlay: connOverlay4,
+            pickMode: pickConnectMode,
+          })
+        ) {
+          hasPendingStructuralOps2 = !![];
+          if (isNodeType4) hasPendingStructuralVideoMounts = !![];
+          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+          enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
           continue;
         }
-        (!enabled40 && (enabled40 = document.createDocumentFragment()),
-          _mountNode(nodeId4, enabled40),
-          (value204 = true),
-          rendererStructuralBudget.consume());
-      }
+        if (value204 && isNodeType4 && mountedHeavyMediaThisFrame && !shouldHydrateVideoMediaImmediately2) {
+          ((hasPendingStructuralOps2 = !![]), (hasPendingStructuralVideoMounts = !![]));
+          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+          continue;
+        }
+        const enabled45 = rendererStructuralBudget['hasBudget']();
+        if (!enabled45 && !shouldHydrateVideoMediaImmediately2) {
+          hasPendingStructuralOps2 = !![];
+          if (isNodeType4) hasPendingStructuralVideoMounts = !![];
+          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+          enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+          continue;
+        }
+        if (isVisibleVideoMediaNode && !shouldHydrateVideoMediaImmediately2 && !_videoHydrationBackpressure['tryAcquire']()) {
+          hasPendingStructuralOps2 = hasPendingStructuralVideoMounts = hasPendingVisibleVideoMounts2 = !![];
+          continue;
+        }
+        !enabled37 && (enabled37 = document['createDocumentFragment']());
+        const value212 = lifecycleStats2 ? _nowMs() : 0x0;
+        _mountNode(nodeId11, enabled37);
+        lifecycleStats2 &&
+          recordRendererLifecycleDuration(lifecycleStats2, 'remount', node7, _nowMs() - value212, 'remount');
+        ((mountedThisFrame2 = !![]), heavyMediaUpdateFrameBudget['consume'](node7));
+        if (shouldHydrateVideoMediaImmediately2) _videoHydrationBackpressure['markPriorityWork']();
+        if (isNodeType4) mountedHeavyMediaThisFrame = !![];
+        if (enabled45) rendererStructuralBudget['consume']();
+      } else
+        isViewportPriorityImageNode2 &&
+          wrapperEl3?.['dataset']?.['detailStage'] === 'deferred' &&
+          (_nodeDetailHydration['hydrateNodeDetails'](nodeId11, wrapperEl3),
+          _rendererDeferredMedia['hydrateNow'](nodeId11));
     }
-    (value204 || wrapperEl2?.dataset?.detailStage === 'deferred') &&
-      _nodeDetailHydration.syncNodeDetailMountStage({
-        wrapperEl: wrapperEl2,
-        node: node4,
-        nodeId: nodeId4,
-        isSelected: isSelected4,
+    const deferHydrate = shouldQueueNodeDetailHydration({
+        wrapperEl: wrapperEl3,
+        nodeId: nodeId11,
+        isSelected: isSelected7,
+        isSelectionRelated: isSelectionRelated7,
+        dragTargets: activeNodeIds,
         connOverlay: connOverlay4,
-        pickMode: pickConnectMode2,
-        relatedNodeIds: relatedNodeIds3,
-        viewport: viewport3,
-        mountCandidateCount: mountCandidateIds3.size,
-        autoHydrate: false,
+        pickMode: pickConnectMode,
+        viewportBusyForPreview: viewportBusy,
+        mountCandidateCount: mountCandidateIds3['size'],
+        nodeCount: nodeCount4,
+        options: interactionBusy,
+      }),
+      enabled46 =
+        nodeCount4 >= 0x78 &&
+        isNodeType(node7, ['ai-video', 'ai-audio']) &&
+        !isSelected7 &&
+        (!isSelectionRelated7 || shouldForceDeferRelatedVideoDetails2) &&
+        !activeNodeIds?.['has']?.(nodeId11) &&
+        connOverlay4?.['srcId'] !== nodeId11 &&
+        connOverlay4?.['hoverId'] !== nodeId11 &&
+        pickConnectMode?.['sourceNodeId'] !== nodeId11 &&
+        pickConnectMode?.['hoverNodeId'] !== nodeId11 &&
+        node7?.['isVideosExpanded'] !== !![] &&
+        node7?.['isImagesExpanded'] !== !![];
+    (mountedThisFrame2 || wrapperEl3?.['dataset']?.['detailStage'] === 'deferred') &&
+      (_nodeDetailHydration['syncNodeDetailMountStage']({
+        wrapperEl: wrapperEl3,
+        node: node7,
+        nodeId: nodeId11,
+        isSelected: isSelected7,
+        connOverlay: connOverlay4,
+        pickMode: pickConnectMode,
+        relatedNodeIds: relatedNodeIds4,
+        viewport: viewport6,
+        mountCandidateCount: mountCandidateIds3['size'],
+        nodeCount: nodeCount4,
+        autoHydrate:
+          !enabled46 &&
+          isNodeType(node7, ['source-video', 'ai-video', 'video', 'source-audio', 'ai-audio', 'audio']),
+        deferHydrate: deferHydrate,
+        forceDeferActiveNodeDetails:
+          shouldForceDeferActiveNodeDetails({
+            nodeId: nodeId11,
+            dragContext: dragContext4,
+            dragTargets: activeNodeIds,
+          }) ||
+          (interactionBusy?.['viewportPriorityMediaOnly'] === !![] && isNodeType3 && !shouldHydrateVideoMediaImmediately2) ||
+          shouldForceDeferRelatedVideoDetails2,
+      }),
+      mountedThisFrame2 &&
+        isNodeType(node7, ['source-video', 'ai-video', 'video', 'source-audio', 'ai-audio', 'audio']) &&
+        !enabled46 &&
+        shouldQueueNodeDetailHydration({
+          wrapperEl: wrapperEl3,
+          nodeId: nodeId11,
+          isSelected: isSelected7,
+          isSelectionRelated: isSelectionRelated7,
+          dragTargets: activeNodeIds,
+          connOverlay: connOverlay4,
+          pickMode: pickConnectMode,
+          viewportBusyForPreview: viewportBusy,
+          mountCandidateCount: mountCandidateIds3['size'],
+          nodeCount: nodeCount4,
+          options: interactionBusy,
+        }) &&
+        _nodeDetailHydration['enqueueNodeDetailHydration'](nodeId11));
+    const value213 = _pendingNodeDataMap['get'](nodeId11),
+      node8 = value213?.['node'] || node7,
+      inEdgeSig4 = _getIncomingEdgeSignature(nodeId11, value181, nodes),
+      mediaLodMode4 = syncNodeMediaLodMode(wrapperEl3, node8, viewport6, { interactionBusy: viewportBusy }),
+      signature5 = buildRendererNodeSignature({
+        node: node8,
+        inEdgeSig: inEdgeSig4,
+        pickMode: pickConnectMode,
+        isSelected: isSelected7,
+        isSelectionRelated: isSelectionRelated7,
+        showVideoMeta: showVideoMeta4,
+        viewport: viewport6,
+        mediaLodMode: mediaLodMode4,
+      }),
+      skipInstanceUpdate3 = shouldSkipInitialMediaNodeUpdate(node8, mountedThisFrame2),
+      value214 =
+        isNodeType4 &&
+        _isNodeVisible(node8, viewport6, width4, height4) &&
+        (value209 ||
+          shouldHydrateVideoMediaImmediately2 ||
+          resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0x0) &&
+        instance?.['prepareRendererVisibleVideoPreview']?.() === !![],
+      _syncMountedNodePresentation2 = _syncMountedNodePresentation({
+        wrapperEl: wrapperEl3,
+        node: node8,
+        nodeId: nodeId11,
+        selectedNodeSet: selectedNodeSet4,
+        selectedNodeRankMap: selectedNodeRankMap4,
+        connOverlay: connOverlay4,
+        pickMode: pickConnectMode,
+        viewport: viewport6,
+        containerW: width4,
+        containerH: height4,
+        dragContext: dragContext4,
+        dragTargets: activeNodeIds,
+        showVideoMeta: showVideoMeta4,
+        relatedNodeIds: relatedNodeIds4,
+        relatedHighlightColor: relatedHighlightColor4,
+        inEdgeSig: inEdgeSig4,
+        signature: signature5,
+        mediaLodMode: mediaLodMode4,
+        skipInstanceUpdate: skipInstanceUpdate3,
+        deferInstanceUpdate:
+          shouldDeferHeavyMediaUpdate({
+            node: node8,
+            nodeId: nodeId11,
+            viewportBusyForPreview: viewportBusy,
+            nodeCount: nodeCount4,
+            skipInstanceUpdate: skipInstanceUpdate3,
+          }) ||
+          (!mountedThisFrame2 &&
+            heavyMediaUpdateFrameBudget['shouldDefer']({
+              node: node8,
+              nodeId: nodeId11,
+              isSelected: isSelected7,
+              isSelectionRelated: isSelectionRelated7,
+              dragTargets: activeNodeIds,
+              connOverlay: connOverlay4,
+              pickMode: pickConnectMode,
+            })),
+        mountedThisFrame: mountedThisFrame2,
+        lifecycleStats: lifecycleStats2,
+        allowActiveDetailHydration: !deferHydrate && !enabled46,
       });
-    const value205 = _pendingNodeDataMap.get(nodeId4),
-      node5 = value205?.node || node4,
-      inEdgeSig3 = _getIncomingEdgeSignature(nodeId4, value199, nodes2),
-      mediaLodMode2 = syncNodeMediaLodMode(wrapperEl2, node5, viewport3),
-      signature3 = buildRendererNodeSignature({
-        node: node5,
-        inEdgeSig: inEdgeSig3,
-        pickMode: pickConnectMode2,
-        isSelected: isSelected4,
-        isSelectionRelated: isSelectionRelated3,
-        showVideoMeta: showVideoMeta2,
-        viewport: viewport3,
-        mediaLodMode: mediaLodMode2,
-      });
-    (_syncMountedNodePresentation({
-      wrapperEl: wrapperEl2,
-      node: node5,
-      nodeId: nodeId4,
-      selectedNodeSet: selectedNodeSet3,
-      selectedNodeRankMap: selectedNodeRankMap3,
-      connOverlay: connOverlay4,
-      pickMode: pickConnectMode2,
-      viewport: viewport3,
-      containerW: width4,
-      containerH: height4,
-      dragContext: dragContext6,
-      dragTargets: activeNodeIds,
-      showVideoMeta: showVideoMeta2,
-      relatedNodeIds: relatedNodeIds3,
-      relatedHighlightColor: relatedHighlightColor2,
-      inEdgeSig: inEdgeSig3,
-      signature: signature3,
-      skipInstanceUpdate: shouldSkipInitialMediaNodeUpdate(node5, value204),
+    if (_syncMountedNodePresentation2?.['deferredUpdate']) {
+      hasPendingStructuralOps2 = !![];
+      if (isNodeType4) hasPendingStructuralVideoMounts = !![];
+      if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+    }
+    if (_syncMountedNodePresentation2?.['didUpdate']) {
+      heavyMediaUpdateFrameBudget['consume'](node8);
+      if (isNodeType4) updatedHeavyMediaThisFrame = !![];
+    }
+    if (value207 || value214) {
+      _fastPreviewLayer['retainNode'](nodeId11);
+      if (value214) {
+        if (mountedThisFrame2) _rendererDeferredMedia['hydrateNow'](nodeId11);
+        else _rendererDeferredMedia['enqueue'](nodeId11, { urgent: !![] });
+      } else _rendererDeferredMedia['enqueue'](nodeId11);
+    }
+    const isVisible = _isNodeVisible(node8, viewport6, width4, height4);
+    (handler2({
+      node: node8,
+      nodeId: nodeId11,
+      isVisible: isVisible,
+      isSelected: isSelected7,
+      component: instance,
     }),
-      value205 && _pendingNodeDataMap.delete(nodeId4));
+      value213 && _pendingNodeDataMap['delete'](nodeId11));
+  }
+  const count3 = enabled37?.['childNodes']?.['length'] || 0x0,
+    value215 = lifecycleStats2 && count3 > 0x0 ? _nowMs() : 0x0;
+  _flushMountBatch(canvasEl2, enabled37);
+  if (lifecycleStats2 && count3 > 0x0) {
+    const _nowMs4 = _nowMs() - value215;
+    ((lifecycleStats2['mountBatchCount'] += count3),
+      (lifecycleStats2['mountBatchFlushMs'] += _nowMs4),
+      (lifecycleStats2['mountBatchFlushMaxMs'] = Math['max'](lifecycleStats2['mountBatchFlushMaxMs'], _nowMs4)));
   }
   return (
-    _flushMountBatch(canvasEl, enabled40),
     syncRendererFastPreviewAfterNodeRender({
       continuation: _fastPreviewContinuation,
       layer: _fastPreviewLayer,
-      canvasEl: canvasEl,
-      nodes: nodes2,
-      previewCandidateIds: isPreviewCandidate,
-      selectedNodeSet: selectedNodeSet3,
-      candidateSignature: signature2,
+      canvasEl: canvasEl2,
+      nodes: nodes,
+      previewCandidateIds: previewCandidateIds,
+      selectedNodeSet: selectedNodeSet4,
+      candidateSignature: candidateSignature,
       hasPendingStructuralOps: hasPendingStructuralOps2,
       connOverlay: connOverlay4,
-      pickConnectMode: pickConnectMode2,
-      nodeCount: nodeCount3,
-      viewport: viewport3,
+      pickConnectMode: pickConnectMode,
+      nodeCount: nodeCount4,
+      viewport: viewport6,
       containerWidth: width4,
       containerHeight: height4,
-      dragContext: dragContext6,
-      dragTargets: activeNodeIds,
-      freezeRasterSurface: freezeRasterSurface.freezeActive === true,
-      mediaSourceOwnerIds: mediaSourceOwnerIds,
+      freezeRasterSurface: freezeActive['freezeActive'] === !![],
+      deferVisibleMediaSrc: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+      suppressNewMedia: suppressNewMedia,
+      mediaSourceOwnerIds: domPreviewMediaSourceOwnerIds,
       requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds,
-      viewportBusy: interactionBusy,
-      ..._fastPreviewLifecycle.getContinuationOptions(),
+      viewportBusy: viewportBusy,
+      dragContext: dragContext4,
+      dragTargets: activeNodeIds,
+      suspendNewMediaSrc: suspendNewMediaSrc,
+      fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds,
+      fullEligiblePreviewImageNodeIds: fullEligiblePreviewImageNodeIds,
+      ..._fastPreviewLifecycle['getContinuationOptions'](),
+      mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame,
+      updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame,
+      hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts,
     }),
-    { hasPendingStructuralOps: hasPendingStructuralOps2, deferredParkCount: deferredParkCount2 }
+    lifecycleStats2 && recordRendererNodeLifecycleSample(lifecycleStats2),
+    {
+      hasPendingStructuralOps: hasPendingStructuralOps2,
+      deferredParkCount: deferredParkCount2,
+      hasPendingVisibleVideoMounts: hasPendingVisibleVideoMounts2,
+      hasPendingFullEligibleVisibleImageMounts: hasPendingFullEligibleVisibleImageMounts2,
+    }
   );
 }
-function _cleanupNodes(el41, value206) {
-  let value207 = false;
-  const map7 = new Set(Object.keys(value206 || {})),
-    value208 = new Set([
-      ..._componentMap.keys(),
-      ..._wrapperMap.keys(),
-      ..._parkedWrapperMap.keys(),
+function _renderNodes(...args9) {
+  if (!_rendererRuntimeDiagnosticsEnabled) return _renderNodesImpl(...args9);
+  const _nowMs5 = _nowMs(),
+    previewOnly = args9[0xc] || {},
+    value216 = args9[0x1] || {},
+    value217 = args9[0xb] || null,
+    nodeCount5 = Number['isFinite'](previewOnly?.['framePlan']?.['nodeCount'])
+      ? previewOnly['framePlan']['nodeCount']
+      : Number['isFinite'](value217?.['_nodeCount'])
+        ? value217['_nodeCount']
+        : Object['keys'](value216)['length'];
+  _rendererRuntimeDiagnosticRenderState = {
+    previewOnly: previewOnly?.['previewOnly'] === !![],
+    viewportBusy:
+      previewOnly?.['viewportBusy'] === !![] ||
+      previewOnly?.['deferParking'] === !![] ||
+      previewOnly?.['deferHeavyMediaMount'] === !![] ||
+      _rendererInteractionGrace['isBusy'](),
+  };
+  try {
+    return _renderNodesImpl(...args9);
+  } finally {
+    recordRendererRuntimeDiagnostic({
+      kind: 'render-nodes',
+      mode: previewOnly?.['mode'] || 'steady',
+      previewOnly: previewOnly?.['previewOnly'] === !![],
+      nodeCount: nodeCount5,
+      durationMs: _nowMs() - _nowMs5,
+    });
+  }
+}
+function _cleanupNodes(el23, value218) {
+  let value219 = ![];
+  const map6 = new Set(Object['keys'](value218 || {})),
+    value220 = new Set([
+      ..._componentMap['keys'](),
+      ..._wrapperMap['keys'](),
+      ..._parkedWrapperMap['keys'](),
       ..._mountedNodeIds,
       ..._parkedNodeIds,
     ]);
-  for (const value209 of value208) {
-    !map7.has(value209) && (_destroyNode(value209), (value207 = true));
+  for (const value221 of value220) {
+    !map6['has'](value221) && (_destroyNode(value221), (value219 = !![]));
   }
-  el41.querySelectorAll('.v2-node').forEach((el42) => {
-    const value210 = el42.id || el42.dataset.nodeId;
-    value210 && !map7.has(value210) && (el42.remove(), (value207 = true));
+  el23['querySelectorAll']('.v2-node')['forEach']((el24) => {
+    const value222 = el24['id'] || el24['dataset']['nodeId'];
+    value222 && !map6['has'](value222) && (el24['remove'](), (value219 = !![]));
   });
-  if (value207) {
-    const el43 = document.getElementById('v2-side-plus-holder');
-    el43 && el43.children.length > 0 && el43.replaceChildren();
+  if (value219) {
+    const el25 = document['getElementById']('v2-side-plus-holder');
+    el25 && el25['children']['length'] > 0x0 && el25['replaceChildren']();
   }
 }
 function _createSvgLayer() {
-  const el44 = document.createElement('div');
-  ((el44.id = 'v2-edges-wrapper'),
-    (el44.style.position = 'absolute'),
-    (el44.style.top = '0'),
-    (el44.style.left = '0'),
-    (el44.style.width = '100%'),
-    (el44.style.height = '100%'),
-    (el44.style.pointerEvents = 'none'),
-    (el44.style.zIndex = '5'));
-  const el45 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const el26 = document['createElement']('div');
+  ((el26['id'] = 'v2-edges-wrapper'),
+    (el26['style']['position'] = 'absolute'),
+    (el26['style']['top'] = '0'),
+    (el26['style']['left'] = '0'),
+    (el26['style']['width'] = '100%'),
+    (el26['style']['height'] = '100%'),
+    (el26['style']['pointerEvents'] = 'none'),
+    (el26['style']['zIndex'] = '5'));
+  const el27 = document['createElementNS']('http://www.w3.org/2000/svg', 'svg');
   return (
-    (el45.id = 'v2-edges'),
-    (el45.style.overflow = 'visible'),
-    (el45.style.pointerEvents = 'none'),
-    el44.appendChild(el45),
-    el44
+    (el27['id'] = 'v2-edges'),
+    (el27['style']['overflow'] = 'visible'),
+    (el27['style']['pointerEvents'] = 'none'),
+    el26['appendChild'](el27),
+    el26
   );
 }
 function _renderEdgesByIds(
-  svgEl,
+  svgEl2,
   edgeIds,
-  edges,
-  nodes3,
-  viewport4,
-  containerEl,
+  edges2,
+  nodes2,
+  viewport7,
+  containerEl2,
   dragOffsetCtx2 = null,
-  relatedEdgeIds3 = null,
-  options4 = {},
+  relatedEdgeIds4 = null,
+  options3 = {},
 ) {
-  const value211 = _edgeLayer.renderPartial({
-    svgEl: svgEl,
+  const value223 = _edgeLayer['renderPartial']({
+    svgEl: svgEl2,
     edgeIds: edgeIds,
-    edges: edges,
-    nodes: nodes3,
-    viewport: viewport4,
-    containerEl: containerEl,
+    edges: edges2,
+    nodes: nodes2,
+    viewport: viewport7,
+    containerEl: containerEl2,
     dragOffsetCtx: dragOffsetCtx2,
-    relatedEdgeIds: relatedEdgeIds3,
-    options: options4,
+    relatedEdgeIds: relatedEdgeIds4,
+    options: options3,
   });
-  if (value211.mutated) _invalidateFullEdgeRenderSignature();
+  if (value223['mutated']) _invalidateFullEdgeRenderSignature();
 }
 function _renderEdges(
-  svgEl2,
-  edges2,
-  nodes4,
-  viewport5,
-  containerEl2,
+  svgEl3,
+  edges3,
+  nodes3,
+  viewport8,
+  containerEl3,
   dragOffsetCtx3 = null,
-  relatedEdgeIds4 = null,
+  relatedEdgeIds5 = null,
   edgeEntries2 = null,
   reason = 'steady',
-  args5 = {},
+  args10 = {},
 ) {
-  _edgeLayer.renderFull({
-    svgEl: svgEl2,
-    edges: edges2,
-    nodes: nodes4,
-    viewport: viewport5,
-    containerEl: containerEl2,
+  (_edgeLayer['renderFull']({
+    svgEl: svgEl3,
+    edges: edges3,
+    nodes: nodes3,
+    viewport: viewport8,
+    containerEl: containerEl3,
     dragOffsetCtx: dragOffsetCtx3,
-    relatedEdgeIds: relatedEdgeIds4,
+    relatedEdgeIds: relatedEdgeIds5,
     edgeEntries: edgeEntries2,
     reason: reason,
-    options: {
-      ...args5,
-      clearedDom: _edgeDomClearedSinceLastFull === true,
-    },
-  });
-  args5?.renderSignature && (_lastFullEdgeRenderSignature = args5.renderSignature);
-  _edgeDomClearedSinceLastFull = false;
+    options: { ...args10, clearedDom: _edgeDomClearedSinceLastFull === !![] },
+  }),
+    args10?.['renderSignature'] && (_lastFullEdgeRenderSignature = args10['renderSignature']),
+    (_edgeDomClearedSinceLastFull = ![]));
 }
-function _clearRenderedEdges(value212) {
-  const count8 = _edgeLayer.clearRenderedEdges(value212);
-  count8 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true });
+function _clearRenderedEdges(value224) {
+  const count4 = _edgeLayer['clearRenderedEdges'](value224);
+  count4 > 0x0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] });
 }
 function _clearRenderedEdgesFromDocument() {
   if (typeof document === 'undefined') {
-    _edgeLayer.reset();
+    _edgeLayer['reset']();
     return;
   }
-  const value213 = document.getElementById?.('v2-edges');
-  (value213 && _clearRenderedEdges(value213),
-    document.getElementById?.('v2-draft-edge')?.remove?.(),
-    document.querySelectorAll?.('.v2-edge-thumbnail').forEach((el46) => el46.remove()),
-    document.querySelectorAll?.('[id^="v2-thumb-"]').forEach((el47) => el47.remove()));
+  const value225 = document['getElementById']?.('v2-edges');
+  (_clearRenderedEdges(value225),
+    document['getElementById']?.('v2-draft-edge')?.['remove']?.(),
+    document['querySelectorAll']?.('.v2-edge-thumbnail')['forEach']((el28) => el28['remove']()),
+    document['querySelectorAll']?.('[id^="v2-thumb-"]')['forEach']((el29) => el29['remove']()));
 }
-function _cleanupEdges(value214, value215) {
-  const count9 = _edgeLayer.cleanupEdges(value214, value215);
-  (document.querySelectorAll('.v2-edge-thumbnail').forEach((el48) => el48.remove()),
-    document.querySelectorAll('[id^="v2-thumb-"]').forEach((el49) => el49.remove()),
-    count9 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true }));
-}
-function _renderEdgeThumbnails_REMOVED(value216, value217, value218) {
-  for (const value219 of Object.values(value217)) {
-  }
+function _cleanupEdges(value226, value227) {
+  const count5 = _edgeLayer['cleanupEdges'](value226, value227);
+  (document['querySelectorAll']('.v2-edge-thumbnail')['forEach']((el30) => el30['remove']()),
+    document['querySelectorAll']('[id^="v2-thumb-"]')['forEach']((el31) => el31['remove']()),
+    count5 > 0x0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] }));
 }
 function _createPickerEl() {
-  const el50 = document.createElement('div');
+  const el32 = document['createElement']('div');
   return (
-    (el50.id = 'v2-picker'),
-    (el50.dataset.uiStop = '1'),
-    Object.assign(el50.style, {
+    (el32['id'] = 'v2-picker'),
+    (el32['dataset']['uiStop'] = '1'),
+    Object['assign'](el32['style'], {
       position: 'fixed',
       display: 'none',
       flexDirection: 'column',
       gap: '4px',
       background: 'var(--preset-menu-bg)',
-      border: '1px solid var(--preset-menu-border)',
+      border: '1px\x20solid\x20var(--preset-menu-border)',
       borderRadius: 'var(--radius-18)',
       padding: '8px',
       minWidth: '160px',
@@ -2287,21 +3211,21 @@ function _createPickerEl() {
       zIndex: '1000',
       fontFamily: 'inherit',
     }),
-    el50
+    el32
   );
 }
-function _renderPicker(el51, enabled44, value220) {
-  if (!enabled44.visible) {
-    ((el51.style.display = 'none'), el51.replaceChildren());
+function _renderPicker(el33, enabled47, value228) {
+  if (!enabled47['visible']) {
+    ((el33['style']['display'] = 'none'), el33['replaceChildren']());
     return;
   }
-  ((el51.style.display = 'flex'),
-    (el51.style.left = enabled44.screenX + 'px'),
-    (el51.style.top = enabled44.screenY + 'px'));
-  if (el51.children.length > 0) return;
-  const el52 = document.createElement('div');
-  ((el52.textContent = t('coreUi.renderer.picker.addNode')),
-    Object.assign(el52.style, {
+  ((el33['style']['display'] = 'flex'),
+    (el33['style']['left'] = enabled47['screenX'] + 'px'),
+    (el33['style']['top'] = enabled47['screenY'] + 'px'));
+  if (el33['children']['length'] > 0x0) return;
+  const el34 = document['createElement']('div');
+  ((el34['textContent'] = t('coreUi.renderer.picker.addNode')),
+    Object['assign'](el34['style'], {
       fontSize: '11px',
       color: 'var(--text-muted)',
       padding: '2px 4px 6px',
@@ -2309,54 +3233,22 @@ function _renderPicker(el51, enabled44, value220) {
       marginBottom: '4px',
       userSelect: 'none',
     }),
-    el51.appendChild(el52));
-  const width5 = getAIGenerationDefaultSizeByType('ai-text'),
-    width6 = getAIGenerationDefaultSizeByType('ai-image'),
-    width7 = getAIGenerationDefaultSizeByType('ai-video'),
-    value221 = [
-      {
-        type: 'ai-text',
-        label: t('coreUi.renderer.picker.items.aiText'),
-        defaultLabel: t('coreUi.renderer.picker.defaults.aiText'),
-        width: width5.width,
-        height: width5.height,
-      },
-      {
-        type: 'ai-image',
-        label: t('coreUi.renderer.picker.items.aiImage'),
-        defaultLabel: t('coreUi.renderer.picker.defaults.aiImage'),
-        width: width6.width,
-        height: width6.height,
-      },
-      {
-        type: 'ai-video',
-        label: t('coreUi.renderer.picker.items.aiVideo'),
-        defaultLabel: t('coreUi.renderer.picker.defaults.aiVideo'),
-        width: width7.width,
-        height: width7.height,
-      },
-      {
-        type: 'ai-audio',
-        label: t('coreUi.renderer.picker.items.aiAudio'),
-        defaultLabel: t('coreUi.renderer.picker.defaults.aiAudio'),
-        width: getAIGenerationDefaultSizeByType('ai-audio').width,
-        height: getAIGenerationDefaultSizeByType('ai-audio').height,
-      },
-    ];
+    el33['appendChild'](el34));
+  const rendererPickerNodeTypes = getRendererPickerNodeTypes();
   for (const {
     type: type,
     label: label,
     defaultLabel: defaultLabel,
-    width: width8,
+    width: width5,
     height: height5,
-  } of value221) {
-    const el53 = document.createElement('button');
-    ((el53.textContent = label),
-      (el53.dataset.nodeType = type),
-      (el53.dataset.defaultLabel = defaultLabel),
-      (el53.dataset.width = String(width8)),
-      (el53.dataset.height = String(height5)),
-      Object.assign(el53.style, {
+  } of rendererPickerNodeTypes) {
+    const el35 = document['createElement']('button');
+    ((el35['textContent'] = label),
+      (el35['dataset']['nodeType'] = type),
+      (el35['dataset']['defaultLabel'] = defaultLabel),
+      (el35['dataset']['width'] = String(width5)),
+      (el35['dataset']['height'] = String(height5)),
+      Object['assign'](el35['style'], {
         background: 'var(--blue-10)',
         border: '1px solid var(--blue-25)',
         borderRadius: '6px',
@@ -2365,16 +3257,16 @@ function _renderPicker(el51, enabled44, value220) {
         padding: '7px 12px',
         cursor: 'pointer',
         textAlign: 'left',
-        transition: 'background 0.15s',
+        transition: 'background\x200.15s',
       }),
-      el51.appendChild(el53));
+      el33['appendChild'](el35));
   }
 }
 function _createSelectionRectEl() {
-  const el54 = document.createElement('div');
+  const el36 = document['createElement']('div');
   return (
-    (el54.id = 'v2-selection-rect'),
-    Object.assign(el54.style, {
+    (el36['id'] = 'v2-selection-rect'),
+    Object['assign'](el36['style'], {
       position: 'absolute',
       border: '1px dashed var(--white-50)',
       backgroundColor: 'var(--white-02)',
@@ -2382,384 +3274,21 @@ function _createSelectionRectEl() {
       display: 'none',
       zIndex: '1000',
     }),
-    el54
+    el36
   );
 }
-function _renderSelectionRect(el55, enabled45) {
-  if (!enabled45 || !enabled45.active) {
-    el55.style.display = 'none';
+function _renderSelectionRect(el37, enabled48) {
+  if (!enabled48 || !enabled48['active']) {
+    el37['style']['display'] = 'none';
     return;
   }
-  el55.style.display = 'block';
-  const value222 = Math.min(enabled45.x1, enabled45.x2),
-    value223 = Math.min(enabled45.y1, enabled45.y2),
-    value224 = Math.abs(enabled45.x2 - enabled45.x1),
-    value225 = Math.abs(enabled45.y2 - enabled45.y1);
-  ((el55.style.left = value222 + 'px'),
-    (el55.style.top = value223 + 'px'),
-    (el55.style.width = value224 + 'px'),
-    (el55.style.height = value225 + 'px'));
-}
-function _createMultiSelectBoxEl(value226) {
-  const el56 = document.createElement('div');
-  ((el56.id = 'v2-multi-select-box'), (el56.className = 'v2-multi-select-box'));
-  const el57 = document.createElement('div');
-  ((el57.className = 'v2-multi-select-tab'), (el57.dataset.uiStop = '1'));
-  const value227 = 'http://www.w3.org/2000/svg',
-    handler = (value228 = '2') => {
-      const el58 = document.createElementNS(value227, 'svg');
-      return (
-        el58.setAttribute('viewBox', '0 0 24 24'),
-        el58.setAttribute('fill', 'none'),
-        el58.setAttribute('stroke', 'currentColor'),
-        el58.setAttribute('stroke-width', value228),
-        el58.setAttribute('stroke-linecap', 'round'),
-        el58.setAttribute('stroke-linejoin', 'round'),
-        el58
-      );
-    },
-    handler2 = (value229, value230, value231) => {
-      const el59 = document.createElement('button');
-      return (
-        (el59.type = 'button'),
-        (el59.className = 'v2-multi-select-btn'),
-        (el59.dataset.uiAction = value229),
-        (el59.title = value230),
-        el59.setAttribute('aria-label', value230),
-        el59.replaceChildren(value231),
-        el59
-      );
-    },
-    handler3 = (el60, value232) => {
-      const el61 = document.createElementNS(value227, 'path');
-      return (el61.setAttribute('d', value232), el60.appendChild(el61), el61);
-    },
-    el62 = handler('2.5'),
-    el63 = document.createElementNS(value227, 'polygon');
-  (el63.setAttribute('points', '5 3 19 12 5 21 5 3'), el62.appendChild(el63));
-  const el64 = handler2('ms-sync-video-play', t('coreUi.renderer.multiSelect.syncVideoPlay'), el62);
-  el64.style.display = 'none';
-  const value233 = handler('2');
-  [
-    'M12 3l1.2 4.1L17 8.3l-3.8 1.2L12 13.5l-1.2-4-3.8-1.2 3.8-1.2L12 3z',
-    'M18 14l.7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14z',
-    'M6 13l.8 2.7L9.5 16.5l-2.7.8L6 20l-.8-2.7-2.7-.8 2.7-.8L6 13z',
-  ].forEach((item11) => handler3(value233, item11));
-  const value234 = handler2('ms-run-selected', t('coreUi.renderer.multiSelect.runSelected'), value233),
-    el65 = handler('1.8'),
-    el66 = document.createElementNS(value227, 'polygon');
-  (el66.setAttribute('points', '12 2 20 12 16 12 16 22 8 22 8 12 4 12 12 2'), el65.appendChild(el66));
-  const value235 = handler2('ms-asset', t('coreUi.renderer.multiSelect.createAsset'), el65),
-    el67 = handler('2');
-  for (const [value236, value237] of [
-    [3, 3],
-    [14, 3],
-    [14, 14],
-    [3, 14],
-  ]) {
-    const el68 = document.createElementNS(value227, 'rect');
-    (el68.setAttribute('x', String(value236)),
-      el68.setAttribute('y', String(value237)),
-      el68.setAttribute('width', '7'),
-      el68.setAttribute('height', '7'),
-      el67.appendChild(el68));
-  }
-  const value238 = handler2('ms-group', t('coreUi.renderer.multiSelect.group'), el67),
-    el69 = handler('2'),
-    el70 = document.createElementNS(value227, 'path');
-  el70.setAttribute('d', 'M3 12a9 9 0 0 1 15.36-6.36');
-  const el71 = document.createElementNS(value227, 'path');
-  el71.setAttribute('d', 'M21 12a9 9 0 0 1-15.36 6.36');
-  const el72 = document.createElementNS(value227, 'polyline');
-  el72.setAttribute('points', '21 3 21 9 15 9');
-  const el73 = document.createElementNS(value227, 'polyline');
-  (el73.setAttribute('points', '3 21 3 15 9 15'),
-    el69.appendChild(el70),
-    el69.appendChild(el71),
-    el69.appendChild(el72),
-    el69.appendChild(el73));
-  const el74 = handler2('ms-reset-image-size', t('coreUi.renderer.multiSelect.resetDefaultSize'), el69);
-  el74.style.display = 'none';
-  const el75 = handler('2'),
-    el76 = document.createElementNS(value227, 'rect');
-  (el76.setAttribute('x', '3'),
-    el76.setAttribute('y', '5'),
-    el76.setAttribute('width', '18'),
-    el76.setAttribute('height', '14'),
-    el76.setAttribute('rx', '2'),
-    el75.appendChild(el76),
-    handler3(el75, 'M3 9h18'),
-    handler3(el75, 'M7 5l4 4'),
-    handler3(el75, 'M13 5l4 4'));
-  const el77 = handler2('ms-compose-video', t('coreUi.renderer.multiSelect.composeVideo'), el75);
-  el77.style.display = 'none';
-  const value239 = handler('2');
-  [
-    'M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
-    'M3 10h18',
-    'M12 10v10',
-  ].forEach((item12) => handler3(value239, item12));
-  const el78 = handler2('ms-create-collage', t('coreUi.renderer.multiSelect.createCollage'), value239);
-  return (
-    (el78.style.display = 'none'),
-    el57.appendChild(value234),
-    el57.appendChild(el64),
-    el57.appendChild(value235),
-    el57.appendChild(value238),
-    el57.appendChild(el74),
-    el57.appendChild(el78),
-    el57.appendChild(el77),
-    el56.appendChild(el57),
-    el56
-  );
-}
-function _createAlignCenterPanelEl() {
-  const el79 = document.createElement('div');
-  ((el79.id = 'v2-align-center-panel'),
-    (el79.className = 'v2-align-center-panel'),
-    (el79.dataset.uiStop = '1'),
-    (el79.style.display = 'none'));
-  const value240 = 'http://www.w3.org/2000/svg',
-    value241 = {
-      'ms-align-left': ['M4 4v16', 'M8 7h10', 'M8 12h7', 'M8 17h9'],
-      'ms-align-h-center': ['M12 4v16', 'M7 7h10', 'M9 12h6', 'M8 17h8'],
-      'ms-align-right': ['M20 4v16', 'M6 7h10', 'M9 12h7', 'M7 17h9'],
-      'ms-align-top': ['M4 4h16', 'M7 8v10', 'M12 8v7', 'M17 8v9'],
-      'ms-align-v-center': ['M4 12h16', 'M7 7v10', 'M12 9v6', 'M17 8v8'],
-      'ms-align-bottom': ['M4 20h16', 'M7 6v10', 'M12 9v7', 'M17 7v9'],
-      'ms-distribute-h': ['M3 20h18', 'M5 8h3v8H5z', 'M11 5h3v11h-3z', 'M17 10h3v6h-3z'],
-      'ms-distribute-v': ['M20 3v18', 'M8 5h8v3H8z', 'M5 11h11v3H5z', 'M10 17h6v3h-6z'],
-    },
-    list14 = [
-      { action: 'ms-align-left', tooltip: t('coreUi.renderer.align.left'), slot: 'slot-1' },
-      { action: 'ms-align-h-center', tooltip: t('coreUi.renderer.align.hCenter'), slot: 'slot-2' },
-      { action: 'ms-align-right', tooltip: t('coreUi.renderer.align.right'), slot: 'slot-3' },
-      { action: 'ms-align-top', tooltip: t('coreUi.renderer.align.top'), slot: 'slot-4' },
-      { action: 'ms-align-bottom', tooltip: t('coreUi.renderer.align.bottom'), slot: 'slot-6' },
-      { action: 'ms-distribute-h', tooltip: t('coreUi.renderer.align.distributeH'), slot: 'slot-7' },
-      { action: 'ms-align-v-center', tooltip: t('coreUi.renderer.align.vCenter'), slot: 'slot-8' },
-      { action: 'ms-distribute-v', tooltip: t('coreUi.renderer.align.distributeV'), slot: 'slot-9' },
-    ];
-  return (
-    list14.forEach((item13) => {
-      const el80 = document.createElement('button');
-      ((el80.type = 'button'),
-        (el80.className = 'v2-align-center-btn ' + item13.slot),
-        (el80.dataset.uiAction = item13.action),
-        (el80.dataset.tooltip = item13.tooltip),
-        el80.setAttribute('aria-label', item13.tooltip));
-      const el81 = document.createElementNS(value240, 'svg');
-      (el81.setAttribute('width', '16'),
-        el81.setAttribute('height', '16'),
-        el81.setAttribute('viewBox', '0 0 24 24'),
-        el81.setAttribute('fill', 'none'),
-        el81.setAttribute('stroke', 'currentColor'),
-        el81.setAttribute('stroke-width', '2'),
-        el81.setAttribute('stroke-linecap', 'round'),
-        el81.setAttribute('stroke-linejoin', 'round'));
-      const list15 = value241[item13.action] || [];
-      (list15.forEach((item14) => {
-        const el82 = document.createElementNS(value240, 'path');
-        (el82.setAttribute('d', item14), el81.appendChild(el82));
-      }),
-        el80.appendChild(el81),
-        el79.appendChild(el80));
-    }),
-    el79
-  );
-}
-function _renderAlignCenterPanel(el83, value242, value243, value244 = {}) {
-  if (!el83) return;
-  const value245 = String(value244?.alignFeatureTriggerMode || 'click'),
-    value246 = value244?.alignFeatureEnabled !== false && value245 !== 'off',
-    value247 = value244?.alignPanelVisible === true,
-    list16 = Array.isArray(value242) ? value242 : [],
-    list17 = getAlignableSelectionNodes(value243 || {}, list16),
-    enabled46 = value246 && value247 && list16.length >= 2 && list17.length >= 2;
-  if (!enabled46) {
-    if (el83.style.display !== 'none') el83.style.display = 'none';
-    ((_alignPanelRenderCache.centerSig = ''), (_alignPanelRenderCache.buttonStateSig = ''));
-    return;
-  }
-  const box3 = value244?.alignPanelAnchorWorld,
-    value248 = !!box3 && Number.isFinite(box3.x) && Number.isFinite(box3.y);
-  let value249 = 0,
-    value250 = 0;
-  if (value248) ((value249 = Number(box3.x)), (value250 = Number(box3.y)));
-  else {
-    const selectionBounds = computeSelectionBounds(list17);
-    if (!selectionBounds) {
-      if (el83.style.display !== 'none') el83.style.display = 'none';
-      ((_alignPanelRenderCache.centerSig = ''), (_alignPanelRenderCache.buttonStateSig = ''));
-      return;
-    }
-    ((value249 = selectionBounds.centerX), (value250 = selectionBounds.centerY));
-  }
-  if (el83.style.display !== 'block') el83.style.display = 'block';
-  const value251 = value249.toFixed(2) + '|' + value250.toFixed(2);
-  _alignPanelRenderCache.centerSig !== value251 &&
-    ((_alignPanelRenderCache.centerSig = value251),
-    (el83.style.left = value249 + 'px'),
-    (el83.style.top = value250 + 'px'));
-  const enabled47 = list17.length >= 2,
-    value252 = enabled47 ? '1' : '0';
-  if (_alignPanelRenderCache.buttonStateSig !== value252) {
-    _alignPanelRenderCache.buttonStateSig = value252;
-    const list18 = el83._actionButtons || Array.from(el83.querySelectorAll('button[data-ui-action]'));
-    ((el83._actionButtons = list18),
-      list18.forEach((el84) => {
-        const value253 = el84.dataset.uiAction,
-          value254 = value253 === 'ms-distribute-h' || value253 === 'ms-distribute-v',
-          value255 = value254 ? !enabled47 : false;
-        ((el84.disabled = value255), el84.classList.toggle('is-disabled', value255));
-      }));
-  }
-}
-function _renderMultiSelectBox(el85, list19, value256, value257, value258 = false) {
-  const enabled48 = list19 && list19.length >= 2,
-    handler4 = (enabled49, { mountedOnly: mountedOnly = false } = {}) => {
-      if (!enabled49) return null;
-      if (mountedOnly && !_mountedNodeIds.has(enabled49)) return null;
-      return _wrapperMap.get(enabled49) || _parkedWrapperMap.get(enabled49) || null;
-    },
-    handler5 = (el86) => {
-      if (!el86) return;
-      const el87 = el86.querySelector('.node-floating-toolbar'),
-        el88 = el86.querySelector('.group-toolbar'),
-        el89 = el86.querySelector('.text-prompt-panel');
-      if (el87) el87.style.display = '';
-      if (el88) el88.style.display = '';
-      if (el89) el89.style.display = '';
-    },
-    handler6 = (el90) => {
-      if (!el90) return;
-      const el91 = el90.querySelector('.node-floating-toolbar'),
-        el92 = el90.querySelector('.group-toolbar'),
-        el93 = el90.querySelector('.text-prompt-panel');
-      if (el91) el91.style.display = 'none';
-      if (el92) el92.style.display = 'none';
-      if (el93) el93.style.display = 'none';
-    };
-  if (!enabled48) {
-    for (const value259 of _msHiddenNodeIds) {
-      handler5(handler4(value259));
-    }
-    _msHiddenNodeIds = new Set();
-  } else {
-    const map8 = new Set(list19 || []),
-      value260 = new Set();
-    for (const value261 of _msHiddenNodeIds) {
-      if (map8.has(value261)) continue;
-      handler5(handler4(value261));
-    }
-    for (const value262 of map8) {
-      const enabled50 = handler4(value262, { mountedOnly: true });
-      if (!enabled50) continue;
-      (handler6(enabled50), value260.add(value262));
-    }
-    _msHiddenNodeIds = value260;
-  }
-  if (!enabled48) {
-    if (el85.style.display !== 'none') el85.style.display = 'none';
-    ((_multiSelectRenderCache.geometrySig = ''),
-      (_multiSelectRenderCache.runBtnDisabled = null),
-      (_multiSelectRenderCache.resetBtnVisible = null),
-      (_multiSelectRenderCache.composeBtnVisible = null),
-      (_multiSelectRenderCache.composeBtnKind = ''));
-    return;
-  }
-  const el94 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-sync-video-play"]'),
-    el95 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-run-selected"]'),
-    el96 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-compose-video"]'),
-    el97 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-reset-image-size"]'),
-    el98 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-create-collage"]');
-  if (el94) el94.style.display = getSelectedSyncPlayableVideoCount(value256, list19) >= 2 ? '' : 'none';
-  if (el95) {
-    el95.style.display = '';
-    let enabled51 = false;
-    for (const value263 of list19) {
-      if (isNodeType(value256[value263], ['ai-text', 'ai-image', 'ai-video', 'ai-audio'])) {
-        enabled51 = true;
-        break;
-      }
-    }
-    const value264 = !enabled51;
-    ((_multiSelectRenderCache.runBtnDisabled = value264),
-      (el95.disabled = value264),
-      el95.classList.toggle('is-disabled', value264));
-  }
-  if (el97) {
-    let value265 = false;
-    for (const value266 of list19) {
-      const enabled52 = value256[value266],
-        value267 =
-          !!enabled52 && isNodeType(enabled52, ['source-image', 'source-video', 'ai-image', 'ai-video']);
-      if (value267) {
-        value265 = true;
-        break;
-      }
-    }
-    const value268 = value258 && value265;
-    _multiSelectRenderCache.resetBtnVisible !== value268 &&
-      ((_multiSelectRenderCache.resetBtnVisible = value268), (el97.style.display = value268 ? '' : 'none'));
-  }
-  if (el98) {
-    const count10 = list19.filter((item15) =>
-      isNodeType(value256[item15], ['source-image', 'ai-image', 'storyboard']),
-    ).length;
-    el98.style.display = count10 >= 2 ? '' : 'none';
-  }
-  if (el96) {
-    const selectedMediaComposeKind = getSelectedMediaComposeKind(value256, list19),
-      value269 = !!selectedMediaComposeKind;
-    _multiSelectRenderCache.composeBtnVisible !== value269 &&
-      ((_multiSelectRenderCache.composeBtnVisible = value269), (el96.style.display = value269 ? '' : 'none'));
-    if (_multiSelectRenderCache.composeBtnKind !== selectedMediaComposeKind) {
-      _multiSelectRenderCache.composeBtnKind = selectedMediaComposeKind;
-      const mediaComposeButtonLabel = getMediaComposeButtonLabel(selectedMediaComposeKind);
-      ((el96.dataset.composeKind = selectedMediaComposeKind),
-        (el96.dataset.tooltip = mediaComposeButtonLabel),
-        el96.setAttribute('aria-label', mediaComposeButtonLabel));
-    }
-  }
-  let value270 = Infinity,
-    value271 = Infinity,
-    value272 = -Infinity,
-    value273 = -Infinity,
-    count11 = 0;
-  list19.forEach((item16) => {
-    const box4 = value256[item16];
-    if (!box4) return;
-    count11++;
-    const value274 = box4.width || 0x104,
-      value275 = box4.height || 100;
-    let value276 = box4.x,
-      value277 = box4.y,
-      value278 = box4.x + value274,
-      value279 = box4.y + value275;
-    (box4.type !== 'group' && (value277 -= 30),
-      (value270 = Math.min(value270, value276)),
-      (value271 = Math.min(value271, value277)),
-      (value272 = Math.max(value272, value278)),
-      (value273 = Math.max(value273, value279)));
-  });
-  if (count11 < 2) {
-    if (el85.style.display !== 'none') el85.style.display = 'none';
-    _multiSelectRenderCache.geometrySig = '';
-    return;
-  }
-  if (el85.style.display !== 'block') el85.style.display = 'block';
-  const value280 = 18,
-    value281 = value270 - value280,
-    value282 = value271 - value280,
-    value283 = value272 - value270 + value280 * 2,
-    value284 = value273 - value271 + value280 * 2,
-    value285 =
-      value281.toFixed(2) + '|' + value282.toFixed(2) + '|' + value283.toFixed(2) + '|' + value284.toFixed(2);
-  _multiSelectRenderCache.geometrySig !== value285 &&
-    ((_multiSelectRenderCache.geometrySig = value285),
-    (el85.style.left = value281 + 'px'),
-    (el85.style.top = value282 + 'px'),
-    (el85.style.width = value283 + 'px'),
-    (el85.style.height = value284 + 'px'));
+  el37['style']['display'] = 'block';
+  const value229 = Math['min'](enabled48['x1'], enabled48['x2']),
+    value230 = Math['min'](enabled48['y1'], enabled48['y2']),
+    value231 = Math['abs'](enabled48['x2'] - enabled48['x1']),
+    value232 = Math['abs'](enabled48['y2'] - enabled48['y1']);
+  ((el37['style']['left'] = value229 + 'px'),
+    (el37['style']['top'] = value230 + 'px'),
+    (el37['style']['width'] = value231 + 'px'),
+    (el37['style']['height'] = value232 + 'px'));
 }

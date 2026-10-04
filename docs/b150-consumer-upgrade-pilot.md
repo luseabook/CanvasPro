@@ -303,3 +303,49 @@ manifests 聚合件（modelRegistry gain 5、vendorTextModelApiManifests gain 4 
 **b156 最终交付：只落 `api/errors/ErrorParser.js`**（+3 个错误解析器
 `ComfyUiErrorParser`/`VolcengineErrorParser`/`VolcengineSpeechErrorParser`，0 回归），
 孤立 272→**269**，全量 **11185/11182/3**。余 10 件原地待命，是否采纳 0.7.16 模型规格需产品侧裁决。
+
+## 13. 第 157 批：脏件批（27 取 15）
+
+"脏件"= 镜像消费方的相对导入集**不是**仓库导入集的超集（升级会丢导入）。27 件全部通过机械工序
+（改名 ~9,800、闸门 PASS）。**导出面 3 件丢失但均为"依赖搬家"**：
+
+| 丢失导出 | 搬到 |
+| --- | --- |
+| `resolveVideoPromptPlaceholder`、`shouldShowVideoPromptInput` | `video-node/parameterPanelPresentationPolicy.js` |
+| `buildVideoModelApiModelSelectionPatch` | `video-node/parameterPanelModelSelectionPolicy.js` |
+| 6 个 `Dreamina*` | `app/appTopbarDreaminaSession.js` |
+| `canCreateCustomPromptPreset` | 仅自用，无外部消费方 |
+
+消费方（`AIGenVideoNode`、`aigenVideo/modelSelector`）随批更新了导入源，批内自洽；无兼容 shim 需求。
+
+### 27 件全落地 = 70 例失败（基线 3）→ 逐件归因
+
+`leave-one-out` 归因（每件单独回滚后跑 14 个失败测试文件）：
+
+| 致回归件 | 失败数 | |
+| --- | --- | --- |
+| `video-node/taskOrchestrationModule.js` | 12 | 回滚 |
+| `AIGenAudioNode.js` | 12 | 回滚 |
+| `SourceVideoNode.js` | 8 | 回滚 |
+| `api/adapters/modelApiResolvers/index.js` | 7 | 回滚 |
+| `app/projectLifecycle.js` | 6 | 回滚 |
+| `parameterPanelModule.js` / `promptPresets.js` | 5 / 5 | 回滚 |
+| `aigenText/uiModule.js` / `VideoKeyingController.js` | 4 / 4 | 回滚 |
+| 两个 `stateSyncModule.js` | 3 | 回滚 |
+| `AIGenVideoNode.js` | 1 | 回滚（补测发现） |
+| 其余 15 件 | 0 | **保留** |
+
+**最终只落 15 件**：`core/renderer.js`、`core/interaction.js`、`components/WhiteboardNode.js`、
+`modules/agent/agentPanel.js` + `agentRuntime.js`、`modules/TaskCenterManager.js`、
+`VideoClip/ImageAnnotate/ImageExpand` 三控制器、`nodeToolbar/imageToolbar.js` + `imageActions/hdAction.js`、
+`imageAnnotate/annotateToolbarMarkup.js`、`modules/AutoUpdate.js`、`CanvasProjectDropdownManager.js`、
+`app/appTopbarAndConfig.js`。
+
+### 结果
+
+- 孤立 **269 → 201**（接通 **80** 件；`renderer.js` 一地接通 12 个 `renderer*` 子模块，agent 两件接通 15 件）。
+- **12 件被 0.7.16 淘汰转为孤立**：`MediaTaskHistoryPanel`、`MediaTaskRecoveryPanel`、`mediaTaskRecoveryCanvas`、
+  `nodeExport/*`、`timelineExport/TimelineExportDialog`、`whiteboard/whiteboardDrawing`、`externalProjectOpen`、
+  `projectPackage/fullProjectPackageSession`、`annotateCloneAction`、`api/mediaTaskHistoryApi`、`services/nodeMediaExportService`
+  —— 均被新控制器取代（**镜像内亦零消费方**），孤立化即与 0.7.16 对齐，非功能回归（本表不计入 483 口径）。
+- 483 口径删 34 件为 **403 / 1238**；全量 **11185/11182/3** 零回归。

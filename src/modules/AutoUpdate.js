@@ -5,113 +5,138 @@ import {
   pingUpdateCheckFromServer,
 } from '../../api/updateApi.js';
 import { getLocale, t } from '../i18n/index.js';
-import { openExternalLink } from '../services/externalLinkService.js';
-const CHECK_INTERVAL = 60 * 60 * 0x3e8,
-  FALLBACK_RELEASE_URL = 'https://github.com/ashuoAI/AI-CanvasPro/releases/latest',
+import { desktopBridge } from '../services/desktopBridge.js';
+import {
+  createLatestStartupVisualTaskQueue,
+  isStartupVisualComplete,
+  waitForStartupVisualComplete,
+} from '../services/startupVisualReadiness.js';
+import {
+  AUTO_UPDATE_PRIMARY_ACTIONS,
+  ensureDesktopUpdateAvailable,
+  resolveAutoUpdatePrimaryAction,
+} from './autoUpdatePolicy.js';
+const CHECK_INTERVAL = 0x3c * 0x3c * 0x3e8,
   _NS = 'http://www.w3.org/2000/svg';
 let _dismissedSignature = '',
   _activeBannerInfo = null,
   _desktopUpdateInfo = null,
   _desktopUpdateUnsubscribe = null,
-  _desktopUpdaterActive = false,
-  _desktopInstallAfterDownload = false;
-let desktopErrorEventSequence = 0;
-let lastDesktopErrorEventId = null;
+  _desktopUpdaterActive = ![],
+  _desktopInstallAfterDownload = ![],
+  _desktopBannerRequestSequence = 0x0;
+const _startupBannerQueue = createLatestStartupVisualTaskQueue(),
+  _startupAutomaticToastQueue = createLatestStartupVisualTaskQueue();
 function autoUpdateText(value, item = {}) {
   return t('autoUpdate.' + value, item);
 }
 function _getUpdateSignature(enabled) {
   if (!enabled || typeof enabled !== 'object') return '';
   return [
-    enabled.previewOnly ? 'preview' : 'update',
-    enabled.localVersion || '',
-    enabled.remoteVersion || '',
-    enabled.downloadUrl || '',
-    enabled.previewVideoUrl || '',
-    enabled.notes || '',
-  ].join('|');
+    enabled['previewOnly'] ? 'preview' : 'update',
+    enabled['localVersion'] || '',
+    enabled['remoteVersion'] || '',
+    enabled['downloadUrl'] || '',
+    enabled['previewVideoUrl'] || '',
+    enabled['notes'] || '',
+  ]['join']('|');
 }
 function _removeBanner() {
-  const el = document.getElementById('update-banner'),
-    el2 = document.getElementById('update-banner-backdrop');
-  (el?.classList?.remove?.('open'),
-    el2?.classList?.remove?.('open'),
-    el?.remove?.(),
-    el2?.remove?.(),
+  _startupBannerQueue['clear']();
+  const el = document['getElementById']('update-banner'),
+    el2 = document['getElementById']('update-banner-backdrop');
+  (el?.['classList']?.['remove']?.('open'),
+    el2?.['classList']?.['remove']?.('open'),
+    el?.['remove']?.(),
+    el2?.['remove']?.(),
     (_activeBannerInfo = null),
-    document.removeEventListener('keydown', _handleBannerKeydown));
+    document['removeEventListener']('keydown', _handleBannerKeydown));
 }
 function _dismissBanner(key) {
   (_removeBanner(), (_dismissedSignature = _getUpdateSignature(key)));
 }
 function _handleBannerKeydown(event) {
-  if (event.key !== 'Escape' || !document.getElementById('update-banner')) return;
-  (event.preventDefault(), _removeBanner());
+  if (event['key'] !== 'Escape' || !document['getElementById']('update-banner')) return;
+  event['preventDefault']();
+  if (typeof _activeBannerInfo?.['closeAction'] === 'function') {
+    _activeBannerInfo['closeAction'](_activeBannerInfo);
+    return;
+  }
+  _removeBanner();
 }
 function _createSvgIcon(index, result = {}) {
-  const el3 = document.createElementNS(_NS, 'svg');
-  if (result.spin) el3.classList.add('spin');
-  (el3.setAttribute('viewBox', '0 0 24 24'),
-    el3.setAttribute('fill', 'none'),
-    el3.setAttribute('stroke', 'currentColor'),
-    el3.setAttribute('stroke-width', '2.2'),
-    el3.setAttribute('stroke-linecap', 'round'),
-    el3.setAttribute('stroke-linejoin', 'round'));
-  const el4 = document.createElementNS(_NS, 'path');
-  return (el4.setAttribute('d', index), el3.appendChild(el4), el3);
+  const el3 = document['createElementNS'](_NS, 'svg');
+  if (result['spin']) el3['classList']['add']('spin');
+  (el3['setAttribute']('viewBox', '0 0 24 24'),
+    el3['setAttribute']('fill', 'none'),
+    el3['setAttribute']('stroke', 'currentColor'),
+    el3['setAttribute']('stroke-width', '2.2'),
+    el3['setAttribute']('stroke-linecap', 'round'),
+    el3['setAttribute']('stroke-linejoin', 'round'));
+  const el4 = document['createElementNS'](_NS, 'path');
+  return (el4['setAttribute']('d', index), el3['appendChild'](el4), el3);
 }
 function _createSpinSvg(spin) {
   const el5 = _createSvgIcon('M21 12a9 9 0 1 1-6.219-8.56', { spin: spin }),
-    el6 = document.createElementNS(_NS, 'polyline');
-  return (el6.setAttribute('points', '16 3 21 3 21 8'), el5.appendChild(el6), el5);
+    el6 = document['createElementNS'](_NS, 'polyline');
+  return (
+    el6['setAttribute']('points', '16 3 21 3 21 8'),
+    el5['appendChild'](el6),
+    el5
+  );
 }
 function _createDownloadSvg() {
-  const el7 = document.createElementNS(_NS, 'svg');
+  const el7 = document['createElementNS'](_NS, 'svg');
   return (
-    el7.setAttribute('viewBox', '0 0 24 24'),
-    el7.setAttribute('fill', 'none'),
-    el7.setAttribute('stroke', 'currentColor'),
-    el7.setAttribute('stroke-width', '2.2'),
-    el7.setAttribute('stroke-linecap', 'round'),
-    el7.setAttribute('stroke-linejoin', 'round'),
-    ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3'].forEach((item2) => {
-      const el8 = document.createElementNS(_NS, 'path');
-      (el8.setAttribute('d', item2), el7.appendChild(el8));
+    el7['setAttribute']('viewBox', '0 0 24 24'),
+    el7['setAttribute']('fill', 'none'),
+    el7['setAttribute']('stroke', 'currentColor'),
+    el7['setAttribute']('stroke-width', '2.2'),
+    el7['setAttribute']('stroke-linecap', 'round'),
+    el7['setAttribute']('stroke-linejoin', 'round'),
+    ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12\x2015V3']['forEach']((data) => {
+      const el8 = document['createElementNS'](_NS, 'path');
+      (el8['setAttribute']('d', data), el7['appendChild'](el8));
     }),
     el7
   );
 }
 function _createUpdateSvg() {
-  const el9 = document.createElementNS(_NS, 'svg');
+  const el9 = document['createElementNS'](_NS, 'svg');
   return (
-    el9.setAttribute('viewBox', '0 0 24 24'),
-    el9.setAttribute('fill', 'none'),
-    el9.setAttribute('stroke', 'currentColor'),
-    el9.setAttribute('stroke-width', '2.2'),
-    el9.setAttribute('stroke-linecap', 'round'),
-    el9.setAttribute('stroke-linejoin', 'round'),
-    ['M12 16V4', 'M7 9l5-5 5 5', 'M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2'].forEach((item3) => {
-      const el10 = document.createElementNS(_NS, 'path');
-      (el10.setAttribute('d', item3), el9.appendChild(el10));
+    el9['setAttribute']('viewBox', '0 0 24 24'),
+    el9['setAttribute']('fill', 'none'),
+    el9['setAttribute']('stroke', 'currentColor'),
+    el9['setAttribute']('stroke-width', '2.2'),
+    el9['setAttribute']('stroke-linecap', 'round'),
+    el9['setAttribute']('stroke-linejoin', 'round'),
+    ['M12 16V4', 'M7 9l5-5 5 5', 'M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2']['forEach']((options) => {
+      const el10 = document['createElementNS'](_NS, 'path');
+      (el10['setAttribute']('d', options), el9['appendChild'](el10));
     }),
     el9
   );
 }
-function _setBtnContent(el11, data, options) {
+function _setBtnContent(el11, target, source) {
   if (!el11) return;
-  (el11.replaceChildren(),
-    el11.appendChild(data ? _createSpinSvg(true) : _createDownloadSvg()),
-    el11.appendChild(document.createTextNode(' ' + options)));
+  (el11['replaceChildren'](),
+    el11['appendChild'](target ? _createSpinSvg(!![]) : _createDownloadSvg()),
+    el11['appendChild'](document['createTextNode']('\x20' + source)));
 }
-function _formatPercent(target) {
-  const source = Math.max(0, Math.min(100, Number(target || 0)));
-  return Math.round(source) + '%';
+function _formatPercent(next) {
+  const current = Math['max'](0x0, Math['min'](0x64, Number(next || 0x0)));
+  return Math['round'](current) + '%';
+}
+function _formatBannerVersion(entry) {
+  return String(entry || '')
+    ['trim']()
+    ['replace'](/^[vV](?=\d)/, '');
 }
 function _formatPubDate(enabled2) {
   if (!enabled2) return '';
-  const next = new Date(enabled2);
-  if (Number.isNaN(next.getTime())) return String(enabled2);
-  return next.toLocaleString(getLocale(), {
+  const record = new Date(enabled2);
+  if (Number['isNaN'](record['getTime']())) return String(enabled2);
+  return record['toLocaleString'](getLocale(), {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -119,106 +144,111 @@ function _formatPubDate(enabled2) {
     minute: '2-digit',
   });
 }
-function _decodeHtmlText(current) {
-  const enabled3 = String(current || '');
+function _decodeHtmlText(payload) {
+  const enabled3 = String(payload || '');
   if (!enabled3) return '';
-  const el12 = document.createElement('textarea');
-  return ((el12.innerHTML = enabled3), el12.value);
+  const el12 = document['createElement']('textarea');
+  return ((el12['innerHTML'] = enabled3), el12['value']);
 }
-function _htmlNotesToText(entry) {
-  let record = String(entry || '').trim();
-  if (!/<\/?[a-z][\s\S]*>/i.test(record)) return record;
+function _htmlNotesToText(handle) {
+  let state = String(handle || '')['trim']();
+  if (!/<\/?[a-z][\s\S]*>/i['test'](state)) return state;
   return (
-    (record = record
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/(?:p|div|h[1-6]|li|ul|ol|section|article|blockquote)>/gi, '\n')
-      .replace(/<li[^>]*>/gi, '- ')
-      .replace(/<[^>]+>/g, '')),
-    _decodeHtmlText(record)
+    (state = state['replace'](/<br\s*\/?>/gi, '\x0a')
+      ['replace'](/<\/(?:p|div|h[1-6]|li|ul|ol|section|article|blockquote)>/gi, '\x0a')
+      ['replace'](/<li[^>]*>/gi, '-\x20')
+      ['replace'](/<[^>]+>/g, '')),
+    _decodeHtmlText(state)
   );
 }
-function _buildNotesText(payload) {
-  const list = _htmlNotesToText(payload)
-    .split(/\r?\n/)
-    .map((item4) => item4.trim())
-    .filter(Boolean);
-  if (!list.length) return autoUpdateText('notes.empty');
-  return list.join('\n');
+function _buildNotesText(config) {
+  const list = _htmlNotesToText(config)
+    ['split'](/\r?\n/)
+    ['map']((scope) => scope['trim']())
+    ['filter'](Boolean);
+  if (!list['length']) return autoUpdateText('notes.empty');
+  return list['join']('\x0a');
 }
-function _cleanNotesHeading(handle) {
-  return String(handle || '')
-    .replace(/^[\s#*>\-•]+/, '')
-    .replace(/^[🎉✨🐛🔧✅⚠️📌]+\s*/u, '')
-    .replace(/[：:]\s*$/, '')
-    .trim();
+function _cleanNotesHeading(input) {
+  return String(input || '')
+    ['replace'](/^[\s#*>\-•]+/, '')
+    ['replace'](/^[🎉✨🐛🔧✅⚠️📌]+\s*/u, '')
+    ['replace'](/[：:]\s*$/, '')
+    ['trim']();
 }
-function _isVersionTitleLine(state) {
-  return /^(?:🎉\s*)?v?\d+(?:\.\d+){1,3}\s*版本更新/u.test(
-    String(state || '')
-      .trim()
-      .toLowerCase(),
+function _isVersionTitleLine(output) {
+  return /^(?:🎉\s*)?v?\d+(?:\.\d+){1,3}\s*版本更新/u['test'](
+    String(output || '')
+      ['trim']()
+      ['toLowerCase'](),
   );
 }
-function _isReleaseFooterLine(config) {
-  const enabled4 = String(config || '').trim();
-  if (!enabled4) return false;
+function _isReleaseFooterLine(value2) {
+  const enabled4 = String(value2 || '')['trim']();
+  if (!enabled4) return ![];
   return (
-    /^(?:AI-CanvasPro|updream-canvas)[！!]/u.test(enabled4) ||
-    /^注[：:]/u.test(enabled4) ||
-    /^BUG问题/u.test(enabled4) ||
-    /^https?:\/\//i.test(enabled4) ||
-    /反馈文档[：:]/u.test(enabled4)
+    /^感谢各位/u['test'](enabled4) ||
+    /^(?:SHUO Canvas|AI-CanvasPro)[！!]/u['test'](enabled4) ||
+    /^windows版本.*下载链接[：:]/iu['test'](enabled4) ||
+    /^注[：:]/u['test'](enabled4) ||
+    /^BUG问题/u['test'](enabled4) ||
+    /^https?:\/\//i['test'](enabled4) ||
+    /反馈文档[：:]/u['test'](enabled4)
   );
 }
-function _isReleaseMetaLine(scope) {
-  return /^\[[a-zA-Z][a-zA-Z0-9_-]*\]\s*:/u.test(String(scope || '').trim());
+function _isReleaseMetaLine(value3) {
+  return /^\[[a-zA-Z][a-zA-Z0-9_-]*\]\s*:/u['test'](String(value3 || '')['trim']());
 }
-function _parseUpdateNotes(input) {
-  const list2 = _buildNotesText(input)
-      .split(/\r?\n/)
-      .map((item5) => item5.trim())
-      .filter(Boolean)
-      .filter((item6) => !_isVersionTitleLine(item6))
-      .filter((item7) => !_isReleaseMetaLine(item7)),
+function _parseUpdateNotes(value4) {
+  const list2 = _buildNotesText(value4)
+      ['split'](/\r?\n/)
+      ['map']((value5) => value5['trim']())
+      ['filter'](Boolean)
+      ['filter']((value6) => !_isVersionTitleLine(value6))
+      ['filter']((value7) => !_isReleaseMetaLine(value7)),
     intro = [],
     sections = [],
     footer = [];
   let enabled5 = null,
-    output = false;
+    value8 = ![];
   const run = (title = autoUpdateText('notes.defaultSectionTitle')) => {
     return (
-      !enabled5 && ((enabled5 = { title: title, items: [], paragraphs: [] }), sections.push(enabled5)),
+      !enabled5 &&
+        ((enabled5 = { title: title, items: [], paragraphs: [] }), sections['push'](enabled5)),
       enabled5
     );
   };
   return (
-    list2.forEach((item8) => {
-      if (output || _isReleaseFooterLine(item8)) {
-        ((output = true), footer.push(item8));
+    list2['forEach']((value9) => {
+      if (value8 || _isReleaseFooterLine(value9)) {
+        ((value8 = !![]), footer['push'](value9));
         return;
       }
-      const enabled6 = /^[-*•]\s+/.test(item8),
-        value2 = item8.replace(/^[-*•]\s+/, '').trim(),
-        title2 = _cleanNotesHeading(item8),
-        value3 = !enabled6 && /[：:]$/.test(item8) && /新增|修复|优化|更新|说明|注意|已知|内容/u.test(title2);
-      if (value3 && title2) {
-        ((enabled5 = { title: title2, items: [], paragraphs: [] }), sections.push(enabled5));
+      const enabled6 = /^[-*•]\s+/['test'](value9),
+        value10 = value9['replace'](/^[-*•]\s+/, '')['trim'](),
+        title2 = _cleanNotesHeading(value9),
+        value11 =
+          !enabled6 &&
+          /[：:]$/['test'](value9) &&
+          /新增|修复|优化|更新|说明|注意|已知|内容/u['test'](title2);
+      if (value11 && title2) {
+        ((enabled5 = { title: title2, items: [], paragraphs: [] }), sections['push'](enabled5));
         return;
       }
       if (!enabled5 && !enabled6) {
-        intro.push(item8);
+        intro['push'](value9);
         return;
       }
-      const value4 = run();
-      if (enabled6 && value2) {
-        value4.items.push(value2);
+      const value12 = run();
+      if (enabled6 && value10) {
+        value12['items']['push'](value10);
         return;
       }
-      value4.paragraphs.push(item8);
+      value12['paragraphs']['push'](value9);
     }),
     {
       intro: intro,
-      sections: sections.length
+      sections: sections['length']
         ? sections
         : [
             {
@@ -231,604 +261,730 @@ function _parseUpdateNotes(input) {
     }
   );
 }
-function _appendTextWithLinks(el13, value5) {
-  const list3 = String(value5 || ''),
-    value6 = /(https?:\/\/[^\s]+)/gi;
-  let value7 = 0,
-    value8 = value6.exec(list3);
-  while (value8) {
-    value8.index > value7 && el13.appendChild(document.createTextNode(list3.slice(value7, value8.index)));
-    const list4 = value8[0].replace(/[),.;，。；）]+$/u, ''),
-      value9 = value8[0].slice(list4.length),
-      el14 = document.createElement('a');
-    ((el14.className = 'update-banner-note-link'),
-      (el14.href = list4),
-      (el14.dataset.externalUrl = list4),
-      (el14.textContent = list4),
-      el13.appendChild(el14));
-    if (value9) el13.appendChild(document.createTextNode(value9));
-    ((value7 = value8.index + value8[0].length), (value8 = value6.exec(list3)));
+export const __autoUpdateNotesForTest = Object['freeze']({ parse: _parseUpdateNotes });
+function _appendTextWithLinks(el13, value13) {
+  const list3 = String(value13 || ''),
+    value14 = /(https?:\/\/[^\s]+)/gi;
+  let value15 = 0x0,
+    value16 = value14['exec'](list3);
+  while (value16) {
+    value16['index'] > value15 &&
+      el13['appendChild'](document['createTextNode'](list3['slice'](value15, value16['index'])));
+    const list4 = value16[0x0]['replace'](/[),.;，。；）]+$/u, ''),
+      value17 = value16[0x0]['slice'](list4['length']),
+      el14 = document['createElement']('a');
+    ((el14['className'] = 'update-banner-note-link'),
+      (el14['href'] = list4),
+      (el14['dataset']['externalUrl'] = list4),
+      (el14['textContent'] = list4),
+      el13['appendChild'](el14));
+    if (value17) el13['appendChild'](document['createTextNode'](value17));
+    ((value15 = value16['index'] + value16[0x0]['length']), (value16 = value14['exec'](list3)));
   }
-  value7 < list3.length && el13.appendChild(document.createTextNode(list3.slice(value7)));
+  value15 < list3['length'] &&
+    el13['appendChild'](document['createTextNode'](list3['slice'](value15)));
 }
-function _createNotesPanel(value10) {
-  const _parseUpdateNotes2 = _parseUpdateNotes(value10),
-    el15 = document.createElement('div');
-  ((el15.className = 'update-banner-notes'), (el15.id = 'update-banner-notes'));
-  const el16 = document.createElement('div');
-  ((el16.className = 'update-banner-section-title'),
-    (el16.textContent = autoUpdateText('notes.defaultSectionTitle')));
-  const el17 = document.createElement('div');
-  el17.className = 'update-banner-notes-scroll';
-  if (_parseUpdateNotes2.intro.length) {
-    const el18 = document.createElement('div');
-    ((el18.className = 'update-banner-note-intro'),
-      _parseUpdateNotes2.intro.forEach((item9) => {
-        const value11 = document.createElement('p');
-        ((value11.className = 'update-banner-note-paragraph'),
-          _appendTextWithLinks(value11, item9),
-          el18.appendChild(value11));
+function _createNotesPanel(value18) {
+  const _parseUpdateNotes2 = _parseUpdateNotes(value18),
+    el15 = document['createElement']('div');
+  ((el15['className'] = 'update-banner-notes'), (el15['id'] = 'update-banner-notes'));
+  const el16 = document['createElement']('div');
+  ((el16['className'] = 'update-banner-section-title'),
+    (el16['textContent'] = autoUpdateText('notes.defaultSectionTitle')));
+  const el17 = document['createElement']('div');
+  el17['className'] = 'update-banner-notes-scroll';
+  if (_parseUpdateNotes2['intro']['length']) {
+    const el18 = document['createElement']('div');
+    ((el18['className'] = 'update-banner-note-intro'),
+      _parseUpdateNotes2['intro']['forEach']((value19) => {
+        const value20 = document['createElement']('p');
+        ((value20['className'] = 'update-banner-note-paragraph'),
+          _appendTextWithLinks(value20, value19),
+          el18['appendChild'](value20));
       }),
-      el17.appendChild(el18));
+      el17['appendChild'](el18));
   }
-  _parseUpdateNotes2.sections.forEach((item10) => {
-    const el19 = document.createElement('section');
-    el19.className = 'update-banner-note-section';
-    const el20 = document.createElement('div');
-    ((el20.className = 'update-banner-note-heading'),
-      (el20.textContent = item10.title),
-      el19.appendChild(el20),
-      item10.paragraphs.forEach((item11) => {
-        const value12 = document.createElement('p');
-        ((value12.className = 'update-banner-note-paragraph'),
-          _appendTextWithLinks(value12, item11),
-          el19.appendChild(value12));
+  _parseUpdateNotes2['sections']['forEach']((value21) => {
+    const el19 = document['createElement']('section');
+    el19['className'] = 'update-banner-note-section';
+    const el20 = document['createElement']('div');
+    ((el20['className'] = 'update-banner-note-heading'),
+      (el20['textContent'] = value21['title']),
+      el19['appendChild'](el20),
+      value21['paragraphs']['forEach']((value22) => {
+        const value23 = document['createElement']('p');
+        ((value23['className'] = 'update-banner-note-paragraph'),
+          _appendTextWithLinks(value23, value22),
+          el19['appendChild'](value23));
       }));
-    if (item10.items.length) {
-      const el21 = document.createElement('ul');
-      ((el21.className = 'update-banner-note-list'),
-        item10.items.forEach((item12) => {
-          const value13 = document.createElement('li');
-          (_appendTextWithLinks(value13, item12), el21.appendChild(value13));
+    if (value21['items']['length']) {
+      const el21 = document['createElement']('ul');
+      ((el21['className'] = 'update-banner-note-list'),
+        value21['items']['forEach']((value24) => {
+          const value25 = document['createElement']('li');
+          (_appendTextWithLinks(value25, value24), el21['appendChild'](value25));
         }),
-        el19.appendChild(el21));
+        el19['appendChild'](el21));
     }
-    el17.appendChild(el19);
+    el17['appendChild'](el19);
   });
-  if (_parseUpdateNotes2.footer.length) {
-    const el22 = document.createElement('section');
-    el22.className = 'update-banner-note-footer';
-    const el23 = document.createElement('div');
-    ((el23.className = 'update-banner-note-footer-title'),
-      (el23.textContent = autoUpdateText('notes.releaseFooterTitle')),
-      el22.appendChild(el23),
-      _parseUpdateNotes2.footer.forEach((item13) => {
-        const value14 = document.createElement('p');
-        ((value14.className = 'update-banner-note-paragraph'),
-          _appendTextWithLinks(value14, item13),
-          el22.appendChild(value14));
+  if (_parseUpdateNotes2['footer']['length']) {
+    const el22 = document['createElement']('section');
+    el22['className'] = 'update-banner-note-footer';
+    const el23 = document['createElement']('div');
+    ((el23['className'] = 'update-banner-note-footer-title'),
+      (el23['textContent'] = autoUpdateText('notes.releaseFooterTitle')),
+      el22['appendChild'](el23),
+      _parseUpdateNotes2['footer']['forEach']((value26) => {
+        const value27 = document['createElement']('p');
+        ((value27['className'] = 'update-banner-note-paragraph'),
+          _appendTextWithLinks(value27, value26),
+          el22['appendChild'](value27));
       }),
-      el17.appendChild(el22));
+      el17['appendChild'](el22));
   }
-  return (el15.appendChild(el16), el15.appendChild(el17), el15);
+  return (el15['appendChild'](el16), el15['appendChild'](el17), el15);
 }
-function _normalizeHttpUrl(value15) {
-  const enabled7 = String(value15 || '').trim();
+function _normalizeHttpUrl(value28) {
+  const enabled7 = String(value28 || '')['trim']();
   if (!enabled7) return '';
-  const value16 = enabled7.startsWith('//') ? 'https:' + enabled7 : enabled7;
-  if (!/^https?:\/\//i.test(value16)) return '';
+  const value29 = enabled7['startsWith']('//') ? 'https:' + enabled7 : enabled7;
+  if (!/^https?:\/\//i['test'](value29)) return '';
   try {
-    const uRL = new URL(value16);
-    if (uRL.protocol !== 'http:' && uRL.protocol !== 'https:') return '';
-    return uRL.toString();
-  } catch (value17) {
+    const uRL = new URL(value29);
+    if (uRL['protocol'] !== 'http:' && uRL['protocol'] !== 'https:') return '';
+    return uRL['toString']();
+  } catch (value30) {
     return '';
   }
 }
-function _isDirectVideoUrl(value18) {
+function _isDirectVideoUrl(value31) {
   try {
-    return /\.(mp4|webm|ogg|m4v|mov)$/i.test(new URL(value18).pathname);
-  } catch (value19) {
-    return false;
+    return /\.(mp4|webm|ogg|m4v|mov)$/i['test'](new URL(value31)['pathname']);
+  } catch (value32) {
+    return ![];
   }
 }
-function _isBilibiliHost(value20) {
-  const value21 = String(value20 || '').toLowerCase();
-  return value21 === 'bilibili.com' || value21.endsWith('.bilibili.com');
+function _isBilibiliHost(value33) {
+  const value34 = String(value33 || '')['toLowerCase']();
+  return value34 === 'bilibili.com' || value34['endsWith']('.bilibili.com');
 }
-function _buildBilibiliPlayerUrl(value22) {
+function _buildBilibiliPlayerUrl(value35) {
   try {
-    const uRL2 = new URL(value22);
-    if (!_isBilibiliHost(uRL2.hostname)) return '';
-    if (uRL2.hostname.toLowerCase() === 'player.bilibili.com')
-      return (uRL2.searchParams.set('autoplay', '0'), uRL2.toString());
-    const enabled8 = uRL2.pathname.match(/\/video\/(BV[a-zA-Z0-9]+)/),
-      enabled9 = uRL2.pathname.match(/\/video\/av(\d+)/i);
+    const uRL2 = new URL(value35);
+    if (!_isBilibiliHost(uRL2['hostname'])) return '';
+    if (uRL2['hostname']['toLowerCase']() === 'player.bilibili.com')
+      return (uRL2['searchParams']['set']('autoplay', '0'), uRL2['toString']());
+    const enabled8 = uRL2['pathname']['match'](/\/video\/(BV[a-zA-Z0-9]+)/),
+      enabled9 = uRL2['pathname']['match'](/\/video\/av(\d+)/i);
     if (!enabled8 && !enabled9) return '';
     const uRL3 = new URL('https://player.bilibili.com/player.html');
     return (
-      enabled8 ? uRL3.searchParams.set('bvid', enabled8[1]) : uRL3.searchParams.set('aid', enabled9[1]),
-      uRL3.searchParams.set('page', uRL2.searchParams.get('p') || '1'),
-      uRL3.searchParams.set('autoplay', '0'),
-      uRL3.toString()
+      enabled8
+        ? uRL3['searchParams']['set']('bvid', enabled8[0x1])
+        : uRL3['searchParams']['set']('aid', enabled9[0x1]),
+      uRL3['searchParams']['set']('page', uRL2['searchParams']['get']('p') || '1'),
+      uRL3['searchParams']['set']('autoplay', '0'),
+      uRL3['toString']()
     );
-  } catch (value23) {
+  } catch (value36) {
     return '';
   }
 }
-function _createPreviewVideo(value24) {
-  const _normalizeHttpUrl2 = _normalizeHttpUrl(value24?.previewVideoUrl || value24?.preview_video_url);
+function _createPreviewVideo(value37) {
+  const _normalizeHttpUrl2 = _normalizeHttpUrl(value37?.['previewVideoUrl'] || value37?.['preview_video_url']);
   if (!_normalizeHttpUrl2) return null;
-  const el24 = document.createElement('div');
-  el24.className = 'update-banner-video-wrap';
-  const el25 = document.createElement('div');
-  el25.className = 'update-banner-video-shell';
+  const el24 = document['createElement']('div');
+  el24['className'] = 'update-banner-video-wrap';
+  const el25 = document['createElement']('div');
+  el25['className'] = 'update-banner-video-shell';
   if (_isDirectVideoUrl(_normalizeHttpUrl2)) {
-    const value25 = document.createElement('video');
+    const value38 = document['createElement']('video');
     return (
-      (value25.className = 'update-banner-video'),
-      (value25.controls = true),
-      (value25.playsInline = true),
-      (value25.preload = 'metadata'),
-      (value25.src = _normalizeHttpUrl2),
-      el25.appendChild(value25),
-      el24.appendChild(el25),
+      (value38['className'] = 'update-banner-video'),
+      (value38['controls'] = !![]),
+      (value38['playsInline'] = !![]),
+      (value38['preload'] = 'metadata'),
+      (value38['src'] = _normalizeHttpUrl2),
+      el25['appendChild'](value38),
+      el24['appendChild'](el25),
       el24
     );
   }
-  const value26 = document.createElement('iframe');
+  const value39 = document['createElement']('iframe');
   return (
-    (value26.className = 'update-banner-video-frame'),
-    (value26.src = _buildBilibiliPlayerUrl(_normalizeHttpUrl2) || _normalizeHttpUrl2),
-    (value26.loading = 'lazy'),
-    (value26.allow = 'autoplay; fullscreen; picture-in-picture'),
-    (value26.allowFullscreen = true),
-    (value26.referrerPolicy = 'no-referrer-when-downgrade'),
-    el25.appendChild(value26),
-    el24.appendChild(el25),
+    (value39['className'] = 'update-banner-video-frame'),
+    (value39['src'] = _buildBilibiliPlayerUrl(_normalizeHttpUrl2) || _normalizeHttpUrl2),
+    (value39['loading'] = 'lazy'),
+    (value39['allow'] = 'autoplay; fullscreen; picture-in-picture'),
+    (value39['allowFullscreen'] = !![]),
+    (value39['referrerPolicy'] = 'no-referrer-when-downgrade'),
+    el25['appendChild'](value39),
+    el24['appendChild'](el25),
     el24
   );
 }
-function _createTutorialVideoList(value27) {
-  const list5 = Array.isArray(value27) ? value27 : [],
-    list6 = list5
-      .map((response) => ({
-        title: String(response?.title || '').trim(),
-        url: String(response?.url || '').trim(),
-      }))
-      .filter((response2) => response2.title && _normalizeHttpUrl(response2.url));
-  if (!list6.length) return null;
-  const el26 = document.createElement('div');
+function _createTutorialVideoList(value40) {
+  const list5 = Array['isArray'](value40) ? value40 : [],
+    list6 = list5['map']((response) => ({
+      title: String(response?.['title'] || '')['trim'](),
+      url: String(response?.['url'] || '')['trim'](),
+    }))['filter']((response2) => response2['title'] && _normalizeHttpUrl(response2['url']));
+  if (!list6['length']) return null;
+  const el26 = document['createElement']('div');
   return (
-    (el26.className = 'update-banner-video-list'),
-    list6.forEach((previewVideoUrl) => {
-      const el27 = document.createElement('section');
-      el27.className = 'update-banner-video-item';
-      const el28 = document.createElement('div');
-      ((el28.className = 'update-banner-video-item-title'), (el28.textContent = previewVideoUrl.title));
-      const _createPreviewVideo2 = _createPreviewVideo({ previewVideoUrl: previewVideoUrl.url });
-      el27.appendChild(el28);
-      if (_createPreviewVideo2) el27.appendChild(_createPreviewVideo2);
-      el26.appendChild(el27);
+    (el26['className'] = 'update-banner-video-list'),
+    list6['forEach']((previewVideoUrl) => {
+      const el27 = document['createElement']('section');
+      el27['className'] = 'update-banner-video-item';
+      const el28 = document['createElement']('div');
+      ((el28['className'] = 'update-banner-video-item-title'),
+        (el28['textContent'] = previewVideoUrl['title']));
+      const _createPreviewVideo2 = _createPreviewVideo({ previewVideoUrl: previewVideoUrl['url'] });
+      el27['appendChild'](el28);
+      if (_createPreviewVideo2) el27['appendChild'](_createPreviewVideo2);
+      el26['appendChild'](el27);
     }),
     el26
   );
 }
-function _openDownload(value28) {
-  const value29 = value28?.downloadUrl || value28?.releaseUrl || FALLBACK_RELEASE_URL;
-  void openExternalLink(value29, { label: autoUpdateText('externalLabels.download') }).catch(() => {
-    window.showToast?.(autoUpdateText('toasts.openDownloadFailed'), 'error');
-  });
+function _createTutorialLinkList(value41) {
+  const list7 = Array['isArray'](value41) ? value41 : [],
+    list8 = list7['map']((response3) => ({
+      title: String(response3?.['title'] || '')['trim'](),
+      url: _normalizeHttpUrl(response3?.['url']),
+    }))['filter']((response4) => response4['title'] && response4['url']);
+  if (!list8['length']) return null;
+  const el29 = document['createElement']('div');
+  return (
+    (el29['className'] = 'update-banner-tutorial-links'),
+    list8['forEach']((title3) => {
+      const el30 = document['createElement']('div');
+      el30['className'] = 'update-banner-tutorial-link';
+      const el31 = document['createElement']('span');
+      ((el31['className'] = 'update-banner-tutorial-link-label'),
+        (el31['textContent'] = autoUpdateText('tutorial.linkLabel', { title: title3['title'] })));
+      const el32 = document['createElement']('a');
+      ((el32['className'] = 'update-banner-note-link'),
+        (el32['href'] = title3['url']),
+        (el32['dataset']['externalUrl'] = title3['url']),
+        (el32['textContent'] = title3['url']),
+        el30['appendChild'](el31),
+        el30['appendChild'](el32),
+        el29['appendChild'](el30));
+    }),
+    el29
+  );
 }
-function _openReleasePage(value30) {
-  const value31 = value30?.releaseUrl || FALLBACK_RELEASE_URL;
-  void openExternalLink(value31, { label: autoUpdateText('externalLabels.releasePage') }).catch(() => {
-    window.showToast?.(autoUpdateText('toasts.openReleaseFailed'), 'error');
-  });
+function _isDesktopProgramUpdateAvailable(options2 = {}) {
+  return options2['desktopUpdaterUnavailable'] !== !![] && desktopBridge['app']['isAvailable']();
 }
-function _setDownloadFallback(value32, value33) {
-  const el29 = document.getElementById('update-banner-btn'),
-    el30 = document.getElementById('update-banner-sub');
-  (el30 && value33 && ((el30.textContent = value33), el30.classList.add('is-error')),
-    el29?.classList?.add?.('is-download'),
-    _setBtnContent(el29, false, autoUpdateText('buttons.downloadLatest')),
-    el29 && ((el29.disabled = false), (el29.onclick = () => _openDownload(value32))));
+function _setProgramUpdateFallback(value42, value43) {
+  const el33 = document['getElementById']('update-banner-btn'),
+    el34 = document['getElementById']('update-banner-sub');
+  el34 &&
+    value43 &&
+    ((el34['hidden'] = ![]),
+    (el34['textContent'] = value43),
+    el34['classList']['add']('is-error'));
+  el33?.['classList']?.['remove']?.('is-download');
+  if (!el33) return;
+  const _isDesktopProgramUpdateAvailable2 = _isDesktopProgramUpdateAvailable(value42);
+  (_setBtnContent(
+    el33,
+    ![],
+    _isDesktopProgramUpdateAvailable2
+      ? autoUpdateText('buttons.downloadInstall')
+      : autoUpdateText('buttons.programUpdateUnavailable'),
+  ),
+    (el33['disabled'] = !_isDesktopProgramUpdateAvailable2),
+    (el33['onclick'] = _isDesktopProgramUpdateAvailable2
+      ? () => _downloadDesktopUpdate(el33, { ensureAvailable: !![] })
+      : null));
 }
-function _setUpdateProgress(value34, value35 = '') {
-  const el31 = document.getElementById('update-banner-progress'),
-    el32 = document.getElementById('update-banner-progress-bar'),
-    el33 = document.getElementById('update-banner-progress-text');
-  if (!el31 || !el32 || !el33) return;
-  const percent = _formatPercent(value34);
-  ((el31.hidden = false),
-    (el32.style.width = percent),
-    (el33.textContent = value35 || autoUpdateText('progress.downloading', { percent: percent })));
+function _setUpdateProgress(value44, value45 = '') {
+  const el35 = document['getElementById']('update-banner-progress'),
+    el36 = document['getElementById']('update-banner-progress-bar'),
+    el37 = document['getElementById']('update-banner-progress-text');
+  if (!el35 || !el36 || !el37) return;
+  const percent = _formatPercent(value44);
+  ((el35['hidden'] = ![]),
+    (el36['style']['width'] = percent),
+    (el37['textContent'] = value45 || autoUpdateText('progress.downloading', { percent: percent })));
 }
-function _setDesktopDownloadInPlace(options2 = {}, { retrying: retrying = false } = {}) {
-  const enabled10 = document.getElementById('update-banner');
-  if (!enabled10) return false;
-  const el34 = document.getElementById('update-banner-sub'),
-    el35 = document.getElementById('update-banner-btn'),
-    el36 = document.getElementById('update-banner-close'),
-    count = Number(options2.retryCount || 0),
-    value36 = retrying
+function _setDesktopDownloadInPlace(options3 = {}, { retrying: retrying = ![] } = {}) {
+  const enabled10 = document['getElementById']('update-banner');
+  if (!enabled10) return ![];
+  const el38 = document['getElementById']('update-banner-sub'),
+    el39 = document['getElementById']('update-banner-btn'),
+    el40 = document['getElementById']('update-banner-close'),
+    value46 = document['getElementById']('update-banner-cancel'),
+    count = Number(options3['retryCount'] || 0x0),
+    value47 = retrying
       ? autoUpdateText('progress.retrying', { count: count })
       : autoUpdateText('progress.downloading', { percent: '0%' });
-  el34 &&
-    (el34.classList.remove('is-error'),
-    (el34.textContent = retrying
+  el38 &&
+    ((el38['hidden'] = ![]),
+    el38['classList']['remove']('is-error'),
+    (el38['textContent'] = retrying
       ? autoUpdateText('status.autoRetry')
       : autoUpdateText('status.downloadingAutoInstall')));
-  (_setUpdateProgress(0, value36),
+  (_setUpdateProgress(0x0, value47),
     _setBtnContent(
-      el35,
-      true,
+      el39,
+      !![],
       retrying ? autoUpdateText('buttons.retrying') : autoUpdateText('buttons.downloading'),
     ));
-  if (el35) el35.disabled = true;
-  if (el36) el36.disabled = true;
-  return true;
+  if (el39) el39['disabled'] = !![];
+  if (value46) value46['onclick'] = _cancelDesktopUpdateDownload;
+  return (
+    el40 && ((el40['disabled'] = ![]), (el40['onclick'] = _cancelDesktopUpdateDownload)),
+    (_activeBannerInfo = { ...(_activeBannerInfo || {}), closeAction: _cancelDesktopUpdateDownload }),
+    !![]
+  );
 }
 function _showBanner(enabled11, enabled12 = {}) {
-  if (enabled12.replace) _removeBanner();
-  if (!enabled12.ignoreDismissed && _dismissedSignature === _getUpdateSignature(enabled11)) return;
-  if (document.getElementById('update-banner')) return;
-  const enabled13 = enabled11.hasUpdate !== false,
-    version = enabled11.remoteVersion || autoUpdateText('versions.newVersion'),
-    version2 = enabled11.localVersion || autoUpdateText('versions.currentVersion'),
-    pubDate = _formatPubDate(enabled11.pubDate),
-    enabled14 = Boolean(enabled11.previewOnly),
-    el37 = document.createElement('div');
-  ((el37.id = 'update-banner'), (el37.className = 'update-banner'));
-  const el38 = document.createElement('div');
-  ((el38.id = 'update-banner-backdrop'),
-    (el38.className = 'update-banner-backdrop'),
-    el38.setAttribute('aria-hidden', 'true'));
-  const el39 = document.createElement('div');
-  el39.className = 'update-banner-header';
-  const el40 = document.createElement('span');
-  ((el40.className = 'update-banner-icon'),
-    el40.setAttribute('aria-hidden', 'true'),
-    el40.appendChild(_createUpdateSvg()));
-  const el41 = document.createElement('div');
-  el41.className = 'update-banner-header-title';
-  if (enabled11.titleText) el41.textContent = enabled11.titleText;
+  if (_startupBannerQueue['defer'](() => _showBanner(enabled11, enabled12))) return;
+  if (enabled12['replace']) _removeBanner();
+  if (!enabled12['ignoreDismissed'] && _dismissedSignature === _getUpdateSignature(enabled11)) return;
+  if (document['getElementById']('update-banner')) return;
+  const value48 = enabled11['hasUpdate'] !== ![],
+    version = _formatBannerVersion(enabled11['remoteVersion'] || autoUpdateText('versions.newVersion')),
+    version2 = _formatBannerVersion(enabled11['localVersion'] || autoUpdateText('versions.currentVersion')),
+    pubDate = _formatPubDate(enabled11['pubDate']),
+    enabled13 = Boolean(enabled11['previewOnly']),
+    el41 = document['createElement']('div');
+  ((el41['id'] = 'update-banner'), (el41['className'] = 'update-banner'));
+  const el42 = document['createElement']('div');
+  ((el42['id'] = 'update-banner-backdrop'),
+    (el42['className'] = 'update-banner-backdrop'),
+    el42['setAttribute']('aria-hidden', 'true'));
+  const el43 = document['createElement']('div');
+  el43['className'] = 'update-banner-header';
+  const el44 = document['createElement']('span');
+  ((el44['className'] = 'update-banner-icon'),
+    el44['setAttribute']('aria-hidden', 'true'),
+    el44['appendChild'](_createUpdateSvg()));
+  const el45 = document['createElement']('div');
+  el45['className'] = 'update-banner-header-title';
+  if (enabled11['titleText']) el45['textContent'] = enabled11['titleText'];
   else {
-    const el42 = document.createElement('span');
-    ((el42.textContent = autoUpdateText('banner.versionUpdateTitle', { version: version })),
-      el41.appendChild(el42));
+    const el46 = document['createElement']('span');
+    ((el46['textContent'] = autoUpdateText('banner.versionUpdateTitle', { version: version })),
+      el45['appendChild'](el46));
     if (version2) {
-      const el43 = document.createElement('span');
-      ((el43.className = 'update-banner-header-current'),
-        (el43.textContent = autoUpdateText('banner.currentVersionSuffix', { version: version2 })),
-        el41.appendChild(el43));
+      const el47 = document['createElement']('span');
+      ((el47['className'] = 'update-banner-header-current'),
+        (el47['textContent'] = autoUpdateText('banner.currentVersionSuffix', { version: version2 })),
+        el45['appendChild'](el47));
     }
   }
-  const el44 = document.createElement('button');
-  ((el44.type = 'button'),
-    (el44.className = 'update-banner-close'),
-    (el44.id = 'update-banner-close'),
-    el44.setAttribute('aria-label', autoUpdateText('banner.closeAria')),
-    (el44.title = autoUpdateText('buttons.close')),
-    (el44.textContent = '×'),
-    el39.appendChild(el40),
-    el39.appendChild(el41),
-    el39.appendChild(el44));
-  const el45 = document.createElement('div');
-  el45.className = 'update-banner-text';
-  const el46 = document.createElement('div');
-  ((el46.className = 'update-banner-sub'),
-    (el46.id = 'update-banner-sub'),
-    (el46.textContent =
-      enabled11.subtitleText ||
-      (enabled14
-        ? autoUpdateText('banner.subtitleCurrent', { localVersion: version2 })
-        : pubDate
-          ? autoUpdateText('banner.subtitleWithDate', { localVersion: version2, pubDate: pubDate })
-          : enabled13
-            ? autoUpdateText('banner.subtitleCurrent', { localVersion: version2 })
-            : autoUpdateText('banner.subtitleNoUpdate', {
-                localVersion: version2,
-                remoteVersion: version,
-              }))));
-  const el47 = document.createElement('div');
-  ((el47.className = 'update-banner-progress'),
-    (el47.id = 'update-banner-progress'),
-    (el47.hidden = !enabled11.showProgress));
-  const el48 = document.createElement('div');
-  el48.className = 'update-banner-progress-track';
-  const el49 = document.createElement('div');
-  ((el49.className = 'update-banner-progress-bar'),
-    (el49.id = 'update-banner-progress-bar'),
-    (el49.style.width = _formatPercent(enabled11.progressPercent)));
-  const el50 = document.createElement('div');
-  ((el50.className = 'update-banner-progress-text'),
-    (el50.id = 'update-banner-progress-text'),
-    (el50.textContent =
-      enabled11.progressText ||
-      autoUpdateText('progress.downloading', { percent: _formatPercent(enabled11.progressPercent) })),
-    el48.appendChild(el49),
-    el47.appendChild(el48),
-    el47.appendChild(el50));
-  const _createNotesPanel2 = _createNotesPanel(enabled11.notes),
+  const el48 = document['createElement']('button');
+  ((el48['type'] = 'button'),
+    (el48['className'] = 'update-banner-close'),
+    (el48['id'] = 'update-banner-close'),
+    el48['setAttribute']('aria-label', autoUpdateText('banner.closeAria')),
+    (el48['title'] = autoUpdateText('buttons.close')),
+    (el48['textContent'] = '×'),
+    el43['appendChild'](el44),
+    el43['appendChild'](el45),
+    el43['appendChild'](el48));
+  const el49 = document['createElement']('div');
+  el49['className'] = 'update-banner-text';
+  const el50 = document['createElement']('div');
+  ((el50['className'] = 'update-banner-sub'), (el50['id'] = 'update-banner-sub'));
+  const value49 = enabled13
+      ? ''
+      : pubDate
+        ? autoUpdateText('banner.subtitleWithDate', { localVersion: version2, pubDate: pubDate })
+        : value48
+          ? ''
+          : autoUpdateText('banner.subtitleNoUpdate', { localVersion: version2, remoteVersion: version }),
+    enabled14 = enabled11['subtitleText'] || value49;
+  ((el50['textContent'] = enabled14), (el50['hidden'] = !enabled14));
+  const el51 = document['createElement']('div');
+  ((el51['className'] = 'update-banner-progress'),
+    (el51['id'] = 'update-banner-progress'),
+    (el51['hidden'] = !enabled11['showProgress']));
+  const el52 = document['createElement']('div');
+  el52['className'] = 'update-banner-progress-track';
+  const el53 = document['createElement']('div');
+  ((el53['className'] = 'update-banner-progress-bar'),
+    (el53['id'] = 'update-banner-progress-bar'),
+    (el53['style']['width'] = _formatPercent(enabled11['progressPercent'])));
+  const el54 = document['createElement']('div');
+  ((el54['className'] = 'update-banner-progress-text'),
+    (el54['id'] = 'update-banner-progress-text'),
+    (el54['textContent'] =
+      enabled11['progressText'] ||
+      autoUpdateText('progress.downloading', { percent: _formatPercent(enabled11['progressPercent']) })),
+    el52['appendChild'](el53),
+    el51['appendChild'](el52),
+    el51['appendChild'](el54));
+  const _createNotesPanel2 = _createNotesPanel(enabled11['notes']),
     _createPreviewVideo3 = _createPreviewVideo(enabled11),
-    _createTutorialVideoList2 = _createTutorialVideoList(enabled11.tutorialVideos);
-  if (!enabled11.hideSubtitle) el45.appendChild(el46);
-  el45.appendChild(el47);
-  if (_createPreviewVideo3) el45.appendChild(_createPreviewVideo3);
-  if (_createTutorialVideoList2) el45.appendChild(_createTutorialVideoList2);
-  if (!enabled11.hideNotes) el45.appendChild(_createNotesPanel2);
-  const el51 = document.createElement('div');
-  el51.className = 'update-banner-actions';
-  if (!enabled11.hideCancelButton) {
-    const el52 = document.createElement('button');
-    ((el52.type = 'button'),
-      (el52.className = 'update-banner-btn update-banner-btn-secondary'),
-      (el52.textContent =
-        enabled11.cancelText ||
-        (enabled14 ? autoUpdateText('buttons.close') : autoUpdateText('buttons.cancel'))),
-      (el52.onclick = () => {
-        if (typeof enabled11.cancelAction === 'function') {
-          enabled11.cancelAction(enabled11);
+    _createTutorialLinkList2 = _createTutorialLinkList(enabled11['tutorialLinks']),
+    _createTutorialVideoList2 = _createTutorialVideoList(enabled11['tutorialVideos']);
+  if (_createTutorialLinkList2) el49['appendChild'](_createTutorialLinkList2);
+  if (!enabled11['hideSubtitle']) el49['appendChild'](el50);
+  el49['appendChild'](el51);
+  if (_createPreviewVideo3) el49['appendChild'](_createPreviewVideo3);
+  if (_createTutorialVideoList2) el49['appendChild'](_createTutorialVideoList2);
+  if (!enabled11['hideNotes']) el49['appendChild'](_createNotesPanel2);
+  const el55 = document['createElement']('div');
+  el55['className'] = 'update-banner-actions';
+  if ((value48 || enabled13) && !enabled11['hideCancelButton']) {
+    const el56 = document['createElement']('button');
+    ((el56['type'] = 'button'),
+      (el56['className'] = 'update-banner-btn update-banner-btn-secondary'),
+      (el56['id'] = 'update-banner-cancel'),
+      (el56['textContent'] =
+        enabled11['cancelText'] ||
+        (enabled13 ? autoUpdateText('buttons.close') : autoUpdateText('buttons.cancel'))),
+      (el56['onclick'] = () => {
+        if (typeof enabled11['cancelAction'] === 'function') {
+          enabled11['cancelAction'](enabled11);
           return;
         }
         _removeBanner();
       }),
-      el51.appendChild(el52));
+      el55['appendChild'](el56));
   }
-  if (!enabled14 && enabled13 && !enabled11.disableSkip) {
-    const el53 = document.createElement('button');
-    ((el53.type = 'button'),
-      (el53.className = 'update-banner-btn update-banner-btn-secondary'),
-      (el53.textContent = autoUpdateText('buttons.skipVersion')),
-      (el53.onclick = () => _dismissBanner(enabled11)),
-      el51.appendChild(el53));
+  if (!enabled13 && value48 && !enabled11['disableSkip']) {
+    const el57 = document['createElement']('button');
+    ((el57['type'] = 'button'),
+      (el57['className'] = 'update-banner-btn\x20update-banner-btn-secondary'),
+      (el57['textContent'] = autoUpdateText('buttons.skipVersion')),
+      (el57['onclick'] = () => _dismissBanner(enabled11)),
+      el55['appendChild'](el57));
   }
-  const el54 = document.createElement('button');
-  ((el54.type = 'button'), (el54.className = 'update-banner-btn'), (el54.id = 'update-banner-btn'));
-  if (enabled14)
-    (el54.classList.add('is-primary'),
-      _setBtnContent(el54, false, enabled11.previewCloseText || autoUpdateText('buttons.gotIt')),
-      (el54.onclick = () => _removeBanner()));
+  const el58 = document['createElement']('button');
+  ((el58['type'] = 'button'),
+    (el58['className'] = 'update-banner-btn'),
+    (el58['id'] = 'update-banner-btn'));
+  const autoUpdatePrimaryAction = resolveAutoUpdatePrimaryAction(enabled11, {
+    desktopUpdaterAvailable: _isDesktopProgramUpdateAvailable(enabled11),
+  });
+  if (enabled13)
+    (el58['classList']['add']('is-primary'),
+      _setBtnContent(el58, ![], enabled11['previewCloseText'] || autoUpdateText('buttons.gotIt')),
+      (el58['onclick'] = () => _removeBanner()));
   else {
-    if (enabled11.installDownloadedUpdate)
-      (el54.classList.add('is-primary'),
-        _setBtnContent(el54, false, autoUpdateText('buttons.restartInstall')),
-        (el54.onclick = () => _installDownloadedDesktopUpdate(el54)));
+    if (autoUpdatePrimaryAction === AUTO_UPDATE_PRIMARY_ACTIONS['INSTALL_DESKTOP'])
+      (el58['classList']['add']('is-primary'),
+        _setBtnContent(el58, ![], autoUpdateText('buttons.restartInstall')),
+        (el58['onclick'] = () => _installDownloadedDesktopUpdate(el58)));
     else {
-      if (enabled11.retryDesktopDownload)
-        (el54.classList.add('is-primary'),
-          _setBtnContent(el54, false, autoUpdateText('buttons.retryDownloadInstall')),
-          (el54.onclick = () => _downloadDesktopUpdate(el54)));
+      if (autoUpdatePrimaryAction === AUTO_UPDATE_PRIMARY_ACTIONS['RETRY_DESKTOP'])
+        (el58['classList']['add']('is-primary'),
+          _setBtnContent(el58, ![], autoUpdateText('buttons.retryDownloadInstall')),
+          (el58['onclick'] = () => _downloadDesktopUpdate(el58)));
       else {
-        if (enabled11.startDesktopDownload)
-          (el54.classList.add('is-primary'),
-            _setBtnContent(el54, false, autoUpdateText('buttons.downloadInstall')),
-            (el54.onclick = () => _downloadDesktopUpdate(el54)));
+        if (autoUpdatePrimaryAction === AUTO_UPDATE_PRIMARY_ACTIONS['DOWNLOAD_DESKTOP'])
+          (el58['classList']['add']('is-primary'),
+            _setBtnContent(el58, ![], autoUpdateText('buttons.downloadInstall')),
+            (el58['onclick'] = () =>
+              _downloadDesktopUpdate(el58, { ensureAvailable: !enabled11['startDesktopDownload'] })));
         else {
-          if (enabled11.canHotApply)
-            (el54.classList.add('is-primary'),
-              _setBtnContent(el54, false, autoUpdateText('buttons.updateNow')),
-              (el54.onclick = () => _doApply(enabled11)));
+          if (autoUpdatePrimaryAction === AUTO_UPDATE_PRIMARY_ACTIONS['HOT_APPLY'])
+            (el58['classList']['add']('is-primary'),
+              _setBtnContent(el58, ![], autoUpdateText('buttons.updateNow')),
+              (el58['onclick'] = () => _doApply(enabled11)));
           else
-            !enabled13
-              ? (el54.classList.add('is-download'),
-                _setBtnContent(el54, false, autoUpdateText('buttons.viewRelease')),
-                (el54.onclick = () => _openReleasePage(enabled11)))
-              : (el54.classList.add('is-download'),
-                _setBtnContent(el54, false, autoUpdateText('buttons.downloadLatest')),
-                (el54.onclick = () => _openDownload(enabled11)));
+            autoUpdatePrimaryAction === AUTO_UPDATE_PRIMARY_ACTIONS['CLOSE']
+              ? (el58['classList']['add']('is-primary'),
+                _setBtnContent(el58, ![], autoUpdateText('buttons.gotIt')),
+                (el58['onclick'] = () => _removeBanner()))
+              : (_setBtnContent(el58, ![], autoUpdateText('buttons.programUpdateUnavailable')),
+                (el58['disabled'] = !![]));
         }
       }
     }
   }
-  (el51.appendChild(el54),
-    el37.appendChild(el39),
-    el37.appendChild(el45),
-    el37.appendChild(el51),
-    document.body.appendChild(el38),
-    document.body.appendChild(el37),
-    el38.classList.add('open'),
-    el37.classList.add('open'),
+  (el55['appendChild'](el58),
+    el41['appendChild'](el43),
+    el41['appendChild'](el49),
+    el41['appendChild'](el55),
+    document['body']['appendChild'](el42),
+    document['body']['appendChild'](el41),
+    el42['classList']['add']('open'),
+    el41['classList']['add']('open'),
     (_activeBannerInfo = enabled11),
-    document.addEventListener('keydown', _handleBannerKeydown),
-    (el44.onclick = () => _removeBanner()));
+    document['addEventListener']('keydown', _handleBannerKeydown),
+    (el48['onclick'] = () => {
+      if (typeof enabled11['closeAction'] === 'function') {
+        enabled11['closeAction'](enabled11);
+        return;
+      }
+      _removeBanner();
+    }));
 }
-async function _downloadDesktopUpdate(el55) {
-  const enabled15 = window.aiCanvasDesktop;
-  if (!enabled15?.downloadUpdate) return;
-  (_setBtnContent(el55, true, autoUpdateText('buttons.preparingDownload')),
-    (el55.disabled = true),
-    (_desktopInstallAfterDownload = true));
+async function _cancelDesktopUpdateDownload() {
+  const enabled15 = desktopBridge['app'];
+  ((_desktopInstallAfterDownload = ![]), _removeBanner());
+  if (!enabled15['isAvailable']()) return;
   try {
-    await enabled15.downloadUpdate();
-  } catch (value37) {
-    ((_desktopInstallAfterDownload = false),
-      (el55.disabled = false),
-      _setBtnContent(el55, false, autoUpdateText('buttons.downloadInstall')),
-      window.showToast?.(autoUpdateText('toasts.downloadFailed')));
+    const response5 = await enabled15['cancelUpdateDownload']();
+    if (response5?.['ok'] === ![]) {
+      window['showToast']?.(autoUpdateText('toasts.cancelDownloadFailed'), 'error');
+      return;
+    }
+    response5?.['cancelled'] !== ![] && window['showToast']?.(autoUpdateText('toasts.downloadCancelled'));
+  } catch (value50) {
+    window['showToast']?.(autoUpdateText('toasts.cancelDownloadFailed'), 'error');
   }
 }
-async function _installDownloadedDesktopUpdate(el56) {
-  const enabled16 = window.aiCanvasDesktop;
-  if (!enabled16?.installDownloadedUpdate) return;
-  _setBtnContent(el56, true, autoUpdateText('buttons.restarting'));
-  if (el56) el56.disabled = true;
+async function _downloadDesktopUpdate(el59, { ensureAvailable: ensureAvailable = ![] } = {}) {
+  const enabled16 = desktopBridge['app'];
+  if (!enabled16['isAvailable']()) return;
+  (_setBtnContent(el59, !![], autoUpdateText('buttons.preparingDownload')),
+    (el59['disabled'] = !![]),
+    (_desktopInstallAfterDownload = !![]));
   try {
-    await enabled16.installDownloadedUpdate();
-  } catch (value38) {
-    if (el56) el56.disabled = false;
-    (_setBtnContent(el56, false, autoUpdateText('buttons.restartInstall')),
-      window.showToast?.(autoUpdateText('toasts.restartInstallFailed')));
+    if (ensureAvailable) {
+      const desktopUpdateAvailable = await ensureDesktopUpdateAvailable(enabled16);
+      if (desktopUpdateAvailable?.['state'] === 'downloaded') {
+        await _installDownloadedDesktopUpdate(el59);
+        return;
+      }
+    }
+    const response6 = await enabled16['downloadUpdate']();
+    if (response6?.['ok'] === ![] && !response6?.['cancelled'])
+      throw new Error('desktop update download failed');
+  } catch (value51) {
+    ((_desktopInstallAfterDownload = ![]),
+      (el59['disabled'] = ![]),
+      _setBtnContent(el59, ![], autoUpdateText('buttons.downloadInstall')),
+      window['showToast']?.(autoUpdateText('toasts.programUpdateFailed'), 'error'));
   }
 }
-async function _doApply(enabled17) {
-  if (enabled17?.previewOnly) {
-    window.showToast?.(autoUpdateText('toasts.previewOnly'));
+async function _installDownloadedDesktopUpdate(el60) {
+  const enabled17 = desktopBridge['app'];
+  if (!enabled17['isAvailable']()) return;
+  _setBtnContent(el60, !![], autoUpdateText('buttons.restarting'));
+  if (el60) el60['disabled'] = !![];
+  try {
+    await enabled17['installDownloadedUpdate']();
+  } catch (value52) {
+    if (el60) el60['disabled'] = ![];
+    (_setBtnContent(el60, ![], autoUpdateText('buttons.restartInstall')),
+      window['showToast']?.(autoUpdateText('toasts.restartInstallFailed')));
+  }
+}
+async function _doApply(enabled18) {
+  if (enabled18?.['previewOnly']) {
+    window['showToast']?.(autoUpdateText('toasts.previewOnly'));
     return;
   }
-  if (!enabled17?.canHotApply) {
-    _openDownload(enabled17);
+  if (!enabled18?.['canHotApply']) {
+    _setProgramUpdateFallback(enabled18, autoUpdateText('errors.programUpdateRequired'));
     return;
   }
-  const el57 = document.getElementById('update-banner-btn'),
-    el58 = document.getElementById('update-banner-sub');
-  (el58?.classList?.remove?.('is-error'),
-    el57?.classList?.remove?.('is-download'),
-    _setBtnContent(el57, true, autoUpdateText('buttons.updating')));
-  if (el57) el57.disabled = true;
+  const el61 = document['getElementById']('update-banner-btn'),
+    el62 = document['getElementById']('update-banner-sub');
+  (el62?.['classList']?.['remove']?.('is-error'),
+    el61?.['classList']?.['remove']?.('is-download'),
+    _setBtnContent(el61, !![], autoUpdateText('buttons.updating')));
+  if (el61) el61['disabled'] = !![];
   try {
     const error = await applyUpdateFromServer();
-    if (error.success) {
-      _setBtnContent(el57, true, autoUpdateText('buttons.restartingWait'));
-      const value39 = Date.now() + 0x7530,
+    if (error['success']) {
+      _setBtnContent(el61, !![], autoUpdateText('buttons.restartingWait'));
+      const value53 = Date['now']() + 0x7530,
         async2 = async () => {
-          if (Date.now() > value39) {
-            location.reload();
+          if (Date['now']() > value53) {
+            location['reload']();
             return;
           }
           try {
             const pingUpdateCheckFromServer2 = await pingUpdateCheckFromServer();
             if (pingUpdateCheckFromServer2) {
-              location.reload();
+              location['reload']();
               return;
             }
-          } catch (value40) {}
+          } catch (value54) {}
           setTimeout(async2, 0x320);
         };
       setTimeout(async2, 0x7d0);
       return;
     }
-    _setDownloadFallback(
-      enabled17,
+    _setProgramUpdateFallback(
+      enabled18,
       autoUpdateText('errors.hotApplyFailed', {
-        error: error.error || autoUpdateText('errors.unknownManualDownload'),
+        error: error['error'] || autoUpdateText('errors.unknownProgramUpdate'),
       }),
     );
-  } catch (value41) {
-    _setDownloadFallback(enabled17, autoUpdateText('errors.networkManualDownload'));
+  } catch (value55) {
+    _setProgramUpdateFallback(enabled18, autoUpdateText('errors.networkProgramUpdate'));
   }
 }
 async function _checkUpdate() {
-  if (window.aiCanvasDesktop?.isElectron || _desktopUpdaterActive) return;
+  if (desktopBridge['isElectron'] || _desktopUpdaterActive) return;
   try {
     const checkUpdateFromServer2 = await checkUpdateFromServer();
-    if (checkUpdateFromServer2?.hasUpdate) _showBanner(checkUpdateFromServer2);
-  } catch (value42) {}
+    if (checkUpdateFromServer2?.['hasUpdate']) _showBanner(checkUpdateFromServer2);
+  } catch (value56) {}
 }
-function _normalizeDesktopUpdateInfo(value43) {
-  const releaseDate = value43 && typeof value43 === 'object' ? value43 : {};
+function _normalizeDesktopUpdateInfo(value57) {
+  const releaseDate = value57 && typeof value57 === 'object' ? value57 : {};
   return {
-    version: String(releaseDate.version || '').trim(),
-    releaseDate: releaseDate.releaseDate || '',
-    releaseNotes: String(releaseDate.releaseNotes || '').trim(),
-    previewVideoUrl: String(releaseDate.previewVideoUrl || releaseDate.preview_video_url || '').trim(),
+    version: String(releaseDate['version'] || '')['trim'](),
+    releaseDate: releaseDate['releaseDate'] || '',
+    releaseNotes: String(releaseDate['releaseNotes'] || '')['trim'](),
+    previewVideoUrl: String(releaseDate['previewVideoUrl'] || releaseDate['preview_video_url'] || '')['trim'](),
   };
 }
-function _formatDesktopRemoteVersion(value44) {
-  const enabled18 = String(value44 || '').trim();
-  if (!enabled18 || enabled18 === autoUpdateText('versions.newVersion'))
+function _formatDesktopRemoteVersion(value58) {
+  const enabled19 = String(value58 || '')['trim']();
+  if (!enabled19 || enabled19 === autoUpdateText('versions.newVersion'))
     return autoUpdateText('versions.newVersion');
-  return enabled18.startsWith('V') ? enabled18 : 'V' + enabled18;
+  return enabled19['startsWith']('V') ? enabled19 : 'V' + enabled19;
+}
+function _getPageLocalVersion() {
+  const value59 = document['querySelector']('meta[name=\x22app-version\x22]')?.['getAttribute']('content');
+  return String(value59 || '')['trim']();
+}
+function _isRemoteVersionNewer(value60, value61, value62 = ![]) {
+  const run2 = (value63) =>
+      String(value63 || '')
+        ['replace'](/^[vV]/, '')
+        ['match'](/\d+/g)
+        ?.['map'](Number) || [],
+    list9 = run2(value60),
+    list10 = run2(value61);
+  if (!list9['length'] || !list10['length']) return Boolean(value62);
+  const value64 = Math['max'](list9['length'], list10['length']);
+  for (let value65 = 0x0; value65 < value64; value65 += 0x1) {
+    const value66 = list9[value65] || 0x0,
+      value67 = list10[value65] || 0x0;
+    if (value67 !== value66) return value67 > value66;
+  }
+  return ![];
 }
 async function _getDesktopLocalVersion() {
   try {
-    const value45 = await window.aiCanvasDesktop?.getAppVersion?.();
-    return value45 ? 'V' + value45 : autoUpdateText('versions.unknownVersion');
-  } catch (value46) {
+    const value68 = await desktopBridge['app']['getAppVersion']();
+    return value68 ? 'V' + value68 : autoUpdateText('versions.unknownVersion');
+  } catch (value69) {
     return autoUpdateText('versions.unknownVersion');
   }
 }
-async function _showDesktopUpdateBanner(value47, value48 = {}) {
-  const pubDate2 = _normalizeDesktopUpdateInfo(value48.info || _desktopUpdateInfo);
-  if (pubDate2.version) _desktopUpdateInfo = pubDate2;
-  const value49 = pubDate2.version || autoUpdateText('versions.newVersion'),
-    localVersion = await _getDesktopLocalVersion(),
-    remoteVersion = _formatDesktopRemoteVersion(value49),
-    notes = pubDate2.releaseNotes || autoUpdateText('desktop.downloadedNotes'),
-    subtitleText = value47 === 'downloaded',
-    showProgress = value47 === 'downloading',
-    enabled19 = value47 === 'retrying',
-    progressPercent = Number(value48.percent || 0),
-    progressText = enabled19
-      ? autoUpdateText('progress.retrying', { count: Number(value48.retryCount || 0) })
+async function _showManualUpdateResult(options4 = {}, subtitleText = '') {
+  const pubDate2 = options4 && typeof options4 === 'object' ? options4 : {},
+    _normalizeDesktopUpdateInfo2 = _normalizeDesktopUpdateInfo(pubDate2),
+    localVersion = _getPageLocalVersion() || pubDate2['localVersion'] || (await _getDesktopLocalVersion()),
+    remoteVersion =
+      pubDate2['remoteVersion'] ||
+      (_normalizeDesktopUpdateInfo2['version']
+        ? _formatDesktopRemoteVersion(_normalizeDesktopUpdateInfo2['version'])
+        : autoUpdateText('versions.unknownVersion'));
+  _showBanner(
+    {
+      ...pubDate2,
+      hasUpdate: ![],
+      previewOnly: ![],
+      localVersion: localVersion,
+      remoteVersion: remoteVersion,
+      pubDate: pubDate2['pubDate'] || _normalizeDesktopUpdateInfo2['releaseDate'] || '',
+      subtitleText: subtitleText || pubDate2['subtitleText'] || autoUpdateText('toasts.alreadyLatest'),
+      notes: pubDate2['notes'] || _normalizeDesktopUpdateInfo2['releaseNotes'] || '',
+      canHotApply: ![],
+    },
+    { replace: !![], ignoreDismissed: !![] },
+  );
+}
+async function _showDesktopUpdateBanner(value70, value71 = {}) {
+  const value72 = ++_desktopBannerRequestSequence,
+    pubDate3 = _normalizeDesktopUpdateInfo(value71['info'] || _desktopUpdateInfo);
+  if (pubDate3['version']) _desktopUpdateInfo = pubDate3;
+  const value73 = pubDate3['version'] || autoUpdateText('versions.newVersion'),
+    localVersion2 = await _getDesktopLocalVersion();
+  if (value72 !== _desktopBannerRequestSequence) return;
+  const remoteVersion2 = _formatDesktopRemoteVersion(value73),
+    notes = pubDate3['releaseNotes'] || autoUpdateText('desktop.downloadedNotes'),
+    subtitleText2 = value70 === 'downloaded',
+    showProgress = value70 === 'downloading',
+    enabled20 = value70 === 'retrying',
+    progressPercent = Number(value71['percent'] || 0x0),
+    progressText = enabled20
+      ? autoUpdateText('progress.retrying', { count: Number(value71['retryCount'] || 0x0) })
       : autoUpdateText('progress.downloading', { percent: _formatPercent(progressPercent) });
   _showBanner(
     {
-      hasUpdate: true,
-      localVersion: localVersion,
-      remoteVersion: remoteVersion,
-      pubDate: pubDate2.releaseDate || '',
-      subtitleText: subtitleText
-        ? autoUpdateText('desktop.subtitleDownloaded', {
-            localVersion: localVersion,
-            remoteVersion: remoteVersion,
-          })
-        : showProgress || enabled19
-          ? autoUpdateText('desktop.subtitleDownloading', {
-              localVersion: localVersion,
-              remoteVersion: remoteVersion,
-            })
-          : autoUpdateText('desktop.subtitleAvailable', {
-              localVersion: localVersion,
-              remoteVersion: remoteVersion,
-            }),
-      notes: notes,
-      previewVideoUrl: subtitleText ? '' : pubDate2.previewVideoUrl,
-      canHotApply: false,
-      startDesktopDownload: !subtitleText && !showProgress && !enabled19,
-      installDownloadedUpdate: subtitleText,
-      showProgress: showProgress || enabled19,
-      hideNotes: subtitleText,
-      progressPercent: progressPercent,
-      progressText: progressText,
-      cancelText: subtitleText ? autoUpdateText('buttons.later') : autoUpdateText('buttons.cancel'),
-      disableSkip: true,
-      hideSubtitle: false,
-    },
-    { replace: true, ignoreDismissed: true },
-  );
-}
-async function _showDesktopDownloadFailedBanner(error2 = {}) {
-  const pubDate3 = _normalizeDesktopUpdateInfo(error2.info || _desktopUpdateInfo);
-  if (pubDate3.version) _desktopUpdateInfo = pubDate3;
-  const value50 = pubDate3.version || autoUpdateText('versions.newVersion'),
-    localVersion2 = await _getDesktopLocalVersion(),
-    remoteVersion2 = _formatDesktopRemoteVersion(value50),
-    retryCount = Number(error2.retryCount || 0),
-    subtitleText2 = Number(error2.maxRetries || 0),
-    message = error2.message || autoUpdateText('desktop.downloadFailedMessage');
-  _showBanner(
-    {
-      hasUpdate: true,
+      hasUpdate: !![],
       localVersion: localVersion2,
       remoteVersion: remoteVersion2,
-      pubDate: pubDate3.releaseDate || '',
+      pubDate: pubDate3['releaseDate'] || '',
       subtitleText: subtitleText2
+        ? autoUpdateText('desktop.subtitleDownloaded', { localVersion: localVersion2, remoteVersion: remoteVersion2 })
+        : showProgress || enabled20
+          ? autoUpdateText('desktop.subtitleDownloading', {
+              localVersion: localVersion2,
+              remoteVersion: remoteVersion2,
+            })
+          : autoUpdateText('desktop.subtitleAvailable', {
+              localVersion: localVersion2,
+              remoteVersion: remoteVersion2,
+            }),
+      notes: notes,
+      previewVideoUrl: subtitleText2 ? '' : pubDate3['previewVideoUrl'],
+      canHotApply: ![],
+      startDesktopDownload: !subtitleText2 && !showProgress && !enabled20,
+      installDownloadedUpdate: subtitleText2,
+      showProgress: showProgress || enabled20,
+      hideNotes: subtitleText2,
+      progressPercent: progressPercent,
+      progressText: progressText,
+      cancelText: subtitleText2 ? autoUpdateText('buttons.later') : autoUpdateText('buttons.cancel'),
+      cancelAction: showProgress || enabled20 ? _cancelDesktopUpdateDownload : null,
+      closeAction: showProgress || enabled20 ? _cancelDesktopUpdateDownload : null,
+      disableSkip: !![],
+      hideSubtitle: ![],
+    },
+    { replace: !![], ignoreDismissed: !![] },
+  );
+}
+async function _showDesktopDownloadFailedBanner(options5 = {}) {
+  const value74 = ++_desktopBannerRequestSequence,
+    pubDate4 = _normalizeDesktopUpdateInfo(options5['info'] || _desktopUpdateInfo);
+  if (pubDate4['version']) _desktopUpdateInfo = pubDate4;
+  const value75 = pubDate4['version'] || autoUpdateText('versions.newVersion'),
+    localVersion3 = await _getDesktopLocalVersion();
+  if (value74 !== _desktopBannerRequestSequence) return;
+  const remoteVersion3 = _formatDesktopRemoteVersion(value75),
+    retryCount = Number(options5['retryCount'] || 0x0),
+    subtitleText3 = Number(options5['maxRetries'] || 0x0),
+    message = autoUpdateText('desktop.downloadFailedMessage');
+  _showBanner(
+    {
+      hasUpdate: !![],
+      localVersion: localVersion3,
+      remoteVersion: remoteVersion3,
+      pubDate: pubDate4['releaseDate'] || '',
+      subtitleText: subtitleText3
         ? autoUpdateText('desktop.downloadFailedWithRetries', {
             message: message,
             retryCount: retryCount,
-            maxRetries: subtitleText2,
+            maxRetries: subtitleText3,
           })
         : message,
-      notes: pubDate3.releaseNotes || autoUpdateText('desktop.downloadFailedNotes'),
+      notes: pubDate4['releaseNotes'] || autoUpdateText('desktop.downloadFailedNotes'),
       previewVideoUrl: '',
-      canHotApply: false,
-      retryDesktopDownload: true,
-      showProgress: false,
-      hideNotes: true,
-      cancelText: autoUpdateText('buttons.viewRelease'),
-      cancelAction: () => _openReleasePage({ releaseUrl: FALLBACK_RELEASE_URL }),
-      disableSkip: true,
-      hideSubtitle: false,
+      canHotApply: ![],
+      retryDesktopDownload: !![],
+      showProgress: ![],
+      hideNotes: !![],
+      cancelText: autoUpdateText('buttons.later'),
+      disableSkip: !![],
+      hideSubtitle: ![],
     },
-    { replace: true, ignoreDismissed: true },
+    { replace: !![], ignoreDismissed: !![] },
   );
 }
 function _desktopEventFromState(state2 = {}) {
-  if (state2.latestEvent) return state2.latestEvent;
-  if (!state2.state || state2.state === 'idle') return null;
-  const value51 = {
+  if (state2['latestEvent']) return state2['latestEvent'];
+  if (!state2['state'] || state2['state'] === 'idle') return null;
+  const value76 = {
       checking: 'checking',
       available: 'available',
       downloading: 'download-started',
@@ -836,105 +992,129 @@ function _desktopEventFromState(state2 = {}) {
       error: 'download-failed',
       installing: 'installing',
     },
-    type = value51[state2.state];
+    type = value76[state2['state']];
   if (!type) return null;
   return {
     type: type,
-    state: state2.state,
-    info: state2.latestInfo || null,
-    retryCount: state2.retryCount || 0,
-    maxRetries: state2.maxRetries || 0,
+    state: state2['state'],
+    info: state2['latestInfo'] || null,
+    retryCount: state2['retryCount'] || 0x0,
+    maxRetries: state2['maxRetries'] || 0x0,
   };
 }
-function _handleDesktopUpdaterEvent(enabled20) {
-  if (!enabled20 || typeof enabled20 !== 'object') return;
-  if (enabled20.type === 'checking') {
-    _desktopUpdaterActive = true;
+function _handleDesktopUpdaterEvent(enabled21) {
+  if (!enabled21 || typeof enabled21 !== 'object') return;
+  if (enabled21['type'] === 'checking') {
+    ((_desktopBannerRequestSequence += 0x1), _startupBannerQueue['clear'](), (_desktopUpdaterActive = !![]));
     return;
   }
-  if (enabled20.type === 'available') {
-    ((_desktopUpdaterActive = true), void _showDesktopUpdateBanner('available', enabled20));
+  if (enabled21['type'] === 'available') {
+    ((_desktopUpdaterActive = !![]),
+      _startupAutomaticToastQueue['clear'](),
+      void _showDesktopUpdateBanner('available', enabled21));
     return;
   }
-  if (enabled20.type === 'download-started') {
-    _desktopUpdaterActive = true;
-    if (_setDesktopDownloadInPlace(enabled20)) return;
-    void _showDesktopUpdateBanner('downloading', enabled20);
+  if (enabled21['type'] === 'download-started') {
+    ((_desktopBannerRequestSequence += 0x1), (_desktopUpdaterActive = !![]));
+    if (_setDesktopDownloadInPlace(enabled21)) return;
+    void _showDesktopUpdateBanner('downloading', enabled21);
     return;
   }
-  if (enabled20.type === 'download-retry') {
-    _desktopUpdaterActive = true;
-    if (_setDesktopDownloadInPlace(enabled20, { retrying: true })) return;
-    void _showDesktopUpdateBanner('retrying', enabled20);
+  if (enabled21['type'] === 'download-retry') {
+    ((_desktopBannerRequestSequence += 0x1), (_desktopUpdaterActive = !![]));
+    if (_setDesktopDownloadInPlace(enabled21, { retrying: !![] })) return;
+    void _showDesktopUpdateBanner('retrying', enabled21);
     return;
   }
-  if (enabled20.type === 'download-progress') {
-    _desktopUpdaterActive = true;
-    if (!document.getElementById('update-banner-progress')) {
-      void _showDesktopUpdateBanner('downloading', enabled20);
+  if (enabled21['type'] === 'download-progress') {
+    ((_desktopBannerRequestSequence += 0x1), (_desktopUpdaterActive = !![]));
+    if (!document['getElementById']('update-banner-progress')) {
+      void _showDesktopUpdateBanner('downloading', enabled21);
       return;
     }
     _setUpdateProgress(
-      enabled20.percent,
-      autoUpdateText('progress.downloading', { percent: _formatPercent(enabled20.percent) }),
+      enabled21['percent'],
+      autoUpdateText('progress.downloading', { percent: _formatPercent(enabled21['percent']) }),
     );
     return;
   }
-  if (enabled20.type === 'downloaded') {
-    _desktopUpdaterActive = true;
+  if (enabled21['type'] === 'downloaded') {
+    _desktopUpdaterActive = !![];
     if (_desktopInstallAfterDownload) {
-      _desktopInstallAfterDownload = false;
-      const el59 = document.getElementById('update-banner-btn'),
-        el60 = document.getElementById('update-banner-sub');
-      el60 &&
-        (el60.classList.remove('is-error'),
-        (el60.textContent = autoUpdateText('status.downloadedRestarting')));
-      _setBtnContent(el59, true, autoUpdateText('buttons.restartingInstall'));
-      if (el59) el59.disabled = true;
-      void _installDownloadedDesktopUpdate(el59);
+      ((_desktopBannerRequestSequence += 0x1), (_desktopInstallAfterDownload = ![]));
+      const el63 = document['getElementById']('update-banner-btn'),
+        el64 = document['getElementById']('update-banner-sub');
+      el64 &&
+        (el64['classList']['remove']('is-error'),
+        (el64['textContent'] = autoUpdateText('status.downloadedRestarting')));
+      _setBtnContent(el63, !![], autoUpdateText('buttons.restartingInstall'));
+      if (el63) el63['disabled'] = !![];
+      void _installDownloadedDesktopUpdate(el63);
       return;
     }
-    void _showDesktopUpdateBanner('downloaded', enabled20);
+    void _showDesktopUpdateBanner('downloaded', enabled21);
     return;
   }
-  if (enabled20.type === 'download-failed') {
-    ((_desktopUpdaterActive = true),
-      (_desktopInstallAfterDownload = false),
-      void _showDesktopDownloadFailedBanner(enabled20));
+  if (enabled21['type'] === 'download-failed') {
+    ((_desktopUpdaterActive = !![]),
+      (_desktopInstallAfterDownload = ![]),
+      void _showDesktopDownloadFailedBanner(enabled21));
     return;
   }
-  if (enabled20.type === 'not-available') {
-    _desktopUpdaterActive = false;
-    if (enabled20.manual) window.showToast?.(autoUpdateText('toasts.alreadyLatest'));
+  if (enabled21['type'] === 'download-cancelled') {
+    ((_desktopBannerRequestSequence += 0x1),
+      (_desktopUpdaterActive = !![]),
+      (_desktopInstallAfterDownload = ![]),
+      _removeBanner());
     return;
   }
-  if (enabled20.type === 'installing') {
-    ((_desktopUpdaterActive = true), window.showToast?.(autoUpdateText('toasts.installing')));
+  if (enabled21['type'] === 'not-available') {
+    ((_desktopBannerRequestSequence += 0x1),
+      _startupBannerQueue['clear'](),
+      (_desktopUpdaterActive = ![]),
+      _startupAutomaticToastQueue['clear']());
+    enabled21['manual'] &&
+      void _showManualUpdateResult(enabled21['info'], autoUpdateText('toasts.alreadyLatest'));
     return;
   }
-  if (enabled20.type === 'error') {
-    _desktopInstallAfterDownload = false;
-    if (enabled20.skipped) return;
-    if (enabled20.eventId != null && enabled20.eventId === lastDesktopErrorEventId) return;
-    lastDesktopErrorEventId = enabled20.eventId ?? null;
-    desktopErrorEventSequence += 1;
-    // Background update checks fail routinely (offline, missing release feed) and the raw
-    // error message embeds the whole HTTP response header dump, which used to be toasted
-    // across the bottom of the canvas. Only surface manual checks, with localized copy.
-    if (enabled20.manual) window.showToast?.(autoUpdateText('toasts.desktopCheckFailed'), 'warn');
+  if (enabled21['type'] === 'installing') {
+    ((_desktopBannerRequestSequence += 0x1),
+      (_desktopUpdaterActive = !![]),
+      window['showToast']?.(autoUpdateText('toasts.installing')));
+    return;
+  }
+  if (enabled21['type'] === 'error') {
+    if (enabled21['skipped']) return;
+    ((_desktopBannerRequestSequence += 0x1),
+      _startupBannerQueue['clear'](),
+      (_desktopInstallAfterDownload = ![]));
+    const autoUpdateText2 = autoUpdateText('toasts.updateFailed');
+    if (enabled21['manual']) {
+      void _showManualUpdateResult(enabled21['info'], autoUpdateText2);
+      return;
+    }
+    _showAutomaticUpdateToast(autoUpdateText2);
   }
 }
+function _showAutomaticUpdateToast(value77) {
+  const run3 = () => window['showToast']?.(value77);
+  if (isStartupVisualComplete()) {
+    run3();
+    return;
+  }
+  if (_startupAutomaticToastQueue['defer'](run3)) return;
+  void waitForStartupVisualComplete()['then'](run3);
+}
 function _bindDesktopUpdaterEvents() {
-  const enabled21 = window.aiCanvasDesktop;
-  if (!enabled21?.onUpdaterEvent || _desktopUpdateUnsubscribe) return;
-  ((_desktopUpdateUnsubscribe = enabled21.onUpdaterEvent(_handleDesktopUpdaterEvent)),
-    void enabled21
-      .getUpdateState?.()
-      .then((value52) => {
-        const _desktopEventFromState2 = _desktopEventFromState(value52);
+  const enabled22 = desktopBridge['app'];
+  if (!enabled22['isAvailable']() || _desktopUpdateUnsubscribe) return;
+  ((_desktopUpdateUnsubscribe = enabled22['onUpdaterEvent'](_handleDesktopUpdaterEvent)),
+    void enabled22['getUpdateState']()
+      ['then']((value78) => {
+        const _desktopEventFromState2 = _desktopEventFromState(value78);
         if (_desktopEventFromState2) _handleDesktopUpdaterEvent(_desktopEventFromState2);
       })
-      .catch(() => {}));
+      ['catch'](() => {}));
 }
 export function initAutoUpdate() {
   (_bindDesktopUpdaterEvents(),
@@ -943,68 +1123,92 @@ export function initAutoUpdate() {
     setInterval(_checkUpdate, CHECK_INTERVAL));
 }
 export async function showManualUpdateCheck() {
-  if (window.aiCanvasDesktop?.isElectron) {
-    const errorsBeforeCheck = desktopErrorEventSequence;
+  window['showToast']?.(autoUpdateText('toasts.checkingUpdate'));
+  let desktopUpdaterUnavailable = ![];
+  if (desktopBridge['app']['isAvailable']())
     try {
-      (window.showToast?.(autoUpdateText('toasts.checkingDesktop')),
-        await window.aiCanvasDesktop.checkForUpdates?.());
-    } catch (value53) {
-      if (desktopErrorEventSequence === errorsBeforeCheck)
-        window.showToast?.(autoUpdateText('toasts.desktopCheckFailed'), 'warning');
-    }
-    return;
-  }
-  try {
-    window.showToast?.(autoUpdateText('toasts.checkingUpdate'));
-    const checkUpdateFromServer3 = await checkUpdateFromServer({ force: true, includeCurrent: true });
-    if (
-      checkUpdateFromServer3?.remoteVersion ||
-      checkUpdateFromServer3?.notes ||
-      checkUpdateFromServer3?.releaseUrl
-    ) {
-      _showBanner(checkUpdateFromServer3, { replace: true, ignoreDismissed: true });
+      const value79 = await desktopBridge['app']['checkForUpdates'](),
+        enabled23 = value79?.['skipped'] === !![] && value79?.['reason'] === 'not-packaged';
+      desktopUpdaterUnavailable = enabled23;
+      if (!enabled23) {
+        value79?.['state'] === 'idle' &&
+          !document['getElementById']('update-banner') &&
+          (await _showManualUpdateResult({}, autoUpdateText('toasts.alreadyLatest')));
+        return;
+      }
+    } catch (value80) {
+      await _showManualUpdateResult({}, autoUpdateText('toasts.desktopCheckFailed'));
       return;
     }
-    window.showToast?.(autoUpdateText('toasts.noRemoteInfo'));
-  } catch (value54) {
-    window.showToast?.(autoUpdateText('toasts.remoteCheckFailed'));
+  try {
+    let args = await checkUpdateFromServer({ force: !![], includeCurrent: !![] });
+    if (!args?.['remoteVersion'] && !args?.['notes'] && !args?.['releaseUrl'])
+      try {
+        const checkLocalUpdatePreviewFromServer2 = await checkLocalUpdatePreviewFromServer();
+        if (checkLocalUpdatePreviewFromServer2?.['remoteVersion'] || checkLocalUpdatePreviewFromServer2?.['notes'] || checkLocalUpdatePreviewFromServer2?.['releaseUrl'])
+          args = checkLocalUpdatePreviewFromServer2;
+      } catch (value81) {}
+    if (args?.['remoteVersion'] || args?.['notes'] || args?.['releaseUrl']) {
+      const localVersion4 = _getPageLocalVersion() || args['localVersion'],
+        hasUpdate = _isRemoteVersionNewer(
+          localVersion4,
+          args['remoteVersion'],
+          args['hasUpdate'] === !![],
+        ),
+        value82 = {
+          ...args,
+          hasUpdate: hasUpdate,
+          previewOnly: ![],
+          localVersion: localVersion4,
+          desktopUpdaterUnavailable: desktopUpdaterUnavailable,
+        };
+      hasUpdate
+        ? _showBanner(value82, { replace: !![], ignoreDismissed: !![] })
+        : await _showManualUpdateResult(value82, autoUpdateText('toasts.alreadyLatest'));
+      return;
+    }
+    await _showManualUpdateResult(args, autoUpdateText('toasts.noRemoteInfo'));
+  } catch (value83) {
+    await _showManualUpdateResult({}, autoUpdateText('toasts.remoteCheckFailed'));
   }
 }
 export async function showLocalUpdatePreview() {
   try {
-    window.showToast?.(autoUpdateText('toasts.generatingPreview'));
-    const checkLocalUpdatePreviewFromServer2 = await checkLocalUpdatePreviewFromServer();
-    if (
-      checkLocalUpdatePreviewFromServer2?.previewOnly &&
-      (checkLocalUpdatePreviewFromServer2?.remoteVersion || checkLocalUpdatePreviewFromServer2?.notes)
-    ) {
-      _showBanner(checkLocalUpdatePreviewFromServer2, { replace: true, ignoreDismissed: true });
+    window['showToast']?.(autoUpdateText('toasts.generatingPreview'));
+    const checkLocalUpdatePreviewFromServer3 = await checkLocalUpdatePreviewFromServer();
+    if (checkLocalUpdatePreviewFromServer3?.['previewOnly'] && (checkLocalUpdatePreviewFromServer3?.['remoteVersion'] || checkLocalUpdatePreviewFromServer3?.['notes'])) {
+      _showBanner(checkLocalUpdatePreviewFromServer3, { replace: !![], ignoreDismissed: !![] });
       return;
     }
-    window.showToast?.(autoUpdateText('toasts.noLocalPreview'));
-  } catch (value55) {
-    window.showToast?.(autoUpdateText('toasts.localPreviewFailed'));
+    window['showToast']?.(autoUpdateText('toasts.noLocalPreview'));
+  } catch (value84) {
+    window['showToast']?.(autoUpdateText('toasts.localPreviewFailed'));
   }
 }
-export function showTutorialVideoPanel(url) {
-  const tutorialVideos = Array.isArray(url)
-    ? url
-    : [{ title: autoUpdateText('tutorial.defaultTitle'), url: url }];
+export function showTutorialVideoPanel(url, tutorialLinks = []) {
+  const tutorialVideos = Array['isArray'](url)
+      ? url
+      : [{ title: autoUpdateText('tutorial.defaultTitle'), url: url }],
+    version3 = _formatBannerVersion(_getPageLocalVersion()),
+    remoteVersion4 = version3
+      ? autoUpdateText('tutorial.versionedTitle', { version: version3 })
+      : autoUpdateText('tutorial.title');
   _showBanner(
     {
-      previewOnly: true,
-      hasUpdate: false,
+      previewOnly: !![],
+      hasUpdate: ![],
       localVersion: '',
-      remoteVersion: autoUpdateText('tutorial.title'),
-      titleText: autoUpdateText('tutorial.title'),
+      remoteVersion: remoteVersion4,
+      titleText: remoteVersion4,
       subtitleText: autoUpdateText('tutorial.subtitle'),
       notes: '',
+      tutorialLinks: tutorialLinks,
       tutorialVideos: tutorialVideos,
-      canHotApply: false,
-      hideNotes: true,
-      hideCancelButton: true,
+      canHotApply: ![],
+      hideNotes: !![],
+      hideCancelButton: !![],
       previewCloseText: autoUpdateText('buttons.close'),
     },
-    { replace: true, ignoreDismissed: true },
+    { replace: !![], ignoreDismissed: !![] },
   );
 }

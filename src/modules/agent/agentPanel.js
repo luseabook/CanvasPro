@@ -1,354 +1,347 @@
-import {
-  buildTextModelSmallIconHTML,
-  buildTextProviderMenuGroupsHTML,
-  findTextModelMenuItem,
-} from '../../components/aigenText/apimartTextModelMenu.js';
+import { findTextModelMenuItem } from '../../components/aigenText/apimartTextModelMenu.js';
+import { createAgentConversationActions } from './agentConversationActions.js';
+import { createAgentPanelContinuity } from './agentPanelContinuity.js';
+import { buildAIGenTextModelMenuMarkup } from '../../components/aigenText/modelSelector.js';
 import { createPromptAttachmentButtonHTML } from '../../components/refAttachmentButton.js';
-import { bindNodeSubmenus, closeNodeFooterMenus } from '../../components/shared/nodeFooterControls.js';
-import { getLocale } from '../../i18n/index.js';
-import { localPathToUrl } from '../../utils/localMediaPath.js';
+import { closeNodeFooterMenus } from '../../components/shared/nodeFooterControls.js';
+import { ADVANCED_SETTINGS_TUNE_ICON_MARKUP } from '../../components/sharedIconMarkup.js';
+import { getLocale, onLocaleChange } from '../../i18n/index.js';
+import { openImagePreview } from '../imagePreview.js';
 import { createLinkCursor, getCursorSize } from '../cursorUtils.js';
-const AGENT_QUICK_ACTIONS = Object.freeze([
+import { createReferenceFallbackThumbElement } from '../referenceThumbnailFallback.js';
+import { showContextMenu } from '../interaction/contextMenuPresenter.js';
+import { bindAgentModelControls } from './agentModelControls.js';
+export { commitAgentModelSelection } from './agentModelControls.js';
+import {
+  AGENT_CONVERSATION_INPUT_REF_LIMIT,
+  createAgentConversationPresentation,
+  normalizeAgentRenderableMediaUrl,
+} from './agentConversationPresentation.js';
+import { AGENT_PANEL_LOCALES, agentPanelText, formatAgentPanelText } from './agentPanelText.js';
+import { agentIconSvg, createAgentButton, createAgentElement } from './agentPanelElements.js';
+import { createAgentSkillPanel } from './agentSkillPanel.js';
+import { createAgentSkillPicker } from './agentSkillPicker.js';
+import { createAgentComposerAttachmentController } from './agentComposerAttachmentController.js';
+import { renderAgentConversationChoices } from './agentConversationChoices.js';
+export { formatAgentAssistantMarkdown } from './agentConversationPresentation.js';
+const AGENT_QUICK_ACTIONS = Object['freeze']([
     {
-      id: 'archive-assets',
-      label: '将现有素材汇总归档',
-      prompt: '请将画布上的现有素材汇总归档，并说明每个节点的用途。',
+      id: 'expand-prompt',
+      labelKey: 'quickActionCanvasReviewLabel',
+      promptKey: 'quickActionCanvasReviewPrompt',
+    },
+    { id: 'canvas-gap-check', labelKey: 'quickActionGapCheckLabel', promptKey: 'quickActionGapCheckPrompt' },
+    {
+      id: 'storyboard-plan',
+      labelKey: 'quickActionStoryboardLabel',
+      promptKey: 'quickActionStoryboardPrompt',
     },
     {
-      id: 'check-style',
-      label: '检查视觉风格一致性',
-      prompt: '请检查当前画布的视觉风格是否一致，并给出调整建议。',
+      id: 'selected-node-tune',
+      labelKey: 'quickActionSelectedTuneLabel',
+      promptKey: 'quickActionSelectedTunePrompt',
     },
-    { id: 'explain-flow', label: '梳理当前创作逻辑', prompt: '请梳理当前画布的创作逻辑和节点关系。' },
   ]),
-  PLACEHOLDER_ACTION_MESSAGES = Object.freeze({
-    canvas: '从当前画布选中节点添加素材入参。',
-    upload: '上传素材后会作为本次 Agent 入参。',
-    custom: '将当前输入保存为自定义快捷卡片。',
+  AGENT_LEGACY_QUICK_ACTIONS = Object['freeze']([
+    {
+      id: 'expand-prompt',
+      labelKey: 'legacyQuickActionExpandPromptLabel',
+      promptKey: 'legacyQuickActionExpandPromptPrompt',
+    },
+    {
+      id: 'storyboard-plan',
+      labelKey: 'legacyQuickActionStoryboardLabel',
+      promptKey: 'legacyQuickActionStoryboardPrompt',
+    },
+    {
+      id: 'canvas-gap-check',
+      labelKey: 'legacyQuickActionGapCheckLabel',
+      promptKey: 'legacyQuickActionGapCheckPrompt',
+    },
+  ]),
+  PLACEHOLDER_ACTION_MESSAGES = Object['freeze']({
+    upload: 'placeholderUpload',
+    custom: 'placeholderCustom',
+    skills: 'placeholderSkills',
   }),
   AGENT_PANEL_WIDTH_STORAGE_KEY = 'aiCanvas.agentSidebarWidth.v1',
   AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY = 'aiCanvas.agentCustomQuickActions.v1',
-  AGENT_PANEL_WIDTH_LIMITS = Object.freeze({ min: 0x230, max: 0x35c }),
-  AGENT_INPUT_REF_LIMIT = 12,
-  AGENT_CUSTOM_QUICK_ACTION_LIMIT = 8,
-  PANEL_TEXT = Object.freeze({
-    'zh-CN': Object.freeze({
-      actionsPrepared: '已完成准备步骤。',
-      addReference: '添加画布内容 / 引用参考',
-      attachSelected: '已添加 {count} 个素材入参。',
-      attachSelectedEmpty: '先在画布选中素材节点，再添加为入参。',
-      materialPickStarted: '请选择画布上的素材节点作为 Agent 入参。',
-      materialPickCancelled: '已退出素材拾取。',
-      materialPickUnsupported: '请选择图片、视频、音频或文本素材节点。',
-      completed: '已完成',
-      confirmUserMessage: '确定',
-      confirmTitle: '请确认',
-      generate: '开始生成',
-      graphConnect: '连接节点',
-      layoutAlign: '对齐节点',
-      layoutArrangeRow: '横向排列节点',
-      nodeCreate: '创建节点',
-      nodeCreateImage: '创建图片节点',
-      nodeCreateVideo: '创建视频节点',
-      nodeCreateAudio: '创建音频节点',
-      nodeCreateText: '创建文本节点',
-      nodeDelete: '删除节点',
-      nodeSetParams: '设置生成参数',
-      nodeSetPrompt: '写入提示词',
-      pending: '待确认',
-      model: '使用模型',
-      prompt: 'Prompt 摘要',
-      params: '参数',
-      inputSource: '输入来源',
-      traceSummary: '策略摘要',
-      noParams: '无',
-      recoveryTitle: '可以这样恢复',
-      recoveryEditPromptDraft: '请修改刚才失败的生成提示词：',
-      recoveryChangeModelDraft: '请为刚才失败的生成换一个模型：',
-      recoveryEditPromptNotice: '已进入重新规划：修改提示词后发送。',
-      recoveryChangeModelNotice: '已进入重新规划：写明想换的模型后发送。',
-      historyTitle: '历史记录',
-      historyEmpty: '当前项目还没有历史对话',
-      historyDelete: '删除对话',
-      unfinishedNotice: '上次有未完成操作，请重新发送或重新规划。',
-      uploadMaterial: '上传素材',
-      uploadMaterialFailed: '上传素材失败，请稍后重试。',
-      uploadMaterialMissing: '上传素材入口暂不可用。',
-      uploadMaterialReady: '已上传并添加为素材入参。',
-      customShortcutEmpty: '先在输入框写好提示词，再保存为自定义快捷卡片。',
-      customShortcutSaved: '已保存为自定义快捷卡片。',
-      waiting: '正在思考',
-    }),
-    'en-US': Object.freeze({
-      actionsPrepared: 'Preparation is complete.',
-      addReference: 'Add canvas context / references',
-      attachSelected: 'Added {count} material reference(s).',
-      attachSelectedEmpty: 'Select canvas material nodes before adding references.',
-      materialPickStarted: 'Pick a canvas material node to use as Agent input.',
-      materialPickCancelled: 'Material picking cancelled.',
-      materialPickUnsupported: 'Pick an image, video, audio, or text material node.',
-      completed: 'Completed',
-      confirmUserMessage: 'Confirm',
-      confirmTitle: 'Confirm',
-      generate: 'Start generation',
-      graphConnect: 'Connect nodes',
-      layoutAlign: 'Align nodes',
-      layoutArrangeRow: 'Arrange nodes horizontally',
-      nodeCreate: 'Create node',
-      nodeCreateImage: 'Create image node',
-      nodeCreateVideo: 'Create video node',
-      nodeCreateAudio: 'Create audio node',
-      nodeCreateText: 'Create text node',
-      nodeDelete: 'Delete node',
-      nodeSetParams: 'Set generation parameters',
-      nodeSetPrompt: 'Set prompt',
-      pending: 'Pending confirmation',
-      model: 'Model',
-      prompt: 'Prompt summary',
-      params: 'Parameters',
-      inputSource: 'Input source',
-      traceSummary: 'Policy summary',
-      noParams: 'None',
-      recoveryTitle: 'Recovery options',
-      recoveryEditPromptDraft: 'Revise the failed generation prompt: ',
-      recoveryChangeModelDraft: 'Switch the failed generation to another model: ',
-      recoveryEditPromptNotice: 'Replanning draft is ready. Edit the prompt and send.',
-      recoveryChangeModelNotice: 'Replanning draft is ready. Name the model you want and send.',
-      historyTitle: 'History',
-      historyEmpty: 'No conversation history in this project yet.',
-      historyDelete: 'Delete conversation',
-      unfinishedNotice: 'The last operation was not completed. Please resend or replan.',
-      uploadMaterial: 'Upload material',
-      uploadMaterialFailed: 'Material upload failed. Please try again.',
-      uploadMaterialMissing: 'Material upload is unavailable.',
-      uploadMaterialReady: 'Uploaded and added as a material reference.',
-      customShortcutEmpty: 'Write a prompt first, then save it as a custom shortcut.',
-      customShortcutSaved: 'Saved as a custom shortcut.',
-      waiting: 'Thinking',
-    }),
-  });
-function normalizePanelLocale(locale = getLocale()) {
-  return String(locale || '')
-    .toLowerCase()
-    .startsWith('en')
-    ? 'en-US'
-    : 'zh-CN';
-}
-function panelText(value, locale2 = getLocale()) {
-  const panelLocale = normalizePanelLocale(locale2);
-  return PANEL_TEXT[panelLocale]?.[value] || PANEL_TEXT['zh-CN'][value] || value;
-}
-function formatPanelText(item, key = {}, locale3 = getLocale()) {
-  return panelText(item, locale3).replace(/\{(\w+)\}/g, (index, result) =>
-    key[result] == null ? '' : String(key[result]),
-  );
-}
-function createEl(data, options = '', target = '') {
-  const el = document.createElement(data);
-  if (options) el.className = options;
-  if (target) el.textContent = target;
-  return el;
-}
-function createButton(
-  next,
-  current,
-  { title: title = '', icon: icon = '', disabled: disabled = false } = {},
-) {
-  const el2 = createEl('button', next);
-  el2.type = 'button';
-  title && ((el2.title = title), el2.setAttribute('aria-label', title));
-  if (icon) {
-    el2.innerHTML = icon;
-    if (current) {
-      const el3 = createEl('span', 'agent-btn-label', current);
-      el2.appendChild(el3);
-    }
-  } else el2.textContent = current;
-  el2.disabled = disabled;
-  if (disabled) el2.setAttribute('aria-disabled', 'true');
-  return el2;
-}
-function iconSvg(entry) {
-  const record =
-      'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"',
-    payload = {
-      collapse: '<rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M10 4v16"></path>',
-      plus: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
-      history:
-        '<path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path><path d="M12 7v5l3 2"></path>',
-      close: '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>',
-      send: '<path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path>',
-      cursor: '<path d="m4 4 7.5 16 2.5-6 6-2.5L4 4Z"></path>',
-      grid: '<rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>',
-      scan: '<path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M16 3h3a2 2 0 0 1 2 2v3"></path><path d="M8 21H5a2 2 0 0 1-2-2v-3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path><path d="M9 12h6"></path>',
-      flow: '<path d="M6 3v6"></path><path d="M18 15v6"></path><circle cx="6" cy="15" r="3"></circle><circle cx="18" cy="9" r="3"></circle><path d="M9 15h3a3 3 0 0 0 3-3V9"></path>',
-      model: '<path d="M13 2 3 14h8l-1 8 11-14h-8l0-6Z"></path>',
-      mode: '<path d="M12 2v4"></path><path d="M12 18v4"></path><path d="m4.93 4.93 2.83 2.83"></path><path d="m16.24 16.24 2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="m4.93 19.07 2.83-2.83"></path><path d="m16.24 7.76 2.83-2.83"></path>',
-      check: '<path d="m20 6-11 11-5-5"></path>',
-      upload: '<path d="M12 16V4"></path><path d="m7 9 5-5 5 5"></path><path d="M20 20H4"></path>',
-      wand: '<path d="M15 4V2"></path><path d="M15 10v-2"></path><path d="M12 5h2"></path><path d="M18 5h-2"></path><path d="m5 19 14-14"></path><path d="m9 15-4-4"></path>',
-    };
-  return '<svg class="agent-icon" width="18" height="18" ' + record + '>' + (payload[entry] || '') + '</svg>';
-}
+  AGENT_CUSTOM_QUICK_ACTIONS_SEEDED_STORAGE_KEY = 'aiCanvas.agentCustomQuickActionsSeeded.v1',
+  AGENT_CUSTOM_QUICK_ACTIONS_VERSION_STORAGE_KEY = 'aiCanvas.agentCustomQuickActionsVersion.v1',
+  AGENT_CUSTOM_QUICK_ACTIONS_VERSION = 'canvas-defaults-v2',
+  AGENT_PANEL_WIDTH_LIMITS = Object['freeze']({ min: 0x230, max: 0x35c }),
+  AGENT_CUSTOM_QUICK_ACTION_LIMIT = 0x8,
+  AGENT_NOTICE_AUTO_HIDE_MS = 0xc80;
 function createAgentPromptAttachmentButton({ title: title = '', className: className = '' } = {}) {
-  const el4 = document.createElement('div');
-  el4.innerHTML = createPromptAttachmentButtonHTML({
+  const el = document['createElement']('div');
+  el['innerHTML'] = createPromptAttachmentButtonHTML({
     tooltip: title,
     stroke: 'currentColor',
     fill: 'var(--white-05)',
     circleFill: 'currentColor',
   });
-  const el5 = el4.firstElementChild;
-  if (el5)
+  const el2 = el['firstElementChild'];
+  if (el2)
     return (
-      className
-        .split(/\s+/)
-        .filter(Boolean)
-        .forEach((item2) => el5.classList.add(item2)),
-      el5.setAttribute('role', 'button'),
-      (el5.tabIndex = 0),
-      el5
+      className['split'](/\s+/)
+        ['filter'](Boolean)
+        ['forEach']((value) => el2['classList']['add'](value)),
+      el2['setAttribute']('role', 'button'),
+      (el2['tabIndex'] = 0x0),
+      el2
     );
-  const el6 = createEl('div', ['prompt-attachment-btn', className].filter(Boolean).join(' '));
-  title && ((el6.title = title), el6.setAttribute('aria-label', title));
-  (el6.setAttribute('role', 'button'), (el6.tabIndex = 0));
-  const el7 = createEl('span', 'btn-icon');
+  const el3 = createAgentElement(
+    'div',
+    ['prompt-attachment-btn', className]['filter'](Boolean)['join']('\x20'),
+  );
+  title && ((el3['title'] = title), el3['setAttribute']('aria-label', title));
+  (el3['setAttribute']('role', 'button'), (el3['tabIndex'] = 0x0));
+  const el4 = createAgentElement('span', 'btn-icon');
   return (
-    (el7.innerHTML =
+    (el4['innerHTML'] =
       '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z" fill="var(--white-05)" /><circle cx="20" cy="20" r="2.5" fill="currentColor" /><path d="M12 12 Q 17 12 19 18" stroke-dasharray="3 3" /></svg>'),
-    el6.appendChild(el7),
-    el6
+    el3['appendChild'](el4),
+    el3
   );
 }
-function appendMessage(el8, handle, state) {
-  const config = String(handle || '') === 'user' ? 'user' : 'assistant',
-    el9 = createEl('div', 'agent-message agent-message--' + config);
-  ((el9.textContent = String(state || '')), el8.appendChild(el9), (el8.scrollTop = el8.scrollHeight));
+function setEditorText(el5, item = '') {
+  ((el5['textContent'] = String(item || '')),
+    el5['dispatchEvent']?.(new Event('input', { bubbles: !![] })));
 }
-function renderMessages(scope, list = []) {
-  (scope.replaceChildren(),
-    list.forEach((response) => {
-      appendMessage(scope, response.role, response.content || response.status || '');
-    }));
+function getEditorText(el6) {
+  return String(el6?.['innerText'] || el6?.['textContent'] || '')['trim']();
 }
-function appendWaitingMessage(el10) {
-  const el11 = createEl('div', 'agent-message agent-message--assistant agent-message--typing'),
-    el12 = createEl('span', 'agent-typing-label', panelText('waiting')),
-    el13 = createEl('span', 'agent-typing-dots');
-  return (
-    el13.append(createEl('span'), createEl('span'), createEl('span')),
-    el11.append(el12, el13),
-    el10.appendChild(el11),
-    (el10.scrollTop = el10.scrollHeight),
-    el11
-  );
+function truncateUiText(key, index = 0x28) {
+  const list = String(key || '')
+    ['replace'](/\s+/g, '\x20')
+    ['trim']();
+  return list['length'] <= index
+    ? list
+    : list['slice'](0x0, Math['max'](0x0, index - 0x3)) + '...';
 }
-function removeWaitingMessage(el14) {
-  if (!el14?.parentNode) return;
-  if (typeof el14.remove === 'function') {
-    el14.remove();
-    return;
-  }
-  const el15 = el14.parentNode,
-    count = el15.children?.indexOf?.(el14) ?? -1;
-  if (count >= 0) el15.children.splice(count, 1);
-  el14.parentNode = null;
-}
-function setEditorText(el16, input = '') {
-  ((el16.textContent = String(input || '')), el16.dispatchEvent?.(new Event('input', { bubbles: true })));
-}
-function getEditorText(el17) {
-  return String(el17?.innerText || el17?.textContent || '').trim();
-}
-function truncateUiText(output, value2 = 40) {
-  const list2 = String(output || '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return list2.length <= value2 ? list2 : list2.slice(0, Math.max(0, value2 - 3)) + '...';
-}
-function readJsonArrayFromStorage(value3, value4) {
+function writeJsonArrayToStorage(result, data, options) {
   try {
-    const value5 = value3?.localStorage?.getItem?.(value4),
-      value6 = value5 ? JSON.parse(value5) : [];
-    return Array.isArray(value6) ? value6 : [];
-  } catch {
-    return [];
-  }
-}
-function writeJsonArrayToStorage(value7, value8, value9) {
-  try {
-    value7?.localStorage?.setItem?.(value8, JSON.stringify(value9));
+    result?.['localStorage']?.['setItem']?.(data, JSON['stringify'](options));
   } catch {}
 }
-function normalizeQuickAction(custom = {}, value10 = '') {
-  const prompt = String(custom.prompt || '').trim();
+function normalizeQuickAction(custom = {}, target = '', locale = getLocale()) {
+  const prompt = String(
+    custom['promptKey'] ? agentPanelText(custom['promptKey'], locale) : custom['prompt'] || '',
+  )['trim']();
   if (!prompt) return null;
-  const id = String(custom.id || value10 || '').trim() || 'custom-' + Date.now();
+  const id = String(custom['id'] || target || '')['trim']() || 'custom-' + Date['now'](),
+    next = custom['labelKey'] ? agentPanelText(custom['labelKey'], locale) : custom['label'];
   return {
     id: id,
-    label: truncateUiText(custom.label || prompt, 28),
+    label: truncateUiText(next || prompt, 0x1c),
     prompt: prompt,
-    custom: custom.custom === true,
+    custom: custom['custom'] === !![],
   };
 }
-function readCustomQuickActions(value11 = globalThis.window) {
-  return readJsonArrayFromStorage(value11, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY)
-    .map((item3, value12) => normalizeQuickAction(item3, 'custom-' + value12))
-    .filter(Boolean)
-    .slice(0, AGENT_CUSTOM_QUICK_ACTION_LIMIT);
+function normalizeQuickActionList(list2 = [], locale2 = getLocale()) {
+  return list2['map']((current, entry) =>
+    normalizeQuickAction(current, 'custom-' + entry, locale2),
+  )
+    ['filter'](Boolean)
+    ['slice'](0x0, AGENT_CUSTOM_QUICK_ACTION_LIMIT);
 }
-function writeCustomQuickActions(list3 = [], value13 = globalThis.window) {
-  const value14 = list3
-    .map((item4, value15) => normalizeQuickAction(item4, 'custom-' + value15))
-    .filter(Boolean)
-    .slice(0, AGENT_CUSTOM_QUICK_ACTION_LIMIT);
-  return (writeJsonArrayToStorage(value13, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY, value14), value14);
+function getDefaultQuickActions(locale3 = getLocale()) {
+  return normalizeQuickActionList(AGENT_QUICK_ACTIONS, locale3);
 }
-function inferAgentInputKind(value16 = '') {
-  const list4 = String(value16 || '').trim();
-  if (list4.includes('image')) return 'image';
-  if (list4.includes('video')) return 'video';
-  if (list4.includes('audio')) return 'audio';
-  if (list4.includes('text')) return 'text';
-  return list4 || 'node';
+function getLegacyQuickActions(locale4 = getLocale()) {
+  return normalizeQuickActionList(AGENT_LEGACY_QUICK_ACTIONS, locale4);
 }
-function normalizeRenderableThumbUrl(value17) {
-  const list5 = String(value17 || '').trim();
-  if (!list5) return '';
-  if (/^https?:\/\//i.test(list5) || list5.startsWith('/')) return list5;
-  if (/^data:image\//i.test(list5) && list5.length <= 0xc350) return list5;
-  return localPathToUrl(list5) || '';
+function isSameQuickActionContent(options2 = {}, record = {}) {
+  return (
+    String(options2['id'] || '') === String(record['id'] || '') &&
+    String(options2['label'] || '') === String(record['label'] || '') &&
+    String(options2['prompt'] || '') === String(record['prompt'] || '')
+  );
 }
-function resolveAgentInputRefThumbUrl(options2 = {}) {
-  const value18 = [
-    options2.thumbUrl,
-    options2.posterUrl,
-    options2.videoThumbSrc,
-    options2.imageUrl,
-    options2.src,
-    options2.coverUrl,
-    options2.waveformUrl,
-    options2.thumbLocalPath,
-    options2.posterLocalPath,
-    options2.displayLocalPath,
-    options2.localPath,
-    options2.originalLocalPath,
-    options2.waveformLocalPath,
-  ];
-  for (const value19 of value18) {
-    const renderableThumbUrl = normalizeRenderableThumbUrl(value19);
-    if (renderableThumbUrl) return renderableThumbUrl;
+function mergeSeedQuickActions(list3 = []) {
+  const map = new Set(),
+    list4 = [];
+  return (
+    [...getDefaultQuickActions(), ...normalizeQuickActionList(list3)]['forEach']((payload) => {
+      const enabled = String(payload?.['id'] || '')['trim']();
+      if (!enabled || map['has'](enabled)) return;
+      (map['add'](enabled), list4['push'](payload));
+    }),
+    list4['slice'](0x0, AGENT_CUSTOM_QUICK_ACTION_LIMIT)
+  );
+}
+function migrateQuickActionsToCurrentDefaults(list5 = []) {
+  const list6 = getDefaultQuickActions(),
+    map2 = new Map(list6['map']((handle) => [handle['id'], handle])),
+    map3 = new Map(getLegacyQuickActions()['map']((state) => [state['id'], state])),
+    list7 = normalizeQuickActionList(list5)['map']((config) => {
+      const scope = map2['get'](config['id']),
+        input = map3['get'](config['id']);
+      if (scope && input && isSameQuickActionContent(config, input)) return scope;
+      return config;
+    }),
+    map4 = new Set(list7['map']((output) => output['id']));
+  return (
+    list6['forEach']((value2) => {
+      if (map4['has'](value2['id'])) return;
+      if (map3['has'](value2['id'])) return;
+      (list7['push'](value2), map4['add'](value2['id']));
+    }),
+    list7['slice'](0x0, AGENT_CUSTOM_QUICK_ACTION_LIMIT)
+  );
+}
+function isKnownDefaultQuickActionContent(options3 = {}) {
+  if (options3['custom'] === !![]) return ![];
+  return AGENT_PANEL_LOCALES['some']((value3) =>
+    [...getDefaultQuickActions(value3), ...getLegacyQuickActions(value3)]['some']((value4) =>
+      isSameQuickActionContent(options3, value4),
+    ),
+  );
+}
+function localizeStoredDefaultQuickActions(list8 = []) {
+  const map5 = new Map(getDefaultQuickActions()['map']((value5) => [value5['id'], value5]));
+  return normalizeQuickActionList(list8)['map']((value6) => {
+    const value7 = map5['get'](value6['id']);
+    return value7 && isKnownDefaultQuickActionContent(value6) ? value7 : value6;
+  });
+}
+function readQuickActionsStorage(value8 = globalThis['window']) {
+  try {
+    const value9 = value8?.['localStorage']?.['getItem']?.(AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY);
+    if (value9 == null) return null;
+    const value10 = JSON['parse'](value9);
+    return Array['isArray'](value10) ? value10 : null;
+  } catch {
+    return null;
+  }
+}
+function markCustomQuickActionsSeeded(value11 = globalThis['window']) {
+  try {
+    (value11?.['localStorage']?.['setItem']?.(AGENT_CUSTOM_QUICK_ACTIONS_SEEDED_STORAGE_KEY, 'true'),
+      value11?.['localStorage']?.['setItem']?.(
+        AGENT_CUSTOM_QUICK_ACTIONS_VERSION_STORAGE_KEY,
+        AGENT_CUSTOM_QUICK_ACTIONS_VERSION,
+      ));
+  } catch {}
+}
+function seedCustomQuickActionsIfNeeded(value12 = globalThis['window']) {
+  try {
+    const value13 =
+        value12?.['localStorage']?.['getItem']?.(AGENT_CUSTOM_QUICK_ACTIONS_SEEDED_STORAGE_KEY) === 'true',
+      value14 = value12?.['localStorage']?.['getItem']?.(AGENT_CUSTOM_QUICK_ACTIONS_VERSION_STORAGE_KEY);
+    if (value13 && value14 === AGENT_CUSTOM_QUICK_ACTIONS_VERSION) return;
+    const quickActionsStorage = readQuickActionsStorage(value12) || [],
+      value15 = value13
+        ? migrateQuickActionsToCurrentDefaults(quickActionsStorage)
+        : mergeSeedQuickActions(quickActionsStorage);
+    (writeJsonArrayToStorage(value12, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY, value15),
+      markCustomQuickActionsSeeded(value12));
+  } catch {}
+}
+function readCustomQuickActions(value16 = globalThis['window']) {
+  const quickActionsStorage2 = readQuickActionsStorage(value16);
+  return quickActionsStorage2 === null ? getDefaultQuickActions() : localizeStoredDefaultQuickActions(quickActionsStorage2);
+}
+function writeCustomQuickActions(list9 = [], value17 = globalThis['window']) {
+  const quickActionList = normalizeQuickActionList(list9);
+  return (
+    writeJsonArrayToStorage(value17, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY, quickActionList),
+    markCustomQuickActionsSeeded(value17),
+    quickActionList
+  );
+}
+function inferAgentInputKind(value18 = '') {
+  const list10 = String(value18 || '')['trim']();
+  if (list10['includes']('image')) return 'image';
+  if (list10['includes']('video')) return 'video';
+  if (list10['includes']('audio')) return 'audio';
+  if (list10['includes']('text')) return 'text';
+  return list10 || 'node';
+}
+function isLikelyRenderableImageUrl(value19 = '') {
+  const enabled2 = String(value19 || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (!enabled2) return ![];
+  if (enabled2['startsWith']('data:image/')) return !![];
+  return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?|#|$)/i['test'](enabled2);
+}
+function resolveFirstAgentThumbUrl(list11 = [], { imageLikeOnly: imageLikeOnly = ![] } = {}) {
+  for (const value20 of list11) {
+    const agentRenderableMediaUrl = normalizeAgentRenderableMediaUrl(value20);
+    if (imageLikeOnly && !isLikelyRenderableImageUrl(agentRenderableMediaUrl)) continue;
+    if (agentRenderableMediaUrl) return agentRenderableMediaUrl;
   }
   return '';
 }
+function getPrimaryVideoItem(options4 = {}) {
+  const list12 = Array['isArray'](options4['videos']) ? options4['videos'] : [];
+  if (list12['length'] === 0x0) return null;
+  const value21 = Number['isFinite'](Number(options4['mainVideoIndex']))
+    ? Math['max'](0x0, Math['trunc'](Number(options4['mainVideoIndex'])))
+    : 0x0;
+  return list12[value21] || list12[0x0] || null;
+}
+function resolveAgentInputRefThumbUrl(options5 = {}, inferAgentInputKind2 = inferAgentInputKind(options5?.['type'])) {
+  const value22 = String(inferAgentInputKind2 || '')['trim']();
+  if (value22 === 'audio')
+    return resolveFirstAgentThumbUrl(
+      [
+        options5['thumbUrl'],
+        options5['thumbnailUrl'],
+        options5['imageUrl'],
+        options5['coverUrl'],
+        options5['posterUrl'],
+        options5['waveformThumbUrl'],
+        options5['waveformImageUrl'],
+        options5['thumbLocalPath'],
+        options5['posterLocalPath'],
+      ],
+      { imageLikeOnly: !![] },
+    );
+  if (value22 === 'video') {
+    const primaryVideoItem = getPrimaryVideoItem(options5);
+    return resolveFirstAgentThumbUrl(
+      [
+        primaryVideoItem?.['thumbUrl'],
+        primaryVideoItem?.['thumbLocalPath'],
+        options5['thumbUrl'],
+        options5['thumbnailUrl'],
+        options5['posterUrl'],
+        options5['videoThumbSrc'],
+        options5['firstFrameUrl'],
+        options5['firstFrameThumbUrl'],
+        options5['imageUrl'],
+        options5['coverUrl'],
+        options5['thumbLocalPath'],
+        options5['posterLocalPath'],
+      ],
+      { imageLikeOnly: !![] },
+    );
+  }
+  return resolveFirstAgentThumbUrl([
+    options5['thumbUrl'],
+    options5['thumbnailUrl'],
+    options5['imageUrl'],
+    options5['src'],
+    options5['coverUrl'],
+    options5['thumbLocalPath'],
+    options5['displayLocalPath'],
+    options5['localPath'],
+    options5['originalLocalPath'],
+  ]);
+}
 function normalizeAgentInputRefFromNode(box = {}, { source: source = 'canvas' } = {}) {
-  const id2 = String(box.id || box.nodeId || '').trim();
+  const id2 = String(box['id'] || box['nodeId'] || '')['trim']();
   if (!id2) return null;
-  const type = String(box.type || '').trim(),
+  const type = String(box['type'] || '')['trim'](),
     kind = inferAgentInputKind(type),
-    name = truncateUiText(box.name || box.label || box.title || id2, 60),
-    count2 = Number(box.width),
-    count3 = Number(box.height),
+    name = truncateUiText(
+      box['name'] || box['label'] || box['title'] || id2,
+      0x3c,
+    ),
+    count = Number(box['width']),
+    count2 = Number(box['height']),
     box2 = {
       id: id2,
       nodeId: id2,
@@ -357,1042 +350,2079 @@ function normalizeAgentInputRefFromNode(box = {}, { source: source = 'canvas' } 
       name: name,
       label: name,
       source: source,
-      thumbUrl: resolveAgentInputRefThumbUrl(box),
+      thumbUrl: resolveAgentInputRefThumbUrl(box, kind),
     };
-  if (Number.isFinite(count2) && count2 > 0) box2.width = Math.round(count2);
-  if (Number.isFinite(count3) && count3 > 0) box2.height = Math.round(count3);
+  if (Number['isFinite'](count) && count > 0x0) box2['width'] = Math['round'](count);
+  if (Number['isFinite'](count2) && count2 > 0x0) box2['height'] = Math['round'](count2);
   return box2;
 }
-function isAgentMaterialRef(options3 = {}) {
-  return ['image', 'video', 'audio', 'text'].includes(String(options3.kind || ''));
+function isAgentMaterialRef(options6 = {}) {
+  return ['image', 'video', 'audio', 'text']['includes'](String(options6['kind'] || ''));
+}
+function getImageFileFromClipboardData(value23 = null) {
+  const list13 = Array['from'](value23?.['files'] || []),
+    value24 = list13['find']((value25) => String(value25?.['type'] || '')['startsWith']('image/'));
+  if (value24) return value24;
+  const value26 = Array['from'](value23?.['items'] || []);
+  for (const value27 of value26) {
+    if (String(value27?.['kind'] || '') !== 'file') continue;
+    if (!String(value27?.['type'] || '')['startsWith']('image/')) continue;
+    const value28 = value27['getAsFile']?.();
+    if (value28) return value28;
+  }
+  return null;
+}
+function normalizePastedImageFile(type2 = null) {
+  if (!type2 || !String(type2['type'] || '')['startsWith']('image/')) return null;
+  if (String(type2['name'] || '')['trim']()) return type2;
+  try {
+    const value29 = String(type2['type'] || '')['split']('/')[0x1] || 'png';
+    return new File([type2], 'agent-paste-image.' + value29, { type: type2['type'] });
+  } catch {
+    return type2;
+  }
 }
 function getStoreState(store2) {
-  return store2?.getStateRaw?.() || store2?.getState?.() || {};
+  return store2?.['getStateRaw']?.() || store2?.['getState']?.() || {};
 }
-function clampAgentSidebarWidth(value20, value21 = globalThis.window?.innerWidth) {
-  const value22 = Number(value20),
-    value23 = Number.isFinite(Number(value21))
-      ? Math.max(0x140, Number(value21) - 24)
-      : AGENT_PANEL_WIDTH_LIMITS.max,
-    value24 = Math.min(AGENT_PANEL_WIDTH_LIMITS.max, value23),
-    value25 = Math.min(AGENT_PANEL_WIDTH_LIMITS.min, value24);
-  return Math.max(value25, Math.min(value24, value22));
+function clampAgentSidebarWidth(value30, value31 = globalThis['window']?.['innerWidth']) {
+  const value32 = Number(value30),
+    value33 = Number['isFinite'](Number(value31))
+      ? Math['max'](0x140, Number(value31) - 0x18)
+      : AGENT_PANEL_WIDTH_LIMITS['max'],
+    value34 = Math['min'](AGENT_PANEL_WIDTH_LIMITS['max'], value33),
+    value35 = Math['min'](AGENT_PANEL_WIDTH_LIMITS['min'], value34);
+  return Math['max'](value35, Math['min'](value34, value32));
 }
-function readStoredSidebarWidth(value26 = globalThis.window) {
-  const count4 = Number(value26?.localStorage?.getItem?.(AGENT_PANEL_WIDTH_STORAGE_KEY));
-  return Number.isFinite(count4) && count4 > 0 ? count4 : null;
+function readStoredSidebarWidth(value36 = globalThis['window']) {
+  const count3 = Number(value36?.['localStorage']?.['getItem']?.(AGENT_PANEL_WIDTH_STORAGE_KEY));
+  return Number['isFinite'](count3) && count3 > 0x0 ? count3 : null;
 }
-function writeStoredSidebarWidth(value27, value28 = globalThis.window) {
+function writeStoredSidebarWidth(value37, value38 = globalThis['window']) {
   try {
-    value28?.localStorage?.setItem?.(AGENT_PANEL_WIDTH_STORAGE_KEY, String(Math.round(value27)));
+    value38?.['localStorage']?.['setItem']?.(
+      AGENT_PANEL_WIDTH_STORAGE_KEY,
+      String(Math['round'](value37)),
+    );
   } catch {}
 }
-export function normalizeAgentSidebarWidth(value29, value30) {
-  return clampAgentSidebarWidth(value29, value30);
+export function normalizeAgentSidebarWidth(value39, value40) {
+  return clampAgentSidebarWidth(value39, value40);
 }
-export function normalizeAgentExecutionMode(value31) {
-  return String(value31 || '').trim() === 'auto' ? 'auto' : 'manual';
+export function normalizeAgentExecutionMode(value41) {
+  return String(value41 || '')['trim']() === 'auto' ? 'auto' : 'manual';
 }
-export function getAgentExecutionModeLabel(value32) {
-  return normalizeAgentExecutionMode(value32) === 'auto' ? '自动执行' : '手动确认';
+export function getAgentExecutionModeLabel(value42) {
+  return normalizeAgentExecutionMode(value42) === 'auto'
+    ? agentPanelText('executionModeAuto')
+    : agentPanelText('executionModeManual');
 }
-export function getAgentPlaceholderActionMessage(value33) {
-  return PLACEHOLDER_ACTION_MESSAGES[value33] || '该入口会在后续接入。';
+export function getAgentPlaceholderActionMessage(value43) {
+  const value44 = PLACEHOLDER_ACTION_MESSAGES[value43] || 'placeholderFallback';
+  return agentPanelText(value44);
 }
-export function resolveAgentModelLabel(value34) {
-  const enabled = String(value34 || '').trim();
-  if (!enabled) return '模型选择';
-  return findTextModelMenuItem(enabled)?.title || enabled;
+export function resolveAgentModelLabel(value45) {
+  const enabled3 = String(value45 || '')['trim']();
+  if (!enabled3) return agentPanelText('modelSelection');
+  return findTextModelMenuItem(enabled3)?.['title'] || enabled3;
 }
-export function commitAgentModelSelection(value35, value36 = {}) {
-  const model2 = String(value36.model || value36.modelId || '').trim(),
-    provider2 = String(value36.provider || '').trim();
-  if (!model2) return null;
+function getCreateActionLabel(value46) {
+  const value47 = String(value46 || '');
+  if (value47 === 'ai-image') return agentPanelText('nodeCreateImage');
+  if (value47 === 'ai-video') return agentPanelText('nodeCreateVideo');
+  if (value47 === 'ai-audio') return agentPanelText('nodeCreateAudio');
+  if (value47 === 'ai-text' || value47 === 'source-text') return agentPanelText('nodeCreateText');
+  return agentPanelText('nodeCreate');
+}
+function formatActionSummary(options7 = {}) {
+  if (options7['label']) {
+    const list14 = [];
+    if (options7['promptSummary']) list14['push']('“' + options7['promptSummary'] + '”');
+    return (
+      Number['isFinite'](Number(options7['args']?.['gap'])) &&
+        list14['push'](formatAgentPanelText('gapValue', { value: Number(options7['args']['gap']) })),
+      list14['length'] ? options7['label'] + '：' + list14['join']('，') : options7['label']
+    );
+  }
+  const value48 = String(options7['type'] || ''),
+    response = options7['args'] || {},
+    value49 =
+      value48 === 'node.create'
+        ? getCreateActionLabel(response['type'])
+        : value48 === 'node.setPrompt' || value48 === 'node.appendPrompt'
+          ? agentPanelText('nodeSetPrompt')
+          : value48 === 'node.setParams'
+            ? agentPanelText('nodeSetParams')
+            : value48 === 'graph.connect'
+              ? agentPanelText('graphConnect')
+              : value48 === 'layout.arrangeRow'
+                ? agentPanelText('layoutArrangeRow')
+                : value48 === 'layout.align'
+                  ? agentPanelText('layoutAlign')
+                  : value48 === 'generation.run'
+                    ? agentPanelText('generate')
+                    : value48 === 'generation.runBatch'
+                      ? agentPanelText('generateBatch')
+                      : value48 === 'node.delete'
+                        ? agentPanelText('nodeDelete')
+                        : value48,
+    list15 = [],
+    value50 = response['prompt'] || response['text'];
+  if (value50) list15['push']('“' + String(value50)['slice'](0x0, 0x24) + '”');
   return (
-    value35?.updateSettings?.({ model: model2, provider: provider2 }) || {
-      model: model2,
-      provider: provider2,
-    }
+    Number['isFinite'](Number(response['gap'])) &&
+      list15['push'](formatAgentPanelText('gapValue', { value: Number(response['gap']) })),
+    list15['length'] ? value49 + '：' + list15['join']('，') : value49
   );
 }
-function getCreateActionLabel(value37) {
-  const value38 = String(value37 || '');
-  if (value38 === 'ai-image') return panelText('nodeCreateImage');
-  if (value38 === 'ai-video') return panelText('nodeCreateVideo');
-  if (value38 === 'ai-audio') return panelText('nodeCreateAudio');
-  if (value38 === 'ai-text' || value38 === 'source-text') return panelText('nodeCreateText');
-  return panelText('nodeCreate');
-}
-function formatActionSummary(options4 = {}) {
-  if (options4.label) {
-    const list6 = [];
-    if (options4.promptSummary) list6.push('“' + options4.promptSummary + '”');
-    if (Number.isFinite(Number(options4.args?.gap))) list6.push('间距 ' + Number(options4.args.gap));
-    return list6.length ? options4.label + '：' + list6.join('，') : options4.label;
+function readParamControlValue(el7, value51 = {}) {
+  const value52 = String(value51['type'] || '')['toLowerCase']();
+  if (value52 === 'toggle') return el7['checked'] === !![];
+  if (value52 === 'slider' || value52 === 'stepper') {
+    const value53 = Number(el7['value']);
+    return Number['isFinite'](value53) ? value53 : el7['value'];
   }
-  const value39 = String(options4.type || ''),
-    response2 = options4.args || {},
-    value40 =
-      value39 === 'node.create'
-        ? getCreateActionLabel(response2.type)
-        : value39 === 'node.setPrompt' || value39 === 'node.appendPrompt'
-          ? panelText('nodeSetPrompt')
-          : value39 === 'node.setParams'
-            ? panelText('nodeSetParams')
-            : value39 === 'graph.connect'
-              ? panelText('graphConnect')
-              : value39 === 'layout.arrangeRow'
-                ? panelText('layoutArrangeRow')
-                : value39 === 'layout.align'
-                  ? panelText('layoutAlign')
-                  : value39 === 'generation.run'
-                    ? panelText('generate')
-                    : value39 === 'node.delete'
-                      ? panelText('nodeDelete')
-                      : value39,
-    list7 = [],
-    value41 = response2.prompt || response2.text;
-  if (value41) list7.push('“' + String(value41).slice(0, 36) + '”');
-  if (Number.isFinite(Number(response2.gap))) list7.push('间距 ' + Number(response2.gap));
-  return list7.length ? value40 + '：' + list7.join('，') : value40;
+  return el7['value'];
 }
-function formatParamValue(value42) {
-  if (value42 == null || value42 === '') return '';
-  if (typeof value42 === 'string' || typeof value42 === 'number' || typeof value42 === 'boolean')
-    return String(value42);
-  try {
-    return JSON.stringify(value42);
-  } catch {
-    return String(value42);
-  }
+function getSelectedParamOption(el8 = {}) {
+  const value54 = el8['value'];
+  return (
+    (Array['isArray'](el8['options']) ? el8['options'] : [])['find'](
+      (el9) => String(el9?.['value'] ?? '') === String(value54 ?? ''),
+    ) || null
+  );
 }
-function formatParams(options5 = {}) {
-  const list8 =
-    options5 && typeof options5 === 'object' && !Array.isArray(options5) ? Object.entries(options5) : [];
-  if (list8.length === 0) return panelText('noParams');
-  return list8
-    .slice(0, 8)
-    .map(([value43, value44]) => value43 + ': ' + formatParamValue(value44))
-    .join('，');
+function getParamOptionLabel(options8 = {}, { selected: selected = ![] } = {}) {
+  const value55 = selected
+    ? (options8['displayLabel'] ?? options8['selectedLabel'] ?? options8['label'])
+    : (options8['label'] ?? options8['selectedLabel'] ?? options8['displayLabel']);
+  return String(value55 ?? '');
 }
-function renderActionGroup(el18, value45, list9 = []) {
-  if (!Array.isArray(list9) || list9.length === 0) return;
-  const el19 = createEl('div', 'agent-plan-group');
-  el19.appendChild(createEl('div', 'agent-plan-group-title', value45));
-  const el20 = createEl('div', 'agent-plan-list');
-  (list9.forEach((item5) => {
-    el20.appendChild(createEl('div', 'agent-plan-item', formatActionSummary(item5)));
-  }),
-    el19.appendChild(el20),
-    el18.appendChild(el19));
-}
-function renderTraceSummary(el21, value46, list10 = []) {
-  if (!Array.isArray(list10) || list10.length === 0) return;
-  const el22 = createEl('div', 'agent-plan-group');
-  el22.appendChild(createEl('div', 'agent-plan-group-title', value46));
-  const el23 = createEl('div', 'agent-plan-list');
-  (list10.forEach((item6) => {
-    el23.appendChild(createEl('div', 'agent-plan-item', item6));
-  }),
-    el22.appendChild(el23),
-    el21.appendChild(el22));
-}
-function renderPlanPreview(el24, enabled2) {
-  el24.replaceChildren();
-  if (!enabled2) {
-    el24.hidden = true;
-    return;
-  }
-  const enabled3 = enabled2.confirmationSummary || null,
-    list11 = Array.isArray(enabled2.actions) ? enabled2.actions : [];
-  if (!enabled3 && list11.length === 0) {
-    el24.hidden = true;
-    return;
-  }
-  el24.hidden = false;
-  const el25 = createEl('div', 'agent-plan-title', panelText('confirmTitle')),
-    el26 = createEl('div', 'agent-plan-body');
-  if (enabled3) {
-    (renderActionGroup(el26, panelText('completed'), enabled3.completedActions || []),
-      renderActionGroup(el26, panelText('pending'), enabled3.pendingActions || []),
-      renderTraceSummary(el26, panelText('traceSummary'), enabled3.debugTraceSummary || []));
-    if (enabled3.generation) {
-      const el27 = createEl('div', 'agent-plan-meta');
-      ([
-        [panelText('model'), enabled3.generation.modelLabel || enabled3.generation.model || ''],
-        [panelText('prompt'), enabled3.generation.promptSummary || ''],
-        [panelText('params'), formatParams(enabled3.generation.params)],
-        [panelText('inputSource'), enabled3.generation.inputSource || ''],
-      ].forEach(([value47, enabled4]) => {
-        if (!enabled4) return;
-        const el28 = createEl('div', 'agent-plan-meta-row');
-        (el28.append(
-          createEl('span', 'agent-plan-meta-label', value47),
-          createEl('span', 'agent-plan-meta-value', enabled4),
-        ),
-          el27.appendChild(el28));
-      }),
-        el26.appendChild(el27));
-    }
-    enabled3.cancelNotice && el26.appendChild(createEl('div', 'agent-plan-notice', enabled3.cancelNotice));
+function createParamControl(field = {}, value56 = null, value57 = null) {
+  const enabled4 = String(field['id'] || '')['trim']();
+  if (!enabled4) return null;
+  const el10 = createAgentElement('div', 'agent-param-control');
+  el10['dataset']['agentParamId'] = enabled4;
+  const enabled5 = String(field['label'] || '')['trim']();
+  if (!enabled5) return null;
+  el10['appendChild'](createAgentElement('span', 'agent-param-label', enabled5));
+  const value58 = String(field['type'] || '')['toLowerCase']();
+  let trigger,
+    value59 = enabled5;
+  if (Array['isArray'](field['options']) && field['options']['length'] > 0x0) {
+    ((trigger = createAgentButton('agent-param-input agent-param-select-trigger', '')),
+      (trigger['value'] = field['value']),
+      trigger['setAttribute']('aria-haspopup', 'menu'),
+      trigger['setAttribute']('aria-expanded', 'false'));
+    const selectedParamOption = getSelectedParamOption(field),
+      value60 = selectedParamOption ? getParamOptionLabel(selectedParamOption, { selected: !![] }) : '—';
+    ((value59 = enabled5 + '：' + value60),
+      trigger['append'](
+        createAgentElement('span', 'agent-param-select-value', value60),
+        createAgentElement('span', 'agent-caret\x20agent-param-select-caret'),
+      ));
+    const el11 = trigger['querySelector']('.agent-param-select-caret');
+    (el11 &&
+      (el11['innerHTML'] =
+        '<svg\x20width=\x2210\x22\x20height=\x2210\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><polyline\x20points=\x226\x209\x2012\x2015\x2018\x209\x22></polyline></svg>'),
+      trigger['addEventListener']('click', (event) => {
+        (event['preventDefault']?.(),
+          event['stopPropagation']?.(),
+          value57?.({
+            trigger: trigger,
+            field: field,
+            onSelect: (value61) => value56?.(enabled4, value61, field),
+          }));
+      }));
   } else {
-    const el29 = createEl('div', 'agent-plan-list');
-    (list11.forEach((item7) => {
-      el29.appendChild(createEl('div', 'agent-plan-item', formatActionSummary(item7)));
-    }),
-      el26.appendChild(el29));
+    if (value58 === 'toggle')
+      ((trigger = createAgentElement('input', 'agent-param-input agent-param-checkbox')),
+        (trigger['type'] = 'checkbox'),
+        (trigger['checked'] = field['value'] === !![]));
+    else {
+      ((trigger = createAgentElement('input', 'agent-param-input agent-param-number')),
+        (trigger['type'] = value58 === 'slider' || value58 === 'stepper' ? 'number' : 'text'),
+        (trigger['value'] = String(field['value'] ?? '')));
+      if (field['min'] !== undefined) trigger['setAttribute']('min', field['min']);
+      if (field['max'] !== undefined) trigger['setAttribute']('max', field['max']);
+      if (field['step'] !== undefined) trigger['setAttribute']('step', field['step']);
+    }
   }
-  el24.append(el25, el26);
+  return (
+    (trigger['dataset']['agentParamId'] = enabled4),
+    trigger['setAttribute']('aria-label', value59),
+    (!Array['isArray'](field['options']) || field['options']['length'] === 0x0) &&
+      trigger['addEventListener']('change', () => {
+        value56?.(enabled4, readParamControlValue(trigger, field), field);
+      }),
+    el10['appendChild'](trigger),
+    el10
+  );
 }
-function renderClarification(
-  el30,
-  value48,
-  value49,
-  handler,
-  value50 = null,
+function isAdvancedEditableParam(options9 = {}) {
+  return String(options9['placement'] || '')
+    ['trim']()
+    ['toLowerCase']()
+    ['endsWith']('advanced');
+}
+function renderEditableParams(
+  el12,
+  list16 = [],
+  value62 = null,
+  value63 = null,
   {
-    onAnswer: onAnswer = null,
-    onWaitingStart: onWaitingStart = null,
-    onWaitingEnd: onWaitingEnd = null,
+    advancedExpanded: advancedExpanded = ![],
+    onAdvancedExpandedChange: onAdvancedExpandedChange = null,
   } = {},
 ) {
-  el30.replaceChildren();
-  const list12 = Array.isArray(value48?.options) ? value48.options : [];
-  el30.hidden = list12.length === 0;
-  for (const value51 of list12) {
-    const el31 = createEl('button', 'agent-option-btn', value51.label);
-    ((el31.type = 'button'),
-      el31.addEventListener('click', async () => {
-        const displayAnswer = String(value51.label || value51.id || '').trim();
-        (onAnswer?.(displayAnswer), (el30.hidden = true));
-        const value52 = onWaitingStart?.();
-        value50?.(true);
-        try {
-          const value53 = await value49.answerClarification(value51.id, { displayAnswer: displayAnswer });
-          handler(value53);
-        } catch (reply2) {
-          handler({
-            ok: false,
-            status: 'failed',
-            reply: reply2?.message || 'Agent clarification failed.',
-          });
-        } finally {
-          (onWaitingEnd?.(value52), value50?.(false));
-        }
-      }),
-      el30.appendChild(el31));
+  if (!Array['isArray'](list16) || list16['length'] === 0x0) return;
+  const list17 = list16['filter'](isAdvancedEditableParam),
+    value64 = list16['filter']((value65) => !isAdvancedEditableParam(value65)),
+    el13 = createAgentElement('div', 'agent-param-editor');
+  el13['appendChild'](
+    createAgentElement('div', 'agent-plan-group-title', agentPanelText('editableParams')),
+  );
+  const run = (list18, value66 = 'agent-param-list') => {
+    if (list18['length'] === 0x0) return null;
+    const el14 = createAgentElement('div', value66);
+    return (
+      list18['map']((value67) => createParamControl(value67, value62, value63))
+        ['filter'](Boolean)
+        ['forEach']((value68) => el14['appendChild'](value68)),
+      el13['appendChild'](el14),
+      el14
+    );
+  };
+  run(value64);
+  if (list17['length'] > 0x0) {
+    const el15 = createAgentElement(
+        'button',
+        'agent-param-advanced-toggle advanced-settings-icon-button',
+      ),
+      agentPanelText2 = agentPanelText('advancedSettings');
+    ((el15['type'] = 'button'),
+      el15['setAttribute']('aria-expanded', advancedExpanded ? 'true' : 'false'),
+      el15['setAttribute']('aria-label', agentPanelText2),
+      (el15['dataset']['tooltip'] = agentPanelText2));
+    const el16 = createAgentElement('span', 'agent-param-advanced-icon');
+    (el16['setAttribute']('aria-hidden', 'true'),
+      (el16['innerHTML'] = ADVANCED_SETTINGS_TUNE_ICON_MARKUP),
+      el15['append'](el16, createAgentElement('span', 'agent-param-advanced-caret', '⌄')),
+      el15['querySelector']('.agent-param-advanced-caret')?.['setAttribute']('aria-hidden', 'true'),
+      el13['appendChild'](el15));
+    const el17 = run(list17, 'agent-param-list agent-param-advanced-list');
+    ((el17['hidden'] = !advancedExpanded),
+      el15['addEventListener']('click', () => {
+        const enabled6 = el17['hidden'];
+        ((el17['hidden'] = !enabled6),
+          el15['setAttribute']('aria-expanded', enabled6 ? 'true' : 'false'),
+          onAdvancedExpandedChange?.(enabled6));
+      }));
+  } else onAdvancedExpandedChange?.(![]);
+  el12['appendChild'](el13);
+}
+function renderActionGroup(el18, value69, list19 = []) {
+  if (!Array['isArray'](list19) || list19['length'] === 0x0) return;
+  const el19 = createAgentElement('div', 'agent-plan-group');
+  el19['appendChild'](createAgentElement('div', 'agent-plan-group-title', value69));
+  const el20 = createAgentElement('div', 'agent-plan-list');
+  (list19['forEach']((value70) => {
+    el20['appendChild'](createAgentElement('div', 'agent-plan-item', formatActionSummary(value70)));
+  }),
+    el19['appendChild'](el20),
+    el18['appendChild'](el19));
+}
+function renderTraceSummary(el21, value71, list20 = []) {
+  if (!Array['isArray'](list20) || list20['length'] === 0x0) return;
+  const el22 = createAgentElement('div', 'agent-plan-group');
+  el22['appendChild'](createAgentElement('div', 'agent-plan-group-title', value71));
+  const el23 = createAgentElement('div', 'agent-plan-list');
+  (list20['forEach']((value72) => {
+    el23['appendChild'](createAgentElement('div', 'agent-plan-item', value72));
+  }),
+    el22['appendChild'](el23),
+    el21['appendChild'](el22));
+}
+function renderPlanPreview(
+  advancedExpanded2,
+  enabled7,
+  { onParamChange: onParamChange = null, onOpenParamOptions: onOpenParamOptions = null } = {},
+) {
+  advancedExpanded2['replaceChildren']();
+  if (!enabled7) {
+    (delete advancedExpanded2['dataset']['agentAdvancedExpanded'], (advancedExpanded2['hidden'] = !![]));
+    return;
   }
+  const enabled8 = enabled7['confirmationSummary'] || null,
+    list21 = Array['isArray'](enabled7['actions']) ? enabled7['actions'] : [];
+  if (!enabled8 && list21['length'] === 0x0) {
+    advancedExpanded2['hidden'] = !![];
+    return;
+  }
+  advancedExpanded2['hidden'] = ![];
+  const agentElement = createAgentElement('div', 'agent-plan-title', agentPanelText('confirmTitle')),
+    el24 = createAgentElement('div', 'agent-plan-body');
+  if (enabled8) {
+    (renderActionGroup(el24, agentPanelText('completed'), enabled8['completedActions'] || []),
+      renderActionGroup(el24, agentPanelText('pending'), enabled8['pendingActions'] || []),
+      renderTraceSummary(el24, agentPanelText('traceSummary'), enabled8['debugTraceSummary'] || []));
+    if (enabled8['generation']) {
+      const el25 = createAgentElement('div', 'agent-plan-meta');
+      ([
+        [
+          agentPanelText('batchNodes'),
+          Number(enabled8['generation']['batchSize'] || 0x0) > 0x1
+            ? '' + enabled8['generation']['batchSize']
+            : '',
+        ],
+        [
+          agentPanelText('model'),
+          enabled8['generation']['modelLabel'] || enabled8['generation']['model'] || '',
+        ],
+        [agentPanelText('prompt'), enabled8['generation']['promptSummary'] || ''],
+        [agentPanelText('inputSource'), enabled8['generation']['inputSource'] || ''],
+      ]['forEach'](([value73, enabled9]) => {
+        if (!enabled9) return;
+        const agentElement2 = createAgentElement('div', 'agent-plan-meta-row');
+        (agentElement2['append'](
+          createAgentElement('span', 'agent-plan-meta-label', value73),
+          createAgentElement('span', 'agent-plan-meta-value', enabled9),
+        ),
+          el25['appendChild'](agentElement2));
+      }),
+        el24['appendChild'](el25),
+        renderEditableParams(
+          el24,
+          enabled8['generation']['editableParams'] || [],
+          onParamChange,
+          onOpenParamOptions,
+          {
+            advancedExpanded: advancedExpanded2['dataset']['agentAdvancedExpanded'] === 'true',
+            onAdvancedExpandedChange: (value74) => {
+              advancedExpanded2['dataset']['agentAdvancedExpanded'] = value74 ? 'true' : 'false';
+            },
+          },
+        ));
+    }
+    enabled8['cancelNotice'] &&
+      el24['appendChild'](createAgentElement('div', 'agent-plan-notice', enabled8['cancelNotice']));
+  } else {
+    const el26 = createAgentElement('div', 'agent-plan-list');
+    (list21['forEach']((value75) => {
+      el26['appendChild'](createAgentElement('div', 'agent-plan-item', formatActionSummary(value75)));
+    }),
+      el24['appendChild'](el26));
+  }
+  advancedExpanded2['append'](agentElement, el24);
 }
 function renderRecovery(
-  el32,
-  value54,
-  value55,
-  handler2,
-  value56 = null,
+  el27,
+  value76,
+  value77,
+  handler,
+  value78 = null,
   { editor: editor = null, setNotice: setNotice = null } = {},
 ) {
-  el32.replaceChildren();
-  const value57 = value54?.recovery || null,
-    list13 = Array.isArray(value57?.options) ? value57.options : [];
-  el32.hidden = list13.length === 0;
-  if (list13.length === 0) return;
-  el32.appendChild(createEl('div', 'agent-recovery-title', panelText('recoveryTitle')));
-  const el33 = createEl('div', 'agent-recovery-actions');
-  for (const value58 of list13) {
-    const el34 = createEl('button', 'agent-recovery-btn', value58.label || value58.id);
-    ((el34.type = 'button'),
-      (el34.dataset.recoveryAction = value58.id),
-      el34.addEventListener('click', async () => {
-        const value59 = String(value58.id || '');
-        if (value59 === 'editPrompt') {
-          (setEditorText(editor, panelText('recoveryEditPromptDraft')),
-            editor?.focus?.(),
-            setNotice?.(panelText('recoveryEditPromptNotice')),
-            (el32.hidden = true));
+  el27['replaceChildren']();
+  const value79 = value76?.['recovery'] || null,
+    list22 = Array['isArray'](value79?.['options']) ? value79['options'] : [];
+  el27['hidden'] = list22['length'] === 0x0;
+  if (list22['length'] === 0x0) return;
+  el27['appendChild'](
+    createAgentElement('div', 'agent-recovery-title', agentPanelText('recoveryTitle')),
+  );
+  const el28 = createAgentElement('div', 'agent-recovery-actions');
+  for (const value80 of list22) {
+    const el29 = createAgentElement(
+      'button',
+      'agent-recovery-btn',
+      value80['label'] || value80['id'],
+    );
+    ((el29['type'] = 'button'),
+      (el29['dataset']['recoveryAction'] = value80['id']),
+      el29['addEventListener']('click', async () => {
+        const value81 = String(value80['id'] || '');
+        if (value81 === 'editPrompt') {
+          (setEditorText(editor, agentPanelText('recoveryEditPromptDraft')),
+            editor?.['focus']?.(),
+            setNotice?.(agentPanelText('recoveryEditPromptNotice')),
+            (el27['hidden'] = !![]));
           return;
         }
-        if (value59 === 'changeModel') {
-          (setEditorText(editor, panelText('recoveryChangeModelDraft')),
-            editor?.focus?.(),
-            setNotice?.(panelText('recoveryChangeModelNotice')),
-            (el32.hidden = true));
+        if (value81 === 'changeModel') {
+          (setEditorText(editor, agentPanelText('recoveryChangeModelDraft')),
+            editor?.['focus']?.(),
+            setNotice?.(agentPanelText('recoveryChangeModelNotice')),
+            (el27['hidden'] = !![]));
           return;
         }
-        value56?.(true);
+        if (value81 === 'editRequest') {
+          (setEditorText(editor, value80['draft'] || ''),
+            editor?.['focus']?.(),
+            setNotice?.(agentPanelText('recoveryEditRequestNotice')),
+            (el27['hidden'] = !![]));
+          return;
+        }
+        value78?.(!![], { stoppable: !![] });
         try {
-          const value60 =
-            value59 === 'keepPrepared'
-              ? await value55.keepPreparedPlan?.()
-              : await value55.retryFailedPlan?.();
-          handler2(value60 || { ok: false, status: 'failed', reply: 'Recovery failed.' });
-        } catch (reply3) {
-          handler2({
-            ok: false,
-            status: 'failed',
-            reply: reply3?.message || 'Agent recovery failed.',
-          });
+          const value82 =
+            value81 === 'keepPrepared'
+              ? await value77['keepPreparedPlan']?.()
+              : value81 === 'retryPlanner'
+                ? await value77['retryPlannerRun']?.()
+                : await value77['retryFailedPlan']?.();
+          handler(value82 || { ok: ![], status: 'failed', reply: 'Recovery\x20failed.' });
+        } catch (reply2) {
+          handler({ ok: ![], status: 'failed', reply: reply2?.['message'] || 'Agent recovery failed.' });
         } finally {
-          value56?.(false);
+          value78?.(![], { stoppable: ![] });
         }
       }),
-      el33.appendChild(el34));
+      el28['appendChild'](el29));
   }
-  el32.appendChild(el33);
+  el27['appendChild'](el28);
 }
-function formatHistoryTime(value61) {
-  const value62 = new Date(Number(value61) || Date.now());
-  return value62.toLocaleString(getLocale(), {
+function formatHistoryTime(value83) {
+  const value84 = new Date(Number(value83) || Date['now']());
+  return value84['toLocaleString'](getLocale(), {
     month: 'numeric',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
 }
-function getLastMessageSummary(options6 = {}) {
-  const list14 = Array.isArray(options6.messages) ? options6.messages : [],
-    value63 = list14[list14.length - 1] || null;
-  return String(value63?.content || options6.lastPlanSummary || options6.title || '').trim();
+function getLastMessageSummary(options10 = {}) {
+  const list23 = Array['isArray'](options10['messages']) ? options10['messages'] : [],
+    value85 = list23[list23['length'] - 0x1] || null;
+  return String(value85?.['content'] || options10['lastPlanSummary'] || options10['title'] || '')['trim']();
 }
-function renderHistory(value64, value65, { onSelect: onSelect = null, onDelete: onDelete = null } = {}) {
-  value64.replaceChildren();
-  const el35 = createEl('div', 'agent-history-title', panelText('historyTitle')),
-    list15 = value65?.listConversations?.() || [],
-    value66 = value65?.getActiveConversation?.() || null;
-  if (!list15.length) {
-    value64.append(el35, createEl('div', 'agent-history-empty', panelText('historyEmpty')));
+function renderHistory(value86, value87, { onSelect: onSelect = null, onDelete: onDelete = null } = {}) {
+  value86['replaceChildren']();
+  const agentElement3 = createAgentElement('div', 'agent-history-title', agentPanelText('historyTitle')),
+    list24 = value87?.['listConversations']?.() || [],
+    value88 = value87?.['getActiveConversation']?.() || null;
+  if (!list24['length']) {
+    value86['append'](
+      agentElement3,
+      createAgentElement('div', 'agent-history-empty', agentPanelText('historyEmpty')),
+    );
     return;
   }
-  const el36 = createEl('div', 'agent-history-list');
-  (list15.forEach((item8) => {
-    const el37 = createEl('div', 'agent-history-item');
-    ((el37.dataset.conversationId = item8.id), el37.classList.toggle('is-active', item8.id === value66?.id));
-    const el38 = createEl('button', 'agent-history-main');
-    ((el38.type = 'button'),
-      el38.append(
-        createEl('span', 'agent-history-name', item8.title || '新对话'),
-        createEl('span', 'agent-history-time', formatHistoryTime(item8.updatedAt)),
-        createEl('span', 'agent-history-content', getLastMessageSummary(item8)),
+  const el30 = createAgentElement('div', 'agent-history-list');
+  (list24['forEach']((value89) => {
+    const el31 = createAgentElement('div', 'agent-history-item');
+    ((el31['dataset']['conversationId'] = value89['id']),
+      el31['classList']['toggle']('is-active', value89['id'] === value88?.['id']));
+    const el32 = createAgentElement('button', 'agent-history-main');
+    ((el32['type'] = 'button'),
+      el32['append'](
+        createAgentElement(
+          'span',
+          'agent-history-name',
+          value89['title'] || agentPanelText('newConversationFallback'),
+        ),
+        createAgentElement('span', 'agent-history-time', formatHistoryTime(value89['updatedAt'])),
+        createAgentElement('span', 'agent-history-content', getLastMessageSummary(value89)),
       ),
-      el38.addEventListener('click', () => onSelect?.(item8.id)));
-    const el39 = createButton('agent-history-delete', panelText('historyDelete'), {
-      title: panelText('historyDelete'),
+      el32['addEventListener']('click', () => onSelect?.(value89['id'])));
+    const el33 = createAgentButton('agent-history-delete', '×', {
+      title: agentPanelText('historyDelete'),
     });
-    (el39.addEventListener('click', (event) => {
-      (event.preventDefault?.(), event.stopPropagation?.(), onDelete?.(item8.id));
+    (el33['addEventListener']('click', (event2) => {
+      (event2['preventDefault']?.(), event2['stopPropagation']?.(), onDelete?.(value89['id']));
     }),
-      el37.append(el38, el39),
-      el36.appendChild(el37));
+      el31['append'](el32, el33),
+      el30['appendChild'](el31));
   }),
-    value64.append(el35, el36));
+    value86['append'](agentElement3, el30));
 }
-function updateModelTrigger(el40, value67 = {}) {
-  const value68 = value67.model || '',
-    el41 = el40.querySelector('.agent-model-label'),
-    el42 = el40.querySelector('.agent-model-icon-slot');
-  if (el41) el41.textContent = resolveAgentModelLabel(value68);
-  el42 && (el42.innerHTML = buildTextModelSmallIconHTML(value68) || iconSvg('model'));
+function isAgentPopoverOpen(el34) {
+  if (!el34) return ![];
+  if (el34['classList']?.['contains']('agent-history-popover')) return el34['hidden'] !== !![];
+  return el34['classList']?.['contains']('show');
 }
-function closeFloatingMenus(el43, enabled5 = null) {
-  el43?.querySelectorAll?.('.agent-floating-menu.show, .agent-model-menu.show')?.forEach((el44) => {
-    if (el44 !== enabled5) el44.classList.remove('show');
+function hideAgentPopover(el35) {
+  if (!el35) return;
+  if (el35['classList']?.['contains']('agent-history-popover')) {
+    ((el35['hidden'] = !![]), el35['classList']?.['remove']?.('show'));
+    return;
+  }
+  (el35['classList']?.['remove']?.('show'),
+    el35['agentPopoverTrigger']?.['setAttribute']?.('aria-expanded', 'false'));
+}
+function showAgentPopover(el36) {
+  if (!el36) return;
+  if (el36['classList']?.['contains']('agent-history-popover')) {
+    ((el36['hidden'] = ![]), el36['classList']?.['add']?.('show'));
+    return;
+  }
+  (el36['classList']?.['add']?.('show'),
+    el36['agentPopoverTrigger']?.['setAttribute']?.('aria-expanded', 'true'));
+}
+function closeFloatingMenus(el37, enabled10 = null) {
+  el37?.['querySelectorAll']?.(
+    '.agent-floating-menu.show,\x20.agent-model-menu.show,\x20.agent-history-popover',
+  )?.['forEach']((value90) => {
+    if (value90 !== enabled10) hideAgentPopover(value90);
   });
-  if (!enabled5) closeNodeFooterMenus(el43);
+  if (!enabled10) closeNodeFooterMenus(el37);
 }
-function setMenuOpen(el45, value69, value70) {
-  (closeFloatingMenus(value70, value69 ? el45 : null), el45?.classList.toggle('show', value69));
+function setMenuOpen(value91, value92, value93) {
+  closeFloatingMenus(value93, value92 ? value91 : null);
+  if (value92) showAgentPopover(value91);
+  else hideAgentPopover(value91);
 }
-function isAgentMenuSurface(el46) {
-  return !!el46?.closest?.('.agent-menu-wrap, .agent-floating-menu, .agent-model-menu');
+function isAgentMenuSurface(el38) {
+  return !!el38?.['closest']?.(
+    '.agent-menu-wrap, .agent-floating-menu, .agent-model-menu, .agent-history-popover, .agent-history-btn',
+  );
+}
+function hasOpenFloatingMenus(el39) {
+  return Array['from'](
+    el39?.['querySelectorAll']?.(
+      '.agent-floating-menu.show,\x20.agent-model-menu.show,\x20.agent-history-popover',
+    ) || [],
+  )['some'](isAgentPopoverOpen);
 }
 export function initAgentPanel({
   runtime: runtime,
   modelSettings: modelSettings,
   store: store = null,
   uploadMaterial: uploadMaterial = null,
-  fabBtnEl: fabBtnEl = document.getElementById('fabBtn'),
-  root: root = document.body,
+  validateDocumentFile: validateDocumentFile = null,
+  skillRegistry: skillRegistry = null,
+  refreshAgentSkills: refreshAgentSkills = null,
+  installAgentSkill: installAgentSkill = null,
+  deleteAgentSkill: deleteAgentSkill = null,
+  saveAgentSkill: saveAgentSkill = null,
+  fabBtnEl: fabBtnEl = document['getElementById']('fabBtn'),
+  root: root = document['body'],
+  stateRoot: stateRoot = document['body'],
+  surface: surface = {},
+  replyActions: replyActions = [],
 } = {}) {
   if (!runtime || !fabBtnEl || !root) return null;
-  const panel = createEl('aside', 'agent-sidebar');
-  (panel.setAttribute('aria-label', 'Canvas Agent 侧边栏'), panel.setAttribute('aria-hidden', 'true'));
-  const el47 = createEl('div', 'agent-sidebar-resize-handle');
-  (el47.setAttribute('role', 'separator'),
-    el47.setAttribute('aria-orientation', 'vertical'),
-    el47.setAttribute('aria-label', '调整 Agent 侧边栏宽度'),
-    (el47.tabIndex = 0));
-  const el48 = createEl('div', 'agent-sidebar-header'),
-    el49 = createButton('agent-icon-btn agent-collapse-btn', '', {
-      title: '折叠',
-      icon: iconSvg('collapse'),
+  const ownerRoot = createAgentElement('aside', 'agent-sidebar');
+  (ownerRoot['setAttribute']('aria-label', agentPanelText('panelAria')),
+    ownerRoot['setAttribute']('aria-hidden', 'true'),
+    (ownerRoot['dataset']['readonlyTextSelectionRoot'] = 'true'));
+  const el40 = createAgentElement('div', 'agent-sidebar-resize-handle');
+  (el40['setAttribute']('role', 'separator'),
+    el40['setAttribute']('aria-orientation', 'vertical'),
+    el40['setAttribute']('aria-label', agentPanelText('resizeAria')),
+    (el40['tabIndex'] = 0x0));
+  const agentElement4 = createAgentElement('div', 'agent-sidebar-header'),
+    agentElement5 = createAgentElement('div', 'agent-sidebar-title');
+  agentElement5['append'](
+    createAgentElement('span', 'agent-sidebar-title-main', surface['title'] || 'Shuo\x20Canvas\x20Agent'),
+    createAgentElement('span', 'agent-sidebar-title-badge', agentPanelText('betaBadge')),
+  );
+  const agentElement6 = createAgentElement('div', 'agent-header-actions'),
+    el41 = createAgentButton('agent-icon-btn agent-new-chat-btn', '', {
+      title: agentPanelText('newConversation'),
+      icon: agentIconSvg('plus'),
+    }),
+    el42 = createAgentButton('agent-icon-btn agent-history-btn', '', {
+      title: agentPanelText('historyTitle'),
+      icon: agentIconSvg('history'),
+    }),
+    el43 = createAgentButton('agent-icon-btn agent-close-btn', '', {
+      title: agentPanelText('close'),
+      icon: agentIconSvg('close'),
     });
-  el49.setAttribute('aria-expanded', 'true');
-  const el50 = createEl('div', 'agent-sidebar-title');
-  el50.append(
-    createEl('span', 'agent-sidebar-title-main', 'Ai CanvasPro Agent'),
-    createEl('span', 'agent-sidebar-title-badge', '测试版'),
+  (agentElement6['append'](el41, el42, el43), agentElement4['append'](agentElement5, agentElement6));
+  const agentElement7 = createAgentElement('div', 'agent-sidebar-main'),
+    el44 = createAgentElement('div', 'agent-greeting');
+  el44['append'](
+    createAgentElement('div', 'agent-greeting-kicker', surface['kicker'] || agentPanelText('greetingKicker')),
+    createAgentElement('div', 'agent-greeting-title', surface['greeting'] || agentPanelText('greetingTitle')),
   );
-  const el51 = createEl('div', 'agent-header-actions'),
-    el52 = createButton('agent-icon-btn agent-new-chat-btn', '', {
-      title: '新建对话',
-      icon: iconSvg('plus'),
-    }),
-    el53 = createButton('agent-icon-btn agent-history-btn', '', {
-      title: '历史记录',
-      icon: iconSvg('history'),
-    }),
-    el54 = createButton('agent-icon-btn', '', { title: '关闭', icon: iconSvg('close') });
-  (el51.append(el52, el53, el54), el48.append(el49, el50, el51));
-  const el55 = createEl('div', 'agent-sidebar-main'),
-    el56 = createEl('div', 'agent-greeting');
-  el56.append(
-    createEl('div', 'agent-greeting-kicker', 'Hi，欢迎回来'),
-    createEl('div', 'agent-greeting-title', '今天一起创作点什么？'),
-  );
-  const el57 = createEl('div', 'agent-messages'),
-    el58 = createEl('div', 'agent-history-popover');
-  ((el58.hidden = true), el55.append(el56, el57, el58));
-  const el59 = createEl('div', 'agent-quick-actions'),
-    value71 = globalThis.window;
-  function run() {
-    (el59.replaceChildren(),
-      [...AGENT_QUICK_ACTIONS, ...readCustomQuickActions(value71)].forEach((icon2) => {
-        const el60 = createButton('agent-quick-card', icon2.label, {
+  const messagesEl = createAgentElement('div', 'agent-messages'),
+    runStepsEl = createAgentElement('div', 'agent-run-steps');
+  runStepsEl['hidden'] = !![];
+  const el45 = createAgentElement('div', 'agent-history-popover');
+  ((el45['hidden'] = !![]), agentElement7['append'](el44, messagesEl, runStepsEl, el45));
+  const el46 = createAgentElement('div', 'agent-quick-actions-shell'),
+    el47 = createAgentElement('div', 'agent-quick-actions');
+  el46['appendChild'](el47);
+  const windowObject = globalThis['window'];
+  let showContextMenu2 = null;
+  const run2 = () => {
+      (showContextMenu2?.['close']?.(), (showContextMenu2 = null));
+    },
+    handler2 = (ownerElement, list25) => {
+      if (!Array['isArray'](list25) || list25['length'] === 0x0) return;
+      (ownerElement['preventDefault']?.(),
+        ownerElement['stopPropagation']?.(),
+        closeFloatingMenus(ownerRoot),
+        run2(),
+        (showContextMenu2 = showContextMenu(
+          Number(ownerElement['clientX']) || 0x0,
+          Number(ownerElement['clientY']) || 0x0,
+          list25,
+          {
+            className: 'v2-canvas-ctx-menu agent-context-menu',
+            ensureItemIcons: !![],
+            ownerElement: ownerElement['target'],
+            ownerRoot: ownerRoot,
+          },
+        )));
+    },
+    onOpenParamOptions2 = ({ trigger: trigger2, field: field2, onSelect: onSelect2 } = {}) => {
+      if (!trigger2 || !Array['isArray'](field2?.['options']) || field2['options']['length'] === 0x0)
+        return;
+      if (trigger2['getAttribute']('aria-expanded') === 'true') {
+        run2();
+        return;
+      }
+      (closeFloatingMenus(ownerRoot), run2());
+      const list26 = field2['options']
+        ['map']((disabled) => {
+          const label = getParamOptionLabel(disabled);
+          if (!label) return null;
+          return {
+            label: label,
+            checked: String(disabled?.['value'] ?? '') === String(field2['value'] ?? ''),
+            disabled: disabled?.['disabled'] === !![],
+            action: () => onSelect2?.(disabled['value']),
+            paramValue: disabled['value'],
+          };
+        })
+        ['filter'](Boolean);
+      if (list26['length'] === 0x0) return;
+      const box3 = trigger2['getBoundingClientRect']?.() || {};
+      trigger2['setAttribute']('aria-expanded', 'true');
+      let showContextMenu3 = null;
+      ((showContextMenu3 = showContextMenu(
+        Number(box3['left']) || 0x0,
+        (Number(box3['bottom']) || 0x0) + 0x4,
+        list26,
+        {
+          className: 'v2-canvas-ctx-menu v2-sb-dropdown agent-param-dropdown-menu',
+          restoreTarget: trigger2,
+          ownerElement: trigger2,
+          ownerRoot: ownerRoot,
+          dismissOnOwnerPointerDown: ![],
+          ariaLabel: String(field2['label'] || ''),
+          onClose: () => {
+            trigger2['setAttribute']('aria-expanded', 'false');
+            if (showContextMenu2 === showContextMenu3) showContextMenu2 = null;
+          },
+        },
+      )),
+        (showContextMenu2 = showContextMenu3),
+        (showContextMenu3['menu']['dataset']['agentParamId'] = String(field2['id'] || '')),
+        showContextMenu3['menu']['querySelectorAll']?.('.v2-menu-row')?.['forEach']((el48, value94) => {
+          el48['dataset']['agentParamValue'] = String(list26[value94]?.['paramValue'] ?? '');
+        }));
+    };
+  seedCustomQuickActionsIfNeeded(windowObject);
+  function run3() {
+    (el47['replaceChildren'](),
+      (surface['quickActions'] || readCustomQuickActions(windowObject))['forEach']((icon) => {
+        const el49 = createAgentButton('agent-quick-card', icon['label'], {
           icon:
-            icon2.custom === true
-              ? iconSvg('wand')
-              : icon2.id === 'archive-assets'
-                ? iconSvg('grid')
-                : icon2.id === 'check-style'
-                  ? iconSvg('scan')
-                  : iconSvg('flow'),
+            icon['custom'] === !![]
+              ? agentIconSvg('wand')
+              : icon['id'] === 'canvas-gap-check'
+                ? agentIconSvg('scan')
+                : icon['id'] === 'storyboard-plan'
+                  ? agentIconSvg('flow')
+                  : agentIconSvg('wand'),
         });
-        ((el60.dataset.prompt = icon2.prompt), el59.appendChild(el60));
-      }));
+        ((el49['dataset']['prompt'] = icon['prompt']), el47['appendChild'](el49));
+      }),
+      run4());
   }
-  run();
-  const el61 = createEl('div', 'agent-notice');
-  el61.hidden = true;
-  const el62 = createEl('div', 'agent-plan-preview');
-  el62.hidden = true;
-  const el63 = createEl('div', 'agent-options');
-  el63.hidden = true;
-  const el64 = createEl('div', 'agent-recovery');
-  el64.hidden = true;
-  const el65 = createEl('div', 'agent-actions');
-  el65.hidden = true;
-  const el66 = createButton('agent-primary-btn', '确认执行'),
-    el67 = createButton('agent-secondary-btn', '取消');
-  el65.append(el66, el67);
-  const el68 = createEl('form', 'agent-compose'),
-    el69 = createEl('div', 'agent-prompt-panel text-prompt-panel'),
-    el70 = createEl('div', 'agent-ref-bar node-ref-bar active'),
-    el71 = createAgentPromptAttachmentButton({
-      title: '从选中素材添加入参',
+  run3();
+  const el50 = createAgentElement('div', 'agent-custom-panel');
+  ((el50['hidden'] = !![]), el50['setAttribute']('aria-hidden', 'true'));
+  const agentElement8 = createAgentElement('div', 'agent-custom-panel-header'),
+    agentElement9 = createAgentElement('div', 'agent-custom-panel-copy');
+  agentElement9['append'](
+    createAgentElement('div', 'agent-custom-panel-title', agentPanelText('customShortcutPanelTitle')),
+    createAgentElement('div', 'agent-custom-panel-desc', agentPanelText('customShortcutPanelDesc')),
+  );
+  const el51 = createAgentButton('agent-custom-close-btn', '×', {
+    title: agentPanelText('customShortcutClose'),
+  });
+  agentElement8['append'](agentElement9, el51);
+  const el52 = createAgentButton(
+      'agent-secondary-btn agent-custom-new-btn',
+      agentPanelText('customShortcutNew'),
+    ),
+    agentElement10 = createAgentElement('div', 'agent-custom-panel-body'),
+    agentElement11 = createAgentElement('div', 'agent-custom-sidebar'),
+    el53 = createAgentElement('div', 'agent-custom-list');
+  (el53['setAttribute']('role', 'list'), agentElement11['append'](el52, el53));
+  const el54 = createAgentElement('div', 'agent-custom-editor'),
+    el55 = createAgentElement('label', 'agent-custom-field');
+  el55['appendChild'](
+    createAgentElement('span', 'agent-custom-label', agentPanelText('customShortcutNameLabel')),
+  );
+  const el56 = createAgentElement('input', 'agent-custom-input');
+  ((el56['type'] = 'text'),
+    (el56['maxLength'] = 0x1c),
+    (el56['placeholder'] = agentPanelText('customShortcutNamePlaceholder')),
+    el55['appendChild'](el56));
+  const el57 = createAgentElement('label', 'agent-custom-field');
+  el57['appendChild'](
+    createAgentElement('span', 'agent-custom-label', agentPanelText('customShortcutPromptLabel')),
+  );
+  const el58 = createAgentElement('textarea', 'agent-custom-textarea');
+  ((el58['rows'] = 0x4),
+    (el58['placeholder'] = agentPanelText('customShortcutPromptPlaceholder')),
+    el57['appendChild'](el58));
+  const agentElement12 = createAgentElement('div', 'agent-custom-editor-actions'),
+    el59 = createAgentButton(
+      'agent-primary-btn agent-custom-save-btn',
+      agentPanelText('customShortcutSave'),
+    );
+  (agentElement12['append'](el59),
+    el54['append'](el55, el57, agentElement12),
+    agentElement10['append'](agentElement11, el54),
+    el50['append'](agentElement8, agentElement10));
+  const el60 = createAgentElement('div', 'agent-notice');
+  el60['hidden'] = !![];
+  const el61 = createAgentElement('div', 'agent-plan-preview');
+  el61['hidden'] = !![];
+  const el62 = createAgentElement('div', 'agent-options');
+  el62['hidden'] = !![];
+  const el63 = createAgentElement('div', 'agent-recovery');
+  el63['hidden'] = !![];
+  const el64 = createAgentElement('div', 'agent-actions');
+  el64['hidden'] = !![];
+  const el65 = createAgentButton('agent-primary-btn', agentPanelText('confirmExecute')),
+    el66 = createAgentButton('agent-secondary-btn', agentPanelText('cancel'));
+  el64['append'](el65, el66);
+  const el67 = createAgentElement('form', 'agent-compose'),
+    agentElement13 = createAgentElement('div', 'agent-prompt-panel text-prompt-panel'),
+    el68 = createAgentElement('div', 'agent-ref-bar node-ref-bar active'),
+    el69 = createAgentPromptAttachmentButton({
+      title: agentPanelText('addSelectedReference'),
       className: 'agent-connect-btn',
     }),
-    el72 = createEl('div', 'agent-ref-placeholder', panelText('addReference')),
-    el73 = createEl('div', 'ref-thumb-container agent-input-ref-list');
-  (el73.setAttribute('role', 'list'), el70.append(el71, el72, el73));
-  const el74 = createEl('div', 'agent-input-wrapper prompt-input-wrapper'),
-    editor2 = createEl('div', 'agent-compose-input prompt-textarea custom-textarea');
-  ((editor2.contentEditable = 'true'),
-    (editor2.spellcheck = false),
-    (editor2.dataset.placeholder = '描述创意或需求，/ 使用技能，@ 引用参考'),
-    el74.appendChild(editor2));
-  const el75 = createEl('div', 'agent-compose-footer prompt-panel-footer'),
-    el76 = createEl('div', 'agent-compose-left'),
-    el77 = createEl('div', 'agent-menu-wrap'),
-    el78 = createButton('agent-round-btn', '', { title: '添加', icon: iconSvg('plus') }),
-    el79 = createEl('div', 'agent-floating-menu agent-add-menu');
-  ([
-    ['canvas', '从画布添加', 'grid'],
-    ['upload', '上传素材', 'upload'],
-    ['custom', '自定义快捷用法', 'wand'],
-  ].forEach(([value72, value73, value74]) => {
-    const el80 = createButton('agent-menu-item', value73, { icon: iconSvg(value74) });
-    ((el80.dataset.placeholderAction = value72), el79.appendChild(el80));
-  }),
-    el77.append(el78, el79));
-  const el81 = createEl('input', 'agent-upload-input');
-  ((el81.type = 'file'), (el81.accept = 'image/*,video/*,audio/*'), (el81.multiple = false));
-  const el82 = createEl('div', 'agent-menu-wrap agent-model-wrap img-model-wrap'),
-    value75 = modelSettings?.getSettings?.() || {},
-    el83 = createButton('agent-pill-btn agent-model-btn img-model-btn-trigger', '', {
-      title: '模型选择',
+    el70 = createAgentElement('div', 'agent-ref-placeholder', agentPanelText('addReference')),
+    el71 = createAgentElement('div', 'ref-thumb-container agent-input-ref-list');
+  (el71['setAttribute']('role', 'list'), el68['append'](el69, el70, el71));
+  if (surface['textOnly']) el68['hidden'] = !![];
+  const el72 = createAgentElement('div', 'agent-input-wrapper prompt-input-wrapper'),
+    slashTrigger = createAgentElement('div', 'agent-compose-input prompt-textarea custom-textarea');
+  ((slashTrigger['contentEditable'] = 'true'),
+    (slashTrigger['spellcheck'] = ![]),
+    (slashTrigger['dataset']['placeholder'] = surface['placeholder'] || agentPanelText('inputPlaceholder')),
+    el72['appendChild'](slashTrigger));
+  const agentElement14 = createAgentElement('div', 'agent-compose-footer prompt-panel-footer'),
+    agentElement15 = createAgentElement('div', 'agent-compose-left'),
+    el73 = createAgentElement('div', 'agent-menu-wrap'),
+    el74 = createAgentButton('agent-round-btn', '', {
+      title: agentPanelText('add'),
+      icon: agentIconSvg('plus'),
     }),
-    el84 = createEl('span', 'agent-model-icon-slot'),
-    el85 = createEl('span', 'agent-model-label'),
-    el86 = createEl('span', 'agent-caret');
-  ((el86.innerHTML =
-    '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
-    el83.append(el84, el85, el86));
-  const el87 = createEl('div', 'floating-menu img-model-menu node-model-menu agent-model-menu');
-  ((el87.innerHTML = buildTextProviderMenuGroupsHTML(value75.model || '')),
-    el82.append(el83, el87),
-    updateModelTrigger(el83, value75));
-  const el88 = createEl('div', 'agent-menu-wrap'),
-    el89 = createButton('agent-pill-btn agent-mode-btn', '', {
-      title: 'Agent 模式',
-      icon: iconSvg('mode'),
-    }),
-    el90 = createEl('span', 'agent-mode-label', getAgentExecutionModeLabel(value75.executionMode)),
-    el91 = createEl('span', 'agent-caret');
-  ((el91.innerHTML =
-    '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
-    el89.append(el90, el91));
-  const el92 = createEl('div', 'agent-floating-menu agent-mode-menu');
+    el75 = createAgentElement('div', 'agent-floating-menu agent-add-menu');
   ([
-    ['manual', '手动确认'],
-    ['auto', '自动执行'],
-  ].forEach(([value76, value77]) => {
-    const el93 = createButton('agent-menu-item', value77, { icon: iconSvg('check') });
-    ((el93.dataset.executionMode = value76),
-      el93.classList.toggle('active', normalizeAgentExecutionMode(value75.executionMode) === value76),
-      el92.appendChild(el93));
+    ['upload', agentPanelText('uploadMaterial'), 'upload'],
+    ['document', agentPanelText('readDocument'), 'upload'],
+    ['custom', agentPanelText('customShortcutPanelTitle'), 'wand'],
+    ['skills', agentPanelText('skillManage'), 'skills'],
+  ]['forEach'](([value95, value96, value97]) => {
+    const el76 = createAgentButton('agent-menu-item', value96, { icon: agentIconSvg(value97) });
+    ((el76['dataset']['placeholderAction'] = value95), el75['appendChild'](el76));
   }),
-    el88.append(el89, el92),
-    (el88.hidden = true),
-    el76.append(el77, el82));
-  const el94 = createButton('agent-send-btn', '', { title: '发送', icon: iconSvg('send') });
-  ((el94.type = 'submit'),
-    el75.append(el76, el94),
-    el69.append(el70, el74, el75),
-    el68.append(el59, el62, el63, el64, el65, el69, el81),
-    panel.append(el47, el48, el55, el68),
-    root.appendChild(panel),
-    (document?.body || root).appendChild(el61),
-    bindNodeSubmenus(el87));
-  let value78 = false;
-  const storedSidebarWidth = readStoredSidebarWidth(value71);
-  storedSidebarWidth &&
-    document?.body?.style?.setProperty?.(
-      '--agent-sidebar-width',
-      clampAgentSidebarWidth(storedSidebarWidth) + 'px',
+    el73['append'](el74, el75));
+  if (surface['textOnly']) el73['hidden'] = !![];
+  const activeModel = modelSettings?.['getSettings']?.() || {},
+    el77 = createAgentElement(
+      'div',
+      'img-model-pills aigen-text-model-selector agent-text-model-selector',
     );
-  function setNotice2(value79) {
-    ((el61.textContent = String(value79 || '')), (el61.hidden = !el61.textContent));
+  el77['dataset']['aigenTextModelSelector'] = '';
+  const agentElement16 = createAgentElement('div', 'agent-menu-wrap\x20agent-model-wrap\x20img-model-wrap'),
+    el78 = createAgentButton('agent-pill-btn agent-model-btn img-model-btn-trigger', '', {
+      title: agentPanelText('modelSelection'),
+    }),
+    el79 = createAgentElement('span', 'agent-model-icon-slot');
+  el79['innerHTML'] = agentIconSvg('model');
+  const agentElement17 = createAgentElement(
+      'span',
+      'agent-model-label img-model-label',
+      resolveAgentModelLabel(activeModel['model']),
+    ),
+    el80 = createAgentElement('span', 'agent-caret\x20node-menu-caret');
+  ((el80['innerHTML'] =
+    '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
+    el78['append'](el79, agentElement17, el80));
+  const el81 = createAgentElement(
+    'div',
+    'floating-menu\x20img-model-menu\x20node-model-menu\x20agent-model-menu',
+  );
+  ((el81['innerHTML'] = buildAIGenTextModelMenuMarkup({ activeModel: activeModel['model'] })),
+    agentElement16['append'](el78, el81));
+  const agentButton = createAgentButton('model-provider-profile-selector-toggle\x20is-hidden', ''),
+    el82 = createAgentElement('div', 'ui-schema-placement ui-schema-mode-slot');
+  ((el82['dataset']['aigenTextUiSchemaModeSlot'] = ''),
+    (el82['hidden'] = !![]),
+    el77['append'](agentElement16, agentButton, el82));
+  const el83 = createAgentElement('div', 'agent-menu-wrap'),
+    el84 = createAgentButton('agent-pill-btn\x20agent-mode-btn', '', {
+      title: agentPanelText('agentMode'),
+      icon: agentIconSvg('mode'),
+    }),
+    el85 = createAgentElement(
+      'span',
+      'agent-mode-label',
+      getAgentExecutionModeLabel(activeModel['executionMode']),
+    ),
+    el86 = createAgentElement('span', 'agent-caret');
+  ((el86['innerHTML'] =
+    '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
+    el84['append'](el85, el86));
+  const el87 = createAgentElement('div', 'agent-floating-menu agent-mode-menu');
+  ([
+    ['manual', getAgentExecutionModeLabel('manual')],
+    ['auto', getAgentExecutionModeLabel('auto')],
+  ]['forEach'](([value98, value99]) => {
+    const el88 = createAgentButton('agent-menu-item', value99, { icon: agentIconSvg('check') });
+    ((el88['dataset']['executionMode'] = value98),
+      el88['classList']['toggle'](
+        'active',
+        normalizeAgentExecutionMode(activeModel['executionMode']) === value98,
+      ),
+      el87['appendChild'](el88));
+  }),
+    el83['append'](el84, el87),
+    (el83['hidden'] = !![]));
+  const onCatalogChange = createAgentSkillPicker({
+    registry: skillRegistry,
+    text: agentPanelText,
+    slashTrigger: slashTrigger,
+    onSelect: (value100) => {
+      const value101 = String(value100?.['id'] || '')['trim']();
+      if (value101) setEditorText(slashTrigger, '$' + value101 + '\x20');
+      (setMenuOpen(onCatalogChange['menu'], ![], ownerRoot), slashTrigger['focus']());
+    },
+  });
+  agentElement15['append'](el73, el77);
+  const el89 = createAgentButton('agent-send-btn', '', {
+    title: agentPanelText('send'),
+    icon: agentIconSvg('send'),
+  });
+  el89['type'] = 'submit';
+  const el90 = createAgentButton('agent-stop-btn', '', {
+    title: agentPanelText('stop'),
+    icon: agentIconSvg('stop'),
+  });
+  ((el90['type'] = 'button'),
+    (el90['hidden'] = !![]),
+    agentElement14['append'](agentElement15, el89, el90),
+    agentElement13['append'](el68, el72, agentElement14, onCatalogChange['element']));
+  const agentSkillPanel = createAgentSkillPanel({
+    registry: skillRegistry,
+    refreshSkills: refreshAgentSkills,
+    installSkill: installAgentSkill,
+    deleteSkill: deleteAgentSkill,
+    saveSkill: saveAgentSkill,
+    text: agentPanelText,
+    formatText: formatAgentPanelText,
+    onInsert: (value102) => {
+      (setEditorText(slashTrigger, '' + value102 + getEditorText(slashTrigger)), slashTrigger['focus']());
+    },
+    onUse: (value103) => {
+      const value104 = String(value103 || '')['trim'](),
+        editorText = getEditorText(slashTrigger);
+      if (value104) {
+        const value105 = '$' + value104;
+        setEditorText(
+          slashTrigger,
+          editorText === value105 || editorText['startsWith'](value105 + '\x20')
+            ? '' + editorText + (editorText === value105 ? '\x20' : '')
+            : '' + value105 + (editorText ? '\x20' + editorText : '\x20'),
+        );
+      }
+      (setMenuOpen(onCatalogChange['menu'], ![], ownerRoot), slashTrigger['focus']());
+    },
+    onCatalogChange: onCatalogChange['render'],
+    onNotice: onNotice,
+    windowObject: windowObject,
+  });
+  function run5() {
+    (run6(![]), agentSkillPanel['open']());
   }
-  let enabled6 = false,
-    list16 = [],
-    enabled7 = false,
-    el95 = null;
-  function run2(options7 = {}) {
-    if (options7.thumbUrl) {
-      const el96 = createEl('img', 'ref-thumb-media agent-input-ref-media');
+  const args = createAgentComposerAttachmentController({
+    documentObject: document,
+    uploadMaterial: uploadMaterial,
+    validateDocumentFile: validateDocumentFile,
+    normalizeMaterialNode: (value106) => normalizeAgentInputRefFromNode(value106, { source: 'upload' }),
+    addInputRefs: addInputRefs,
+    setBusy: setBusy,
+    getBusy: () => enabled11,
+    captureContext: () => agentPanelContinuity['capture'](),
+    isContextCurrent: (value107) => agentPanelContinuity['isCurrent'](value107),
+    setNotice: onNotice,
+    text: agentPanelText,
+    formatText: formatAgentPanelText,
+    focusInput: () => slashTrigger['focus'](),
+    onDocumentChange: onDocumentChange,
+  });
+  (el67['append'](
+    el46,
+    el50,
+    agentSkillPanel['element'],
+    el61,
+    el62,
+    el63,
+    el64,
+    agentElement13,
+    args['materialInput'],
+    args['documentInput'],
+  ),
+    ownerRoot['append'](el40, agentElement4, agentElement7, el67),
+    root['appendChild'](ownerRoot),
+    stateRoot['appendChild'](el60));
+  let bindAgentModelControls2 = null;
+  (el78['addEventListener']('click', () => {
+    if (el81['classList']['contains']('show')) return;
+    closeFloatingMenus(ownerRoot, el81);
+    const value108 = modelSettings?.['getSettings']?.() || activeModel;
+    bindAgentModelControls2?.['sync']?.(value108);
+  }),
+    (bindAgentModelControls2 = bindAgentModelControls(el77, {
+      modelSettings: modelSettings,
+      initialSettings: activeModel,
+      documentObject: document,
+    })));
+  let enabled11 = ![];
+  const agentPanelContinuity = createAgentPanelContinuity({
+    getConversation: () =>
+      runtime['sessionStore']?.['getActiveConversation']?.() || runtime['getActiveConversation']?.(),
+    getHistory: getHistory,
+    getMessageCount: () => messagesEl['children']['length'],
+  });
+  let agentConversationPresentation = null,
+    agentConversationActions = null,
+    timer = null,
+    value109 = ![],
+    value110 = null;
+  const storedSidebarWidth = readStoredSidebarWidth(windowObject);
+  storedSidebarWidth &&
+    stateRoot['style']?.['setProperty']?.('--agent-sidebar-width', clampAgentSidebarWidth(storedSidebarWidth) + 'px');
+  function run7() {
+    timer !== null && (clearTimeout(timer), (timer = null));
+  }
+  function onNotice(value111, { sticky: sticky = ![] } = {}) {
+    run7();
+    const value112 =
+      ownerRoot['classList']['contains']('is-open') && runtime['sessionStore']?.['getPersistenceError']?.();
+    ((value109 = Boolean(value112)),
+      value112 && ((value111 = value112), (sticky = !![])),
+      (el60['textContent'] = String(value111 || '')),
+      (el60['hidden'] = !el60['textContent']),
+      el60['textContent'] &&
+        !sticky &&
+        ((timer = setTimeout(() => {
+          ((timer = null), (el60['textContent'] = ''), (el60['hidden'] = !![]));
+        }, AGENT_NOTICE_AUTO_HIDE_MS)),
+        timer?.['unref']?.()));
+  }
+  async function onCopy(value113 = '') {
+    const enabled12 = String(value113 || '')['trim']();
+    if (!enabled12) return ![];
+    try {
+      const enabled13 = windowObject?.['navigator']?.['clipboard'] || globalThis['navigator']?.['clipboard'];
+      if (!enabled13?.['writeText']) throw new Error('Clipboard unavailable');
+      return (await enabled13['writeText'](enabled12), onNotice(agentPanelText('copyMessageDone')), !![]);
+    } catch {
+      return (onNotice(agentPanelText('copyMessageFailed')), ![]);
+    }
+  }
+  function onImagePreview(value114 = '', alt = '') {
+    const enabled14 = String(value114 || '')['trim']();
+    if (!enabled14) return;
+    openImagePreview(enabled14, {
+      alt: alt || agentPanelText('imageResultOpen'),
+      sidebarSubmenuOwner: 'agent',
+    });
+  }
+  function run8(value115 = ownerRoot) {
+    const value116 =
+        document?.['getSelection']?.() || windowObject?.['getSelection']?.() || globalThis['getSelection']?.(),
+      enabled15 = String(value116?.['toString']?.() || '')['trim']();
+    if (!enabled15 || value116?.['isCollapsed'] === !![]) return '';
+    const count4 = Number(value116?.['rangeCount']) || 0x0;
+    if (count4 > 0x0 && typeof value116['getRangeAt'] === 'function') {
+      for (let value117 = 0x0; value117 < count4; value117 += 0x1) {
+        const value118 = value116['getRangeAt'](value117);
+        if (
+          value115['contains'](value118['commonAncestorContainer']) ||
+          value115['contains'](value118['startContainer']) ||
+          value115['contains'](value118['endContainer'])
+        )
+          return enabled15;
+      }
+      return '';
+    }
+    return value115['contains'](value116?.['anchorNode']) || value115['contains'](value116?.['focusNode'])
+      ? enabled15
+      : '';
+  }
+  function run9(event3) {
+    const enabled16 = run8();
+    if (!enabled16) return;
+    (event3['stopPropagation']?.(),
+      event3['clipboardData']?.['setData'] &&
+        (event3['preventDefault']?.(), event3['clipboardData']['setData']('text/plain', enabled16)));
+  }
+  function run10() {
+    const scrollWidth = Math['max'](0x0, Number(el47['scrollWidth']) || 0x0),
+      value119 = Number(el47['getBoundingClientRect']?.()['width']) || 0x0,
+      clientWidth = Math['max'](
+        0x0,
+        Number(el47['clientWidth']) || value119 || Number(el47['offsetWidth']) || 0x0,
+      ),
+      maxScroll = Math['max'](0x0, scrollWidth - clientWidth),
+      scrollLeft = Math['min'](maxScroll, Math['max'](0x0, Number(el47['scrollLeft']) || 0x0));
+    return { clientWidth: clientWidth, maxScroll: maxScroll, scrollLeft: scrollLeft, scrollWidth: scrollWidth };
+  }
+  function run4() {
+    const { maxScroll: maxScroll2, scrollLeft: scrollLeft2 } = run10(),
+      value120 = maxScroll2 > 0x1;
+    (el46['classList']['toggle']('has-overflow', value120),
+      el46['classList']['toggle']('has-left-fade', value120 && scrollLeft2 > 0x1),
+      el46['classList']['toggle']('has-right-fade', value120 && scrollLeft2 < maxScroll2 - 0x1));
+  }
+  function run11(value121) {
+    const value122 = value121 === !![];
+    ((el47['hidden'] = value122), (el46['hidden'] = value122), run4());
+  }
+  function run12(event4) {
+    const { maxScroll: maxScroll3, scrollLeft: scrollLeft3 } = run10();
+    if (maxScroll3 <= 0x1) return;
+    const value123 = Number(event4?.['deltaY']) || 0x0,
+      count5 = Number(event4?.['deltaX']) || 0x0,
+      enabled17 =
+        Math['abs'](count5) > Math['abs'](value123) && count5 !== 0x0 ? count5 : value123;
+    if (!enabled17) return;
+    const enabled18 = enabled17 < 0x0 && scrollLeft3 > 0x1,
+      enabled19 = enabled17 > 0x0 && scrollLeft3 < maxScroll3 - 0x1;
+    if (!enabled18 && !enabled19) return;
+    (event4?.['preventDefault']?.(),
+      (el47['scrollLeft'] = Math['min'](maxScroll3, Math['max'](0x0, scrollLeft3 + enabled17))),
+      run4());
+  }
+  function run6(value124) {
+    if (value124) {
+      ((el50['hidden'] = ![]),
+        el50['setAttribute']('aria-hidden', 'false'),
+        el50['classList']['remove']('is-open'),
+        void el50['offsetWidth'],
+        el50['classList']['add']('is-open'));
+      return;
+    }
+    (el50['classList']['remove']('is-open'),
+      el50['setAttribute']('aria-hidden', 'true'),
+      (el50['hidden'] = !![]));
+  }
+  let enabled20 = ![],
+    list27 = [],
+    enabled21 = ![],
+    el91 = null;
+  function run13(el92, value125) {
+    if (!el92) return;
+    const value126 = String(value125 || '');
+    value126
+      ? ((el92['title'] = value126), el92['setAttribute']?.('aria-label', value126))
+      : ((el92['title'] = ''), el92['removeAttribute']?.('aria-label'));
+  }
+  function run14(el93, value127) {
+    if (!el93) return;
+    const el94 = el93['querySelector']?.('.agent-btn-label');
+    if (el94) {
+      el94['textContent'] = value127;
+      return;
+    }
+    el93['textContent'] = value127;
+  }
+  function run15() {
+    const value128 = modelSettings?.['getSettings']?.() || activeModel;
+    (ownerRoot['setAttribute']('aria-label', agentPanelText('panelAria')),
+      el40['setAttribute']('aria-label', agentPanelText('resizeAria')),
+      (ownerRoot['querySelector']('.agent-sidebar-title-badge')['textContent'] = agentPanelText('betaBadge')),
+      run13(el41, agentPanelText('newConversation')),
+      run13(el42, agentPanelText('historyTitle')),
+      run13(el43, agentPanelText('close')),
+      (el44['querySelector']('.agent-greeting-kicker')['textContent'] =
+        surface['kicker'] || agentPanelText('greetingKicker')),
+      (el44['querySelector']('.agent-greeting-title')['textContent'] =
+        surface['greeting'] || agentPanelText('greetingTitle')),
+      (el50['querySelector']('.agent-custom-panel-title')['textContent'] =
+        agentPanelText('customShortcutPanelTitle')),
+      (el50['querySelector']('.agent-custom-panel-desc')['textContent'] =
+        agentPanelText('customShortcutPanelDesc')),
+      run13(el51, agentPanelText('customShortcutClose')),
+      run14(el52, agentPanelText('customShortcutNew')));
+    const value129 = el54['querySelectorAll']('.agent-custom-label');
+    if (value129[0x0]) value129[0x0]['textContent'] = agentPanelText('customShortcutNameLabel');
+    if (value129[0x1]) value129[0x1]['textContent'] = agentPanelText('customShortcutPromptLabel');
+    ((el56['placeholder'] = agentPanelText('customShortcutNamePlaceholder')),
+      (el58['placeholder'] = agentPanelText('customShortcutPromptPlaceholder')),
+      run14(el59, agentPanelText('customShortcutSave')),
+      run14(el65, agentPanelText('confirmExecute')),
+      run14(el66, agentPanelText('cancel')),
+      run13(el69, agentPanelText('addSelectedReference')),
+      el69['setAttribute']?.('data-tooltip', agentPanelText('addSelectedReference')),
+      (el70['textContent'] = agentPanelText('addReference')),
+      (slashTrigger['dataset']['placeholder'] = surface['placeholder'] || agentPanelText('inputPlaceholder')),
+      run13(el74, agentPanelText('add')),
+      el75['querySelectorAll']('.agent-menu-item')['forEach']((el95) => {
+        const value130 = el95['dataset']?.['placeholderAction'];
+        if (value130 === 'upload') run14(el95, agentPanelText('uploadMaterial'));
+        if (value130 === 'document') run14(el95, agentPanelText('readDocument'));
+        if (value130 === 'custom') run14(el95, agentPanelText('customShortcutPanelTitle'));
+        if (value130 === 'skills') run14(el95, agentPanelText('skillManage'));
+      }),
+      run13(el78, agentPanelText('modelSelection')),
+      bindAgentModelControls2?.['sync']?.(value128),
+      run13(el84, agentPanelText('agentMode')),
+      (el85['textContent'] = getAgentExecutionModeLabel(value128['executionMode'])),
+      el87['querySelectorAll']('[data-execution-mode]')['forEach']((el96) => {
+        run14(el96, getAgentExecutionModeLabel(el96['dataset']['executionMode']));
+      }),
+      run13(el89, agentPanelText('send')),
+      run13(el90, agentPanelText('stop')),
+      onCatalogChange['refreshText'](),
+      agentSkillPanel['refreshText'](),
+      run3(),
+      onDocumentChange());
+    isAgentPopoverOpen(el45) &&
+      renderHistory(el45, runtime, { onSelect: onSelect3, onDelete: onDelete2 });
+    if (!el50['hidden']) renderCustomShortcutList();
+    enabled21 && onNotice(agentPanelText('materialPickStarted'), { sticky: !![] });
+  }
+  function run16(options11 = {}) {
+    if (options11['thumbUrl']) {
+      const agentElement18 = createAgentElement('img', 'ref-thumb-media agent-input-ref-media');
       return (
-        (el96.src = options7.thumbUrl),
-        (el96.alt = options7.label || options7.nodeId || ''),
-        (el96.draggable = false),
-        el96
+        (agentElement18['src'] = options11['thumbUrl']),
+        (agentElement18['alt'] = options11['label'] || options11['nodeId'] || ''),
+        (agentElement18['draggable'] = ![]),
+        agentElement18
       );
     }
-    const el97 = createEl(
+    if (String(options11['kind'] || '') === 'audio') {
+      const el97 =
+        createReferenceFallbackThumbElement('audio', 'ref-thumb-media\x20agent-input-ref-fallback') ||
+        createAgentElement('div', 'ref-thumb-media ref-thumb-fallback agent-input-ref-fallback');
+      (el97['classList']?.['add']?.('agent-input-ref-audio-thumb'), (el97['textContent'] = ''));
+      const el98 = createAgentElement('span', 'agent-audio-thumb-bars');
+      for (let count6 = 0x0; count6 < 0x9; count6 += 0x1) {
+        el98['appendChild'](createAgentElement('span', 'agent-audio-thumb-bar'));
+      }
+      return (el97['appendChild'](el98), el97);
+    }
+    const el99 = createAgentElement(
       'div',
       'ref-thumb-media ref-thumb-fallback agent-input-ref-fallback',
-      String(options7.kind || 'node')
-        .slice(0, 3)
-        .toUpperCase(),
+      String(options11['kind'] || 'node')
+        ['slice'](0x0, 0x3)
+        ['toUpperCase'](),
     );
-    return (el97.setAttribute('aria-hidden', 'true'), el97);
+    return (el99['setAttribute']('aria-hidden', 'true'), el99);
   }
-  function run3() {
-    (el73.replaceChildren(),
-      list16.forEach((error) => {
-        const el98 = createEl('div', 'ref-thumb-wrap agent-input-ref-thumb'),
-          value80 = String(error.label || error.name || error.nodeId || '').trim();
-        ((el98.title = value80),
-          el98.setAttribute('aria-label', value80),
-          el98.setAttribute('role', 'listitem'),
-          (el98.dataset.inputRefId = error.nodeId),
-          el98.appendChild(run2(error)));
-        const el99 = createEl('button', 'ref-thumb-delete agent-input-ref-remove', 'x');
-        ((el99.type = 'button'),
-          (el99.title = 'Remove reference'),
-          el99.setAttribute('aria-label', 'Remove reference'),
-          (el99.dataset.inputRefRemove = error.nodeId),
-          el98.appendChild(el99),
-          el73.appendChild(el98));
-      }),
-      el70.classList.add('active'),
-      el70.classList.toggle('has-input-refs', list16.length > 0),
-      (el72.hidden = list16.length > 0));
+  function onDocumentChange() {
+    el71['replaceChildren']();
+    const list28 = [...list27, ...args['getDocumentDisplayRefs']()];
+    (list28['forEach']((error) => {
+      const el100 = createAgentElement('div', 'ref-thumb-wrap\x20agent-input-ref-thumb'),
+        value131 = String(error['label'] || error['name'] || error['nodeId'] || '')['trim']();
+      ((el100['title'] = value131),
+        el100['setAttribute']('aria-label', value131),
+        el100['setAttribute']('role', 'listitem'),
+        (el100['dataset']['inputRefId'] = error['nodeId']),
+        el100['appendChild'](run16(error)));
+      const agentPanelText3 = agentPanelText('removeReference'),
+        el101 = createAgentElement('button', 'ref-thumb-delete agent-input-ref-remove', '×');
+      ((el101['type'] = 'button'),
+        (el101['title'] = agentPanelText3),
+        el101['setAttribute']('aria-label', agentPanelText3),
+        (el101['dataset']['inputRefRemove'] = error['nodeId']),
+        el100['appendChild'](el101),
+        el71['appendChild'](el100));
+    }),
+      el68['classList']['add']('active'),
+      el68['classList']['toggle']('has-input-refs', list28['length'] > 0x0),
+      (el70['hidden'] = list28['length'] > 0x0));
   }
-  function run4(list17 = []) {
-    const map = new Map(list16.map((item9) => [item9.nodeId, item9]));
+  function addInputRefs(list29 = []) {
+    const map6 = new Map(list27['map']((value132) => [value132['nodeId'], value132]));
     return (
-      list17.filter(Boolean).forEach((enabled8) => {
-        if (!enabled8.nodeId || map.has(enabled8.nodeId)) return;
-        map.set(enabled8.nodeId, enabled8);
+      list29['filter'](Boolean)['forEach']((enabled22) => {
+        if (!enabled22['nodeId'] || map6['has'](enabled22['nodeId'])) return;
+        map6['set'](enabled22['nodeId'], enabled22);
       }),
-      (list16 = Array.from(map.values()).slice(0, AGENT_INPUT_REF_LIMIT)),
-      run3(),
-      list16.length
+      (list27 = Array['from'](map6['values']())['slice'](0x0, AGENT_CONVERSATION_INPUT_REF_LIMIT)),
+      onDocumentChange(),
+      list27['length']
     );
   }
-  function run5() {
-    ((list16 = []), run3());
+  function run17() {
+    ((list27 = []), args['clearDocuments']({ notify: ![] }), onDocumentChange());
   }
-  function run6() {
-    return document?.getElementById?.('v2-wrap') || null;
+  function run18({ clearWhenMissing: clearWhenMissing = ![] } = {}) {
+    const value133 =
+        runtime?.['sessionStore']?.['getPendingClarification']?.() ||
+        runtime?.['sessionStore']?.['getState']?.()['pendingClarification'] ||
+        null,
+      list30 = (Array['isArray'](value133?.['inputRefs']) ? value133['inputRefs'] : [])
+        ['filter']((value134) => String(value134?.['nodeId'] || value134?.['id'] || '')['trim']())
+        ['map']((args2) => ({
+          ...args2,
+          id: String(args2['nodeId'] || args2['id'] || '')['trim'](),
+          nodeId: String(args2['nodeId'] || args2['id'] || '')['trim'](),
+        }))
+        ['slice'](0x0, AGENT_CONVERSATION_INPUT_REF_LIMIT);
+    if (list30['length'] === 0x0 && !clearWhenMissing) return ![];
+    return ((list27 = list30), onDocumentChange(), list30['length'] > 0x0);
   }
-  function run7() {
-    return document?.documentElement || globalThis.document?.documentElement || null;
+  function run19() {
+    return document?.['getElementById']?.('v2-wrap') || null;
   }
-  function run8() {
+  function run20() {
+    return document?.['documentElement'] || globalThis['document']?.['documentElement'] || null;
+  }
+  function run21() {
     try {
       return createLinkCursor({ size: getCursorSize() });
     } catch {
       return createLinkCursor({ size: 'small' });
     }
   }
-  function run9() {
-    (el95?.classList?.remove?.('agent-material-pick-hover'), (el95 = null));
+  function run22() {
+    (el91?.['classList']?.['remove']?.('agent-material-pick-hover'), (el91 = null));
   }
-  function run10(value81) {
-    if (el95 === value81) return;
-    (run9(), (el95 = value81 || null), el95?.classList?.add?.('agent-material-pick-hover'));
+  function run23(value135) {
+    if (el91 === value135) return;
+    (run22(),
+      (el91 = value135 || null),
+      el91?.['classList']?.['add']?.('agent-material-pick-hover'));
   }
-  function run11({ noticeText: noticeText = '' } = {}) {
-    if (!enabled7) return;
-    ((enabled7 = false),
-      run9(),
-      panel.classList.remove('is-material-picking'),
-      el71.classList.remove('is-picking', 'is-connecting-active'),
-      el71.setAttribute('aria-pressed', 'false'));
-    const el100 = run6();
-    el100?.classList?.remove?.('is-connecting', 'agent-material-pick-mode');
-    const el101 = run7();
-    (el101?.classList?.remove?.('is-connecting-mode'),
-      el101?.style?.removeProperty?.('--connect-cursor'),
-      document?.removeEventListener?.('click', run12, true),
-      document?.removeEventListener?.('pointermove', run13, true),
-      document?.removeEventListener?.('keydown', run14, true));
-    if (noticeText) setNotice2(noticeText);
+  function run24({ noticeText: noticeText = '' } = {}) {
+    if (!enabled21) return;
+    ((enabled21 = ![]),
+      run22(),
+      ownerRoot['classList']['remove']('is-material-picking'),
+      el69['classList']['remove']('is-picking', 'is-connecting-active'),
+      el69['setAttribute']('aria-pressed', 'false'));
+    const el102 = run19();
+    el102?.['classList']?.['remove']?.('is-connecting', 'agent-material-pick-mode');
+    const el103 = run20();
+    (el103?.['classList']?.['remove']?.('is-connecting-mode'),
+      el103?.['style']?.['removeProperty']?.('--connect-cursor'),
+      document?.['removeEventListener']?.('click', run25, !![]),
+      document?.['removeEventListener']?.('pointermove', run26, !![]),
+      document?.['removeEventListener']?.('keydown', run27, !![]));
+    if (noticeText) onNotice(noticeText);
   }
-  function run15({ toggle: toggle = true } = {}) {
-    if (enabled7) {
-      toggle && run11({ noticeText: panelText('materialPickCancelled') });
+  function run28({ toggle: toggle = !![] } = {}) {
+    if (enabled21) {
+      toggle && run24({ noticeText: agentPanelText('materialPickCancelled') });
       return;
     }
-    ((enabled7 = true),
-      panel.classList.add('is-material-picking'),
-      el71.classList.add('is-picking', 'is-connecting-active'),
-      el71.setAttribute('aria-pressed', 'true'));
-    const el102 = run6();
-    el102?.classList?.add?.('is-connecting', 'agent-material-pick-mode');
-    const el103 = run7();
-    (el103?.classList?.add?.('is-connecting-mode'),
-      el103?.style?.setProperty?.('--connect-cursor', run8()),
-      document?.addEventListener?.('click', run12, true),
-      document?.addEventListener?.('pointermove', run13, true),
-      document?.addEventListener?.('keydown', run14, true),
-      setNotice2(panelText('materialPickStarted')));
+    ((enabled21 = !![]),
+      ownerRoot['classList']['add']('is-material-picking'),
+      el69['classList']['add']('is-picking', 'is-connecting-active'),
+      el69['setAttribute']('aria-pressed', 'true'));
+    const el104 = run19();
+    el104?.['classList']?.['add']?.('is-connecting', 'agent-material-pick-mode');
+    const el105 = run20();
+    (el105?.['classList']?.['add']?.('is-connecting-mode'),
+      el105?.['style']?.['setProperty']?.('--connect-cursor', run21()),
+      document?.['addEventListener']?.('click', run25, !![]),
+      document?.['addEventListener']?.('pointermove', run26, !![]),
+      document?.['addEventListener']?.('keydown', run27, !![]),
+      onNotice(agentPanelText('materialPickStarted'), { sticky: !![] }));
   }
-  function run16(el104) {
-    const nodeEl = el104?.closest?.('.v2-node') || null,
-      enabled9 = String(nodeEl?.id || '').trim();
-    if (!enabled9) return { nodeEl: null, node: null, ref: null };
-    const node = getStoreState(store).nodes?.[enabled9] || null,
+  function run29(el106) {
+    const nodeEl = el106?.['closest']?.('.v2-node') || null,
+      enabled23 = String(nodeEl?.['id'] || '')['trim']();
+    if (!enabled23) return { nodeEl: null, node: null, ref: null };
+    const node = getStoreState(store)['nodes']?.[enabled23] || null,
       ref = normalizeAgentInputRefFromNode(node, { source: 'canvas-pick' });
     return { nodeEl: nodeEl, node: node, ref: ref };
   }
-  function run13(event2) {
-    if (!enabled7 || panel.contains(event2.target)) return;
-    const { nodeEl: nodeEl2, ref: ref2 } = run16(event2.target);
-    run10(nodeEl2 && isAgentMaterialRef(ref2) ? nodeEl2 : null);
+  function run26(event5) {
+    if (!enabled21 || ownerRoot['contains'](event5['target'])) return;
+    const { nodeEl: nodeEl2, ref: ref2 } = run29(event5['target']);
+    run23(nodeEl2 && isAgentMaterialRef(ref2) ? nodeEl2 : null);
   }
-  function run12(event3) {
-    if (!enabled7) return;
-    if (panel.contains(event3.target)) return;
-    const { ref: ref3 } = run16(event3.target);
+  function run25(event6) {
+    if (!enabled21) return;
+    if (ownerRoot['contains'](event6['target'])) return;
+    const { ref: ref3 } = run29(event6['target']);
     if (!ref3) return;
-    (event3.preventDefault?.(), event3.stopPropagation?.(), event3.stopImmediatePropagation?.());
+    (event6['preventDefault']?.(),
+      event6['stopPropagation']?.(),
+      event6['stopImmediatePropagation']?.());
     if (!isAgentMaterialRef(ref3)) {
-      setNotice2(panelText('materialPickUnsupported'));
+      onNotice(agentPanelText('materialPickUnsupported'), { sticky: !![] });
       return;
     }
-    (run4([ref3]), setNotice2(formatPanelText('attachSelected', { count: 1 })));
+    (addInputRefs([ref3]),
+      onNotice(formatAgentPanelText('attachSelected', { count: 0x1 }), { sticky: !![] }));
   }
-  function run14(event4) {
-    if (!enabled7 || event4.key !== 'Escape') return;
-    (event4.preventDefault?.(),
-      event4.stopPropagation?.(),
-      run11({ noticeText: panelText('materialPickCancelled') }));
+  function run27(event7) {
+    if (!enabled21 || event7['key'] !== 'Escape') return;
+    (event7['preventDefault']?.(),
+      event7['stopPropagation']?.(),
+      run24({ noticeText: agentPanelText('materialPickCancelled') }));
   }
-  function run17() {
+  function run30() {
     const storeState = getStoreState(store),
-      list18 = Array.isArray(storeState.selectedNodeIds)
-        ? storeState.selectedNodeIds.map((item10) => String(item10 || '')).filter(Boolean)
+      list31 = Array['isArray'](storeState['selectedNodeIds'])
+        ? storeState['selectedNodeIds']['map']((value136) => String(value136 || ''))['filter'](Boolean)
         : [],
-      list19 = list18
-        .map((item11) =>
-          normalizeAgentInputRefFromNode(storeState.nodes?.[item11], { source: 'canvas-selection' }),
-        )
-        .filter(Boolean),
-      list20 = list19.filter(isAgentMaterialRef);
-    if (list20.length === 0) return (setNotice2(panelText('attachSelectedEmpty')), 0);
-    const value82 = list16.length;
-    run4(list20);
-    const count5 = Math.max(0, list16.length - value82);
+      list32 = list31['map']((value137) =>
+        normalizeAgentInputRefFromNode(storeState['nodes']?.[value137], { source: 'canvas-selection' }),
+      )['filter'](Boolean),
+      list33 = list32['filter'](isAgentMaterialRef);
+    if (list33['length'] === 0x0) return (onNotice(agentPanelText('attachSelectedEmpty')), 0x0);
+    const value138 = list27['length'];
+    addInputRefs(list33);
+    const count7 = Math['max'](0x0, list27['length'] - value138);
     return (
-      setNotice2(formatPanelText('attachSelected', { count: count5 || list20.length })),
-      editor2.focus(),
-      count5 || list20.length
+      onNotice(formatAgentPanelText('attachSelected', { count: count7 || list33['length'] })),
+      slashTrigger['focus'](),
+      count7 || list33['length']
     );
   }
-  function run18({ toggle: toggle = true } = {}) {
-    if (enabled7) return (run15({ toggle: toggle }), 0);
-    const count6 = run17();
-    if (count6 > 0) return count6;
-    return (run15({ toggle: false }), 0);
+  function run31({ toggle: toggle = !![] } = {}) {
+    if (enabled21) return (run28({ toggle: toggle }), 0x0);
+    const count8 = run30();
+    if (count8 > 0x0) return count8;
+    return (run28({ toggle: ![] }), 0x0);
   }
-  function run19() {
-    const prompt2 = getEditorText(editor2);
-    if (!prompt2) {
-      (setNotice2(panelText('customShortcutEmpty')), editor2.focus());
+  let id3 = '';
+  function run32() {
+    const list34 = readCustomQuickActions(windowObject);
+    el53['replaceChildren']();
+    if (list34['length'] === 0x0) {
+      const agentElement19 = createAgentElement(
+        'div',
+        'agent-custom-empty',
+        agentPanelText('customShortcutEmpty'),
+      );
+      return (el53['appendChild'](agentElement19), list34);
+    }
+    return (
+      list34['forEach']((value139) => {
+        const value140 = String(value139['label'] || value139['prompt'] || '')['trim'](),
+          el107 = createAgentElement('div', 'agent-custom-item'),
+          agentButton2 = createAgentButton('agent-custom-item-main', value140),
+          el108 = createAgentButton('agent-custom-item-delete', '×');
+        ((el107['dataset']['agentCustomActionId'] = value139['id']),
+          el107['setAttribute']('role', 'listitem'),
+          el107['classList']['toggle']('is-active', value139['id'] === id3),
+          el108['setAttribute']('aria-label', agentPanelText('customShortcutDelete')),
+          (el108['dataset']['agentCustomDeleteActionId'] = value139['id']),
+          el107['append'](agentButton2, el108),
+          el53['appendChild'](el107));
+      }),
+      list34
+    );
+  }
+  function run33(value141) {
+    const enabled24 = String(value141 || '')['trim']();
+    if (!enabled24) return null;
+    const customQuickActions = readCustomQuickActions(windowObject)['find']((value142) => value142['id'] === enabled24);
+    if (!customQuickActions) return null;
+    return (run34(customQuickActions), customQuickActions);
+  }
+  function run34(options12 = {}) {
+    id3 = String(options12['id'] || '')['trim']();
+    const value143 = String(options12['prompt'] || '')['trim']();
+    ((el56['value'] = String(options12['label'] || '')['trim']()),
+      (el58['value'] = value143),
+      run32(),
+      !el56['value'] && value143 && (el56['value'] = truncateUiText(value143, 0x12)));
+  }
+  function run35({ prefillFromInput: prefillFromInput = ![] } = {}) {
+    run6(!![]);
+    const customQuickActions2 = readCustomQuickActions(windowObject),
+      prompt2 = prefillFromInput ? getEditorText(slashTrigger) : '';
+    (prompt2
+      ? run34({ label: truncateUiText(prompt2, 0x12), prompt: prompt2 })
+      : run34(customQuickActions2[0x0] || {}),
+      el58['focus']?.());
+  }
+  function run36() {
+    const prompt3 = String(el58['value'] || '')['trim']();
+    if (!prompt3) {
+      (onNotice(agentPanelText('customShortcutEmpty')), el58['focus']?.());
       return;
     }
-    const list21 = readCustomQuickActions(value71),
-      args = list21.filter((item12) => item12.prompt !== prompt2),
-      writeCustomQuickActions2 = writeCustomQuickActions(
-        [
-          {
-            id: 'custom-' + Date.now(),
-            label: truncateUiText(prompt2, 18),
-            prompt: prompt2,
-            custom: true,
-          },
-          ...args,
-        ],
-        value71,
-      );
+    const label2 = truncateUiText(el56['value'] || prompt3, 0x1c),
+      list35 = readCustomQuickActions(windowObject),
+      custom2 = list35['find']((value144) => value144['id'] === id3),
+      value145 = {
+        id: id3 || 'custom-' + Date['now'](),
+        label: label2,
+        prompt: prompt3,
+        custom: custom2 ? custom2['custom'] === !![] : !![],
+      },
+      count9 = list35['findIndex']((value146) => value146['id'] === value145['id']),
+      value147 =
+        count9 >= 0x0
+          ? list35['map']((value148) => (value148['id'] === value145['id'] ? value145 : value148))
+          : [value145, ...list35['filter']((value149) => value149['prompt'] !== prompt3)],
+      writeCustomQuickActions2 = writeCustomQuickActions(value147, windowObject);
     return (
-      run(),
-      (el59.hidden = el57.children.length > 0),
-      setNotice2(panelText('customShortcutSaved')),
+      (id3 = value145['id']),
+      run3(),
+      run32(),
+      run11(messagesEl['children']['length'] > 0x0),
+      onNotice(agentPanelText('customShortcutSaved')),
       writeCustomQuickActions2
     );
   }
-  async function run20(enabled10) {
-    if (!enabled10) return;
-    if (typeof uploadMaterial !== 'function') {
-      setNotice2(panelText('uploadMaterialMissing'));
+  function run37(value150) {
+    const enabled25 = String(value150 || '')['trim']();
+    if (!enabled25) return [];
+    const writeCustomQuickActions3 = writeCustomQuickActions(
+      readCustomQuickActions(windowObject)['filter']((value151) => value151['id'] !== enabled25),
+      windowObject,
+    );
+    return (
+      run3(),
+      run11(messagesEl['children']['length'] > 0x0),
+      id3 === enabled25 ? run34(writeCustomQuickActions3[0x0] || {}) : run32(),
+      onNotice(agentPanelText('customShortcutDeleted')),
+      writeCustomQuickActions3
+    );
+  }
+  function getHistory() {
+    return (
+      runtime?.['sessionStore']?.['getHistory']?.() ||
+      runtime?.['sessionStore']?.['getState']?.()['history'] ||
+      []
+    );
+  }
+  function run38() {
+    (run2(),
+      renderPlanPreview(el61, null),
+      el62['replaceChildren'](),
+      (el62['hidden'] = !![]),
+      el63['replaceChildren'](),
+      (el63['hidden'] = !![]),
+      (el64['hidden'] = !![]));
+  }
+  function run39(options13 = {}) {
+    agentConversationPresentation?.['appendEntry'](options13);
+  }
+  function run40({ hasMessages: hasMessages } = {}) {
+    const value152 = hasMessages ?? messagesEl['children']['length'] > 0x0;
+    ((el44['hidden'] = value152), run11(value152));
+    if (value152) run6(![]);
+  }
+  function run41({ preserveNotice: preserveNotice = ![] } = {}) {
+    if (!ownerRoot['classList']['contains']('is-open')) {
+      onNotice('');
       return;
     }
-    run21(true);
-    try {
-      const uploadMaterial2 = await uploadMaterial(enabled10),
-        list22 = Array.isArray(uploadMaterial2) ? uploadMaterial2 : [uploadMaterial2],
-        list23 = list22
-          .map((item13) => normalizeAgentInputRefFromNode(item13, { source: 'upload' }))
-          .filter(Boolean);
-      if (list23.length === 0) {
-        setNotice2(panelText('uploadMaterialFailed'));
-        return;
-      }
-      (run4(list23), setNotice2(panelText('uploadMaterialReady')), editor2.focus());
-    } catch (error2) {
-      setNotice2(error2?.message || panelText('uploadMaterialFailed'));
-    } finally {
-      run21(false);
-    }
-  }
-  function run22() {
-    return runtime?.sessionStore?.getHistory?.() || runtime?.sessionStore?.getState?.().history || [];
-  }
-  function run23() {
-    (renderPlanPreview(el62, null),
-      el63.replaceChildren(),
-      (el63.hidden = true),
-      el64.replaceChildren(),
-      (el64.hidden = true),
-      (el65.hidden = true));
-  }
-  function run24({ preserveNotice: preserveNotice = false } = {}) {
-    const value83 =
-      runtime?.getActiveConversation?.() || runtime?.sessionStore?.getState?.().activeConversation || null;
-    if (value83?.hasUnfinishedOperation) {
-      setNotice2(panelText('unfinishedNotice'));
+    if (runtime['sessionStore']?.['getPersistenceError']?.()) {
+      onNotice('');
       return;
     }
-    if (!preserveNotice) setNotice2('');
+    const value153 =
+      runtime?.['getActiveConversation']?.() ||
+      runtime?.['sessionStore']?.['getState']?.()['activeConversation'] ||
+      null;
+    if (value153?.['hasUnfinishedOperation']) {
+      onNotice(agentPanelText('unfinishedNotice'), { sticky: !![] });
+      return;
+    }
+    if (!preserveNotice) onNotice('');
   }
-  function run25({ preserveNotice: preserveNotice = false } = {}) {
-    (run23(), renderMessages(el57, run22()));
-    const value84 = el57.children.length > 0;
-    ((el56.hidden = value84), (el59.hidden = value84), run24({ preserveNotice: preserveNotice }));
+  function run42({
+    preserveNotice: preserveNotice = ![],
+    restorePendingInputRefs: restorePendingInputRefs = ![],
+  } = {}) {
+    run38();
+    const sessionSnapshot = runtime?.['sessionStore']?.['getState']?.() || {};
+    agentConversationPresentation?.['render']({ history: getHistory(), sessionSnapshot: sessionSnapshot });
+    const value154 = sessionSnapshot['pendingPlan'] || null;
+    (value154 &&
+      (renderPlanPreview(el61, value154, { onParamChange: onParamChange2, onOpenParamOptions: onOpenParamOptions2 }),
+      (el64['hidden'] = ![])),
+      restorePendingInputRefs && run18({ clearWhenMissing: !![] }),
+      run43(runtime['getPendingAssistantChoice']?.() || sessionSnapshot['pendingClarification']),
+      run40(),
+      run41({ preserveNotice: preserveNotice }));
   }
-  function run21(value85) {
-    ((value78 = value85 === true),
-      (el94.disabled = value78),
-      (el66.disabled = value78),
-      (el67.disabled = value78),
-      el63.querySelectorAll?.('.agent-option-btn')?.forEach((el105) => {
-        el105.disabled = value78;
+  function run44() {
+    const value155 = getHistory(),
+      list36 = Array['isArray'](value155) ? value155 : [];
+    return (agentConversationPresentation?.['renderMessages'](list36), run40(), list36['length'] > 0x0);
+  }
+  function setBusy(value156, { stoppable: stoppable = ![] } = {}) {
+    enabled11 = value156 === !![];
+    if (enabled11) run2();
+    (el67['setAttribute']('aria-busy', enabled11 ? 'true' : 'false'),
+      el90['setAttribute']('aria-busy', enabled11 && stoppable ? 'true' : 'false'),
+      (el89['disabled'] = enabled11),
+      (el89['hidden'] = enabled11 && stoppable),
+      (el90['hidden'] = !(enabled11 && stoppable)),
+      (el65['disabled'] = enabled11),
+      (el66['disabled'] = enabled11),
+      el62['querySelectorAll']?.('.agent-option-btn')?.['forEach']((el109) => {
+        el109['disabled'] = enabled11;
       }),
-      el64.querySelectorAll?.('.agent-recovery-btn')?.forEach((el106) => {
-        el106.disabled = value78;
+      el63['querySelectorAll']?.('.agent-recovery-btn')?.['forEach']((el110) => {
+        el110['disabled'] = enabled11;
       }),
-      panel.classList.toggle('is-busy', value78));
+      el61['querySelectorAll']?.('.agent-param-input')?.['forEach']((el111) => {
+        el111['disabled'] = enabled11;
+      }),
+      ownerRoot['classList']['toggle']('is-busy', enabled11),
+      agentConversationPresentation?.['setBusy'](enabled11),
+      agentConversationActions?.['setBusy']());
+    if (!enabled11 && (value109 || runtime['sessionStore']?.['getPersistenceError']?.())) onNotice('');
   }
-  function run26(value86) {
-    (panel.classList.toggle('is-open', value86),
-      panel.setAttribute('aria-hidden', value86 ? 'false' : 'true'),
-      document?.body?.classList?.toggle('agent-sidebar-open', value86),
-      document?.body?.classList?.toggle('agent-sidebar-collapsed', value86 && enabled6),
-      fabBtnEl.classList.toggle('is-agent-open', value86));
-    if (value86) {
-      if (!enabled6) editor2.focus();
-      run24({ preserveNotice: true });
-    } else (run11(), closeFloatingMenus(panel), setNotice2(''));
+  function run45(enabled26) {
+    !enabled26 && (value110?.(), agentPanelContinuity['rememberClosed']());
+    (ownerRoot['classList']['toggle']('is-open', enabled26),
+      ownerRoot['setAttribute']('aria-hidden', enabled26 ? 'false' : 'true'),
+      stateRoot['classList']?.['toggle']('agent-sidebar-open', enabled26),
+      stateRoot['classList']?.['toggle']('agent-sidebar-collapsed', enabled26 && enabled20),
+      fabBtnEl['classList']['toggle']('is-agent-open', enabled26));
+    if (enabled26) {
+      (runtime['sessionStore']?.['retryPersistence']?.(),
+        bindAgentModelControls2?.['sync']?.(modelSettings?.['getSettings']?.() || activeModel));
+      if (!enabled11 && !agentPanelContinuity['canResume']())
+        run42({ preserveNotice: !![], restorePendingInputRefs: !agentPanelContinuity['isSameConversation']() });
+      run4();
+      if (!enabled20)
+        (messagesEl['querySelector']('.agent-message-edit-input') || slashTrigger)['focus']({
+          preventScroll: !![],
+        });
+      run41({ preserveNotice: !![] });
+    } else (run24(), run2(), closeFloatingMenus(ownerRoot), onNotice(''));
   }
   function toggle2() {
-    run26(!panel.classList.contains('is-open'));
+    run45(!ownerRoot['classList']['contains']('is-open'));
   }
-  function run27(value87) {
-    ((enabled6 = value87 === true),
-      panel.classList.toggle('is-collapsed', enabled6),
-      el49.setAttribute('aria-expanded', enabled6 ? 'false' : 'true'),
-      (el49.title = enabled6 ? '展开' : '折叠'),
-      el49.setAttribute('aria-label', enabled6 ? '展开' : '折叠'),
-      document?.body?.classList?.toggle(
+  function run46(value157) {
+    ((enabled20 = value157 === !![]),
+      ownerRoot['classList']['toggle']('is-collapsed', enabled20),
+      stateRoot['classList']?.['toggle'](
         'agent-sidebar-collapsed',
-        enabled6 && panel.classList.contains('is-open'),
+        enabled20 && ownerRoot['classList']['contains']('is-open'),
       ));
-    if (!enabled6 && panel.classList.contains('is-open')) editor2.focus();
-    enabled6 && (run11(), closeFloatingMenus(panel), setNotice2(''));
+    if (!enabled20 && ownerRoot['classList']['contains']('is-open'))
+      slashTrigger['focus']({ preventScroll: !![] });
+    enabled20 && (run24(), closeFloatingMenus(ownerRoot), onNotice(''));
   }
-  function run28(value88, { persist: persist = false } = {}) {
-    const clampAgentSidebarWidth2 = clampAgentSidebarWidth(value88);
-    document?.body?.style?.setProperty?.('--agent-sidebar-width', clampAgentSidebarWidth2 + 'px');
-    if (persist) writeStoredSidebarWidth(clampAgentSidebarWidth2, value71);
-    return clampAgentSidebarWidth2;
+  function run47(value158, { persist: persist = ![] } = {}) {
+    const clampAgentSidebarWidth2 = clampAgentSidebarWidth(value158);
+    stateRoot['style']?.['setProperty']?.('--agent-sidebar-width', clampAgentSidebarWidth2 + 'px');
+    if (persist) writeStoredSidebarWidth(clampAgentSidebarWidth2, windowObject);
+    return (run4(), clampAgentSidebarWidth2);
   }
-  function run29(event5) {
-    (event5.preventDefault?.(), event5.stopPropagation?.());
-    const value89 = Number(event5.clientX),
-      enabled11 = panel.getBoundingClientRect?.().width || panel.offsetWidth || 0;
-    if (!Number.isFinite(value89) || !enabled11) return;
-    document?.body?.classList?.add?.('agent-sidebar-resizing');
-    const value90 = (event6) => {
-        const value91 = Number(event6.clientX);
-        if (!Number.isFinite(value91)) return;
-        run28(enabled11 + (value89 - value91));
+  function run48(event8) {
+    (event8['preventDefault']?.(), event8['stopPropagation']?.());
+    const value159 = Number(event8['clientX']),
+      enabled27 = ownerRoot['getBoundingClientRect']?.()['width'] || ownerRoot['offsetWidth'] || 0x0;
+    if (!Number['isFinite'](value159) || !enabled27) return;
+    stateRoot['classList']?.['add']?.('agent-sidebar-resizing');
+    const value160 = (event9) => {
+        const value161 = Number(event9['clientX']);
+        if (!Number['isFinite'](value161)) return;
+        run47(enabled27 + (value159 - value161));
       },
-      value92 = (event7) => {
-        (document?.removeEventListener?.('pointermove', value90),
-          document?.removeEventListener?.('pointerup', value92),
-          document?.body?.classList?.remove?.('agent-sidebar-resizing'));
-        const value93 = Number(event7.clientX);
-        Number.isFinite(value93) && run28(enabled11 + (value89 - value93), { persist: true });
+      handler3 = (event10) => {
+        ((value110 = null),
+          document?.['removeEventListener']?.('pointermove', value160),
+          document?.['removeEventListener']?.('pointerup', handler3),
+          stateRoot['classList']?.['remove']?.('agent-sidebar-resizing'));
+        const value162 = Number(event10['clientX']);
+        Number['isFinite'](value162) && run47(enabled27 + (value159 - value162), { persist: !![] });
       };
-    (document?.addEventListener?.('pointermove', value90),
-      document?.addEventListener?.('pointerup', value92));
+    (value110?.(),
+      (value110 = () => handler3({})),
+      document?.['addEventListener']?.('pointermove', value160),
+      document?.['addEventListener']?.('pointerup', handler3));
   }
   function reset() {
-    (run11(),
-      runtime.startNewConversation?.(),
-      run25({ preserveNotice: true }),
-      setEditorText(editor2, ''),
-      run5(),
-      (el58.hidden = true),
-      setNotice2('已新建对话。'));
+    (agentPanelContinuity['invalidate'](),
+      run24(),
+      runtime['startNewConversation']?.(),
+      run42({ preserveNotice: !![], restorePendingInputRefs: !![] }),
+      setBusy(![]),
+      setEditorText(slashTrigger, ''),
+      run17(),
+      run6(![]),
+      (el45['hidden'] = !![]),
+      onNotice(agentPanelText('newConversationNotice')));
   }
-  function onSelect2(value94) {
-    if (!runtime.switchConversation?.(value94)) return;
-    (run11(), setEditorText(editor2, ''), run5(), (el58.hidden = true), run25());
+  function onSelect3(value163) {
+    if (!runtime['switchConversation']?.(value163)) return;
+    (agentPanelContinuity['invalidate'](),
+      run24(),
+      setEditorText(slashTrigger, ''),
+      run17(),
+      run6(![]),
+      (el45['hidden'] = !![]),
+      run42({ restorePendingInputRefs: !![] }),
+      setBusy(![]));
   }
-  function onDelete2(value95) {
-    (run11(),
-      runtime.deleteConversation?.(value95),
-      setEditorText(editor2, ''),
-      run5(),
-      run25(),
-      renderHistory(el58, runtime, { onSelect: onSelect2, onDelete: onDelete2 }));
+  function onDelete2(value164) {
+    const value165 = value164 === runtime['getActiveConversation']?.()?.['id'];
+    (value165 && (agentPanelContinuity['invalidate'](), run24()),
+      runtime['deleteConversation']?.(value164),
+      value165 &&
+        (setEditorText(slashTrigger, ''),
+        run17(),
+        run6(![]),
+        run42({ restorePendingInputRefs: !![] }),
+        setBusy(![])),
+      renderHistory(el45, runtime, { onSelect: onSelect3, onDelete: onDelete2 }));
   }
-  function run30(response3) {
-    if (response3?.reply) appendMessage(el57, 'assistant', response3.reply);
-    el56.hidden = el57.children.length > 0;
-    const value96 = response3?.status === 'need_confirmation' ? response3?.plan || null : null;
-    (renderPlanPreview(el62, value96),
-      renderClarification(el63, response3, runtime, run30, run21, {
-        onAnswer: (enabled12) => {
-          if (!enabled12) return;
-          (appendMessage(el57, 'user', enabled12), (el56.hidden = true));
-        },
-        onWaitingStart: () => appendWaitingMessage(el57),
-        onWaitingEnd: removeWaitingMessage,
-      }),
-      renderRecovery(el64, response3, runtime, run30, run21, {
-        editor: editor2,
-        setNotice: setNotice2,
-      }),
-      (el65.hidden = response3?.status !== 'need_confirmation'));
-  }
-  async function run31() {
-    const editorText = getEditorText(editor2);
-    if (!editorText) return;
-    (setNotice2(''), run11());
-    const inputRefs = list16.slice();
-    (run5(),
-      setEditorText(editor2, ''),
-      (el59.hidden = true),
-      appendMessage(el57, 'user', editorText),
-      (el56.hidden = true),
-      run21(true));
-    const appendWaitingMessage2 = appendWaitingMessage(el57);
+  async function onParamChange2(value166, value167) {
+    if (typeof runtime?.['updatePendingGenerationParams'] !== 'function') return;
+    const value168 = agentPanelContinuity['capture']();
+    setBusy(!![]);
     try {
-      run30(await runtime.handleUserMessage(editorText, { inputRefs: inputRefs }));
+      const error2 = await runtime['updatePendingGenerationParams']({
+        params: { [value166]: value167 },
+      });
+      if (!agentPanelContinuity['isCurrent'](value168) || error2?.['stale']) return;
+      if (error2?.['ok'] && error2['plan']) {
+        (renderPlanPreview(el61, error2['plan'], {
+          onParamChange: onParamChange2,
+          onOpenParamOptions: onOpenParamOptions2,
+        }),
+          agentConversationPresentation?.['acknowledgeSessionState']?.(),
+          onNotice(''));
+        return;
+      }
+      onNotice(error2?.['message'] || error2?.['reply'] || agentPanelText('paramUpdateFailed'));
     } catch (error3) {
-      appendMessage(el57, 'assistant', error3?.message || 'Agent failed.');
+      if (agentPanelContinuity['isCurrent'](value168))
+        onNotice(error3?.['message'] || agentPanelText('paramUpdateFailed'));
     } finally {
-      (removeWaitingMessage(appendWaitingMessage2), run21(false));
+      if (agentPanelContinuity['isCurrent'](value168)) setBusy(![]);
     }
   }
-  return (
-    fabBtnEl.addEventListener('click', (event8) => {
-      (event8.stopPropagation(), toggle2());
-    }),
-    el54.addEventListener('click', () => run26(false)),
-    el49.addEventListener('click', () => run27(!enabled6)),
-    el52.addEventListener('click', reset),
-    el53.addEventListener('click', () => {
-      const enabled13 = !el58.hidden;
-      ((el58.hidden = enabled13),
-        !enabled13 && renderHistory(el58, runtime, { onSelect: onSelect2, onDelete: onDelete2 }));
-    }),
-    el59.addEventListener('click', (event9) => {
-      const el107 = event9.target?.closest?.('.agent-quick-card');
-      if (!el107) return;
-      (setEditorText(editor2, el107.dataset.prompt || el107.textContent || ''), editor2.focus());
-    }),
-    el78.addEventListener('click', (event10) => {
-      (event10.stopPropagation(), setMenuOpen(el79, !el79.classList.contains('show'), panel));
-    }),
-    el79.addEventListener('click', (event11) => {
-      const el108 = event11.target?.closest?.('[data-placeholder-action]');
-      if (!el108) return;
-      event11.stopPropagation?.();
-      const value97 = el108.dataset.placeholderAction;
-      if (value97 === 'canvas') run18({ toggle: false });
-      else {
-        if (value97 === 'upload')
-          ((el81.value = ''), el81.click?.(), setNotice2(panelText('uploadMaterial')));
-        else value97 === 'custom' && run19();
-      }
-      el79.classList.remove('show');
-    }),
-    el71.addEventListener('click', (event12) => {
-      (event12.stopPropagation?.(), run18());
-    }),
-    el71.addEventListener('keydown', (event13) => {
-      if (event13.key !== 'Enter' && event13.key !== ' ') return;
-      (event13.preventDefault?.(), run18());
-    }),
-    el73.addEventListener('click', (event14) => {
-      const el109 = event14.target?.closest?.('[data-input-ref-remove]'),
-        enabled14 = String(el109?.dataset?.inputRefRemove || '').trim();
-      if (!enabled14) return;
-      ((list16 = list16.filter((item14) => item14.nodeId !== enabled14)), run3());
-    }),
-    el81.addEventListener('change', () => {
-      const value98 = el81.files?.[0];
-      (run20(value98), (el81.value = ''));
-    }),
-    el83.addEventListener('click', (event15) => {
-      (event15.stopPropagation(), setMenuOpen(el87, !el87.classList.contains('show'), panel));
-    }),
-    el87.addEventListener('click', (event16) => {
-      const provider3 = event16.target?.closest?.('.floating-menu-item');
-      if (!provider3 || provider3.hasAttribute('data-node-menu-submenu')) return;
-      const model3 = provider3.dataset.value || '';
-      if (!model3 || provider3.dataset.disabled === 'true') return;
-      const commitAgentModelSelection2 = commitAgentModelSelection(modelSettings, {
-        model: model3,
-        provider: provider3.dataset.provider || '',
+  function onResult(diagnostic) {
+    if (diagnostic?.['stale']) return;
+    if (diagnostic?.['notice']) onNotice(diagnostic['notice']);
+    diagnostic?.['reply'] &&
+      !diagnostic['assistantHandled'] &&
+      agentConversationPresentation['appendMessage']('assistant', diagnostic['reply'], {
+        diagnostic: diagnostic['diagnostic'] || null,
       });
-      (el87.querySelectorAll('.floating-menu-item').forEach((el110) => el110.classList.remove('active')),
-        provider3.classList.add('active'),
-        el87.classList.remove('show'),
-        closeNodeFooterMenus(el87),
-        updateModelTrigger(el83, commitAgentModelSelection2 || { model: model3 }));
+    Array['isArray'](diagnostic?.['taskMessages']) &&
+      diagnostic['taskMessages']['forEach']((value169) => run39(value169));
+    el44['hidden'] = messagesEl['children']['length'] > 0x0;
+    const value170 = diagnostic?.['status'] === 'need_confirmation' ? diagnostic?.['plan'] || null : null;
+    (renderPlanPreview(el61, value170, { onParamChange: onParamChange2, onOpenParamOptions: onOpenParamOptions2 }),
+      run43(diagnostic),
+      renderRecovery(el63, diagnostic, runtime, onResult, setBusy, {
+        editor: slashTrigger,
+        setNotice: onNotice,
+      }),
+      (el64['hidden'] = diagnostic?.['status'] !== 'need_confirmation'),
+      agentConversationPresentation['renderRunSteps'](runtime?.['sessionStore']?.['getState']?.() || {}),
+      run18({ clearWhenMissing: !![] }),
+      agentConversationPresentation?.['acknowledgeSessionState']?.({ taskMessages: diagnostic?.['taskMessages'] || [] }));
+  }
+  function run43(value171) {
+    renderAgentConversationChoices(
+      el62,
+      value171,
+      runtime,
+      onResult,
+      (stoppable2) => setBusy(stoppable2, { stoppable: stoppable2 === !![] }),
+      {
+        onAnswer: (enabled28) => {
+          if (!enabled28) return;
+          const inputRefs = list27['slice']();
+          (run17(),
+            agentConversationPresentation['appendMessage']('user', enabled28, { inputRefs: inputRefs }),
+            (el44['hidden'] = !![]));
+        },
+        onWaitingStart: () => agentConversationPresentation['appendWaiting'](),
+        onWaitingEnd: (value172) => agentConversationPresentation['removeWaiting'](value172),
+      },
+    );
+  }
+  async function run49() {
+    const editorText2 = getEditorText(slashTrigger);
+    if (!editorText2) return;
+    const value173 = agentPanelContinuity['capture']();
+    (run44(), onNotice(''), run24());
+    const inputRefs2 = list27['slice'](),
+      documentFiles = args['consumeDocuments'](),
+      inputRefs3 = [...inputRefs2, ...documentFiles['displayRefs']];
+    (run17(),
+      setEditorText(slashTrigger, ''),
+      run6(![]),
+      agentSkillPanel['close'](),
+      run11(!![]),
+      agentConversationPresentation['appendMessage']('user', editorText2, { inputRefs: inputRefs3 }),
+      (el44['hidden'] = !![]),
+      (el62['hidden'] = !![]),
+      setBusy(!![], { stoppable: !![] }));
+    const el112 = agentConversationPresentation['appendWaiting']();
+    try {
+      const value174 = await runtime['handleUserMessage'](editorText2, {
+        inputRefs: inputRefs2,
+        ...(documentFiles['files']['length'] > 0x0
+          ? { documentFiles: documentFiles['files'], displayInputRefs: inputRefs3 }
+          : {}),
+      });
+      if (agentPanelContinuity['isCurrent'](value173)) onResult(value174);
+    } catch (error4) {
+      if (!agentPanelContinuity['isCurrent'](value173)) return;
+      agentConversationPresentation['appendMessage']('assistant', error4?.['message'] || 'Agent failed.');
+    } finally {
+      if (agentPanelContinuity['isCurrent'](value173)) {
+        const value175 = Boolean(el112['parentNode']);
+        agentConversationPresentation['removeWaiting'](el112);
+        if (value175) setBusy(![]);
+      }
+    }
+  }
+  const value176 = (event11) => {
+    (event11['stopPropagation'](), toggle2());
+  };
+  (fabBtnEl['addEventListener']('click', value176),
+    el43['addEventListener']('click', () => run45(![])),
+    el41['addEventListener']('click', reset),
+    el42['addEventListener']('click', (event12) => {
+      event12['stopPropagation']?.();
+      const value177 = !isAgentPopoverOpen(el45);
+      (setMenuOpen(el45, value177, ownerRoot),
+        value177 && renderHistory(el45, runtime, { onSelect: onSelect3, onDelete: onDelete2 }));
     }),
-    el89.addEventListener('click', (event17) => {
-      if (el88.hidden) return;
-      (event17.stopPropagation(), setMenuOpen(el92, !el92.classList.contains('show'), panel));
+    el47['addEventListener']('click', (event13) => {
+      const el113 = event13['target']?.['closest']?.('.agent-quick-card');
+      if (!el113) return;
+      (setEditorText(slashTrigger, el113['dataset']['prompt'] || el113['textContent'] || ''),
+        slashTrigger['focus']());
     }),
-    el92.addEventListener('click', (event18) => {
-      const el111 = event18.target?.closest?.('[data-execution-mode]');
-      if (!el111) return;
-      const executionMode2 = normalizeAgentExecutionMode(el111.dataset.executionMode),
-        value99 = modelSettings?.updateSettings?.({ executionMode: executionMode2 }) || {
+    el47['addEventListener']('scroll', run4),
+    el47['addEventListener']('wheel', run12),
+    windowObject?.['addEventListener']?.('resize', run4),
+    el53['addEventListener']('click', (event14) => {
+      const el114 = event14['target']?.['closest']?.('[data-agent-custom-delete-action-id]');
+      if (el114) {
+        (event14['preventDefault']?.(),
+          event14['stopPropagation']?.(),
+          run37(el114['dataset']['agentCustomDeleteActionId']));
+        return;
+      }
+      const el115 = event14['target']?.['closest']?.('[data-agent-custom-action-id]'),
+        value178 = String(el115?.['dataset']?.['agentCustomActionId'] || '')['trim']();
+      run33(value178);
+    }),
+    el52['addEventListener']('click', () => {
+      const prompt4 = getEditorText(slashTrigger);
+      (run34(prompt4 ? { label: truncateUiText(prompt4, 0x12), prompt: prompt4 } : {}),
+        el58['focus']?.());
+    }),
+    el59['addEventListener']('click', run36),
+    el51['addEventListener']('click', () => {
+      (run6(![]), slashTrigger['focus']());
+    }),
+    el74['addEventListener']('click', (event15) => {
+      (event15['stopPropagation'](),
+        setMenuOpen(el75, !el75['classList']['contains']('show'), ownerRoot));
+    }),
+    el75['addEventListener']('click', (event16) => {
+      const el116 = event16['target']?.['closest']?.('[data-placeholder-action]');
+      if (!el116) return;
+      event16['stopPropagation']?.();
+      const value179 = el116['dataset']['placeholderAction'];
+      if (value179 === 'upload') args['openMaterialPicker']();
+      else {
+        if (value179 === 'document') args['openDocumentPicker']();
+        else {
+          if (value179 === 'custom') (agentSkillPanel['close'](), run35({ prefillFromInput: !![] }));
+          else value179 === 'skills' && run5();
+        }
+      }
+      el75['classList']['remove']('show');
+    }),
+    el69['addEventListener']('click', (event17) => {
+      (event17['stopPropagation']?.(), run31());
+    }),
+    el69['addEventListener']('keydown', (event18) => {
+      if (event18['key'] !== 'Enter' && event18['key'] !== '\x20') return;
+      (event18['preventDefault']?.(), run31());
+    }),
+    el71['addEventListener']('click', (event19) => {
+      const el117 = event19['target']?.['closest']?.('[data-input-ref-remove]'),
+        enabled29 = String(el117?.['dataset']?.['inputRefRemove'] || '')['trim']();
+      if (!enabled29) return;
+      ((list27 = list27['filter']((value180) => value180['nodeId'] !== enabled29)),
+        args['removeDocument'](enabled29),
+        onDocumentChange());
+    }),
+    el84['addEventListener']('click', (event20) => {
+      if (el83['hidden']) return;
+      (event20['stopPropagation'](),
+        setMenuOpen(el87, !el87['classList']['contains']('show'), ownerRoot));
+    }),
+    el87['addEventListener']('click', (event21) => {
+      const el118 = event21['target']?.['closest']?.('[data-execution-mode]');
+      if (!el118) return;
+      const executionMode2 = normalizeAgentExecutionMode(el118['dataset']['executionMode']),
+        value181 = modelSettings?.['updateSettings']?.({ executionMode: executionMode2 }) || {
           executionMode: executionMode2,
         };
-      ((el90.textContent = getAgentExecutionModeLabel(value99.executionMode)),
-        el92
-          .querySelectorAll('[data-execution-mode]')
-          .forEach((el112) =>
-            el112.classList.toggle('active', el112.dataset.executionMode === value99.executionMode),
+      ((el85['textContent'] = getAgentExecutionModeLabel(value181['executionMode'])),
+        el87['querySelectorAll']('[data-execution-mode]')['forEach']((el119) =>
+          el119['classList']['toggle'](
+            'active',
+            el119['dataset']['executionMode'] === value181['executionMode'],
           ),
-        el92.classList.remove('show'),
-        setNotice2('执行模式已保存；本轮不会改变确认策略。'));
+        ),
+        el87['classList']['remove']('show'),
+        onNotice(agentPanelText('executionModeSaved')));
     }),
-    el68.addEventListener('submit', (event19) => {
-      event19.preventDefault();
-      if (value78) return;
-      run31();
+    el67['addEventListener']('submit', (event22) => {
+      event22['preventDefault']();
+      if (enabled11) return;
+      run49();
     }),
-    editor2.addEventListener('keydown', (event20) => {
-      if (event20.key === 'Enter' && !event20.shiftKey) {
-        event20.preventDefault();
-        if (value78) return;
-        run31();
+    el90['addEventListener']('click', () => {
+      const value182 = runtime['stop']?.();
+      (messagesEl['querySelectorAll']?.('.agent-message--typing')?.['forEach']((value183) =>
+        agentConversationPresentation['removeWaiting'](value183),
+      ),
+        setBusy(![]),
+        onNotice(value182?.['notice'] || agentPanelText('stopRequested')));
+    }),
+    slashTrigger['addEventListener']('input', () => {
+      if (surface['textOnly']) return;
+      const editorText3 = getEditorText(slashTrigger)['match'](/^\/([^\s]*)$/);
+      if (!editorText3) {
+        setMenuOpen(onCatalogChange['menu'], ![], ownerRoot);
+        return;
+      }
+      (agentSkillPanel['close'](),
+        run6(![]),
+        onCatalogChange['openSlash'](editorText3[0x1]),
+        setMenuOpen(onCatalogChange['menu'], !![], ownerRoot));
+    }),
+    slashTrigger['addEventListener']('keydown', (event23) => {
+      if (isAgentPopoverOpen(onCatalogChange['menu']) && !event23['isComposing']) {
+        if (event23['key'] === 'ArrowDown' || event23['key'] === 'ArrowUp') {
+          (event23['preventDefault'](),
+            onCatalogChange['moveActive'](event23['key'] === 'ArrowUp' ? -0x1 : 0x1));
+          return;
+        }
+        if ((event23['key'] === 'Enter' && !event23['shiftKey']) || event23['key'] === 'Tab') {
+          (event23['preventDefault'](), onCatalogChange['chooseActive']());
+          return;
+        }
+        if (event23['key'] === 'Escape') {
+          (event23['preventDefault'](),
+            setMenuOpen(onCatalogChange['menu'], ![], ownerRoot),
+            slashTrigger['focus']());
+          return;
+        }
+      }
+      if (event23['key'] === 'Enter' && !event23['shiftKey']) {
+        event23['preventDefault']();
+        if (enabled11) return;
+        run49();
       }
     }),
-    panel.addEventListener('pointerdown', (event21) => event21.stopPropagation()),
-    panel.addEventListener('click', (event22) => {
-      if (isAgentMenuSurface(event22.target)) return;
-      closeFloatingMenus(panel);
+    slashTrigger['addEventListener']('paste', (event24) => {
+      if (surface['textOnly']) return;
+      const pastedImageFile = normalizePastedImageFile(getImageFileFromClipboardData(event24['clipboardData']));
+      if (!pastedImageFile) return;
+      (event24['preventDefault']?.(), args['uploadMaterialFile'](pastedImageFile));
     }),
-    document?.addEventListener?.('click', (event23) => {
-      if (!panel.contains(event23.target)) closeFloatingMenus(panel);
+    ownerRoot['addEventListener']('copy', run9),
+    ownerRoot['addEventListener']('contextmenu', (event25) => {
+      const el120 = event25['target']?.['closest']?.('.agent-message-media-card');
+      if (el120) {
+        handler2(event25, [
+          {
+            label: agentPanelText('imageResultOpen'),
+            icon: 'fullscreen',
+            shortcutActionId: 'context-agent-open-image',
+            action: () =>
+              onImagePreview(el120['dataset']['imageUrl'] || '', el120['dataset']['imageName'] || ''),
+          },
+        ]);
+        return;
+      }
+      const el121 = event25['target']?.['closest']?.('.agent-history-item');
+      if (el121) {
+        const enabled30 = String(el121['dataset']['conversationId'] || '')['trim']();
+        if (!enabled30) return;
+        handler2(event25, [
+          {
+            label: agentPanelText('historyOpen'),
+            icon: 'folder-open',
+            shortcutActionId: 'context-agent-open-history',
+            action: () => onSelect3(enabled30),
+          },
+          'sep',
+          {
+            label: agentPanelText('historyDelete'),
+            icon: 'delete',
+            danger: !![],
+            shortcutActionId: 'context-agent-delete-history',
+            action: () => onDelete2(enabled30),
+          },
+        ]);
+        return;
+      }
+      const value184 = event25['target']?.['closest']?.('.agent-message'),
+        value185 = value184 ? run8(value184) : '',
+        enabled31 = value185 || String(value184?.['agentMessageCopyText'] || '')['trim']();
+      if (!enabled31) return;
+      handler2(event25, [
+        {
+          label: agentPanelText(value185 ? 'copySelection' : 'copyMessage'),
+          icon: 'copy',
+          kbd: 'Ctrl\x20C',
+          shortcutActionId: 'copy',
+          action: () => void onCopy(enabled31),
+        },
+      ]);
     }),
-    el47.addEventListener('pointerdown', run29),
-    el47.addEventListener('keydown', (event24) => {
-      if (event24.key !== 'ArrowLeft' && event24.key !== 'ArrowRight') return;
-      event24.preventDefault();
-      const value100 = panel.getBoundingClientRect?.().width || panel.offsetWidth || 0,
-        value101 = event24.key === 'ArrowLeft' ? 24 : -24;
-      run28(value100 + value101, { persist: true });
+    ownerRoot['addEventListener']('pointerdown', (event26) => event26['stopPropagation']()),
+    ownerRoot['addEventListener']('click', (event27) => {
+      if (isAgentMenuSurface(event27['target'])) return;
+      closeFloatingMenus(ownerRoot);
+    }));
+  const value186 = (event28) => {
+      if (!ownerRoot['contains'](event28['target'])) closeFloatingMenus(ownerRoot);
+    },
+    value187 = (event29) => {
+      if (event29['key'] !== 'Escape') return;
+      if (!hasOpenFloatingMenus(ownerRoot)) return;
+      const isAgentPopoverOpen2 = isAgentPopoverOpen(onCatalogChange['menu']);
+      (event29['preventDefault']?.(), closeFloatingMenus(ownerRoot));
+      if (isAgentPopoverOpen2) slashTrigger['focus']();
+    };
+  (document?.['addEventListener']?.('click', value186),
+    document?.['addEventListener']?.('keydown', value187),
+    el40['addEventListener']('pointerdown', run48),
+    el40['addEventListener']('keydown', (event30) => {
+      if (event30['key'] !== 'ArrowLeft' && event30['key'] !== 'ArrowRight') return;
+      event30['preventDefault']();
+      const value188 = ownerRoot['getBoundingClientRect']?.()['width'] || ownerRoot['offsetWidth'] || 0x0,
+        value189 = event30['key'] === 'ArrowLeft' ? 0x18 : -0x18;
+      run47(value188 + value189, { persist: !![] });
     }),
-    el66.addEventListener('click', async () => {
-      if (value78) return;
-      const displayAnswer2 = panelText('confirmUserMessage');
-      (appendMessage(el57, 'user', displayAnswer2), (el56.hidden = true), (el65.hidden = true), run21(true));
-      const appendWaitingMessage3 = appendWaitingMessage(el57);
+    el65['addEventListener']('click', async () => {
+      if (enabled11) return;
+      const value190 = agentPanelContinuity['capture'](),
+        displayAnswer = agentPanelText('confirmUserMessage');
+      (agentConversationPresentation['appendMessage']('user', displayAnswer),
+        (el44['hidden'] = !![]),
+        (el64['hidden'] = !![]),
+        setBusy(!![], { stoppable: !![] }));
+      const el122 = agentConversationPresentation['appendWaiting']();
       try {
-        run30(await runtime.confirmPendingPlan({ displayAnswer: displayAnswer2 }));
-      } catch (error4) {
-        appendMessage(el57, 'assistant', error4?.message || 'Agent confirmation failed.');
+        const value191 = await runtime['confirmPendingPlan']({ displayAnswer: displayAnswer });
+        if (agentPanelContinuity['isCurrent'](value190) && el122['parentNode']) onResult(value191);
+      } catch (error5) {
+        if (!agentPanelContinuity['isCurrent'](value190) || !el122['parentNode']) return;
+        agentConversationPresentation['appendMessage']('assistant', error5?.['message'] || 'Agent confirmation failed.');
       } finally {
-        (removeWaitingMessage(appendWaitingMessage3), run21(false));
+        agentPanelContinuity['isCurrent'](value190) &&
+          el122['parentNode'] &&
+          (agentConversationPresentation['removeWaiting'](el122), setBusy(![]));
       }
     }),
-    el67.addEventListener('click', () => {
-      if (value78) return;
-      ((el65.hidden = true), run30(runtime.cancelPendingPlan()));
+    el66['addEventListener']('click', () => {
+      if (enabled11) return;
+      ((el64['hidden'] = !![]), setBusy(!![]));
+      try {
+        onResult(runtime['cancelPendingPlan']());
+      } finally {
+        setBusy(![]);
+      }
     }),
-    run25(),
+    (agentConversationActions = createAgentConversationActions({
+      replyActions: replyActions,
+      messagesEl: messagesEl,
+      runtime: runtime,
+      getBusy: () => enabled11,
+      setBusy: setBusy,
+      getPresentation: () => agentConversationPresentation,
+      onResult: onResult,
+      setNotice: onNotice,
+    })),
+    (agentConversationPresentation = createAgentConversationPresentation({
+      messagesEl: messagesEl,
+      runStepsEl: runStepsEl,
+      sessionStore: runtime['sessionStore'],
+      getHistory: getHistory,
+      onCopy: onCopy,
+      onImagePreview: onImagePreview,
+      copyIconHtml: agentIconSvg('copy'),
+      onMessagesChanged: () => {
+        (run40(), agentConversationActions['render']());
+        if (!ownerRoot['classList']['contains']('is-open')) agentPanelContinuity['rememberClosed']();
+      },
+      onConversationInvalidated: ({ historyOnly: historyOnly = ![] } = {}) => {
+        if (!historyOnly) return run42({ preserveNotice: !![] });
+        (agentConversationPresentation?.['render']({
+          history: getHistory(),
+          sessionSnapshot: runtime?.['sessionStore']?.['getState']?.() || {},
+        }),
+          run40());
+      },
+    })));
+  const run50 = onLocaleChange(run15);
+  return (
+    run42({ restorePendingInputRefs: !![] }),
     {
-      panel: panel,
-      open: () => run26(true),
-      close: () => run26(false),
+      panel: ownerRoot,
+      sendMessage: (value192) => {
+        if (enabled11) return;
+        return (setEditorText(slashTrigger, value192), run49());
+      },
+      open: () => run45(!![]),
+      close: () => run45(![]),
       toggle: toggle2,
-      collapse: () => run27(true),
-      expand: () => run27(false),
+      collapse: () => run46(!![]),
+      expand: () => run46(![]),
       reset: reset,
-      setWidth: (value102) => run28(value102, { persist: true }),
+      setWidth: (value193) => run47(value193, { persist: !![] }),
+      destroy: () => {
+        (agentPanelContinuity['destroy'](),
+          value110?.(),
+          run2(),
+          bindAgentModelControls2?.['destroy']?.(),
+          onCatalogChange['destroy'](),
+          agentSkillPanel['destroy'](),
+          agentConversationPresentation?.['destroy']?.(),
+          agentConversationActions?.['destroy'](),
+          run50(),
+          run24(),
+          args['clearDocuments']({ notify: ![] }),
+          run7(),
+          document?.['removeEventListener']?.('click', value186),
+          document?.['removeEventListener']?.('keydown', value187),
+          windowObject?.['removeEventListener']?.('resize', run4),
+          fabBtnEl['removeEventListener']('click', value176),
+          stateRoot['classList']?.['remove']?.(
+            'agent-sidebar-open',
+            'agent-sidebar-collapsed',
+            'agent-sidebar-resizing',
+          ),
+          fabBtnEl['classList']?.['remove']?.('is-agent-open'),
+          ownerRoot['remove']?.(),
+          el60['remove']?.());
+      },
     }
   );
 }
-export { formatAgentAssistantMarkdown } from './agentConversationPresentation.js';
