@@ -85,6 +85,7 @@
 |------|------|--------|------|
 | 试点 | 1 | 74 | `src/modules/assetPackageMedia.js`；纯改名闸门 PASS，模块测试 8/8，全量回归失败集合不变 |
 | 批量 1 | 8 | 233 | 纯改名闸门 8/8 PASS；模块测试合计 78/78；全量回归失败集合不变 |
+| 批量 2 | 8 | 234 | 纯改名闸门 8/8 PASS；模块测试合计 93/93；全量回归失败集合不变 |
 
 批量 1 的 8 件（均为零消费方叶子模块）：
 
@@ -99,7 +100,20 @@ src/components/video-node/sourceVideoFramePresentationBatch.js    33
 src/modules/promptMentionSelection.js                             51
 ```
 
-累计 9 件 / 307 个名字。零消费方候选池还剩 68 件（`tools/deobf-scan.mjs` 实测）。
+批量 2 的 8 件：
+
+```
+src/modules/interaction/dropTargetSpatialQuery.js                 18
+src/modules/panoramaSceneNode/characterBodyProfile.js             18
+src/core/stores/rendererStateRevisions.js                         22
+src/modules/agent/agentConversationCanvasTransferRuntime.js       28
+src/modules/taskCenterListView.js                                 32
+api/adapters/textResponsesRequest.js                              32
+src/modules/app/workspaceCacheIdleScheduler.js                    36
+src/modules/agent/agentComposerAttachmentController.js            48
+```
+
+累计 17 件 / 541 个名字。零消费方候选池还剩 60 件（`tools/deobf-scan.mjs` 实测）。
 
 ## 4. 与移植工序的关系（重要）
 
