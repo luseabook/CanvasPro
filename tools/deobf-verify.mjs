@@ -217,10 +217,23 @@ function main() {
     );
   }
 
-  const collisions = [...rename.entries()]
-    .filter(([from, to]) => from !== to && [...rename.entries()].some(([otherFrom, otherTo]) =>
-      otherFrom !== from && otherTo === to))
-    .map(([from, to]) => from + ' -> ' + to);
+  // The rename map must be injective. Two different old names collapsing onto one
+  // new name means two distinct bindings now share a name, which is either a
+  // redeclaration ("Identifier 'value_' has already been declared") or a silent
+  // merge of unrelated values.
+  const byTarget = new Map();
+  for (const [from, to] of rename) {
+    if (from === to) continue;
+    if (!byTarget.has(to)) byTarget.set(to, []);
+    byTarget.get(to).push(from);
+  }
+  const merged = [...byTarget.entries()].filter(([, sources]) => sources.length > 1);
+  if (merged.length) {
+    failures.push(
+      'rename map is not injective: ' +
+        merged.slice(0, 10).map(([to, sources]) => sources.join('+') + ' -> ' + to).join(', '),
+    );
+  }
 
   const renamed = [...rename.entries()].filter(([from, to]) => from !== to);
 
@@ -237,12 +250,6 @@ function main() {
   );
   if (explain) {
     for (const [from, to] of [...renamed].sort()) console.log('  ' + from + ' -> ' + to);
-  }
-  if (collisions.length) {
-    // Usually a destructuring property key such as `itemKey: _0x30c878`, which is
-    // safe. Anything else deserves a manual look before the batch lands.
-    console.log('REVIEW ' + collisions.length + ' rename target shares a name with another rename target:');
-    for (const collision of collisions.slice(0, 20)) console.log('  ' + collision);
   }
 }
 

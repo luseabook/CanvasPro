@@ -298,7 +298,11 @@ export function stringValue(text) {
       if (group[0] === 'x') return String.fromCharCode(parseInt(group.slice(1), 16));
       if (group[0] === 'u') {
         const hex = group[1] === '{' ? group.slice(2, -1) : group.slice(1);
-        return String.fromCodePoint(parseInt(hex, 16));
+        const code = parseInt(hex, 16);
+        // Never throw on malformed input: this runs over arbitrary source, and a
+        // bad escape must not take the whole comparison down.
+        if (!Number.isFinite(code) || code < 0 || code > 0x10ffff) return whole;
+        return String.fromCodePoint(code);
       }
       if (group === '\n') return '';
       return Object.prototype.hasOwnProperty.call(SIMPLE, group) ? SIMPLE[group] : group;

@@ -46,25 +46,32 @@ const CATEGORIES = [
 
 const FALLBACKS = ['value', 'item', 'key', 'index', 'result', 'data', 'options', 'target', 'source', 'next', 'current', 'entry', 'record', 'payload', 'handle', 'state', 'config', 'scope', 'input', 'output'];
 
+// Every returned name is registered in `used`, which is what makes the map
+// injective. A file can need hundreds of names from a handful of bases (one here
+// has 707 renames), so the suffix search must not run out: an unregistered
+// fallback would hand the same name out twice and the file would stop parsing
+// with "Identifier 'value_' has already been declared".
 function unique(base, used) {
   let cleaned = String(base).replace(/[^A-Za-z0-9_$]/g, '') || 'value';
   if (/^[0-9]/.test(cleaned)) cleaned = 'v' + cleaned;
   // A binding name cannot be a reserved word. `{ enum: _0x1 }` offers `enum` as a
   // name, and `const { enum: enum }` is a SyntaxError, so derive a usable one.
   if (RESERVED_BINDING_NAMES.has(cleaned)) cleaned = cleaned + 'Value';
-  const safe = cleaned;
-  if (!used.has(safe)) {
-    used.add(safe);
-    return safe;
+  if (!used.has(cleaned)) {
+    used.add(cleaned);
+    return cleaned;
   }
-  for (let suffix = 2; suffix < 200; suffix += 1) {
-    const candidate = safe + suffix;
+  for (let suffix = 2; suffix <= 1000000; suffix += 1) {
+    const candidate = cleaned + suffix;
     if (!used.has(candidate)) {
       used.add(candidate);
       return candidate;
     }
   }
-  return safe + '_';
+  let fallback = cleaned + '_';
+  while (used.has(fallback)) fallback += '_';
+  used.add(fallback);
+  return fallback;
 }
 
 function collect(match, key, into) {

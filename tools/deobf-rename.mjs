@@ -52,6 +52,12 @@ if (unused.length) {
 }
 
 const keys = Object.keys(mapping).sort((a, b) => b.length - a.length);
+// An empty map would build the pattern `\b()\b`, which matches every word
+// boundary and rewrites each one to the string "undefined", destroying the file.
+if (keys.length === 0) {
+  console.error('refusing to write: mapping is empty, nothing to rename');
+  process.exit(1);
+}
 const pattern = new RegExp('\\b(' + keys.join('|') + ')\\b', 'g');
 const rewritten = source.replace(pattern, match => mapping[match]);
 
