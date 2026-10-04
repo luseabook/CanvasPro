@@ -10,78 +10,78 @@ let active = false,
   latestViewport = null,
   pendingViewport = null,
   previewStartViewport = null;
-function toFiniteNumber(_0x2c1278, _0x49168b = 0) {
-  const _0x570af2 = Number(_0x2c1278);
-  return Number.isFinite(_0x570af2) ? _0x570af2 : _0x49168b;
+function toFiniteNumber(value, item = 0) {
+  const key = Number(value);
+  return Number.isFinite(key) ? key : item;
 }
-function normalizeViewport(_0x1981de = {}) {
-  const _0x1c4e37 = toFiniteNumber(_0x1981de.zoom, 1);
+function normalizeViewport(box = {}) {
+  const zoom = toFiniteNumber(box.zoom, 1);
   return {
-    x: toFiniteNumber(_0x1981de.x, 0),
-    y: toFiniteNumber(_0x1981de.y, 0),
-    zoom: _0x1c4e37 > 0 ? _0x1c4e37 : 1,
+    x: toFiniteNumber(box.x, 0),
+    y: toFiniteNumber(box.y, 0),
+    zoom: zoom > 0 ? zoom : 1,
   };
 }
-function resolveCanvasEl(_0x16d7ba = null) {
-  if (_0x16d7ba) return _0x16d7ba;
+function resolveCanvasEl(value2 = null) {
+  if (value2) return value2;
   if (canvasEl) return canvasEl;
   if (typeof document === 'undefined') return null;
   return document.getElementById?.(CANVAS_ID) || null;
 }
-function resolveSidePlusHolderEl(_0x7f241a = null) {
-  if (_0x7f241a) return _0x7f241a;
+function resolveSidePlusHolderEl(value3 = null) {
+  if (value3) return value3;
   if (sidePlusHolderEl) return sidePlusHolderEl;
   if (typeof document === 'undefined') return null;
   return document.getElementById?.(SIDE_PLUS_HOLDER_ID) || null;
 }
-function buildViewportTransform(_0x483ce1) {
-  return 'translate3d(' + _0x483ce1.x + 'px, ' + _0x483ce1.y + 'px, 0) scale(' + _0x483ce1.zoom + ')';
+function buildViewportTransform(box2) {
+  return 'translate3d(' + box2.x + 'px, ' + box2.y + 'px, 0) scale(' + box2.zoom + ')';
 }
-function buildSidePlusPreviewTransform(_0x37d589) {
+function buildSidePlusPreviewTransform(box3) {
   if (!previewStartViewport) return sidePlusHolderInitialTransform;
-  const _0x33ab0b = _0x37d589.x - previewStartViewport.x,
-    _0x4e9f3a = _0x37d589.y - previewStartViewport.y;
-  if (!_0x33ab0b && !_0x4e9f3a) return sidePlusHolderInitialTransform;
-  return 'translate3d(' + _0x33ab0b + 'px, ' + _0x4e9f3a + 'px, 0)';
+  const enabled = box3.x - previewStartViewport.x,
+    enabled2 = box3.y - previewStartViewport.y;
+  if (!enabled && !enabled2) return sidePlusHolderInitialTransform;
+  return 'translate3d(' + enabled + 'px, ' + enabled2 + 'px, 0)';
 }
-function applySidePlusPreviewTransform(_0x12b8d1) {
-  const _0x31ca2d = resolveSidePlusHolderEl();
-  if (!_0x31ca2d?.style) return false;
-  const _0x2e467c = buildSidePlusPreviewTransform(_0x12b8d1);
+function applySidePlusPreviewTransform(index) {
+  const el = resolveSidePlusHolderEl();
+  if (!el?.style) return false;
+  const sidePlusPreviewTransform = buildSidePlusPreviewTransform(index);
   return (
-    _0x31ca2d.style.transform !== _0x2e467c && (_0x31ca2d.style.transform = _0x2e467c),
-    (_0x31ca2d._lastPanPreviewTransform = _0x2e467c),
+    el.style.transform !== sidePlusPreviewTransform && (el.style.transform = sidePlusPreviewTransform),
+    (el._lastPanPreviewTransform = sidePlusPreviewTransform),
     true
   );
 }
 function clearSidePlusPreviewTransform() {
-  const _0x51087b = resolveSidePlusHolderEl();
-  (_0x51087b?.style &&
-    ((_0x51087b.style.transform = sidePlusHolderInitialTransform), (_0x51087b._lastPanPreviewTransform = '')),
+  const el2 = resolveSidePlusHolderEl();
+  (el2?.style &&
+    ((el2.style.transform = sidePlusHolderInitialTransform), (el2._lastPanPreviewTransform = '')),
     (sidePlusHolderEl = null),
     (sidePlusHolderInitialTransform = ''));
 }
-function applyViewportTransform(_0x55ad89) {
-  const _0x490015 = resolveCanvasEl();
-  if (!_0x490015) return false;
-  const _0x19a49b = buildViewportTransform(_0x55ad89);
+function applyViewportTransform(result) {
+  const el3 = resolveCanvasEl();
+  if (!el3) return false;
+  const viewportTransform = buildViewportTransform(result);
   return (
-    _0x490015.style.transform !== _0x19a49b && (_0x490015.style.transform = _0x19a49b),
-    (_0x490015._lastTransform = _0x19a49b),
-    applySidePlusPreviewTransform(_0x55ad89),
+    el3.style.transform !== viewportTransform && (el3.style.transform = viewportTransform),
+    (el3._lastTransform = viewportTransform),
+    applySidePlusPreviewTransform(result),
     true
   );
 }
-function dispatchViewportPanPreviewFrame(_0x5986d9) {
-  const _0x44f2f7 = typeof window !== 'undefined' ? window : null;
-  if (!_0x44f2f7?.dispatchEvent) return;
-  const _0x19a3f3 = { viewport: { ..._0x5986d9 } };
+function dispatchViewportPanPreviewFrame(args) {
+  const enabled3 = typeof window !== 'undefined' ? window : null;
+  if (!enabled3?.dispatchEvent) return;
+  const detail = { viewport: { ...args } };
   try {
-    const _0x9d7a0c = typeof CustomEvent === 'function' ? CustomEvent : null;
-    _0x44f2f7.dispatchEvent(
-      _0x9d7a0c
-        ? new _0x9d7a0c(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, { detail: _0x19a3f3 })
-        : { type: VIEWPORT_PAN_PREVIEW_FRAME_EVENT, detail: _0x19a3f3 },
+    const run = typeof CustomEvent === 'function' ? CustomEvent : null;
+    enabled3.dispatchEvent(
+      run
+        ? new run(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, { detail: detail })
+        : { type: VIEWPORT_PAN_PREVIEW_FRAME_EVENT, detail: detail },
     );
   } catch {}
 }
@@ -92,10 +92,10 @@ function cancelScheduledFrame() {
 function flushPreviewFrame() {
   rafId = 0;
   if (!pendingViewport) return;
-  const _0x1ebb15 = pendingViewport;
+  const data = pendingViewport;
   ((pendingViewport = null),
-    (latestViewport = _0x1ebb15),
-    applyViewportTransform(_0x1ebb15) && dispatchViewportPanPreviewFrame(_0x1ebb15));
+    (latestViewport = data),
+    applyViewportTransform(data) && dispatchViewportPanPreviewFrame(data));
 }
 function schedulePreviewFrame() {
   if (rafId) return;
@@ -105,21 +105,21 @@ function schedulePreviewFrame() {
   }
   flushPreviewFrame();
 }
-export function beginViewportPanPreview(_0x229b52, _0x38dacc = {}) {
+export function beginViewportPanPreview(options, target = {}) {
   ((active = true),
     (dirty = false),
-    (canvasEl = resolveCanvasEl(_0x38dacc.canvasEl || null)),
-    (sidePlusHolderEl = resolveSidePlusHolderEl(_0x38dacc.sidePlusHolderEl || null)),
+    (canvasEl = resolveCanvasEl(target.canvasEl || null)),
+    (sidePlusHolderEl = resolveSidePlusHolderEl(target.sidePlusHolderEl || null)),
     (sidePlusHolderInitialTransform = sidePlusHolderEl?.style?.transform || ''),
-    (latestViewport = normalizeViewport(_0x229b52)),
+    (latestViewport = normalizeViewport(options)),
     (previewStartViewport = latestViewport),
     (pendingViewport = null),
     canvasEl?.style && (canvasEl.style.willChange = 'transform'));
 }
-export function updateViewportPanPreview(_0x76b908, _0x1e3475, _0x345943) {
-  !active && beginViewportPanPreview({ x: _0x76b908, y: _0x1e3475, zoom: _0x345943 });
-  const _0xc06607 = normalizeViewport({ x: _0x76b908, y: _0x1e3475, zoom: _0x345943 });
-  ((dirty = true), (latestViewport = _0xc06607), (pendingViewport = _0xc06607), schedulePreviewFrame());
+export function updateViewportPanPreview(x, y, zoom2) {
+  !active && beginViewportPanPreview({ x: x, y: y, zoom: zoom2 });
+  const viewport = normalizeViewport({ x: x, y: y, zoom: zoom2 });
+  ((dirty = true), (latestViewport = viewport), (pendingViewport = viewport), schedulePreviewFrame());
 }
 export function getViewportPanPreview() {
   if (!active) return null;
@@ -128,7 +128,7 @@ export function getViewportPanPreview() {
 export function flushViewportPanPreview() {
   cancelScheduledFrame();
   pendingViewport && flushPreviewFrame();
-  const _0x18f05c = dirty && latestViewport ? { ...latestViewport } : null;
+  const source = dirty && latestViewport ? { ...latestViewport } : null;
   return (
     (active = false),
     (dirty = false),
@@ -137,7 +137,7 @@ export function flushViewportPanPreview() {
     (previewStartViewport = null),
     (canvasEl = null),
     clearSidePlusPreviewTransform(),
-    _0x18f05c
+    source
   );
 }
 export function cancelViewportPanPreview() {

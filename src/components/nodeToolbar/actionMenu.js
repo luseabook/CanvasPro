@@ -1,149 +1,134 @@
 import { positionAnchoredSubmenu } from '../../utils/submenuPosition.js';
-function resolveCanvasViewportTop(_0x3fcba7, _0x1dd732 = globalThis.document) {
-  const _0x549beb = Number(_0x3fcba7);
-  if (Number.isFinite(_0x549beb)) return Math.max(0, _0x549beb);
-  const _0x3d6ac1 = _0x1dd732?.querySelector?.('.v2-canvas-stage')?.getBoundingClientRect?.();
-  return Number.isFinite(Number(_0x3d6ac1?.top)) ? Math.max(0, Number(_0x3d6ac1.top)) : 0;
+function resolveCanvasViewportTop(value, el = globalThis.document) {
+  const item = Number(value);
+  if (Number.isFinite(item)) return Math.max(0, item);
+  const box = el?.querySelector?.('.v2-canvas-stage')?.getBoundingClientRect?.();
+  return Number.isFinite(Number(box?.top)) ? Math.max(0, Number(box.top)) : 0;
 }
-export function appendToolbarActionMenuTitle(_0x39d049, _0x4f819c) {
-  const _0x136b37 = document.createElement('div');
+export function appendToolbarActionMenuTitle(el2, key) {
+  const el3 = document.createElement('div');
   return (
-    (_0x136b37.className = 'node-toolbar-action-menu-title'),
-    (_0x136b37.textContent = _0x4f819c),
-    _0x39d049.appendChild(_0x136b37),
-    _0x136b37
+    (el3.className = 'node-toolbar-action-menu-title'),
+    (el3.textContent = key),
+    el2.appendChild(el3),
+    el3
   );
 }
-export function createToolbarActionMenuItem(_0x1ecb86 = '') {
-  const _0x1e2207 = document.createElement('div');
-  return (
-    (_0x1e2207.className = ['node-toolbar-action-menu-item', _0x1ecb86].filter(Boolean).join(' ')),
-    _0x1e2207
-  );
+export function createToolbarActionMenuItem(index = '') {
+  const result = document.createElement('div');
+  return ((result.className = ['node-toolbar-action-menu-item', index].filter(Boolean).join(' ')), result);
 }
 export function createToolbarActionMenuIcon() {
-  const _0x5d8c75 = document.createElement('div');
-  return ((_0x5d8c75.className = 'node-toolbar-action-menu-icon'), _0x5d8c75);
+  const data = document.createElement('div');
+  return ((data.className = 'node-toolbar-action-menu-icon'), data);
 }
 export function createRunningHubActionIcon() {
-  const _0x19afe9 = createToolbarActionMenuIcon(),
-    _0x1c6c2b = document.createElement('img');
+  const el4 = createToolbarActionMenuIcon(),
+    options = document.createElement('img');
   return (
-    (_0x1c6c2b.className = 'node-toolbar-action-provider-logo'),
-    (_0x1c6c2b.src = 'images/RH.png'),
-    (_0x1c6c2b.alt = 'runninghub'),
-    _0x19afe9.appendChild(_0x1c6c2b),
-    _0x19afe9
+    (options.className = 'node-toolbar-action-provider-logo'),
+    (options.src = 'images/RH.png'),
+    (options.alt = 'runninghub'),
+    el4.appendChild(options),
+    el4
   );
 }
 export function createToolbarActionMenuBody() {
-  const _0xed61f9 = document.createElement('div');
-  return ((_0xed61f9.className = 'node-toolbar-action-menu-body'), _0xed61f9);
+  const target = document.createElement('div');
+  return ((target.className = 'node-toolbar-action-menu-body'), target);
 }
 export function createToolbarActionTitleRow() {
-  const _0x131c8f = document.createElement('div');
-  return ((_0x131c8f.className = 'node-toolbar-action-title-row'), _0x131c8f);
+  const source = document.createElement('div');
+  return ((source.className = 'node-toolbar-action-title-row'), source);
 }
-export function createToolbarActionTitle(_0x1ad7c0) {
-  const _0x2f1bb9 = document.createElement('span');
-  return (
-    (_0x2f1bb9.className = 'node-toolbar-action-menu-item-title'),
-    (_0x2f1bb9.textContent = _0x1ad7c0),
-    _0x2f1bb9
-  );
+export function createToolbarActionTitle(next) {
+  const el5 = document.createElement('span');
+  return ((el5.className = 'node-toolbar-action-menu-item-title'), (el5.textContent = next), el5);
 }
-export function createToolbarActionDescription(_0x34a315) {
-  const _0x51378a = document.createElement('span');
-  return (
-    (_0x51378a.className = 'node-toolbar-action-menu-item-desc'),
-    (_0x51378a.textContent = _0x34a315),
-    _0x51378a
-  );
+export function createToolbarActionDescription(current) {
+  const el6 = document.createElement('span');
+  return ((el6.className = 'node-toolbar-action-menu-item-desc'), (el6.textContent = current), el6);
 }
-export function createToolbarActionVipBadge(_0x25c9ec = 'VIP') {
-  const _0x243b8b = document.createElement('span');
-  return (
-    (_0x243b8b.className = 'node-toolbar-action-vip-badge'),
-    (_0x243b8b.textContent = _0x25c9ec),
-    _0x243b8b
-  );
+export function createToolbarActionVipBadge(entry = 'VIP') {
+  const el7 = document.createElement('span');
+  return ((el7.className = 'node-toolbar-action-vip-badge'), (el7.textContent = entry), el7);
 }
-export function createToolbarActionPopupAnchorPositionGetter(_0x176133, _0x2c7f22 = {}) {
-  const _0x19f0ca = Number.isFinite(Number(_0x2c7f22.gap)) ? Number(_0x2c7f22.gap) : 12,
-    _0x3e7176 = (_0x3f2c33) => {
-      const _0x282e89 = _0x3f2c33?.getBoundingClientRect?.();
-      if (!_0x282e89) return null;
-      const _0x35fd4e = Number(_0x282e89.width) || 0,
-        _0x42aa35 = Number(_0x282e89.height) || 0;
+export function createToolbarActionPopupAnchorPositionGetter(el8, record = {}) {
+  const payload = Number.isFinite(Number(record.gap)) ? Number(record.gap) : 12,
+    handler = (el9) => {
+      const box2 = el9?.getBoundingClientRect?.();
+      if (!box2) return null;
+      const width2 = Number(box2.width) || 0,
+        height2 = Number(box2.height) || 0;
       return {
-        left: Number(_0x282e89.left) || 0,
-        top: Number(_0x282e89.top) || 0,
-        width: _0x35fd4e,
-        height: _0x42aa35,
-        right: Number(_0x282e89.right) || (Number(_0x282e89.left) || 0) + _0x35fd4e,
-        bottom: Number(_0x282e89.bottom) || (Number(_0x282e89.top) || 0) + _0x42aa35,
+        left: Number(box2.left) || 0,
+        top: Number(box2.top) || 0,
+        width: width2,
+        height: height2,
+        right: Number(box2.right) || (Number(box2.left) || 0) + width2,
+        bottom: Number(box2.bottom) || (Number(box2.top) || 0) + height2,
       };
     },
-    _0x5331e7 = (_0x3d5cad) => Boolean(_0x3d5cad && _0x3d5cad.width > 0 && _0x3d5cad.height > 0),
-    _0x806911 = () => _0x3e7176(_0x176133?.closest?.('.v2-img-toolbar-more-menu')),
-    _0x4da827 = () => _0x3e7176(_0x176133),
-    _0x459fed = () => {
-      const _0x267f00 = _0x4da827() || { left: 0, top: 0, width: 0, height: 0 },
-        _0x291c0b = _0x806911();
+    handler2 = (box3) => Boolean(box3 && box3.width > 0 && box3.height > 0),
+    handler3 = () => handler(el8?.closest?.('.v2-img-toolbar-more-menu')),
+    handler4 = () => handler(el8),
+    handle = () => {
+      const left2 = handler4() || { left: 0, top: 0, width: 0, height: 0 },
+        box4 = handler3();
       return {
-        left: _0x267f00.left + _0x267f00.width / 2,
-        top: (_0x5331e7(_0x291c0b) ? _0x291c0b.top : _0x267f00.top) - _0x19f0ca,
+        left: left2.left + left2.width / 2,
+        top: (handler2(box4) ? box4.top : left2.top) - payload,
       };
     };
-  return ((_0x459fed.hasVisibleAnchor = () => _0x5331e7(_0x4da827())), _0x459fed);
+  return ((handle.hasVisibleAnchor = () => handler2(handler4())), handle);
 }
 export function positionToolbarActionSubmenu(
-  _0x474476,
-  _0x25190e,
+  el10,
+  submenu,
   {
     gap: gap = 12,
     viewportInset: viewportInset = 8,
-    viewportTop: _0x12c5e5,
+    viewportTop: viewportTop,
     windowObject: windowObject = globalThis.window,
   } = {},
 ) {
-  const _0x303b2c = _0x474476?.getBoundingClientRect?.();
-  if (!_0x303b2c || _0x303b2c.width <= 0 || _0x303b2c.height <= 0) return null;
+  const anchorRect = el10?.getBoundingClientRect?.();
+  if (!anchorRect || anchorRect.width <= 0 || anchorRect.height <= 0) return null;
   return (
-    (_0x25190e.style.transform = 'translate(0, 0)'),
+    (submenu.style.transform = 'translate(0, 0)'),
     positionAnchoredSubmenu({
-      submenu: _0x25190e,
-      anchorRect: _0x303b2c,
+      submenu: submenu,
+      anchorRect: anchorRect,
       preferredSide: 'right',
       position: 'fixed',
       gap,
       viewportMargin: viewportInset,
       viewportWidth: windowObject?.innerWidth,
       viewportHeight: windowObject?.innerHeight,
-      viewportTop: resolveCanvasViewportTop(_0x12c5e5),
+      viewportTop: resolveCanvasViewportTop(viewportTop),
     })
   );
 }
 export function positionToolbarActionSubmenuAbove(
-  _0x4ee4f0,
-  _0x3d45a7,
+  box5,
+  submenu2,
   {
     viewportInset: viewportInset = 8,
-    viewportTop: _0x55c2b1,
+    viewportTop: viewportTop2,
     windowObject: windowObject = globalThis.window,
   } = {},
 ) {
-  const _0x447a3d = Number(_0x4ee4f0?.left) || 0,
-    _0x5585b4 = Number(_0x4ee4f0?.top) || 0;
+  const left3 = Number(box5?.left) || 0,
+    top2 = Number(box5?.top) || 0;
   return (
-    (_0x3d45a7.style.transform = 'translate(0, 0)'),
+    (submenu2.style.transform = 'translate(0, 0)'),
     positionAnchoredSubmenu({
-      submenu: _0x3d45a7,
+      submenu: submenu2,
       anchorRect: {
-        left: _0x447a3d,
-        right: _0x447a3d,
-        top: _0x5585b4,
-        bottom: _0x5585b4,
+        left: left3,
+        right: left3,
+        top: top2,
+        bottom: top2,
         width: 0,
         height: 0,
       },
@@ -153,7 +138,7 @@ export function positionToolbarActionSubmenuAbove(
       viewportMargin: viewportInset,
       viewportWidth: windowObject?.innerWidth,
       viewportHeight: windowObject?.innerHeight,
-      viewportTop: resolveCanvasViewportTop(_0x55c2b1),
+      viewportTop: resolveCanvasViewportTop(viewportTop2),
     })
   );
 }

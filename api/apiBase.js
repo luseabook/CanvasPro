@@ -5,133 +5,126 @@ export function getApiBase() {
   } catch {}
   return '';
 }
-export function buildApiUrl(_0x4c388d) {
-  const _0x14c316 = getApiBase(),
-    _0x19b56e = String(_0x4c388d || '');
-  if (!_0x19b56e) return _0x14c316 || '';
-  if (!_0x19b56e.startsWith('/')) return _0x14c316 + '/' + _0x19b56e;
-  return '' + _0x14c316 + _0x19b56e;
+export function buildApiUrl(value) {
+  const apiBase = getApiBase(),
+    enabled = String(value || '');
+  if (!enabled) return apiBase || '';
+  if (!enabled.startsWith('/')) return apiBase + '/' + enabled;
+  return '' + apiBase + enabled;
 }
-export function fetchWithTimeout(_0x43a12e, _0x374d48 = {}, _0x380fed = DEFAULT_TIMEOUT) {
-  const _0x38509 = new AbortController(),
-    _0x313931 = setTimeout(() => _0x38509.abort(), _0x380fed);
-  return fetch(_0x43a12e, { ..._0x374d48, signal: _0x38509.signal }).finally(() => clearTimeout(_0x313931));
+export function fetchWithTimeout(item, args = {}, key = DEFAULT_TIMEOUT) {
+  const signal = new AbortController(),
+    setTimeout2 = setTimeout(() => signal.abort(), key);
+  return fetch(item, { ...args, signal: signal.signal }).finally(() => clearTimeout(setTimeout2));
 }
-export function fetchWithTimeoutWithSignal(
-  _0x59fd6a,
-  _0x5a9374 = {},
-  _0x26f1e0 = DEFAULT_TIMEOUT,
-  _0x4ccc4e,
-) {
-  const _0x30f984 = new AbortController(),
-    _0x5d7a01 = setTimeout(() => _0x30f984.abort(), _0x26f1e0);
-  let _0x1e60ee = null;
-  if (_0x4ccc4e) {
-    if (_0x4ccc4e.aborted) _0x30f984.abort();
-    else
-      ((_0x1e60ee = () => _0x30f984.abort()), _0x4ccc4e.addEventListener('abort', _0x1e60ee, { once: true }));
+export function fetchWithTimeoutWithSignal(index, args2 = {}, result = DEFAULT_TIMEOUT, el) {
+  const signal2 = new AbortController(),
+    setTimeout3 = setTimeout(() => signal2.abort(), result);
+  let data = null;
+  if (el) {
+    if (el.aborted) signal2.abort();
+    else ((data = () => signal2.abort()), el.addEventListener('abort', data, { once: true }));
   }
-  return fetch(_0x59fd6a, { ..._0x5a9374, signal: _0x30f984.signal }).finally(() => {
-    clearTimeout(_0x5d7a01);
-    if (_0x4ccc4e && _0x1e60ee) _0x4ccc4e.removeEventListener('abort', _0x1e60ee);
+  return fetch(index, { ...args2, signal: signal2.signal }).finally(() => {
+    clearTimeout(setTimeout3);
+    if (el && data) el.removeEventListener('abort', data);
   });
 }
-function stringifyErrorBodyValue(_0x17f439) {
-  if (_0x17f439 === undefined || _0x17f439 === null) return '';
-  if (typeof _0x17f439 === 'string') return _0x17f439;
-  if (typeof _0x17f439 === 'number' || typeof _0x17f439 === 'boolean') return String(_0x17f439);
-  if (_0x17f439 && typeof _0x17f439 === 'object') {
-    const _0x27e8c7 =
-      _0x17f439.message ||
-      _0x17f439.errorMessage ||
-      _0x17f439.error_message ||
-      _0x17f439.reason ||
-      _0x17f439.detail ||
-      _0x17f439.details ||
-      _0x17f439.msg;
-    if (_0x27e8c7 !== undefined && _0x27e8c7 !== null && _0x27e8c7 !== _0x17f439) {
-      const _0x4f6a28 = stringifyErrorBodyValue(_0x27e8c7);
-      if (_0x4f6a28) return _0x4f6a28;
+function stringifyErrorBodyValue(error) {
+  if (error === undefined || error === null) return '';
+  if (typeof error === 'string') return error;
+  if (typeof error === 'number' || typeof error === 'boolean') return String(error);
+  if (error && typeof error === 'object') {
+    const options =
+      error.message ||
+      error.errorMessage ||
+      error.error_message ||
+      error.reason ||
+      error.detail ||
+      error.details ||
+      error.msg;
+    if (options !== undefined && options !== null && options !== error) {
+      const stringifyErrorBodyValue2 = stringifyErrorBodyValue(options);
+      if (stringifyErrorBodyValue2) return stringifyErrorBodyValue2;
     }
     try {
-      return JSON.stringify(_0x17f439);
+      return JSON.stringify(error);
     } catch {
       return '';
     }
   }
-  return String(_0x17f439 || '');
+  return String(error || '');
 }
-async function parseErrorBody(_0x5cc680) {
-  let _0x425b3a = '';
+async function parseErrorBody(response) {
+  let target = '';
   try {
-    _0x425b3a = await _0x5cc680.text();
-    const _0x1a4b5d = JSON.parse(_0x425b3a);
+    target = await response.text();
+    const error2 = JSON.parse(target);
     return stringifyErrorBodyValue(
-      _0x1a4b5d.error?.message ||
-        _0x1a4b5d.error ||
-        _0x1a4b5d.message ||
-        _0x1a4b5d.data?.error ||
-        _0x1a4b5d.data?.message ||
-        _0x425b3a,
+      error2.error?.message ||
+        error2.error ||
+        error2.message ||
+        error2.data?.error ||
+        error2.data?.message ||
+        target,
     );
   } catch {
-    return _0x425b3a || 'HTTP ' + _0x5cc680.status;
+    return target || 'HTTP ' + response.status;
   }
 }
-export async function request(_0x142c44, _0x517187 = {}, _0x545795 = DEFAULT_TIMEOUT) {
-  const _0x528a7c = _0x142c44.startsWith('http') ? _0x142c44 : buildApiUrl(_0x142c44);
+export async function request(source, next = {}, current = DEFAULT_TIMEOUT) {
+  const entry = source.startsWith('http') ? source : buildApiUrl(source);
   try {
-    const _0x2d5b9b = await fetchWithTimeout(_0x528a7c, _0x517187, _0x545795);
-    if (_0x2d5b9b.status === 0x194) return { success: true, data: null, status: 0x194 };
-    if (!_0x2d5b9b.ok) {
-      const _0x564bad = await parseErrorBody(_0x2d5b9b);
+    const status = await fetchWithTimeout(entry, next, current);
+    if (status.status === 0x194) return { success: true, data: null, status: 0x194 };
+    if (!status.ok) {
+      const errorBody = await parseErrorBody(status);
       return {
         success: false,
-        error: '请求失败: HTTP ' + _0x2d5b9b.status + (_0x564bad ? ' — ' + _0x564bad : ''),
-        status: _0x2d5b9b.status,
+        error: '请求失败: HTTP ' + status.status + (errorBody ? ' — ' + errorBody : ''),
+        status: status.status,
       };
     }
-    const _0x290fde = _0x2d5b9b.headers.get('content-type') || '';
-    let _0x3f638a;
-    if (_0x290fde.includes('application/json')) _0x3f638a = await _0x2d5b9b.json();
+    const list = status.headers.get('content-type') || '';
+    let data2;
+    if (list.includes('application/json')) data2 = await status.json();
     else {
-      const _0x4ebc9d = await _0x2d5b9b.text();
+      const record = await status.text();
       try {
-        _0x3f638a = JSON.parse(_0x4ebc9d);
+        data2 = JSON.parse(record);
       } catch {
-        _0x3f638a = _0x4ebc9d;
+        data2 = record;
       }
     }
-    return { success: true, data: _0x3f638a, status: _0x2d5b9b.status };
-  } catch (_0x36b4f9) {
-    if (_0x36b4f9.name === 'AbortError')
+    return { success: true, data: data2, status: status.status };
+  } catch (error3) {
+    if (error3.name === 'AbortError')
       return { success: false, error: '请求超时，请检查网络连接或服务器状态', status: 0 };
-    if (_0x36b4f9.message?.includes('Failed to fetch'))
+    if (error3.message?.includes('Failed to fetch'))
       return {
         success: false,
         error:
           '网络请求失败。请检查：\n1. 网络连接是否正常\n2. 本地 Python 服务器(server.py)是否已启动\n3. 浏览器是否可以访问 http://localhost:8777\n4. 是否有防火墙拦截了 8777 端口',
         status: 0,
       };
-    return { success: false, error: _0x36b4f9.message || '未知网络错误', status: 0 };
+    return { success: false, error: error3.message || '未知网络错误', status: 0 };
   }
 }
-export function get(_0xa0b2d0, _0x39f30e) {
-  return request(_0xa0b2d0, { method: 'GET' }, _0x39f30e);
+export function get(payload, handle) {
+  return request(payload, { method: 'GET' }, handle);
 }
-export function post(_0x37835e, _0x275ce7, _0x344410) {
-  const _0xef8ce9 = { method: 'POST', headers: {} };
-  if (_0x275ce7 !== undefined) {
-    if (_0x275ce7 instanceof FormData || _0x275ce7 instanceof Blob || _0x275ce7 instanceof ArrayBuffer)
-      _0xef8ce9.body = _0x275ce7;
+export function post(state, config, scope) {
+  const dom = { method: 'POST', headers: {} };
+  if (config !== undefined) {
+    if (config instanceof FormData || config instanceof Blob || config instanceof ArrayBuffer)
+      dom.body = config;
     else
-      typeof _0x275ce7 === 'object'
-        ? ((_0xef8ce9.headers['Content-Type'] = 'application/json'),
-          (_0xef8ce9.body = JSON.stringify(_0x275ce7)))
-        : (_0xef8ce9.body = _0x275ce7);
+      typeof config === 'object'
+        ? ((dom.headers['Content-Type'] = 'application/json'), (dom.body = JSON.stringify(config)))
+        : (dom.body = config);
   }
-  return request(_0x37835e, _0xef8ce9, _0x344410);
+  return request(state, dom, scope);
 }
-export function del(_0x166276, _0x296fa3) {
-  return request(_0x166276, { method: 'DELETE' }, _0x296fa3);
+export function del(input, output) {
+  return request(input, { method: 'DELETE' }, output);
 }

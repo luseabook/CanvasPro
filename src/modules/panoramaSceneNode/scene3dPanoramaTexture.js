@@ -4,107 +4,103 @@ const PANORAMA_TEXTURE_FETCH_TIMEOUT_MS = 0x3a98;
 function createAbortError() {
   if (typeof DOMException === 'function')
     return new DOMException('Panorama\x20texture\x20load\x20aborted', 'AbortError');
-  const _0x212fcf = new Error('Panorama\x20texture\x20load\x20aborted');
-  return ((_0x212fcf['name'] = 'AbortError'), _0x212fcf);
+  const error = new Error('Panorama\x20texture\x20load\x20aborted');
+  return ((error['name'] = 'AbortError'), error);
 }
-function isUsableBlob(_0x2d7a93) {
-  return Boolean(_0x2d7a93 && typeof _0x2d7a93['arrayBuffer'] === 'function');
+function isUsableBlob(value) {
+  return Boolean(value && typeof value['arrayBuffer'] === 'function');
 }
-function createTextureFromImageBitmap(_0xe28143) {
-  const _0x3570fc = Number(_0xe28143?.['width']) || 0x0,
-    _0x245f4d = Number(_0xe28143?.['height']) || 0x0;
-  if (_0x3570fc <= 0x0 || _0x245f4d <= 0x0) return (_0xe28143?.['close']?.(), null);
-  const _0x2cd03b = new threeRuntime['Texture'](_0xe28143);
-  _0x2cd03b['flipY'] = ![];
-  let _0x1766b5 = ![];
-  const _0x2761f9 = () => {
-    if (_0x1766b5) return;
-    ((_0x1766b5 = !![]), _0x2cd03b['removeEventListener']?.('dispose', _0x2761f9), _0xe28143?.['close']?.());
+function createTextureFromImageBitmap(box) {
+  const count = Number(box?.['width']) || 0x0,
+    count2 = Number(box?.['height']) || 0x0;
+  if (count <= 0x0 || count2 <= 0x0) return (box?.['close']?.(), null);
+  const el = new threeRuntime['Texture'](box);
+  el['flipY'] = ![];
+  let item = ![];
+  const key = () => {
+    if (item) return;
+    ((item = !![]), el['removeEventListener']?.('dispose', key), box?.['close']?.());
   };
-  return (_0x2cd03b['addEventListener']?.('dispose', _0x2761f9), _0x2cd03b);
+  return (el['addEventListener']?.('dispose', key), el);
 }
-function loadTextureWithTextureLoader(_0x2a2329, _0x204afa, _0x21d481) {
-  if (!_0x204afa || typeof _0x204afa['load'] !== 'function')
+function loadTextureWithTextureLoader(index, enabled, el2) {
+  if (!enabled || typeof enabled['load'] !== 'function')
     return Promise['reject'](new Error('Panorama texture loader is unavailable'));
-  if (_0x21d481?.['aborted']) return Promise['reject'](createAbortError());
-  return new Promise((_0x1b469f, _0x27e189) => {
-    let _0x14df6b = ![];
-    const _0x40eb7e = () => _0x21d481?.['removeEventListener']?.('abort', _0x3ee5),
-      _0x21e7e6 = (_0xed9b59) => {
-        if (_0x14df6b) {
-          _0xed9b59?.['dispose']?.();
+  if (el2?.['aborted']) return Promise['reject'](createAbortError());
+  return new Promise((handler, handler2) => {
+    let result = ![];
+    const run = () => el2?.['removeEventListener']?.('abort', data),
+      options = (target) => {
+        if (result) {
+          target?.['dispose']?.();
           return;
         }
-        ((_0x14df6b = !![]), _0x40eb7e(), _0x1b469f(_0xed9b59));
+        ((result = !![]), run(), handler(target));
       },
-      _0x7cd571 = (_0x536a70) => {
-        if (_0x14df6b) return;
-        ((_0x14df6b = !![]),
-          _0x40eb7e(),
-          _0x27e189(_0x536a70 instanceof Error ? _0x536a70 : new Error('Panorama texture load failed')));
+      handler3 = (source) => {
+        if (result) return;
+        ((result = !![]),
+          run(),
+          handler2(source instanceof Error ? source : new Error('Panorama texture load failed')));
       },
-      _0x3ee5 = () => _0x7cd571(createAbortError());
-    _0x21d481?.['addEventListener']?.('abort', _0x3ee5, { once: !![] });
+      data = () => handler3(createAbortError());
+    el2?.['addEventListener']?.('abort', data, { once: !![] });
     try {
-      _0x204afa['load'](_0x2a2329, _0x21e7e6, undefined, _0x7cd571);
-    } catch (_0x163631) {
-      _0x7cd571(_0x163631);
+      enabled['load'](index, options, undefined, handler3);
+    } catch (next) {
+      handler3(next);
     }
   });
 }
 export async function loadPanoramaTextureSource(
-  _0x4da187,
+  current,
   {
-    signal: _0x5892ee,
+    signal: signal,
     fetchBlobImpl: fetchBlobImpl = fetchRemoteBlob,
     createImageBitmapImpl: createImageBitmapImpl = globalThis['createImageBitmap'],
-    textureLoader: _0x4a610a,
+    textureLoader: textureLoader,
     timeout: timeout = PANORAMA_TEXTURE_FETCH_TIMEOUT_MS,
   } = {},
 ) {
-  const _0x5a6fa4 = String(_0x4da187 || '')['trim']();
-  if (!_0x5a6fa4) throw new Error('Panorama texture URL is empty');
-  if (_0x5892ee?.['aborted']) throw createAbortError();
-  let _0x2383ef = null;
+  const enabled2 = String(current || '')['trim']();
+  if (!enabled2) throw new Error('Panorama texture URL is empty');
+  if (signal?.['aborted']) throw createAbortError();
+  let entry = null;
   if (typeof fetchBlobImpl === 'function' && typeof createImageBitmapImpl === 'function') {
-    let _0x263d5e = null;
+    let imageBitmapImpl = null;
     try {
-      const _0x4bb64a = await fetchBlobImpl(_0x5a6fa4, { signal: _0x5892ee, timeout: timeout });
-      if (_0x5892ee?.['aborted']) throw createAbortError();
-      if (!isUsableBlob(_0x4bb64a)) throw new Error('Panorama texture response is empty');
-      _0x263d5e = await createImageBitmapImpl(_0x4bb64a, { imageOrientation: 'flipY' });
-      if (_0x5892ee?.['aborted']) throw createAbortError();
-      const _0x5098bc = createTextureFromImageBitmap(_0x263d5e);
-      if (!_0x5098bc) throw new Error('Panorama texture bitmap is invalid');
-      return ((_0x263d5e = null), _0x5098bc);
-    } catch (_0x3a3eb2) {
-      _0x263d5e?.['close']?.();
-      if (_0x5892ee?.['aborted']) throw createAbortError();
-      _0x2383ef = _0x3a3eb2;
+      const fetchBlobImpl2 = await fetchBlobImpl(enabled2, { signal: signal, timeout: timeout });
+      if (signal?.['aborted']) throw createAbortError();
+      if (!isUsableBlob(fetchBlobImpl2)) throw new Error('Panorama texture response is empty');
+      imageBitmapImpl = await createImageBitmapImpl(fetchBlobImpl2, { imageOrientation: 'flipY' });
+      if (signal?.['aborted']) throw createAbortError();
+      const textureFromImageBitmap = createTextureFromImageBitmap(imageBitmapImpl);
+      if (!textureFromImageBitmap) throw new Error('Panorama texture bitmap is invalid');
+      return ((imageBitmapImpl = null), textureFromImageBitmap);
+    } catch (record) {
+      imageBitmapImpl?.['close']?.();
+      if (signal?.['aborted']) throw createAbortError();
+      entry = record;
     }
   }
   try {
-    return await loadTextureWithTextureLoader(_0x5a6fa4, _0x4a610a, _0x5892ee);
-  } catch (_0x36d213) {
-    throw _0x2383ef || _0x36d213;
+    return await loadTextureWithTextureLoader(enabled2, textureLoader, signal);
+  } catch (payload) {
+    throw entry || payload;
   }
 }
-export function configureInsideSpherePanoramaTexture(
-  _0x1cd7a0,
-  _0x2d6d21,
-  { isPreview: isPreview = ![] } = {},
-) {
-  if (!_0x1cd7a0) return;
-  ((_0x1cd7a0['colorSpace'] = threeRuntime['SRGBColorSpace']),
-    (_0x1cd7a0['minFilter'] = isPreview
+export function configureInsideSpherePanoramaTexture(enabled3, handle, { isPreview: isPreview = ![] } = {}) {
+  if (!enabled3) return;
+  ((enabled3['colorSpace'] = threeRuntime['SRGBColorSpace']),
+    (enabled3['minFilter'] = isPreview
       ? threeRuntime['LinearFilter']
       : threeRuntime['LinearMipmapLinearFilter']),
-    (_0x1cd7a0['magFilter'] = threeRuntime['LinearFilter']),
-    (_0x1cd7a0['generateMipmaps'] = !isPreview),
-    (_0x1cd7a0['anisotropy'] = isPreview
+    (enabled3['magFilter'] = threeRuntime['LinearFilter']),
+    (enabled3['generateMipmaps'] = !isPreview),
+    (enabled3['anisotropy'] = isPreview
       ? 0x1
-      : Math['min'](0x8, _0x2d6d21?.['capabilities']?.['getMaxAnisotropy']?.() || 0x1)),
-    _0x1cd7a0['repeat']['set'](-0x1, 0x1),
-    _0x1cd7a0['offset']['set'](0x1, 0x0),
-    (_0x1cd7a0['needsUpdate'] = !![]));
+      : Math['min'](0x8, handle?.['capabilities']?.['getMaxAnisotropy']?.() || 0x1)),
+    enabled3['repeat']['set'](-0x1, 0x1),
+    enabled3['offset']['set'](0x1, 0x0),
+    (enabled3['needsUpdate'] = !![]));
 }

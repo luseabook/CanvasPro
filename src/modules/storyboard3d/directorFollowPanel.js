@@ -1,5 +1,5 @@
-const escape = (_0x310523) =>
-    String(_0x310523 ?? '')
+const escape = (value) =>
+    String(value ?? '')
       ['replaceAll']('&', '&amp;')
       ['replaceAll']('\x22', '&quot;')
       ['replaceAll']('<', '&lt;'),
@@ -8,121 +8,114 @@ const escape = (_0x310523) =>
     ['path', '沿轨道注视目标'],
     ['fixed', '固定偏移跟拍'],
   ];
-export function renderDirectorFollowPanel(_0x37b716, _0x100b36) {
-  const _0x4719a8 = _0x37b716['cameraConstraint'],
-    _0x47c4aa = (_0x4bbef1, _0x4ceca8, _0x3be035) =>
+export function renderDirectorFollowPanel(item, key) {
+  const index = item['cameraConstraint'],
+    handler = (result, data, list) =>
       '<select data-director-follow="' +
-      _0x4bbef1 +
+      result +
       '\x22>' +
-      _0x3be035['map'](
-        ([_0x4b3735, _0x468925]) =>
+      list['map'](
+        ([options, target]) =>
           '<option value="' +
-          escape(_0x4b3735) +
+          escape(options) +
           '\x22\x20' +
-          (_0x4b3735 === _0x4ceca8 ? 'selected' : '') +
+          (options === data ? 'selected' : '') +
           '>' +
-          escape(_0x468925) +
+          escape(target) +
           '</option>',
       )['join']('') +
       '</select>',
-    _0x384822 = (_0x41f327, _0x12dc8b, _0x9530d3) =>
+    handler2 = (source, next, current) =>
       '<label>' +
-      _0x9530d3 +
+      current +
       '<input type="number" step="0.1" data-director-follow="' +
-      _0x41f327 +
+      source +
       '" value="' +
-      _0x12dc8b +
+      next +
       '"></label>',
-    _0x57a495 = (_0x52c0da) =>
+    handler3 = (entry) =>
       '<label>跟拍方式' +
-      _0x47c4aa('mode', _0x52c0da['mode'], modes) +
+      handler('mode', entry['mode'], modes) +
       '</label>' +
-      _0x52c0da['followOffset']
-        ['map']((_0x31e7ea, _0xa5eb1a) =>
-          _0x384822(
-            'followOffset-' + _0xa5eb1a,
-            _0x31e7ea,
-            '偏移 ' + ['X', 'Y', 'Z'][_0xa5eb1a] + '\x20/\x20米',
-          ),
+      entry['followOffset']
+        ['map']((record, payload) =>
+          handler2('followOffset-' + payload, record, '偏移 ' + ['X', 'Y', 'Z'][payload] + '\x20/\x20米'),
         )
         ['join']('');
   return (
     '<div class="storyboard-3d-director-fields">' +
-    _0x57a495(_0x4719a8) +
+    handler3(index) +
     '<button data-storyboard-3d-action="timeline-follow-add">从播放头添加跟拍段</button></div>\n    ' +
-    (_0x37b716['cameraConstraintClips'] || [])
+    (item['cameraConstraintClips'] || [])
       ['map'](
-        (_0x130bc4) =>
+        (handle) =>
           '<div class="storyboard-3d-director-fields" data-director-follow-clip="' +
-          escape(_0x130bc4['id']) +
+          escape(handle['id']) +
           '\x22>' +
-          _0x384822('start', _0x130bc4['start'], '开始\x20/\x20秒') +
-          _0x384822('end', _0x130bc4['end'], '结束 / 秒') +
-          _0x57a495(_0x130bc4) +
+          handler2('start', handle['start'], '开始\x20/\x20秒') +
+          handler2('end', handle['end'], '结束 / 秒') +
+          handler3(handle) +
           '<label>跟随' +
-          _0x47c4aa('followObjectId', _0x130bc4['followObjectId'], _0x100b36) +
+          handler('followObjectId', handle['followObjectId'], key) +
           '</label><label>注视' +
-          _0x47c4aa('lookAtObjectId', _0x130bc4['lookAtObjectId'], _0x100b36) +
+          handler('lookAtObjectId', handle['lookAtObjectId'], key) +
           '</label>' +
-          _0x384822('lookAtOffset-1', _0x130bc4['lookAtOffset'][0x1], '注视高度') +
+          handler2('lookAtOffset-1', handle['lookAtOffset'][0x1], '注视高度') +
           '<button data-storyboard-3d-action="timeline-follow-delete" data-clip-id="' +
-          escape(_0x130bc4['id']) +
+          escape(handle['id']) +
           '">删除跟拍段</button></div>',
       )
       ['join']('')
   );
 }
-export function changeDirectorFollow(_0x1d052a, _0x507c22) {
-  const _0x13e43b = _0x507c22['target'];
-  if (!_0x13e43b['matches']?.('[data-director-follow]')) return ![];
-  const _0x4344ab = _0x13e43b['closest']('[data-director-follow-clip]')?.['dataset']['directorFollowClip'];
+export function changeDirectorFollow(state, event) {
+  const el = event['target'];
+  if (!el['matches']?.('[data-director-follow]')) return ![];
+  const config = el['closest']('[data-director-follow-clip]')?.['dataset']['directorFollowClip'];
   return (
-    _0x1d052a['mutate']('调整跟拍方式与片段', (_0x2c6ce8) => {
-      const _0x4f0112 = _0x4344ab
-        ? _0x2c6ce8['cameraConstraintClips']['find']((_0x3e9399) => _0x3e9399['id'] === _0x4344ab)
-        : _0x2c6ce8['cameraConstraint'];
-      if (!_0x4f0112) return _0x2c6ce8;
-      const [_0x50ab0c, _0x21898e] = _0x13e43b['dataset']['directorFollow']['split']('-'),
-        _0x2475fb = _0x13e43b['type'] === 'number' ? Number(_0x13e43b['value']) : _0x13e43b['value'];
-      if (_0x13e43b['type'] === 'number' && !Number['isFinite'](_0x2475fb)) return _0x2c6ce8;
-      if (_0x21898e != null) _0x4f0112[_0x50ab0c][Number(_0x21898e)] = _0x2475fb;
+    state['mutate']('调整跟拍方式与片段', (scope) => {
+      const enabled = config
+        ? scope['cameraConstraintClips']['find']((input) => input['id'] === config)
+        : scope['cameraConstraint'];
+      if (!enabled) return scope;
+      const [output, value2] = el['dataset']['directorFollow']['split']('-'),
+        value3 = el['type'] === 'number' ? Number(el['value']) : el['value'];
+      if (el['type'] === 'number' && !Number['isFinite'](value3)) return scope;
+      if (value2 != null) enabled[output][Number(value2)] = value3;
       else {
-        _0x4f0112[_0x50ab0c] = _0x2475fb;
+        enabled[output] = value3;
         if (
-          _0x50ab0c === 'mode' &&
-          _0x2475fb === 'fixed' &&
-          _0x4f0112['followOffset']['every']((_0x5ecd12) => _0x5ecd12 === 0x0)
+          output === 'mode' &&
+          value3 === 'fixed' &&
+          enabled['followOffset']['every']((count) => count === 0x0)
         )
-          _0x4f0112['followOffset'] = [0x0, 0x2, 0x5];
+          enabled['followOffset'] = [0x0, 0x2, 0x5];
       }
-      return _0x2c6ce8;
+      return scope;
     }),
     !![]
   );
 }
-export function clickDirectorFollow(_0xc96a82, _0x19736b, _0x9bcec4) {
-  if (!_0x19736b['startsWith']('timeline-follow-')) return ![];
+export function clickDirectorFollow(value4, enabled2, el2) {
+  if (!enabled2['startsWith']('timeline-follow-')) return ![];
   return (
-    _0xc96a82['mutate']('编辑分段跟拍', (_0x1f0e43) => {
-      if (_0x19736b === 'timeline-follow-delete')
-        _0x1f0e43['cameraConstraintClips'] = _0x1f0e43['cameraConstraintClips']['filter'](
-          (_0x4188ec) => _0x4188ec['id'] !== _0x9bcec4['dataset']['clipId'],
+    value4['mutate']('编辑分段跟拍', (value5) => {
+      if (enabled2 === 'timeline-follow-delete')
+        value5['cameraConstraintClips'] = value5['cameraConstraintClips']['filter'](
+          (value6) => value6['id'] !== el2['dataset']['clipId'],
         );
-      if (_0x19736b === 'timeline-follow-add') {
-        const _0x568ab1 = Math['min'](
-          0xe0f,
-          _0xc96a82['timeline']['_timeForShot'](_0xc96a82['context']()['shot']),
-        );
-        _0x1f0e43['cameraConstraintClips']['push']({
-          ...structuredClone(_0x1f0e43['cameraConstraint']),
+      if (enabled2 === 'timeline-follow-add') {
+        const start = Math['min'](0xe0f, value4['timeline']['_timeForShot'](value4['context']()['shot']));
+        value5['cameraConstraintClips']['push']({
+          ...structuredClone(value5['cameraConstraint']),
           id: 'follow-' + globalThis['crypto']['randomUUID'](),
-          start: _0x568ab1,
-          end: Math['min'](0xe10, _0x568ab1 + 0x3),
+          start: start,
+          end: Math['min'](0xe10, start + 0x3),
         });
       }
-      return _0x1f0e43;
+      return value5;
     }),
-    _0xc96a82['timeline']['requestRender']?.(),
+    value4['timeline']['requestRender']?.(),
     !![]
   );
 }

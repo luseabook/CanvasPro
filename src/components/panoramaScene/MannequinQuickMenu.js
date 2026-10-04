@@ -20,97 +20,92 @@ export const PANORAMA_MANNEQUIN_GENDER_OPTIONS = Object.freeze([
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M12 13v8"/><path d="M9 18h6"/></svg>',
   ],
 ]);
-function panoramaSceneText(_0x1cb8ee, _0x27a746 = {}) {
-  return t('panoramaSceneNode.' + _0x1cb8ee, _0x27a746);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
-export function getPanoramaMannequinColorLabel(_0x992d12) {
-  return panoramaSceneText('mannequin.colors.' + _0x992d12);
+export function getPanoramaMannequinColorLabel(key) {
+  return panoramaSceneText('mannequin.colors.' + key);
 }
-export function getPanoramaMannequinGenderLabel(_0x5523fc) {
-  return panoramaSceneText('mannequin.genders.' + (_0x5523fc === 'female' ? 'female' : 'male'));
+export function getPanoramaMannequinGenderLabel(index) {
+  return panoramaSceneText('mannequin.genders.' + (index === 'female' ? 'female' : 'male'));
 }
-export function resolvePanoramaSceneColorToken(_0x719c15) {
-  if (_0x719c15 === 'yellow') return 'gold';
-  return _0x719c15;
+export function resolvePanoramaSceneColorToken(result) {
+  if (result === 'yellow') return 'gold';
+  return result;
 }
-export function createMannequinQuickMenu({ onSelectColor: _0x4dd912, onSelectGender: _0x50bd60 } = {}) {
-  const _0x5d6739 = document.createElement('div');
-  ((_0x5d6739.className = 'panorama-mannequin-menu'),
-    (_0x5d6739.dataset.uiStop = '1'),
-    (_0x5d6739.dataset.activeGender = 'male'));
-  const _0x519975 = document.createElement('div');
-  ((_0x519975.className = 'panorama-mannequin-menu__title'),
-    (_0x519975.textContent = panoramaSceneText('mannequin.title')),
-    _0x5d6739.appendChild(_0x519975));
-  const _0x197109 = document.createElement('div');
-  ((_0x197109.className = 'panorama-mannequin-menu__row panorama-mannequin-menu__genders'),
-    _0x5d6739.appendChild(_0x197109),
-    PANORAMA_MANNEQUIN_GENDER_OPTIONS.forEach(([_0x447dc6, , _0x4d079b]) => {
-      const _0x535656 = getPanoramaMannequinGenderLabel(_0x447dc6),
-        _0x3b3ffe = document.createElement('button');
-      ((_0x3b3ffe.type = 'button'),
-        (_0x3b3ffe.className = 'panorama-mannequin-menu__gender-btn'),
-        (_0x3b3ffe.dataset.gender = _0x447dc6),
-        _0x447dc6 === 'male' && _0x3b3ffe.classList.add('is-active'),
-        _0x3b3ffe.setAttribute(
-          'aria-label',
-          panoramaSceneText('mannequin.setGenderAria', { label: _0x535656 }),
-        ),
-        (_0x3b3ffe.innerHTML = _0x4d079b),
-        _0x3b3ffe.addEventListener('click', () => {
-          ((_0x5d6739.dataset.activeGender = _0x447dc6), _0x50bd60?.({ gender: _0x447dc6 }));
+export function createMannequinQuickMenu({
+  onSelectColor: onSelectColor,
+  onSelectGender: onSelectGender,
+} = {}) {
+  const el = document.createElement('div');
+  ((el.className = 'panorama-mannequin-menu'), (el.dataset.uiStop = '1'), (el.dataset.activeGender = 'male'));
+  const el2 = document.createElement('div');
+  ((el2.className = 'panorama-mannequin-menu__title'),
+    (el2.textContent = panoramaSceneText('mannequin.title')),
+    el.appendChild(el2));
+  const el3 = document.createElement('div');
+  ((el3.className = 'panorama-mannequin-menu__row panorama-mannequin-menu__genders'),
+    el.appendChild(el3),
+    PANORAMA_MANNEQUIN_GENDER_OPTIONS.forEach(([gender, , data]) => {
+      const label = getPanoramaMannequinGenderLabel(gender),
+        el4 = document.createElement('button');
+      ((el4.type = 'button'),
+        (el4.className = 'panorama-mannequin-menu__gender-btn'),
+        (el4.dataset.gender = gender),
+        gender === 'male' && el4.classList.add('is-active'),
+        el4.setAttribute('aria-label', panoramaSceneText('mannequin.setGenderAria', { label: label })),
+        (el4.innerHTML = data),
+        el4.addEventListener('click', () => {
+          ((el.dataset.activeGender = gender), onSelectGender?.({ gender: gender }));
         }),
-        _0x197109.appendChild(_0x3b3ffe));
+        el3.appendChild(el4));
     }));
-  const _0x70f00c = document.createElement('div');
+  const el5 = document.createElement('div');
   return (
-    (_0x70f00c.className = 'panorama-mannequin-menu__row panorama-mannequin-menu__colors'),
-    _0x5d6739.appendChild(_0x70f00c),
-    PANORAMA_MANNEQUIN_COLOR_OPTIONS.forEach(([_0xfffb99]) => {
-      const _0x933e70 = getPanoramaMannequinColorLabel(_0xfffb99),
-        _0x1de8e3 = document.createElement('button');
-      ((_0x1de8e3.type = 'button'),
-        (_0x1de8e3.className = 'panorama-mannequin-menu__color-btn'),
-        (_0x1de8e3.dataset.colorKey = _0xfffb99),
-        _0xfffb99 === 'blue' && _0x1de8e3.classList.add('is-active'),
-        _0x1de8e3.setAttribute(
-          'aria-label',
-          panoramaSceneText('mannequin.createColorAria', { label: _0x933e70 }),
-        ),
-        _0x1de8e3.addEventListener('click', () => {
-          const _0x355011 = _0x5d6739.dataset.activeGender === 'female' ? 'female' : 'male';
-          _0x4dd912?.({ colorKey: _0xfffb99, gender: _0x355011 });
+    (el5.className = 'panorama-mannequin-menu__row panorama-mannequin-menu__colors'),
+    el.appendChild(el5),
+    PANORAMA_MANNEQUIN_COLOR_OPTIONS.forEach(([colorKey]) => {
+      const label2 = getPanoramaMannequinColorLabel(colorKey),
+        el6 = document.createElement('button');
+      ((el6.type = 'button'),
+        (el6.className = 'panorama-mannequin-menu__color-btn'),
+        (el6.dataset.colorKey = colorKey),
+        colorKey === 'blue' && el6.classList.add('is-active'),
+        el6.setAttribute('aria-label', panoramaSceneText('mannequin.createColorAria', { label: label2 })),
+        el6.addEventListener('click', () => {
+          const gender2 = el.dataset.activeGender === 'female' ? 'female' : 'male';
+          onSelectColor?.({ colorKey: colorKey, gender: gender2 });
         }),
-        _0x70f00c.appendChild(_0x1de8e3));
+        el5.appendChild(el6));
     }),
-    _0x5d6739
+    el
   );
 }
-export function renderMannequinQuickMenu(_0x3d8fea, _0x43b165) {
-  if (!_0x3d8fea) return;
-  const _0x18a4cf = _0x3d8fea.querySelector('.panorama-mannequin-menu__title');
-  if (_0x18a4cf) _0x18a4cf.textContent = panoramaSceneText('mannequin.title');
-  const _0x25df79 = _0x43b165?.gridPlacement?.gender === 'female' ? 'female' : 'male';
-  ((_0x3d8fea.dataset.activeGender = _0x25df79),
-    _0x3d8fea.querySelectorAll('.panorama-mannequin-menu__gender-btn').forEach((_0x1c2272) => {
-      const _0x1ab571 = _0x1c2272.dataset.gender === 'female' ? 'female' : 'male';
-      (_0x1c2272.setAttribute(
+export function renderMannequinQuickMenu(el7, options) {
+  if (!el7) return;
+  const el8 = el7.querySelector('.panorama-mannequin-menu__title');
+  if (el8) el8.textContent = panoramaSceneText('mannequin.title');
+  const target = options?.gridPlacement?.gender === 'female' ? 'female' : 'male';
+  ((el7.dataset.activeGender = target),
+    el7.querySelectorAll('.panorama-mannequin-menu__gender-btn').forEach((el9) => {
+      const source = el9.dataset.gender === 'female' ? 'female' : 'male';
+      (el9.setAttribute(
         'aria-label',
-        panoramaSceneText('mannequin.setGenderAria', { label: getPanoramaMannequinGenderLabel(_0x1ab571) }),
+        panoramaSceneText('mannequin.setGenderAria', { label: getPanoramaMannequinGenderLabel(source) }),
       ),
-        _0x1c2272.classList.toggle('is-active', _0x1ab571 === _0x25df79));
+        el9.classList.toggle('is-active', source === target));
     }));
-  const _0x25a2e9 = _0x43b165?.gridPlacement?.colorKey || 'blue';
-  _0x3d8fea.querySelectorAll('.panorama-mannequin-menu__color-btn').forEach((_0x2b1a58) => {
-    const _0x1cd6b0 = _0x2b1a58.dataset.colorKey;
-    (_0x2b1a58.setAttribute(
+  const next = options?.gridPlacement?.colorKey || 'blue';
+  el7.querySelectorAll('.panorama-mannequin-menu__color-btn').forEach((el10) => {
+    const current = el10.dataset.colorKey;
+    (el10.setAttribute(
       'aria-label',
-      panoramaSceneText('mannequin.createColorAria', { label: getPanoramaMannequinColorLabel(_0x1cd6b0) }),
+      panoramaSceneText('mannequin.createColorAria', { label: getPanoramaMannequinColorLabel(current) }),
     ),
-      _0x2b1a58.classList.toggle('is-active', _0x1cd6b0 === _0x25a2e9),
-      _0x2b1a58.style.setProperty(
+      el10.classList.toggle('is-active', current === next),
+      el10.style.setProperty(
         '--panorama-scene-swatch-token',
-        'var(--' + resolvePanoramaSceneColorToken(_0x1cd6b0) + ')',
+        'var(--' + resolvePanoramaSceneColorToken(current) + ')',
       ));
   });
 }

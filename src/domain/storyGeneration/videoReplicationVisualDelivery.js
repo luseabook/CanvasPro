@@ -1,1 +1,146 @@
-import{isStorySeedance25PromptMode}from'./promptModes.js';import{getReplicationVisualGaps}from'./videoReplicationTimingContract.js';import{replicationVisualFields}from'./videoReplicationVisualState.js';export function projectReplicationObservedShots(_0x3990a7,_0x407752,{episode:_0x323790,project:_0x2b3f55,assets:_0x316867}){const _0x113e73=Number(_0x407752["sourceStartSec"]),_0x465f18=Number(_0x407752["sourceEndSec"]);if(!(_0x465f18>_0x113e73)||getReplicationVisualGaps(_0x407752["events"],_0x113e73,_0x465f18)["length"])return _0x3990a7["shots"];const _0xce1ef1=new Set(),_0x362f06=_0x407752["events"]['flatMap'](_0x228198=>(_0x228198['shots']||[])['map'](_0x4f52ff=>({..._0x4f52ff,'sound':_0x4f52ff["sound"]??_0x228198["sound"]??''})))["filter"](_0x3373c0=>{const _0x45cd77=_0x3373c0['id']+':'+_0x3373c0["startSec"]+':'+_0x3373c0["endSec"];if(_0xce1ef1["has"](_0x45cd77)||_0x3373c0["endSec"]<=_0x113e73||_0x3373c0["startSec"]>=_0x465f18)return![];return _0xce1ef1["add"](_0x45cd77),!![];})["sort"]((_0x3e7db0,_0x24fc84)=>_0x3e7db0["startSec"]-_0x24fc84["startSec"]);if(!_0x362f06["length"]||_0x362f06["some"](_0x5a6540=>!String(_0x5a6540["visual"]||'')["trim"]()))return _0x3990a7['shots'];let _0x48ef64=_0x113e73;for(const _0x95441d of _0x362f06){if(Math['abs'](Math['max'](_0x113e73,_0x95441d["startSec"])-_0x48ef64)>0.001)return _0x3990a7["shots"];_0x48ef64=Math["min"](_0x465f18,_0x95441d["endSec"]);}if(Math["abs"](_0x48ef64-_0x465f18)>0.001)return _0x3990a7['shots'];const _0x5bfc6c=_0x323790['replication']["sourceAnalysis"]["characters"]||[],_0x1d97cc=new Set(_0x5bfc6c['flatMap'](_0x399397=>[_0x399397['id'],_0x399397['name']])),_0x4b6642=_0x305bf3=>(_0x305bf3||[])["filter"](_0x7e64df=>!_0x5bfc6c['length']||_0x1d97cc["has"](_0x7e64df["subject"])||[...String(_0x7e64df["subject"]||'')["matchAll"](/[（(]([^（）()]+)[）)]/gu)]["some"](_0x179e8f=>_0x1d97cc["has"](_0x179e8f[0x1])))['map'](_0x56ec3a=>Object["fromEntries"](Object["entries"](_0x56ec3a)['map'](([_0x1ae7ed,_0x5b8323])=>[_0x1ae7ed,/^(?:无|未知|不明|N\/A)$/iu["test"](String(_0x5b8323)["trim"]())?'':_0x5b8323]))),_0x532346=_0x5bfc6c['flatMap'](_0x3758f2=>{const _0x2e5aaf=_0x2b3f55["replication"]?.["characterBindings"]?.[_0x323790['id']+':'+_0x3758f2['id']],_0x25b6e3=_0x316867['filter'](_0x1a5a90=>_0x1a5a90["kind"]==='character'&&(_0x2e5aaf?_0x1a5a90['id']===_0x2e5aaf:_0x1a5a90["replicationSource"]?.["ref"]===_0x3758f2['id']));return _0x25b6e3["length"]===0x1&&_0x3758f2['name']&&_0x25b6e3[0x0]["name"]!==_0x3758f2["name"]?[[_0x3758f2['name'],_0x25b6e3[0x0]["name"]]]:[];})["sort"]((_0x938bf,_0x139375)=>_0x139375[0x0]['length']-_0x938bf[0x0]['length']),_0x1ba183=_0x15f094=>{const _0x109bc8=String(_0x15f094||'');if(!_0x532346["length"])return _0x109bc8;const _0x8f7824=new Map(_0x532346),_0x5b2a5d=_0x532346["map"](([_0x57edd0])=>_0x57edd0['replace'](/[.*+?^${}()|[\]\\]/gu,"\\$&"))["join"]('|');return _0x109bc8["replace"](new RegExp(_0x5b2a5d,'gu'),_0x12a0e9=>_0x8f7824["get"](_0x12a0e9));},_0x53f190=isStorySeedance25PromptMode(_0x3990a7['promptMode']||_0x2b3f55['planning']?.["promptMode"])?Math["round"]:_0x398f9b=>Number(_0x398f9b["toFixed"](0x3));let _0x217655=0x0;const _0x336015=_0x3990a7["shots"]['map'](_0x1e3eea=>({..._0x1e3eea,'startSec':_0x217655,'endSec':_0x217655+=Number(_0x1e3eea['durationSec'])})),_0x1c2e36=[];let _0x576dea=[];for(const [_0x2acc46,_0x3bb3ed]of _0x362f06['entries']()){const _0x5551f5=_0x53f190(Math["max"](_0x113e73,_0x3bb3ed["startSec"])-_0x113e73),_0x4d4bc3=_0x2acc46===_0x362f06["length"]-0x1?Number(_0x407752["durationSec"]):_0x53f190(Math['min'](_0x465f18,_0x3bb3ed["endSec"])-_0x113e73);if(_0x4d4bc3<=_0x5551f5){if(_0x1c2e36['length'])_0x1c2e36['at'](-0x1)["sources"]["push"](_0x3bb3ed);else _0x576dea["push"](_0x3bb3ed);continue;}_0x1c2e36["push"]({'from':_0x5551f5,'to':_0x4d4bc3,'sources':[..._0x576dea,_0x3bb3ed]}),_0x576dea=[];}return _0x1c2e36['map'](({from:_0x4d0dc0,to:_0x201501,sources:_0x487466},_0x1b8ea3)=>{const _0x5eb438=_0x336015["map"](_0x3ab339=>({'shot':_0x3ab339,'overlap':Math["min"](_0x201501,_0x3ab339["endSec"])-Math["max"](_0x4d0dc0,_0x3ab339['startSec'])}))['sort']((_0x109ab2,_0x1eefb4)=>_0x1eefb4["overlap"]-_0x109ab2['overlap'])[0x0]?.["shot"]||{},_0x259718=_0x487466[0x0],_0x295f3c=_0x487466['at'](-0x1),_0x1fbb31=[..._0x5eb438["assetUsages"]||[]],_0x1786c2=_0x487466['map'](_0x76afbe=>_0x1ba183(_0x76afbe["visual"]))["join"]('\x0a');for(const _0x5a646c of _0x316867["filter"](_0x3c0ea2=>_0x3c0ea2["kind"]==="character"&&_0x3c0ea2["name"]&&_0x1786c2["includes"](_0x3c0ea2["name"]))){const _0x44bdfa=_0x5a646c["ref"]||_0x5a646c['assetRef']||_0x5a646c['id'];if(_0x1fbb31['some'](_0x2059b8=>_0x2059b8["assetRef"]===_0x44bdfa))continue;const _0x3509ab=_0x336015["flatMap"](_0x5ceece=>_0x5ceece["assetUsages"]||[])["filter"](_0x385b6d=>_0x385b6d["assetRef"]===_0x44bdfa);if(_0x3509ab["length"]&&new Set(_0x3509ab["map"](_0x2e2986=>_0x2e2986["appearanceRef"]||''))["size"]===0x1)_0x1fbb31['push']({..._0x3509ab[0x0]});}const _0x5ec214=replicationVisualFields(_0x259718);for(const _0x4bc909 of['spatialStart',"spatialEnd"])_0x5ec214[_0x4bc909]=_0x4b6642((_0x4bc909==="spatialStart"?_0x259718:_0x295f3c)[_0x4bc909])['map'](_0x6c828=>Object["fromEntries"](Object["entries"](_0x6c828)["map"](([_0x552017,_0x292d21])=>[_0x552017,_0x1ba183(_0x292d21)])));return{..._0x5eb438,..._0x5ec214,'assetUsages':_0x1fbb31,'id':_0x3990a7['ref']+"-observed-"+(_0x1b8ea3+0x1),'startSec':_0x4d0dc0,'endSec':_0x201501,'durationSec':_0x201501-_0x4d0dc0,'visual':_0x487466["map"](_0x2b3135=>_0x1ba183(_0x2b3135['visual']))["filter"](Boolean)["join"]('\x0a'),'camera':_0x487466["map"](_0x56e0f0=>_0x1ba183(_0x56e0f0["camera"]))["filter"](Boolean)["join"]('\x0a'),'audio':[...new Set(_0x487466["map"](_0x4b8007=>_0x4b8007["sound"])['filter'](Boolean))]["join"]('\x0a'),'dialogue':'','voiceover':'','replicationSourceShotIds':_0x487466["map"](_0x42e33c=>_0x42e33c['id'])};});}
+import { isStorySeedance25PromptMode } from './promptModes.js';
+import { getReplicationVisualGaps } from './videoReplicationTimingContract.js';
+import { replicationVisualFields } from './videoReplicationVisualState.js';
+export function projectReplicationObservedShots(
+  value,
+  item,
+  { episode: episode, project: project, assets: assets },
+) {
+  const key = Number(item['sourceStartSec']),
+    index = Number(item['sourceEndSec']);
+  if (!(index > key) || getReplicationVisualGaps(item['events'], key, index)['length']) return value['shots'];
+  const result = new Set(),
+    map = item['events']
+      ['flatMap']((data) =>
+        (data['shots'] || [])['map']((args) => ({ ...args, sound: args['sound'] ?? data['sound'] ?? '' })),
+      )
+      ['filter']((options) => {
+        const target = options['id'] + ':' + options['startSec'] + ':' + options['endSec'];
+        if (result['has'](target) || options['endSec'] <= key || options['startSec'] >= index) return ![];
+        return (result['add'](target), !![]);
+      })
+      ['sort']((source, next) => source['startSec'] - next['startSec']);
+  if (!map['length'] || map['some']((current) => !String(current['visual'] || '')['trim']()))
+    return value['shots'];
+  let entry = key;
+  for (const record of map) {
+    if (Math['abs'](Math['max'](key, record['startSec']) - entry) > 0.001) return value['shots'];
+    entry = Math['min'](index, record['endSec']);
+  }
+  if (Math['abs'](entry - index) > 0.001) return value['shots'];
+  const list = episode['replication']['sourceAnalysis']['characters'] || [],
+    payload = new Set(list['flatMap']((error) => [error['id'], error['name']])),
+    handler = (handle) =>
+      (handle || [])
+        ['filter'](
+          (state) =>
+            !list['length'] ||
+            payload['has'](state['subject']) ||
+            [...String(state['subject'] || '')['matchAll'](/[（(]([^（）()]+)[）)]/gu)]['some']((config) =>
+              payload['has'](config[0x1]),
+            ),
+        )
+        ['map']((scope) =>
+          Object['fromEntries'](
+            Object['entries'](scope)['map'](([input, output]) => [
+              input,
+              /^(?:无|未知|不明|N\/A)$/iu['test'](String(output)['trim']()) ? '' : output,
+            ]),
+          ),
+        ),
+    enabled = list['flatMap']((error2) => {
+      const value2 = project['replication']?.['characterBindings']?.[episode['id'] + ':' + error2['id']],
+        value3 = assets['filter'](
+          (value4) =>
+            value4['kind'] === 'character' &&
+            (value2 ? value4['id'] === value2 : value4['replicationSource']?.['ref'] === error2['id']),
+        );
+      return value3['length'] === 0x1 && error2['name'] && value3[0x0]['name'] !== error2['name']
+        ? [[error2['name'], value3[0x0]['name']]]
+        : [];
+    })['sort']((value5, value6) => value6[0x0]['length'] - value5[0x0]['length']),
+    handler2 = (value7) => {
+      const value8 = String(value7 || '');
+      if (!enabled['length']) return value8;
+      const value9 = new Map(enabled),
+        value10 = enabled['map'](([value11]) => value11['replace'](/[.*+?^${}()|[\]\\]/gu, '\\$&'))['join'](
+          '|',
+        );
+      return value8['replace'](new RegExp(value10, 'gu'), (value12) => value9['get'](value12));
+    },
+    handler3 = isStorySeedance25PromptMode(value['promptMode'] || project['planning']?.['promptMode'])
+      ? Math['round']
+      : (value13) => Number(value13['toFixed'](0x3));
+  let value14 = 0x0;
+  const value15 = value['shots']['map']((args2) => ({
+      ...args2,
+      startSec: value14,
+      endSec: (value14 += Number(args2['durationSec'])),
+    })),
+    list2 = [];
+  let args3 = [];
+  for (const [value16, value17] of map['entries']()) {
+    const value18 = handler3(Math['max'](key, value17['startSec']) - key),
+      value19 =
+        value16 === map['length'] - 0x1
+          ? Number(item['durationSec'])
+          : handler3(Math['min'](index, value17['endSec']) - key);
+    if (value19 <= value18) {
+      if (list2['length']) list2['at'](-0x1)['sources']['push'](value17);
+      else args3['push'](value17);
+      continue;
+    }
+    (list2['push']({ from: value18, to: value19, sources: [...args3, value17] }), (args3 = []));
+  }
+  return list2['map'](({ from: from2, to: to, sources: sources }, value20) => {
+    const args4 =
+        value15['map']((value21) => ({
+          shot: value21,
+          overlap: Math['min'](to, value21['endSec']) - Math['max'](from2, value21['startSec']),
+        }))['sort']((value22, value23) => value23['overlap'] - value22['overlap'])[0x0]?.['shot'] || {},
+      value24 = sources[0x0],
+      value25 = sources['at'](-0x1),
+      list3 = [...(args4['assetUsages'] || [])],
+      value26 = sources['map']((value27) => handler2(value27['visual']))['join']('\x0a');
+    for (const value28 of assets['filter'](
+      (value29) => value29['kind'] === 'character' && value29['name'] && value26['includes'](value29['name']),
+    )) {
+      const value30 = value28['ref'] || value28['assetRef'] || value28['id'];
+      if (list3['some']((value31) => value31['assetRef'] === value30)) continue;
+      const args5 = value15['flatMap']((value32) => value32['assetUsages'] || [])['filter'](
+        (value33) => value33['assetRef'] === value30,
+      );
+      if (
+        args5['length'] &&
+        new Set(args5['map']((value34) => value34['appearanceRef'] || ''))['size'] === 0x1
+      )
+        list3['push']({ ...args5[0x0] });
+    }
+    const args6 = replicationVisualFields(value24);
+    for (const value35 of ['spatialStart', 'spatialEnd'])
+      args6[value35] = handler((value35 === 'spatialStart' ? value24 : value25)[value35])['map']((value36) =>
+        Object['fromEntries'](
+          Object['entries'](value36)['map'](([value37, value38]) => [value37, handler2(value38)]),
+        ),
+      );
+    return {
+      ...args4,
+      ...args6,
+      assetUsages: list3,
+      id: value['ref'] + '-observed-' + (value20 + 0x1),
+      startSec: from2,
+      endSec: to,
+      durationSec: to - from2,
+      visual: sources['map']((value39) => handler2(value39['visual']))
+        ['filter'](Boolean)
+        ['join']('\x0a'),
+      camera: sources['map']((value40) => handler2(value40['camera']))
+        ['filter'](Boolean)
+        ['join']('\x0a'),
+      audio: [...new Set(sources['map']((value41) => value41['sound'])['filter'](Boolean))]['join']('\x0a'),
+      dialogue: '',
+      voiceover: '',
+      replicationSourceShotIds: sources['map']((value42) => value42['id']),
+    };
+  });
+}

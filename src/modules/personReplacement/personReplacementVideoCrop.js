@@ -1,36 +1,36 @@
 import { localPathToUrl } from '../../utils/localMediaPath.js';
 import { resolvePersonReplacementVideoSourceRef } from './personReplacementProject.js';
-function normalizeText(_0x30e754) {
-  return String(_0x30e754 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function normalizeMediaUrl(_0x454a85) {
-  const _0x40bfd1 = normalizeText(_0x454a85);
-  return _0x40bfd1 ? localPathToUrl(_0x40bfd1) || _0x40bfd1 : '';
+function normalizeMediaUrl(item) {
+  const text = normalizeText(item);
+  return text ? localPathToUrl(text) || text : '';
 }
-function findShot(_0xc48eb8 = {}, _0x4100af = '') {
-  const _0x4e561c = normalizeText(_0x4100af);
+function findShot(options = {}, key = '') {
+  const text2 = normalizeText(key);
   return (
-    (Array['isArray'](_0xc48eb8?.['shots']) ? _0xc48eb8['shots'] : [])['find'](
-      (_0x1a2f7e) => normalizeText(_0x1a2f7e?.['id']) === _0x4e561c,
+    (Array['isArray'](options?.['shots']) ? options['shots'] : [])['find'](
+      (index) => normalizeText(index?.['id']) === text2,
     ) || null
   );
 }
-function resolveCropReverseState(_0x150bde = {}) {
-  const _0x33f321 = Boolean(_0x150bde['videoIterationReferenceRef']);
+function resolveCropReverseState(options2 = {}) {
+  const isReversed = Boolean(options2['videoIterationReferenceRef']);
   return {
-    isReversed: _0x33f321
-      ? _0x150bde['videoIterationInputIsReversed'] === !![]
-      : _0x150bde['isReversed'] === !![],
-    materializedIsReversed: _0x33f321
-      ? _0x150bde['videoIterationInputIsReversed'] === !![]
-      : _0x150bde['materializedIsReversed'] === !![],
+    isReversed: isReversed
+      ? options2['videoIterationInputIsReversed'] === !![]
+      : options2['isReversed'] === !![],
+    materializedIsReversed: isReversed
+      ? options2['videoIterationInputIsReversed'] === !![]
+      : options2['materializedIsReversed'] === !![],
   };
 }
-export function isPersonReplacementVideoCropReverseRunning(_0x4166a5 = {}) {
+export function isPersonReplacementVideoCropReverseRunning(enabled = {}) {
   return (
-    !_0x4166a5['videoIterationReferenceRef'] &&
-    normalizeText(_0x4166a5['materializationStatus']) === 'running' &&
-    Boolean(_0x4166a5['isReversed']) !== Boolean(_0x4166a5['materializedIsReversed'])
+    !enabled['videoIterationReferenceRef'] &&
+    normalizeText(enabled['materializationStatus']) === 'running' &&
+    Boolean(enabled['isReversed']) !== Boolean(enabled['materializedIsReversed'])
   );
 }
 export function assertPersonReplacementVideoCropSourceCurrent({
@@ -39,58 +39,61 @@ export function assertPersonReplacementVideoCropSourceCurrent({
   shotId: shotId = '',
   result: result = {},
 } = {}) {
-  const _0x83fade = normalizeText(projectId),
-    _0xc39510 = findShot(project, shotId),
-    _0x2c59eb = normalizeText(result?.['sourceLocalPath']),
-    { isReversed: _0x3f67fe, materializedIsReversed: _0xf1d1fd } = resolveCropReverseState(_0xc39510 || {}),
-    _0x25ecac = typeof result?.['isReversed'] === 'boolean' ? result['isReversed'] : _0x3f67fe;
-  if (_0x83fade && normalizeText(project?.['id']) !== _0x83fade)
-    throw new Error('当前项目已切换，请重新打开裁剪。');
+  const text3 = normalizeText(projectId),
+    shot = findShot(project, shotId),
+    text4 = normalizeText(result?.['sourceLocalPath']),
+    { isReversed: isReversed2, materializedIsReversed: materializedIsReversed } = resolveCropReverseState(
+      shot || {},
+    ),
+    data = typeof result?.['isReversed'] === 'boolean' ? result['isReversed'] : isReversed2;
+  if (text3 && normalizeText(project?.['id']) !== text3) throw new Error('当前项目已切换，请重新打开裁剪。');
   if (
-    !_0xc39510 ||
-    (_0x2c59eb && resolvePersonReplacementVideoSourceRef(_0xc39510) !== _0x2c59eb) ||
-    _0x3f67fe !== _0x25ecac ||
-    _0xf1d1fd !== _0x25ecac
+    !shot ||
+    (text4 && resolvePersonReplacementVideoSourceRef(shot) !== text4) ||
+    isReversed2 !== data ||
+    materializedIsReversed !== data
   )
     throw new Error('当前片段的倒放状态已变化，请重新打开裁剪。');
-  return _0xc39510;
+  return shot;
 }
 function createReverseControl({
-  selectedShot: _0x19aa2c,
-  getProject: _0x1e54d0,
-  acceptProject: _0x25aff3,
-  requestReverseChange: _0x14766d,
+  selectedShot: selectedShot,
+  getProject: getProject2,
+  acceptProject: acceptProject2,
+  requestReverseChange: requestReverseChange2,
 }) {
-  const _0x53eb2d = normalizeText(_0x19aa2c['videoIterationReferenceRef']),
-    _0x3c0910 = Boolean(_0x53eb2d);
+  const iterationReferenceRef = normalizeText(selectedShot['videoIterationReferenceRef']),
+    target = Boolean(iterationReferenceRef);
   return {
-    ...resolveCropReverseState(_0x19aa2c),
-    async onChange(_0x58ed00) {
-      const _0x3f1222 = _0x14766d(
-          _0x19aa2c['id'],
-          _0x58ed00,
-          _0x3c0910
+    ...resolveCropReverseState(selectedShot),
+    async onChange(source) {
+      const promise = requestReverseChange2(
+          selectedShot['id'],
+          source,
+          target
             ? {
-                iterationReferenceRef: _0x53eb2d,
-                sourceRef: resolvePersonReplacementVideoSourceRef(findShot(_0x1e54d0(), _0x19aa2c['id'])),
+                iterationReferenceRef: iterationReferenceRef,
+                sourceRef: resolvePersonReplacementVideoSourceRef(
+                  findShot(getProject2(), selectedShot['id']),
+                ),
               }
             : {},
         ),
-        _0x3e53e2 = _0x3f1222?.['then'] ? await _0x3f1222 : _0x3f1222;
-      if (!_0x3e53e2) throw new Error('视频倒放服务不可用');
-      const _0x2ad925 = _0x3e53e2['completion'] ? await _0x3e53e2['completion'] : _0x3e53e2,
-        _0x569fc1 = _0x2ad925?.['stale'] === !![],
-        _0x3ad822 = _0x2ad925?.['project'] || _0x3e53e2['project'] || _0x1e54d0(),
-        _0x4e4828 = _0x569fc1 ? _0x1e54d0() : _0x25aff3(_0x3ad822),
-        _0x497522 = findShot(_0x4e4828, _0x19aa2c['id']);
-      if (!_0x497522) throw new Error('倒放完成后未找到当前片段');
+        enabled2 = promise?.['then'] ? await promise : promise;
+      if (!enabled2) throw new Error('视频倒放服务不可用');
+      const ok = enabled2['completion'] ? await enabled2['completion'] : enabled2,
+        enabled3 = ok?.['stale'] === !![],
+        next = ok?.['project'] || enabled2['project'] || getProject2(),
+        current = enabled3 ? getProject2() : acceptProject2(next),
+        shot2 = findShot(current, selectedShot['id']);
+      if (!shot2) throw new Error('倒放完成后未找到当前片段');
       return {
-        ok: _0x2ad925?.['ok'] !== ![] && !_0x569fc1,
-        ...resolveCropReverseState(_0x497522),
-        sourceLocalPath: resolvePersonReplacementVideoSourceRef(_0x497522),
-        sourceUrl: normalizeMediaUrl(resolvePersonReplacementVideoSourceRef(_0x497522)),
-        posterUrl: normalizeMediaUrl(_0x497522['keyframeRef']),
-        error: _0x2ad925?.['error'] || _0x497522['error'] || '',
+        ok: ok?.['ok'] !== ![] && !enabled3,
+        ...resolveCropReverseState(shot2),
+        sourceLocalPath: resolvePersonReplacementVideoSourceRef(shot2),
+        sourceUrl: normalizeMediaUrl(resolvePersonReplacementVideoSourceRef(shot2)),
+        posterUrl: normalizeMediaUrl(shot2['keyframeRef']),
+        error: ok?.['error'] || shot2['error'] || '',
         suppressToast: !![],
       };
     },
@@ -98,51 +101,52 @@ function createReverseControl({
 }
 export function createPersonReplacementVideoCropOptions({
   projectId: projectId = '',
-  selectedShot: _0x4a4020,
-  stage: _0x246954,
-  videoEl: _0x461696,
+  selectedShot: selectedShot2,
+  stage: stage,
+  videoEl: videoEl,
   durationSec: durationSec = 0x0,
   getProject: getProject = () => ({}),
-  acceptProject: acceptProject = (_0x56ac34) => _0x56ac34,
+  acceptProject: acceptProject = (entry) => entry,
   requestReverseChange: requestReverseChange = () => null,
   onConfirm: onConfirm = () => {},
   onExit: onExit = () => {},
 } = {}) {
-  const _0x40abdd = resolvePersonReplacementVideoSourceRef(_0x4a4020);
+  const sourceLocalPath = resolvePersonReplacementVideoSourceRef(selectedShot2);
   return {
-    anchorId: 'person-replacement-video:' + normalizeText(projectId) + ':' + normalizeText(_0x4a4020?.['id']),
-    wrapperEl: _0x246954,
-    videoEl: _0x461696,
-    sourceUrl: normalizeMediaUrl(_0x40abdd),
-    sourceLocalPath: _0x40abdd,
+    anchorId:
+      'person-replacement-video:' + normalizeText(projectId) + ':' + normalizeText(selectedShot2?.['id']),
+    wrapperEl: stage,
+    videoEl: videoEl,
+    sourceUrl: normalizeMediaUrl(sourceLocalPath),
+    sourceLocalPath: sourceLocalPath,
     sourceData: {
       videoDuration: durationSec,
-      videoFps: _0x4a4020?.['outputFps'],
-      videoWidth: Number(_0x461696?.['videoWidth']) || Number(_0x4a4020?.['frame']?.['width']) || 0x0,
-      videoHeight: Number(_0x461696?.['videoHeight']) || Number(_0x4a4020?.['frame']?.['height']) || 0x0,
+      videoFps: selectedShot2?.['outputFps'],
+      videoWidth: Number(videoEl?.['videoWidth']) || Number(selectedShot2?.['frame']?.['width']) || 0x0,
+      videoHeight: Number(videoEl?.['videoHeight']) || Number(selectedShot2?.['frame']?.['height']) || 0x0,
     },
-    posterUrl: normalizeMediaUrl(_0x4a4020?.['keyframeRef']),
+    posterUrl: normalizeMediaUrl(selectedShot2?.['keyframeRef']),
     durationSec: durationSec,
-    videoWidth: Number(_0x461696?.['videoWidth']) || Number(_0x4a4020?.['frame']?.['width']) || 0x0,
-    videoHeight: Number(_0x461696?.['videoHeight']) || Number(_0x4a4020?.['frame']?.['height']) || 0x0,
+    videoWidth: Number(videoEl?.['videoWidth']) || Number(selectedShot2?.['frame']?.['width']) || 0x0,
+    videoHeight: Number(videoEl?.['videoHeight']) || Number(selectedShot2?.['frame']?.['height']) || 0x0,
     initialStartSec: 0x0,
     initialEndSec: durationSec,
     dimMode: ![],
     reverseControl: createReverseControl({
-      selectedShot: _0x4a4020,
+      selectedShot: selectedShot2,
       getProject: getProject,
       acceptProject: acceptProject,
       requestReverseChange: requestReverseChange,
     }),
-    onConfirm: (_0x20df06) => {
+    onConfirm: (result2) => {
       return (
         assertPersonReplacementVideoCropSourceCurrent({
           project: getProject(),
           projectId: projectId,
-          shotId: _0x4a4020?.['id'],
-          result: _0x20df06,
+          shotId: selectedShot2?.['id'],
+          result: result2,
         }),
-        onConfirm(_0x20df06)
+        onConfirm(result2)
       );
     },
     onExit: onExit,

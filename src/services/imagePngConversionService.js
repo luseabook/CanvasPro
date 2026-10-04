@@ -1,49 +1,49 @@
-function isBlobLike(_0x3eadfe) {
-  return !!_0x3eadfe && typeof _0x3eadfe.arrayBuffer === 'function';
+function isBlobLike(enabled) {
+  return !!enabled && typeof enabled.arrayBuffer === 'function';
 }
-function normalizeImageMimeType(_0x654132) {
-  const _0x567e26 = String(_0x654132 || '')
+function normalizeImageMimeType(value) {
+  const enabled2 = String(value || '')
     .split(';')[0]
     .trim()
     .toLowerCase();
-  if (!_0x567e26.startsWith('image/')) return '';
-  return _0x567e26;
+  if (!enabled2.startsWith('image/')) return '';
+  return enabled2;
 }
-function inferImageMimeTypeFromUrl(_0x4bd419) {
-  const _0x4a29aa = String(_0x4bd419 || '').trim();
-  if (!_0x4a29aa) return '';
-  const _0x384525 = _0x4a29aa.match(/^data:([^;,]+)/i),
-    _0x2bdf9c = normalizeImageMimeType(_0x384525?.[1] || '');
-  if (_0x2bdf9c) return _0x2bdf9c;
-  const _0xae5ee0 = _0x4a29aa.toLowerCase().split('#')[0].split('?')[0];
-  if (_0xae5ee0.endsWith('.png')) return 'image/png';
-  if (_0xae5ee0.endsWith('.jpg') || _0xae5ee0.endsWith('.jpeg')) return 'image/jpeg';
-  if (_0xae5ee0.endsWith('.webp')) return 'image/webp';
-  if (_0xae5ee0.endsWith('.gif')) return 'image/gif';
-  if (_0xae5ee0.endsWith('.bmp')) return 'image/bmp';
-  if (_0xae5ee0.endsWith('.avif')) return 'image/avif';
-  if (_0xae5ee0.endsWith('.svg')) return 'image/svg+xml';
+function inferImageMimeTypeFromUrl(item) {
+  const enabled3 = String(item || '').trim();
+  if (!enabled3) return '';
+  const key = enabled3.match(/^data:([^;,]+)/i),
+    imageMimeType = normalizeImageMimeType(key?.[1] || '');
+  if (imageMimeType) return imageMimeType;
+  const index = enabled3.toLowerCase().split('#')[0].split('?')[0];
+  if (index.endsWith('.png')) return 'image/png';
+  if (index.endsWith('.jpg') || index.endsWith('.jpeg')) return 'image/jpeg';
+  if (index.endsWith('.webp')) return 'image/webp';
+  if (index.endsWith('.gif')) return 'image/gif';
+  if (index.endsWith('.bmp')) return 'image/bmp';
+  if (index.endsWith('.avif')) return 'image/avif';
+  if (index.endsWith('.svg')) return 'image/svg+xml';
   return '';
 }
-function resolveImageMimeType(_0x4228f0, _0x52257a) {
-  return normalizeImageMimeType(_0x4228f0?.type) || inferImageMimeTypeFromUrl(_0x52257a);
+function resolveImageMimeType(result, data) {
+  return normalizeImageMimeType(result?.type) || inferImageMimeTypeFromUrl(data);
 }
-function bytesToBase64(_0x1ecbf1) {
-  if (typeof Buffer !== 'undefined') return Buffer.from(_0x1ecbf1).toString('base64');
-  let _0x1f95bb = '';
-  const _0x13f5f2 = 0x8000;
-  for (let _0x1ede5b = 0; _0x1ede5b < _0x1ecbf1.length; _0x1ede5b += _0x13f5f2) {
-    _0x1f95bb += String.fromCharCode(..._0x1ecbf1.subarray(_0x1ede5b, _0x1ede5b + _0x13f5f2));
+function bytesToBase64(list) {
+  if (typeof Buffer !== 'undefined') return Buffer.from(list).toString('base64');
+  let options = '';
+  const target = 0x8000;
+  for (let source = 0; source < list.length; source += target) {
+    options += String.fromCharCode(...list.subarray(source, source + target));
   }
-  return typeof btoa === 'function' ? btoa(_0x1f95bb) : '';
+  return typeof btoa === 'function' ? btoa(options) : '';
 }
-async function convertImageBlobToDataUrl(_0x2431f6, _0x5abb86 = '') {
-  if (!isBlobLike(_0x2431f6)) return '';
-  const _0x4435d0 = new Uint8Array(await _0x2431f6.arrayBuffer()),
-    _0x125668 = bytesToBase64(_0x4435d0);
-  if (!_0x125668) return '';
-  const _0x564139 = resolveImageMimeType(_0x2431f6, _0x5abb86) || 'image/png';
-  return 'data:' + _0x564139 + ';base64,' + _0x125668;
+async function convertImageBlobToDataUrl(next, current = '') {
+  if (!isBlobLike(next)) return '';
+  const uint8Array = new Uint8Array(await next.arrayBuffer()),
+    base64 = bytesToBase64(uint8Array);
+  if (!base64) return '';
+  const imageMimeType2 = resolveImageMimeType(next, current) || 'image/png';
+  return 'data:' + imageMimeType2 + ';base64,' + base64;
 }
 function hasDomCanvasRuntime() {
   return (
@@ -52,80 +52,79 @@ function hasDomCanvasRuntime() {
     typeof globalThis?.Image === 'function'
   );
 }
-function loadImage(_0x705667) {
-  return new Promise((_0x3fe9ae, _0x956900) => {
-    const _0x34db35 = globalThis?.Image;
-    if (typeof _0x34db35 !== 'function') {
-      _0x956900(new Error('image-not-supported'));
+function loadImage(entry) {
+  return new Promise((handler, handler2) => {
+    const run = globalThis?.Image;
+    if (typeof run !== 'function') {
+      handler2(new Error('image-not-supported'));
       return;
     }
-    const _0x24a8ee = new _0x34db35();
-    ('crossOrigin' in _0x24a8ee && (_0x24a8ee.crossOrigin = 'anonymous'),
-      (_0x24a8ee.onload = () => _0x3fe9ae(_0x24a8ee)),
-      (_0x24a8ee.onerror = () => _0x956900(new Error('image-load-failed'))),
-      (_0x24a8ee.src = _0x705667));
+    const record = new run();
+    ('crossOrigin' in record && (record.crossOrigin = 'anonymous'),
+      (record.onload = () => handler(record)),
+      (record.onerror = () => handler2(new Error('image-load-failed'))),
+      (record.src = entry));
   });
 }
-function canvasToBlob(_0x2e00f1, _0x29319b = 'image/png') {
-  return new Promise((_0x15b9e3) => {
-    if (!_0x2e00f1 || typeof _0x2e00f1.toBlob !== 'function') {
-      _0x15b9e3(null);
+function canvasToBlob(enabled4, payload = 'image/png') {
+  return new Promise((handler3) => {
+    if (!enabled4 || typeof enabled4.toBlob !== 'function') {
+      handler3(null);
       return;
     }
-    _0x2e00f1.toBlob((_0x29f379) => _0x15b9e3(_0x29f379), _0x29319b);
+    enabled4.toBlob((handle) => handler3(handle), payload);
   });
 }
-async function renderImageElementToPngBlob(_0x1d115a) {
+async function renderImageElementToPngBlob(box) {
   if (!hasDomCanvasRuntime()) return null;
-  const _0x396166 = Number(_0x1d115a?.naturalWidth || _0x1d115a?.width || 0),
-    _0x1ce5fb = Number(_0x1d115a?.naturalHeight || _0x1d115a?.height || 0);
-  if (!_0x396166 || !_0x1ce5fb) return null;
-  const _0x4a7539 = document.createElement('canvas');
-  ((_0x4a7539.width = _0x396166), (_0x4a7539.height = _0x1ce5fb));
-  const _0x142483 = _0x4a7539.getContext('2d');
-  if (!_0x142483) return null;
-  return (_0x142483.drawImage(_0x1d115a, 0, 0), canvasToBlob(_0x4a7539, 'image/png'));
+  const enabled5 = Number(box?.naturalWidth || box?.width || 0),
+    enabled6 = Number(box?.naturalHeight || box?.height || 0);
+  if (!enabled5 || !enabled6) return null;
+  const box2 = document.createElement('canvas');
+  ((box2.width = enabled5), (box2.height = enabled6));
+  const ctx = box2.getContext('2d');
+  if (!ctx) return null;
+  return (ctx.drawImage(box, 0, 0), canvasToBlob(box2, 'image/png'));
 }
-async function convertImageBlobToPngBlob(_0x5e6ee1) {
-  if (!isBlobLike(_0x5e6ee1)) return null;
-  const _0x389839 = globalThis?.createImageBitmap,
-    _0x556351 = globalThis?.OffscreenCanvas;
-  if (typeof _0x389839 === 'function' && typeof _0x556351 === 'function') {
-    let _0x1b042b = null;
+async function convertImageBlobToPngBlob(state) {
+  if (!isBlobLike(state)) return null;
+  const run2 = globalThis?.createImageBitmap,
+    handler4 = globalThis?.OffscreenCanvas;
+  if (typeof run2 === 'function' && typeof handler4 === 'function') {
+    let box3 = null;
     try {
-      _0x1b042b = await _0x389839(_0x5e6ee1);
-      const _0x251027 = Number(_0x1b042b?.width || 0),
-        _0x58d922 = Number(_0x1b042b?.height || 0);
-      if (!_0x251027 || !_0x58d922) return null;
-      const _0x57caf9 = new _0x556351(_0x251027, _0x58d922),
-        _0x596608 = _0x57caf9.getContext('2d');
-      if (!_0x596608) return null;
-      _0x596608.drawImage(_0x1b042b, 0, 0);
-      if (typeof _0x57caf9.convertToBlob === 'function')
-        return await _0x57caf9.convertToBlob({ type: 'image/png' });
+      box3 = await run2(state);
+      const enabled7 = Number(box3?.width || 0),
+        enabled8 = Number(box3?.height || 0);
+      if (!enabled7 || !enabled8) return null;
+      const el = new handler4(enabled7, enabled8),
+        ctx2 = el.getContext('2d');
+      if (!ctx2) return null;
+      ctx2.drawImage(box3, 0, 0);
+      if (typeof el.convertToBlob === 'function') return await el.convertToBlob({ type: 'image/png' });
     } catch {
     } finally {
-      _0x1b042b?.close?.();
+      box3?.close?.();
     }
   }
   if (!hasDomCanvasRuntime()) return null;
-  const _0x5da7b9 = globalThis?.URL;
-  if (typeof _0x5da7b9?.createObjectURL !== 'function') return null;
-  const _0x17f5f4 = _0x5da7b9.createObjectURL(_0x5e6ee1);
+  const config = globalThis?.URL;
+  if (typeof config?.createObjectURL !== 'function') return null;
+  const scope = config.createObjectURL(state);
   try {
-    const _0x1b0485 = await loadImage(_0x17f5f4);
-    return await renderImageElementToPngBlob(_0x1b0485);
+    const image = await loadImage(scope);
+    return await renderImageElementToPngBlob(image);
   } catch {
     return null;
   } finally {
-    _0x5da7b9.revokeObjectURL?.(_0x17f5f4);
+    config.revokeObjectURL?.(scope);
   }
 }
-async function convertImageUrlToPngBlob(_0x46c01e) {
+async function convertImageUrlToPngBlob(input) {
   if (!hasDomCanvasRuntime()) return null;
   try {
-    const _0x5a014a = await loadImage(_0x46c01e);
-    return await renderImageElementToPngBlob(_0x5a014a);
+    const image2 = await loadImage(input);
+    return await renderImageElementToPngBlob(image2);
   } catch {
     return null;
   }

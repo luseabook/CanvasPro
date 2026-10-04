@@ -6,147 +6,146 @@ import {
   mapBrushPoints,
 } from '../imageEditorBrushStyle.js';
 import { drawNumberLabelCommand } from './numberLabels.js';
-const canvasToBlob = (_0x1e7d89, _0x1d139c, _0x58819e) =>
-    new Promise((_0x579c9d) => _0x1e7d89.toBlob(_0x579c9d, _0x1d139c, _0x58819e)),
+const canvasToBlob = (value, item, key) => new Promise((index) => value.toBlob(index, item, key)),
   renderCommandToNaturalCanvas = ({
-    ctx: _0x1c4317,
-    cmd: _0x58276d,
-    scaleX: _0x5be26b,
-    scaleY: _0x6510a0,
-    isEraseScene: _0x1a406c,
-    defaultTextColor: _0x5f3e6e,
+    ctx: ctx,
+    cmd: cmd,
+    scaleX: scaleX,
+    scaleY: scaleY,
+    isEraseScene: isEraseScene,
+    defaultTextColor: defaultTextColor,
     numberLabelBackgroundColor: numberLabelBackgroundColor = '',
   } = {}) => {
-    if (_0x1a406c) return;
-    if (_0x58276d.type === 'brush') {
-      (_0x1c4317.save(),
-        drawRoundBrushStroke(_0x1c4317, {
-          points: mapBrushPoints(_0x58276d.points, _0x5be26b, _0x6510a0),
-          lineWidth: getBrushLineWidth(_0x58276d.sizeWorld, _0x5be26b, 'brush'),
-          strokeStyle: _0x58276d.color,
-          fillStyle: _0x58276d.color,
+    if (isEraseScene) return;
+    if (cmd.type === 'brush') {
+      (ctx.save(),
+        drawRoundBrushStroke(ctx, {
+          points: mapBrushPoints(cmd.points, scaleX, scaleY),
+          lineWidth: getBrushLineWidth(cmd.sizeWorld, scaleX, 'brush'),
+          strokeStyle: cmd.color,
+          fillStyle: cmd.color,
           globalCompositeOperation: 'source-over',
         }),
-        _0x1c4317.restore());
+        ctx.restore());
       return;
     }
-    if (_0x58276d.type === 'eraser') {
-      (_0x1c4317.save(),
-        drawRoundBrushStroke(_0x1c4317, {
-          points: mapBrushPoints(_0x58276d.points, _0x5be26b, _0x6510a0),
-          lineWidth: getEraserClearLineWidth(getBrushLineWidth(_0x58276d.sizeWorld, _0x5be26b, 'eraser')),
+    if (cmd.type === 'eraser') {
+      (ctx.save(),
+        drawRoundBrushStroke(ctx, {
+          points: mapBrushPoints(cmd.points, scaleX, scaleY),
+          lineWidth: getEraserClearLineWidth(getBrushLineWidth(cmd.sizeWorld, scaleX, 'eraser')),
           strokeStyle: '#000',
           fillStyle: '#000',
           globalCompositeOperation: 'destination-out',
         }),
-        _0x1c4317.restore());
+        ctx.restore());
       return;
     }
-    if (_0x58276d.type === 'rect') {
-      const _0x2a57bb = _0x58276d.x1 * _0x5be26b,
-        _0x4ccb3f = _0x58276d.y1 * _0x6510a0,
-        _0x2874b9 = _0x58276d.x2 * _0x5be26b,
-        _0x440d85 = _0x58276d.y2 * _0x6510a0,
-        _0x4986a3 = Math.min(_0x2a57bb, _0x2874b9),
-        _0x48a165 = Math.min(_0x4ccb3f, _0x440d85),
-        _0x14b590 = Math.abs(_0x2874b9 - _0x2a57bb),
-        _0x3aa880 = Math.abs(_0x440d85 - _0x4ccb3f);
-      (_0x1c4317.save(),
-        (_0x1c4317.globalCompositeOperation = 'source-over'),
-        (_0x1c4317.strokeStyle = _0x58276d.color),
-        (_0x1c4317.lineWidth = getBrushLineWidth(_0x58276d.sizeWorld, _0x5be26b, 'brush')),
-        _0x1c4317.strokeRect(_0x4986a3, _0x48a165, _0x14b590, _0x3aa880),
-        _0x1c4317.restore());
+    if (cmd.type === 'rect') {
+      const result = cmd.x1 * scaleX,
+        data = cmd.y1 * scaleY,
+        options = cmd.x2 * scaleX,
+        target = cmd.y2 * scaleY,
+        source = Math.min(result, options),
+        next = Math.min(data, target),
+        current = Math.abs(options - result),
+        entry = Math.abs(target - data);
+      (ctx.save(),
+        (ctx.globalCompositeOperation = 'source-over'),
+        (ctx.strokeStyle = cmd.color),
+        (ctx.lineWidth = getBrushLineWidth(cmd.sizeWorld, scaleX, 'brush')),
+        ctx.strokeRect(source, next, current, entry),
+        ctx.restore());
       return;
     }
-    if (_0x58276d.type === 'text') {
-      const _0x2b8f49 = _0x58276d.x * _0x5be26b,
-        _0x550e7f = _0x58276d.y * _0x6510a0,
-        _0x53b830 = Math.max(1, _0x58276d.sizeWorld * _0x5be26b),
-        _0x32e24a = getTextScalePair(_0x58276d),
-        _0x46b599 = Number(_0x58276d.rotation) || 0;
-      (_0x1c4317.save(),
-        (_0x1c4317.globalCompositeOperation = 'source-over'),
-        (_0x1c4317.fillStyle = _0x58276d.color || _0x5f3e6e),
-        (_0x1c4317.font = _0x53b830 + 'px sans-serif'),
-        (_0x1c4317.textBaseline = 'top'),
-        _0x1c4317.translate(_0x2b8f49, _0x550e7f),
-        _0x1c4317.rotate(_0x46b599),
-        _0x1c4317.scale(_0x32e24a.scaleX, _0x32e24a.scaleY),
-        _0x1c4317.fillText(String(_0x58276d.text || ''), 0, 0),
-        _0x1c4317.restore());
+    if (cmd.type === 'text') {
+      const record = cmd.x * scaleX,
+        payload = cmd.y * scaleY,
+        handle = Math.max(1, cmd.sizeWorld * scaleX),
+        textScalePair = getTextScalePair(cmd),
+        state = Number(cmd.rotation) || 0;
+      (ctx.save(),
+        (ctx.globalCompositeOperation = 'source-over'),
+        (ctx.fillStyle = cmd.color || defaultTextColor),
+        (ctx.font = handle + 'px sans-serif'),
+        (ctx.textBaseline = 'top'),
+        ctx.translate(record, payload),
+        ctx.rotate(state),
+        ctx.scale(textScalePair.scaleX, textScalePair.scaleY),
+        ctx.fillText(String(cmd.text || ''), 0, 0),
+        ctx.restore());
       return;
     }
-    _0x58276d.type === 'number-label' &&
+    cmd.type === 'number-label' &&
       drawNumberLabelCommand({
-        ctx: _0x1c4317,
-        cmd: _0x58276d,
-        scaleX: _0x5be26b,
-        scaleY: _0x6510a0,
-        defaultColor: _0x5f3e6e,
+        ctx: ctx,
+        cmd: cmd,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        defaultColor: defaultTextColor,
         backgroundColor: numberLabelBackgroundColor,
       });
   };
 export const exportAnnotateCanvasBlob = async ({
   documentRef: documentRef = null,
-  node: _0x33bd57,
-  imgEl: _0x5a3eff,
-  imgUrl: _0x3157ec,
-  commands: _0x58df5b,
-  useWhiteboardBase: _0x294f5f,
-  isEraseScene: _0x2efb7d,
-  loadImage: _0x584892,
-  getCurrentFlipState: _0x1a26e2,
-  applyFlipTransformToContext: _0x5adaff,
-  createSelectionMaskCanvas: _0x36c738,
-  canvasWhiteColor: _0x308413,
-  defaultTextColor: _0x4db2fe,
+  node: node,
+  imgEl: imgEl,
+  imgUrl: imgUrl,
+  commands: commands,
+  useWhiteboardBase: useWhiteboardBase,
+  isEraseScene: isEraseScene2,
+  loadImage: loadImage,
+  getCurrentFlipState: getCurrentFlipState,
+  applyFlipTransformToContext: applyFlipTransformToContext,
+  createSelectionMaskCanvas: createSelectionMaskCanvas,
+  canvasWhiteColor: canvasWhiteColor,
+  defaultTextColor: defaultTextColor2,
 } = {}) => {
-  const _0xa1baca = documentRef || globalThis.document;
-  let _0x271685 = null,
-    _0x324511 = 0,
-    _0x110a78 = 0;
-  _0x294f5f &&
-    ((_0x324511 = Number(_0x5a3eff?.naturalWidth || _0x5a3eff?.width || 0)),
-    (_0x110a78 = Number(_0x5a3eff?.naturalHeight || _0x5a3eff?.height || 0)));
-  (!_0x324511 || !_0x110a78 || !_0x294f5f) &&
-    ((_0x271685 = await _0x584892(_0x3157ec)),
-    (_0x324511 = _0x271685.naturalWidth || _0x271685.width),
-    (_0x110a78 = _0x271685.naturalHeight || _0x271685.height));
-  const _0x590b05 = _0xa1baca.createElement('canvas');
-  ((_0x590b05.width = _0x324511), (_0x590b05.height = _0x110a78));
-  const _0xd82c28 = _0x590b05.getContext('2d'),
-    _0x16833b = _0x1a26e2();
-  !_0x2efb7d &&
-    ((_0xd82c28.fillStyle = _0x308413),
-    _0xd82c28.fillRect(0, 0, _0x324511, _0x110a78),
-    _0xd82c28.save(),
-    _0x5adaff(_0xd82c28, _0x324511, _0x110a78, _0x16833b));
-  !_0x294f5f && _0xd82c28.drawImage(_0x271685, 0, 0, _0x324511, _0x110a78);
-  const _0x4ec1f0 = _0x324511 / (_0x33bd57?.width || 1),
-    _0x38b33d = _0x110a78 / (_0x33bd57?.height || 1);
-  if (_0x2efb7d) {
-    const _0x25640a = _0x36c738(_0x324511, _0x110a78, _0x4ec1f0, _0x38b33d);
-    (_0xd82c28.save(),
-      (_0xd82c28.globalCompositeOperation = 'destination-out'),
-      _0xd82c28.drawImage(_0x25640a, 0, 0),
-      _0xd82c28.restore());
+  const el = documentRef || globalThis.document;
+  let box = null,
+    naturalWidth = 0,
+    naturalHeight = 0;
+  useWhiteboardBase &&
+    ((naturalWidth = Number(imgEl?.naturalWidth || imgEl?.width || 0)),
+    (naturalHeight = Number(imgEl?.naturalHeight || imgEl?.height || 0)));
+  (!naturalWidth || !naturalHeight || !useWhiteboardBase) &&
+    ((box = await loadImage(imgUrl)),
+    (naturalWidth = box.naturalWidth || box.width),
+    (naturalHeight = box.naturalHeight || box.height));
+  const box2 = el.createElement('canvas');
+  ((box2.width = naturalWidth), (box2.height = naturalHeight));
+  const ctx2 = box2.getContext('2d'),
+    config = getCurrentFlipState();
+  !isEraseScene2 &&
+    ((ctx2.fillStyle = canvasWhiteColor),
+    ctx2.fillRect(0, 0, naturalWidth, naturalHeight),
+    ctx2.save(),
+    applyFlipTransformToContext(ctx2, naturalWidth, naturalHeight, config));
+  !useWhiteboardBase && ctx2.drawImage(box, 0, 0, naturalWidth, naturalHeight);
+  const scaleX2 = naturalWidth / (node?.width || 1),
+    scaleY2 = naturalHeight / (node?.height || 1);
+  if (isEraseScene2) {
+    const scope = createSelectionMaskCanvas(naturalWidth, naturalHeight, scaleX2, scaleY2);
+    (ctx2.save(),
+      (ctx2.globalCompositeOperation = 'destination-out'),
+      ctx2.drawImage(scope, 0, 0),
+      ctx2.restore());
   }
-  (Array.isArray(_0x58df5b) ? _0x58df5b : []).forEach((_0xeff3a3) =>
+  (Array.isArray(commands) ? commands : []).forEach((cmd2) =>
     renderCommandToNaturalCanvas({
-      ctx: _0xd82c28,
-      cmd: _0xeff3a3,
-      scaleX: _0x4ec1f0,
-      scaleY: _0x38b33d,
-      isEraseScene: _0x2efb7d,
-      defaultTextColor: _0x4db2fe,
-      numberLabelBackgroundColor: _0x308413,
+      ctx: ctx2,
+      cmd: cmd2,
+      scaleX: scaleX2,
+      scaleY: scaleY2,
+      isEraseScene: isEraseScene2,
+      defaultTextColor: defaultTextColor2,
+      numberLabelBackgroundColor: canvasWhiteColor,
     }),
   );
-  !_0x2efb7d && _0xd82c28.restore();
-  const _0x14efd7 = _0x2efb7d ? 'image/png' : 'image/jpeg',
-    _0x38e4b8 = _0x2efb7d ? undefined : 0.9,
-    _0x242a51 = await canvasToBlob(_0x590b05, _0x14efd7, _0x38e4b8);
-  if (!_0x242a51) throw new Error('Canvas 导出失败');
-  return { blob: _0x242a51, exportType: _0x14efd7, naturalWidth: _0x324511, naturalHeight: _0x110a78 };
+  !isEraseScene2 && ctx2.restore();
+  const exportType = isEraseScene2 ? 'image/png' : 'image/jpeg',
+    input = isEraseScene2 ? undefined : 0.9,
+    blob = await canvasToBlob(box2, exportType, input);
+  if (!blob) throw new Error('Canvas 导出失败');
+  return { blob: blob, exportType: exportType, naturalWidth: naturalWidth, naturalHeight: naturalHeight };
 };

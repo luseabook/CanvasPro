@@ -1,21 +1,21 @@
 import { normalizedMediaDragRect } from '../../core/math.js';
 import { renderStoryGenerationSpinner } from './storyAsyncButtonPresentation.js';
 export function createStoryReplicationPortraitEditor({
-  card: _0x4baf6f,
-  character: _0x240c00,
-  capture: _0x224858,
-  isActive: _0x504762,
-  onSaved: _0x289c14,
-  showToast: _0x2836a6,
+  card: card,
+  character: character,
+  capture: capture,
+  isActive: isActive,
+  onSaved: onSaved,
+  showToast: showToast,
 }) {
-  if (!_0x240c00['frame']?.['url'])
-    return (_0x2836a6('请先保存该人物的代表画面，再裁剪人物图。', 'warn'), null);
-  const _0x7172be = _0x240c00['frame'],
-    _0x522b14 = () => _0x504762() && _0x240c00['frame'] === _0x7172be,
-    _0x4aae11 = _0x4baf6f['ownerDocument'],
-    _0x26e908 = _0x4aae11['createElement']('section');
-  ((_0x26e908['className'] = 'story-source-portrait-editor'),
-    (_0x26e908['innerHTML'] =
+  if (!character['frame']?.['url'])
+    return (showToast('请先保存该人物的代表画面，再裁剪人物图。', 'warn'), null);
+  const timeSec = character['frame'],
+    handler = () => isActive() && character['frame'] === timeSec,
+    el = card['ownerDocument'],
+    el2 = el['createElement']('section');
+  ((el2['className'] = 'story-source-portrait-editor'),
+    (el2['innerHTML'] =
       '<strong>拖动框选人物，或输入裁剪百分比</strong><div class="story-source-portrait-image"><img draggable="false" alt="框选原片人物"><span class="story-source-portrait-rect"></span></div>\n    <div class="story-source-portrait-values">' +
       [
         ['x', '左侧'],
@@ -24,117 +24,110 @@ export function createStoryReplicationPortraitEditor({
         ['height', '高度'],
       ]
         ['map'](
-          ([_0x46eec0, _0xe91395]) =>
+          ([value, item]) =>
             '<label>' +
-            _0xe91395 +
+            item +
             '%<input type="number" min="0" max="100" step="1" data-crop-value="' +
-            _0x46eec0 +
+            value +
             '\x22></label>',
         )
         ['join']('') +
       '</div>\x0a\x20\x20\x20\x20<div\x20class=\x22story-source-actions\x22><button\x20type=\x22button\x22\x20data-crop-save>保存人物图</button><button\x20type=\x22button\x22\x20data-crop-close>取消</button></div><span\x20role=\x22status\x22></span>'),
-    (_0x26e908['querySelector']('img')['src'] = _0x7172be['url']),
-    _0x4baf6f['append'](_0x26e908));
-  const _0x11bfb1 = _0x26e908['querySelector']('.story-source-portrait-image'),
-    _0x459d34 = _0x11bfb1['querySelector']('img'),
-    _0x43883c = _0x11bfb1['querySelector']('span');
-  let _0x23c000 = { x: 0x0, y: 0x0, width: 0x1, height: 0x1 },
-    _0x418de5 = null,
-    _0x1c9982 = null,
-    _0x427f65 = ![],
-    _0x236842 = ![];
-  function _0x18deae() {
-    for (const [_0x4ca0f3, _0x443b7e] of Object['entries'](_0x23c000)) {
-      (_0x43883c['style']['setProperty']('--crop-' + _0x4ca0f3, _0x443b7e * 0x64 + '%'),
-        (_0x26e908['querySelector']('[data-crop-value=\x22' + _0x4ca0f3 + '\x22]')['value'] = String(
-          Math['round'](_0x443b7e * 0x64),
+    (el2['querySelector']('img')['src'] = timeSec['url']),
+    card['append'](el2));
+  const el3 = el2['querySelector']('.story-source-portrait-image'),
+    el4 = el3['querySelector']('img'),
+    el5 = el3['querySelector']('span');
+  let box = { x: 0x0, y: 0x0, width: 0x1, height: 0x1 },
+    enabled = null,
+    value2 = null,
+    enabled2 = ![],
+    enabled3 = ![];
+  function run() {
+    for (const [key, index] of Object['entries'](box)) {
+      (el5['style']['setProperty']('--crop-' + key, index * 0x64 + '%'),
+        (el2['querySelector']('[data-crop-value=\x22' + key + '\x22]')['value'] = String(
+          Math['round'](index * 0x64),
         )));
     }
   }
-  function _0x4866e2() {
-    const _0xb1d715 = _0x1c9982;
-    ((_0x1c9982 = null), (_0x418de5 = null));
-    if (_0xb1d715 !== null && _0x11bfb1['hasPointerCapture']?.(_0xb1d715))
-      _0x11bfb1['releasePointerCapture'](_0xb1d715);
+  function run2() {
+    const result = value2;
+    ((value2 = null), (enabled = null));
+    if (result !== null && el3['hasPointerCapture']?.(result)) el3['releasePointerCapture'](result);
   }
-  function _0x5dbf21() {
-    ((_0x427f65 = !![]), _0x4866e2(), _0x26e908['remove']());
+  function destroy() {
+    ((enabled2 = !![]), run2(), el2['remove']());
   }
-  (_0x11bfb1['addEventListener']('pointerdown', (_0x7314f5) => {
-    if (_0x236842 || _0x7314f5['button'] !== 0x0 || !_0x459d34['naturalWidth']) return;
-    ((_0x418de5 = { x: _0x7314f5['clientX'], y: _0x7314f5['clientY'] }),
-      (_0x1c9982 = _0x7314f5['pointerId']),
-      _0x11bfb1['setPointerCapture'](_0x7314f5['pointerId']),
-      _0x7314f5['preventDefault']());
+  (el3['addEventListener']('pointerdown', (x) => {
+    if (enabled3 || x['button'] !== 0x0 || !el4['naturalWidth']) return;
+    ((enabled = { x: x['clientX'], y: x['clientY'] }),
+      (value2 = x['pointerId']),
+      el3['setPointerCapture'](x['pointerId']),
+      x['preventDefault']());
   }),
-    _0x11bfb1['addEventListener']('pointermove', (_0xfa63b7) => {
-      if (!_0x418de5 || _0x236842) return;
-      ((_0x23c000 = normalizedMediaDragRect(_0x459d34['getBoundingClientRect'](), _0x418de5, {
-        x: _0xfa63b7['clientX'],
-        y: _0xfa63b7['clientY'],
+    el3['addEventListener']('pointermove', (x2) => {
+      if (!enabled || enabled3) return;
+      ((box = normalizedMediaDragRect(el4['getBoundingClientRect'](), enabled, {
+        x: x2['clientX'],
+        y: x2['clientY'],
       })),
-        _0x18deae());
+        run());
     }));
-  for (const _0x4a57fe of ['pointerup', 'pointercancel', 'lostpointercapture'])
-    _0x11bfb1['addEventListener'](_0x4a57fe, _0x4866e2);
+  for (const data of ['pointerup', 'pointercancel', 'lostpointercapture'])
+    el3['addEventListener'](data, run2);
   return (
-    _0x26e908['addEventListener']('input', (_0x409b60) => {
-      if (_0x236842 || !_0x409b60['target']['dataset']['cropValue']) return;
-      ((_0x23c000[_0x409b60['target']['dataset']['cropValue']] = Number(_0x409b60['target']['value']) / 0x64),
-        _0x18deae());
+    el2['addEventListener']('input', (event) => {
+      if (enabled3 || !event['target']['dataset']['cropValue']) return;
+      ((box[event['target']['dataset']['cropValue']] = Number(event['target']['value']) / 0x64), run());
     }),
-    _0x26e908['addEventListener']('click', async (_0x51531b) => {
-      if (_0x51531b['target']['closest']('[data-crop-close]')) {
-        _0x5dbf21();
+    el2['addEventListener']('click', async (event2) => {
+      if (event2['target']['closest']('[data-crop-close]')) {
+        destroy();
         return;
       }
-      if (!_0x51531b['target']['closest']('[data-crop-save]') || _0x236842 || _0x427f65) return;
-      if (!_0x522b14()) {
-        (_0x2836a6('代表画面已变化，请重新打开人物裁剪。', 'warn'), _0x5dbf21());
+      if (!event2['target']['closest']('[data-crop-save]') || enabled3 || enabled2) return;
+      if (!handler()) {
+        (showToast('代表画面已变化，请重新打开人物裁剪。', 'warn'), destroy());
         return;
       }
       if (
-        Object['values'](_0x23c000)['some'](
-          (_0x575870) => !Number['isFinite'](_0x575870) || _0x575870 < 0x0,
-        ) ||
-        _0x23c000['width'] <= 0x0 ||
-        _0x23c000['height'] <= 0x0 ||
-        _0x23c000['x'] + _0x23c000['width'] > 1.000001 ||
-        _0x23c000['y'] + _0x23c000['height'] > 1.000001
+        Object['values'](box)['some']((count) => !Number['isFinite'](count) || count < 0x0) ||
+        box['width'] <= 0x0 ||
+        box['height'] <= 0x0 ||
+        box['x'] + box['width'] > 1.000001 ||
+        box['y'] + box['height'] > 1.000001
       ) {
-        _0x2836a6('请在原图范围内框选完整人物。', 'warn');
+        showToast('请在原图范围内框选完整人物。', 'warn');
         return;
       }
-      ((_0x236842 = !![]),
-        _0x26e908['setAttribute']('aria-busy', 'true'),
-        (_0x26e908['querySelector']('[role=status]')['innerHTML'] =
+      ((enabled3 = !![]),
+        el2['setAttribute']('aria-busy', 'true'),
+        (el2['querySelector']('[role=status]')['innerHTML'] =
           renderStoryGenerationSpinner({ button: !![] }) + '正在保存人物图…'),
-        _0x26e908['querySelectorAll']('input, [data-crop-save]')['forEach']((_0x1073c4) => {
-          _0x1073c4['disabled'] = !![];
+        el2['querySelectorAll']('input, [data-crop-save]')['forEach']((el6) => {
+          el6['disabled'] = !![];
         }));
       try {
-        const _0x33d87d = await _0x224858({
-          crop: { ..._0x23c000 },
-          timeSec: _0x7172be['timeSec'] ?? _0x240c00['representativeTimeSec'],
-          isActive: () => !_0x427f65 && _0x522b14(),
+        const options = await capture({
+          crop: { ...box },
+          timeSec: timeSec['timeSec'] ?? character['representativeTimeSec'],
+          isActive: () => !enabled2 && handler(),
         });
-        _0x33d87d &&
-          !_0x427f65 &&
-          _0x522b14() &&
-          ((_0x240c00['portrait'] = _0x33d87d), _0x289c14(), _0x5dbf21());
-      } catch (_0x8217a3) {
-        if (!_0x427f65) _0x2836a6(_0x8217a3?.['message'] || '人物图保存失败。', 'error');
+        options && !enabled2 && handler() && ((character['portrait'] = options), onSaved(), destroy());
+      } catch (error) {
+        if (!enabled2) showToast(error?.['message'] || '人物图保存失败。', 'error');
       } finally {
-        ((_0x236842 = ![]),
-          !_0x427f65 &&
-            (_0x26e908['setAttribute']('aria-busy', 'false'),
-            (_0x26e908['querySelector']('[role=status]')['textContent'] = ''),
-            _0x26e908['querySelectorAll']('input, [data-crop-save]')['forEach']((_0x4c274b) => {
-              _0x4c274b['disabled'] = ![];
+        ((enabled3 = ![]),
+          !enabled2 &&
+            (el2['setAttribute']('aria-busy', 'false'),
+            (el2['querySelector']('[role=status]')['textContent'] = ''),
+            el2['querySelectorAll']('input, [data-crop-save]')['forEach']((el7) => {
+              el7['disabled'] = ![];
             })));
       }
     }),
-    _0x18deae(),
-    { destroy: _0x5dbf21 }
+    run(),
+    { destroy: destroy }
   );
 }

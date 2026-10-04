@@ -13,67 +13,67 @@ const AUDIO_EXTENSIONS = new Set([
   'webm',
   'wma',
 ]);
-function firstNonEmptyString(..._0x3a08ce) {
-  for (const _0x15a165 of _0x3a08ce) {
-    const _0x34f5ef = String(_0x15a165 || '').trim();
-    if (_0x34f5ef) return _0x34f5ef;
+function firstNonEmptyString(...args) {
+  for (const value of args) {
+    const item = String(value || '').trim();
+    if (item) return item;
   }
   return '';
 }
-function normalizeAudioDownloadUrl(_0x576d88) {
-  const _0x212fbb = String(_0x576d88 || '').trim();
-  if (!_0x212fbb) return '';
-  if (/^(?:https?:|blob:|data:)/i.test(_0x212fbb)) return _0x212fbb;
-  if (_0x212fbb.startsWith('/')) return _0x212fbb;
-  return '/' + _0x212fbb.replace(/^\/+/, '');
+function normalizeAudioDownloadUrl(key) {
+  const enabled = String(key || '').trim();
+  if (!enabled) return '';
+  if (/^(?:https?:|blob:|data:)/i.test(enabled)) return enabled;
+  if (enabled.startsWith('/')) return enabled;
+  return '/' + enabled.replace(/^\/+/, '');
 }
-function safeDecode(_0x42e57d) {
+function safeDecode(index) {
   try {
-    return decodeURIComponent(_0x42e57d);
+    return decodeURIComponent(index);
   } catch {
-    return _0x42e57d;
+    return index;
   }
 }
-function basenameFromUrl(_0x3f8cf8) {
-  const _0x3e257c = String(_0x3f8cf8 || '').trim();
-  if (!_0x3e257c || _0x3e257c.startsWith('data:') || _0x3e257c.startsWith('blob:')) return '';
+function basenameFromUrl(result) {
+  const enabled2 = String(result || '').trim();
+  if (!enabled2 || enabled2.startsWith('data:') || enabled2.startsWith('blob:')) return '';
   try {
-    const _0x2b1afb = new URL(_0x3e257c, globalThis.location?.href || 'http://localhost/');
-    return safeDecode(_0x2b1afb.pathname.split('/').filter(Boolean).pop() || '');
+    const uRL = new URL(enabled2, globalThis.location?.href || 'http://localhost/');
+    return safeDecode(uRL.pathname.split('/').filter(Boolean).pop() || '');
   } catch {
-    const _0x24ab7b = _0x3e257c.split('#')[0].split('?')[0].replace(/\\/g, '/');
-    return safeDecode(_0x24ab7b.split('/').filter(Boolean).pop() || '');
+    const data = enabled2.split('#')[0].split('?')[0].replace(/\\/g, '/');
+    return safeDecode(data.split('/').filter(Boolean).pop() || '');
   }
 }
-function sanitizeFileName(_0x63808) {
-  return String(_0x63808 || '')
+function sanitizeFileName(options) {
+  return String(options || '')
     .trim()
     .replace(/[\\/:*?"<>|]/g, '_')
     .slice(0, 160);
 }
-function getFileExtension(_0x3a9767) {
-  const _0x306e24 = basenameFromUrl(_0x3a9767) || String(_0x3a9767 || '').trim(),
-    _0x327e08 = _0x306e24.match(/\.([a-z0-9]{1,8})$/i);
-  return String(_0x327e08?.[1] || '').toLowerCase();
+function getFileExtension(target) {
+  const basenameFromUrl2 = basenameFromUrl(target) || String(target || '').trim(),
+    source = basenameFromUrl2.match(/\.([a-z0-9]{1,8})$/i);
+  return String(source?.[1] || '').toLowerCase();
 }
-function getAudioExtension(..._0x415c08) {
-  for (const _0x508e1e of _0x415c08) {
-    const _0x254bdc = getFileExtension(_0x508e1e);
-    if (AUDIO_EXTENSIONS.has(_0x254bdc)) return _0x254bdc;
+function getAudioExtension(...args2) {
+  for (const next of args2) {
+    const fileExtension = getFileExtension(next);
+    if (AUDIO_EXTENSIONS.has(fileExtension)) return fileExtension;
   }
   return 'mp3';
 }
-function ensureAudioFileExtension(_0x1891c1, _0x3608dc) {
-  const _0x3ac89f = sanitizeFileName(_0x1891c1);
-  if (!_0x3ac89f) return 'audio.' + (_0x3608dc || 'mp3');
-  if (/\.[a-z0-9]{1,8}$/i.test(_0x3ac89f)) return _0x3ac89f;
-  return _0x3ac89f + '.' + (_0x3608dc || 'mp3');
+function ensureAudioFileExtension(current, entry) {
+  const sanitizeFileName2 = sanitizeFileName(current);
+  if (!sanitizeFileName2) return 'audio.' + (entry || 'mp3');
+  if (/\.[a-z0-9]{1,8}$/i.test(sanitizeFileName2)) return sanitizeFileName2;
+  return sanitizeFileName2 + '.' + (entry || 'mp3');
 }
 export function resolveAudioDownloadTarget({
   nodeData: nodeData = {},
   audioElement: audioElement = null,
 } = {}) {
-  const _0x9a8cf9 = firstNonEmptyString(
+  const nonEmptyString = firstNonEmptyString(
       nodeData.localPath,
       nodeData.audioUrl,
       nodeData.src,
@@ -82,63 +82,60 @@ export function resolveAudioDownloadTarget({
       audioElement?.currentSrc,
       audioElement?.src,
     ),
-    _0x56dd1d = normalizeAudioDownloadUrl(_0x9a8cf9);
-  if (!_0x56dd1d) return null;
-  const _0x5d8ab7 = getAudioExtension(
+    url = normalizeAudioDownloadUrl(nonEmptyString);
+  if (!url) return null;
+  const audioExtension = getAudioExtension(
       nodeData.fileName,
       nodeData.localPath,
       nodeData.audioUrl,
       nodeData.src,
       nodeData.url,
       nodeData.resultUrl,
-      _0x56dd1d,
+      url,
     ),
-    _0x2babf5 = firstNonEmptyString(
+    nonEmptyString2 = firstNonEmptyString(
       nodeData.fileName,
       basenameFromUrl(nodeData.localPath),
       basenameFromUrl(nodeData.audioUrl),
       basenameFromUrl(nodeData.src),
       basenameFromUrl(nodeData.url),
       basenameFromUrl(nodeData.resultUrl),
-      basenameFromUrl(_0x56dd1d),
+      basenameFromUrl(url),
       nodeData.name,
     );
-  return { url: _0x56dd1d, filename: ensureAudioFileExtension(_0x2babf5, _0x5d8ab7) };
+  return { url: url, filename: ensureAudioFileExtension(nonEmptyString2, audioExtension) };
 }
-export function triggerAudioDownload(_0x34446d, _0x105d7a = globalThis.document) {
-  if (!_0x34446d?.url || !_0x105d7a?.createElement || !_0x105d7a?.body) return false;
-  const _0x4ce1ff = _0x105d7a.createElement('a');
-  ((_0x4ce1ff.href = _0x34446d.url),
-    (_0x4ce1ff.download = _0x34446d.filename || 'audio.mp3'),
-    (_0x4ce1ff.rel = 'noopener'),
-    _0x105d7a.body.appendChild(_0x4ce1ff),
-    _0x4ce1ff.click(),
-    _0x4ce1ff.remove?.());
-  if (_0x4ce1ff.parentNode) _0x4ce1ff.parentNode.removeChild(_0x4ce1ff);
+export function triggerAudioDownload(response, el = globalThis.document) {
+  if (!response?.url || !el?.createElement || !el?.body) return false;
+  const el2 = el.createElement('a');
+  ((el2.href = response.url),
+    (el2.download = response.filename || 'audio.mp3'),
+    (el2.rel = 'noopener'),
+    el.body.appendChild(el2),
+    el2.click(),
+    el2.remove?.());
+  if (el2.parentNode) el2.parentNode.removeChild(el2);
   return true;
 }
 export function bindAudioDownloadAction({
-  button: _0xdd5c6f,
-  getNodeData: _0xdb8b11,
-  getAudioElement: _0x2bafb8,
-  notifyMissing: _0x4b5370,
+  button: button,
+  getNodeData: getNodeData,
+  getAudioElement: getAudioElement,
+  notifyMissing: notifyMissing,
   documentRef: documentRef = globalThis.document,
 } = {}) {
-  if (!_0xdd5c6f) return () => {};
-  const _0x44a53c = (_0x34a8f) => {
-    (_0x34a8f?.preventDefault?.(), _0x34a8f?.stopPropagation?.());
-    const _0x1b9222 = resolveAudioDownloadTarget({
-      nodeData: typeof _0xdb8b11 === 'function' ? _0xdb8b11() : {},
-      audioElement: typeof _0x2bafb8 === 'function' ? _0x2bafb8() : null,
+  if (!button) return () => {};
+  const record = (event) => {
+    (event?.preventDefault?.(), event?.stopPropagation?.());
+    const audioDownloadTarget = resolveAudioDownloadTarget({
+      nodeData: typeof getNodeData === 'function' ? getNodeData() : {},
+      audioElement: typeof getAudioElement === 'function' ? getAudioElement() : null,
     });
-    if (!_0x1b9222) {
-      if (typeof _0x4b5370 === 'function') _0x4b5370();
+    if (!audioDownloadTarget) {
+      if (typeof notifyMissing === 'function') notifyMissing();
       return;
     }
-    triggerAudioDownload(_0x1b9222, documentRef);
+    triggerAudioDownload(audioDownloadTarget, documentRef);
   };
-  return (
-    _0xdd5c6f.addEventListener('click', _0x44a53c),
-    () => _0xdd5c6f.removeEventListener('click', _0x44a53c)
-  );
+  return (button.addEventListener('click', record), () => button.removeEventListener('click', record));
 }

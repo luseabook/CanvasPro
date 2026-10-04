@@ -1,127 +1,121 @@
 import { t } from '../../i18n/index.js';
-function panoramaSceneText(_0x5afc75, _0x36ef78 = {}) {
-  return t('panoramaSceneNode.' + _0x5afc75, _0x36ef78);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
 export function createCameraPresetList() {
-  const _0x421f32 = document.createElement('div');
-  return ((_0x421f32.className = 'panorama-camera-dock'), (_0x421f32.dataset.uiStop = '1'), _0x421f32);
+  const el = document.createElement('div');
+  return ((el.className = 'panorama-camera-dock'), (el.dataset.uiStop = '1'), el);
 }
-function normalizeCameraSlot(_0x13b070) {
-  const _0x273ff9 = Number(_0x13b070);
-  if (!Number.isInteger(_0x273ff9)) return null;
-  if (_0x273ff9 < 1 || _0x273ff9 > 10) return null;
-  return _0x273ff9;
+function normalizeCameraSlot(key) {
+  const count = Number(key);
+  if (!Number.isInteger(count)) return null;
+  if (count < 1 || count > 10) return null;
+  return count;
 }
-function resolveCameraSlotEntries(_0x55ac80 = []) {
-  const _0x3c079f = Array.isArray(_0x55ac80) ? _0x55ac80 : [],
-    _0x356c3e = new Set(),
-    _0x5ec1db = [];
+function resolveCameraSlotEntries(list = []) {
+  const list2 = Array.isArray(list) ? list : [],
+    map = new Set(),
+    list3 = [];
   return (
-    _0x3c079f.forEach((_0x3c22ea) => {
-      const _0x37f13a = normalizeCameraSlot(_0x3c22ea?.slot);
-      if (!_0x37f13a || _0x356c3e.has(_0x37f13a)) return;
-      (_0x356c3e.add(_0x37f13a), _0x5ec1db.push({ camera: _0x3c22ea, slot: _0x37f13a }));
+    list2.forEach((camera) => {
+      const slot = normalizeCameraSlot(camera?.slot);
+      if (!slot || map.has(slot)) return;
+      (map.add(slot), list3.push({ camera: camera, slot: slot }));
     }),
-    _0x3c079f.forEach((_0x2307e8) => {
-      if (_0x5ec1db.some((_0x2e12bf) => _0x2e12bf.camera?.id === _0x2307e8?.id)) return;
-      for (let _0x2279a9 = 1; _0x2279a9 <= 10; _0x2279a9 += 1) {
-        if (_0x356c3e.has(_0x2279a9)) continue;
-        (_0x356c3e.add(_0x2279a9), _0x5ec1db.push({ camera: _0x2307e8, slot: _0x2279a9 }));
+    list2.forEach((camera2) => {
+      if (list3.some((item2) => item2.camera?.id === camera2?.id)) return;
+      for (let slot2 = 1; slot2 <= 10; slot2 += 1) {
+        if (map.has(slot2)) continue;
+        (map.add(slot2), list3.push({ camera: camera2, slot: slot2 }));
         break;
       }
     }),
-    _0x5ec1db.sort((_0x21e763, _0x3d7f0d) => _0x21e763.slot - _0x3d7f0d.slot)
+    list3.sort((item3, index) => item3.slot - index.slot)
   );
 }
 function createCameraButton(
-  _0x39923a,
-  _0x29e3dc,
-  { onActivate: _0x1c347d, onDelete: _0x53b317, onContextMenu: _0x280a30 } = {},
+  result,
+  data,
+  { onActivate: onActivate, onDelete: onDelete, onContextMenu: onContextMenu } = {},
 ) {
-  const { camera: _0x29c0fe, slot: _0x5c5e28 } = _0x39923a,
-    _0x3e4848 = document.createElement('div');
-  ((_0x3e4848.className = 'panorama-camera-dock__item'),
-    (_0x3e4848.dataset.cameraId = _0x29c0fe.id),
-    (_0x3e4848.dataset.cameraSlot = String(_0x5c5e28)),
-    (_0x3e4848.tabIndex = 0));
-  const _0x23e801 = _0x5c5e28 >= 1 && _0x5c5e28 <= 9,
-    _0x2a6d1b = _0x23e801 ? String(_0x5c5e28) : '';
-  _0x3e4848.setAttribute(
-    'aria-label',
-    _0x29c0fe.name || panoramaSceneText('camera.bookmarkAria', { slot: _0x5c5e28 }),
-  );
-  const _0x4c40a4 = _0x29e3dc?.viewport?.activeCameraId === _0x29c0fe.id,
-    _0x1ffdae =
-      _0x29e3dc?.selection?.selectedObjectType === 'camera' &&
-      _0x29e3dc?.selection?.selectedObjectId === _0x29c0fe.id;
-  (_0x4c40a4 || _0x1ffdae) && _0x3e4848.classList.add('is-active');
-  const _0x41ca03 = document.createElement('button');
-  ((_0x41ca03.type = 'button'),
-    (_0x41ca03.className = 'panorama-camera-dock__activate'),
-    _0x41ca03.setAttribute('aria-label', _0x3e4848.getAttribute('aria-label') || ''));
-  const _0x2ca157 = document.createElement('span');
-  ((_0x2ca157.className = 'panorama-camera-dock__number'),
-    (_0x2ca157.textContent = _0x2a6d1b),
-    _0x41ca03.appendChild(_0x2ca157));
-  const _0x530698 = document.createElement('button');
+  const { camera: camera3, slot: slot3 } = result,
+    el2 = document.createElement('div');
+  ((el2.className = 'panorama-camera-dock__item'),
+    (el2.dataset.cameraId = camera3.id),
+    (el2.dataset.cameraSlot = String(slot3)),
+    (el2.tabIndex = 0));
+  const options = slot3 >= 1 && slot3 <= 9,
+    target = options ? String(slot3) : '';
+  el2.setAttribute('aria-label', camera3.name || panoramaSceneText('camera.bookmarkAria', { slot: slot3 }));
+  const source = data?.viewport?.activeCameraId === camera3.id,
+    next =
+      data?.selection?.selectedObjectType === 'camera' && data?.selection?.selectedObjectId === camera3.id;
+  (source || next) && el2.classList.add('is-active');
+  const el3 = document.createElement('button');
+  ((el3.type = 'button'),
+    (el3.className = 'panorama-camera-dock__activate'),
+    el3.setAttribute('aria-label', el2.getAttribute('aria-label') || ''));
+  const el4 = document.createElement('span');
+  ((el4.className = 'panorama-camera-dock__number'), (el4.textContent = target), el3.appendChild(el4));
+  const el5 = document.createElement('button');
   return (
-    (_0x530698.type = 'button'),
-    (_0x530698.className = 'panorama-camera-dock__delete'),
-    (_0x530698.textContent = '×'),
-    (_0x530698.hidden = true),
-    _0x530698.setAttribute('aria-label', panoramaSceneText('camera.deleteBookmark')),
-    _0x41ca03.appendChild(_0x530698),
-    _0x41ca03.addEventListener('click', (_0x4e1ffe) => {
-      (_0x4e1ffe.preventDefault(), _0x4e1ffe.stopPropagation(), _0x1c347d?.(_0x29c0fe.id, _0x5c5e28));
+    (el5.type = 'button'),
+    (el5.className = 'panorama-camera-dock__delete'),
+    (el5.textContent = '×'),
+    (el5.hidden = true),
+    el5.setAttribute('aria-label', panoramaSceneText('camera.deleteBookmark')),
+    el3.appendChild(el5),
+    el3.addEventListener('click', (event) => {
+      (event.preventDefault(), event.stopPropagation(), onActivate?.(camera3.id, slot3));
     }),
-    _0x41ca03.addEventListener('keydown', (_0x2d1f5c) => {
-      if (_0x2d1f5c.key !== 'Enter' && _0x2d1f5c.key !== ' ') return;
-      (_0x2d1f5c.preventDefault(), _0x2d1f5c.stopPropagation(), _0x1c347d?.(_0x29c0fe.id, _0x5c5e28));
+    el3.addEventListener('keydown', (event2) => {
+      if (event2.key !== 'Enter' && event2.key !== ' ') return;
+      (event2.preventDefault(), event2.stopPropagation(), onActivate?.(camera3.id, slot3));
     }),
-    _0x3e4848.addEventListener('click', () => _0x1c347d?.(_0x29c0fe.id, _0x5c5e28)),
-    _0x3e4848.addEventListener('keydown', (_0x14ff55) => {
-      if (_0x14ff55.key !== 'Enter' && _0x14ff55.key !== ' ') return;
-      (_0x14ff55.preventDefault(), _0x1c347d?.(_0x29c0fe.id, _0x5c5e28));
+    el2.addEventListener('click', () => onActivate?.(camera3.id, slot3)),
+    el2.addEventListener('keydown', (event3) => {
+      if (event3.key !== 'Enter' && event3.key !== ' ') return;
+      (event3.preventDefault(), onActivate?.(camera3.id, slot3));
     }),
-    _0x3e4848.addEventListener('mouseenter', () => {
-      _0x530698.hidden = false;
+    el2.addEventListener('mouseenter', () => {
+      el5.hidden = false;
     }),
-    _0x3e4848.addEventListener('mouseleave', () => {
-      _0x530698.hidden = true;
+    el2.addEventListener('mouseleave', () => {
+      el5.hidden = true;
     }),
-    _0x530698.addEventListener('click', (_0x59f787) => {
-      (_0x59f787.preventDefault(), _0x59f787.stopPropagation(), _0x53b317?.(_0x29c0fe.id, _0x5c5e28));
+    el5.addEventListener('click', (event4) => {
+      (event4.preventDefault(), event4.stopPropagation(), onDelete?.(camera3.id, slot3));
     }),
-    _0x3e4848.addEventListener('contextmenu', (_0x5f40b3) => {
-      (_0x5f40b3.preventDefault(),
-        _0x5f40b3.stopPropagation(),
-        _0x280a30?.({
-          cameraId: _0x29c0fe.id,
-          slot: _0x5c5e28,
-          clientX: _0x5f40b3.clientX,
-          clientY: _0x5f40b3.clientY,
+    el2.addEventListener('contextmenu', (clientX) => {
+      (clientX.preventDefault(),
+        clientX.stopPropagation(),
+        onContextMenu?.({
+          cameraId: camera3.id,
+          slot: slot3,
+          clientX: clientX.clientX,
+          clientY: clientX.clientY,
         }));
     }),
-    _0x3e4848.appendChild(_0x41ca03),
-    _0x3e4848
+    el2.appendChild(el3),
+    el2
   );
 }
 export function renderCameraPresetList(
-  _0x1d9103,
-  _0x4cded9,
-  { onActivate: _0x4b3ac3, onDelete: _0x1aada1, onContextMenu: _0x2cf25d } = {},
+  el6,
+  current,
+  { onActivate: onActivate2, onDelete: onDelete2, onContextMenu: onContextMenu2 } = {},
 ) {
-  if (!_0x1d9103) return;
-  const _0x27b28a = Array.isArray(_0x4cded9?.cameras) ? _0x4cded9.cameras : [],
-    _0x3e667d = resolveCameraSlotEntries(_0x27b28a);
-  (_0x1d9103.replaceChildren(),
-    _0x1d9103.classList.toggle('is-visible', _0x3e667d.length > 0),
-    _0x3e667d.forEach((_0x1d416a) => {
-      _0x1d9103.appendChild(
-        createCameraButton(_0x1d416a, _0x4cded9, {
-          onActivate: _0x4b3ac3,
-          onDelete: _0x1aada1,
-          onContextMenu: _0x2cf25d,
+  if (!el6) return;
+  const entry = Array.isArray(current?.cameras) ? current.cameras : [],
+    list4 = resolveCameraSlotEntries(entry);
+  (el6.replaceChildren(),
+    el6.classList.toggle('is-visible', list4.length > 0),
+    list4.forEach((item4) => {
+      el6.appendChild(
+        createCameraButton(item4, current, {
+          onActivate: onActivate2,
+          onDelete: onDelete2,
+          onContextMenu: onContextMenu2,
         }),
       );
     }));

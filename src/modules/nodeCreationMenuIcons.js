@@ -96,36 +96,36 @@ const SVG_NS = 'http://www.w3.org/2000/svg',
     undo: [['path', { d: 'M9 7l-5 5 5 5M4 12h9a7 7 0 0 1 7 7' }]],
     redo: [['path', { d: 'M15\x207l5\x205-5\x205M20\x2012h-9a7\x207\x200\x200\x200-7\x207' }]],
   });
-function appendShape(_0x125cd8, _0x3e9c9f, _0x4aaf5d, _0x200065) {
-  const _0x4a11f7 = _0x125cd8['createElementNS'](SVG_NS, _0x4aaf5d);
-  (Object['entries'](_0x200065)['forEach'](([_0x5435b5, _0x492daf]) => {
-    _0x4a11f7['setAttribute'](_0x5435b5, String(_0x492daf));
+function appendShape(value, el, item, key) {
+  const el2 = value['createElementNS'](SVG_NS, item);
+  (Object['entries'](key)['forEach'](([index, result]) => {
+    el2['setAttribute'](index, String(result));
   }),
-    _0x3e9c9f['appendChild'](_0x4a11f7));
+    el['appendChild'](el2));
 }
 export function createNodeCreationMenuIcon(
-  _0x49e15c,
+  data,
   { documentObject: documentObject = globalThis['document'], stroke: stroke = 'currentColor' } = {},
 ) {
   if (typeof documentObject?.['createElementNS'] !== 'function') return null;
-  const _0x4f7f9c = ICON_ALIASES[_0x49e15c] || _0x49e15c,
-    _0x38e370 = ICON_SHAPES[_0x4f7f9c];
-  if (!_0x38e370) return null;
-  const _0x17359b = documentObject['createElementNS'](SVG_NS, 'svg');
+  const options = ICON_ALIASES[data] || data,
+    list = ICON_SHAPES[options];
+  if (!list) return null;
+  const el3 = documentObject['createElementNS'](SVG_NS, 'svg');
   return (
-    _0x17359b['setAttribute']('width', '18'),
-    _0x17359b['setAttribute']('height', '18'),
-    _0x17359b['setAttribute']('viewBox', '0 0 24 24'),
-    _0x17359b['setAttribute']('fill', 'none'),
-    _0x17359b['setAttribute']('stroke', stroke),
-    _0x17359b['setAttribute']('stroke-width', '1.8'),
-    _0x17359b['setAttribute']('stroke-linecap', 'round'),
-    _0x17359b['setAttribute']('stroke-linejoin', 'round'),
-    _0x17359b['setAttribute']('aria-hidden', 'true'),
-    (_0x17359b['dataset']['nodeCreationIcon'] = String(_0x49e15c || '')),
-    _0x38e370['forEach'](([_0x145725, _0x7168a1]) => {
-      appendShape(documentObject, _0x17359b, _0x145725, _0x7168a1);
+    el3['setAttribute']('width', '18'),
+    el3['setAttribute']('height', '18'),
+    el3['setAttribute']('viewBox', '0 0 24 24'),
+    el3['setAttribute']('fill', 'none'),
+    el3['setAttribute']('stroke', stroke),
+    el3['setAttribute']('stroke-width', '1.8'),
+    el3['setAttribute']('stroke-linecap', 'round'),
+    el3['setAttribute']('stroke-linejoin', 'round'),
+    el3['setAttribute']('aria-hidden', 'true'),
+    (el3['dataset']['nodeCreationIcon'] = String(data || '')),
+    list['forEach'](([target, source]) => {
+      appendShape(documentObject, el3, target, source);
     }),
-    _0x17359b
+    el3
   );
 }

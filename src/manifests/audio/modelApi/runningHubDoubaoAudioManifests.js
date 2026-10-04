@@ -9,7 +9,7 @@ import {
   paramMapping,
 } from './runningHubAudioCatalogShared.js';
 const FORMAT = audioSelect('format', '音频格式', ['mp3', 'wav', 'ogg_opus'], 'mp3'),
-  rates = (_0x376c81) => audioSelect('sampleRate', '采样率', _0x376c81, '24000'),
+  rates = (value) => audioSelect('sampleRate', '采样率', value, '24000'),
   speed = audioSlider('speechRate', '语速', -0x32, 0x64, 0x0),
   volume = audioSlider('loudnessRate', '音量', -0x32, 0x64, 0x0),
   pitch = audioSlider('pitch', '音调', -0xc, 0xc, 0x0),
@@ -64,7 +64,7 @@ export const runningHubDoubaoAudioEntries = Object['freeze']([
           'fil',
           'ms',
           'ar',
-        ]['map']((_0x56eb9e) => ({ value: _0x56eb9e, label: _0x56eb9e === 'auto' ? '自动' : _0x56eb9e })),
+        ]['map']((value2) => ({ value: value2, label: value2 === 'auto' ? '自动' : value2 })),
         'auto',
       ),
       audioText('dialect', '方言', '使用支持该方言的音色；中文方言填写拼音。'),

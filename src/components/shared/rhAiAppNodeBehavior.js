@@ -2,72 +2,72 @@ import { GENERATION_MANUAL_DISPLAY_SIZE_FIELD } from './generationDisplayPolicy.
 import { getModelManifest, resolveModelExecution } from '../../manifests/index.js';
 export const RH_AI_APP_PERSISTENT_ADVANCED_CLASS = 'is-rh-ai-app-persistent';
 export const RH_AI_APP_RESULT_RATIO_KEY = 'rhAiAppResultRatioKey';
-export function isRunningHubCustomAiAppManifest(_0x533db1) {
-  return Boolean(_0x533db1?.['extensions']?.['rhAiApp']);
+export function isRunningHubCustomAiAppManifest(value) {
+  return Boolean(value?.['extensions']?.['rhAiApp']);
 }
-export function isComfyUiWorkflowManifest(_0x59376c) {
-  return Boolean(_0x59376c?.['extensions']?.['comfyUiWorkflow']);
+export function isComfyUiWorkflowManifest(item) {
+  return Boolean(item?.['extensions']?.['comfyUiWorkflow']);
 }
-export function isCustomAiAppManifest(_0x2762bb) {
-  return Boolean(isRunningHubCustomAiAppManifest(_0x2762bb) || isComfyUiWorkflowManifest(_0x2762bb));
+export function isCustomAiAppManifest(key) {
+  return Boolean(isRunningHubCustomAiAppManifest(key) || isComfyUiWorkflowManifest(key));
 }
-export function isRunningHubAiAppManifest(_0x1d9f43) {
-  return isCustomAiAppManifest(_0x1d9f43);
+export function isRunningHubAiAppManifest(index) {
+  return isCustomAiAppManifest(index);
 }
-export function shouldAllowEmptyCustomAiAppInputs(_0x5bb457) {
-  return isCustomAiAppManifest(_0x5bb457);
+export function shouldAllowEmptyCustomAiAppInputs(result) {
+  return isCustomAiAppManifest(result);
 }
-function findBundleModelManifest(_0x123eac, _0x26bf5e = '', _0x2f17c0 = '') {
-  const _0x57d418 = Array['isArray'](_0x123eac?.['models']) ? _0x123eac['models'] : [];
-  if (!_0x57d418['length']) return null;
-  const _0x127f0b = String(_0x26bf5e || '')['trim'](),
-    _0x232f02 = String(_0x2f17c0 || '')
+function findBundleModelManifest(data, options = '', target = '') {
+  const list = Array['isArray'](data?.['models']) ? data['models'] : [];
+  if (!list['length']) return null;
+  const source = String(options || '')['trim'](),
+    enabled = String(target || '')
       ['trim']()
       ['toLowerCase']();
   return (
-    _0x57d418['find']((_0x49fb01) => String(_0x49fb01?.['modelId'] || '')['trim']() === _0x127f0b) ||
-    _0x57d418['find']((_0x4c69cd) => {
+    list['find']((next) => String(next?.['modelId'] || '')['trim']() === source) ||
+    list['find']((current) => {
       return (
-        (!_0x232f02 ||
-          String(_0x4c69cd?.['provider'] || '')
+        (!enabled ||
+          String(current?.['provider'] || '')
             ['trim']()
-            ['toLowerCase']() === _0x232f02) &&
-        isCustomAiAppManifest(_0x4c69cd)
+            ['toLowerCase']() === enabled) &&
+        isCustomAiAppManifest(current)
       );
     }) ||
     null
   );
 }
-export function resolveCustomAiAppNodeManifest(_0x23d1b9 = {}, _0x2f3908 = {}) {
-  const _0x13c3ad = String(
-      _0x2f3908['model'] || _0x23d1b9?.['model'] || _0x23d1b9?.['audioWorkflowKey'] || '',
-    )['trim'](),
-    _0x2d9526 = _0x2f3908['provider'] ?? _0x23d1b9?.['provider'],
-    _0x419551 =
-      (_0x13c3ad ? resolveModelExecution(_0x13c3ad, { providerHint: _0x2d9526 }) : null) ||
-      (_0x13c3ad ? resolveModelExecution(_0x13c3ad) : null),
-    _0x374b2a = _0x419551?.['modelManifest'] || (_0x13c3ad ? getModelManifest(_0x13c3ad) : null) || null;
-  if (isCustomAiAppManifest(_0x374b2a)) return _0x374b2a;
-  const _0x4aa52d =
-      _0x2f3908['bundle'] ||
-      _0x23d1b9?.['rhAiAppManifestBundle'] ||
-      _0x23d1b9?.['customAiAppManifestBundle'] ||
+export function resolveCustomAiAppNodeManifest(options2 = {}, entry = {}) {
+  const record = String(entry['model'] || options2?.['model'] || options2?.['audioWorkflowKey'] || '')[
+      'trim'
+    ](),
+    providerHint = entry['provider'] ?? options2?.['provider'],
+    payload =
+      (record ? resolveModelExecution(record, { providerHint: providerHint }) : null) ||
+      (record ? resolveModelExecution(record) : null),
+    handle = payload?.['modelManifest'] || (record ? getModelManifest(record) : null) || null;
+  if (isCustomAiAppManifest(handle)) return handle;
+  const state =
+      entry['bundle'] ||
+      options2?.['rhAiAppManifestBundle'] ||
+      options2?.['customAiAppManifestBundle'] ||
       null,
-    _0x4cb33f = findBundleModelManifest(_0x4aa52d, _0x13c3ad, _0x2d9526);
-  return isCustomAiAppManifest(_0x4cb33f) ? _0x4cb33f : null;
+    bundleModelManifest = findBundleModelManifest(state, record, providerHint);
+  return isCustomAiAppManifest(bundleModelManifest) ? bundleModelManifest : null;
 }
-function normalizePositiveNumber(_0x369516) {
-  const _0x4d5be0 = Number(_0x369516);
-  return Number['isFinite'](_0x4d5be0) && _0x4d5be0 > 0x0 ? _0x4d5be0 : 0x0;
+function normalizePositiveNumber(config) {
+  const count = Number(config);
+  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
 }
-function scaleByShortSide(_0x2df992, _0x14c497, _0x5bedb7) {
-  const _0x9bca0d = normalizePositiveNumber(_0x2df992) || 0x1,
-    _0x1367e4 = normalizePositiveNumber(_0x14c497) || 0x1,
-    _0x4469b2 = Math['max'](0x1, Math['round'](Number(_0x5bedb7) || 0x120)),
-    _0xb3663e = _0x4469b2 / Math['min'](_0x9bca0d, _0x1367e4);
+function scaleByShortSide(scope, input, output) {
+  const positiveNumber = normalizePositiveNumber(scope) || 0x1,
+    positiveNumber2 = normalizePositiveNumber(input) || 0x1,
+    value2 = Math['max'](0x1, Math['round'](Number(output) || 0x120)),
+    value3 = value2 / Math['min'](positiveNumber, positiveNumber2);
   return {
-    width: Math['max'](0x1, Math['round'](_0x9bca0d * _0xb3663e)),
-    height: Math['max'](0x1, Math['round'](_0x1367e4 * _0xb3663e)),
+    width: Math['max'](0x1, Math['round'](positiveNumber * value3)),
+    height: Math['max'](0x1, Math['round'](positiveNumber2 * value3)),
   };
 }
 export function buildRhAiAppResultDisplayPatch({
@@ -77,24 +77,28 @@ export function buildRhAiAppResultDisplayPatch({
   mediaKey: mediaKey = '',
   shortSide: shortSide = 0x120,
 } = {}) {
-  const _0x2e97a7 = normalizePositiveNumber(mediaWidth),
-    _0xee2a0 = normalizePositiveNumber(mediaHeight);
-  if (!(_0x2e97a7 > 0x0 && _0xee2a0 > 0x0)) return {};
-  const _0xbb3c58 = [String(mediaKey || '')['trim'](), Math['round'](_0x2e97a7), Math['round'](_0xee2a0)]
+  const positiveNumber3 = normalizePositiveNumber(mediaWidth),
+    positiveNumber4 = normalizePositiveNumber(mediaHeight);
+  if (!(positiveNumber3 > 0x0 && positiveNumber4 > 0x0)) return {};
+  const value4 = [
+    String(mediaKey || '')['trim'](),
+    Math['round'](positiveNumber3),
+    Math['round'](positiveNumber4),
+  ]
     ['filter'](Boolean)
     ['join']('|');
-  if (_0xbb3c58 && String(nodeData?.[RH_AI_APP_RESULT_RATIO_KEY] || '') === _0xbb3c58) return {};
-  const _0x368aeb = scaleByShortSide(_0x2e97a7, _0xee2a0, shortSide),
-    _0x190062 = Math['max'](0x1, Math['round'](Number(nodeData?.['width']) || shortSide)),
-    _0x17e94e = Math['max'](0x1, Math['round'](Number(nodeData?.['height']) || shortSide)),
-    _0x59fe45 = Number['isFinite'](Number(nodeData?.['x'])) ? Number(nodeData['x']) : 0x0,
-    _0x3f8132 = Number['isFinite'](Number(nodeData?.['y'])) ? Number(nodeData['y']) : 0x0;
+  if (value4 && String(nodeData?.[RH_AI_APP_RESULT_RATIO_KEY] || '') === value4) return {};
+  const width = scaleByShortSide(positiveNumber3, positiveNumber4, shortSide),
+    value5 = Math['max'](0x1, Math['round'](Number(nodeData?.['width']) || shortSide)),
+    value6 = Math['max'](0x1, Math['round'](Number(nodeData?.['height']) || shortSide)),
+    value7 = Number['isFinite'](Number(nodeData?.['x'])) ? Number(nodeData['x']) : 0x0,
+    value8 = Number['isFinite'](Number(nodeData?.['y'])) ? Number(nodeData['y']) : 0x0;
   return {
-    width: _0x368aeb['width'],
-    height: _0x368aeb['height'],
-    x: Math['round'](_0x59fe45 - (_0x368aeb['width'] - _0x190062) / 0x2),
-    y: Math['round'](_0x3f8132 - (_0x368aeb['height'] - _0x17e94e)),
-    [RH_AI_APP_RESULT_RATIO_KEY]: _0xbb3c58,
+    width: width['width'],
+    height: width['height'],
+    x: Math['round'](value7 - (width['width'] - value5) / 0x2),
+    y: Math['round'](value8 - (width['height'] - value6)),
+    [RH_AI_APP_RESULT_RATIO_KEY]: value4,
     [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![],
   };
 }

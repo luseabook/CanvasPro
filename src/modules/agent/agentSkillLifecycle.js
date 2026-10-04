@@ -10,89 +10,80 @@ const QUESTION_PATTERN = /^(?:(?:如何|怎么|怎样|为什么)|(?:what\s+is|ho
     ['update', /(?:修改|编辑|更新|调整|改成|改为|改得|\b(?:edit|update|revise|rewrite)\b)/iu],
     ['inspect', /(?:查看|显示|展示|看看|详情|定义|\b(?:inspect|show|view)\b)/iu],
   ]);
-function normalizeText(_0xafe497 = '') {
-  return String(_0xafe497 || '')['trim']();
+function normalizeText(value = '') {
+  return String(value || '')['trim']();
 }
-function installedSkills(_0x4c29ad = []) {
-  return (Array['isArray'](_0x4c29ad) ? _0x4c29ad : [])['filter'](
-    (_0x335fb4) => _0x335fb4?.['source'] === 'installed' && normalizeText(_0x335fb4['id']),
+function installedSkills(list = []) {
+  return (Array['isArray'](list) ? list : [])['filter'](
+    (item) => item?.['source'] === 'installed' && normalizeText(item['id']),
   );
 }
-function includesSkillSubject(_0x56c76a, _0x1d0be6 = []) {
-  const _0x3aa429 = normalizeText(_0x56c76a)['toLowerCase']();
-  if (/(?:skills?|技能)/iu['test'](_0x3aa429) || /[$/][a-z0-9][a-z0-9-]{0,63}/iu['test'](_0x3aa429))
-    return !![];
-  return installedSkills(_0x1d0be6)['some']((_0x2d40f6) => {
-    const _0x4cc7c7 = normalizeText(_0x2d40f6['id'])['toLowerCase'](),
-      _0x1537c0 = normalizeText(_0x2d40f6['title'])['toLowerCase']();
-    return Boolean(
-      (_0x4cc7c7 && _0x3aa429['includes'](_0x4cc7c7)) || (_0x1537c0 && _0x3aa429['includes'](_0x1537c0)),
-    );
+function includesSkillSubject(key, index = []) {
+  const list2 = normalizeText(key)['toLowerCase']();
+  if (/(?:skills?|技能)/iu['test'](list2) || /[$/][a-z0-9][a-z0-9-]{0,63}/iu['test'](list2)) return !![];
+  return installedSkills(index)['some']((result) => {
+    const text = normalizeText(result['id'])['toLowerCase'](),
+      text2 = normalizeText(result['title'])['toLowerCase']();
+    return Boolean((text && list2['includes'](text)) || (text2 && list2['includes'](text2)));
   });
 }
-export function detectAgentSkillLifecycleIntent(_0x47d786 = '', _0x54d140 = []) {
-  const _0x3424e7 = normalizeText(_0x47d786);
+export function detectAgentSkillLifecycleIntent(data = '', options = []) {
+  const text3 = normalizeText(data);
   if (
-    !_0x3424e7 ||
-    QUESTION_PATTERN['test'](_0x3424e7) ||
-    NEGATED_PATTERN['test'](_0x3424e7) ||
-    !includesSkillSubject(_0x3424e7, _0x54d140)
+    !text3 ||
+    QUESTION_PATTERN['test'](text3) ||
+    NEGATED_PATTERN['test'](text3) ||
+    !includesSkillSubject(text3, options)
   )
     return '';
-  const _0x26983c = installedSkills(_0x54d140)['reduce']((_0x112063, _0x46b5bb) => {
-    const _0x2e888d = normalizeText(_0x46b5bb['id']),
-      _0x52afa4 = normalizeText(_0x46b5bb['title']);
-    return _0x112063['replaceAll']('$' + _0x2e888d, '\x20')
-      ['replaceAll']('/' + _0x2e888d, '\x20')
-      ['replaceAll'](_0x2e888d, '\x20')
-      ['replaceAll'](_0x52afa4, '\x20');
-  }, _0x3424e7['toLowerCase']());
-  return OPERATION_PATTERNS['find'](([, _0x20ff6b]) => _0x20ff6b['test'](_0x26983c))?.[0x0] || '';
+  const installedSkills2 = installedSkills(options)['reduce']((target, source) => {
+    const text4 = normalizeText(source['id']),
+      text5 = normalizeText(source['title']);
+    return target['replaceAll']('$' + text4, '\x20')
+      ['replaceAll']('/' + text4, '\x20')
+      ['replaceAll'](text4, '\x20')
+      ['replaceAll'](text5, '\x20');
+  }, text3['toLowerCase']());
+  return OPERATION_PATTERNS['find'](([, next]) => next['test'](installedSkills2))?.[0x0] || '';
 }
-export function resolveAgentSkillLifecycleTarget(_0xec2742 = '', _0x3dc113 = []) {
-  const _0x3bb833 = installedSkills(_0x3dc113),
-    _0x2c7dc9 = normalizeText(_0xec2742)['toLowerCase'](),
-    _0x56a871 = _0x2c7dc9['match'](/[$/]([a-z0-9][a-z0-9-]{0,63})/iu)?.[0x1]?.['toLowerCase']() || '';
-  if (_0x56a871) {
-    const _0x234833 = _0x3bb833['find'](
-      (_0x10b678) => normalizeText(_0x10b678['id'])['toLowerCase']() === _0x56a871,
-    );
-    return _0x234833
-      ? { status: 'resolved', skill: _0x234833 }
-      : { status: 'not_found', requestedId: _0x56a871 };
+export function resolveAgentSkillLifecycleTarget(current = '', entry = []) {
+  const skills = installedSkills(entry),
+    list3 = normalizeText(current)['toLowerCase'](),
+    requestedId = list3['match'](/[$/]([a-z0-9][a-z0-9-]{0,63})/iu)?.[0x1]?.['toLowerCase']() || '';
+  if (requestedId) {
+    const skill = skills['find']((record) => normalizeText(record['id'])['toLowerCase']() === requestedId);
+    return skill ? { status: 'resolved', skill: skill } : { status: 'not_found', requestedId: requestedId };
   }
-  const _0x1996d0 = _0x3bb833['filter']((_0x2c14fc) => {
-    const _0x54a5f4 = normalizeText(_0x2c14fc['id'])['toLowerCase'](),
-      _0x233e6a = normalizeText(_0x2c14fc['title'])['toLowerCase']();
-    return Boolean(
-      (_0x54a5f4 && _0x2c7dc9['includes'](_0x54a5f4)) || (_0x233e6a && _0x2c7dc9['includes'](_0x233e6a)),
-    );
+  const skill2 = skills['filter']((payload) => {
+    const text6 = normalizeText(payload['id'])['toLowerCase'](),
+      text7 = normalizeText(payload['title'])['toLowerCase']();
+    return Boolean((text6 && list3['includes'](text6)) || (text7 && list3['includes'](text7)));
   });
-  if (_0x1996d0['length'] === 0x1) return { status: 'resolved', skill: _0x1996d0[0x0] };
-  if (_0x1996d0['length'] > 0x1) return { status: 'ambiguous', skills: _0x1996d0 };
-  const _0x23a6b6 = (_0x2c7dc9['match'](/[\u3400-\u9fff]{2,}/g) || [])
-      ['map']((_0xeb5534) =>
-        _0xeb5534['replace'](
+  if (skill2['length'] === 0x1) return { status: 'resolved', skill: skill2[0x0] };
+  if (skill2['length'] > 0x1) return { status: 'ambiguous', skills: skill2 };
+  const list4 = (list3['match'](/[\u3400-\u9fff]{2,}/g) || [])
+      ['map']((handle) =>
+        handle['replace'](
           /(?:删除|移除|卸载|复制|克隆|拷贝|停用|禁用|关闭|启用|开启|恢复使用|修改|编辑|更新|调整|改成|改为|查看|显示|展示|看看|详情|定义|技能)/gu,
           '',
         ),
       )
-      ['filter']((_0xae4d6c) => _0xae4d6c['length'] >= 0x2),
-    _0x5a1ca5 = _0x3bb833['filter']((_0x3d3c9c) => {
-      const _0x17fde0 = normalizeText(_0x3d3c9c['title']) + '\x20' + normalizeText(_0x3d3c9c['description']);
-      return _0x23a6b6['some']((_0x31e75d) => _0x17fde0['includes'](_0x31e75d));
+      ['filter']((list5) => list5['length'] >= 0x2),
+    skill3 = skills['filter']((state) => {
+      const list6 = normalizeText(state['title']) + '\x20' + normalizeText(state['description']);
+      return list4['some']((config) => list6['includes'](config));
     });
-  if (_0x5a1ca5['length'] === 0x1) return { status: 'resolved', skill: _0x5a1ca5[0x0] };
-  if (_0x5a1ca5['length'] > 0x1) return { status: 'ambiguous', skills: _0x5a1ca5 };
-  return { status: 'missing', skills: _0x3bb833 };
+  if (skill3['length'] === 0x1) return { status: 'resolved', skill: skill3[0x0] };
+  if (skill3['length'] > 0x1) return { status: 'ambiguous', skills: skill3 };
+  return { status: 'missing', skills: skills };
 }
-export function isAgentSkillLifecycleConfirmMessage(_0x2c3535 = '') {
+export function isAgentSkillLifecycleConfirmMessage(scope = '') {
   return /^(?:确认(?:删除)?|确定(?:删除)?|是的?|继续删除|delete|confirm|yes)\s*[。.!！]?$/iu['test'](
-    normalizeText(_0x2c3535),
+    normalizeText(scope),
   );
 }
-export function isAgentSkillLifecycleCancelMessage(_0x813b12 = '') {
+export function isAgentSkillLifecycleCancelMessage(input = '') {
   return /^(?:取消(?:删除|操作)?|不删了|先别删|算了|cancel|never\s*mind|no)\s*[。.!！]?$/iu['test'](
-    normalizeText(_0x813b12),
+    normalizeText(input),
   );
 }

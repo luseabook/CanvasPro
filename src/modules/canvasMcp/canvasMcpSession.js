@@ -5,146 +5,144 @@ import {
   sanitizeMcpResult,
 } from './canvasMcpTools.js';
 export function createCanvasMcpSession({
-  request: _0x165eec,
-  registry: _0x12b311,
-  execute: _0x3e0701,
-  getBinding: _0x1f61ee,
-  listModels: _0x51116e,
+  request: request,
+  registry: registry,
+  execute: execute,
+  getBinding: getBinding,
+  listModels: listModels,
   onChange: onChange = () => {},
   owner: owner = crypto['randomUUID'](),
 }) {
-  let _0x56c9b7 = null,
-    _0x3985ac = null,
-    _0xa700a6 = 0x0,
-    _0x57d4da = ![],
-    _0xe2696 = Promise['resolve']();
-  const _0x424a19 = (_0x3c8264) =>
-    !_0x57d4da && _0x56c9b7 === _0x3c8264 && _0x3c8264['binding'] === _0x1f61ee();
-  async function _0x58a754(_0x32f198 = '') {
-    _0xa700a6 += 0x1;
-    const _0x21c519 = _0x56c9b7;
-    ((_0x56c9b7 = null),
-      (_0x3985ac = null),
-      _0x21c519?.['controller']['abort'](),
-      onChange({ enabled: ![], reason: _0x32f198 }));
-    if (_0x21c519)
+  let value = null,
+    value2 = null,
+    item = 0x0,
+    enabled = ![],
+    promise = Promise['resolve']();
+  const run = (key) => !enabled && value === key && key['binding'] === getBinding();
+  async function disable(reason = '') {
+    item += 0x1;
+    const sessionId = value;
+    ((value = null),
+      (value2 = null),
+      sessionId?.['controller']['abort'](),
+      onChange({ enabled: ![], reason: reason }));
+    if (sessionId)
       try {
-        await _0x165eec({ action: 'disable', owner: owner, sessionId: _0x21c519['id'] });
+        await request({ action: 'disable', owner: owner, sessionId: sessionId['id'] });
       } catch {}
   }
-  async function _0x5771ad(_0x51c2fe, _0x5d5ca9) {
-    let _0x44ad07;
-    if (!_0x424a19(_0x51c2fe)) return;
+  async function run2(sessionId2, requestId) {
+    let result;
+    if (!run(sessionId2)) return;
     try {
-      if (_0x5d5ca9['name'] === 'canvas_models')
-        _0x44ad07 = { ok: !![], result: describeCanvasMcpModels(_0x51116e(), _0x5d5ca9['arguments']) };
+      if (requestId['name'] === 'canvas_models')
+        result = { ok: !![], result: describeCanvasMcpModels(listModels(), requestId['arguments']) };
       else {
-        const _0x3c52dc = _0x51c2fe['commandIds']['get'](_0x5d5ca9['name']),
-          _0x718bef = _0x12b311['list']()['find']((_0x234108) => _0x234108['id'] === _0x3c52dc);
-        if (!_0x718bef || !canExposeCanvasCommand(_0x718bef, _0x51c2fe))
+        const index = sessionId2['commandIds']['get'](requestId['name']),
+          enabled2 = registry['list']()['find']((data) => data['id'] === index);
+        if (!enabled2 || !canExposeCanvasCommand(enabled2, sessionId2))
           throw new Error('Unauthorized canvas command');
-        _0x44ad07 = await _0x3e0701(_0x3c52dc, _0x5d5ca9['arguments']);
+        result = await execute(index, requestId['arguments']);
       }
-      _0x44ad07 = sanitizeMcpResult(_0x44ad07);
-      if (JSON['stringify'](_0x44ad07)['length'] > 0x3d090)
-        _0x44ad07 = {
+      result = sanitizeMcpResult(result);
+      if (JSON['stringify'](result)['length'] > 0x3d090)
+        result = {
           ok: ![],
           errorCode: 'RESULT_TOO_LARGE',
           message: 'Operation may have succeeded. Inspect individual node summaries instead of resubmitting.',
         };
-    } catch (_0x30077b) {
-      _0x44ad07 = {
+    } catch (message) {
+      result = {
         ok: ![],
         errorCode: 'CANVAS_COMMAND_FAILED',
-        message: _0x30077b['message'] || String(_0x30077b),
+        message: message['message'] || String(message),
       };
     }
-    if (!_0x424a19(_0x51c2fe)) return;
-    for (let _0x3fbd07 = 0x0; _0x3fbd07 < 0x2; _0x3fbd07 += 0x1) {
+    if (!run(sessionId2)) return;
+    for (let count = 0x0; count < 0x2; count += 0x1) {
       try {
-        await _0x165eec(
+        await request(
           {
             action: 'complete',
             owner: owner,
-            sessionId: _0x51c2fe['id'],
-            requestId: _0x5d5ca9['requestId'],
-            result: _0x44ad07,
+            sessionId: sessionId2['id'],
+            requestId: requestId['requestId'],
+            result: result,
           },
-          _0x51c2fe['controller']['signal'],
+          sessionId2['controller']['signal'],
         );
         return;
-      } catch (_0x36951e) {
-        if (!_0x424a19(_0x51c2fe)) return;
-        if (_0x3fbd07 === 0x1) await _0x58a754(_0x36951e['message']);
+      } catch (error) {
+        if (!run(sessionId2)) return;
+        if (count === 0x1) await disable(error['message']);
       }
     }
   }
-  async function _0x12f3f9(_0x4c4cbb) {
-    while (_0x424a19(_0x4c4cbb)) {
+  async function run3(sessionId3) {
+    while (run(sessionId3)) {
       try {
-        const _0x1aedec = await _0x165eec(
-          { action: 'poll', owner: owner, sessionId: _0x4c4cbb['id'], binding: _0x4c4cbb['binding'] },
-          _0x4c4cbb['controller']['signal'],
+        const enabled3 = await request(
+          { action: 'poll', owner: owner, sessionId: sessionId3['id'], binding: sessionId3['binding'] },
+          sessionId3['controller']['signal'],
         );
-        if (!_0x424a19(_0x4c4cbb)) break;
-        if (!_0x1aedec['request']) continue;
-        const _0x10a855 = _0x1aedec['request'],
-          _0x18531a = _0x4c4cbb['tools']['find']((_0x4ee8ea) => _0x4ee8ea['name'] === _0x10a855['name']);
-        _0x18531a?.['annotations']?.['readOnlyHint'] ||
-        _0x4c4cbb['commandIds']['get'](_0x10a855['name']) === 'generation.cancel'
-          ? void _0x5771ad(_0x4c4cbb, _0x10a855)
-          : (_0xe2696 = _0xe2696['then'](() => _0x5771ad(_0x4c4cbb, _0x10a855)));
-      } catch (_0x16dec1) {
-        if (_0x56c9b7 === _0x4c4cbb) await _0x58a754(_0x16dec1['message']);
+        if (!run(sessionId3)) break;
+        if (!enabled3['request']) continue;
+        const error2 = enabled3['request'],
+          options = sessionId3['tools']['find']((error3) => error3['name'] === error2['name']);
+        options?.['annotations']?.['readOnlyHint'] ||
+        sessionId3['commandIds']['get'](error2['name']) === 'generation.cancel'
+          ? void run2(sessionId3, error2)
+          : (promise = promise['then'](() => run2(sessionId3, error2)));
+      } catch (error4) {
+        if (value === sessionId3) await disable(error4['message']);
         return;
       }
     }
-    if (_0x56c9b7 === _0x4c4cbb) await _0x58a754('canvasChanged');
+    if (value === sessionId3) await disable('canvasChanged');
   }
   return {
     async enable({ allowGeneration: allowGeneration = ![] } = {}) {
-      await _0x58a754();
-      if (_0x57d4da) return null;
-      const _0x1fd9f1 = _0xa700a6,
-        _0xab97de = _0x1f61ee();
-      if (!_0xab97de) throw new Error('Open a canvas before connecting');
-      const _0x195390 = buildCanvasMcpTools(_0x12b311, { allowGeneration: allowGeneration });
-      _0x3985ac = _0xab97de;
-      let _0x106ab4;
+      await disable();
+      if (enabled) return null;
+      const target = item,
+        binding = getBinding();
+      if (!binding) throw new Error('Open a canvas before connecting');
+      const tools = buildCanvasMcpTools(registry, { allowGeneration: allowGeneration });
+      value2 = binding;
+      let sessionId4;
       try {
-        _0x106ab4 = await _0x165eec({
+        sessionId4 = await request({
           action: 'enable',
           owner: owner,
-          binding: _0xab97de,
-          tools: _0x195390['tools'],
+          binding: binding,
+          tools: tools['tools'],
           allowGeneration: allowGeneration,
         });
       } finally {
-        if (_0x1fd9f1 === _0xa700a6) _0x3985ac = null;
+        if (target === item) value2 = null;
       }
-      if (_0x57d4da || _0x1fd9f1 !== _0xa700a6 || _0xab97de !== _0x1f61ee())
-        return (await _0x165eec({ action: 'disable', owner: owner, sessionId: _0x106ab4['id'] }), null);
+      if (enabled || target !== item || binding !== getBinding())
+        return (await request({ action: 'disable', owner: owner, sessionId: sessionId4['id'] }), null);
       return (
-        (_0x56c9b7 = { ..._0x106ab4, ..._0x195390, controller: new AbortController() }),
-        (_0xe2696 = Promise['resolve']()),
+        (value = { ...sessionId4, ...tools, controller: new AbortController() }),
+        (promise = Promise['resolve']()),
         onChange({
           enabled: !![],
-          url: _0x106ab4['url'],
-          token: _0x106ab4['token'],
-          binding: _0xab97de,
-          toolCount: _0x195390['tools']['length'] + 0x1,
+          url: sessionId4['url'],
+          token: sessionId4['token'],
+          binding: binding,
+          toolCount: tools['tools']['length'] + 0x1,
         }),
-        void _0x12f3f9(_0x56c9b7),
-        _0x106ab4
+        void run3(value),
+        sessionId4
       );
     },
-    disable: _0x58a754,
+    disable: disable,
     checkBinding() {
-      if ((_0x56c9b7 && !_0x424a19(_0x56c9b7)) || (_0x3985ac && _0x3985ac !== _0x1f61ee()))
-        void _0x58a754('canvasChanged');
+      if ((value && !run(value)) || (value2 && value2 !== getBinding())) void disable('canvasChanged');
     },
     async destroy() {
-      ((_0x57d4da = !![]), await _0x58a754());
+      ((enabled = !![]), await disable());
     },
   };
 }

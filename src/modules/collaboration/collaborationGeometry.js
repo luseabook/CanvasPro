@@ -4,115 +4,107 @@ import {
   readNodeGeometryPreviewEntries,
 } from '../../core/nodeGeometryPreview.js';
 export function createCollaborationGeometry({
-  store: _0x133103,
-  getSession: _0x50dd31,
+  store: store,
+  getSession: getSession,
   windowObject: windowObject = globalThis['window'],
 }) {
-  const _0x4067e1 = Symbol('remote-geometry'),
-    _0x379401 = new Map();
-  let _0x4ea6ee = {},
-    _0x4ba6a9 = '',
-    _0x264d34 = null;
-  function _0x1b4a4d() {
-    const _0x275173 = _0x50dd31(),
-      _0x29716a = _0x275173?.['state'],
-      _0x57fffb = _0x133103['getStateRaw']()['nodes'];
-    _0x275173 !== _0x264d34 && (_0x1ba4e0(), (_0x264d34 = _0x275173));
-    if (!_0x29716a) return;
-    const _0x2d80bb = Date['now'](),
-      _0x30149c = new Map(readNodeGeometryPreviewEntries()),
-      _0x3183a4 = (_0x5c3e57) => {
-        const _0x8492e = _0x29716a['locks']?.[_0x5c3e57];
-        return _0x8492e?.['clientId'] === _0x29716a['clientId'] &&
-          _0x8492e['actorId'] === _0x29716a['actorId'] &&
-          _0x8492e['expiresAt'] * 0x3e8 > _0x2d80bb
-          ? _0x8492e
+  const symbol = Symbol('remote-geometry'),
+    map = new Map();
+  let geometry = {},
+    value = '',
+    item = null;
+  function update() {
+    const key = getSession(),
+      enabled = key?.['state'],
+      enabled2 = store['getStateRaw']()['nodes'];
+    key !== item && (clear(), (item = key));
+    if (!enabled) return;
+    const index = Date['now'](),
+      map2 = new Map(readNodeGeometryPreviewEntries()),
+      handler = (result) => {
+        const data = enabled['locks']?.[result];
+        return data?.['clientId'] === enabled['clientId'] &&
+          data['actorId'] === enabled['actorId'] &&
+          data['expiresAt'] * 0x3e8 > index
+          ? data
           : null;
       },
-      _0x2b3802 = {};
-    for (const [_0x136e08, _0xa99f23] of _0x30149c) {
-      const _0x3b63b2 = _0x3183a4(_0x136e08);
-      if (_0x3b63b2) _0x2b3802[_0x136e08] = { ..._0xa99f23, editId: _0x3b63b2['editId'] };
+      enabled3 = {};
+    for (const [options, args] of map2) {
+      const editId = handler(options);
+      if (editId) enabled3[options] = { ...args, editId: editId['editId'] };
     }
-    for (const [_0x5247fe, _0x226993] of Object['entries'](_0x4ea6ee)) {
+    for (const [target, source] of Object['entries'](geometry)) {
       if (
-        !_0x2b3802[_0x5247fe] &&
-        _0x3183a4(_0x5247fe)?.['editId'] === _0x226993['editId'] &&
-        Object['entries'](_0x226993)['every'](
-          ([_0x2c9965, _0x3e8784]) =>
-            _0x2c9965 === 'editId' || _0x57fffb[_0x5247fe]?.[_0x2c9965] === _0x3e8784,
+        !enabled3[target] &&
+        handler(target)?.['editId'] === source['editId'] &&
+        Object['entries'](source)['every'](
+          ([next, current]) => next === 'editId' || enabled2[target]?.[next] === current,
         )
       )
-        _0x2b3802[_0x5247fe] = _0x226993;
+        enabled3[target] = source;
     }
-    _0x4ea6ee = _0x2b3802;
-    const _0x50a62e = JSON['stringify'](_0x4ea6ee);
-    _0x50a62e !== _0x4ba6a9 && ((_0x4ba6a9 = _0x50a62e), _0x275173['setPresence']({ geometry: _0x4ea6ee }));
-    const _0x35edf1 = new Map();
-    for (const _0x39f4ab of _0x29716a['presence'] || []) {
-      if (_0x39f4ab['clientId'] === _0x29716a['clientId'] || _0x39f4ab['expiresAt'] * 0x3e8 <= _0x2d80bb)
-        continue;
-      for (const [_0x1b1239, _0x3f203e] of Object['entries'](_0x39f4ab['geometry'] || {})) {
-        const _0x33fc94 = _0x29716a['locks']?.[_0x1b1239];
+    geometry = enabled3;
+    const entry = JSON['stringify'](geometry);
+    entry !== value && ((value = entry), key['setPresence']({ geometry: geometry }));
+    const map3 = new Map();
+    for (const clientId of enabled['presence'] || []) {
+      if (clientId['clientId'] === enabled['clientId'] || clientId['expiresAt'] * 0x3e8 <= index) continue;
+      for (const [record, payload] of Object['entries'](clientId['geometry'] || {})) {
+        const handle = enabled['locks']?.[record];
         if (
-          !_0x57fffb[_0x1b1239] ||
-          _0x30149c['has'](_0x1b1239) ||
-          _0x33fc94?.['clientId'] !== _0x39f4ab['clientId'] ||
-          _0x33fc94['actorId'] !== _0x39f4ab['actorId'] ||
-          _0x33fc94['editId'] !== _0x3f203e['editId'] ||
-          _0x33fc94['expiresAt'] * 0x3e8 <= _0x2d80bb
+          !enabled2[record] ||
+          map2['has'](record) ||
+          handle?.['clientId'] !== clientId['clientId'] ||
+          handle['actorId'] !== clientId['actorId'] ||
+          handle['editId'] !== payload['editId'] ||
+          handle['expiresAt'] * 0x3e8 <= index
         )
           continue;
-        const _0x33408d = Object['fromEntries'](
-          Object['entries'](_0x3f203e)['filter'](
-            ([_0x566dd4, _0x3f498f]) =>
-              ['x', 'y', 'width', 'height']['includes'](_0x566dd4) && Number['isFinite'](_0x3f498f),
+        const patch = Object['fromEntries'](
+          Object['entries'](payload)['filter'](
+            ([state, config]) =>
+              ['x', 'y', 'width', 'height']['includes'](state) && Number['isFinite'](config),
           ),
         );
-        _0x35edf1['set'](_0x1b1239, { patch: _0x33408d, clientId: _0x39f4ab['clientId'] });
+        map3['set'](record, { patch: patch, clientId: clientId['clientId'] });
       }
-      if (_0x39f4ab['geometryRevision'] > _0x29716a['revision'])
-        for (const [_0x3bf6db, _0x46a056] of _0x379401) {
+      if (clientId['geometryRevision'] > enabled['revision'])
+        for (const [scope, input] of map) {
           if (
-            !_0x35edf1['has'](_0x3bf6db) &&
-            !_0x30149c['has'](_0x3bf6db) &&
-            _0x57fffb[_0x3bf6db] &&
-            _0x46a056['clientId'] === _0x39f4ab['clientId']
+            !map3['has'](scope) &&
+            !map2['has'](scope) &&
+            enabled2[scope] &&
+            input['clientId'] === clientId['clientId']
           )
-            _0x35edf1['set'](_0x3bf6db, _0x46a056);
+            map3['set'](scope, input);
         }
     }
-    const _0x3bb216 = [..._0x379401['keys']()]['filter']((_0x2f0cb8) => !_0x35edf1['has'](_0x2f0cb8));
-    if (_0x3bb216['length']) clearNodeGeometryPreview(_0x3bb216, _0x4067e1);
-    const _0x4c245d = [..._0x35edf1]['filter'](
-      ([_0x1b075f, _0x1b31dd]) =>
-        JSON['stringify'](_0x379401['get'](_0x1b075f)) !== JSON['stringify'](_0x1b31dd),
+    const list = [...map['keys']()]['filter']((output) => !map3['has'](output));
+    if (list['length']) clearNodeGeometryPreview(list, symbol);
+    const list2 = [...map3]['filter'](
+      ([value2, value3]) => JSON['stringify'](map['get'](value2)) !== JSON['stringify'](value3),
     );
-    if (_0x4c245d['length'])
+    if (list2['length'])
       setNodeGeometryPreview(
-        _0x4c245d['map'](([_0x1b1396, _0x6a8a37]) => [_0x1b1396, _0x6a8a37['patch']]),
-        _0x4067e1,
+        list2['map'](([value4, value5]) => [value4, value5['patch']]),
+        symbol,
       );
-    const _0x5a726f = [
-      ..._0x3bb216['filter']((_0x1689a8) => !_0x30149c['has'](_0x1689a8))['map']((_0x99ca48) => [
-        _0x99ca48,
-        null,
-      ]),
-      ...[..._0x35edf1]['map'](([_0x8d9e64, _0x39ffc3]) => [_0x8d9e64, _0x39ffc3['patch']]),
+    const list3 = [
+      ...list['filter']((value6) => !map2['has'](value6))['map']((value7) => [value7, null]),
+      ...[...map3]['map'](([value8, value9]) => [value8, value9['patch']]),
     ];
-    if (_0x5a726f['length']) windowObject?.['v2Renderer']?.['previewNodeGeometry']?.(_0x5a726f);
-    _0x379401['clear']();
-    for (const [_0x2b9245, _0xe6bfa0] of _0x35edf1) _0x379401['set'](_0x2b9245, _0xe6bfa0);
+    if (list3['length']) windowObject?.['v2Renderer']?.['previewNodeGeometry']?.(list3);
+    map['clear']();
+    for (const [value10, value11] of map3) map['set'](value10, value11);
   }
-  function _0x1ba4e0() {
-    const _0x52210f = [..._0x379401['keys']()];
-    (clearNodeGeometryPreview(_0x52210f, _0x4067e1),
-      windowObject?.['v2Renderer']?.['previewNodeGeometry']?.(
-        _0x52210f['map']((_0x587501) => [_0x587501, null]),
-      ),
-      _0x379401['clear'](),
-      (_0x4ea6ee = {}),
-      (_0x4ba6a9 = ''));
+  function clear() {
+    const list4 = [...map['keys']()];
+    (clearNodeGeometryPreview(list4, symbol),
+      windowObject?.['v2Renderer']?.['previewNodeGeometry']?.(list4['map']((value12) => [value12, null])),
+      map['clear'](),
+      (geometry = {}),
+      (value = ''));
   }
-  return { update: _0x1b4a4d, clear: _0x1ba4e0, active: () => _0x379401['size'] > 0x0 };
+  return { update: update, clear: clear, active: () => map['size'] > 0x0 };
 }

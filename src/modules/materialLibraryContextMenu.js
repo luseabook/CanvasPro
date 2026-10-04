@@ -16,97 +16,95 @@ const EDITABLE_SELECTOR = 'select, ' + TEXT_CONTEXT_MENU_TARGET_SELECTOR,
     'material-folder-rename': 'context-material-folder-rename',
     'material-folder-delete-request': 'context-material-folder-delete',
   });
-function getActionLabel(_0x5aa15f) {
-  return _0x5aa15f?.['getAttribute']?.('aria-label') || String(_0x5aa15f?.['textContent'] || '')['trim']();
+function getActionLabel(el) {
+  return el?.['getAttribute']?.('aria-label') || String(el?.['textContent'] || '')['trim']();
 }
 export function createMaterialLibraryContextMenuController({
-  getPanel: _0x162b5b,
-  getText: _0x2b5127,
-  closeAssetMenu: _0x6806f3,
-  openAssetMenu: _0x282e92,
-  restoreAssetSubItem: _0x4e7d80,
+  getPanel: getPanel,
+  getText: getText,
+  closeAssetMenu: closeAssetMenu,
+  openAssetMenu: openAssetMenu,
+  restoreAssetSubItem: restoreAssetSubItem,
   presentMenu: presentMenu = showContextMenu,
   removePresentedMenus: removePresentedMenus = removeContextMenus,
 } = {}) {
-  let _0x2671b2 = null;
-  const _0x30e1f6 = () => {
-      (_0x2671b2?.['close']?.(), (_0x2671b2 = null));
+  let presentMenu2 = null;
+  const close = () => {
+      (presentMenu2?.['close']?.(), (presentMenu2 = null));
     },
-    _0x3e34bd = (_0x50652d, _0x1aeb1a) => {
-      if (!_0x1aeb1a['length']) return ![];
+    handler = (ownerElement, list) => {
+      if (!list['length']) return ![];
       return (
-        _0x50652d['preventDefault'](),
-        _0x50652d['stopPropagation'](),
-        _0x6806f3?.(),
-        (_0x2671b2 = presentMenu(_0x50652d['clientX'], _0x50652d['clientY'], _0x1aeb1a, {
+        ownerElement['preventDefault'](),
+        ownerElement['stopPropagation'](),
+        closeAssetMenu?.(),
+        (presentMenu2 = presentMenu(ownerElement['clientX'], ownerElement['clientY'], list, {
           ensureItemIcons: !![],
-          ownerElement: _0x50652d['target'],
-          ownerRoot: _0x162b5b?.(),
+          ownerElement: ownerElement['target'],
+          ownerRoot: getPanel?.(),
         })),
         !![]
       );
     },
-    _0x4553e8 = (_0x2aac7c) => {
-      if (_0x2aac7c['target']?.['closest']?.(EDITABLE_SELECTOR)) return ![];
-      const _0x3795c2 = _0x162b5b?.(),
-        _0x6fc048 = _0x2aac7c['target']?.['closest']?.('.v2-material-item-row');
-      if (_0x6fc048 && _0x3795c2?.['contains']?.(_0x6fc048)) {
-        const _0x2f55c0 = String(_0x6fc048['dataset']['assetId'] || ''),
-          _0x3bce29 = Number(_0x6fc048['dataset']['itemIndex']),
-          _0x2b4ffa = _0x6fc048['querySelector']?.('[data-ui-action="material-item-rename"]');
-        if (!_0x2f55c0 || !Number['isInteger'](_0x3bce29)) return ![];
-        const _0x299eaf = [
+    handleContextMenu = (event) => {
+      if (event['target']?.['closest']?.(EDITABLE_SELECTOR)) return ![];
+      const enabled = getPanel?.(),
+        el2 = event['target']?.['closest']?.('.v2-material-item-row');
+      if (el2 && enabled?.['contains']?.(el2)) {
+        const enabled2 = String(el2['dataset']['assetId'] || ''),
+          value = Number(el2['dataset']['itemIndex']),
+          el3 = el2['querySelector']?.('[data-ui-action="material-item-rename"]');
+        if (!enabled2 || !Number['isInteger'](value)) return ![];
+        const list2 = [
           {
-            label: _0x2b5127?.('loadToCanvas') || '',
+            label: getText?.('loadToCanvas') || '',
             icon: 'add-to-canvas',
             shortcutActionId: 'context-material-load-item',
-            action: () => _0x4e7d80?.(_0x2f55c0, _0x3bce29),
+            action: () => restoreAssetSubItem?.(enabled2, value),
           },
         ];
         return (
-          _0x2b4ffa &&
-            _0x299eaf['push']({
-              label: getActionLabel(_0x2b4ffa),
+          el3 &&
+            list2['push']({
+              label: getActionLabel(el3),
               icon: 'edit',
               shortcutActionId: 'context-material-rename-item',
-              action: () => _0x2b4ffa['click']?.(),
+              action: () => el3['click']?.(),
             }),
-          _0x3e34bd(_0x2aac7c, _0x299eaf)
+          handler(event, list2)
         );
       }
-      const _0x33d362 = _0x2aac7c['target']?.['closest']?.(
-        '.v2-material-asset-row,\x20.v2-material-project-row',
-      );
-      if (_0x33d362 && _0x3795c2?.['contains']?.(_0x33d362)) {
-        const _0x2af584 = String(
-          _0x33d362['dataset']['assetId'] ||
-            _0x33d362['querySelector']?.('[data-asset-id]')?.['dataset']?.['assetId'] ||
+      const el4 = event['target']?.['closest']?.('.v2-material-asset-row,\x20.v2-material-project-row');
+      if (el4 && enabled?.['contains']?.(el4)) {
+        const enabled3 = String(
+          el4['dataset']['assetId'] ||
+            el4['querySelector']?.('[data-asset-id]')?.['dataset']?.['assetId'] ||
             '',
         );
-        if (!_0x2af584) return ![];
+        if (!enabled3) return ![];
         return (
-          _0x2aac7c['preventDefault'](),
-          _0x2aac7c['stopPropagation'](),
-          _0x30e1f6(),
+          event['preventDefault'](),
+          event['stopPropagation'](),
+          close(),
           removePresentedMenus?.(),
-          _0x282e92?.(_0x2af584, _0x33d362),
+          openAssetMenu?.(enabled3, el4),
           !![]
         );
       }
-      const _0x1073dc = _0x2aac7c['target']?.['closest']?.('.v2-material-folder-row');
-      if (!_0x1073dc || !_0x3795c2?.['contains']?.(_0x1073dc)) return ![];
-      const _0x37c5e0 = Array['from'](_0x1073dc['querySelectorAll']?.(FOLDER_ACTION_SELECTOR) || []);
-      return _0x3e34bd(
-        _0x2aac7c,
-        _0x37c5e0['map']((_0x8b2776) => ({
-          label: getActionLabel(_0x8b2776),
-          icon: MATERIAL_CONTEXT_MENU_ICONS[_0x8b2776['dataset']['uiAction']] || 'action',
-          shortcutActionId: MATERIAL_CONTEXT_MENU_SHORTCUTS[_0x8b2776['dataset']['uiAction']],
-          disabled: _0x8b2776['disabled'] === !![] || _0x8b2776['getAttribute']?.('aria-disabled') === 'true',
-          danger: _0x8b2776['dataset']['uiAction'] === 'material-folder-delete-request',
-          action: () => _0x8b2776['click']?.(),
+      const el5 = event['target']?.['closest']?.('.v2-material-folder-row');
+      if (!el5 || !enabled?.['contains']?.(el5)) return ![];
+      const list3 = Array['from'](el5['querySelectorAll']?.(FOLDER_ACTION_SELECTOR) || []);
+      return handler(
+        event,
+        list3['map']((disabled) => ({
+          label: getActionLabel(disabled),
+          icon: MATERIAL_CONTEXT_MENU_ICONS[disabled['dataset']['uiAction']] || 'action',
+          shortcutActionId: MATERIAL_CONTEXT_MENU_SHORTCUTS[disabled['dataset']['uiAction']],
+          disabled: disabled['disabled'] === !![] || disabled['getAttribute']?.('aria-disabled') === 'true',
+          danger: disabled['dataset']['uiAction'] === 'material-folder-delete-request',
+          action: () => disabled['click']?.(),
         })),
       );
     };
-  return { close: _0x30e1f6, handleContextMenu: _0x4553e8 };
+  return { close: close, handleContextMenu: handleContextMenu };
 }

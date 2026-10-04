@@ -2,161 +2,157 @@ import {
   getPersonReplacementShotCutPositionAtTimelineSec,
   getPersonReplacementShotCutTotalDuration,
 } from './personReplacementShotCutModel.js';
-function normalizeText(_0x1a874e) {
-  return String(_0x1a874e ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function clamp(_0x3b7adf, _0x5b05bc, _0x5531f2, _0x1908ac = _0x5b05bc) {
-  const _0x44f497 = Number(_0x3b7adf);
-  return Number['isFinite'](_0x44f497)
-    ? Math['min'](_0x5531f2, Math['max'](_0x5b05bc, _0x44f497))
-    : _0x1908ac;
+function clamp(item, key, index, result = key) {
+  const data = Number(item);
+  return Number['isFinite'](data) ? Math['min'](index, Math['max'](key, data)) : result;
 }
 export function createPersonReplacementShotCutPlaybackController({
-  windowObject: _0x432b15,
-  isEditorOpen: _0x458c4e,
-  getDraft: _0x3e4993,
-  getProject: _0x293eb3,
-  syncNativePlayback: _0x34512f,
-  syncTimelinePosition: _0x87bd1,
-  previewShotCut: _0x525a40,
+  windowObject: windowObject,
+  isEditorOpen: isEditorOpen,
+  getDraft: getDraft,
+  getProject: getProject,
+  syncNativePlayback: syncNativePlayback,
+  syncTimelinePosition: syncTimelinePosition,
+  previewShotCut: previewShotCut,
 } = {}) {
-  let _0x430b7f = 0x0,
-    _0x50bbe8 = ![],
-    _0x50872d = null,
-    _0x415171 = 0x0,
-    _0x456eb1 = 0x0,
-    _0x1b7429 = ![],
-    _0x1702f6 = 0x0,
-    _0x2f8fbc = 0x0;
-  const _0x270a61 = () => {
-      ((_0x456eb1 += 0x1), (_0x1b7429 = ![]), (_0x1702f6 = 0x0), (_0x2f8fbc = 0x0));
-      const _0x1e3e65 = _0x50872d;
-      _0x50872d = null;
-      if (_0x430b7f) {
+  let options = 0x0,
+    enabled = ![],
+    target = null,
+    source = 0x0,
+    next = 0x0,
+    enabled2 = ![],
+    enabled3 = 0x0,
+    clamp2 = 0x0;
+  const stop = () => {
+      ((next += 0x1), (enabled2 = ![]), (enabled3 = 0x0), (clamp2 = 0x0));
+      const current = target;
+      target = null;
+      if (options) {
         try {
-          _0x50bbe8
-            ? _0x432b15?.['clearTimeout']?.(_0x430b7f)
-            : _0x432b15?.['cancelAnimationFrame']?.(_0x430b7f);
+          enabled
+            ? windowObject?.['clearTimeout']?.(options)
+            : windowObject?.['cancelAnimationFrame']?.(options);
         } catch {}
-        _0x430b7f = 0x0;
+        options = 0x0;
       }
-      _0x50bbe8 = ![];
-      if (_0x415171 && _0x1e3e65?.['cancelVideoFrameCallback'])
+      enabled = ![];
+      if (source && current?.['cancelVideoFrameCallback'])
         try {
-          _0x1e3e65['cancelVideoFrameCallback'](_0x415171);
+          current['cancelVideoFrameCallback'](source);
         } catch {}
-      _0x415171 = 0x0;
+      source = 0x0;
     },
-    _0x5950fb = (_0x7e0fbb) => {
+    handler = (enabled4) => {
       if (
-        !_0x458c4e() ||
-        !_0x7e0fbb ||
-        _0x7e0fbb !== _0x50872d ||
-        _0x7e0fbb['paused'] !== ![] ||
-        _0x7e0fbb['ended'] === !![]
+        !isEditorOpen() ||
+        !enabled4 ||
+        enabled4 !== target ||
+        enabled4['paused'] !== ![] ||
+        enabled4['ended'] === !![]
       )
         return;
-      if (_0x430b7f || _0x415171) return;
-      const _0x117ee8 = _0x456eb1,
-        _0x48a68e = () => {
-          if (_0x117ee8 !== _0x456eb1 || _0x7e0fbb !== _0x50872d || !_0x458c4e()) return;
-          ((_0x430b7f = 0x0),
-            (_0x50bbe8 = ![]),
-            (_0x415171 = 0x0),
-            _0x34512f(_0x7e0fbb),
-            _0x7e0fbb['paused'] === ![] && _0x7e0fbb['ended'] !== !![] && _0x5950fb(_0x7e0fbb));
+      if (options || source) return;
+      const entry = next,
+        record = () => {
+          if (entry !== next || enabled4 !== target || !isEditorOpen()) return;
+          ((options = 0x0),
+            (enabled = ![]),
+            (source = 0x0),
+            syncNativePlayback(enabled4),
+            enabled4['paused'] === ![] && enabled4['ended'] !== !![] && handler(enabled4));
         };
-      if (typeof _0x7e0fbb['requestVideoFrameCallback'] === 'function')
+      if (typeof enabled4['requestVideoFrameCallback'] === 'function')
         try {
-          _0x415171 = _0x7e0fbb['requestVideoFrameCallback'](_0x48a68e);
+          source = enabled4['requestVideoFrameCallback'](record);
           return;
         } catch {}
-      const _0x25c9d0 = _0x432b15?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
-      typeof _0x25c9d0 === 'function'
-        ? ((_0x50bbe8 = ![]), (_0x430b7f = _0x25c9d0(_0x48a68e)))
-        : ((_0x50bbe8 = !![]), (_0x430b7f = _0x432b15?.['setTimeout']?.(_0x48a68e, 0x10) || 0x0));
+      const run = windowObject?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
+      typeof run === 'function'
+        ? ((enabled = ![]), (options = run(record)))
+        : ((enabled = !![]), (options = windowObject?.['setTimeout']?.(record, 0x10) || 0x0));
     },
-    _0x3af220 = (_0x190917) => {
-      if (!_0x190917) return;
-      (_0x190917 !== _0x50872d && (_0x270a61(), (_0x50872d = _0x190917)), _0x5950fb(_0x190917));
+    startNative = (enabled5) => {
+      if (!enabled5) return;
+      (enabled5 !== target && (stop(), (target = enabled5)), handler(enabled5));
     },
-    _0x3b2334 = (_0x618203, _0x594ff2) => {
-      if (!_0x618203 || !_0x458c4e()) return ![];
-      _0x270a61();
+    startReverse = (el, payload) => {
+      if (!el || !isEditorOpen()) return ![];
+      stop();
       try {
-        _0x618203['pause']?.();
+        el['pause']?.();
       } catch {}
-      ((_0x50872d = _0x618203), (_0x1b7429 = !![]), (_0x1702f6 = 0x0));
-      const _0x2d3b08 = _0x3e4993();
-      ((_0x2f8fbc = clamp(_0x594ff2, 0x0, getPersonReplacementShotCutTotalDuration(_0x2d3b08), 0x0)),
-        (_0x618203['muted'] = !![]));
-      const _0x5180f0 = _0x456eb1,
-        _0x26ef04 = () => {
-          if (_0x5180f0 !== _0x456eb1 || !_0x1b7429 || _0x618203 !== _0x50872d || !_0x458c4e()) return;
-          const _0x446908 = _0x432b15?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
-          typeof _0x446908 === 'function'
-            ? ((_0x50bbe8 = ![]), (_0x430b7f = _0x446908(_0x38bd96)))
-            : ((_0x50bbe8 = !![]),
-              (_0x430b7f = _0x432b15?.['setTimeout']?.(() => _0x38bd96(Date['now']()), 0x10) || 0x0));
+      ((target = el), (enabled2 = !![]), (enabled3 = 0x0));
+      const handle = getDraft();
+      ((clamp2 = clamp(payload, 0x0, getPersonReplacementShotCutTotalDuration(handle), 0x0)),
+        (el['muted'] = !![]));
+      const state = next,
+        handler2 = () => {
+          if (state !== next || !enabled2 || el !== target || !isEditorOpen()) return;
+          const run2 = windowObject?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
+          typeof run2 === 'function'
+            ? ((enabled = ![]), (options = run2(handler3)))
+            : ((enabled = !![]),
+              (options = windowObject?.['setTimeout']?.(() => handler3(Date['now']()), 0x10) || 0x0));
         },
-        _0x38bd96 = (_0x58bc76) => {
-          ((_0x430b7f = 0x0), (_0x50bbe8 = ![]));
-          if (_0x5180f0 !== _0x456eb1 || !_0x1b7429 || _0x618203 !== _0x50872d || !_0x458c4e()) return;
-          const _0x203078 = Number['isFinite'](Number(_0x58bc76)) ? Number(_0x58bc76) : Date['now']();
-          if (!_0x1702f6) _0x1702f6 = _0x203078;
-          const _0x1b03ae = Math['max'](0x0, (_0x203078 - _0x1702f6) / 0x3e8),
-            _0x4c3ac8 = _0x3e4993(),
-            _0x59f43f = getPersonReplacementShotCutTotalDuration(_0x4c3ac8),
-            _0xe6943a = Math['min'](_0x59f43f, _0x2f8fbc + _0x1b03ae),
-            _0x1131c5 = getPersonReplacementShotCutPositionAtTimelineSec(_0x4c3ac8, _0xe6943a),
-            _0x3739b3 = _0x4c3ac8[_0x1131c5['shotIndex']];
-          if (!_0x3739b3) {
-            _0x270a61();
+        handler3 = (config) => {
+          ((options = 0x0), (enabled = ![]));
+          if (state !== next || !enabled2 || el !== target || !isEditorOpen()) return;
+          const scope = Number['isFinite'](Number(config)) ? Number(config) : Date['now']();
+          if (!enabled3) enabled3 = scope;
+          const input = Math['max'](0x0, (scope - enabled3) / 0x3e8),
+            output = getDraft(),
+            personReplacementShotCutTotalDuration = getPersonReplacementShotCutTotalDuration(output),
+            value2 = Math['min'](personReplacementShotCutTotalDuration, clamp2 + input),
+            timelineSec = getPersonReplacementShotCutPositionAtTimelineSec(output, value2),
+            enabled6 = output[timelineSec['shotIndex']];
+          if (!enabled6) {
+            stop();
             return;
           }
-          if (_0x3739b3['isReversed'] !== !![]) {
-            (_0x270a61(),
-              _0x525a40(_0x1131c5['shotId'], _0x1131c5['sourceTimeSec'], {
-                timelineSec: _0x1131c5['timelineSec'],
+          if (enabled6['isReversed'] !== !![]) {
+            (stop(),
+              previewShotCut(timelineSec['shotId'], timelineSec['sourceTimeSec'], {
+                timelineSec: timelineSec['timelineSec'],
                 autoplay: !![],
               }));
             return;
           }
-          const _0x163569 = _0x293eb3(),
-            _0x32bcd4 =
-              _0x163569['shots']['find']((_0x14587a) => _0x14587a['id'] === _0x1131c5['shotId']) ||
-              _0x163569['shots']['find'](
-                (_0xa9ae8e) => _0xa9ae8e['id'] === normalizeText(_0x3739b3['originShotId']),
-              );
-          if (_0x618203['dataset']?.['sourceId'] !== _0x32bcd4?.['sourceId']) {
-            (_0x270a61(),
-              _0x525a40(_0x1131c5['shotId'], _0x1131c5['sourceTimeSec'], {
-                timelineSec: _0x1131c5['timelineSec'],
+          const value3 = getProject(),
+            value4 =
+              value3['shots']['find']((value5) => value5['id'] === timelineSec['shotId']) ||
+              value3['shots']['find']((value6) => value6['id'] === normalizeText(enabled6['originShotId']));
+          if (el['dataset']?.['sourceId'] !== value4?.['sourceId']) {
+            (stop(),
+              previewShotCut(timelineSec['shotId'], timelineSec['sourceTimeSec'], {
+                timelineSec: timelineSec['timelineSec'],
                 autoplay: !![],
               }));
             return;
           }
-          _0x87bd1(_0x1131c5);
+          syncTimelinePosition(timelineSec);
           try {
-            (!Number['isFinite'](Number(_0x618203['currentTime'])) ||
-              Math['abs'](Number(_0x618203['currentTime']) - _0x1131c5['sourceTimeSec']) > 0.01) &&
-              (_0x618203['currentTime'] = _0x1131c5['sourceTimeSec']);
+            (!Number['isFinite'](Number(el['currentTime'])) ||
+              Math['abs'](Number(el['currentTime']) - timelineSec['sourceTimeSec']) > 0.01) &&
+              (el['currentTime'] = timelineSec['sourceTimeSec']);
           } catch {}
-          if (_0xe6943a >= _0x59f43f) {
-            _0x270a61();
+          if (value2 >= personReplacementShotCutTotalDuration) {
+            stop();
             try {
-              _0x618203['pause']?.();
+              el['pause']?.();
             } catch {}
             return;
           }
-          _0x26ef04();
+          handler2();
         };
-      return (_0x26ef04(), !![]);
+      return (handler2(), !![]);
     };
   return {
-    isReverseActive: () => _0x1b7429,
-    startNative: _0x3af220,
-    startReverse: _0x3b2334,
-    stop: _0x270a61,
+    isReverseActive: () => enabled2,
+    startNative: startNative,
+    startReverse: startReverse,
+    stop: stop,
   };
 }

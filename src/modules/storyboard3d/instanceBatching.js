@@ -1,123 +1,116 @@
 import * as threeRuntime from '../panoramaSceneNode/threeRuntime.js';
 export const STORYBOARD_3D_INSTANCE_BATCH_MIN_COUNT = 0x3;
-function finite(_0x46632f, _0x4653a0 = 0x0) {
-  const _0x9bca16 = Number(_0x46632f);
-  return Number['isFinite'](_0x9bca16) ? _0x9bca16 : _0x4653a0;
+function finite(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
 }
-function vector3(_0x266f40, _0x991e79) {
-  const _0x23d85d = Array['isArray'](_0x266f40) ? _0x266f40 : [];
+function vector3(index, result) {
+  const data = Array['isArray'](index) ? index : [];
   return new threeRuntime['Vector3'](
-    finite(_0x23d85d[0x0], _0x991e79[0x0]),
-    finite(_0x23d85d[0x1], _0x991e79[0x1]),
-    finite(_0x23d85d[0x2], _0x991e79[0x2]),
+    finite(data[0x0], result[0x0]),
+    finite(data[0x1], result[0x1]),
+    finite(data[0x2], result[0x2]),
   );
 }
-export function createStoryboard3DInstanceMatrix(_0x5e12ef, _0x15d1d9 = null) {
-  const _0x3f81cb = vector3(_0x5e12ef?.['position'], [0x0, 0x0, 0x0]),
-    _0x435ddf = vector3(_0x5e12ef?.['rotation'], [0x0, 0x0, 0x0]),
-    _0x2f498f = vector3(_0x5e12ef?.['scale'], [0x1, 0x1, 0x1]);
-  _0x2f498f['set'](
-    Math['max'](0.001, _0x2f498f['x']),
-    Math['max'](0.001, _0x2f498f['y']),
-    Math['max'](0.001, _0x2f498f['z']),
-  );
-  const _0x2ca68f = new threeRuntime['Matrix4']()['compose'](
-    _0x3f81cb,
+export function createStoryboard3DInstanceMatrix(box, options = null) {
+  const vector32 = vector3(box?.['position'], [0x0, 0x0, 0x0]),
+    box2 = vector3(box?.['rotation'], [0x0, 0x0, 0x0]),
+    box3 = vector3(box?.['scale'], [0x1, 0x1, 0x1]);
+  box3['set'](Math['max'](0.001, box3['x']), Math['max'](0.001, box3['y']), Math['max'](0.001, box3['z']));
+  const target = new threeRuntime['Matrix4']()['compose'](
+    vector32,
     new threeRuntime['Quaternion']()['setFromEuler'](
-      new threeRuntime['Euler'](_0x435ddf['x'], _0x435ddf['y'], _0x435ddf['z']),
+      new threeRuntime['Euler'](box2['x'], box2['y'], box2['z']),
     ),
-    _0x2f498f,
+    box3,
   );
-  if (_0x15d1d9) _0x2ca68f['multiply'](_0x15d1d9);
-  return _0x2ca68f;
+  if (options) target['multiply'](options);
+  return target;
 }
-export function findStoryboard3DInstancingTemplate(_0x313658) {
-  if (!_0x313658?.['traverse']) return null;
-  _0x313658['updateMatrixWorld']?.(!![]);
-  const _0x5e4694 = [];
-  let _0x44b81 = ![];
-  _0x313658['traverse']((_0x75fb04) => {
-    if (_0x75fb04?.['isSkinnedMesh'] || _0x75fb04?.['morphTargetInfluences']?.['length']) _0x44b81 = !![];
-    if (_0x75fb04?.['isMesh'] && !_0x75fb04['isInstancedMesh']) _0x5e4694['push'](_0x75fb04);
+export function findStoryboard3DInstancingTemplate(enabled) {
+  if (!enabled?.['traverse']) return null;
+  enabled['updateMatrixWorld']?.(!![]);
+  const list = [];
+  let source = ![];
+  enabled['traverse']((enabled2) => {
+    if (enabled2?.['isSkinnedMesh'] || enabled2?.['morphTargetInfluences']?.['length']) source = !![];
+    if (enabled2?.['isMesh'] && !enabled2['isInstancedMesh']) list['push'](enabled2);
   });
-  if (_0x44b81 || _0x5e4694['length'] !== 0x1) return null;
-  const _0x113cf3 = _0x5e4694[0x0];
-  if (!_0x113cf3['geometry'] || !_0x113cf3['material']) return null;
+  if (source || list['length'] !== 0x1) return null;
+  const geometry = list[0x0];
+  if (!geometry['geometry'] || !geometry['material']) return null;
   return {
-    geometry: _0x113cf3['geometry'],
-    material: _0x113cf3['material'],
-    sourceMatrix: _0x113cf3['matrixWorld']['clone'](),
+    geometry: geometry['geometry'],
+    material: geometry['material'],
+    sourceMatrix: geometry['matrixWorld']['clone'](),
   };
 }
 export function createStoryboard3DInstanceBatch({
-  template: _0x562731,
+  template: template,
   objects: objects = [],
   tint: tint = '',
   castShadow: castShadow = !![],
   receiveShadow: receiveShadow = !![],
 } = {}) {
-  if (!_0x562731?.['geometry'] || !_0x562731?.['material'])
+  if (!template?.['geometry'] || !template?.['material'])
     throw new TypeError('An\x20instancing\x20template\x20is\x20required');
-  const _0x2a78e6 = Array['isArray'](objects) ? objects['filter']((_0x122a72) => _0x122a72?.['id']) : [];
-  if (_0x2a78e6['length'] === 0x0)
+  const list2 = Array['isArray'](objects) ? objects['filter']((next) => next?.['id']) : [];
+  if (list2['length'] === 0x0)
     throw new Error('At\x20least\x20one\x20storyboard\x20object\x20is\x20required');
-  const _0x4bdf80 = Array['isArray'](_0x562731['material']) ? _0x562731['material'] : [_0x562731['material']],
-    _0x33e818 = [],
-    _0x3eeea8 = _0x4bdf80['map']((_0x507760) => {
-      if (!tint || !_0x507760?.['clone']) return _0x507760;
-      const _0x272848 = _0x507760['clone']();
-      return (_0x272848['color']?.['set']?.(tint), _0x33e818['push'](_0x272848), _0x272848);
+  const list3 = Array['isArray'](template['material']) ? template['material'] : [template['material']],
+    ownedMaterials = [],
+    current = list3['map']((enabled3) => {
+      if (!tint || !enabled3?.['clone']) return enabled3;
+      const entry = enabled3['clone']();
+      return (entry['color']?.['set']?.(tint), ownedMaterials['push'](entry), entry);
     }),
-    _0x35637a = new threeRuntime['InstancedMesh'](
-      _0x562731['geometry'],
-      Array['isArray'](_0x562731['material']) ? _0x3eeea8 : _0x3eeea8[0x0],
-      _0x2a78e6['length'],
+    mesh = new threeRuntime['InstancedMesh'](
+      template['geometry'],
+      Array['isArray'](template['material']) ? current : current[0x0],
+      list2['length'],
     );
   return (
-    (_0x35637a['name'] = 'storyboard3d-instance-batch'),
-    (_0x35637a['castShadow'] = castShadow !== ![]),
-    (_0x35637a['receiveShadow'] = receiveShadow !== ![]),
-    (_0x35637a['userData']['storyboardObjectIds'] = _0x2a78e6['map']((_0x4d1e4e) => _0x4d1e4e['id'])),
-    _0x2a78e6['forEach']((_0x379d9e, _0x79f8b6) => {
-      _0x35637a['setMatrixAt'](
-        _0x79f8b6,
-        createStoryboard3DInstanceMatrix(_0x379d9e['transform'], _0x562731['sourceMatrix']),
+    (mesh['name'] = 'storyboard3d-instance-batch'),
+    (mesh['castShadow'] = castShadow !== ![]),
+    (mesh['receiveShadow'] = receiveShadow !== ![]),
+    (mesh['userData']['storyboardObjectIds'] = list2['map']((record) => record['id'])),
+    list2['forEach']((payload, handle) => {
+      mesh['setMatrixAt'](
+        handle,
+        createStoryboard3DInstanceMatrix(payload['transform'], template['sourceMatrix']),
       );
     }),
-    (_0x35637a['instanceMatrix']['needsUpdate'] = !![]),
-    _0x35637a['computeBoundingBox']?.(),
-    _0x35637a['computeBoundingSphere']?.(),
+    (mesh['instanceMatrix']['needsUpdate'] = !![]),
+    mesh['computeBoundingBox']?.(),
+    mesh['computeBoundingSphere']?.(),
     {
-      mesh: _0x35637a,
-      objectIds: [..._0x35637a['userData']['storyboardObjectIds']],
-      sourceMatrix: _0x562731['sourceMatrix']['clone'](),
-      ownedMaterials: _0x33e818,
+      mesh: mesh,
+      objectIds: [...mesh['userData']['storyboardObjectIds']],
+      sourceMatrix: template['sourceMatrix']['clone'](),
+      ownedMaterials: ownedMaterials,
     }
   );
 }
-export function refreshStoryboard3DInstanceBatchBounds(_0x1a857d) {
-  const _0x24e96c = _0x1a857d?.['mesh'];
-  if (!_0x24e96c) return ![];
-  return (_0x24e96c['computeBoundingBox']?.(), _0x24e96c['computeBoundingSphere']?.(), !![]);
+export function refreshStoryboard3DInstanceBatchBounds(state) {
+  const enabled4 = state?.['mesh'];
+  if (!enabled4) return ![];
+  return (enabled4['computeBoundingBox']?.(), enabled4['computeBoundingSphere']?.(), !![]);
 }
 export function updateStoryboard3DInstanceTransform(
-  _0x4f4e81,
-  _0x26450b,
-  _0xac5f70,
+  enabled5,
+  config,
+  scope,
   { recomputeBounds: recomputeBounds = !![] } = {},
 ) {
-  const _0x1436ae = _0x4f4e81?.['objectIds']?.['indexOf']?.(_0x26450b) ?? -0x1;
-  if (_0x1436ae < 0x0 || !_0x4f4e81?.['mesh']?.['setMatrixAt']) return ![];
-  (_0x4f4e81['mesh']['setMatrixAt'](
-    _0x1436ae,
-    createStoryboard3DInstanceMatrix(_0xac5f70, _0x4f4e81['sourceMatrix']),
-  ),
-    (_0x4f4e81['mesh']['instanceMatrix']['needsUpdate'] = !![]));
-  if (recomputeBounds) refreshStoryboard3DInstanceBatchBounds(_0x4f4e81);
+  const count = enabled5?.['objectIds']?.['indexOf']?.(config) ?? -0x1;
+  if (count < 0x0 || !enabled5?.['mesh']?.['setMatrixAt']) return ![];
+  (enabled5['mesh']['setMatrixAt'](count, createStoryboard3DInstanceMatrix(scope, enabled5['sourceMatrix'])),
+    (enabled5['mesh']['instanceMatrix']['needsUpdate'] = !![]));
+  if (recomputeBounds) refreshStoryboard3DInstanceBatchBounds(enabled5);
   return !![];
 }
-export function disposeStoryboard3DInstanceBatch(_0x552e05) {
-  (_0x552e05?.['mesh']?.['removeFromParent']?.(),
-    _0x552e05?.['mesh']?.['dispose']?.(),
-    (_0x552e05?.['ownedMaterials'] || [])['forEach']((_0x3ca191) => _0x3ca191?.['dispose']?.()));
+export function disposeStoryboard3DInstanceBatch(input) {
+  (input?.['mesh']?.['removeFromParent']?.(),
+    input?.['mesh']?.['dispose']?.(),
+    (input?.['ownedMaterials'] || [])['forEach']((output) => output?.['dispose']?.()));
 }

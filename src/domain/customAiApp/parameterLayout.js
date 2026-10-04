@@ -1,116 +1,111 @@
 export const CUSTOM_APP_FOOTER_LIMIT = 0x4;
-export function getParameterEntries(_0x18e7f0 = [], _0x5f1bed = CUSTOM_APP_FOOTER_LIMIT) {
-  const _0x24628b = [],
-    _0x2f2e33 = new Map();
+export function getParameterEntries(list = [], value = CUSTOM_APP_FOOTER_LIMIT) {
+  const list2 = [],
+    map = new Map();
   return (
-    _0x18e7f0['filter'](
-      (_0x385c36) => _0x385c36['componentKind'] === 'param' && _0x385c36['previewPlacement'] === 'home',
-    )
+    list['filter']((item) => item['componentKind'] === 'param' && item['previewPlacement'] === 'home')
       ['sort'](
-        (_0x3f6876, _0x3fbb4a) =>
-          (Number(_0x3f6876['homeParamOrder']) || 0x0) - (Number(_0x3fbb4a['homeParamOrder']) || 0x0),
+        (key, index) => (Number(key['homeParamOrder']) || 0x0) - (Number(index['homeParamOrder']) || 0x0),
       )
-      ['forEach']((_0x7c7b59) => {
-        const _0x5dcaab = String(_0x7c7b59['footerGroupId'] || '')['trim']();
-        let _0x2749ab = _0x5dcaab ? _0x2f2e33['get'](_0x5dcaab) : null;
-        if (!_0x2749ab) {
-          ((_0x2749ab = {
-            id: _0x5dcaab,
-            label: String(_0x7c7b59['footerGroupLabel'] || '参数组')['trim'](),
-            description: String(_0x7c7b59['footerGroupDescription'] || '')['trim'](),
+      ['forEach']((result) => {
+        const id = String(result['footerGroupId'] || '')['trim']();
+        let enabled = id ? map['get'](id) : null;
+        if (!enabled) {
+          ((enabled = {
+            id: id,
+            label: String(result['footerGroupLabel'] || '参数组')['trim'](),
+            description: String(result['footerGroupDescription'] || '')['trim'](),
             members: [],
           }),
-            _0x24628b['push'](_0x2749ab));
-          if (_0x5dcaab) _0x2f2e33['set'](_0x5dcaab, _0x2749ab);
+            list2['push'](enabled));
+          if (id) map['set'](id, enabled);
         }
-        _0x2749ab['members']['push'](_0x7c7b59);
+        enabled['members']['push'](result);
       }),
-    _0x24628b['slice'](0x0, _0x5f1bed)
+    list2['slice'](0x0, value)
   );
 }
-export function clearParameterGroup(_0x50c140) {
-  (delete _0x50c140['footerGroupId'],
-    delete _0x50c140['footerGroupLabel'],
-    delete _0x50c140['footerGroupDescription']);
+export function clearParameterGroup(data) {
+  (delete data['footerGroupId'], delete data['footerGroupLabel'], delete data['footerGroupDescription']);
 }
-export function normalizeParameterGroups(_0x2c8be9) {
-  (_0x2c8be9['filter'](
-    (_0x480d1c) => _0x480d1c['componentKind'] !== 'param' || _0x480d1c['previewPlacement'] !== 'home',
+export function normalizeParameterGroups(list3) {
+  (list3['filter'](
+    (options) => options['componentKind'] !== 'param' || options['previewPlacement'] !== 'home',
   )['forEach'](clearParameterGroup),
-    getParameterEntries(_0x2c8be9, Infinity)['forEach']((_0x389845) => {
-      if (_0x389845['members']['length'] < 0x2) _0x389845['members']['forEach'](clearParameterGroup);
+    getParameterEntries(list3, Infinity)['forEach']((target) => {
+      if (target['members']['length'] < 0x2) target['members']['forEach'](clearParameterGroup);
     }));
 }
-export function orderParameterEntries(_0x467d88) {
-  _0x467d88['flatMap']((_0x2a2c5c) => _0x2a2c5c['members'])['forEach']((_0x4799ad, _0x4c0b85) => {
-    _0x4799ad['homeParamOrder'] = _0x4c0b85;
+export function orderParameterEntries(list4) {
+  list4['flatMap']((source) => source['members'])['forEach']((next, current) => {
+    next['homeParamOrder'] = current;
   });
 }
-export function groupParameters(_0x16df58, _0x6a0317, _0x3107d4, { wholeGroup: wholeGroup = ![] } = {}) {
-  const _0x1adf82 = _0x16df58['find']((_0x2f01a3) => _0x2f01a3['index'] === _0x6a0317),
-    _0x1f93de = _0x16df58['find']((_0x240c15) => _0x240c15['index'] === _0x3107d4);
+export function groupParameters(list5, entry, record, { wholeGroup: wholeGroup = ![] } = {}) {
+  const enabled2 = list5['find']((payload) => payload['index'] === entry),
+    enabled3 = list5['find']((handle) => handle['index'] === record);
   if (
-    !_0x1adf82 ||
-    !_0x1f93de ||
-    _0x1adf82 === _0x1f93de ||
-    _0x1adf82['componentKind'] !== 'param' ||
-    _0x1f93de['componentKind'] !== 'param'
+    !enabled2 ||
+    !enabled3 ||
+    enabled2 === enabled3 ||
+    enabled2['componentKind'] !== 'param' ||
+    enabled3['componentKind'] !== 'param'
   )
     return ![];
-  if (_0x1f93de['previewPlacement'] !== 'home') return ![];
-  if (_0x1adf82['footerGroupId'] && _0x1adf82['footerGroupId'] === _0x1f93de['footerGroupId']) return ![];
-  const _0x408876 =
-    wholeGroup && _0x1adf82['footerGroupId']
-      ? _0x16df58['filter']((_0x1d6e73) => _0x1d6e73['footerGroupId'] === _0x1adf82['footerGroupId'])
-      : [_0x1adf82];
-  let _0xa9ce32 = _0x1f93de['footerGroupId'] || 'group-' + _0x1f93de['index'];
-  if (!_0x1f93de['footerGroupId']) {
-    const _0x4a16a6 = new Set(_0x16df58['map']((_0x54a849) => _0x54a849['footerGroupId']));
-    while (_0x4a16a6['has'](_0xa9ce32)) _0xa9ce32 += '-new';
+  if (enabled3['previewPlacement'] !== 'home') return ![];
+  if (enabled2['footerGroupId'] && enabled2['footerGroupId'] === enabled3['footerGroupId']) return ![];
+  const list6 =
+    wholeGroup && enabled2['footerGroupId']
+      ? list5['filter']((state) => state['footerGroupId'] === enabled2['footerGroupId'])
+      : [enabled2];
+  let config = enabled3['footerGroupId'] || 'group-' + enabled3['index'];
+  if (!enabled3['footerGroupId']) {
+    const map2 = new Set(list5['map']((scope) => scope['footerGroupId']));
+    while (map2['has'](config)) config += '-new';
   }
-  const _0x31498c = _0x1f93de['footerGroupLabel'] || '参数组',
-    _0xb6b776 = _0x1f93de['footerGroupDescription'] || '',
-    _0x4b37b3 = getParameterEntries(_0x16df58, Infinity),
-    _0x1ce257 = _0x4b37b3['find']((_0xf1e058) => _0xf1e058['members']['includes'](_0x1f93de));
+  const input = enabled3['footerGroupLabel'] || '参数组',
+    output = enabled3['footerGroupDescription'] || '',
+    list7 = getParameterEntries(list5, Infinity),
+    value2 = list7['find']((value3) => value3['members']['includes'](enabled3));
   return (
-    _0x4b37b3['forEach']((_0x37a3b0) => {
-      _0x37a3b0['members'] = _0x37a3b0['members']['filter']((_0x343665) => !_0x408876['includes'](_0x343665));
+    list7['forEach']((value4) => {
+      value4['members'] = value4['members']['filter']((value5) => !list6['includes'](value5));
     }),
-    _0x1ce257['members']['push'](..._0x408876),
-    _0x1ce257['members']['forEach']((_0x2a79e4) => {
-      ((_0x2a79e4['previewPlacement'] = 'home'),
-        (_0x2a79e4['footerGroupId'] = _0xa9ce32),
-        (_0x2a79e4['footerGroupLabel'] = _0x31498c),
-        (_0x2a79e4['footerGroupDescription'] = _0xb6b776),
-        delete _0x2a79e4['advancedParamOrder']);
+    value2['members']['push'](...list6),
+    value2['members']['forEach']((value6) => {
+      ((value6['previewPlacement'] = 'home'),
+        (value6['footerGroupId'] = config),
+        (value6['footerGroupLabel'] = input),
+        (value6['footerGroupDescription'] = output),
+        delete value6['advancedParamOrder']);
     }),
-    normalizeParameterGroups(_0x16df58),
-    orderParameterEntries(_0x4b37b3),
+    normalizeParameterGroups(list5),
+    orderParameterEntries(list7),
     !![]
   );
 }
-export function getParameterFooterFields(_0x231e4b) {
-  const _0x3e9309 = new Map();
+export function getParameterFooterFields(value7) {
+  const map3 = new Map();
   return (
-    getParameterEntries(_0x231e4b)['forEach']((_0x5ecc48) =>
-      _0x5ecc48['members']['forEach']((_0x38d66c) => {
-        _0x3e9309['set'](_0x38d66c['index'], {
+    getParameterEntries(value7)['forEach']((id2) =>
+      id2['members']['forEach']((value8) => {
+        map3['set'](value8['index'], {
           variant: 'rhAiAppFooterParam',
-          displayOrder: Number['isFinite'](Number(_0x38d66c['homeParamOrder']))
-            ? Number(_0x38d66c['homeParamOrder'])
-            : _0x38d66c['index'],
-          ...(_0x5ecc48['id'] && _0x5ecc48['members']['length'] > 0x1
+          displayOrder: Number['isFinite'](Number(value8['homeParamOrder']))
+            ? Number(value8['homeParamOrder'])
+            : value8['index'],
+          ...(id2['id'] && id2['members']['length'] > 0x1
             ? {
                 footerGroup: {
-                  id: _0x5ecc48['id'],
-                  label: _0x5ecc48['label'],
-                  description: _0x5ecc48['description'],
+                  id: id2['id'],
+                  label: id2['label'],
+                  description: id2['description'],
                 },
               }
             : {}),
         });
       }),
     ),
-    _0x3e9309
+    map3
   );
 }

@@ -64,34 +64,34 @@ export const PERSON_REPLACEMENT_WORKSPACE_INTENTS = Object['freeze']({
   CLOSE: 'close',
 });
 const KNOWN_INTENTS = new Set(Object['values'](PERSON_REPLACEMENT_WORKSPACE_INTENTS));
-function normalizeIntent(_0x563ad3) {
-  return String(_0x563ad3 || '')['trim']();
+function normalizeIntent(value) {
+  return String(value || '')['trim']();
 }
 export function createPersonReplacementWorkspaceIntentPort({ handlers: handlers = {} } = {}) {
   if (!handlers || typeof handlers !== 'object' || Array['isArray'](handlers))
     throw new TypeError(
       'Replacement\x20Studio\x20workspace\x20intent\x20handlers\x20must\x20be\x20an\x20object.',
     );
-  const _0x26f2f7 = new Map();
+  const map = new Map();
   return (
-    Object['entries'](handlers)['forEach'](([_0x1ac657, _0x42625d]) => {
-      const _0x3c7fa2 = normalizeIntent(_0x1ac657);
-      if (!KNOWN_INTENTS['has'](_0x3c7fa2))
-        throw new TypeError('Unsupported\x20Replacement\x20Studio\x20workspace\x20intent:\x20' + _0x1ac657);
-      if (typeof _0x42625d !== 'function')
-        throw new TypeError('Replacement Studio workspace intent handler must be a function: ' + _0x1ac657);
-      _0x26f2f7['set'](_0x3c7fa2, _0x42625d);
+    Object['entries'](handlers)['forEach'](([item, key]) => {
+      const intent = normalizeIntent(item);
+      if (!KNOWN_INTENTS['has'](intent))
+        throw new TypeError('Unsupported\x20Replacement\x20Studio\x20workspace\x20intent:\x20' + item);
+      if (typeof key !== 'function')
+        throw new TypeError('Replacement Studio workspace intent handler must be a function: ' + item);
+      map['set'](intent, key);
     }),
     Object['freeze']({
-      supports(_0x42df60) {
-        const _0xe09faf = normalizeIntent(_0x42df60);
-        return KNOWN_INTENTS['has'](_0xe09faf) && _0x26f2f7['has'](_0xe09faf);
+      supports(index) {
+        const intent2 = normalizeIntent(index);
+        return KNOWN_INTENTS['has'](intent2) && map['has'](intent2);
       },
-      request(_0x44865f, ..._0x3d5a59) {
-        const _0x444647 = normalizeIntent(_0x44865f);
-        if (!KNOWN_INTENTS['has'](_0x444647))
-          throw new TypeError('Unsupported\x20Replacement\x20Studio\x20workspace\x20intent:\x20' + _0x44865f);
-        return _0x26f2f7['get'](_0x444647)?.(..._0x3d5a59);
+      request(result, ...args) {
+        const intent3 = normalizeIntent(result);
+        if (!KNOWN_INTENTS['has'](intent3))
+          throw new TypeError('Unsupported\x20Replacement\x20Studio\x20workspace\x20intent:\x20' + result);
+        return map['get'](intent3)?.(...args);
       },
     })
   );

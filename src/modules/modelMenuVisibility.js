@@ -7,87 +7,91 @@ import { getCachedCliProviderStatus } from '../../api/cliProviderApi.js';
 import { getCachedDreaminaCliStatus } from '../../api/dreaminaCliApi.js';
 const previousDisplay = new WeakMap(),
   filteredMenus = new WeakSet();
-function setHidden(_0x4f678d, _0x1a589f) {
-  if (!_0x4f678d?.['style'] || !_0x4f678d?.['dataset']) return;
-  if (_0x1a589f) {
-    if (!previousDisplay['has'](_0x4f678d)) previousDisplay['set'](_0x4f678d, _0x4f678d['style']['display']);
-    ((_0x4f678d['dataset']['modelMenuHidden'] = 'true'), (_0x4f678d['style']['display'] = 'none'));
+function setHidden(el, value) {
+  if (!el?.['style'] || !el?.['dataset']) return;
+  if (value) {
+    if (!previousDisplay['has'](el)) previousDisplay['set'](el, el['style']['display']);
+    ((el['dataset']['modelMenuHidden'] = 'true'), (el['style']['display'] = 'none'));
   } else
-    previousDisplay['has'](_0x4f678d) &&
-      ((_0x4f678d['style']['display'] = previousDisplay['get'](_0x4f678d)),
-      previousDisplay['delete'](_0x4f678d),
-      delete _0x4f678d['dataset']['modelMenuHidden']);
+    previousDisplay['has'](el) &&
+      ((el['style']['display'] = previousDisplay['get'](el)),
+      previousDisplay['delete'](el),
+      delete el['dataset']['modelMenuHidden']);
 }
-export function isModelMenuEntryUnconfigured(_0x31111c, _0x2ff963 = getModelGenerationReadiness) {
-  const _0xc0dded = getModelProviderProfileIds(_0x31111c['modelId']);
-  return (_0xc0dded['length'] ? _0xc0dded : [_0x31111c['providerProfileId']])['every']((_0x14bbc7) => {
-    const _0x323e5a = _0x2ff963({ ..._0x31111c, providerProfileId: _0x14bbc7 });
-    if (_0x323e5a['reason'] === 'cli-login-missing') {
-      const _0x26c437 =
-        _0x323e5a['cliProviderId'] === 'dreamina'
+export function isModelMenuEntryUnconfigured(args, handler = getModelGenerationReadiness) {
+  const list = getModelProviderProfileIds(args['modelId']);
+  return (list['length'] ? list : [args['providerProfileId']])['every']((providerProfileId) => {
+    const item = handler({ ...args, providerProfileId: providerProfileId });
+    if (item['reason'] === 'cli-login-missing') {
+      const enabled =
+        item['cliProviderId'] === 'dreamina'
           ? getCachedDreaminaCliStatus()
-          : getCachedCliProviderStatus(_0x323e5a['cliProviderId']);
-      return !_0x26c437?.['authConfigured'] && !_0x26c437?.['error'];
+          : getCachedCliProviderStatus(item['cliProviderId']);
+      return !enabled?.['authConfigured'] && !enabled?.['error'];
     }
-    return _0x323e5a['reason'] === 'credential-missing';
+    return item['reason'] === 'credential-missing';
   });
 }
-export function syncModelMenuVisibility(_0x99eaa6, _0x94f072, _0x1a991e = {}) {
-  const _0x5a983c = modelMenuPreferenceStore['getState']()['hideUnconfigured'];
-  if (!_0x5a983c && !filteredMenus['has'](_0x99eaa6)) return;
-  if (_0x5a983c) filteredMenus['add'](_0x99eaa6);
-  else filteredMenus['delete'](_0x99eaa6);
-  _0x94f072['forEach']((_0x1379a0) => {
+export function syncModelMenuVisibility(el2, list2, key = {}) {
+  const enabled2 = modelMenuPreferenceStore['getState']()['hideUnconfigured'];
+  if (!enabled2 && !filteredMenus['has'](el2)) return;
+  if (enabled2) filteredMenus['add'](el2);
+  else filteredMenus['delete'](el2);
+  list2['forEach']((providerProfileId2) => {
     setHidden(
-      _0x1379a0,
-      _0x5a983c &&
+      providerProfileId2,
+      enabled2 &&
         isModelMenuEntryUnconfigured({
-          modelId: String(_0x1379a0['dataset']?.['credentialModel'] || _0x1379a0['dataset']?.['value'] || ''),
-          provider: String(_0x1379a0['dataset']?.['provider'] || ''),
-          providerProfileId: _0x1379a0['dataset']?.['providerProfileId'] || '',
+          modelId: String(
+            providerProfileId2['dataset']?.['credentialModel'] ||
+              providerProfileId2['dataset']?.['value'] ||
+              '',
+          ),
+          provider: String(providerProfileId2['dataset']?.['provider'] || ''),
+          providerProfileId: providerProfileId2['dataset']?.['providerProfileId'] || '',
         }),
     );
   });
-  const _0x4c153f = [..._0x99eaa6['querySelectorAll']('[data-node-menu-submenu]')];
-  _0x4c153f['reverse']()['forEach']((_0x298084) => {
-    const _0x2767e1 = _0x99eaa6['querySelector']?.(_0x298084['dataset']?.['nodeMenuSubmenu']);
-    if (!_0x2767e1) return;
-    const _0x240a4d = _0x94f072['filter']((_0x457b5b) => _0x2767e1['contains'](_0x457b5b)),
-      _0x3b31e2 =
-        _0x5a983c &&
-        (_0x240a4d['length'] > 0x0
-          ? _0x240a4d['every']((_0x539518) => _0x539518['dataset']?.['modelMenuHidden'] === 'true')
-          : Boolean(_0x298084['dataset']?.['credentialProvider']) &&
+  const index = [...el2['querySelectorAll']('[data-node-menu-submenu]')];
+  index['reverse']()['forEach']((provider) => {
+    const el3 = el2['querySelector']?.(provider['dataset']?.['nodeMenuSubmenu']);
+    if (!el3) return;
+    const list3 = list2['filter']((result) => el3['contains'](result)),
+      data =
+        enabled2 &&
+        (list3['length'] > 0x0
+          ? list3['every']((el4) => el4['dataset']?.['modelMenuHidden'] === 'true')
+          : Boolean(provider['dataset']?.['credentialProvider']) &&
             isModelMenuEntryUnconfigured({
               modelId: '',
-              provider: _0x298084['dataset']['credentialProvider'],
+              provider: provider['dataset']['credentialProvider'],
             }));
-    (setHidden(_0x298084, _0x3b31e2),
-      _0x3b31e2 && ((_0x2767e1['style']['display'] = 'none'), _0x2767e1['classList']?.['remove']('open')));
+    (setHidden(provider, data),
+      data && ((el3['style']['display'] = 'none'), el3['classList']?.['remove']('open')));
   });
-  let _0x3c3e2c = _0x99eaa6['querySelector']?.('[data-model-menu-empty]');
-  const _0xb086dd =
-    _0x5a983c &&
-    _0x94f072['length'] > 0x0 &&
-    _0x94f072['every']((_0x45b2ca) => _0x45b2ca['dataset']?.['modelMenuHidden'] === 'true');
-  if (_0xb086dd && !_0x3c3e2c) {
-    const _0x3fb722 = _0x1a991e['documentObject'] || _0x99eaa6['ownerDocument'] || globalThis['document'];
-    ((_0x3c3e2c = _0x3fb722?.['createElement']?.('button')),
-      _0x3c3e2c &&
-        ((_0x3c3e2c['type'] = 'button'),
-        (_0x3c3e2c['className'] = 'floating-menu-item\x20model-menu-configuration-empty'),
-        (_0x3c3e2c['dataset']['modelMenuEmpty'] = 'true'),
-        _0x3c3e2c['addEventListener']('click', (_0x13c9a3) => {
-          (_0x13c9a3['stopPropagation'](),
+  let el5 = el2['querySelector']?.('[data-model-menu-empty]');
+  const enabled3 =
+    enabled2 &&
+    list2['length'] > 0x0 &&
+    list2['every']((el6) => el6['dataset']?.['modelMenuHidden'] === 'true');
+  if (enabled3 && !el5) {
+    const el7 = key['documentObject'] || el2['ownerDocument'] || globalThis['document'];
+    ((el5 = el7?.['createElement']?.('button')),
+      el5 &&
+        ((el5['type'] = 'button'),
+        (el5['className'] = 'floating-menu-item\x20model-menu-configuration-empty'),
+        (el5['dataset']['modelMenuEmpty'] = 'true'),
+        el5['addEventListener']('click', (event) => {
+          (event['stopPropagation'](),
             openProviderApiKeySettings({ fieldIds: ['hideUnconfiguredProviders'] }));
         }),
-        _0x99eaa6['appendChild'](_0x3c3e2c)));
+        el2['appendChild'](el5)));
   }
-  _0x3c3e2c &&
-    ((_0x3c3e2c['textContent'] =
+  el5 &&
+    ((el5['textContent'] =
       t('settings.apiInput.catalog.noConfiguredModels') +
       ' · ' +
       t('settings.apiInput.catalog.configureModels')),
-    (_0x3c3e2c['hidden'] = !_0xb086dd),
-    (_0x3c3e2c['style']['display'] = _0xb086dd ? '' : 'none'));
+    (el5['hidden'] = !enabled3),
+    (el5['style']['display'] = enabled3 ? '' : 'none'));
 }

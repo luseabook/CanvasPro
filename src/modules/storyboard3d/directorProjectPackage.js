@@ -1,1 +1,162 @@
-import{migrateStoryboard3DProject}from'./projectModel.js';import{saveStoryboard3DProjectAsCopy}from'./sceneProjectOperations.js';const MAGIC="AIC3DP01",MAX_SIZE=0x400*0x400*0x400;export function downloadDirectorProjectPackage(_0x22f8ea,_0x3731a9,_0x4249d1){const _0x40e824=_0x4249d1["URL"]["createObjectURL"](_0x22f8ea),_0x371ffa=_0x4249d1["document"]["createElement"]('a');_0x371ffa["href"]=_0x40e824,_0x371ffa["download"]=String(_0x3731a9)["replace"](/[\\/:*?"<>|]/g,'-')+".aic3d",_0x4249d1["document"]['body']['append'](_0x371ffa),_0x371ffa["click"](),_0x371ffa['remove'](),_0x4249d1["setTimeout"](()=>_0x4249d1["URL"]["revokeObjectURL"](_0x40e824),0x2710);}function referencedAssets(_0x3e3b67){const _0x2e7de0=new Set(),_0x417fca=_0x3848d3=>{if(!_0x3848d3||typeof _0x3848d3!=="object")return;for(const [_0x421c2a,_0x3f5ef5]of Object["entries"](_0x3848d3)){if((_0x421c2a==="assetId"||_0x421c2a==="binaryAssetId")&&typeof _0x3f5ef5==='string'&&_0x3f5ef5)_0x2e7de0["add"](_0x3f5ef5);else{if(_0x3f5ef5&&typeof _0x3f5ef5==="object")_0x417fca(_0x3f5ef5);}}};return _0x417fca(_0x3e3b67),[..._0x2e7de0];}function requiredAssets(_0x260314){const _0x5cee14=new Set(),_0x45d8c8=(_0x2d9f4b,_0x1f8174='')=>{if(!_0x2d9f4b||typeof _0x2d9f4b!=="object")return;for(const [_0x1555c9,_0x14b5e2]of Object["entries"](_0x2d9f4b)){if((_0x1555c9==='binaryAssetId'||_0x1555c9==="assetId"&&["panorama",'history',"screenshots"]["includes"](_0x1f8174))&&typeof _0x14b5e2==="string"&&_0x14b5e2)_0x5cee14["add"](_0x14b5e2);else{if(Array["isArray"](_0x14b5e2))_0x14b5e2['forEach'](_0x12a219=>_0x45d8c8(_0x12a219,_0x1555c9));else{if(_0x14b5e2&&typeof _0x14b5e2==='object')_0x45d8c8(_0x14b5e2,_0x1555c9);}}}};return _0x45d8c8(_0x260314),[..._0x5cee14];}function remapReferences(_0x6c5192,_0x3f042c){if(typeof _0x6c5192==="string")return _0x3f042c['get'](_0x6c5192)||_0x6c5192;if(Array["isArray"](_0x6c5192))return _0x6c5192["map"](_0x2e0ae8=>remapReferences(_0x2e0ae8,_0x3f042c));if(_0x6c5192&&typeof _0x6c5192==="object")return Object['fromEntries'](Object["entries"](_0x6c5192)["map"](([_0xaa88d7,_0x211315])=>[_0xaa88d7,remapReferences(_0x211315,_0x3f042c)]));return _0x6c5192;}export async function exportDirectorProjectPackage(_0x2ac971,_0x359077){const _0x414945=migrateStoryboard3DProject(structuredClone(_0x2ac971)),_0x3f9274=(await _0x359077["getMany"](referencedAssets(_0x414945)))["filter"](Boolean),_0x5e3a4c=[];let _0xfa9fce=0x0;const _0x251ecf=new Set(_0x3f9274['map'](_0x1aa860=>_0x1aa860["assetId"]));if(requiredAssets(_0x414945)["some"](_0x4a8e6d=>!_0x251ecf["has"](_0x4a8e6d)))throw new Error("项目引用的素材文件缺失，请恢复素材后再打包。");const _0x490558=_0x3f9274["map"](_0x4a419b=>{const _0x4307f7=[_0x4a419b["primaryFile"],..._0x4a419b['relatedFiles']]["map"](({blob:_0x19fc72,..._0x2f89c3})=>{const _0x12aa46={..._0x2f89c3,'offset':_0xfa9fce,'size':_0x19fc72['size']};return _0xfa9fce+=_0x19fc72["size"],_0x5e3a4c["push"](_0x19fc72),_0x12aa46;});return{'assetId':_0x4a419b['assetId'],'kind':_0x4a419b["kind"],'descriptor':_0x4a419b["descriptor"],'files':_0x4307f7};});if(_0xfa9fce>MAX_SIZE)throw new Error("项目素材超过 1 GB，请拆分场景后打包。");const _0x48d21e=JSON["stringify"]({'version':0x1,'project':_0x414945,'assets':_0x490558},(_0x52309a,_0x1dea98)=>typeof _0x1dea98==="string"&&_0x1dea98["startsWith"]("blob:")?'':_0x1dea98),_0x1e4be2=new TextEncoder()["encode"](_0x48d21e),_0x3e9b82=new ArrayBuffer(0xc),_0x4b4b42=new Uint8Array(_0x3e9b82);if(_0x1e4be2["byteLength"]>0x20*0x400*0x400)throw new Error("项目清单超过 32 MB，请拆分项目后打包。");return _0x4b4b42["set"](new TextEncoder()["encode"](MAGIC)),new DataView(_0x3e9b82)['setUint32'](0x8,_0x1e4be2["byteLength"],!![]),new Blob([_0x3e9b82,_0x1e4be2,..._0x5e3a4c],{'type':"application/octet-stream"});}export async function importDirectorProjectPackage(_0x36ba68,_0x4b9552){if(_0x36ba68["size"]<0xc||_0x36ba68['size']>MAX_SIZE+0x20*0x400*0x400)throw new Error('项目包大小无效。');const _0x2ae0ce=await _0x36ba68["slice"](0x0,0xc)["arrayBuffer"]();if(new TextDecoder()["decode"](new Uint8Array(_0x2ae0ce,0x0,0x8))!==MAGIC)throw new Error("请选择有效的 .aic3d 项目包。");const _0x2f27c7=new DataView(_0x2ae0ce)["getUint32"](0x8,!![]);if(_0x2f27c7>0x20*0x400*0x400||_0x2f27c7+0xc>_0x36ba68['size'])throw new Error("项目包清单无效。");const _0x2d1233=JSON["parse"](await _0x36ba68["slice"](0xc,0xc+_0x2f27c7)["text"]());if(_0x2d1233["version"]!==0x1||!Array['isArray'](_0x2d1233["assets"])||_0x2d1233["assets"]["length"]>0x1f4)throw new Error("项目包版本或素材清单不受支持。");const _0x3dbb6d=new Map(_0x2d1233['assets']['map'](_0xec522a=>[_0xec522a["assetId"],"package-"+globalThis["crypto"]['randomUUID']()]));if(_0x3dbb6d["size"]!==_0x2d1233['assets']['length']||!_0x2d1233["project"]||requiredAssets(_0x2d1233["project"])['some'](_0x221143=>!_0x3dbb6d["has"](_0x221143)))throw new Error('项目包素材重复或缺失。');const _0xf694aa=[],_0x4d64f9=_0x2f27c7+0xc;for(const _0x150d28 of _0x2d1233["assets"]){if(typeof _0x150d28["assetId"]!=='string'||!Array["isArray"](_0x150d28['files'])||!_0x150d28['files']["length"])throw new Error("项目素材记录不完整。");for(const _0x364c98 of _0x150d28['files'])if(!Number["isSafeInteger"](_0x364c98["offset"])||!Number['isSafeInteger'](_0x364c98["size"])||_0x364c98["offset"]<0x0||_0x364c98["size"]<0x0||_0x4d64f9+_0x364c98["offset"]+_0x364c98["size"]>_0x36ba68["size"])throw new Error("项目素材范围越界。");}const _0x3d92fa=saveStoryboard3DProjectAsCopy(migrateStoryboard3DProject(remapReferences(_0x2d1233["project"],_0x3dbb6d)),{'name':(_0x2d1233["project"]["name"]||"3D 项目")+" 导入"});try{for(const _0x71a94b of _0x2d1233["assets"]){const _0x2f3c83=_0x71a94b['files']["map"](({offset:_0x210e15,size:_0x36eba3,..._0x4e1f64})=>({..._0x4e1f64,'blob':_0x36ba68["slice"](_0x4d64f9+_0x210e15,_0x4d64f9+_0x210e15+_0x36eba3,_0x4e1f64["type"])})),_0x305051=_0x3dbb6d["get"](_0x71a94b["assetId"]);await _0x4b9552['put']({'assetId':_0x305051,'kind':_0x71a94b['kind'],'descriptor':remapReferences(_0x71a94b["descriptor"],_0x3dbb6d),'primaryFile':_0x2f3c83[0x0],'relatedFiles':_0x2f3c83["slice"](0x1)}),_0xf694aa["push"](_0x305051);}return _0x3d92fa;}catch(_0x1de6fc){await Promise["allSettled"](_0xf694aa["map"](_0x55b496=>_0x4b9552['remove'](_0x55b496)));throw _0x1de6fc;}}
+import { migrateStoryboard3DProject } from './projectModel.js';
+import { saveStoryboard3DProjectAsCopy } from './sceneProjectOperations.js';
+const MAGIC = 'AIC3DP01',
+  MAX_SIZE = 0x400 * 0x400 * 0x400;
+export function downloadDirectorProjectPackage(value, item, key) {
+  const index = key['URL']['createObjectURL'](value),
+    el = key['document']['createElement']('a');
+  ((el['href'] = index),
+    (el['download'] = String(item)['replace'](/[\\/:*?"<>|]/g, '-') + '.aic3d'),
+    key['document']['body']['append'](el),
+    el['click'](),
+    el['remove'](),
+    key['setTimeout'](() => key['URL']['revokeObjectURL'](index), 0x2710));
+}
+function referencedAssets(result) {
+  const args = new Set(),
+    handler = (enabled) => {
+      if (!enabled || typeof enabled !== 'object') return;
+      for (const [data, options] of Object['entries'](enabled)) {
+        if ((data === 'assetId' || data === 'binaryAssetId') && typeof options === 'string' && options)
+          args['add'](options);
+        else {
+          if (options && typeof options === 'object') handler(options);
+        }
+      }
+    };
+  return (handler(result), [...args]);
+}
+function requiredAssets(target) {
+  const args2 = new Set(),
+    handler2 = (enabled2, source = '') => {
+      if (!enabled2 || typeof enabled2 !== 'object') return;
+      for (const [next, list] of Object['entries'](enabled2)) {
+        if (
+          (next === 'binaryAssetId' ||
+            (next === 'assetId' && ['panorama', 'history', 'screenshots']['includes'](source))) &&
+          typeof list === 'string' &&
+          list
+        )
+          args2['add'](list);
+        else {
+          if (Array['isArray'](list)) list['forEach']((current) => handler2(current, next));
+          else {
+            if (list && typeof list === 'object') handler2(list, next);
+          }
+        }
+      }
+    };
+  return (handler2(target), [...args2]);
+}
+function remapReferences(entry, map) {
+  if (typeof entry === 'string') return map['get'](entry) || entry;
+  if (Array['isArray'](entry)) return entry['map']((record) => remapReferences(record, map));
+  if (entry && typeof entry === 'object')
+    return Object['fromEntries'](
+      Object['entries'](entry)['map'](([payload, handle]) => [payload, remapReferences(handle, map)]),
+    );
+  return entry;
+}
+export async function exportDirectorProjectPackage(state, config) {
+  const migrateStoryboard3DProject2 = migrateStoryboard3DProject(structuredClone(state)),
+    list2 = (await config['getMany'](referencedAssets(migrateStoryboard3DProject2)))['filter'](Boolean),
+    args3 = [];
+  let scope = 0x0;
+  const enabled3 = new Set(list2['map']((input) => input['assetId']));
+  if (requiredAssets(migrateStoryboard3DProject2)['some']((output) => !enabled3['has'](output)))
+    throw new Error('项目引用的素材文件缺失，请恢复素材后再打包。');
+  const value2 = list2['map']((args4) => {
+    const value3 = [args4['primaryFile'], ...args4['relatedFiles']]['map'](({ blob: blob, ...args5 }) => {
+      const value4 = { ...args5, offset: scope, size: blob['size'] };
+      return ((scope += blob['size']), args3['push'](blob), value4);
+    });
+    return { assetId: args4['assetId'], kind: args4['kind'], descriptor: args4['descriptor'], files: value3 };
+  });
+  if (scope > MAX_SIZE) throw new Error('项目素材超过 1 GB，请拆分场景后打包。');
+  const value5 = JSON['stringify'](
+      { version: 0x1, project: migrateStoryboard3DProject2, assets: value2 },
+      (value6, value7) => (typeof value7 === 'string' && value7['startsWith']('blob:') ? '' : value7),
+    ),
+    textEncoder = new TextEncoder()['encode'](value5),
+    arrayBuffer = new ArrayBuffer(0xc),
+    uint8Array = new Uint8Array(arrayBuffer);
+  if (textEncoder['byteLength'] > 0x20 * 0x400 * 0x400)
+    throw new Error('项目清单超过 32 MB，请拆分项目后打包。');
+  return (
+    uint8Array['set'](new TextEncoder()['encode'](MAGIC)),
+    new DataView(arrayBuffer)['setUint32'](0x8, textEncoder['byteLength'], !![]),
+    new Blob([arrayBuffer, textEncoder, ...args3], { type: 'application/octet-stream' })
+  );
+}
+export async function importDirectorProjectPackage(value8, el2) {
+  if (value8['size'] < 0xc || value8['size'] > MAX_SIZE + 0x20 * 0x400 * 0x400)
+    throw new Error('项目包大小无效。');
+  const value9 = await value8['slice'](0x0, 0xc)['arrayBuffer']();
+  if (new TextDecoder()['decode'](new Uint8Array(value9, 0x0, 0x8)) !== MAGIC)
+    throw new Error('请选择有效的 .aic3d 项目包。');
+  const dataView = new DataView(value9)['getUint32'](0x8, !![]);
+  if (dataView > 0x20 * 0x400 * 0x400 || dataView + 0xc > value8['size']) throw new Error('项目包清单无效。');
+  const enabled4 = JSON['parse'](await value8['slice'](0xc, 0xc + dataView)['text']());
+  if (
+    enabled4['version'] !== 0x1 ||
+    !Array['isArray'](enabled4['assets']) ||
+    enabled4['assets']['length'] > 0x1f4
+  )
+    throw new Error('项目包版本或素材清单不受支持。');
+  const enabled5 = new Map(
+    enabled4['assets']['map']((value10) => [
+      value10['assetId'],
+      'package-' + globalThis['crypto']['randomUUID'](),
+    ]),
+  );
+  if (
+    enabled5['size'] !== enabled4['assets']['length'] ||
+    !enabled4['project'] ||
+    requiredAssets(enabled4['project'])['some']((value11) => !enabled5['has'](value11))
+  )
+    throw new Error('项目包素材重复或缺失。');
+  const value12 = [],
+    value13 = dataView + 0xc;
+  for (const enabled6 of enabled4['assets']) {
+    if (
+      typeof enabled6['assetId'] !== 'string' ||
+      !Array['isArray'](enabled6['files']) ||
+      !enabled6['files']['length']
+    )
+      throw new Error('项目素材记录不完整。');
+    for (const value14 of enabled6['files'])
+      if (
+        !Number['isSafeInteger'](value14['offset']) ||
+        !Number['isSafeInteger'](value14['size']) ||
+        value14['offset'] < 0x0 ||
+        value14['size'] < 0x0 ||
+        value13 + value14['offset'] + value14['size'] > value8['size']
+      )
+        throw new Error('项目素材范围越界。');
+  }
+  const saveStoryboard3DProjectAsCopy2 = saveStoryboard3DProjectAsCopy(
+    migrateStoryboard3DProject(remapReferences(enabled4['project'], enabled5)),
+    { name: (enabled4['project']['name'] || '3D 项目') + ' 导入' },
+  );
+  try {
+    for (const value15 of enabled4['assets']) {
+      const value16 = value15['files']['map'](({ offset: offset, size: size, ...args6 }) => ({
+          ...args6,
+          blob: value8['slice'](value13 + offset, value13 + offset + size, args6['type']),
+        })),
+        value17 = enabled5['get'](value15['assetId']);
+      (await el2['put']({
+        assetId: value17,
+        kind: value15['kind'],
+        descriptor: remapReferences(value15['descriptor'], enabled5),
+        primaryFile: value16[0x0],
+        relatedFiles: value16['slice'](0x1),
+      }),
+        value12['push'](value17));
+    }
+    return saveStoryboard3DProjectAsCopy2;
+  } catch (value18) {
+    await Promise['allSettled'](value12['map']((value19) => el2['remove'](value19)));
+    throw value18;
+  }
+}

@@ -111,9 +111,9 @@ const BODY_RESOLVERS = Object['freeze']({
     runninghubWan27VideoEndpoint: runninghubWan27VideoEndpoint,
     runninghubLlmChatEndpoint: runninghubLlmChatEndpoint,
   });
-export function getModelApiBodyResolver(_0x1fc877) {
-  return BODY_RESOLVERS[String(_0x1fc877 || '')['trim']()] || null;
+export function getModelApiBodyResolver(value) {
+  return BODY_RESOLVERS[String(value || '')['trim']()] || null;
 }
-export function getModelApiEndpointResolver(_0x197efa) {
-  return ENDPOINT_RESOLVERS[String(_0x197efa || '')['trim']()] || null;
+export function getModelApiEndpointResolver(item) {
+  return ENDPOINT_RESOLVERS[String(item || '')['trim']()] || null;
 }

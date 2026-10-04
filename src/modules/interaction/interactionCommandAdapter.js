@@ -1,162 +1,149 @@
 import { canvasCommandRegistry, executeCanvasCommandSync } from '../canvasCommands/index.js';
 export function createInteractionCommandAdapter({
-  store: _0x387134,
-  graphStore: _0x2d0cd5,
-  uiStore: _0x4660df,
-  commit: _0x552abb,
-  buildNodeData: _0x3aec8c,
-  getNodeDefaultSize: _0x1530da,
-  getAIGenerationDefaultSizeByType: _0x283868,
-  getAIGenerationNodeSize: _0x5f4da0,
-  connectNodes: _0x1f63b8,
-  clipboard: _0x4f12e2,
-  focusNodes: _0x5e0654,
-  translate: _0x31b933,
-  showToast: _0xf8f4da,
-  scheduleFrame: _0xef3619,
-  windowObject: _0x5b5eec,
+  store: store,
+  graphStore: graphStore,
+  uiStore: uiStore,
+  commit: commit,
+  buildNodeData: buildNodeData,
+  getNodeDefaultSize: getNodeDefaultSize,
+  getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType,
+  getAIGenerationNodeSize: getAIGenerationNodeSize,
+  connectNodes: connectNodes,
+  clipboard: clipboard,
+  focusNodes: focusNodes,
+  translate: translate,
+  showToast: showToast,
+  scheduleFrame: scheduleFrame,
+  windowObject: windowObject,
   commandRegistry: commandRegistry = canvasCommandRegistry,
-  recordCommand: _0x543b89,
+  recordCommand: recordCommand,
 } = {}) {
-  const _0x34267e = {
-    store: _0x387134,
-    graphStore: _0x2d0cd5 || _0x387134,
-    uiStore: _0x4660df || _0x387134,
-    commit: _0x552abb,
-    buildNodeData: _0x3aec8c,
-    getNodeDefaultSize: _0x1530da,
-    getAIGenerationDefaultSizeByType: _0x283868,
-    getAIGenerationNodeSize: _0x5f4da0,
-    connectNodes: _0x1f63b8,
-    clipboard: _0x4f12e2,
-    focusNodes: _0x5e0654,
-    translate: _0x31b933,
-    showToast: _0xf8f4da,
-    scheduleFrame: _0xef3619,
-    windowObject: _0x5b5eec,
+  const value = {
+    store: store,
+    graphStore: graphStore || store,
+    uiStore: uiStore || store,
+    commit: commit,
+    buildNodeData: buildNodeData,
+    getNodeDefaultSize: getNodeDefaultSize,
+    getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType,
+    getAIGenerationNodeSize: getAIGenerationNodeSize,
+    connectNodes: connectNodes,
+    clipboard: clipboard,
+    focusNodes: focusNodes,
+    translate: translate,
+    showToast: showToast,
+    scheduleFrame: scheduleFrame,
+    windowObject: windowObject,
     commandRegistry: commandRegistry,
-    recordCommand: _0x543b89,
+    recordCommand: recordCommand,
   };
   return {
-    executeCanvasCommand(_0x191f00, _0x415d3f = {}) {
-      return executeCanvasCommandSync(_0x191f00, _0x415d3f, _0x34267e);
+    executeCanvasCommand(item, key = {}) {
+      return executeCanvasCommandSync(item, key, value);
     },
-    execute(_0x5eed53, _0x8ce464 = {}) {
-      const _0x287408 = _0x387134?.['getStateRaw']?.() || _0x387134?.['getState']?.() || {};
-      switch (String(_0x5eed53 || '')) {
+    execute(index, edgeId = {}) {
+      const ids = store?.['getStateRaw']?.() || store?.['getState']?.() || {};
+      switch (String(index || '')) {
         case 'delete_edge':
-          executeCanvasCommandSync(
-            'graph.disconnect',
-            { edgeId: _0x8ce464['edgeId'] || _0x8ce464['id'] },
-            _0x34267e,
-          );
+          executeCanvasCommandSync('graph.disconnect', { edgeId: edgeId['edgeId'] || edgeId['id'] }, value);
           return !![];
         case 'delete_nodes':
-          executeCanvasCommandSync('node.delete', { ids: _0x8ce464['ids'] }, _0x34267e);
+          executeCanvasCommandSync('node.delete', { ids: edgeId['ids'] }, value);
           return !![];
         case 'rename_node':
-          if (!_0x8ce464['id'] || typeof _0x8ce464['name'] !== 'string') return !![];
-          executeCanvasCommandSync(
-            'node.rename',
-            { nodeId: _0x8ce464['id'], name: _0x8ce464['name'] },
-            _0x34267e,
-          );
+          if (!edgeId['id'] || typeof edgeId['name'] !== 'string') return !![];
+          executeCanvasCommandSync('node.rename', { nodeId: edgeId['id'], name: edgeId['name'] }, value);
           return !![];
         case 'create_node':
           executeCanvasCommandSync(
             'node.create',
-            { ..._0x8ce464, name: _0x8ce464['name'] || _0x8ce464['label'] || '' },
-            _0x34267e,
+            { ...edgeId, name: edgeId['name'] || edgeId['label'] || '' },
+            value,
           );
           return !![];
         case 'group':
         case 'create_group':
-          executeCanvasCommandSync(
-            'node.group',
-            { ids: _0x8ce464['ids'], name: _0x8ce464['name'] },
-            _0x34267e,
-          );
+          executeCanvasCommandSync('node.group', { ids: edgeId['ids'], name: edgeId['name'] }, value);
           return !![];
         case 'ungroup':
-          executeCanvasCommandSync('node.ungroup', { ids: _0x8ce464['ids'] }, _0x34267e);
+          executeCanvasCommandSync('node.ungroup', { ids: edgeId['ids'] }, value);
           return !![];
         case 'copy':
-          executeCanvasCommandSync('clipboard.copy', { ids: _0x8ce464['ids'] }, _0x34267e);
+          executeCanvasCommandSync('clipboard.copy', { ids: edgeId['ids'] }, value);
           return !![];
         case 'paste':
-          executeCanvasCommandSync('clipboard.paste', { x: _0x8ce464['x'], y: _0x8ce464['y'] }, _0x34267e);
+          executeCanvasCommandSync('clipboard.paste', { x: edgeId['x'], y: edgeId['y'] }, value);
           return !![];
         case 'create_collage_from_selection': {
-          const _0x4fbcb0 = executeCanvasCommandSync(
+          const error = executeCanvasCommandSync(
             'collage.createFromSelection',
-            { ids: _0x8ce464['ids'] },
-            _0x34267e,
+            { ids: edgeId['ids'] },
+            value,
           );
           return (
-            !_0x4fbcb0['ok'] &&
-              _0x4fbcb0['errorCode'] === 'NO_COLLAGE_IMAGES' &&
-              _0xf8f4da?.(_0x4fbcb0['message'], 'warning'),
+            !error['ok'] &&
+              error['errorCode'] === 'NO_COLLAGE_IMAGES' &&
+              showToast?.(error['message'], 'warning'),
             !![]
           );
         }
         case 'reset_source_media_size':
         case 'reset_source_image_size':
-          executeCanvasCommandSync('media.resetSize', { ids: _0x8ce464['ids'] }, _0x34267e);
+          executeCanvasCommandSync('media.resetSize', { ids: edgeId['ids'] }, value);
           return !![];
         case 'hide_picker':
-          (_0x4660df || _0x387134)?.['hidePicker']?.();
+          (uiStore || store)?.['hidePicker']?.();
           return !![];
         case 'set_pick_connect_mode':
-          (_0x4660df || _0x387134)?.['setPickConnectMode']?.({
-            active: !!_0x8ce464['active'],
-            sourceNodeId: _0x8ce464['sourceNodeId'] !== undefined ? _0x8ce464['sourceNodeId'] : null,
-            handleDirection: _0x8ce464['handleDirection'] !== undefined ? _0x8ce464['handleDirection'] : null,
-            hoverNodeId: _0x8ce464['hoverNodeId'] !== undefined ? _0x8ce464['hoverNodeId'] : null,
+          (uiStore || store)?.['setPickConnectMode']?.({
+            active: !!edgeId['active'],
+            sourceNodeId: edgeId['sourceNodeId'] !== undefined ? edgeId['sourceNodeId'] : null,
+            handleDirection: edgeId['handleDirection'] !== undefined ? edgeId['handleDirection'] : null,
+            hoverNodeId: edgeId['hoverNodeId'] !== undefined ? edgeId['hoverNodeId'] : null,
           });
           return !![];
         case 'select_all': {
-          const _0x22e222 = Object['keys'](_0x287408['nodes'] || {});
-          if (_0x22e222['length'] === 0x0)
-            return ((_0x2d0cd5 || _0x387134)?.['setSelectedNodes']?.([]), !![]);
-          return (executeCanvasCommandSync('node.select', { ids: _0x22e222 }, _0x34267e), !![]);
+          const ids2 = Object['keys'](ids['nodes'] || {});
+          if (ids2['length'] === 0x0) return ((graphStore || store)?.['setSelectedNodes']?.([]), !![]);
+          return (executeCanvasCommandSync('node.select', { ids: ids2 }, value), !![]);
         }
         case 'align_nodes': {
-          if (_0x287408['ui']?.['alignFeatureEnabled'] === ![]) return !![];
-          const _0xb1cb3a = String(_0x8ce464['mode'] || '')['trim']();
-          if (_0xb1cb3a === 'arrange-grid') {
-            const _0x2c3eef = Number(_0x287408['ui']?.['alignDistributeGap']),
-              _0x2ff83c = Number['isFinite'](_0x2c3eef) && _0x2c3eef >= 0x0 ? _0x2c3eef : 0x28;
+          if (ids['ui']?.['alignFeatureEnabled'] === ![]) return !![];
+          const axis = String(edgeId['mode'] || '')['trim']();
+          if (axis === 'arrange-grid') {
+            const count = Number(ids['ui']?.['alignDistributeGap']),
+              gapX = Number['isFinite'](count) && count >= 0x0 ? count : 0x28;
             return (
               executeCanvasCommandSync(
                 'layout.arrangeGrid',
                 {
-                  ids: _0x287408['selectedNodeIds'] || [],
-                  columns: _0x8ce464['columns'],
-                  gapX: _0x2ff83c,
-                  gapY: _0x2ff83c,
+                  ids: ids['selectedNodeIds'] || [],
+                  columns: edgeId['columns'],
+                  gapX: gapX,
+                  gapY: gapX,
                 },
-                _0x34267e,
+                value,
               ),
               !![]
             );
           }
-          if (_0xb1cb3a === 'distribute-h' || _0xb1cb3a === 'distribute-v')
+          if (axis === 'distribute-h' || axis === 'distribute-v')
             return (
               executeCanvasCommandSync(
                 'layout.distribute',
                 {
-                  ids: _0x287408['selectedNodeIds'] || [],
-                  axis: _0xb1cb3a === 'distribute-h' ? 'horizontal' : 'vertical',
+                  ids: ids['selectedNodeIds'] || [],
+                  axis: axis === 'distribute-h' ? 'horizontal' : 'vertical',
                 },
-                _0x34267e,
+                value,
               ),
               !![]
             );
           return (
             executeCanvasCommandSync(
               'layout.align',
-              { ids: _0x287408['selectedNodeIds'] || [], mode: _0xb1cb3a },
-              _0x34267e,
+              { ids: ids['selectedNodeIds'] || [], mode: axis },
+              value,
             ),
             !![]
           );

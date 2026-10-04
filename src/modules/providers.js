@@ -12,34 +12,33 @@ export const APIMART_API_ROUTES = Object.freeze([
 ]);
 export const DEFAULT_APIMART_ROUTE_ID = APIMART_ROUTE_IDS.DOMESTIC_1;
 export const DEFAULT_APIMART_API_URL =
-  APIMART_API_ROUTES.find((_0x4fb2c9) => _0x4fb2c9.id === DEFAULT_APIMART_ROUTE_ID)?.apiUrl ||
-  'https://api.apib.ai';
-function normalizeRouteApiUrl(_0x305fa2) {
-  return String(_0x305fa2 || '')
+  APIMART_API_ROUTES.find((item) => item.id === DEFAULT_APIMART_ROUTE_ID)?.apiUrl || 'https://api.apib.ai';
+function normalizeRouteApiUrl(value) {
+  return String(value || '')
     .trim()
     .replace(/\/+$/, '')
     .replace(/\/v1$/i, '');
 }
-export function getApimartRouteById(_0x420ad4) {
-  const _0x2c0d85 = String(_0x420ad4 || '').trim();
+export function getApimartRouteById(key) {
+  const index = String(key || '').trim();
   return (
-    APIMART_API_ROUTES.find((_0x4b862c) => _0x4b862c.id === _0x2c0d85) ||
-    APIMART_API_ROUTES.find((_0x760ceb) => _0x760ceb.id === DEFAULT_APIMART_ROUTE_ID)
+    APIMART_API_ROUTES.find((item2) => item2.id === index) ||
+    APIMART_API_ROUTES.find((item3) => item3.id === DEFAULT_APIMART_ROUTE_ID)
   );
 }
-export function getApimartApiUrlForRoute(_0x2fcf74) {
-  return getApimartRouteById(_0x2fcf74)?.apiUrl || DEFAULT_APIMART_API_URL;
+export function getApimartApiUrlForRoute(result) {
+  return getApimartRouteById(result)?.apiUrl || DEFAULT_APIMART_API_URL;
 }
-export function resolveApimartRouteByApiUrl(_0xa46d3a) {
-  const _0x308cf8 = normalizeRouteApiUrl(_0xa46d3a);
-  if (!_0x308cf8) return null;
-  return APIMART_API_ROUTES.find((_0xdb2ef7) => normalizeRouteApiUrl(_0xdb2ef7.apiUrl) === _0x308cf8) || null;
+export function resolveApimartRouteByApiUrl(data) {
+  const routeApiUrl = normalizeRouteApiUrl(data);
+  if (!routeApiUrl) return null;
+  return APIMART_API_ROUTES.find((item4) => normalizeRouteApiUrl(item4.apiUrl) === routeApiUrl) || null;
 }
-export const getDisplayModelName = (_0x13cafe) => {
-  if (!_0x13cafe) return '';
-  const _0x1ac447 = getModelManifest(_0x13cafe);
-  if (_0x1ac447?.displayName) return translateManifestText(_0x1ac447.displayName);
-  const _0x464a99 = {
+export const getDisplayModelName = (enabled) => {
+  if (!enabled) return '';
+  const modelManifest = getModelManifest(enabled);
+  if (modelManifest?.displayName) return translateManifestText(modelManifest.displayName);
+  const options = {
     'minimax/minimax-m2.5-highspeed': 'MiniMax M2.5-highspeed',
     'qwen/qwen3.5-397b-a17b': 'Qwen3.5-397B-A17B',
     'deepseek/deepseek-v3.2': 'DeepSeek-V3.2',
@@ -66,7 +65,7 @@ export const getDisplayModelName = (_0x13cafe) => {
     'aicanvas/image-lite': 'AICanvas Image Lite',
     'aicanvas/image-pro': 'AICanvas Image Pro',
   };
-  return translateManifestText(_0x464a99[_0x13cafe] || _0x13cafe);
+  return translateManifestText(options[enabled] || enabled);
 };
 export const GRSAI_API_ROUTES = Object.freeze([
   Object.freeze({ id: 'domestic', apiUrl: 'https://grsai.dakka.com.cn' }),
@@ -136,4 +135,19 @@ export function getAllProviderIds() {
   return Object.keys(PROVIDERS_META);
 }
 
-export function resolveProviderApiRoute(_0x1b844f,_0x359a44={}){const _0x5332e6=PROVIDERS_META[_0x1b844f],_0x1d7d54=_0x5332e6?.["apiRoutes"];if(!_0x1d7d54)return null;const _0x154435=String(_0x359a44["apiUrl"]||'')['trim']()["replace"](/\/+$/,''),_0x1e09ea=_0x1d7d54["find"](_0xaada00=>normalizeRouteApiUrl(_0xaada00['apiUrl'])===normalizeRouteApiUrl(_0x154435));if(_0x154435)return{'apiUrl':_0x154435,'routeId':_0x1e09ea?.['id']||''};const _0x1220f5=_0x1d7d54["find"](_0x73a473=>_0x73a473['id']===_0x359a44["routeId"])||_0x1d7d54["find"](_0x83a27e=>_0x83a27e['id']===_0x5332e6['defaultRouteId']);return{'apiUrl':_0x1220f5['apiUrl'],'routeId':_0x1220f5['id']};}
+export function resolveProviderApiRoute(target, source = {}) {
+  const next = PROVIDERS_META[target],
+    enabled2 = next?.['apiRoutes'];
+  if (!enabled2) return null;
+  const current = String(source['apiUrl'] || '')
+      ['trim']()
+      ['replace'](/\/+$/, ''),
+    entry = enabled2['find'](
+      (record) => normalizeRouteApiUrl(record['apiUrl']) === normalizeRouteApiUrl(current),
+    );
+  if (current) return { apiUrl: current, routeId: entry?.['id'] || '' };
+  const payload =
+    enabled2['find']((handle) => handle['id'] === source['routeId']) ||
+    enabled2['find']((state) => state['id'] === next['defaultRouteId']);
+  return { apiUrl: payload['apiUrl'], routeId: payload['id'] };
+}

@@ -1,36 +1,36 @@
 const INPUT_KINDS = new Set(['text', 'image', 'video', 'audio']);
-function normalizeKind(_0x57d907 = '') {
-  const _0x4d5b23 = String(_0x57d907 || '')['trim']();
-  return INPUT_KINDS['has'](_0x4d5b23) ? _0x4d5b23 : '';
+function normalizeKind(value = '') {
+  const item = String(value || '')['trim']();
+  return INPUT_KINDS['has'](item) ? item : '';
 }
-function normalizeSlotId(_0x1f876a = '') {
-  return String(_0x1f876a || '')['trim']();
+function normalizeSlotId(key = '') {
+  return String(key || '')['trim']();
 }
-function toPositiveInteger(_0x1d077f) {
-  const _0x43c61f = Number(_0x1d077f);
-  if (!Number['isFinite'](_0x43c61f) || _0x43c61f <= 0x0) return 0x0;
-  return Math['trunc'](_0x43c61f);
+function toPositiveInteger(index) {
+  const count = Number(index);
+  if (!Number['isFinite'](count) || count <= 0x0) return 0x0;
+  return Math['trunc'](count);
 }
-function getVisibleFixedSlots(_0x1dca44 = null) {
-  const _0x26e101 = new Set(
-    (Array['isArray'](_0x1dca44?.['visibleSlots']) ? _0x1dca44['visibleSlots'] : [])
+function getVisibleFixedSlots(value2 = null) {
+  const map = new Set(
+    (Array['isArray'](value2?.['visibleSlots']) ? value2['visibleSlots'] : [])
       ['map'](normalizeSlotId)
       ['filter'](Boolean),
   );
-  return (Array['isArray'](_0x1dca44?.['fixedSlots']) ? _0x1dca44['fixedSlots'] : [])
-    ['map']((_0x431678) => ({
-      ..._0x431678,
-      id: normalizeSlotId(_0x431678?.['id']),
-      kind: normalizeKind(_0x431678?.['kind']),
+  return (Array['isArray'](value2?.['fixedSlots']) ? value2['fixedSlots'] : [])
+    ['map']((args) => ({
+      ...args,
+      id: normalizeSlotId(args?.['id']),
+      kind: normalizeKind(args?.['kind']),
     }))
-    ['filter']((_0x363ffb) => _0x363ffb['id'] && _0x363ffb['kind'] && _0x26e101['has'](_0x363ffb['id']));
+    ['filter']((result) => result['id'] && result['kind'] && map['has'](result['id']));
 }
-export function countManifestInputRecords(_0x551f07 = []) {
-  return (Array['isArray'](_0x551f07) ? _0x551f07 : [])['reduce'](
-    (_0x18467e, _0x511f20) => {
-      const _0x47549e = normalizeKind(_0x511f20?.['kind']);
-      if (!_0x47549e) return _0x18467e;
-      return ((_0x18467e[_0x47549e] = (_0x18467e[_0x47549e] || 0x0) + 0x1), _0x18467e);
+export function countManifestInputRecords(list = []) {
+  return (Array['isArray'](list) ? list : [])['reduce'](
+    (data, options) => {
+      const kind = normalizeKind(options?.['kind']);
+      if (!kind) return data;
+      return ((data[kind] = (data[kind] || 0x0) + 0x1), data);
     },
     { text: 0x0, image: 0x0, video: 0x0, audio: 0x0 },
   );
@@ -39,38 +39,36 @@ export function buildFixedSlotOccupancy({
   fixedInputConfig: fixedInputConfig = null,
   inputRecords: inputRecords = [],
 } = {}) {
-  const _0x45ce51 = getVisibleFixedSlots(fixedInputConfig);
-  if (_0x45ce51['length'] === 0x0) return {};
-  const _0x4c0934 = new Map(_0x45ce51['map']((_0x1f3fdf) => [_0x1f3fdf['id'], _0x1f3fdf])),
-    _0x204ba3 = _0x45ce51['reduce']((_0x1df0e2, _0x3aca6c) => {
-      if (!_0x1df0e2['has'](_0x3aca6c['kind'])) _0x1df0e2['set'](_0x3aca6c['kind'], []);
-      return (_0x1df0e2['get'](_0x3aca6c['kind'])['push'](_0x3aca6c['id']), _0x1df0e2);
+  const list2 = getVisibleFixedSlots(fixedInputConfig);
+  if (list2['length'] === 0x0) return {};
+  const map2 = new Map(list2['map']((target) => [target['id'], target])),
+    map3 = list2['reduce']((map4, source) => {
+      if (!map4['has'](source['kind'])) map4['set'](source['kind'], []);
+      return (map4['get'](source['kind'])['push'](source['id']), map4);
     }, new Map()),
-    _0x16e808 = (Array['isArray'](inputRecords) ? inputRecords : [])
-      ['map']((_0x55fbc1, _0x135304) => ({
-        index: _0x135304,
-        kind: normalizeKind(_0x55fbc1?.['kind']),
-        refSlot: normalizeSlotId(_0x55fbc1?.['refSlot']),
+    list3 = (Array['isArray'](inputRecords) ? inputRecords : [])
+      ['map']((next, index2) => ({
+        index: index2,
+        kind: normalizeKind(next?.['kind']),
+        refSlot: normalizeSlotId(next?.['refSlot']),
       }))
-      ['filter']((_0xda912b) => _0xda912b['kind']),
-    _0x5d7a41 = {},
-    _0x5baaa4 = new Set();
+      ['filter']((current) => current['kind']),
+    enabled = {},
+    map5 = new Set();
   return (
-    _0x16e808['forEach']((_0x5964fc) => {
-      if (!_0x5964fc['refSlot'] || _0x5baaa4['has'](_0x5964fc['index'])) return;
-      const _0xaaf28e = _0x4c0934['get'](_0x5964fc['refSlot']);
-      if (!_0xaaf28e || _0xaaf28e['kind'] !== _0x5964fc['kind'] || _0x5d7a41[_0xaaf28e['id']]) return;
-      ((_0x5d7a41[_0xaaf28e['id']] = !![]), _0x5baaa4['add'](_0x5964fc['index']));
+    list3['forEach']((enabled2) => {
+      if (!enabled2['refSlot'] || map5['has'](enabled2['index'])) return;
+      const enabled3 = map2['get'](enabled2['refSlot']);
+      if (!enabled3 || enabled3['kind'] !== enabled2['kind'] || enabled[enabled3['id']]) return;
+      ((enabled[enabled3['id']] = !![]), map5['add'](enabled2['index']));
     }),
-    _0x16e808['forEach']((_0x14f7a2) => {
-      if (_0x5baaa4['has'](_0x14f7a2['index'])) return;
-      const _0x46b077 = (_0x204ba3['get'](_0x14f7a2['kind']) || [])['find'](
-        (_0x557a1d) => !_0x5d7a41[_0x557a1d],
-      );
-      if (!_0x46b077) return;
-      ((_0x5d7a41[_0x46b077] = !![]), _0x5baaa4['add'](_0x14f7a2['index']));
+    list3['forEach']((entry) => {
+      if (map5['has'](entry['index'])) return;
+      const enabled4 = (map3['get'](entry['kind']) || [])['find']((record) => !enabled[record]);
+      if (!enabled4) return;
+      ((enabled[enabled4] = !![]), map5['add'](entry['index']));
     }),
-    _0x5d7a41
+    enabled
   );
 }
 export function getMissingManifestInputRequirement({
@@ -79,31 +77,31 @@ export function getMissingManifestInputRequirement({
   inputCounts: inputCounts = null,
   occupiedFixedSlots: occupiedFixedSlots = null,
 } = {}) {
-  const _0x19cb05 =
+  const payload =
       inputCounts && typeof inputCounts === 'object'
         ? inputCounts
         : { text: 0x0, image: 0x0, video: 0x0, audio: 0x0 },
-    _0x42050a = occupiedFixedSlots && typeof occupiedFixedSlots === 'object' ? occupiedFixedSlots : {},
-    _0x4c7891 = getVisibleFixedSlots(fixedInputConfig)['find'](
-      (_0x11eb93) => _0x11eb93['required'] === !![] && _0x42050a[_0x11eb93['id']] !== !![],
+    handle = occupiedFixedSlots && typeof occupiedFixedSlots === 'object' ? occupiedFixedSlots : {},
+    kind2 = getVisibleFixedSlots(fixedInputConfig)['find'](
+      (state) => state['required'] === !![] && handle[state['id']] !== !![],
     );
-  if (_0x4c7891)
+  if (kind2)
     return {
-      kind: _0x4c7891['kind'],
-      slotId: _0x4c7891['id'],
+      kind: kind2['kind'],
+      slotId: kind2['id'],
       required: 0x1,
       actual: 0x0,
       source: 'fixedSlot',
     };
-  const _0x3d915e =
+  const config =
     inputSlots?.['minByKind'] && typeof inputSlots['minByKind'] === 'object' ? inputSlots['minByKind'] : {};
-  for (const [_0x17685c, _0x15602c] of Object['entries'](_0x3d915e)) {
-    const _0x26d3dc = normalizeKind(_0x17685c),
-      _0x33754f = toPositiveInteger(_0x15602c);
-    if (!_0x26d3dc || _0x33754f <= 0x0) continue;
-    const _0x1e085d = Math['max'](0x0, Number(_0x19cb05[_0x26d3dc]) || 0x0);
-    if (_0x1e085d < _0x33754f)
-      return { kind: _0x26d3dc, slotId: '', required: _0x33754f, actual: _0x1e085d, source: 'minByKind' };
+  for (const [scope, input] of Object['entries'](config)) {
+    const kind3 = normalizeKind(scope),
+      required = toPositiveInteger(input);
+    if (!kind3 || required <= 0x0) continue;
+    const actual = Math['max'](0x0, Number(payload[kind3]) || 0x0);
+    if (actual < required)
+      return { kind: kind3, slotId: '', required: required, actual: actual, source: 'minByKind' };
   }
   return null;
 }

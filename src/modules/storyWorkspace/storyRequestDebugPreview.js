@@ -2,92 +2,92 @@ import { openDebugRequestWindow, closeDebugRequestWindow } from '../debugRequest
 import { maskDebugPayloadSecrets } from '../../utils/debugRequestMasking.js';
 import { buildDebugJsonPreview } from '../../utils/debugImagePreview.js';
 const STORY_REQUEST_CAPTURE_CODE = 'STORY_REQUEST_DEBUG_CAPTURED';
-function cloneSerializableValue(_0x4411c1) {
-  return JSON['parse'](JSON['stringify'](_0x4411c1));
+function cloneSerializableValue(value) {
+  return JSON['parse'](JSON['stringify'](value));
 }
-function countCharacters(_0x41d600 = '') {
-  return [...String(_0x41d600 || '')]['length'];
+function countCharacters(item = '') {
+  return [...String(item || '')]['length'];
 }
-function parsePromptObject(_0x5320bd = '') {
+function parsePromptObject(key = '') {
   try {
-    const _0x2d7f73 = JSON['parse'](String(_0x5320bd || ''));
-    return _0x2d7f73 && typeof _0x2d7f73 === 'object' ? _0x2d7f73 : null;
+    const index = JSON['parse'](String(key || ''));
+    return index && typeof index === 'object' ? index : null;
   } catch {
     return null;
   }
 }
-function formatPromptForPreview(_0x4b8de7 = '') {
-  const _0x29f93b = parsePromptObject(_0x4b8de7);
-  return _0x29f93b ? JSON['stringify'](_0x29f93b, null, 0x2) : String(_0x4b8de7 || '');
+function formatPromptForPreview(result = '') {
+  const promptObject = parsePromptObject(result);
+  return promptObject ? JSON['stringify'](promptObject, null, 0x2) : String(result || '');
 }
-function getPromptSectionCharacters(_0x38bafb) {
-  if (!_0x38bafb || typeof _0x38bafb !== 'object') return {};
+function getPromptSectionCharacters(enabled) {
+  if (!enabled || typeof enabled !== 'object') return {};
   return Object['fromEntries'](
-    Object['entries'](_0x38bafb)['map'](([_0xfe642f, _0x52e44d]) => [
-      _0xfe642f,
-      countCharacters(JSON['stringify'](_0x52e44d)),
+    Object['entries'](enabled)['map'](([data, options]) => [
+      data,
+      countCharacters(JSON['stringify'](options)),
     ]),
   );
 }
-export async function captureStoryRequestPayload(_0x2ccb97) {
-  if (typeof _0x2ccb97 !== 'function') throw new TypeError('调试请求缺少可执行的生成操作。');
-  let _0x48c102 = null;
-  const _0x90e44c = async (_0x3b8fe8 = {}) => {
-    if (!_0x48c102) _0x48c102 = cloneSerializableValue(_0x3b8fe8);
-    const _0x4dcbbc = new Error('调试请求已在发送前截获。');
-    _0x4dcbbc['code'] = STORY_REQUEST_CAPTURE_CODE;
-    throw _0x4dcbbc;
+export async function captureStoryRequestPayload(handler) {
+  if (typeof handler !== 'function') throw new TypeError('调试请求缺少可执行的生成操作。');
+  let cloneSerializableValue2 = null;
+  const async2 = async (options2 = {}) => {
+    if (!cloneSerializableValue2) cloneSerializableValue2 = cloneSerializableValue(options2);
+    const error = new Error('调试请求已在发送前截获。');
+    error['code'] = STORY_REQUEST_CAPTURE_CODE;
+    throw error;
   };
   try {
-    await _0x2ccb97(_0x90e44c);
-  } catch (_0x175a26) {
-    if (_0x48c102) return _0x48c102;
-    throw _0x175a26;
+    await handler(async2);
+  } catch (target) {
+    if (cloneSerializableValue2) return cloneSerializableValue2;
+    throw target;
   }
-  if (_0x48c102) return _0x48c102;
+  if (cloneSerializableValue2) return cloneSerializableValue2;
   throw new Error('生成操作没有构造出可调试的 API 请求。');
 }
 export function buildStoryRequestDebugPreviewModel(
-  _0x5dbd4c = {},
+  options3 = {},
   { title: title = '剧本工作室请求调试', subtitle: subtitle = '' } = {},
 ) {
-  const _0x115c38 = maskDebugPayloadSecrets(cloneSerializableValue(_0x5dbd4c || {})),
-    _0x273667 = String(_0x115c38?.['prompt'] || ''),
-    _0x2d23f5 = String(_0x115c38?.['systemPrompt'] || ''),
-    _0x55ea4e = parsePromptObject(_0x273667),
-    _0x5b9aa1 = String(_0x55ea4e?.['task'] || ''),
-    _0x16e1b3 = Math['max'](0x0, Math['trunc'](Number(_0x55ea4e?.['batch']?.['index']) || 0x0)),
-    _0x5691dc = Math['max'](0x0, Math['trunc'](Number(_0x55ea4e?.['batch']?.['total']) || 0x0)),
-    _0x54ce25 = Array['isArray'](_0x55ea4e?.['batch']?.['clipPlans'])
-      ? _0x55ea4e['batch']['clipPlans']['length']
+  const maskDebugPayloadSecrets2 = maskDebugPayloadSecrets(cloneSerializableValue(options3 || {})),
+    source = String(maskDebugPayloadSecrets2?.['prompt'] || ''),
+    content = String(maskDebugPayloadSecrets2?.['systemPrompt'] || ''),
+    promptObject2 = parsePromptObject(source),
+    task = String(promptObject2?.['task'] || ''),
+    batchIndex = Math['max'](0x0, Math['trunc'](Number(promptObject2?.['batch']?.['index']) || 0x0)),
+    batchTotal = Math['max'](0x0, Math['trunc'](Number(promptObject2?.['batch']?.['total']) || 0x0)),
+    clipCount = Array['isArray'](promptObject2?.['batch']?.['clipPlans'])
+      ? promptObject2['batch']['clipPlans']['length']
       : 0x0;
   return {
     title: title,
     subtitle: subtitle,
-    task: _0x5b9aa1,
-    batchIndex: _0x16e1b3,
-    batchTotal: _0x5691dc,
-    clipCount: _0x54ce25,
-    model: String(_0x115c38?.['model'] || ''),
-    provider: String(_0x115c38?.['provider'] || ''),
-    structuredOutputName: String(_0x115c38?.['structuredOutput']?.['name'] || ''),
+    task: task,
+    batchIndex: batchIndex,
+    batchTotal: batchTotal,
+    clipCount: clipCount,
+    model: String(maskDebugPayloadSecrets2?.['model'] || ''),
+    provider: String(maskDebugPayloadSecrets2?.['provider'] || ''),
+    structuredOutputName: String(maskDebugPayloadSecrets2?.['structuredOutput']?.['name'] || ''),
     metrics: {
-      promptCharacters: countCharacters(_0x273667),
-      systemPromptCharacters: countCharacters(_0x2d23f5),
-      requestCharacters: countCharacters(JSON['stringify'](_0x115c38)),
+      promptCharacters: countCharacters(source),
+      systemPromptCharacters: countCharacters(content),
+      requestCharacters: countCharacters(JSON['stringify'](maskDebugPayloadSecrets2)),
     },
-    promptSectionCharacters: getPromptSectionCharacters(_0x55ea4e),
+    promptSectionCharacters: getPromptSectionCharacters(promptObject2),
     tabs: [
-      { id: 'prompt', label: '用户提示词', content: formatPromptForPreview(_0x273667) },
-      { id: 'system', label: '系统提示词', content: _0x2d23f5 },
-      { id: 'request', label: '完整请求参数', ...buildDebugJsonPreview(_0x115c38) },
+      { id: 'prompt', label: '用户提示词', content: formatPromptForPreview(source) },
+      { id: 'system', label: '系统提示词', content: content },
+      { id: 'request', label: '完整请求参数', ...buildDebugJsonPreview(maskDebugPayloadSecrets2) },
       {
         id: 'sections',
         label: '区块字符统计',
         content: JSON['stringify'](
           Object['fromEntries'](
-            Object['entries'](getPromptSectionCharacters(_0x55ea4e))['sort'](
-              (_0x45f047, _0x30f403) => _0x30f403[0x1] - _0x45f047[0x1],
+            Object['entries'](getPromptSectionCharacters(promptObject2))['sort'](
+              (next, current) => current[0x1] - next[0x1],
             ),
           ),
           null,
@@ -97,17 +97,17 @@ export function buildStoryRequestDebugPreviewModel(
     ],
   };
 }
-export function closeStoryRequestDebugPreview(_0x4e6174 = globalThis['document']) {
-  closeDebugRequestWindow(_0x4e6174);
+export function closeStoryRequestDebugPreview(entry = globalThis['document']) {
+  closeDebugRequestWindow(entry);
 }
-export function openStoryRequestDebugPreview(_0x15c2bd = {}) {
-  if (_0x15c2bd['preparePayload'])
+export function openStoryRequestDebugPreview(args = {}) {
+  if (args['preparePayload'])
     return openDebugRequestWindow({
-      ..._0x15c2bd,
+      ...args,
       prepare: async () => ({
-        tabs: buildStoryRequestDebugPreviewModel(await _0x15c2bd['preparePayload'](), _0x15c2bd)['tabs'],
+        tabs: buildStoryRequestDebugPreviewModel(await args['preparePayload'](), args)['tabs'],
       }),
     });
-  const _0x4179c8 = buildStoryRequestDebugPreviewModel(_0x15c2bd['payload'], _0x15c2bd);
-  return openDebugRequestWindow({ ..._0x15c2bd, tabs: _0x4179c8['tabs'] });
+  const tabs = buildStoryRequestDebugPreviewModel(args['payload'], args);
+  return openDebugRequestWindow({ ...args, tabs: tabs['tabs'] });
 }

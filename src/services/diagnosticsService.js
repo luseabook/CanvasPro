@@ -3,100 +3,99 @@ import { t } from '../i18n/index.js';
 const MAX_CONTEXT_STRING_LENGTH = 0x4b0,
   MAX_CONTEXT_DEPTH = 5;
 function getDiagnosticsApi() {
-  const _0x3c30b3 = globalThis.window?.electronAPI?.diagnostics;
-  if (!_0x3c30b3 || typeof _0x3c30b3 !== 'object') return null;
-  return _0x3c30b3;
+  const enabled = globalThis.window?.electronAPI?.diagnostics;
+  if (!enabled || typeof enabled !== 'object') return null;
+  return enabled;
 }
-function toMessage(_0x2289e3, _0xdaf5d3 = 'Unknown error') {
-  if (typeof _0x2289e3 === 'string') return _0x2289e3;
-  if (_0x2289e3?.message) return String(_0x2289e3.message);
-  return String(_0x2289e3 || _0xdaf5d3);
+function toMessage(error, value = 'Unknown error') {
+  if (typeof error === 'string') return error;
+  if (error?.message) return String(error.message);
+  return String(error || value);
 }
-function normalizeContextValue(_0x210241, _0x433bfc = 0) {
-  if (_0x210241 == null) return _0x210241;
-  if (typeof _0x210241 === 'string') {
-    if (_0x210241.length <= MAX_CONTEXT_STRING_LENGTH) return _0x210241;
-    return _0x210241.slice(0, MAX_CONTEXT_STRING_LENGTH) + '...';
+function normalizeContextValue(name, item = 0) {
+  if (name == null) return name;
+  if (typeof name === 'string') {
+    if (name.length <= MAX_CONTEXT_STRING_LENGTH) return name;
+    return name.slice(0, MAX_CONTEXT_STRING_LENGTH) + '...';
   }
-  if (typeof _0x210241 === 'number' || typeof _0x210241 === 'boolean') return _0x210241;
-  if (typeof _0x210241 !== 'object') return String(_0x210241);
-  if (_0x433bfc >= MAX_CONTEXT_DEPTH) return '[Object]';
-  if (_0x210241 instanceof Error)
+  if (typeof name === 'number' || typeof name === 'boolean') return name;
+  if (typeof name !== 'object') return String(name);
+  if (item >= MAX_CONTEXT_DEPTH) return '[Object]';
+  if (name instanceof Error)
     return {
-      name: _0x210241.name || 'Error',
-      message: _0x210241.message || '',
-      stack: _0x210241.stack || '',
+      name: name.name || 'Error',
+      message: name.message || '',
+      stack: name.stack || '',
     };
-  if (Array.isArray(_0x210241))
-    return _0x210241.slice(0, 20).map((_0x5669a0) => normalizeContextValue(_0x5669a0, _0x433bfc + 1));
-  const _0x4a0b0a = {};
+  if (Array.isArray(name)) return name.slice(0, 20).map((item2) => normalizeContextValue(item2, item + 1));
+  const key = {};
   return (
-    Object.entries(_0x210241)
+    Object.entries(name)
       .slice(0, 50)
-      .forEach(([_0x8160a1, _0x104b11]) => {
-        _0x4a0b0a[_0x8160a1] = normalizeContextValue(_0x104b11, _0x433bfc + 1);
+      .forEach(([index, result]) => {
+        key[index] = normalizeContextValue(result, item + 1);
       }),
-    _0x4a0b0a
+    key
   );
 }
-export function logDiagnosticEvent(_0x45f280 = {}) {
-  const _0x10f560 = getDiagnosticsApi();
-  if (typeof _0x10f560?.logEvent !== 'function') return Promise.resolve({ ok: false });
-  const _0x1ad520 = _0x45f280.error instanceof Error ? _0x45f280.error : null,
-    _0x2a6103 = {
-      type: String(_0x45f280.type || 'renderer.event'),
-      level: String(_0x45f280.level || 'info'),
-      source: String(_0x45f280.source || 'renderer'),
-      message: String(_0x45f280.message || toMessage(_0x1ad520 || _0x45f280.error, 'Renderer event')),
-      context: normalizeContextValue(_0x45f280.context || {}),
-      stack: String(_0x45f280.stack || _0x1ad520?.stack || ''),
+export function logDiagnosticEvent(error2 = {}) {
+  const diagnosticsApi = getDiagnosticsApi();
+  if (typeof diagnosticsApi?.logEvent !== 'function') return Promise.resolve({ ok: false });
+  const error3 = error2.error instanceof Error ? error2.error : null,
+    data = {
+      type: String(error2.type || 'renderer.event'),
+      level: String(error2.level || 'info'),
+      source: String(error2.source || 'renderer'),
+      message: String(error2.message || toMessage(error3 || error2.error, 'Renderer event')),
+      context: normalizeContextValue(error2.context || {}),
+      stack: String(error2.stack || error3?.stack || ''),
     };
   try {
-    return Promise.resolve(_0x10f560.logEvent(_0x2a6103)).catch(() => ({ ok: false }));
+    return Promise.resolve(diagnosticsApi.logEvent(data)).catch(() => ({ ok: false }));
   } catch {
     return Promise.resolve({ ok: false });
   }
 }
 export function logDeveloperDiagnosticEvent(
-  _0x4cc3fc = {},
+  options = {},
   { windowObject: windowObject = globalThis.window, logEvent: logEvent = logDiagnosticEvent } = {},
 ) {
   if (windowObject?.AI_CANVAS_IS_DEV_BUILD !== true) return Promise.resolve({ ok: false, skipped: true });
   try {
-    return Promise.resolve(logEvent(_0x4cc3fc)).catch(() => ({ ok: false }));
+    return Promise.resolve(logEvent(options)).catch(() => ({ ok: false }));
   } catch {
     return Promise.resolve({ ok: false });
   }
 }
-export function logPerformanceSnapshot(_0x4bf383 = 'manual') {
-  const _0x54b6c4 = String(_0x4bf383 || 'manual').trim() || 'manual';
+export function logPerformanceSnapshot(target = 'manual') {
+  const reason = String(target || 'manual').trim() || 'manual';
   return logDiagnosticEvent({
     type: 'performance.snapshot',
     level: 'info',
     source: 'renderer',
     message: 'Canvas performance snapshot',
-    context: { reason: _0x54b6c4, snapshot: getPerfProbeSnapshot() },
+    context: { reason: reason, snapshot: getPerfProbeSnapshot() },
   });
 }
-export async function createDiagnosticsPackage(_0xb390a9 = {}) {
-  const _0x564743 = getDiagnosticsApi();
-  if (typeof _0x564743?.createPackage !== 'function')
+export async function createDiagnosticsPackage(options2 = {}) {
+  const diagnosticsApi2 = getDiagnosticsApi();
+  if (typeof diagnosticsApi2?.createPackage !== 'function')
     throw new Error(t('coreServices.diagnostics.packageUnsupported'));
-  return await _0x564743.createPackage(_0xb390a9 && typeof _0xb390a9 === 'object' ? _0xb390a9 : {});
+  return await diagnosticsApi2.createPackage(options2 && typeof options2 === 'object' ? options2 : {});
 }
 export async function openDiagnosticsLogsFolder() {
-  const _0x54f67d = getDiagnosticsApi();
-  if (typeof _0x54f67d?.openLogsFolder !== 'function')
+  const diagnosticsApi3 = getDiagnosticsApi();
+  if (typeof diagnosticsApi3?.openLogsFolder !== 'function')
     throw new Error(t('coreServices.diagnostics.logsUnsupported'));
-  return await _0x54f67d.openLogsFolder();
+  return await diagnosticsApi3.openLogsFolder();
 }
 export function canUseDiagnostics() {
-  const _0x34aa9c = getDiagnosticsApi();
+  const diagnosticsApi4 = getDiagnosticsApi();
   return !!(
-    _0x34aa9c &&
-    typeof _0x34aa9c.logEvent === 'function' &&
-    typeof _0x34aa9c.createPackage === 'function' &&
-    typeof _0x34aa9c.openLogsFolder === 'function'
+    diagnosticsApi4 &&
+    typeof diagnosticsApi4.logEvent === 'function' &&
+    typeof diagnosticsApi4.createPackage === 'function' &&
+    typeof diagnosticsApi4.openLogsFolder === 'function'
   );
 }
 export function initDiagnosticsService() {
@@ -104,29 +103,29 @@ export function initDiagnosticsService() {
   if (!canUseDiagnostics()) return;
   ((globalThis.window.__aiCanvasDiagnosticsInstalled = true),
     setPerfProbeEnabled(true),
-    globalThis.window.addEventListener('error', (_0xb90420) => {
+    globalThis.window.addEventListener('error', (message) => {
       void logDiagnosticEvent({
         type: 'renderer.window_error',
         level: 'error',
         source: 'renderer',
-        message: _0xb90420?.message || 'Renderer window error',
-        error: _0xb90420?.error,
+        message: message?.message || 'Renderer window error',
+        error: message?.error,
         context: {
-          filename: _0xb90420?.filename || '',
-          lineno: _0xb90420?.lineno || 0,
-          colno: _0xb90420?.colno || 0,
+          filename: message?.filename || '',
+          lineno: message?.lineno || 0,
+          colno: message?.colno || 0,
         },
       });
     }),
-    globalThis.window.addEventListener('unhandledrejection', (_0x2a4f63) => {
-      const _0x53ec39 = _0x2a4f63?.reason;
+    globalThis.window.addEventListener('unhandledrejection', (source) => {
+      const error4 = source?.reason;
       void logDiagnosticEvent({
         type: 'renderer.unhandled_rejection',
         level: 'error',
         source: 'renderer',
-        message: toMessage(_0x53ec39, 'Renderer unhandled rejection'),
-        error: _0x53ec39 instanceof Error ? _0x53ec39 : null,
-        context: _0x53ec39 instanceof Error ? {} : { reason: toMessage(_0x53ec39) },
+        message: toMessage(error4, 'Renderer unhandled rejection'),
+        error: error4 instanceof Error ? error4 : null,
+        context: error4 instanceof Error ? {} : { reason: toMessage(error4) },
       });
     }),
     void logDiagnosticEvent({

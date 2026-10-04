@@ -1,128 +1,122 @@
-export function isGroupNodeData(_0x4eeb65) {
-  return String(_0x4eeb65?.type || '').trim() === 'group';
+export function isGroupNodeData(value) {
+  return String(value?.type || '').trim() === 'group';
 }
 export function wouldCreateGroupOutputCycle({
-  sourceId: _0xa97a77,
-  targetId: _0x2302c4,
-  nodes: _0x1d7e98,
-  edges: _0x5b0206,
+  sourceId: sourceId,
+  targetId: targetId,
+  nodes: nodes,
+  edges: edges,
 } = {}) {
-  const _0x522165 = String(_0xa97a77 || '').trim(),
-    _0xbc2cf0 = String(_0x2302c4 || '').trim();
-  if (!_0x522165 || !_0xbc2cf0) return false;
-  if (_0x522165 === _0xbc2cf0) return true;
-  if (!isGroupNodeData(_0x1d7e98?.[_0x522165])) return false;
-  if (!isGroupNodeData(_0x1d7e98?.[_0xbc2cf0])) return false;
-  const _0xb45fce = [_0xbc2cf0],
-    _0x2418f0 = new Set();
-  while (_0xb45fce.length > 0) {
-    const _0x1bd8ed = _0xb45fce.shift();
-    if (!_0x1bd8ed || _0x2418f0.has(_0x1bd8ed)) continue;
-    _0x2418f0.add(_0x1bd8ed);
-    if (_0x1bd8ed === _0x522165) return true;
-    for (const _0x182e86 of Object.values(_0x5b0206 || {})) {
-      if (!_0x182e86 || String(_0x182e86.sourceId || '') !== _0x1bd8ed) continue;
-      const _0x53325f = String(_0x182e86.targetId || '').trim();
-      if (!isGroupNodeData(_0x1d7e98?.[_0x53325f])) continue;
-      if (_0x53325f === _0x522165) return true;
-      if (!_0x2418f0.has(_0x53325f)) _0xb45fce.push(_0x53325f);
+  const enabled = String(sourceId || '').trim(),
+    enabled2 = String(targetId || '').trim();
+  if (!enabled || !enabled2) return false;
+  if (enabled === enabled2) return true;
+  if (!isGroupNodeData(nodes?.[enabled])) return false;
+  if (!isGroupNodeData(nodes?.[enabled2])) return false;
+  const list = [enabled2],
+    map = new Set();
+  while (list.length > 0) {
+    const enabled3 = list.shift();
+    if (!enabled3 || map.has(enabled3)) continue;
+    map.add(enabled3);
+    if (enabled3 === enabled) return true;
+    for (const enabled4 of Object.values(edges || {})) {
+      if (!enabled4 || String(enabled4.sourceId || '') !== enabled3) continue;
+      const item = String(enabled4.targetId || '').trim();
+      if (!isGroupNodeData(nodes?.[item])) continue;
+      if (item === enabled) return true;
+      if (!map.has(item)) list.push(item);
     }
   }
   return false;
 }
-export function getDirectGroupChildNodes(_0x486feb, _0x12a7fb) {
-  const _0x4cde9c = String(_0x12a7fb || '');
-  if (!_0x4cde9c) return [];
-  return Object.values(_0x486feb || {}).filter((_0x35e289) => {
-    if (!_0x35e289 || String(_0x35e289.id || '') === _0x4cde9c) return false;
-    if (String(_0x35e289.parentId || '') !== _0x4cde9c) return false;
-    return !isGroupNodeData(_0x35e289);
+export function getDirectGroupChildNodes(key, index) {
+  const enabled5 = String(index || '');
+  if (!enabled5) return [];
+  return Object.values(key || {}).filter((enabled6) => {
+    if (!enabled6 || String(enabled6.id || '') === enabled5) return false;
+    if (String(enabled6.parentId || '') !== enabled5) return false;
+    return !isGroupNodeData(enabled6);
   });
 }
-export function buildGroupOutputMembershipSignature(_0x4a2787, _0x4a4b2b) {
-  if (!isGroupNodeData(_0x4a2787)) return '';
-  return getDirectGroupChildNodes(_0x4a4b2b, _0x4a2787.id)
-    .map((_0x2ec8c1) => {
-      const _0x50d048 = typeof _0x2ec8c1?._bizRev === 'number' ? _0x2ec8c1._bizRev : 0;
-      return (_0x2ec8c1.id || '') + ':' + _0x50d048;
+export function buildGroupOutputMembershipSignature(result, data) {
+  if (!isGroupNodeData(result)) return '';
+  return getDirectGroupChildNodes(data, result.id)
+    .map((item2) => {
+      const options = typeof item2?._bizRev === 'number' ? item2._bizRev : 0;
+      return (item2.id || '') + ':' + options;
     })
     .join('|');
 }
-function sortGroupChildrenBySavedOutputOrder(_0x1b3999, _0x4270a1) {
-  if (!Array.isArray(_0x4270a1) || _0x4270a1.length === 0) return _0x1b3999;
-  const _0x1d394b = new Map();
-  _0x4270a1.forEach((_0x440c04, _0x46f36b) => {
-    const _0x187a37 = String(_0x440c04 || '').trim();
-    _0x187a37 && !_0x1d394b.has(_0x187a37) && _0x1d394b.set(_0x187a37, _0x46f36b);
+function sortGroupChildrenBySavedOutputOrder(list2, list3) {
+  if (!Array.isArray(list3) || list3.length === 0) return list2;
+  const map2 = new Map();
+  list3.forEach((item3, target) => {
+    const source = String(item3 || '').trim();
+    source && !map2.has(source) && map2.set(source, target);
   });
-  if (_0x1d394b.size === 0) return _0x1b3999;
-  return _0x1b3999
-    .map((_0x2eeb95, _0xfc1ba7) => ({ node: _0x2eeb95, index: _0xfc1ba7 }))
-    .sort((_0x7a8727, _0x31dbba) => {
-      const _0x3798e1 = _0x1d394b.has(_0x7a8727.node?.id) ? _0x1d394b.get(_0x7a8727.node.id) : Infinity,
-        _0x215505 = _0x1d394b.has(_0x31dbba.node?.id) ? _0x1d394b.get(_0x31dbba.node.id) : Infinity;
-      if (_0x3798e1 !== _0x215505) return _0x3798e1 - _0x215505;
-      return _0x7a8727.index - _0x31dbba.index;
+  if (map2.size === 0) return list2;
+  return list2
+    .map((node, index2) => ({ node: node, index: index2 }))
+    .sort((item4, next) => {
+      const current = map2.has(item4.node?.id) ? map2.get(item4.node.id) : Infinity,
+        entry = map2.has(next.node?.id) ? map2.get(next.node.id) : Infinity;
+      if (current !== entry) return current - entry;
+      return item4.index - next.index;
     })
-    .map((_0x418569) => _0x418569.node);
+    .map((item5) => item5.node);
 }
-export function resolveGroupOutputSourceOrder(_0x326089, _0x4bf2ff) {
-  const _0x558bc6 = String(_0x4bf2ff || '').trim(),
-    _0x17f03d = _0x326089?.groupOutputSourceOrderByTarget;
-  if (
-    _0x558bc6 &&
-    _0x17f03d &&
-    typeof _0x17f03d === 'object' &&
-    !Array.isArray(_0x17f03d) &&
-    Array.isArray(_0x17f03d[_0x558bc6])
-  )
-    return _0x17f03d[_0x558bc6];
-  const _0x3c7b82 = String(_0x326089?.targetId || '').trim();
-  if (_0x558bc6 && _0x3c7b82 && _0x3c7b82 !== _0x558bc6) return [];
-  return _0x326089?.groupOutputSourceOrder;
+export function resolveGroupOutputSourceOrder(record, payload) {
+  const handle = String(payload || '').trim(),
+    state = record?.groupOutputSourceOrderByTarget;
+  if (handle && state && typeof state === 'object' && !Array.isArray(state) && Array.isArray(state[handle]))
+    return state[handle];
+  const config = String(record?.targetId || '').trim();
+  if (handle && config && config !== handle) return [];
+  return record?.groupOutputSourceOrder;
 }
 export function collectGroupOutputIncomingEdges({
-  edge: _0x299ad6,
-  groupNode: _0x493723,
-  nodes: _0x8dcc10,
-  targetId: _0x1fbc1b,
-  policy: _0x2e981a,
-  counts: _0x23a89e,
-  directSourceIds: _0x422e53,
-  acceptSource: _0xa861ef,
-  canAppendInputKindWithinLimit: _0x36e186,
+  edge: edge,
+  groupNode: groupNode,
+  nodes: nodes2,
+  targetId: targetId2,
+  policy: policy,
+  counts: counts,
+  directSourceIds: directSourceIds,
+  acceptSource: acceptSource,
+  canAppendInputKindWithinLimit: canAppendInputKindWithinLimit,
   reserveInputSlot: reserveInputSlot = null,
 }) {
-  const _0x19cf92 = String(_0x493723?.id || _0x299ad6?.sourceId || ''),
-    _0x21e9ee = [],
-    _0x4b6575 = sortGroupChildrenBySavedOutputOrder(
-      getDirectGroupChildNodes(_0x8dcc10, _0x19cf92),
-      resolveGroupOutputSourceOrder(_0x299ad6, _0x1fbc1b),
+  const outputGroupId = String(groupNode?.id || edge?.sourceId || ''),
+    list4 = [],
+    sortGroupChildrenBySavedOutputOrder2 = sortGroupChildrenBySavedOutputOrder(
+      getDirectGroupChildNodes(nodes2, outputGroupId),
+      resolveGroupOutputSourceOrder(edge, targetId2),
     );
-  for (const _0x48d63a of _0x4b6575) {
-    if (!_0x48d63a?.id || _0x48d63a.id === _0x1fbc1b) continue;
-    const _0x1b748b = _0xa861ef(_0x48d63a, _0x299ad6);
-    if (!_0x1b748b || _0x422e53.has(_0x48d63a.id)) continue;
-    if (!_0x36e186(_0x2e981a, _0x1b748b, _0x23a89e)) continue;
-    let _0x6ad57a = '';
+  for (const sourceId2 of sortGroupChildrenBySavedOutputOrder2) {
+    if (!sourceId2?.id || sourceId2.id === targetId2) continue;
+    const enabled7 = acceptSource(sourceId2, edge);
+    if (!enabled7 || directSourceIds.has(sourceId2.id)) continue;
+    if (!canAppendInputKindWithinLimit(policy, enabled7, counts)) continue;
+    let refSlot = '';
     if (typeof reserveInputSlot === 'function') {
-      const _0x131145 = { ..._0x299ad6, refSlot: '', sourceId: _0x48d63a.id },
-        _0x339b35 = reserveInputSlot(_0x1b748b, _0x131145);
-      if (!_0x339b35) continue;
-      if (typeof _0x339b35 === 'string') _0x6ad57a = _0x339b35;
+      const scope = { ...edge, refSlot: '', sourceId: sourceId2.id },
+        reserveInputSlot2 = reserveInputSlot(enabled7, scope);
+      if (!reserveInputSlot2) continue;
+      if (typeof reserveInputSlot2 === 'string') refSlot = reserveInputSlot2;
     }
-    (_0x21e9ee.push({
-      ..._0x299ad6,
-      id: _0x299ad6.id + '::group-output::' + _0x48d63a.id,
-      sourceId: _0x48d63a.id,
-      ...(_0x6ad57a ? { refSlot: _0x6ad57a } : null),
+    (list4.push({
+      ...edge,
+      id: edge.id + '::group-output::' + sourceId2.id,
+      sourceId: sourceId2.id,
+      ...(refSlot ? { refSlot: refSlot } : null),
       isGroupOutput: true,
-      outputGroupId: _0x19cf92,
-      groupOutputEdgeId: _0x299ad6.id,
-      effectiveTargetId: _0x1fbc1b,
+      outputGroupId: outputGroupId,
+      groupOutputEdgeId: edge.id,
+      effectiveTargetId: targetId2,
     }),
-      _0x422e53.add(_0x48d63a.id),
-      (_0x23a89e[_0x1b748b] = (_0x23a89e[_0x1b748b] || 0) + 1));
+      directSourceIds.add(sourceId2.id),
+      (counts[enabled7] = (counts[enabled7] || 0) + 1));
   }
-  return _0x21e9ee;
+  return list4;
 }

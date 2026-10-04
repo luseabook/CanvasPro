@@ -1,20 +1,20 @@
 import { normalizeNodeType } from '../modules/nodeMeta.js';
 const RENDERER_NODE_LIFECYCLE_SLOW_LIMIT = 0x8;
 export function createRendererNodeLifecycleStats({
-  mode: _0x22b14d,
-  nodeCount: _0x4fb3ac,
-  renderNodeCount: _0x305119,
-  mountCandidateCount: _0x136010,
-  parkCandidateCount: _0x4668de,
-  viewportBusy: _0x2f868f,
+  mode: mode,
+  nodeCount: nodeCount,
+  renderNodeCount: renderNodeCount,
+  mountCandidateCount: mountCandidateCount,
+  parkCandidateCount: parkCandidateCount,
+  viewportBusy: viewportBusy,
 } = {}) {
   return {
-    mode: String(_0x22b14d || 'unknown'),
-    nodeCount: Number['isFinite'](Number(_0x4fb3ac)) ? Number(_0x4fb3ac) : 0x0,
-    renderNodeCount: Number['isFinite'](Number(_0x305119)) ? Number(_0x305119) : 0x0,
-    mountCandidateCount: Number['isFinite'](Number(_0x136010)) ? Number(_0x136010) : 0x0,
-    parkCandidateCount: Number['isFinite'](Number(_0x4668de)) ? Number(_0x4668de) : 0x0,
-    viewportBusy: _0x2f868f === !![],
+    mode: String(mode || 'unknown'),
+    nodeCount: Number['isFinite'](Number(nodeCount)) ? Number(nodeCount) : 0x0,
+    renderNodeCount: Number['isFinite'](Number(renderNodeCount)) ? Number(renderNodeCount) : 0x0,
+    mountCandidateCount: Number['isFinite'](Number(mountCandidateCount)) ? Number(mountCandidateCount) : 0x0,
+    parkCandidateCount: Number['isFinite'](Number(parkCandidateCount)) ? Number(parkCandidateCount) : 0x0,
+    viewportBusy: viewportBusy === !![],
     createdCount: 0x0,
     createRuntimeMs: 0x0,
     createRuntimeMaxMs: 0x0,
@@ -38,98 +38,91 @@ export function createRendererNodeLifecycleStats({
     slowUpdates: [],
   };
 }
-function getRendererLifecycleNodeType(_0x5c15aa) {
-  const _0x2c6290 = normalizeNodeType(_0x5c15aa?.['type']);
-  return _0x2c6290 || String(_0x5c15aa?.['type'] || 'unknown');
+function getRendererLifecycleNodeType(value) {
+  const nodeType = normalizeNodeType(value?.['type']);
+  return nodeType || String(value?.['type'] || 'unknown');
 }
-function addRendererLifecycleTypeDuration(_0x23a540, _0x122bda, _0x1b92ee) {
-  if (!_0x23a540 || !_0x122bda) return;
-  const _0x3e85ee = getRendererLifecycleNodeType(_0x122bda),
-    _0x20a7ed = _0x23a540[_0x3e85ee] || (_0x23a540[_0x3e85ee] = { count: 0x0, durationMs: 0x0, maxMs: 0x0 });
-  ((_0x20a7ed['count'] += 0x1),
-    (_0x20a7ed['durationMs'] += _0x1b92ee),
-    (_0x20a7ed['maxMs'] = Math['max'](_0x20a7ed['maxMs'], _0x1b92ee)));
+function addRendererLifecycleTypeDuration(enabled, enabled2, item) {
+  if (!enabled || !enabled2) return;
+  const rendererLifecycleNodeType = getRendererLifecycleNodeType(enabled2),
+    key =
+      enabled[rendererLifecycleNodeType] ||
+      (enabled[rendererLifecycleNodeType] = { count: 0x0, durationMs: 0x0, maxMs: 0x0 });
+  ((key['count'] += 0x1), (key['durationMs'] += item), (key['maxMs'] = Math['max'](key['maxMs'], item)));
 }
-function sanitizeRendererLifecycleBreakdown(_0x5b9a00) {
-  const _0x59e580 = Array['isArray'](_0x5b9a00?.['sections']) ? _0x5b9a00['sections'] : [],
-    _0x3691c3 = _0x59e580['map']((_0x368a14) => ({
-      name: String(_0x368a14?.['name'] || '')['slice'](0x0, 0x50),
-      durationMs: Number(_0x368a14?.['durationMs'] || 0x0),
+function sanitizeRendererLifecycleBreakdown(index) {
+  const list = Array['isArray'](index?.['sections']) ? index['sections'] : [],
+    sections = list['map']((error) => ({
+      name: String(error?.['name'] || '')['slice'](0x0, 0x50),
+      durationMs: Number(error?.['durationMs'] || 0x0),
     }))
-      ['filter']((_0x390a52) => _0x390a52['name'] && Number['isFinite'](_0x390a52['durationMs']))
+      ['filter']((error2) => error2['name'] && Number['isFinite'](error2['durationMs']))
       ['slice'](0x0, 0xc);
-  if (!_0x3691c3['length']) return null;
-  const _0x2845cb = { totalMs: Number(_0x5b9a00?.['totalMs'] || 0x0), sections: _0x3691c3 };
+  if (!sections['length']) return null;
+  const result = { totalMs: Number(index?.['totalMs'] || 0x0), sections: sections };
   return (
-    _0x5b9a00?.['details'] &&
-      typeof _0x5b9a00['details'] === 'object' &&
-      (_0x2845cb['details'] = Object['fromEntries'](
-        Object['entries'](_0x5b9a00['details'])
-          ['map'](([_0x4f7587, _0x33abd3]) => [
-            String(_0x4f7587 || '')['slice'](0x0, 0x50),
-            String(_0x33abd3 ?? '')['slice'](0x0, 0x1f4),
+    index?.['details'] &&
+      typeof index['details'] === 'object' &&
+      (result['details'] = Object['fromEntries'](
+        Object['entries'](index['details'])
+          ['map'](([data, options]) => [
+            String(data || '')['slice'](0x0, 0x50),
+            String(options ?? '')['slice'](0x0, 0x1f4),
           ])
-          ['filter'](([_0x9450a7]) => _0x9450a7),
+          ['filter'](([target]) => target),
       )),
-    _0x2845cb
+    result
   );
 }
-function pushRendererLifecycleSlow(_0x3deed4, _0x1cd58d, _0xaf79dc, _0x50ebf0, _0x3db95f = {}) {
-  if (!Array['isArray'](_0x3deed4) || !_0x1cd58d) return;
-  const _0x54ade9 = {
-      nodeId: String(_0x1cd58d['id'] || ''),
-      type: getRendererLifecycleNodeType(_0x1cd58d),
-      reason: String(_0x50ebf0 || ''),
-      durationMs: _0xaf79dc,
+function pushRendererLifecycleSlow(list2, enabled3, durationMs, source, next = {}) {
+  if (!Array['isArray'](list2) || !enabled3) return;
+  const current = {
+      nodeId: String(enabled3['id'] || ''),
+      type: getRendererLifecycleNodeType(enabled3),
+      reason: String(source || ''),
+      durationMs: durationMs,
     },
-    _0x51d50d = sanitizeRendererLifecycleBreakdown(_0x3db95f['breakdown']);
-  if (_0x51d50d) _0x54ade9['breakdown'] = _0x51d50d;
-  (_0x3deed4['push'](_0x54ade9),
-    _0x3deed4['sort']((_0x5e9370, _0x570027) => _0x570027['durationMs'] - _0x5e9370['durationMs']),
-    _0x3deed4['length'] > RENDERER_NODE_LIFECYCLE_SLOW_LIMIT &&
-      (_0x3deed4['length'] = RENDERER_NODE_LIFECYCLE_SLOW_LIMIT));
+    sanitizeRendererLifecycleBreakdown2 = sanitizeRendererLifecycleBreakdown(next['breakdown']);
+  if (sanitizeRendererLifecycleBreakdown2) current['breakdown'] = sanitizeRendererLifecycleBreakdown2;
+  (list2['push'](current),
+    list2['sort']((entry, record) => record['durationMs'] - entry['durationMs']),
+    list2['length'] > RENDERER_NODE_LIFECYCLE_SLOW_LIMIT &&
+      (list2['length'] = RENDERER_NODE_LIFECYCLE_SLOW_LIMIT));
 }
-export function recordRendererLifecycleDuration(
-  _0x271d83,
-  _0x371179,
-  _0x24d2ce,
-  _0x41a4c7,
-  _0x3de4db,
-  _0x1bf2bc = {},
-) {
-  if (!_0x271d83) return;
-  const _0x1a29f0 = Number(_0x41a4c7);
-  if (!Number['isFinite'](_0x1a29f0) || _0x1a29f0 < 0x0) return;
-  if (_0x371179 === 'create') {
-    ((_0x271d83['createdCount'] += 0x1),
-      (_0x271d83['createRuntimeMs'] += _0x1a29f0),
-      (_0x271d83['createRuntimeMaxMs'] = Math['max'](_0x271d83['createRuntimeMaxMs'], _0x1a29f0)),
-      addRendererLifecycleTypeDuration(_0x271d83['createdByType'], _0x24d2ce, _0x1a29f0),
-      pushRendererLifecycleSlow(_0x271d83['slowCreates'], _0x24d2ce, _0x1a29f0, _0x3de4db));
+export function recordRendererLifecycleDuration(enabled4, payload, handle, state, config, scope = {}) {
+  if (!enabled4) return;
+  const count = Number(state);
+  if (!Number['isFinite'](count) || count < 0x0) return;
+  if (payload === 'create') {
+    ((enabled4['createdCount'] += 0x1),
+      (enabled4['createRuntimeMs'] += count),
+      (enabled4['createRuntimeMaxMs'] = Math['max'](enabled4['createRuntimeMaxMs'], count)),
+      addRendererLifecycleTypeDuration(enabled4['createdByType'], handle, count),
+      pushRendererLifecycleSlow(enabled4['slowCreates'], handle, count, config));
     return;
   }
-  if (_0x371179 === 'remount') {
-    ((_0x271d83['remountedCount'] += 0x1),
-      (_0x271d83['remountRuntimeMs'] += _0x1a29f0),
-      (_0x271d83['remountRuntimeMaxMs'] = Math['max'](_0x271d83['remountRuntimeMaxMs'], _0x1a29f0)));
+  if (payload === 'remount') {
+    ((enabled4['remountedCount'] += 0x1),
+      (enabled4['remountRuntimeMs'] += count),
+      (enabled4['remountRuntimeMaxMs'] = Math['max'](enabled4['remountRuntimeMaxMs'], count)));
     return;
   }
-  if (_0x371179 === 'park') {
-    ((_0x271d83['parkedCount'] += 0x1),
-      (_0x271d83['parkRuntimeMs'] += _0x1a29f0),
-      (_0x271d83['parkRuntimeMaxMs'] = Math['max'](_0x271d83['parkRuntimeMaxMs'], _0x1a29f0)));
+  if (payload === 'park') {
+    ((enabled4['parkedCount'] += 0x1),
+      (enabled4['parkRuntimeMs'] += count),
+      (enabled4['parkRuntimeMaxMs'] = Math['max'](enabled4['parkRuntimeMaxMs'], count)));
     return;
   }
-  if (_0x371179 === 'update') {
-    _0x271d83['updateCount'] += 0x1;
-    if (_0x3de4db === 'hidden') _0x271d83['hiddenUpdateCount'] += 0x1;
-    ((_0x271d83['updateRuntimeMs'] += _0x1a29f0),
-      (_0x271d83['updateRuntimeMaxMs'] = Math['max'](_0x271d83['updateRuntimeMaxMs'], _0x1a29f0)),
-      addRendererLifecycleTypeDuration(_0x271d83['updatedByType'], _0x24d2ce, _0x1a29f0),
-      pushRendererLifecycleSlow(_0x271d83['slowUpdates'], _0x24d2ce, _0x1a29f0, _0x3de4db, _0x1bf2bc));
+  if (payload === 'update') {
+    enabled4['updateCount'] += 0x1;
+    if (config === 'hidden') enabled4['hiddenUpdateCount'] += 0x1;
+    ((enabled4['updateRuntimeMs'] += count),
+      (enabled4['updateRuntimeMaxMs'] = Math['max'](enabled4['updateRuntimeMaxMs'], count)),
+      addRendererLifecycleTypeDuration(enabled4['updatedByType'], handle, count),
+      pushRendererLifecycleSlow(enabled4['slowUpdates'], handle, count, config, scope));
   }
 }
-export function recordRendererLifecycleSkippedUpdate(_0x522fb6) {
-  if (!_0x522fb6) return;
-  _0x522fb6['skippedUpdateCount'] += 0x1;
+export function recordRendererLifecycleSkippedUpdate(enabled5) {
+  if (!enabled5) return;
+  enabled5['skippedUpdateCount'] += 0x1;
 }

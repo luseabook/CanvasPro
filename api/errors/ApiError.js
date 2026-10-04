@@ -33,40 +33,40 @@ const ERROR_MESSAGES = {
   [ErrorType.UNKNOWN]: '发生未知错误，请稍后重试',
 };
 export class ApiError extends Error {
-  constructor(_0x40b7ef) {
+  constructor(value) {
     const {
-      type: _0x369563,
-      message: _0x5913ef,
-      provider: _0x3fde10,
-      code: _0x18c1c1,
-      retryable: _0x258be8,
-      raw: _0x29f650,
-      status: _0x3f7f72,
-    } = _0x40b7ef;
-    (super(_0x5913ef || ERROR_MESSAGES[_0x369563] || ERROR_MESSAGES[ErrorType.UNKNOWN]),
+      type: type,
+      message: message,
+      provider: provider,
+      code: code,
+      retryable: retryable,
+      raw: raw,
+      status: status,
+    } = value;
+    (super(message || ERROR_MESSAGES[type] || ERROR_MESSAGES[ErrorType.UNKNOWN]),
       (this.name = 'ApiError'),
-      (this.type = _0x369563 || ErrorType.UNKNOWN),
-      (this.provider = _0x3fde10 || 'unknown'),
-      (this.code = _0x18c1c1),
-      (this.retryable = _0x258be8 ?? this._isRetryable(_0x369563)),
-      (this.raw = _0x29f650),
-      (this.status = _0x3f7f72),
+      (this.type = type || ErrorType.UNKNOWN),
+      (this.provider = provider || 'unknown'),
+      (this.code = code),
+      (this.retryable = retryable ?? this._isRetryable(type)),
+      (this.raw = raw),
+      (this.status = status),
       Error.captureStackTrace && Error.captureStackTrace(this, ApiError));
   }
-  ['_isRetryable'](_0x550838) {
-    const _0x706144 = [
+  ['_isRetryable'](item) {
+    const list = [
       ErrorType.TIMEOUT,
       ErrorType.RATE_LIMIT,
       ErrorType.SERVER_ERROR,
       ErrorType.SERVICE_UNAVAILABLE,
       ErrorType.NETWORK_ERROR,
     ];
-    return _0x706144.includes(_0x550838);
+    return list.includes(item);
   }
-  ['getUserMessage'](_0x5662cc = true) {
-    let _0x17d3f4 = this.message;
-    if (_0x5662cc && this.provider && this.provider !== 'unknown') {
-      const _0xc92143 = {
+  ['getUserMessage'](key = true) {
+    let index = this.message;
+    if (key && this.provider && this.provider !== 'unknown') {
+      const result = {
           grsai: 'GRSAI',
           ppio: 'PPIO',
           apimart: 'APIMart',
@@ -75,113 +75,113 @@ export class ApiError extends Error {
           gemini: 'Gemini',
           openai: 'OpenAI',
         },
-        _0x242c7b = _0xc92143[this.provider] || this.provider;
-      _0x17d3f4 = '[' + _0x242c7b + '] ' + _0x17d3f4;
+        data = result[this.provider] || this.provider;
+      index = '[' + data + '] ' + index;
     }
-    return (this.code && (_0x17d3f4 += ' (错误码: ' + this.code + ')'), _0x17d3f4);
+    return (this.code && (index += ' (错误码: ' + this.code + ')'), index);
   }
   ['toLogString']() {
     return '[' + this.provider + '] ' + this.type + '(' + (this.code || 'N/A') + '): ' + this.message;
   }
-  static ['networkError'](_0x298af9, _0x15473e) {
+  static ['networkError'](provider2, raw2) {
     return new ApiError({
       type: ErrorType.NETWORK_ERROR,
-      provider: _0x298af9,
-      message: '网络请求失败: ' + (_0x15473e?.message || '未知网络错误'),
-      raw: _0x15473e,
+      provider: provider2,
+      message: '网络请求失败: ' + (raw2?.message || '未知网络错误'),
+      raw: raw2,
       retryable: true,
     });
   }
-  static ['timeout'](_0x2b4c1e, _0x4edefb) {
+  static ['timeout'](provider3, options) {
     return new ApiError({
       type: ErrorType.TIMEOUT,
-      provider: _0x2b4c1e,
+      provider: provider3,
       message:
         '请求超时（' +
-        (_0x4edefb ? Math.round(_0x4edefb / 0x3e8) + '秒' : '未知') +
+        (options ? Math.round(options / 0x3e8) + '秒' : '未知') +
         '），请检查网络连接或稍后重试',
       retryable: true,
     });
   }
-  static ['insufficientBalance'](_0x4ec1b9, _0x506d44) {
+  static ['insufficientBalance'](provider4, code2) {
     return new ApiError({
       type: ErrorType.INSUFFICIENT_BALANCE,
-      provider: _0x4ec1b9,
-      code: _0x506d44,
+      provider: provider4,
+      code: code2,
       message: '账户余额不足，请充值或更换 API Key',
       retryable: false,
     });
   }
-  static ['authError'](_0x28eea0, _0x2793f4, _0x39c338) {
+  static ['authError'](provider5, code3, message2) {
     return new ApiError({
       type: ErrorType.AUTH_ERROR,
-      provider: _0x28eea0,
-      code: _0x2793f4,
-      message: _0x39c338 || 'API Key 无效或已过期',
+      provider: provider5,
+      code: code3,
+      message: message2 || 'API Key 无效或已过期',
       retryable: false,
     });
   }
-  static ['rateLimit'](_0x14cf7e, _0x48d389) {
+  static ['rateLimit'](provider6, code4) {
     return new ApiError({
       type: ErrorType.RATE_LIMIT,
-      provider: _0x14cf7e,
-      code: _0x48d389,
+      provider: provider6,
+      code: code4,
       message: '请求过于频繁，请稍后再试',
       retryable: true,
     });
   }
-  static ['contentFiltered'](_0x2c4a86, _0x38f976) {
+  static ['contentFiltered'](provider7, message3) {
     return new ApiError({
       type: ErrorType.CONTENT_FILTERED,
-      provider: _0x2c4a86,
-      message: _0x38f976 || '生成内容被安全过滤，请修改提示词后重试',
+      provider: provider7,
+      message: message3 || '生成内容被安全过滤，请修改提示词后重试',
       retryable: false,
     });
   }
-  static ['taskFailed'](_0x3abcb2, _0x5b78bf) {
+  static ['taskFailed'](provider8, target) {
     return new ApiError({
       type: ErrorType.TASK_FAILED,
-      provider: _0x3abcb2,
-      message: '生成任务失败: ' + (_0x5b78bf || '未知原因'),
+      provider: provider8,
+      message: '生成任务失败: ' + (target || '未知原因'),
       retryable: false,
     });
   }
-  static ['taskTimeout'](_0x5b12ee) {
+  static ['taskTimeout'](provider9) {
     return new ApiError({
       type: ErrorType.TASK_TIMEOUT,
-      provider: _0x5b12ee,
+      provider: provider9,
       message: '任务处理超时，请稍后查询结果',
       retryable: false,
     });
   }
-  static ['fromHttpStatus'](_0xbb92e0, _0x350b71, _0x548aa3) {
-    let _0x97c279 = ErrorType.UNKNOWN;
-    switch (_0xbb92e0) {
+  static ['fromHttpStatus'](status2, provider10, message4) {
+    let type2 = ErrorType.UNKNOWN;
+    switch (status2) {
       case 0x190:
-        _0x97c279 = ErrorType.INVALID_PARAMS;
+        type2 = ErrorType.INVALID_PARAMS;
         break;
       case 0x191:
-        _0x97c279 = ErrorType.AUTH_ERROR;
+        type2 = ErrorType.AUTH_ERROR;
         break;
       case 0x193:
-        _0x97c279 = ErrorType.FORBIDDEN;
+        type2 = ErrorType.FORBIDDEN;
         break;
       case 0x1ad:
-        _0x97c279 = ErrorType.RATE_LIMIT;
+        type2 = ErrorType.RATE_LIMIT;
         break;
       case 0x1f4:
-        _0x97c279 = ErrorType.SERVER_ERROR;
+        type2 = ErrorType.SERVER_ERROR;
         break;
       case 0x1f7:
-        _0x97c279 = ErrorType.SERVICE_UNAVAILABLE;
+        type2 = ErrorType.SERVICE_UNAVAILABLE;
         break;
     }
     return new ApiError({
-      type: _0x97c279,
-      provider: _0x350b71,
-      status: _0xbb92e0,
-      message: _0x548aa3 || ERROR_MESSAGES[_0x97c279],
-      retryable: _0xbb92e0 >= 0x1f4 || _0xbb92e0 === 0x1ad,
+      type: type2,
+      provider: provider10,
+      status: status2,
+      message: message4 || ERROR_MESSAGES[type2],
+      retryable: status2 >= 0x1f4 || status2 === 0x1ad,
     });
   }
 }

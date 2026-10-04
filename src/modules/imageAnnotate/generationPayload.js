@@ -1,136 +1,135 @@
-const canvasToBlob = (_0x5811f5, _0x153113) =>
-    new Promise((_0x446aac) => _0x5811f5.toBlob(_0x446aac, _0x153113)),
-  createSceneCanvas = ({ documentRef: _0x3afde5, naturalW: _0x3c316f, naturalH: _0x35f275 }) => {
-    const _0x3cc37a = _0x3afde5.createElement('canvas');
-    return ((_0x3cc37a.width = _0x3c316f), (_0x3cc37a.height = _0x35f275), _0x3cc37a);
+const canvasToBlob = (value, item) => new Promise((key) => value.toBlob(key, item)),
+  createSceneCanvas = ({ documentRef: documentRef2, naturalW: naturalW, naturalH: naturalH }) => {
+    const box = documentRef2.createElement('canvas');
+    return ((box.width = naturalW), (box.height = naturalH), box);
   },
   buildEraseInputCanvas = ({
-    documentRef: _0x173339,
-    loaded: _0x20e070,
-    maskCanvas: _0x39a58d,
-    naturalW: _0x51f4aa,
-    naturalH: _0xcb9ac2,
+    documentRef: documentRef3,
+    loaded: loaded,
+    maskCanvas: maskCanvas,
+    naturalW: naturalW2,
+    naturalH: naturalH2,
   }) => {
-    const _0x58ff3f = createSceneCanvas({ documentRef: _0x173339, naturalW: _0x51f4aa, naturalH: _0xcb9ac2 }),
-      _0x1d1d02 = _0x58ff3f.getContext('2d');
-    _0x1d1d02.drawImage(_0x20e070, 0, 0, _0x51f4aa, _0xcb9ac2);
-    const _0x1fc960 = createSceneCanvas({ documentRef: _0x173339, naturalW: _0x51f4aa, naturalH: _0xcb9ac2 }),
-      _0x4747ef = _0x1fc960.getContext('2d');
+    const el = createSceneCanvas({ documentRef: documentRef3, naturalW: naturalW2, naturalH: naturalH2 }),
+      ctx = el.getContext('2d');
+    ctx.drawImage(loaded, 0, 0, naturalW2, naturalH2);
+    const el2 = createSceneCanvas({ documentRef: documentRef3, naturalW: naturalW2, naturalH: naturalH2 }),
+      ctx2 = el2.getContext('2d');
     return (
-      (_0x4747ef.fillStyle = '#00FF00'),
-      _0x4747ef.fillRect(0, 0, _0x51f4aa, _0xcb9ac2),
-      _0x4747ef.save(),
-      (_0x4747ef.globalCompositeOperation = 'destination-in'),
-      _0x4747ef.drawImage(_0x39a58d, 0, 0),
-      _0x4747ef.restore(),
-      _0x1d1d02.drawImage(_0x1fc960, 0, 0),
-      _0x58ff3f
+      (ctx2.fillStyle = '#00FF00'),
+      ctx2.fillRect(0, 0, naturalW2, naturalH2),
+      ctx2.save(),
+      (ctx2.globalCompositeOperation = 'destination-in'),
+      ctx2.drawImage(maskCanvas, 0, 0),
+      ctx2.restore(),
+      ctx.drawImage(el2, 0, 0),
+      el
     );
   },
   buildRepaintInputCanvas = ({
-    documentRef: _0xd5338b,
-    loaded: _0xff7995,
-    maskCanvas: _0x1e5d17,
-    naturalW: _0x222871,
-    naturalH: _0x2e8641,
+    documentRef: documentRef4,
+    loaded: loaded2,
+    maskCanvas: maskCanvas2,
+    naturalW: naturalW3,
+    naturalH: naturalH3,
   }) => {
-    const _0x56ee16 = createSceneCanvas({ documentRef: _0xd5338b, naturalW: _0x222871, naturalH: _0x2e8641 }),
-      _0x591ba0 = _0x56ee16.getContext('2d');
+    const el3 = createSceneCanvas({ documentRef: documentRef4, naturalW: naturalW3, naturalH: naturalH3 }),
+      ctx3 = el3.getContext('2d');
     return (
-      _0x591ba0.drawImage(_0xff7995, 0, 0, _0x222871, _0x2e8641),
-      _0x591ba0.save(),
-      (_0x591ba0.globalCompositeOperation = 'destination-out'),
-      _0x591ba0.drawImage(_0x1e5d17, 0, 0),
-      _0x591ba0.restore(),
-      _0x56ee16
+      ctx3.drawImage(loaded2, 0, 0, naturalW3, naturalH3),
+      ctx3.save(),
+      (ctx3.globalCompositeOperation = 'destination-out'),
+      ctx3.drawImage(maskCanvas2, 0, 0),
+      ctx3.restore(),
+      el3
     );
   };
 export const buildGenerationPayload = async ({
-  scene: _0x18930d,
-  commands: _0x19131c,
-  promptText: _0x555585,
-  node: _0x280c2e,
-  imgUrl: _0x3ea5e6,
-  model: _0x5c6e9a,
-  provider: _0x1884fb,
-  imageSize: _0x2fb6b9,
-  erasePrompt: _0x3d8be9,
-  loadImage: _0x2d7996,
-  createSelectionMaskCanvas: _0x52d997,
-  getModelProvider: _0x2b82d8,
+  scene: scene,
+  commands: commands,
+  promptText: promptText,
+  node: node,
+  imgUrl: imgUrl,
+  model: model,
+  provider: provider,
+  imageSize: imageSize,
+  erasePrompt: erasePrompt,
+  loadImage: loadImage,
+  createSelectionMaskCanvas: createSelectionMaskCanvas,
+  getModelProvider: getModelProvider,
   notify: notify = () => {},
   documentRef: documentRef = null,
   urlApi: urlApi = null,
 } = {}) => {
-  const _0x10f86a = documentRef || globalThis.document,
-    _0x4e0a5a = urlApi || globalThis.URL,
-    _0x5157f8 = Array.isArray(_0x19131c) ? _0x19131c : [];
-  if (_0x18930d === 'erase') {
-    if (!_0x5157f8.length) return (notify('请先涂抹要擦除的区域', 'warn'), null);
-    const _0x406029 = await _0x2d7996(_0x3ea5e6),
-      _0x12b1b6 = _0x406029.naturalWidth || _0x406029.width,
-      _0x1fecb5 = _0x406029.naturalHeight || _0x406029.height,
-      _0xe24405 = _0x12b1b6 / (_0x280c2e?.width || 1),
-      _0x288387 = _0x1fecb5 / (_0x280c2e?.height || 1),
-      _0x52b247 = _0x52d997(_0x12b1b6, _0x1fecb5, _0xe24405, _0x288387),
-      _0x5ee5ca = buildEraseInputCanvas({
-        documentRef: _0x10f86a,
-        loaded: _0x406029,
-        maskCanvas: _0x52b247,
-        naturalW: _0x12b1b6,
-        naturalH: _0x1fecb5,
+  const documentRef5 = documentRef || globalThis.document,
+    index = urlApi || globalThis.URL,
+    list = Array.isArray(commands) ? commands : [];
+  if (scene === 'erase') {
+    if (!list.length) return (notify('请先涂抹要擦除的区域', 'warn'), null);
+    const loaded3 = await loadImage(imgUrl),
+      naturalW4 = loaded3.naturalWidth || loaded3.width,
+      naturalH4 = loaded3.naturalHeight || loaded3.height,
+      result = naturalW4 / (node?.width || 1),
+      data = naturalH4 / (node?.height || 1),
+      maskCanvas3 = createSelectionMaskCanvas(naturalW4, naturalH4, result, data),
+      eraseInputCanvas = buildEraseInputCanvas({
+        documentRef: documentRef5,
+        loaded: loaded3,
+        maskCanvas: maskCanvas3,
+        naturalW: naturalW4,
+        naturalH: naturalH4,
       }),
-      _0x1687d = await canvasToBlob(_0x5ee5ca, 'image/png');
-    if (!_0x1687d) throw new Error('擦除输入图导出失败');
-    const _0x3d9bac = _0x4e0a5a.createObjectURL(_0x1687d);
+      blob = await canvasToBlob(eraseInputCanvas, 'image/png');
+    if (!blob) throw new Error('擦除输入图导出失败');
+    const inputUrl = index.createObjectURL(blob);
     return {
       payload: {
-        prompt: _0x3d8be9,
-        model: _0x5c6e9a,
-        provider: _0x1884fb || _0x2b82d8(_0x5c6e9a),
-        imageSize: _0x2fb6b9 || '1K',
+        prompt: erasePrompt,
+        model: model,
+        provider: provider || getModelProvider(model),
+        imageSize: imageSize || '1K',
         batchSize: 1,
-        inputUrls: [_0x3d9bac],
+        inputUrls: [inputUrl],
         suppressAspectRatio: true,
       },
-      inputUrl: _0x3d9bac,
-      naturalWidth: _0x12b1b6,
-      naturalHeight: _0x1fecb5,
+      inputUrl: inputUrl,
+      naturalWidth: naturalW4,
+      naturalHeight: naturalH4,
     };
   }
-  if (_0x18930d === 'repaint') {
-    const _0x2782ef = String(_0x555585 || '').trim();
-    if (!_0x5157f8.length) return (notify('请先选中要重绘的区域', 'warn'), null);
-    if (!_0x2782ef) return (notify('请输入重绘提示词', 'warn'), null);
-    const _0x21b47a = await _0x2d7996(_0x3ea5e6),
-      _0x2022e5 = _0x21b47a.naturalWidth || _0x21b47a.width,
-      _0x913156 = _0x21b47a.naturalHeight || _0x21b47a.height,
-      _0x56f79b = _0x2022e5 / (_0x280c2e?.width || 1),
-      _0x2e937f = _0x913156 / (_0x280c2e?.height || 1),
-      _0x27225b = _0x52d997(_0x2022e5, _0x913156, _0x56f79b, _0x2e937f),
-      _0x42a1f8 = buildRepaintInputCanvas({
-        documentRef: _0x10f86a,
-        loaded: _0x21b47a,
-        maskCanvas: _0x27225b,
-        naturalW: _0x2022e5,
-        naturalH: _0x913156,
+  if (scene === 'repaint') {
+    const prompt = String(promptText || '').trim();
+    if (!list.length) return (notify('请先选中要重绘的区域', 'warn'), null);
+    if (!prompt) return (notify('请输入重绘提示词', 'warn'), null);
+    const loaded4 = await loadImage(imgUrl),
+      naturalW5 = loaded4.naturalWidth || loaded4.width,
+      naturalH5 = loaded4.naturalHeight || loaded4.height,
+      options = naturalW5 / (node?.width || 1),
+      target = naturalH5 / (node?.height || 1),
+      maskCanvas4 = createSelectionMaskCanvas(naturalW5, naturalH5, options, target),
+      repaintInputCanvas = buildRepaintInputCanvas({
+        documentRef: documentRef5,
+        loaded: loaded4,
+        maskCanvas: maskCanvas4,
+        naturalW: naturalW5,
+        naturalH: naturalH5,
       }),
-      _0x5219f8 = await canvasToBlob(_0x42a1f8, 'image/png');
-    if (!_0x5219f8) throw new Error('重绘输入图导出失败');
-    const _0x26fd52 = _0x4e0a5a.createObjectURL(_0x5219f8);
+      blob2 = await canvasToBlob(repaintInputCanvas, 'image/png');
+    if (!blob2) throw new Error('重绘输入图导出失败');
+    const inputUrl2 = index.createObjectURL(blob2);
     return {
       payload: {
-        prompt: _0x2782ef,
-        model: _0x5c6e9a,
-        provider: _0x1884fb || _0x2b82d8(_0x5c6e9a),
-        imageSize: _0x2fb6b9 || '1K',
+        prompt: prompt,
+        model: model,
+        provider: provider || getModelProvider(model),
+        imageSize: imageSize || '1K',
         batchSize: 1,
-        inputUrls: [_0x26fd52],
+        inputUrls: [inputUrl2],
         suppressAspectRatio: true,
       },
-      inputUrl: _0x26fd52,
-      naturalWidth: _0x2022e5,
-      naturalHeight: _0x913156,
+      inputUrl: inputUrl2,
+      naturalWidth: naturalW5,
+      naturalHeight: naturalH5,
     };
   }
   return null;

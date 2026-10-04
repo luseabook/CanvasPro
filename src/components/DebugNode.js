@@ -1,27 +1,24 @@
 import appStore from '../core/stores/appStore.js';
 import { onLocaleChange, t } from '../i18n/index.js';
-function debugNodeText(_0x2ec791, _0xe91af3 = {}) {
-  return t('debugNode.' + _0x2ec791, _0xe91af3);
+function debugNodeText(value, item = {}) {
+  return t('debugNode.' + value, item);
 }
 export class DebugNode {
-  constructor(_0x1f2dc1) {
-    ((this._data = _0x1f2dc1),
-      (this.nodeId = _0x1f2dc1.id),
-      (this.contentEl = null),
-      (this._unsubscribeLocale = null));
+  constructor(key) {
+    ((this._data = key), (this.nodeId = key.id), (this.contentEl = null), (this._unsubscribeLocale = null));
   }
   ['mount']() {
     this._subscribeLocaleChanges();
-    const _0x295995 = document.createElement('div');
-    (Object.assign(_0x295995.style, {
+    const el = document.createElement('div');
+    (Object.assign(el.style, {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
       pointerEvents: 'auto',
     }),
-      (this._root = _0x295995));
-    const _0x2f2dc2 = document.createElement('div');
-    (Object.assign(_0x2f2dc2.style, {
+      (this._root = el));
+    const el2 = document.createElement('div');
+    (Object.assign(el2.style, {
       padding: '8px 12px',
       background: 'var(--debug-header-bg)',
       borderBottom: '1px solid var(--debug-header-border)',
@@ -35,25 +32,25 @@ export class DebugNode {
       borderTopRightRadius: '8px',
       cursor: 'move',
     }),
-      _0x2f2dc2.replaceChildren());
-    const _0x3a2a14 = 'http://www.w3.org/2000/svg',
-      _0x57d566 = document.createElementNS(_0x3a2a14, 'svg');
-    (_0x57d566.setAttribute('width', '14'),
-      _0x57d566.setAttribute('height', '14'),
-      _0x57d566.setAttribute('viewBox', '0 0 24 24'),
-      _0x57d566.setAttribute('fill', 'none'),
-      _0x57d566.setAttribute('stroke', 'currentColor'),
-      _0x57d566.setAttribute('stroke-width', '2'));
-    const _0xda1dc2 = document.createElementNS(_0x3a2a14, 'path');
-    (_0xda1dc2.setAttribute(
+      el2.replaceChildren());
+    const index = 'http://www.w3.org/2000/svg',
+      el3 = document.createElementNS(index, 'svg');
+    (el3.setAttribute('width', '14'),
+      el3.setAttribute('height', '14'),
+      el3.setAttribute('viewBox', '0 0 24 24'),
+      el3.setAttribute('fill', 'none'),
+      el3.setAttribute('stroke', 'currentColor'),
+      el3.setAttribute('stroke-width', '2'));
+    const el4 = document.createElementNS(index, 'path');
+    (el4.setAttribute(
       'd',
       'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
     ),
-      _0x57d566.appendChild(_0xda1dc2),
-      _0x2f2dc2.appendChild(_0x57d566),
+      el3.appendChild(el4),
+      el2.appendChild(el3),
       (this._headerLabel = document.createTextNode(debugNodeText('title'))),
-      _0x2f2dc2.appendChild(this._headerLabel),
-      _0x295995.appendChild(_0x2f2dc2),
+      el2.appendChild(this._headerLabel),
+      el.appendChild(el2),
       (this.contentEl = document.createElement('div')),
       (this.contentEl.className = 'debug-output-content custom-scrollbar'),
       Object.assign(this.contentEl.style, {
@@ -79,13 +76,12 @@ export class DebugNode {
       this.contentEl.setAttribute('contenteditable', 'true'),
       this.contentEl.style.setProperty('user-select', 'text', 'important'),
       this.contentEl.style.setProperty('-webkit-user-select', 'text', 'important'),
-      this.contentEl.addEventListener('keydown', (_0x22c393) => {
-        if ((_0x22c393.ctrlKey || _0x22c393.metaKey) && (_0x22c393.key === 'c' || _0x22c393.key === 'a'))
-          return;
-        _0x22c393.preventDefault();
+      this.contentEl.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && (event.key === 'c' || event.key === 'a')) return;
+        event.preventDefault();
       }),
-      this.contentEl.addEventListener('input', (_0x410044) => {
-        _0x410044.preventDefault();
+      this.contentEl.addEventListener('input', (event2) => {
+        event2.preventDefault();
       }));
     this._data.outputText
       ? (this.contentEl.textContent = this._data.outputText)
@@ -93,53 +89,53 @@ export class DebugNode {
         (this.contentEl.style.color = 'var(--text-muted)'));
     (this.contentEl.addEventListener(
       'wheel',
-      (_0x509133) => {
-        _0x509133.stopPropagation();
+      (event3) => {
+        event3.stopPropagation();
       },
       { passive: true },
     ),
-      this.contentEl.addEventListener('mousedown', (_0x22e8e4) => {
-        _0x22e8e4.stopPropagation();
+      this.contentEl.addEventListener('mousedown', (event4) => {
+        event4.stopPropagation();
       }),
-      this.contentEl.addEventListener('pointerdown', (_0x55131f) => {
-        _0x55131f.stopPropagation();
+      this.contentEl.addEventListener('pointerdown', (event5) => {
+        event5.stopPropagation();
       }),
-      _0x295995.appendChild(this.contentEl));
-    const _0x368493 = document.createElement('div');
+      el.appendChild(this.contentEl));
+    const el5 = document.createElement('div');
     return (
-      (_0x368493.className = 'group-resizer'),
-      (_0x368493.style.pointerEvents = 'auto'),
-      _0x368493.addEventListener('pointerdown', (_0x10c4bc) => {
-        (_0x10c4bc.stopPropagation(), _0x10c4bc.preventDefault());
-        const _0x9593e1 = _0x10c4bc.clientX,
-          _0x1f3d0b = _0x10c4bc.clientY,
-          _0x4625ce = this._data.width || 0x12c,
-          _0x18fb16 = this._data.height || 200,
-          _0x4f4ebf = (_0x236952) => {
-            const { viewport: _0x117596 } = appStore.getState(),
-              _0x4c1d0f = (_0x236952.clientX - _0x9593e1) / _0x117596.zoom,
-              _0x4d99cd = (_0x236952.clientY - _0x1f3d0b) / _0x117596.zoom;
+      (el5.className = 'group-resizer'),
+      (el5.style.pointerEvents = 'auto'),
+      el5.addEventListener('pointerdown', (event6) => {
+        (event6.stopPropagation(), event6.preventDefault());
+        const result = event6.clientX,
+          data = event6.clientY,
+          options = this._data.width || 0x12c,
+          target = this._data.height || 200,
+          source = (event7) => {
+            const { viewport: viewport } = appStore.getState(),
+              next = (event7.clientX - result) / viewport.zoom,
+              current = (event7.clientY - data) / viewport.zoom;
             appStore.updateNodeData(this.nodeId, {
-              width: Math.max(200, _0x4625ce + _0x4c1d0f),
-              height: Math.max(120, _0x18fb16 + _0x4d99cd),
+              width: Math.max(200, options + next),
+              height: Math.max(120, target + current),
             });
           },
-          _0x3111b5 = () => {
-            (window.removeEventListener('pointermove', _0x4f4ebf),
-              window.removeEventListener('pointerup', _0x3111b5));
+          entry = () => {
+            (window.removeEventListener('pointermove', source),
+              window.removeEventListener('pointerup', entry));
           };
-        (window.addEventListener('pointermove', _0x4f4ebf), window.addEventListener('pointerup', _0x3111b5));
+        (window.addEventListener('pointermove', source), window.addEventListener('pointerup', entry));
       }),
-      _0x295995.appendChild(_0x368493),
-      _0x295995
+      el.appendChild(el5),
+      el
     );
   }
-  ['update'](_0x28b3fe) {
-    ((this._data = _0x28b3fe),
+  ['update'](record) {
+    ((this._data = record),
       this.contentEl &&
         document.activeElement !== this.contentEl &&
-        (_0x28b3fe.outputText
-          ? ((this.contentEl.textContent = _0x28b3fe.outputText),
+        (record.outputText
+          ? ((this.contentEl.textContent = record.outputText),
             (this.contentEl.style.color = 'var(--debug-body-text)'))
           : ((this.contentEl.textContent = debugNodeText('empty')),
             (this.contentEl.style.color = 'var(--text-muted)'))));

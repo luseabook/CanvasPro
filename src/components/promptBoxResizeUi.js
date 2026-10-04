@@ -5,92 +5,92 @@ import {
 } from './promptBoxResize.js';
 const EDGE_HIT_TOP_OFFSET = 20,
   EDGE_HIT_BOTTOM_OFFSET = 10;
-export function syncPromptBoxSizeFromData(_0x3cd449, _0x5550eb = _0x3cd449?._data) {
-  if (!_0x3cd449?.promptEl || _0x3cd449._isPromptBoxResizing) return;
-  const _0x18b156 = getPromptBoxHeightBounds(_0x3cd449._promptPanel),
-    _0x3e8b86 = normalizePromptBoxHeight(_0x5550eb?.promptBoxHeight, _0x18b156);
-  applyPromptBoxHeight(_0x3cd449.promptEl, _0x3e8b86);
+export function syncPromptBoxSizeFromData(enabled, value = enabled?._data) {
+  if (!enabled?.promptEl || enabled._isPromptBoxResizing) return;
+  const promptBoxHeightBounds = getPromptBoxHeightBounds(enabled._promptPanel),
+    promptBoxHeight = normalizePromptBoxHeight(value?.promptBoxHeight, promptBoxHeightBounds);
+  applyPromptBoxHeight(enabled.promptEl, promptBoxHeight);
 }
-export function setupPromptBoxResize(_0x3e3ce9, { store: _0x31ca61, getStateSnapshot: _0x470b19 }) {
-  if (!_0x3e3ce9?._promptPanel || _0x3e3ce9._promptResizeHandle) return;
-  _0x3e3ce9._promptResizeHandle = true;
-  const _0x21fff0 = () => _0x470b19().ui?.promptBoxResizeEnabled !== false,
-    _0x573057 = (_0x2e0e5d) => !!_0x2e0e5d?.closest('.floating-menu, .img-model-menu'),
-    _0x2e33f0 = (_0x3cfa01) => {
-      const _0x239bde = _0x3e3ce9._promptPanel.getBoundingClientRect();
-      return (
-        _0x3cfa01 >= _0x239bde.bottom - EDGE_HIT_TOP_OFFSET &&
-        _0x3cfa01 <= _0x239bde.bottom + EDGE_HIT_BOTTOM_OFFSET
-      );
+export function setupPromptBoxResize(enabled2, { store: store, getStateSnapshot: getStateSnapshot }) {
+  if (!enabled2?._promptPanel || enabled2._promptResizeHandle) return;
+  enabled2._promptResizeHandle = true;
+  const run = () => getStateSnapshot().ui?.promptBoxResizeEnabled !== false,
+    handler = (el) => !!el?.closest('.floating-menu, .img-model-menu'),
+    handler2 = (item) => {
+      const box = enabled2._promptPanel.getBoundingClientRect();
+      return item >= box.bottom - EDGE_HIT_TOP_OFFSET && item <= box.bottom + EDGE_HIT_BOTTOM_OFFSET;
     },
-    _0x24ea4c = (_0x4251f3) => {
-      if (!_0x3e3ce9._promptPanel) return;
-      if (!_0x21fff0()) {
-        _0x3e3ce9._promptPanel.classList.remove('is-resize-hover');
+    handler3 = (event) => {
+      if (!enabled2._promptPanel) return;
+      if (!run()) {
+        enabled2._promptPanel.classList.remove('is-resize-hover');
         return;
       }
-      if (_0x3e3ce9._isPromptBoxResizing) {
-        _0x3e3ce9._promptPanel.classList.add('is-resize-hover');
+      if (enabled2._isPromptBoxResizing) {
+        enabled2._promptPanel.classList.add('is-resize-hover');
         return;
       }
-      const _0x5d4fa0 = !_0x573057(_0x4251f3?.target) && _0x2e33f0(_0x4251f3.clientY);
-      _0x3e3ce9._promptPanel.classList.toggle('is-resize-hover', _0x5d4fa0);
+      const key = !handler(event?.target) && handler2(event.clientY);
+      enabled2._promptPanel.classList.toggle('is-resize-hover', key);
     },
-    _0x4c34f4 = () => {
-      !_0x3e3ce9._isPromptBoxResizing && _0x3e3ce9._promptPanel?.classList.remove('is-resize-hover');
+    index = () => {
+      !enabled2._isPromptBoxResizing && enabled2._promptPanel?.classList.remove('is-resize-hover');
     },
-    _0x5f192f = () => {
-      (_0x3e3ce9._promptPanel?.removeEventListener('pointerdown', _0x105b6e),
-        _0x3e3ce9._promptPanel?.removeEventListener('pointermove', _0x24ea4c),
-        _0x3e3ce9._promptPanel?.removeEventListener('pointerleave', _0x4c34f4),
-        _0x3e3ce9._promptPanel?.classList.remove('is-resize-hover'));
+    handler4 = () => {
+      (enabled2._promptPanel?.removeEventListener('pointerdown', result),
+        enabled2._promptPanel?.removeEventListener('pointermove', handler3),
+        enabled2._promptPanel?.removeEventListener('pointerleave', index),
+        enabled2._promptPanel?.classList.remove('is-resize-hover'));
     },
-    _0x105b6e = (_0x5b03e8) => {
-      if (!_0x3e3ce9._promptInputWrap || !_0x3e3ce9.promptEl) return;
-      if (!_0x21fff0()) return;
-      if (_0x5b03e8.button !== 0) return;
-      if (!_0x2e33f0(_0x5b03e8.clientY)) return;
-      if (_0x5b03e8.target?.closest('.prompt-submit') || _0x573057(_0x5b03e8.target)) return;
-      (_0x5b03e8.stopPropagation(), _0x5b03e8.preventDefault());
-      const _0x2b0c80 = getPromptBoxHeightBounds(_0x3e3ce9._promptPanel),
-        _0x268b32 = _0x5b03e8.clientY,
-        _0x3fabb5 = _0x3e3ce9.promptEl.getBoundingClientRect().height;
-      ((_0x3e3ce9._isPromptBoxResizing = true),
-        _0x3e3ce9._promptInputWrap.classList.add('is-resizing'),
-        _0x3e3ce9._promptPanel.classList.add('is-resize-hover'));
-      const _0xd3878d = (_0x233533) => {
-          _0x233533.preventDefault();
-          const _0x37684a = normalizePromptBoxHeight(_0x3fabb5 + (_0x233533.clientY - _0x268b32), _0x2b0c80);
-          applyPromptBoxHeight(_0x3e3ce9.promptEl, _0x37684a);
-        },
-        _0x315947 = (_0x5de6bf) => {
-          (_0x5de6bf.preventDefault(),
-            window.removeEventListener('pointermove', _0xd3878d),
-            window.removeEventListener('pointerup', _0x315947),
-            window.removeEventListener('pointercancel', _0x315947));
-          const _0x2ca0b9 = normalizePromptBoxHeight(
-            _0x3e3ce9.promptEl?.getBoundingClientRect().height,
-            _0x2b0c80,
+    result = (event2) => {
+      if (!enabled2._promptInputWrap || !enabled2.promptEl) return;
+      if (!run()) return;
+      if (event2.button !== 0) return;
+      if (!handler2(event2.clientY)) return;
+      if (event2.target?.closest('.prompt-submit') || handler(event2.target)) return;
+      (event2.stopPropagation(), event2.preventDefault());
+      const promptBoxHeightBounds2 = getPromptBoxHeightBounds(enabled2._promptPanel),
+        data = event2.clientY,
+        options = enabled2.promptEl.getBoundingClientRect().height;
+      ((enabled2._isPromptBoxResizing = true),
+        enabled2._promptInputWrap.classList.add('is-resizing'),
+        enabled2._promptPanel.classList.add('is-resize-hover'));
+      const target = (event3) => {
+          event3.preventDefault();
+          const promptBoxHeight2 = normalizePromptBoxHeight(
+            options + (event3.clientY - data),
+            promptBoxHeightBounds2,
           );
-          (applyPromptBoxHeight(_0x3e3ce9.promptEl, _0x2ca0b9),
-            _0x3e3ce9._promptInputWrap.classList.remove('is-resizing'),
-            (_0x3e3ce9._isPromptBoxResizing = false),
-            _0x3e3ce9._promptPanel.classList.remove('is-resize-hover'),
-            _0x24ea4c(_0x5de6bf),
-            _0x31ca61.updateNodeData(_0x3e3ce9.nodeId, { promptBoxHeight: _0x2ca0b9 }));
+          applyPromptBoxHeight(enabled2.promptEl, promptBoxHeight2);
+        },
+        source = (event4) => {
+          (event4.preventDefault(),
+            window.removeEventListener('pointermove', target),
+            window.removeEventListener('pointerup', source),
+            window.removeEventListener('pointercancel', source));
+          const promptBoxHeight3 = normalizePromptBoxHeight(
+            enabled2.promptEl?.getBoundingClientRect().height,
+            promptBoxHeightBounds2,
+          );
+          (applyPromptBoxHeight(enabled2.promptEl, promptBoxHeight3),
+            enabled2._promptInputWrap.classList.remove('is-resizing'),
+            (enabled2._isPromptBoxResizing = false),
+            enabled2._promptPanel.classList.remove('is-resize-hover'),
+            handler3(event4),
+            store.updateNodeData(enabled2.nodeId, { promptBoxHeight: promptBoxHeight3 }));
         };
-      (window.addEventListener('pointermove', _0xd3878d),
-        window.addEventListener('pointerup', _0x315947),
-        window.addEventListener('pointercancel', _0x315947),
-        (_0x3e3ce9._promptResizeCleanup = () => {
-          (_0x5f192f(),
-            window.removeEventListener('pointermove', _0xd3878d),
-            window.removeEventListener('pointerup', _0x315947),
-            window.removeEventListener('pointercancel', _0x315947));
+      (window.addEventListener('pointermove', target),
+        window.addEventListener('pointerup', source),
+        window.addEventListener('pointercancel', source),
+        (enabled2._promptResizeCleanup = () => {
+          (handler4(),
+            window.removeEventListener('pointermove', target),
+            window.removeEventListener('pointerup', source),
+            window.removeEventListener('pointercancel', source));
         }));
     };
-  (_0x3e3ce9._promptPanel.addEventListener('pointermove', _0x24ea4c),
-    _0x3e3ce9._promptPanel.addEventListener('pointerleave', _0x4c34f4),
-    _0x3e3ce9._promptPanel.addEventListener('pointerdown', _0x105b6e),
-    (_0x3e3ce9._promptResizeCleanup = _0x5f192f));
+  (enabled2._promptPanel.addEventListener('pointermove', handler3),
+    enabled2._promptPanel.addEventListener('pointerleave', index),
+    enabled2._promptPanel.addEventListener('pointerdown', result),
+    (enabled2._promptResizeCleanup = handler4));
 }

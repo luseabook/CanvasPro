@@ -1,126 +1,122 @@
 import { t } from '../../i18n/index.js';
 const SVG_NS = 'http://www.w3.org/2000/svg';
-function storyboardCellText(_0x123f29, _0x51de03 = {}) {
-  return t('storyboard.cell.' + _0x123f29, _0x51de03);
+function storyboardCellText(value, item = {}) {
+  return t('storyboard.cell.' + value, item);
 }
 function createEmptyPlusIcon() {
-  const _0x41e560 = document.createElementNS(SVG_NS, 'svg');
-  (_0x41e560.setAttribute('width', '24'),
-    _0x41e560.setAttribute('height', '24'),
-    _0x41e560.setAttribute('viewBox', '0 0 24 24'),
-    _0x41e560.setAttribute('fill', 'none'),
-    _0x41e560.setAttribute('stroke', 'currentColor'),
-    _0x41e560.setAttribute('stroke-width', '1.5'));
-  const _0x477dfa = document.createElementNS(SVG_NS, 'path');
-  return (_0x477dfa.setAttribute('d', 'M12 3v18m9-9H3'), _0x41e560.appendChild(_0x477dfa), _0x41e560);
+  const el = document.createElementNS(SVG_NS, 'svg');
+  (el.setAttribute('width', '24'),
+    el.setAttribute('height', '24'),
+    el.setAttribute('viewBox', '0 0 24 24'),
+    el.setAttribute('fill', 'none'),
+    el.setAttribute('stroke', 'currentColor'),
+    el.setAttribute('stroke-width', '1.5'));
+  const el2 = document.createElementNS(SVG_NS, 'path');
+  return (el2.setAttribute('d', 'M12 3v18m9-9H3'), el.appendChild(el2), el);
 }
-export function createStoryboardCellImageElement(_0x10a06b) {
-  const _0x9d51e3 = document.createElement('img');
+export function createStoryboardCellImageElement(key) {
+  const el3 = document.createElement('img');
   return (
-    (_0x9d51e3.className = 'storyboard-cell-img'),
-    _0x9d51e3.setAttribute('src', _0x10a06b),
-    (_0x9d51e3.decoding = 'async'),
-    (_0x9d51e3.loading = 'eager'),
-    (_0x9d51e3.style.width = '100%'),
-    (_0x9d51e3.style.height = '100%'),
-    (_0x9d51e3.style.objectFit = 'cover'),
-    (_0x9d51e3.style.pointerEvents = 'none'),
-    _0x9d51e3.addEventListener('error', () => {
-      const _0x5762dc = _0x9d51e3.parentElement;
-      if (!_0x5762dc) return;
-      _0x5762dc.replaceChildren();
-      const _0x57ed54 = document.createElement('div');
-      ((_0x57ed54.style.color = 'var(--text-muted)'),
-        (_0x57ed54.style.fontSize = '10px'),
-        (_0x57ed54.textContent = storyboardCellText('loadFailed')),
-        _0x5762dc.appendChild(_0x57ed54));
+    (el3.className = 'storyboard-cell-img'),
+    el3.setAttribute('src', key),
+    (el3.decoding = 'async'),
+    (el3.loading = 'eager'),
+    (el3.style.width = '100%'),
+    (el3.style.height = '100%'),
+    (el3.style.objectFit = 'cover'),
+    (el3.style.pointerEvents = 'none'),
+    el3.addEventListener('error', () => {
+      const el4 = el3.parentElement;
+      if (!el4) return;
+      el4.replaceChildren();
+      const el5 = document.createElement('div');
+      ((el5.style.color = 'var(--text-muted)'),
+        (el5.style.fontSize = '10px'),
+        (el5.textContent = storyboardCellText('loadFailed')),
+        el4.appendChild(el5));
     }),
-    _0x9d51e3
+    el3
   );
 }
-function createResidualImage(_0x391110) {
-  const _0xb2e184 = document.createElement('img');
+function createResidualImage(index) {
+  const el6 = document.createElement('img');
   return (
-    (_0xb2e184.className = 'storyboard-empty-residual-img'),
-    _0xb2e184.setAttribute('src', _0x391110),
-    (_0xb2e184.decoding = 'async'),
-    (_0xb2e184.loading = 'eager'),
-    (_0xb2e184.style.pointerEvents = 'none'),
-    _0xb2e184
+    (el6.className = 'storyboard-empty-residual-img'),
+    el6.setAttribute('src', index),
+    (el6.decoding = 'async'),
+    (el6.loading = 'eager'),
+    (el6.style.pointerEvents = 'none'),
+    el6
   );
 }
-function createEmptyPlaceholder(_0x402821 = 'empty-placeholder') {
-  const _0x1a8165 = document.createElement('div');
+function createEmptyPlaceholder(result = 'empty-placeholder') {
+  const el7 = document.createElement('div');
   return (
-    (_0x1a8165.className = _0x402821),
-    (_0x1a8165.style.color = 'var(--white-10)'),
-    _0x1a8165.appendChild(createEmptyPlusIcon()),
-    _0x1a8165
+    (el7.className = result),
+    (el7.style.color = 'var(--white-10)'),
+    el7.appendChild(createEmptyPlusIcon()),
+    el7
   );
 }
-function createEmptyResidualContent(_0xdd71a6) {
-  const _0x3bb287 = document.createElement('div');
+function createEmptyResidualContent(data) {
+  const el8 = document.createElement('div');
   return (
-    (_0x3bb287.className = 'storyboard-empty-residual'),
-    _0x3bb287.appendChild(createResidualImage(_0xdd71a6)),
-    _0x3bb287.appendChild(createEmptyPlaceholder('empty-placeholder storyboard-empty-cutout')),
-    _0x3bb287
+    (el8.className = 'storyboard-empty-residual'),
+    el8.appendChild(createResidualImage(data)),
+    el8.appendChild(createEmptyPlaceholder('empty-placeholder storyboard-empty-cutout')),
+    el8
   );
 }
-function createExtractedCellContent(_0x5fb153, _0x4c6d63, _0x1e9bd3) {
-  const _0x2c6432 = document.createElement('div');
-  _0x2c6432.className = 'storyboard-extracted-cell-content';
-  if (_0x1e9bd3) _0x2c6432.appendChild(createResidualImage(_0x1e9bd3));
-  const _0x4e5bb5 = createStoryboardCellImageElement(_0x4c6d63);
-  return (
-    _0x4e5bb5.classList.add('storyboard-cell-img--extracted-cutout'),
-    _0x2c6432.appendChild(_0x4e5bb5),
-    _0x2c6432
-  );
+function createExtractedCellContent(options, target, source) {
+  const el9 = document.createElement('div');
+  el9.className = 'storyboard-extracted-cell-content';
+  if (source) el9.appendChild(createResidualImage(source));
+  const el10 = createStoryboardCellImageElement(target);
+  return (el10.classList.add('storyboard-cell-img--extracted-cutout'), el9.appendChild(el10), el9);
 }
 export function createStoryboardCellContentNode({
-  cell: _0x57dbf4,
-  finalUrl: _0x3d6c82,
+  cell: cell,
+  finalUrl: finalUrl,
   residualUrl: residualUrl = '',
 } = {}) {
-  if (!_0x57dbf4) return document.createTextNode('');
-  if (!_0x3d6c82) return residualUrl ? createEmptyResidualContent(residualUrl) : createEmptyPlaceholder();
-  if (_0x57dbf4.storyboardExtractedCell === true || _0x57dbf4.storyboardLockedCell === true)
-    return createExtractedCellContent(_0x57dbf4, _0x3d6c82, residualUrl);
-  return createStoryboardCellImageElement(_0x3d6c82);
+  if (!cell) return document.createTextNode('');
+  if (!finalUrl) return residualUrl ? createEmptyResidualContent(residualUrl) : createEmptyPlaceholder();
+  if (cell.storyboardExtractedCell === true || cell.storyboardLockedCell === true)
+    return createExtractedCellContent(cell, finalUrl, residualUrl);
+  return createStoryboardCellImageElement(finalUrl);
 }
-export function buildReusableStoryboardCellImageMap(_0xc08e9b) {
-  const _0x23cb4e = new Map();
-  if (!_0xc08e9b) return _0x23cb4e;
+export function buildReusableStoryboardCellImageMap(list) {
+  const map = new Map();
+  if (!list) return map;
   return (
-    _0xc08e9b.forEach((_0x4a96bb) => {
-      const _0x49bc82 = _0x4a96bb?.querySelector?.('.cell-content-wrap'),
-        _0x33a7b2 = _0x49bc82?.querySelector?.('.storyboard-cell-img');
-      if (!_0x33a7b2 || _0x33a7b2.tagName !== 'IMG') return;
-      const _0x4ae66c = _0x33a7b2.getAttribute('src') || '';
-      if (_0x4ae66c && !_0x23cb4e.has(_0x4ae66c)) _0x23cb4e.set(_0x4ae66c, _0x33a7b2);
+    list.forEach((el11) => {
+      const el12 = el11?.querySelector?.('.cell-content-wrap'),
+        enabled = el12?.querySelector?.('.storyboard-cell-img');
+      if (!enabled || enabled.tagName !== 'IMG') return;
+      const next = enabled.getAttribute('src') || '';
+      if (next && !map.has(next)) map.set(next, enabled);
     }),
-    _0x23cb4e
+    map
   );
 }
-export function cloneReusableStoryboardCellImage(_0x3d919e, _0x1d32c9) {
-  const _0x210e05 = _0x1d32c9?.get?.(_0x3d919e);
-  if (!_0x210e05 || _0x210e05.tagName !== 'IMG') return null;
-  const _0x1c88b9 = _0x210e05.cloneNode(false);
+export function cloneReusableStoryboardCellImage(current, map2) {
+  const enabled2 = map2?.get?.(current);
+  if (!enabled2 || enabled2.tagName !== 'IMG') return null;
+  const el13 = enabled2.cloneNode(false);
   return (
-    _0x1c88b9.classList.remove('is-cell-preloading', 'is-cell-ready'),
-    _0x1c88b9.classList.add('storyboard-cell-img'),
-    _0x1c88b9.setAttribute('src', _0x3d919e),
-    (_0x1c88b9.decoding = 'async'),
-    (_0x1c88b9.loading = 'eager'),
-    (_0x1c88b9.style.width = '100%'),
-    (_0x1c88b9.style.height = '100%'),
-    (_0x1c88b9.style.objectFit = 'cover'),
-    (_0x1c88b9.style.pointerEvents = 'none'),
-    (_0x1c88b9.style.position = ''),
-    (_0x1c88b9.style.inset = ''),
-    (_0x1c88b9.style.opacity = ''),
-    (_0x1c88b9.style.transition = ''),
-    _0x1c88b9
+    el13.classList.remove('is-cell-preloading', 'is-cell-ready'),
+    el13.classList.add('storyboard-cell-img'),
+    el13.setAttribute('src', current),
+    (el13.decoding = 'async'),
+    (el13.loading = 'eager'),
+    (el13.style.width = '100%'),
+    (el13.style.height = '100%'),
+    (el13.style.objectFit = 'cover'),
+    (el13.style.pointerEvents = 'none'),
+    (el13.style.position = ''),
+    (el13.style.inset = ''),
+    (el13.style.opacity = ''),
+    (el13.style.transition = ''),
+    el13
   );
 }

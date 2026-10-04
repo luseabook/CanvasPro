@@ -10,114 +10,110 @@ const SKILL_TERM_PATTERN = '(?:skills?|技能)',
     new RegExp(CREATE_TERM_PATTERN + '.{0,32}' + SKILL_TERM_PATTERN, 'iu'),
     new RegExp(SKILL_TERM_PATTERN + '.{0,32}' + CREATE_TERM_PATTERN, 'iu'),
   ]);
-export function isAgentSkillAuthoringIntent(_0x4cb53e = '') {
-  const _0x20dd9a = String(_0x4cb53e || '')['trim']();
-  if (
-    !_0x20dd9a ||
-    NEGATED_AUTHORING_PATTERN['test'](_0x20dd9a) ||
-    AUTHORING_QUESTION_PATTERN['test'](_0x20dd9a)
-  )
+export function isAgentSkillAuthoringIntent(value = '') {
+  const enabled = String(value || '')['trim']();
+  if (!enabled || NEGATED_AUTHORING_PATTERN['test'](enabled) || AUTHORING_QUESTION_PATTERN['test'](enabled))
     return ![];
-  return AUTHORING_PATTERNS['some']((_0x24c369) => _0x24c369['test'](_0x20dd9a));
+  return AUTHORING_PATTERNS['some']((item) => item['test'](enabled));
 }
-export function isAgentSkillAuthoringCancelMessage(_0x620dd0 = '') {
+export function isAgentSkillAuthoringCancelMessage(key = '') {
   return /^(?:取消(?:创建)?|不创建了|算了|cancel|never\s*mind)\s*[。.!！]?$/iu['test'](
-    String(_0x620dd0 || '')['trim'](),
+    String(key || '')['trim'](),
   );
 }
-function failed(_0x1ec129, _0x551e0f) {
+function failed(index, result) {
   return {
     ok: ![],
     status: 'failed',
-    errorCode: String(_0x1ec129 || 'SKILL_AUTHORING_INVALID'),
-    message: String(_0x551e0f || 'Skill draft is invalid.'),
+    errorCode: String(index || 'SKILL_AUTHORING_INVALID'),
+    message: String(result || 'Skill draft is invalid.'),
   };
 }
-export function normalizeAgentSkillAuthoringResult(_0x17f4e2 = {}) {
-  if (!_0x17f4e2 || typeof _0x17f4e2 !== 'object' || Array['isArray'](_0x17f4e2))
+export function normalizeAgentSkillAuthoringResult(error = {}) {
+  if (!error || typeof error !== 'object' || Array['isArray'](error))
     return failed('SKILL_AUTHORING_INVALID', 'Skill\x20authoring\x20returned\x20an\x20invalid\x20result.');
-  const _0x397ccd = String(_0x17f4e2['status'] || '')['trim']();
-  if (_0x397ccd === 'need_clarification') {
-    const _0x59096d = String(_0x17f4e2['question'] || _0x17f4e2['reply'] || '')['trim']();
-    if (!_0x59096d)
+  const status = String(error['status'] || '')['trim']();
+  if (status === 'need_clarification') {
+    const question = String(error['question'] || error['reply'] || '')['trim']();
+    if (!question)
       return failed('SKILL_AUTHORING_QUESTION_MISSING', 'Skill clarification question is missing.');
     return {
       ok: !![],
-      status: _0x397ccd,
-      reply: String(_0x17f4e2['reply'] || _0x59096d)['trim'](),
-      question: _0x59096d,
-      options: Array['isArray'](_0x17f4e2['options']) ? _0x17f4e2['options']['slice'](0x0, 0x6) : [],
+      status: status,
+      reply: String(error['reply'] || question)['trim'](),
+      question: question,
+      options: Array['isArray'](error['options']) ? error['options']['slice'](0x0, 0x6) : [],
     };
   }
-  if (_0x397ccd === 'failed')
+  if (status === 'failed')
     return failed(
-      _0x17f4e2['errorCode'] || 'SKILL_AUTHORING_FAILED',
-      _0x17f4e2['reply'] || _0x17f4e2['message'] || 'Skill authoring failed.',
+      error['errorCode'] || 'SKILL_AUTHORING_FAILED',
+      error['reply'] || error['message'] || 'Skill authoring failed.',
     );
-  const _0x347c00 = serializeManagedAgentSkillDefinition(_0x17f4e2['definition'] || {});
-  if (!_0x347c00['ok']) return failed(_0x347c00['errorCode'], _0x347c00['message']);
+  const error2 = serializeManagedAgentSkillDefinition(error['definition'] || {});
+  if (!error2['ok']) return failed(error2['errorCode'], error2['message']);
   const {
-    id: _0x7967ea,
-    title: _0x521817,
-    description: _0x3bd19f,
-    triggers: _0x425efc,
-    instructions: _0x5b60d1,
-  } = _0x347c00['definition'];
+    id: id,
+    title: title,
+    description: description,
+    triggers: triggers,
+    instructions: instructions,
+  } = error2['definition'];
   return {
     ok: !![],
     status: 'ready',
-    reply: String(_0x17f4e2['reply'] || '')['trim'](),
+    reply: String(error['reply'] || '')['trim'](),
     definition: {
-      id: _0x7967ea,
-      title: _0x521817,
-      description: _0x3bd19f,
-      triggers: _0x425efc,
-      instructions: _0x5b60d1,
+      id: id,
+      title: title,
+      description: description,
+      triggers: triggers,
+      instructions: instructions,
     },
   };
 }
 export async function requestNormalizedAgentSkillDraft({
-  author: _0x3a7c04,
+  author: author,
   payload: payload = {},
   onTrace: onTrace = null,
 } = {}) {
-  if (typeof _0x3a7c04 !== 'function')
+  if (typeof author !== 'function')
     return failed('SKILL_AUTHORING_UNAVAILABLE', 'Skill authoring is unavailable.');
-  let _0x2e7a42 = normalizeAgentSkillAuthoringResult(await _0x3a7c04(payload));
-  if (_0x2e7a42['ok'] || _0x2e7a42['errorCode'] === 'SKILL_AUTHORING_FAILED') return _0x2e7a42;
+  let errorCode = normalizeAgentSkillAuthoringResult(await author(payload));
+  if (errorCode['ok'] || errorCode['errorCode'] === 'SKILL_AUTHORING_FAILED') return errorCode;
   return (
-    onTrace?.({ type: 'agent_skill_authoring_schema_retry', errorCode: _0x2e7a42['errorCode'] }),
-    (_0x2e7a42 = normalizeAgentSkillAuthoringResult(
-      await _0x3a7c04({ ...payload, repairReason: _0x2e7a42['errorCode'] + ':\x20' + _0x2e7a42['message'] }),
+    onTrace?.({ type: 'agent_skill_authoring_schema_retry', errorCode: errorCode['errorCode'] }),
+    (errorCode = normalizeAgentSkillAuthoringResult(
+      await author({ ...payload, repairReason: errorCode['errorCode'] + ':\x20' + errorCode['message'] }),
     )),
-    _0x2e7a42
+    errorCode
   );
 }
-export function createAvailableAgentSkillId(_0x27b9f9 = 'skill', _0x451d41 = []) {
-  const _0x20ea6f =
-      String(_0x27b9f9 || 'skill')
+export function createAvailableAgentSkillId(data = 'skill', options = []) {
+  const list =
+      String(data || 'skill')
         ['trim']()
         ['toLowerCase']()
         ['replace'](/[^a-z0-9-]+/g, '-')
         ['replace'](/^-+|-+$/g, '')
         ['slice'](0x0, 0x40) || 'skill',
-    _0x1fae08 = new Set(
-      (Array['isArray'](_0x451d41) ? _0x451d41 : [])
-        ['map']((_0x4716ac) =>
-          String(_0x4716ac || '')
+    map = new Set(
+      (Array['isArray'](options) ? options : [])
+        ['map']((target) =>
+          String(target || '')
             ['trim']()
             ['toLowerCase'](),
         )
         ['filter'](Boolean),
     );
-  if (!_0x1fae08['has'](_0x20ea6f)) return _0x20ea6f;
-  const _0x29ed1c = _0x20ea6f['match'](/^(.*?)-(\d+)$/),
-    _0x4cf250 = _0x29ed1c?.[0x1] || _0x20ea6f,
-    _0x10d937 = _0x29ed1c ? Math['max'](0x2, Number(_0x29ed1c[0x2]) + 0x1) : 0x2;
-  for (let _0x246d50 = _0x10d937; _0x246d50 < 0x3e8; _0x246d50 += 0x1) {
-    const _0x454f44 = '-' + _0x246d50,
-      _0x4ec3ed = '' + _0x4cf250['slice'](0x0, 0x40 - _0x454f44['length']) + _0x454f44;
-    if (!_0x1fae08['has'](_0x4ec3ed)) return _0x4ec3ed;
+  if (!map['has'](list)) return list;
+  const source = list['match'](/^(.*?)-(\d+)$/),
+    list2 = source?.[0x1] || list,
+    next = source ? Math['max'](0x2, Number(source[0x2]) + 0x1) : 0x2;
+  for (let count = next; count < 0x3e8; count += 0x1) {
+    const list3 = '-' + count,
+      current = '' + list2['slice'](0x0, 0x40 - list3['length']) + list3;
+    if (!map['has'](current)) return current;
   }
-  return _0x20ea6f['slice'](0x0, 0x37) + '-' + Date['now']()['toString'](0x24)['slice'](-0x8);
+  return list['slice'](0x0, 0x37) + '-' + Date['now']()['toString'](0x24)['slice'](-0x8);
 }

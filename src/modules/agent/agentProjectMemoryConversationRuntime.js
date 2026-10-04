@@ -31,17 +31,17 @@ const TEXT = Object['freeze']({
     preferences: 'Other preferences',
   }),
 });
-function localeKey(_0x2a743c = '') {
-  return String(_0x2a743c || '')
+function localeKey(value = '') {
+  return String(value || '')
     ['toLowerCase']()
     ['startsWith']('en')
     ? 'en-US'
     : 'zh-CN';
 }
-function formatText(_0x4f3173, _0x321734 = {}, _0x6a96ac = 'zh-CN') {
-  return (TEXT[localeKey(_0x6a96ac)]?.[_0x4f3173] || TEXT['zh-CN'][_0x4f3173] || _0x4f3173)['replace'](
+function formatText(item, key = {}, index = 'zh-CN') {
+  return (TEXT[localeKey(index)]?.[item] || TEXT['zh-CN'][item] || item)['replace'](
     /\{(\w+)\}/g,
-    (_0x191987, _0x1d9e9e) => String(_0x321734[_0x1d9e9e] ?? ''),
+    (result, data) => String(key[data] ?? ''),
   );
 }
 export function createAgentProjectMemoryConversationRuntime({
@@ -49,81 +49,78 @@ export function createAgentProjectMemoryConversationRuntime({
   sessionStore: sessionStore = null,
   localeProvider: localeProvider = () => 'zh-CN',
 } = {}) {
-  const _0x2d16c4 = (_0x1dbbc8, _0x30e288, _0x21f50a) => {
+  const run = (turnId, content, projectMemory) => {
     return (
       sessionStore?.['pushHistory']?.({
         role: 'assistant',
         status: 'success',
-        content: _0x30e288,
-        turnId: _0x1dbbc8,
+        content: content,
+        turnId: turnId,
       }),
-      sessionStore?.['setCurrentRun']?.({ id: _0x1dbbc8, status: 'success', stopped: ![] }),
+      sessionStore?.['setCurrentRun']?.({ id: turnId, status: 'success', stopped: ![] }),
       {
         ok: !![],
         status: 'success',
-        reply: _0x30e288,
+        reply: content,
         responseChannel: 'project.memory',
-        projectMemory: _0x21f50a,
+        projectMemory: projectMemory,
       }
     );
   };
-  function _0x38f2dc(_0x391144) {
-    const _0x3040e0 = projectMemoryStore['getMemory']();
-    if (isAgentProjectMemoryEmpty(_0x3040e0))
-      return _0x2d16c4(_0x391144, formatText('empty', {}, localeProvider?.()), _0x3040e0);
-    const _0x5e552d = AGENT_PROJECT_MEMORY_CATEGORIES['filter'](
-      (_0x3e9798) => _0x3040e0[_0x3e9798]['length'] > 0x0,
-    )
+  function run2(options) {
+    const target = projectMemoryStore['getMemory']();
+    if (isAgentProjectMemoryEmpty(target))
+      return run(options, formatText('empty', {}, localeProvider?.()), target);
+    const lines = AGENT_PROJECT_MEMORY_CATEGORIES['filter']((source) => target[source]['length'] > 0x0)
       ['map'](
-        (_0x1fcf0a) =>
-          '-\x20' + formatText(_0x1fcf0a, {}, localeProvider?.()) + '：' + _0x3040e0[_0x1fcf0a]['join']('；'),
+        (next) => '-\x20' + formatText(next, {}, localeProvider?.()) + '：' + target[next]['join']('；'),
       )
       ['join']('\x0a');
-    return _0x2d16c4(_0x391144, formatText('inspect', { lines: _0x5e552d }, localeProvider?.()), _0x3040e0);
+    return run(options, formatText('inspect', { lines: lines }, localeProvider?.()), target);
   }
-  function _0x52f532({ message: message = '', runId: runId = '' } = {}) {
+  function handle({ message: message = '', runId: runId = '' } = {}) {
     if (!projectMemoryStore) return null;
-    const _0x47f225 = detectAgentProjectMemoryIntent(message);
-    if (!_0x47f225) return null;
+    const detectAgentProjectMemoryIntent2 = detectAgentProjectMemoryIntent(message);
+    if (!detectAgentProjectMemoryIntent2) return null;
     sessionStore?.['recordTrace']?.({
       type: 'agent_turn_routed',
       channel: 'project.memory',
-      reason: 'project-memory-' + _0x47f225['operation'],
+      reason: 'project-memory-' + detectAgentProjectMemoryIntent2['operation'],
     });
-    if (_0x47f225['operation'] === 'inspect') return _0x38f2dc(runId);
-    if (_0x47f225['operation'] === 'remember') {
-      const _0x539a41 = projectMemoryStore['remember'](_0x47f225['records']),
-        _0x5c27ab =
-          _0x539a41['added']['length'] > 0x0
+    if (detectAgentProjectMemoryIntent2['operation'] === 'inspect') return run2(runId);
+    if (detectAgentProjectMemoryIntent2['operation'] === 'remember') {
+      const items = projectMemoryStore['remember'](detectAgentProjectMemoryIntent2['records']),
+        current =
+          items['added']['length'] > 0x0
             ? formatText(
                 'remembered',
                 {
-                  items: _0x539a41['added']
+                  items: items['added']
                     ['map'](
-                      ({ category: _0x5b278a, value: _0x1b4da0 }) =>
-                        formatText(_0x5b278a, {}, localeProvider?.()) + '：' + _0x1b4da0,
+                      ({ category: category, value: value2 }) =>
+                        formatText(category, {}, localeProvider?.()) + '：' + value2,
                     )
                     ['join']('；'),
                 },
                 localeProvider?.(),
               )
             : formatText('unchanged', {}, localeProvider?.());
-      return _0x2d16c4(runId, _0x5c27ab, _0x539a41['memory']);
+      return run(runId, current, items['memory']);
     }
-    if (_0x47f225['operation'] === 'forget') {
-      const _0x4ed1e4 = projectMemoryStore['forget'](_0x47f225);
-      return _0x2d16c4(
+    if (detectAgentProjectMemoryIntent2['operation'] === 'forget') {
+      const count = projectMemoryStore['forget'](detectAgentProjectMemoryIntent2);
+      return run(
         runId,
         formatText(
-          _0x4ed1e4['removed'] > 0x0 ? 'forgotten' : 'notFound',
-          { count: _0x4ed1e4['removed'] },
+          count['removed'] > 0x0 ? 'forgotten' : 'notFound',
+          { count: count['removed'] },
           localeProvider?.(),
         ),
-        _0x4ed1e4['memory'],
+        count['memory'],
       );
     }
-    const _0x1cb669 = projectMemoryStore['clearMemory']();
-    return _0x2d16c4(runId, formatText('cleared', {}, localeProvider?.()), _0x1cb669['memory']);
+    const entry = projectMemoryStore['clearMemory']();
+    return run(runId, formatText('cleared', {}, localeProvider?.()), entry['memory']);
   }
-  return { handle: _0x52f532 };
+  return { handle: handle };
 }

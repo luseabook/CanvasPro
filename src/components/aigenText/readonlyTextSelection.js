@@ -1,140 +1,134 @@
-function getCaretRangeFromPoint(_0x556895, _0x19c737, _0x5ddd06) {
-  if (typeof _0x556895?.caretRangeFromPoint === 'function')
-    return _0x556895.caretRangeFromPoint(_0x19c737, _0x5ddd06);
-  const _0x3d5f88 = _0x556895?.caretPositionFromPoint?.(_0x19c737, _0x5ddd06);
-  if (!_0x3d5f88 || typeof _0x556895?.createRange !== 'function') return null;
-  const _0x2cbd01 = _0x556895.createRange();
-  return (_0x2cbd01.setStart(_0x3d5f88.offsetNode, _0x3d5f88.offset), _0x2cbd01);
+function getCaretRangeFromPoint(dom, value, item) {
+  if (typeof dom?.caretRangeFromPoint === 'function') return dom.caretRangeFromPoint(value, item);
+  const enabled = dom?.caretPositionFromPoint?.(value, item);
+  if (!enabled || typeof dom?.createRange !== 'function') return null;
+  const key = dom.createRange();
+  return (key.setStart(enabled.offsetNode, enabled.offset), key);
 }
-function setSelection(_0x4c2642, _0x1f2972, _0x11d56d) {
-  const _0x468def = _0x4c2642?.getSelection?.();
-  if (!_0x468def || !_0x1f2972 || !_0x11d56d) return;
-  _0x468def.removeAllRanges();
-  if (typeof _0x468def.setBaseAndExtent === 'function') {
-    _0x468def.setBaseAndExtent(
-      _0x1f2972.startContainer,
-      _0x1f2972.startOffset,
-      _0x11d56d.startContainer,
-      _0x11d56d.startOffset,
+function setSelection(dom2, enabled2, enabled3) {
+  const enabled4 = dom2?.getSelection?.();
+  if (!enabled4 || !enabled2 || !enabled3) return;
+  enabled4.removeAllRanges();
+  if (typeof enabled4.setBaseAndExtent === 'function') {
+    enabled4.setBaseAndExtent(
+      enabled2.startContainer,
+      enabled2.startOffset,
+      enabled3.startContainer,
+      enabled3.startOffset,
     );
     return;
   }
-  const _0x3f372a = _0x1f2972.startContainer.ownerDocument.createRange();
-  (_0x3f372a.setStart(_0x1f2972.startContainer, _0x1f2972.startOffset),
-    _0x3f372a.setEnd(_0x11d56d.startContainer, _0x11d56d.startOffset),
-    _0x468def.addRange(_0x3f372a));
+  const index = enabled2.startContainer.ownerDocument.createRange();
+  (index.setStart(enabled2.startContainer, enabled2.startOffset),
+    index.setEnd(enabled3.startContainer, enabled3.startOffset),
+    enabled4.addRange(index));
 }
-function findActiveReadonlyTextRoot(_0x677934) {
-  if (!_0x677934) return null;
-  const _0x4e50f8 = _0x677934.nodeType === 1 ? _0x677934 : _0x677934.parentElement;
-  if (!_0x4e50f8) return null;
-  if (typeof _0x4e50f8.closest === 'function')
-    return _0x4e50f8.closest('.aigen-text-output.is-text-selection-active');
-  let _0x1730fb = _0x4e50f8;
-  while (_0x1730fb) {
+function findActiveReadonlyTextRoot(enabled5) {
+  if (!enabled5) return null;
+  const el = enabled5.nodeType === 1 ? enabled5 : enabled5.parentElement;
+  if (!el) return null;
+  if (typeof el.closest === 'function') return el.closest('.aigen-text-output.is-text-selection-active');
+  let el2 = el;
+  while (el2) {
     if (
-      _0x1730fb.classList?.contains?.('aigen-text-output') &&
-      _0x1730fb.classList?.contains?.('is-text-selection-active')
+      el2.classList?.contains?.('aigen-text-output') &&
+      el2.classList?.contains?.('is-text-selection-active')
     )
-      return _0x1730fb;
-    _0x1730fb = _0x1730fb.parentElement;
+      return el2;
+    el2 = el2.parentElement;
   }
   return null;
 }
-function rangeTouchesActiveReadonlyText(_0x358c0b, _0x1d807c) {
-  if (!_0x358c0b) return false;
+function rangeTouchesActiveReadonlyText(enabled6, el3) {
+  if (!enabled6) return false;
   if (
-    findActiveReadonlyTextRoot(_0x358c0b.commonAncestorContainer) ||
-    findActiveReadonlyTextRoot(_0x358c0b.startContainer) ||
-    findActiveReadonlyTextRoot(_0x358c0b.endContainer)
+    findActiveReadonlyTextRoot(enabled6.commonAncestorContainer) ||
+    findActiveReadonlyTextRoot(enabled6.startContainer) ||
+    findActiveReadonlyTextRoot(enabled6.endContainer)
   )
     return true;
-  const _0x521cda = Array.from(
-    _0x1d807c?.querySelectorAll?.('.aigen-text-output.is-text-selection-active') || [],
-  );
-  return _0x521cda.some((_0x466543) => {
+  const list = Array.from(el3?.querySelectorAll?.('.aigen-text-output.is-text-selection-active') || []);
+  return list.some((item2) => {
     try {
-      if (typeof _0x358c0b.intersectsNode === 'function') return _0x358c0b.intersectsNode(_0x466543);
-    } catch (_0x1fd553) {
+      if (typeof enabled6.intersectsNode === 'function') return enabled6.intersectsNode(item2);
+    } catch (result) {
       return false;
     }
-    return _0x466543.contains?.(_0x358c0b.startContainer) || _0x466543.contains?.(_0x358c0b.endContainer);
+    return item2.contains?.(enabled6.startContainer) || item2.contains?.(enabled6.endContainer);
   });
 }
-export function hasActiveReadonlyTextSelection(_0x1067fd = document) {
-  const _0x4a9b98 = _0x1067fd?.getSelection?.();
-  if (!_0x4a9b98 || _0x4a9b98.isCollapsed || !String(_0x4a9b98.toString?.() || '').trim()) return false;
-  const _0xd927fb = Number(_0x4a9b98.rangeCount) || 0;
-  for (let _0x25aa01 = 0; _0x25aa01 < _0xd927fb; _0x25aa01 += 1) {
-    if (rangeTouchesActiveReadonlyText(_0x4a9b98.getRangeAt(_0x25aa01), _0x1067fd)) return true;
+export function hasActiveReadonlyTextSelection(dom3 = document) {
+  const enabled7 = dom3?.getSelection?.();
+  if (!enabled7 || enabled7.isCollapsed || !String(enabled7.toString?.() || '').trim()) return false;
+  const data = Number(enabled7.rangeCount) || 0;
+  for (let options = 0; options < data; options += 1) {
+    if (rangeTouchesActiveReadonlyText(enabled7.getRangeAt(options), dom3)) return true;
   }
   return false;
 }
-export function bindReadonlyTextSelection(_0x141c81, _0x526550 = {}) {
-  if (!_0x141c81?.addEventListener) return () => {};
-  const _0x302df9 = _0x141c81.ownerDocument || document,
-    _0x2858f9 = _0x302df9.defaultView || window;
-  let _0x37b307 = false;
-  const _0x4c1d06 = () => {
-      if (_0x37b307) return;
-      ((_0x37b307 = true), _0x141c81.classList?.add('is-text-selection-active'), _0x526550.onActivate?.());
+export function bindReadonlyTextSelection(el4, target = {}) {
+  if (!el4?.addEventListener) return () => {};
+  const el5 = el4.ownerDocument || document,
+    source = el5.defaultView || window;
+  let enabled8 = false;
+  const run = () => {
+      if (enabled8) return;
+      ((enabled8 = true), el4.classList?.add('is-text-selection-active'), target.onActivate?.());
     },
-    _0x1ee057 = () => {
-      if (!_0x37b307) return;
-      ((_0x37b307 = false),
-        _0x526550.onDeactivate?.(),
-        _0x141c81.classList?.remove('is-text-selection-active'),
-        _0x302df9.body?.classList.remove('is-aigen-text-selecting'));
+    handler = () => {
+      if (!enabled8) return;
+      ((enabled8 = false),
+        target.onDeactivate?.(),
+        el4.classList?.remove('is-text-selection-active'),
+        el5.body?.classList.remove('is-aigen-text-selecting'));
     },
-    _0x2d98b3 = (_0x41879b) => {
-      if (_0x41879b.button !== 0) return;
-      if (!_0x37b307) return;
-      (_0x41879b.preventDefault(),
-        _0x41879b.stopPropagation(),
-        _0x302df9.body?.classList.add('is-aigen-text-selecting'));
-      const _0x4c638a = getCaretRangeFromPoint(_0x302df9, _0x41879b.clientX, _0x41879b.clientY),
-        _0x18533c = (_0x10836c) => {
-          const _0x1fc0e6 = getCaretRangeFromPoint(_0x302df9, _0x10836c.clientX, _0x10836c.clientY);
-          (_0x4c638a &&
-            _0x1fc0e6 &&
-            _0x141c81.contains(_0x4c638a.startContainer) &&
-            _0x141c81.contains(_0x1fc0e6.startContainer) &&
-            setSelection(_0x2858f9, _0x4c638a, _0x1fc0e6),
-            _0x10836c.preventDefault(),
-            _0x10836c.stopPropagation());
+    next = (event) => {
+      if (event.button !== 0) return;
+      if (!enabled8) return;
+      (event.preventDefault(), event.stopPropagation(), el5.body?.classList.add('is-aigen-text-selecting'));
+      const caretRangeFromPoint = getCaretRangeFromPoint(el5, event.clientX, event.clientY),
+        handler2 = (event2) => {
+          const caretRangeFromPoint2 = getCaretRangeFromPoint(el5, event2.clientX, event2.clientY);
+          (caretRangeFromPoint &&
+            caretRangeFromPoint2 &&
+            el4.contains(caretRangeFromPoint.startContainer) &&
+            el4.contains(caretRangeFromPoint2.startContainer) &&
+            setSelection(source, caretRangeFromPoint, caretRangeFromPoint2),
+            event2.preventDefault(),
+            event2.stopPropagation());
         },
-        _0x5ec33b = (_0x35b651) => {
-          (_0x18533c(_0x35b651),
-            _0x302df9.body?.classList.remove('is-aigen-text-selecting'),
-            _0x302df9.removeEventListener('pointermove', _0x18533c, true),
-            _0x302df9.removeEventListener('pointerup', _0x5ec33b, true),
-            _0x302df9.removeEventListener('pointercancel', _0x5ec33b, true));
+        current = (entry) => {
+          (handler2(entry),
+            el5.body?.classList.remove('is-aigen-text-selecting'),
+            el5.removeEventListener('pointermove', handler2, true),
+            el5.removeEventListener('pointerup', current, true),
+            el5.removeEventListener('pointercancel', current, true));
         };
-      (_0x302df9.addEventListener('pointermove', _0x18533c, true),
-        _0x302df9.addEventListener('pointerup', _0x5ec33b, true),
-        _0x302df9.addEventListener('pointercancel', _0x5ec33b, true));
+      (el5.addEventListener('pointermove', handler2, true),
+        el5.addEventListener('pointerup', current, true),
+        el5.addEventListener('pointercancel', current, true));
     },
-    _0x29f34e = (_0x8357b) => {
-      (_0x8357b.preventDefault(), _0x8357b.stopPropagation(), _0x4c1d06());
+    record = (event3) => {
+      (event3.preventDefault(), event3.stopPropagation(), run());
     },
-    _0xfb210 = (_0x22ccb8) => {
-      if (!_0x37b307 || _0x141c81.contains(_0x22ccb8.target)) return;
-      _0x1ee057();
+    payload = (event4) => {
+      if (!enabled8 || el4.contains(event4.target)) return;
+      handler();
     },
-    _0x3b29b6 = (_0x566b66) => {
-      if (_0x566b66.key === 'Escape') _0x1ee057();
+    handle = (event5) => {
+      if (event5.key === 'Escape') handler();
     };
   return (
-    _0x141c81.addEventListener('pointerdown', _0x2d98b3, true),
-    _0x141c81.addEventListener('dblclick', _0x29f34e),
-    _0x302df9.addEventListener('pointerdown', _0xfb210, true),
-    _0x302df9.addEventListener('keydown', _0x3b29b6, true),
+    el4.addEventListener('pointerdown', next, true),
+    el4.addEventListener('dblclick', record),
+    el5.addEventListener('pointerdown', payload, true),
+    el5.addEventListener('keydown', handle, true),
     () => {
-      (_0x1ee057(),
-        _0x141c81.removeEventListener('pointerdown', _0x2d98b3, true),
-        _0x141c81.removeEventListener('dblclick', _0x29f34e),
-        _0x302df9.removeEventListener('pointerdown', _0xfb210, true),
-        _0x302df9.removeEventListener('keydown', _0x3b29b6, true));
+      (handler(),
+        el4.removeEventListener('pointerdown', next, true),
+        el4.removeEventListener('dblclick', record),
+        el5.removeEventListener('pointerdown', payload, true),
+        el5.removeEventListener('keydown', handle, true));
     }
   );
 }

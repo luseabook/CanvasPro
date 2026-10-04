@@ -5,134 +5,132 @@ import { createRendererVideoHydrationBackpressure } from './rendererVideoHydrati
 import { resolveCanvasVideoPosterUrl } from '../services/canvasMediaLocalService.js';
 const VIDEO_TYPES = new Set(['source-video', 'ai-video', 'video']);
 export function createRendererMediaPresentationCoordinator({
-  getNode: _0x144c77,
-  getComponent: _0x49a6ce,
-  getWrapper: _0x5d4b67,
-  getParkedWrapper: _0x285e37,
-  getWrappers: _0x3b13bb,
-  getParkedWrappers: _0x381117,
-  isMounted: _0x492ea4,
-  isInteractionBusy: _0x1bd25b,
-  isPinned: _0x385706,
-  isSelected: _0x33a88b,
-  preview: _0x36fec2,
-  previewRelease: _0x54ef19,
-  videoSlots: _0x4dc2b5,
+  getNode: getNode,
+  getComponent: getComponent,
+  getWrapper: getWrapper,
+  getParkedWrapper: getParkedWrapper,
+  getWrappers: getWrappers,
+  getParkedWrappers: getParkedWrappers,
+  isMounted: isMounted,
+  isInteractionBusy: isInteractionBusy,
+  isPinned: isPinned,
+  isSelected: isSelected,
+  preview: preview,
+  previewRelease: previewRelease,
+  videoSlots: videoSlots,
   videoBackpressure: videoBackpressure = createRendererVideoHydrationBackpressure(),
   batchSize: batchSize = 0x2,
   presentedMediaLeaseMs: presentedMediaLeaseMs = 0x258,
   maxRetainedPresentedMedia: maxRetainedPresentedMedia = 0x3,
-  suspendDelayMs: _0x1700ee,
-  onHydrateDiagnostic: _0x1f758e,
-  onParkSuspendDiagnostic: _0x19809e,
+  suspendDelayMs: suspendDelayMs,
+  onHydrateDiagnostic: onHydrateDiagnostic,
+  onParkSuspendDiagnostic: onParkSuspendDiagnostic,
 } = {}) {
-  const _0x499ef8 = (_0x392e71) => VIDEO_TYPES['has'](_0x144c77?.(_0x392e71)?.['type']),
-    _0x4ffd96 = (_0x3bad9b) => _0x49a6ce?.(_0x3bad9b)?.['getRendererMediaState']?.() || {};
-  let _0x8aa6c9;
-  const _0x352a10 = createRendererVideoMediaResidencyController({
-    getComponent: _0x49a6ce,
-    getWrapper: _0x5d4b67,
-    isMounted: _0x492ea4,
+  const isVideoNodeDetails = (value) => VIDEO_TYPES['has'](getNode?.(value)?.['type']),
+    handler = (item) => getComponent?.(item)?.['getRendererMediaState']?.() || {};
+  let media;
+  const canHydrateMedia = createRendererVideoMediaResidencyController({
+    getComponent: getComponent,
+    getWrapper: getWrapper,
+    isMounted: isMounted,
     presentedMediaLeaseMs: presentedMediaLeaseMs,
     maxRetainedPresentedMedia: maxRetainedPresentedMedia,
-    suspendDelayMs: _0x1700ee,
-    isMediaDeferred: (_0x346cdf) => _0x4ffd96(_0x346cdf)['deferred'] === !![],
-    isPlaybackActive: (_0x57db47, _0xcd4f80, _0x4c2666) => {
-      if (_0x385706?.(_0x57db47)) return !![];
-      return [...(_0x4c2666?.['querySelectorAll']?.('video, audio') || [])]['some'](
-        (_0x2950f7) => _0x2950f7['paused'] === ![] && _0x2950f7['ended'] !== !![],
+    suspendDelayMs: suspendDelayMs,
+    isMediaDeferred: (key) => handler(key)['deferred'] === !![],
+    isPlaybackActive: (index, result, el) => {
+      if (isPinned?.(index)) return !![];
+      return [...(el?.['querySelectorAll']?.('video, audio') || [])]['some'](
+        (data) => data['paused'] === ![] && data['ended'] !== !![],
       );
     },
-    shouldRetainPresentedMedia: (_0x26501c, _0x5d41fc) => {
+    shouldRetainPresentedMedia: (options, target) => {
       try {
-        return _0x5d41fc?.['hasPresentedRendererMedia']?.() === !![];
+        return target?.['hasPresentedRendererMedia']?.() === !![];
       } catch {
         return ![];
       }
     },
-    isRetentionProtected: (_0x448660) =>
-      _0x33a88b?.(_0x448660) === !![] || _0x4ffd96(_0x448660)['interactionActive'] === !![],
-    onSuspend: (_0x4e8ffd, _0x4bc467) => {
-      _0x36fec2['retainNode'](_0x4e8ffd);
-      const _0x2a3967 = _0x36fec2['isNodePreviewReady'](_0x4e8ffd),
-        _0x279594 = _0x4bc467?.['prepareRendererMediaFallbackForSuspend']?.() === !![];
-      if (!_0x2a3967 && !_0x279594) return ![];
+    isRetentionProtected: (source) =>
+      isSelected?.(source) === !![] || handler(source)['interactionActive'] === !![],
+    onSuspend: (next, current) => {
+      preview['retainNode'](next);
+      const enabled = preview['isNodePreviewReady'](next),
+        enabled2 = current?.['prepareRendererMediaFallbackForSuspend']?.() === !![];
+      if (!enabled && !enabled2) return ![];
       return (
-        _0x8aa6c9['forget'](_0x4e8ffd),
-        _0x54ef19['forget'](_0x4e8ffd),
-        _0x4bc467?.['suspendRendererMedia']?.(),
-        _0x4dc2b5['suspendPresentedSurface'](_0x4e8ffd),
+        media['forget'](next),
+        previewRelease['forget'](next),
+        current?.['suspendRendererMedia']?.(),
+        videoSlots['suspendPresentedSurface'](next),
         !![]
       );
     },
-    onParkSuspend: (_0x44c9f8, _0x58c25a) => {
-      const _0x2c9b24 = _0x19809e ? performance['now']() : 0x0;
+    onParkSuspend: (nodeId, entry) => {
+      const record = onParkSuspendDiagnostic ? performance['now']() : 0x0;
       try {
-        _0x58c25a?.['suspendRendererMedia']?.();
+        entry?.['suspendRendererMedia']?.();
       } catch {}
-      _0x19809e?.({ nodeId: _0x44c9f8, durationMs: performance['now']() - _0x2c9b24 });
+      onParkSuspendDiagnostic?.({ nodeId: nodeId, durationMs: performance['now']() - record });
     },
-    onResume: (_0x3821ea, _0xd15bb8) => {
-      if (_0xd15bb8?.['prepareRendererVisibleVideoPreview']?.() !== !![]) return;
-      (_0x36fec2['retainNode'](_0x3821ea), _0x8aa6c9['enqueue'](_0x3821ea, { urgent: !![] }));
+    onResume: (payload, handle) => {
+      if (handle?.['prepareRendererVisibleVideoPreview']?.() !== !![]) return;
+      (preview['retainNode'](payload), media['enqueue'](payload, { urgent: !![] }));
     },
   });
-  _0x8aa6c9 = createRendererDeferredMediaController({
-    getComponent: _0x49a6ce,
-    isInteractionBusy: _0x1bd25b,
+  media = createRendererDeferredMediaController({
+    getComponent: getComponent,
+    isInteractionBusy: isInteractionBusy,
     batchSize: batchSize,
-    getNodeType: (_0x4c616b) => _0x144c77?.(_0x4c616b)?.['type'],
-    onHydrateMedia: _0x54ef19['schedule'],
-    onHydrateDiagnostic: _0x1f758e,
-    canHydrateMedia: _0x352a10['isHydrationAllowed'],
+    getNodeType: (state) => getNode?.(state)?.['type'],
+    onHydrateMedia: previewRelease['schedule'],
+    onHydrateDiagnostic: onHydrateDiagnostic,
+    canHydrateMedia: canHydrateMedia['isHydrationAllowed'],
     canHydrateVideo: () => videoBackpressure['tryAcquire'](),
   });
-  const _0x1f6ec3 = createNodeDetailHydrationController({
-    getWrapper: _0x5d4b67,
-    getParkedWrapper: _0x285e37,
-    getWrappers: _0x3b13bb,
-    getParkedWrappers: _0x381117,
-    isMounted: _0x492ea4,
-    isInteractionBusy: _0x1bd25b,
-    isVideoNodeDetails: _0x499ef8,
+  const details = createNodeDetailHydrationController({
+    getWrapper: getWrapper,
+    getParkedWrapper: getParkedWrapper,
+    getWrappers: getWrappers,
+    getParkedWrappers: getParkedWrappers,
+    isMounted: isMounted,
+    isInteractionBusy: isInteractionBusy,
+    isVideoNodeDetails: isVideoNodeDetails,
     canHydrateVideoDetails: () => videoBackpressure['tryAcquire'](),
-    onHydrateNodeDetails: (_0x217c9f) => {
-      (_0x49a6ce?.(_0x217c9f)?.['hydrateDeferredDetails']?.(),
-        _0x36fec2['retainNode'](_0x217c9f),
-        (!_0x499ef8(_0x217c9f) || !resolveCanvasVideoPosterUrl(_0x144c77?.(_0x217c9f))) &&
-          _0x8aa6c9['enqueue'](_0x217c9f));
+    onHydrateNodeDetails: (config) => {
+      (getComponent?.(config)?.['hydrateDeferredDetails']?.(),
+        preview['retainNode'](config),
+        (!isVideoNodeDetails(config) || !resolveCanvasVideoPosterUrl(getNode?.(config))) &&
+          media['enqueue'](config));
     },
   });
-  function _0x28b8e7(_0x35cae2) {
-    (_0x1f6ec3['forgetNodeDetailHydration'](_0x35cae2),
-      _0x8aa6c9['forget'](_0x35cae2),
-      _0x54ef19['forget'](_0x35cae2));
+  function forgetHydration(scope) {
+    (details['forgetNodeDetailHydration'](scope), media['forget'](scope), previewRelease['forget'](scope));
   }
-  function _0x3704c2(_0x37c17b) {
-    (_0x352a10['forget'](_0x37c17b), _0x28b8e7(_0x37c17b));
+  function forget(input) {
+    (canHydrateMedia['forget'](input), forgetHydration(input));
   }
-  function _0x72dece() {
-    (_0x8aa6c9['pause'](), _0x1f6ec3['pause']());
+  function pause() {
+    (media['pause'](), details['pause']());
   }
-  function _0x35c6ba() {
-    (_0x1f6ec3['resumeNodeDetailHydration'](), _0x8aa6c9['resume']());
+  function resume() {
+    (details['resumeNodeDetailHydration'](), media['resume']());
   }
-  function _0x2567ec() {
-    (_0x1f6ec3['clearNodeDetailHydrationState'](),
-      _0x8aa6c9['clear'](),
-      _0x352a10['clear'](),
+  function clear() {
+    (details['clearNodeDetailHydrationState'](),
+      media['clear'](),
+      canHydrateMedia['clear'](),
       videoBackpressure['reset'](),
-      _0x54ef19['clear']());
+      previewRelease['clear']());
   }
   return Object['freeze']({
-    media: _0x8aa6c9,
-    details: _0x1f6ec3,
-    residency: _0x352a10,
+    media: media,
+    details: details,
+    residency: canHydrateMedia,
     videoBackpressure: videoBackpressure,
-    forgetHydration: _0x28b8e7,
-    forget: _0x3704c2,
-    pause: _0x72dece,
-    resume: _0x35c6ba,
-    clear: _0x2567ec,
+    forgetHydration: forgetHydration,
+    forget: forget,
+    pause: pause,
+    resume: resume,
+    clear: clear,
   });
 }

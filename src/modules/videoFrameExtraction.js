@@ -10,153 +10,148 @@ import {
 import { saveOutputBlob } from './project.js';
 import { calcSafeSpawnPosNearNode } from './nodeSpawn.js';
 import { t } from '../i18n/index.js';
-function frameExtractionText(_0x55c645, _0x48166f = {}) {
-  return t('videoFrameExtraction.' + _0x55c645, _0x48166f);
+function frameExtractionText(value, item = {}) {
+  return t('videoFrameExtraction.' + value, item);
 }
-function getToast(_0x1259dc) {
-  if (typeof _0x1259dc === 'function') return _0x1259dc;
+function getToast(key) {
+  if (typeof key === 'function') return key;
   return globalThis.window?.showToast;
 }
-function createCapturePreviewUrl(_0x1657cb) {
-  const _0x4a55a8 = globalThis.window?.URL || globalThis.URL;
-  if (!_0x1657cb || typeof _0x4a55a8?.createObjectURL !== 'function') return '';
+function createCapturePreviewUrl(enabled) {
+  const index = globalThis.window?.URL || globalThis.URL;
+  if (!enabled || typeof index?.createObjectURL !== 'function') return '';
   try {
-    return _0x4a55a8.createObjectURL(_0x1657cb);
+    return index.createObjectURL(enabled);
   } catch {
     return '';
   }
 }
 export function resolveVideoFrameCaptureIndex(
-  _0x55abdf,
+  result,
   { currentTimeSec: currentTimeSec = 0, fallbackDurationSec: fallbackDurationSec = 0 } = {},
 ) {
-  const _0x2ee153 = Number(_0x55abdf?.videoFps),
-    _0x5238fa = Number(_0x55abdf?.videoFrameCount),
-    _0x5eb703 = Number(_0x55abdf?.videoDuration),
-    _0x39b9d9 = Number.isFinite(_0x5eb703) && _0x5eb703 > 0 ? _0x5eb703 : Number(fallbackDurationSec),
-    _0x40f3ca =
-      Number.isFinite(_0x2ee153) && _0x2ee153 > 0
-        ? _0x2ee153
-        : Number.isFinite(_0x5238fa) && _0x5238fa > 0 && Number.isFinite(_0x39b9d9) && _0x39b9d9 > 0
-          ? _0x5238fa / _0x39b9d9
+  const count = Number(result?.videoFps),
+    count2 = Number(result?.videoFrameCount),
+    count3 = Number(result?.videoDuration),
+    count4 = Number.isFinite(count3) && count3 > 0 ? count3 : Number(fallbackDurationSec),
+    count5 =
+      Number.isFinite(count) && count > 0
+        ? count
+        : Number.isFinite(count2) && count2 > 0 && Number.isFinite(count4) && count4 > 0
+          ? count2 / count4
           : 0;
-  if (Number.isFinite(_0x40f3ca) && _0x40f3ca > 0) {
-    let _0x9229df = Math.floor(Math.max(0, Number(currentTimeSec) || 0) * _0x40f3ca) + 1;
+  if (Number.isFinite(count5) && count5 > 0) {
+    let frameIndex = Math.floor(Math.max(0, Number(currentTimeSec) || 0) * count5) + 1;
     return (
-      Number.isFinite(_0x5238fa) && _0x5238fa > 0
-        ? (_0x9229df = Math.max(1, Math.min(Math.round(_0x5238fa), _0x9229df)))
-        : (_0x9229df = Math.max(1, _0x9229df)),
-      { frameIndex: _0x9229df, nextSnapSeq: null, usedSequence: false }
+      Number.isFinite(count2) && count2 > 0
+        ? (frameIndex = Math.max(1, Math.min(Math.round(count2), frameIndex)))
+        : (frameIndex = Math.max(1, frameIndex)),
+      { frameIndex: frameIndex, nextSnapSeq: null, usedSequence: false }
     );
   }
-  const _0x51c3fd = Math.max(1, Math.floor(Number(_0x55abdf?.snapSeq) || 0) + 1);
-  return { frameIndex: _0x51c3fd, nextSnapSeq: _0x51c3fd, usedSequence: true };
+  const frameIndex2 = Math.max(1, Math.floor(Number(result?.snapSeq) || 0) + 1);
+  return { frameIndex: frameIndex2, nextSnapSeq: frameIndex2, usedSequence: true };
 }
 export async function extractCurrentVideoFrameToImageNode({
-  videoEl: _0x2d8603,
-  anchorNodeId: _0x5857ba,
+  videoEl: videoEl,
+  anchorNodeId: anchorNodeId,
   fallbackDurationSec: fallbackDurationSec = 0,
   fileNamePrefix: fileNamePrefix = 'source_video_frame',
-  onMissingMetadata: _0x34bcdd,
+  onMissingMetadata: onMissingMetadata,
   logPrefix: logPrefix = '[VideoFrameExtraction]',
-  showToast: _0x3f0d87,
+  showToast: showToast,
 } = {}) {
-  const _0xb480ee = getToast(_0x3f0d87),
-    _0x222d0a = _0x2d8603;
-  if (!_0x222d0a || !getVideoFrameSource(_0x222d0a))
+  const toast = getToast(showToast),
+    enabled2 = videoEl;
+  if (!enabled2 || !getVideoFrameSource(enabled2))
     return (
-      _0xb480ee?.(frameExtractionText('videoNotLoaded'), 'info'),
+      toast?.(frameExtractionText('videoNotLoaded'), 'info'),
       { ok: false, reason: 'video-not-loaded' }
     );
-  if (!isVideoFrameReady(_0x222d0a)) {
-    const _0x4b34c3 = await waitForVideoFrame(_0x222d0a);
-    if (!_0x4b34c3)
+  if (!isVideoFrameReady(enabled2)) {
+    const waitForVideoFrame2 = await waitForVideoFrame(enabled2);
+    if (!waitForVideoFrame2)
       return (
-        _0xb480ee?.(frameExtractionText('videoNotLoaded'), 'info'),
+        toast?.(frameExtractionText('videoNotLoaded'), 'info'),
         { ok: false, reason: 'frame-not-ready' }
       );
   }
-  const _0x4f1d32 = Number(_0x222d0a.videoWidth) || 0,
-    _0x13b4c2 = Number(_0x222d0a.videoHeight) || 0;
-  if (!_0x4f1d32 || !_0x13b4c2) return { ok: false, reason: 'missing-size' };
-  let _0x178118 = null;
+  const enabled3 = Number(enabled2.videoWidth) || 0,
+    enabled4 = Number(enabled2.videoHeight) || 0;
+  if (!enabled3 || !enabled4) return { ok: false, reason: 'missing-size' };
+  let originalWidth = null;
   try {
-    _0x178118 = await captureVideoFrameSnapshot(_0x222d0a, { fileNamePrefix: fileNamePrefix });
-  } catch (_0x5821a4) {
+    originalWidth = await captureVideoFrameSnapshot(enabled2, { fileNamePrefix: fileNamePrefix });
+  } catch (error) {
     return (
-      console.warn(logPrefix + ' capture frame failed:', _0x5821a4),
-      _0xb480ee?.(frameExtractionText('captureUnsupported'), 'error'),
-      { ok: false, reason: 'capture-failed', error: _0x5821a4 }
+      console.warn(logPrefix + ' capture frame failed:', error),
+      toast?.(frameExtractionText('captureUnsupported'), 'error'),
+      { ok: false, reason: 'capture-failed', error: error }
     );
   }
-  if (!_0x178118?.blob) return { ok: false, reason: 'missing-blob' };
-  const _0x5f34d0 = String(_0x5857ba || '').trim(),
-    _0x28f7c8 = appStore.getState().nodes || {},
-    _0x2d1932 = _0x28f7c8[_0x5f34d0];
-  if (!_0x2d1932) return { ok: false, reason: 'missing-anchor-node' };
+  if (!originalWidth?.blob) return { ok: false, reason: 'missing-blob' };
+  const data = String(anchorNodeId || '').trim(),
+    options = appStore.getState().nodes || {},
+    enabled5 = options[data];
+  if (!enabled5) return { ok: false, reason: 'missing-anchor-node' };
   const {
-    frameIndex: _0x23a302,
-    nextSnapSeq: _0x116eae,
-    usedSequence: _0x496f81,
-  } = resolveVideoFrameCaptureIndex(_0x2d1932, {
-    currentTimeSec: Number(_0x222d0a.currentTime) || 0,
+    frameIndex: frameIndex3,
+    nextSnapSeq: nextSnapSeq,
+    usedSequence: usedSequence,
+  } = resolveVideoFrameCaptureIndex(enabled5, {
+    currentTimeSec: Number(enabled2.currentTime) || 0,
     fallbackDurationSec: fallbackDurationSec,
   });
-  if (_0x116eae) {
-    appStore.updateNodeData(_0x5f34d0, { snapSeq: _0x116eae });
-    if (typeof _0x34bcdd === 'function') _0x34bcdd(_0x2d1932);
+  if (nextSnapSeq) {
+    appStore.updateNodeData(data, { snapSeq: nextSnapSeq });
+    if (typeof onMissingMetadata === 'function') onMissingMetadata(enabled5);
   }
-  const _0x196dc6 = getAutoMediaSizeByShortSide(_0x4f1d32, _0x13b4c2),
-    _0x110f27 = calcSafeSpawnPosNearNode(
-      appStore.getState().nodes,
-      _0x2d1932,
-      _0x196dc6.width,
-      _0x196dc6.height,
-    ),
-    _0x5b5325 = 'src-img-' + Date.now(),
-    _0x3c1139 = createCapturePreviewUrl(_0x178118.blob);
+  const width = getAutoMediaSizeByShortSide(enabled3, enabled4),
+    x = calcSafeSpawnPosNearNode(appStore.getState().nodes, enabled5, width.width, width.height),
+    id = 'src-img-' + Date.now(),
+    capturePreviewUrl = createCapturePreviewUrl(originalWidth.blob);
   return (
     appStore.addNode(
       buildSourceMediaNodePayload({
-        id: _0x5b5325,
+        id: id,
         type: 'source-image',
-        name: frameExtractionText('capturedFrameName', { frameIndex: _0x23a302 }),
-        capturePreviewUrl: _0x3c1139,
+        name: frameExtractionText('capturedFrameName', { frameIndex: frameIndex3 }),
+        capturePreviewUrl: capturePreviewUrl,
         captureSavePending: true,
         captureSaveError: null,
-        originalWidth: _0x178118.originalWidth,
-        originalHeight: _0x178118.originalHeight,
-        fileName: _0x178118.fileName,
-        x: _0x110f27.x,
-        y: _0x110f27.y,
-        width: _0x196dc6.width,
-        height: _0x196dc6.height,
+        originalWidth: originalWidth.originalWidth,
+        originalHeight: originalWidth.originalHeight,
+        fileName: originalWidth.fileName,
+        x: x.x,
+        y: x.y,
+        width: width.width,
+        height: width.height,
         needsAutoResize: false,
       }),
     ),
-    saveVideoFrameSnapshot(_0x178118, saveOutputBlob)
-      .then((_0x53d01d) => {
-        if (!appStore.getStateRaw().nodes?.[_0x5b5325]) return;
-        appStore.updateNodeData(_0x5b5325, {
-          src: _0x53d01d.src,
-          localPath: _0x53d01d.localPath,
-          originalLocalPath: _0x53d01d.originalLocalPath,
-          displayLocalPath: _0x53d01d.displayLocalPath,
-          thumbLocalPath: _0x53d01d.thumbLocalPath,
-          originalWidth: _0x53d01d.originalWidth,
-          originalHeight: _0x53d01d.originalHeight,
-          fileName: _0x53d01d.fileName,
+    saveVideoFrameSnapshot(originalWidth, saveOutputBlob)
+      .then((src) => {
+        if (!appStore.getStateRaw().nodes?.[id]) return;
+        appStore.updateNodeData(id, {
+          src: src.src,
+          localPath: src.localPath,
+          originalLocalPath: src.originalLocalPath,
+          displayLocalPath: src.displayLocalPath,
+          thumbLocalPath: src.thumbLocalPath,
+          originalWidth: src.originalWidth,
+          originalHeight: src.originalHeight,
+          fileName: src.fileName,
           captureSavePending: false,
           captureSaveError: null,
         });
       })
-      .catch((_0x4ff524) => {
-        const _0x2fe8cd = String(_0x4ff524?.message || frameExtractionText('localSaveFailed'));
-        (console.warn(logPrefix + ' save captured frame failed:', _0x4ff524),
-          appStore.getStateRaw().nodes?.[_0x5b5325] &&
-            appStore.updateNodeData(_0x5b5325, { captureSavePending: false, captureSaveError: _0x2fe8cd }),
-          _0xb480ee?.(frameExtractionText('shownButSaveFailed'), 'warning'));
+      .catch((error2) => {
+        const captureSaveError = String(error2?.message || frameExtractionText('localSaveFailed'));
+        (console.warn(logPrefix + ' save captured frame failed:', error2),
+          appStore.getStateRaw().nodes?.[id] &&
+            appStore.updateNodeData(id, { captureSavePending: false, captureSaveError: captureSaveError }),
+          toast?.(frameExtractionText('shownButSaveFailed'), 'warning'));
       }),
-    { ok: true, nodeId: _0x5b5325, frameIndex: _0x23a302, usedSequence: _0x496f81 }
+    { ok: true, nodeId: id, frameIndex: frameIndex3, usedSequence: usedSequence }
   );
 }

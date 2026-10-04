@@ -13,23 +13,23 @@ const KIND_LABEL_KEY = Object.freeze({
   video: 'settings.apiInput.models.video',
 });
 
-function tr(_0x21f7c9, _0x1a0d05 = {}) {
-  let _0x4d0a9e = t(_0x21f7c9);
-  for (const [_0x4a1f8d, _0x29f0b9] of Object.entries(_0x1a0d05 || {}))
-    _0x4d0a9e = _0x4d0a9e.split('{' + _0x4a1f8d + '}').join(String(_0x29f0b9 ?? ''));
-  return _0x4d0a9e;
+function tr(value, item = {}) {
+  let t2 = t(value);
+  for (const [key, index] of Object.entries(item || {}))
+    t2 = t2.split('{' + key + '}').join(String(index ?? ''));
+  return t2;
 }
 
-function escapeHtml(_0x2b6f1a) {
-  return String(_0x2b6f1a ?? '')
+function escapeHtml(result) {
+  return String(result ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
 
-export function resolveProviderModelAppModelId(_0x3f2a1c, _0x4c8b9e) {
-  return getProviderModelCatalogOwnerProviderId(_0x3f2a1c) + '/' + String(_0x4c8b9e || '').trim();
+export function resolveProviderModelAppModelId(data, options) {
+  return getProviderModelCatalogOwnerProviderId(data) + '/' + String(options || '').trim();
 }
 
 /**
@@ -38,64 +38,69 @@ export function resolveProviderModelAppModelId(_0x3f2a1c, _0x4c8b9e) {
  *   dynamic —— 由这份清单动态登记进来的模型，已可用但可以取消勾选；
  *   none    —— 还没接入，勾选后保存即登记。
  */
-export function getProviderModelRowState(_0x1a2c3f, _0x45d0a1) {
-  const _0x53c1c6 = getModelManifest(resolveProviderModelAppModelId(_0x1a2c3f, _0x45d0a1));
-  if (!_0x53c1c6) return 'none';
-  return _0x53c1c6.extensions?.providerModelCatalog ? 'dynamic' : 'builtin';
+export function getProviderModelRowState(target, source) {
+  const modelManifest = getModelManifest(resolveProviderModelAppModelId(target, source));
+  if (!modelManifest) return 'none';
+  return modelManifest.extensions?.providerModelCatalog ? 'dynamic' : 'builtin';
 }
 
-export function isProviderModelIntegrated(_0x1a2c3f, _0x45d0a1) {
-  return getProviderModelRowState(_0x1a2c3f, _0x45d0a1) !== 'none';
+export function isProviderModelIntegrated(target, source) {
+  return getProviderModelRowState(target, source) !== 'none';
 }
 
-export function getProviderModelCatalogPanelId(_0x123456) {
-  return PANEL_ID_PREFIX + _0x123456;
+export function getProviderModelCatalogPanelId(next) {
+  return PANEL_ID_PREFIX + next;
 }
 
 export function renderProviderModelCatalogPanel({
   documentObject: documentObject = globalThis.document,
-  providerId: _0x30e5a1,
-  catalog: _0x392b1d,
+  providerId: providerId,
+  catalog: catalog,
   statusText: statusText = '',
-  message: _0x1a0c4f = '',
-  messageKind: _0x242cb4 = 'info',
+  message: message = '',
+  messageKind: messageKind = 'info',
 } = {}) {
-  const _0x4c1d5f = documentObject?.getElementById?.(getProviderModelCatalogPanelId(_0x30e5a1));
-  if (!_0x4c1d5f) return null;
-  const { models: _0x2a0d0c } = readProviderModelCatalog({ modelCatalog: _0x392b1d });
-  if (_0x2a0d0c.length === 0 && !_0x1a0c4f) {
-    (_0x4c1d5f.classList?.remove?.('is-active'), (_0x4c1d5f.hidden = true), (_0x4c1d5f.innerHTML = ''));
+  const el = documentObject?.getElementById?.(getProviderModelCatalogPanelId(providerId));
+  if (!el) return null;
+  const { models: models } = readProviderModelCatalog({ modelCatalog: catalog });
+  if (models.length === 0 && !message) {
+    (el.classList?.remove?.('is-active'), (el.hidden = true), (el.innerHTML = ''));
     return null;
   }
-  const _0x3e4f07 = _0x2a0d0c
-    .map((_0x10f2a2) => {
-      const _0x4f2b91 = getProviderModelRowState(_0x30e5a1, _0x10f2a2.id),
-        _0x3a0c9b = _0x4f2b91 !== 'none',
-        _0x5e7a3d = _0x4f2b91 === 'builtin',
-        _0x437f0f = escapeHtml(_0x10f2a2.id);
+  const current = models
+    .map((item2) => {
+      const providerModelRowState = getProviderModelRowState(providerId, item2.id),
+        entry = providerModelRowState !== 'none',
+        record = providerModelRowState === 'builtin',
+        escapeHtml2 = escapeHtml(item2.id);
       return [
-        '<label class="settings-provider-model-row' + (_0x3a0c9b ? ' is-integrated' : '') + '">',
-        '<input type="checkbox" data-provider-model-id="' + _0x437f0f + '"' +
-          (_0x5e7a3d || _0x10f2a2.enabled ? ' checked' : '') +
-          (_0x5e7a3d ? ' disabled' : '') + ' />',
-        '<span class="settings-provider-model-name">' + _0x437f0f + '</span>',
-        '<span class="settings-provider-model-tag' + (_0x3a0c9b ? ' is-integrated' : '') + '">' +
-          escapeHtml(tr(_0x3a0c9b ? 'settings.apiInput.models.matched' : 'settings.apiInput.models.unmatched')) +
+        '<label class="settings-provider-model-row' + (entry ? ' is-integrated' : '') + '">',
+        '<input type="checkbox" data-provider-model-id="' +
+          escapeHtml2 +
+          '"' +
+          (record || item2.enabled ? ' checked' : '') +
+          (record ? ' disabled' : '') +
+          ' />',
+        '<span class="settings-provider-model-name">' + escapeHtml2 + '</span>',
+        '<span class="settings-provider-model-tag' +
+          (entry ? ' is-integrated' : '') +
+          '">' +
+          escapeHtml(tr(entry ? 'settings.apiInput.models.matched' : 'settings.apiInput.models.unmatched')) +
           '</span>',
-        _0x4f2b91 === 'none'
+        providerModelRowState === 'none'
           ? '<select class="settings-provider-model-kind" data-provider-model-kind="' +
-            _0x437f0f +
+            escapeHtml2 +
             '" aria-label="' +
-            _0x437f0f +
+            escapeHtml2 +
             '">' +
             PROVIDER_MODEL_KINDS.map(
-              (_0x2d1d60) =>
+              (item3) =>
                 '<option value="' +
-                _0x2d1d60 +
+                item3 +
                 '"' +
-                (_0x10f2a2.kind === _0x2d1d60 ? ' selected' : '') +
+                (item2.kind === item3 ? ' selected' : '') +
                 '>' +
-                escapeHtml(tr(KIND_LABEL_KEY[_0x2d1d60])) +
+                escapeHtml(tr(KIND_LABEL_KEY[item3])) +
                 '</option>',
             ).join('') +
             '</select>'
@@ -104,7 +109,7 @@ export function renderProviderModelCatalogPanel({
       ].join('');
     })
     .join('');
-  _0x4c1d5f.innerHTML =
+  el.innerHTML =
     '<div class="settings-provider-models-head">' +
     '<span class="settings-provider-models-title">' +
     escapeHtml(tr('settings.apiInput.models.selectHint')) +
@@ -113,38 +118,42 @@ export function renderProviderModelCatalogPanel({
     escapeHtml(statusText) +
     '</span>' +
     '<button type="button" class="settings-provider-models-save" data-provider-model-save="' +
-    escapeHtml(_0x30e5a1) +
+    escapeHtml(providerId) +
     '">' +
     escapeHtml(tr('settings.apiInput.models.save')) +
     '</button>' +
     '</div>' +
-    (_0x1a0c4f
-      ? '<div class="settings-provider-models-message is-' + _0x242cb4 + '">' + escapeHtml(_0x1a0c4f) + '</div>'
+    (message
+      ? '<div class="settings-provider-models-message is-' +
+        messageKind +
+        '">' +
+        escapeHtml(message) +
+        '</div>'
       : '') +
     '<div class="settings-provider-models-list">' +
-    _0x3e4f07 +
+    current +
     '</div>';
-  ((_0x4c1d5f.hidden = false), _0x4c1d5f.classList?.add?.('is-active'));
-  return _0x4c1d5f;
+  ((el.hidden = false), el.classList?.add?.('is-active'));
+  return el;
 }
 
-export function readProviderModelCatalogSelection(_0x3594a7, _0x4f0d69) {
-  const _0x2b5da0 = _0x3594a7?.getElementById?.(getProviderModelCatalogPanelId(_0x4f0d69));
-  if (!_0x2b5da0) return [];
-  const _0x5c7b1c = new Map();
-  _0x2b5da0.querySelectorAll?.('[data-provider-model-id]')?.forEach?.((_0x2f5a1a) => {
-    const _0x1d3d70 = String(_0x2f5a1a?.dataset?.providerModelId || '').trim();
-    if (_0x1d3d70) _0x5c7b1c.set(_0x1d3d70, _0x2f5a1a.checked === true);
+export function readProviderModelCatalogSelection(payload, handle) {
+  const el2 = payload?.getElementById?.(getProviderModelCatalogPanelId(handle));
+  if (!el2) return [];
+  const map = new Map();
+  el2.querySelectorAll?.('[data-provider-model-id]')?.forEach?.((el3) => {
+    const state = String(el3?.dataset?.providerModelId || '').trim();
+    if (state) map.set(state, el3.checked === true);
   });
-  const _0x4e1e0d = new Map();
-  _0x2b5da0.querySelectorAll?.('[data-provider-model-kind]')?.forEach?.((_0x2d5b6b) => {
-    const _0x5a3d3d = String(_0x2d5b6b?.dataset?.providerModelKind || '').trim(),
-      _0x3c0cbe = String(_0x2d5b6b?.value || '').trim();
-    if (_0x5a3d3d && PROVIDER_MODEL_KINDS.includes(_0x3c0cbe)) _0x4e1e0d.set(_0x5a3d3d, _0x3c0cbe);
+  const kind = new Map();
+  el2.querySelectorAll?.('[data-provider-model-kind]')?.forEach?.((el4) => {
+    const config = String(el4?.dataset?.providerModelKind || '').trim(),
+      scope = String(el4?.value || '').trim();
+    if (config && PROVIDER_MODEL_KINDS.includes(scope)) kind.set(config, scope);
   });
-  return [..._0x5c7b1c.entries()].map(([_0x33e13d, _0x361d95]) => ({
-    id: _0x33e13d,
-    kind: _0x4e1e0d.get(_0x33e13d) || '',
-    enabled: _0x361d95 || getProviderModelRowState(_0x4f0d69, _0x33e13d) === 'builtin',
+  return [...map.entries()].map(([id, enabled]) => ({
+    id: id,
+    kind: kind.get(id) || '',
+    enabled: enabled || getProviderModelRowState(handle, id) === 'builtin',
   }));
 }

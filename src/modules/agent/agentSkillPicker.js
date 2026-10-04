@@ -1,151 +1,142 @@
 import { agentIconSvg, createAgentButton, createAgentElement } from './agentPanelElements.js';
 import { createAgentScrollableWheelHandler } from './agentScrollableWheel.js';
-function listSelectableSkills(_0x34f162) {
-  return (_0x34f162?.['listSkills']?.() || [])['filter'](
-    (_0x31142e) => _0x31142e['source'] === 'installed' && _0x31142e['enabled'] !== ![],
+function listSelectableSkills(value) {
+  return (value?.['listSkills']?.() || [])['filter'](
+    (item) => item['source'] === 'installed' && item['enabled'] !== ![],
   );
 }
-function matchesSkillQuery(_0x477afa, _0x2252ce = '') {
-  const _0x159ac1 = String(_0x2252ce || '')
+function matchesSkillQuery(key, index = '') {
+  const enabled = String(index || '')
     ['trim']()
     ['toLowerCase']();
-  if (!_0x159ac1) return !![];
-  return [_0x477afa['id'], _0x477afa['title'], _0x477afa['description']]['some']((_0x573ed2) =>
-    String(_0x573ed2 || '')
+  if (!enabled) return !![];
+  return [key['id'], key['title'], key['description']]['some']((result) =>
+    String(result || '')
       ['toLowerCase']()
-      ['includes'](_0x159ac1),
+      ['includes'](enabled),
   );
 }
 export function createAgentSkillPicker({
-  registry: _0x56f43c,
-  text: _0x170950,
-  onSelect: _0x29ad64,
+  registry: registry,
+  text: text,
+  onSelect: onSelect,
   slashTrigger: slashTrigger = null,
 } = {}) {
-  const _0x3464c5 = createAgentElement('div', 'agent-skill-picker'),
-    _0x4ce374 = createAgentElement('div', 'agent-floating-menu\x20agent-skill-picker-menu');
-  ((_0x4ce374['id'] = 'agent-skill-picker-menu'),
-    _0x4ce374['setAttribute']('id', _0x4ce374['id']),
-    _0x4ce374['setAttribute']('role', 'listbox'),
-    (_0x4ce374['agentPopoverTrigger'] = slashTrigger),
+  const element = createAgentElement('div', 'agent-skill-picker'),
+    menu = createAgentElement('div', 'agent-floating-menu\x20agent-skill-picker-menu');
+  ((menu['id'] = 'agent-skill-picker-menu'),
+    menu['setAttribute']('id', menu['id']),
+    menu['setAttribute']('role', 'listbox'),
+    (menu['agentPopoverTrigger'] = slashTrigger),
     slashTrigger?.['setAttribute']?.('aria-haspopup', 'listbox'),
-    slashTrigger?.['setAttribute']?.('aria-controls', _0x4ce374['id']),
-    _0x3464c5['appendChild'](_0x4ce374));
-  let _0x5c6b2c = '',
-    _0x4ac4e4 = '';
-  function _0x377fcc({
+    slashTrigger?.['setAttribute']?.('aria-controls', menu['id']),
+    element['appendChild'](menu));
+  let data = '',
+    options = '';
+  function run({
     id: id = '',
     title: title = '',
     description: description = '',
     selected: selected = ![],
   } = {}) {
-    const _0x5a0717 = createAgentButton('agent-menu-item\x20agent-skill-picker-item', '', {
+    const el = createAgentButton('agent-menu-item\x20agent-skill-picker-item', '', {
       icon: agentIconSvg(id ? 'skills' : 'check'),
     });
-    ((_0x5a0717['dataset']['agentSkillPick'] = id),
-      _0x5a0717['setAttribute']('role', 'option'),
-      _0x5a0717['setAttribute']('aria-selected', String(selected)),
-      _0x5a0717['classList']['toggle']('active', selected));
-    const _0x54cc92 = createAgentElement('span', 'agent-skill-picker-item-copy');
+    ((el['dataset']['agentSkillPick'] = id),
+      el['setAttribute']('role', 'option'),
+      el['setAttribute']('aria-selected', String(selected)),
+      el['classList']['toggle']('active', selected));
+    const el2 = createAgentElement('span', 'agent-skill-picker-item-copy');
     return (
-      _0x54cc92['appendChild'](createAgentElement('span', 'agent-skill-picker-item-title', title)),
+      el2['appendChild'](createAgentElement('span', 'agent-skill-picker-item-title', title)),
       description &&
-        _0x54cc92['appendChild'](createAgentElement('span', 'agent-skill-picker-item-desc', description)),
-      _0x5a0717['appendChild'](_0x54cc92),
-      _0x5a0717
+        el2['appendChild'](createAgentElement('span', 'agent-skill-picker-item-desc', description)),
+      el['appendChild'](el2),
+      el
     );
   }
-  function _0xd341c1() {
-    const _0x4733f4 = listSelectableSkills(_0x56f43c);
-    return _0x4733f4['filter']((_0x22fc3f) => matchesSkillQuery(_0x22fc3f, _0x5c6b2c));
+  function run2() {
+    const list = listSelectableSkills(registry);
+    return list['filter']((target) => matchesSkillQuery(target, data));
   }
-  function _0x42b2f8() {
-    const _0x3d1fdd = _0xd341c1();
-    _0x4ce374['replaceChildren']();
-    for (const _0x367505 of _0x3d1fdd) {
-      _0x4ce374['appendChild'](
-        _0x377fcc({
-          id: _0x367505['id'],
-          title: _0x367505['title'] || _0x367505['id'],
-          description: _0x367505['description'] || '$' + _0x367505['id'],
-          selected: _0x367505['id'] === _0x4ac4e4,
+  function render() {
+    const list2 = run2();
+    menu['replaceChildren']();
+    for (const id2 of list2) {
+      menu['appendChild'](
+        run({
+          id: id2['id'],
+          title: id2['title'] || id2['id'],
+          description: id2['description'] || '$' + id2['id'],
+          selected: id2['id'] === options,
         }),
       );
     }
-    _0x3d1fdd['length'] === 0x0 &&
-      _0x4ce374['appendChild'](
-        createAgentElement(
-          'div',
-          'agent-custom-empty agent-skill-picker-empty',
-          _0x170950('skillPickerEmpty'),
-        ),
+    list2['length'] === 0x0 &&
+      menu['appendChild'](
+        createAgentElement('div', 'agent-custom-empty agent-skill-picker-empty', text('skillPickerEmpty')),
       );
   }
-  function _0x48de6d(_0x51af90 = '') {
-    ((_0x5c6b2c = String(_0x51af90 || '')['trim']()), (_0x4ac4e4 = ''), _0x42b2f8());
+  function openSlash(source = '') {
+    ((data = String(source || '')['trim']()), (options = ''), render());
   }
-  function _0x158d0b(_0x21baaa = 0x1) {
-    const _0x40044f = Array['from'](_0x4ce374['querySelectorAll']('[data-agent-skill-pick]'))['filter'](
-      (_0x1f9573) => _0x1f9573['dataset']['agentSkillPick'],
+  function moveActive(next = 0x1) {
+    const list3 = Array['from'](menu['querySelectorAll']('[data-agent-skill-pick]'))['filter'](
+      (el3) => el3['dataset']['agentSkillPick'],
     );
-    if (_0x40044f['length'] === 0x0) return ![];
-    const _0x480f6c = _0x40044f['findIndex'](
-        (_0x4b0e49) => _0x4b0e49['dataset']['agentSkillPick'] === _0x4ac4e4,
-      ),
-      _0x4f9c0e = Number(_0x21baaa) < 0x0 ? -0x1 : 0x1;
-    let _0x40bdee;
-    if (_0x480f6c < 0x0) _0x40bdee = _0x4f9c0e > 0x0 ? 0x0 : _0x40044f['length'] - 0x1;
-    else _0x40bdee = (_0x480f6c + _0x4f9c0e + _0x40044f['length']) % _0x40044f['length'];
+    if (list3['length'] === 0x0) return ![];
+    const count = list3['findIndex']((el4) => el4['dataset']['agentSkillPick'] === options),
+      count2 = Number(next) < 0x0 ? -0x1 : 0x1;
+    let current;
+    if (count < 0x0) current = count2 > 0x0 ? 0x0 : list3['length'] - 0x1;
+    else current = (count + count2 + list3['length']) % list3['length'];
     return (
-      (_0x4ac4e4 = _0x40044f[_0x40bdee]['dataset']['agentSkillPick']),
-      _0x40044f['forEach']((_0x4bf23a, _0x55ec90) => {
-        const _0x16f85a = _0x55ec90 === _0x40bdee;
-        (_0x4bf23a['classList']['toggle']('active', _0x16f85a),
-          _0x4bf23a['setAttribute']('aria-selected', String(_0x16f85a)));
+      (options = list3[current]['dataset']['agentSkillPick']),
+      list3['forEach']((el5, entry) => {
+        const record = entry === current;
+        (el5['classList']['toggle']('active', record), el5['setAttribute']('aria-selected', String(record)));
       }),
-      _0x40044f[_0x40bdee]['scrollIntoView']?.({ block: 'nearest' }),
+      list3[current]['scrollIntoView']?.({ block: 'nearest' }),
       !![]
     );
   }
-  function _0xda274b() {
-    const _0x4bae66 = Array['from'](_0x4ce374['querySelectorAll']('[data-agent-skill-pick]'))['filter'](
-        (_0x48f3b6) => _0x48f3b6['dataset']['agentSkillPick'],
+  function chooseActive() {
+    const list4 = Array['from'](menu['querySelectorAll']('[data-agent-skill-pick]'))['filter'](
+        (el6) => el6['dataset']['agentSkillPick'],
       ),
-      _0x25bb1b =
-        _0x4bae66['find']((_0x356f06) => _0x356f06['dataset']['agentSkillPick'] === _0x4ac4e4) ||
-        _0x4bae66[0x0];
-    if (!_0x25bb1b) return ![];
-    const _0x2b68a7 = listSelectableSkills(_0x56f43c)['find'](
-      (_0x439b19) => _0x439b19['id'] === _0x25bb1b['dataset']['agentSkillPick'],
+      el7 = list4['find']((el8) => el8['dataset']['agentSkillPick'] === options) || list4[0x0];
+    if (!el7) return ![];
+    const listSelectableSkills2 = listSelectableSkills(registry)['find'](
+      (payload) => payload['id'] === el7['dataset']['agentSkillPick'],
     );
-    if (!_0x2b68a7) return ![];
-    return (_0x29ad64?.(_0x2b68a7), !![]);
+    if (!listSelectableSkills2) return ![];
+    return (onSelect?.(listSelectableSkills2), !![]);
   }
-  function _0x227f68(_0x2b7cb0) {
-    const _0x23271f = _0x2b7cb0['target']?.['closest']?.('[data-agent-skill-pick]');
-    if (!_0x23271f || _0x23271f['disabled']) return;
-    (_0x2b7cb0['preventDefault']?.(), _0x2b7cb0['stopPropagation']?.());
-    const _0x117245 = listSelectableSkills(_0x56f43c)['find'](
-      (_0x2967bc) => _0x2967bc['id'] === _0x23271f['dataset']['agentSkillPick'],
+  function run3(event) {
+    const el9 = event['target']?.['closest']?.('[data-agent-skill-pick]');
+    if (!el9 || el9['disabled']) return;
+    (event['preventDefault']?.(), event['stopPropagation']?.());
+    const listSelectableSkills3 = listSelectableSkills(registry)['find'](
+      (handle) => handle['id'] === el9['dataset']['agentSkillPick'],
     );
-    if (_0x117245) _0x29ad64?.(_0x117245);
+    if (listSelectableSkills3) onSelect?.(listSelectableSkills3);
   }
-  const _0x467e93 = createAgentScrollableWheelHandler(_0x4ce374);
+  const agentScrollableWheelHandler = createAgentScrollableWheelHandler(menu);
   return (
-    _0x4ce374['addEventListener']('click', _0x227f68),
-    _0x4ce374['addEventListener']('wheel', _0x467e93, { passive: ![] }),
-    _0x42b2f8(),
+    menu['addEventListener']('click', run3),
+    menu['addEventListener']('wheel', agentScrollableWheelHandler, { passive: ![] }),
+    render(),
     {
-      element: _0x3464c5,
-      menu: _0x4ce374,
-      render: _0x42b2f8,
-      refreshText: _0x42b2f8,
-      openSlash: _0x48de6d,
-      moveActive: _0x158d0b,
-      chooseActive: _0xda274b,
+      element: element,
+      menu: menu,
+      render: render,
+      refreshText: render,
+      openSlash: openSlash,
+      moveActive: moveActive,
+      chooseActive: chooseActive,
       destroy() {
-        (_0x4ce374['removeEventListener']('click', _0x227f68),
-          _0x4ce374['removeEventListener']('wheel', _0x467e93));
+        (menu['removeEventListener']('click', run3),
+          menu['removeEventListener']('wheel', agentScrollableWheelHandler));
       },
     }
   );

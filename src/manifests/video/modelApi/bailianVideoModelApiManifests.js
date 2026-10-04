@@ -38,7 +38,7 @@ export const BAILIAN_VIDEO_MODELS = Object['freeze']([
       createResolutionField({ defaultValue: '1080P', options: ['480P', '720P', '1080P'] }),
       createAspectRatioField({ options: ['16:9', '4:3', '1:1', '3:4', '9:16'] }),
       createFooterDurationSliderOptionsField({
-        values: [-0x1, ...Array['from']({ length: 0x1d }, (_0x457023, _0x13377f) => _0x13377f + 0x2)],
+        values: [-0x1, ...Array['from']({ length: 0x1d }, (value, item) => item + 0x2)],
         defaultValue: 0x5,
         optionOverridesByValue: { '-1': { label: '自动', displayLabel: '自动' } },
       }),

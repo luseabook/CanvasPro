@@ -13,63 +13,61 @@ import {
 import { t } from '../../i18n/index.js';
 export const RUNNING_HUB_TOOLBAR_TASK_EVENT = 'aicanvas:runninghub-toolbar-task-change';
 export const RUNNING_HUB_CANCEL_ICON_HTML = GENERATE_CANCEL_ICON_HTML;
-function toolbarText(_0x46f3ae, _0x201550 = {}) {
-  return t('nodeToolbar.common.' + _0x46f3ae, _0x201550);
+function toolbarText(value, item = {}) {
+  return t('nodeToolbar.common.' + value, item);
 }
 function getStateSnapshot() {
   return typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
 }
-function normalizeList(_0x24c2cc) {
-  return Array.isArray(_0x24c2cc)
-    ? _0x24c2cc.map((_0x3fc7d8) => String(_0x3fc7d8 || '').trim()).filter(Boolean)
-    : [];
+function normalizeList(list) {
+  return Array.isArray(list) ? list.map((item2) => String(item2 || '').trim()).filter(Boolean) : [];
 }
-function includesAny(_0x2f6c0c, _0x61f97c) {
-  const _0x453d12 = String(_0x2f6c0c || '');
-  return _0x61f97c.some((_0x2ca191) => _0x453d12.includes(_0x2ca191));
+function includesAny(key, list2) {
+  const list3 = String(key || '');
+  return list2.some((item3) => list3.includes(item3));
 }
-function getTaskTime(_0x15c543) {
-  return Number(_0x15c543?.rhTaskStartedAt || _0x15c543?.generationStartTime || 0) || 0;
+function getTaskTime(index) {
+  return Number(index?.rhTaskStartedAt || index?.generationStartTime || 0) || 0;
 }
-function isRunningHubTaskProvider(_0x4f52c3) {
-  const _0x46bbcd = normalizeProviderId(_0x4f52c3?.provider);
-  if (_0x46bbcd === 'runninghubwf' || _0x46bbcd === 'runninghub') return true;
-  const _0x20b226 = String(_0x4f52c3?.model || '').trim();
-  if (!_0x20b226) return false;
-  const _0x197781 = resolveModelExecution(_0x20b226, { providerHint: _0x46bbcd }),
-    _0x5934cb = normalizeProviderId(_0x197781?.modelManifest?.provider),
-    _0x286181 = normalizeProviderId(_0x197781?.executionManifest?.provider);
+function isRunningHubTaskProvider(result) {
+  const providerHint = normalizeProviderId(result?.provider);
+  if (providerHint === 'runninghubwf' || providerHint === 'runninghub') return true;
+  const enabled = String(result?.model || '').trim();
+  if (!enabled) return false;
+  const modelExecution = resolveModelExecution(enabled, { providerHint: providerHint }),
+    providerId = normalizeProviderId(modelExecution?.modelManifest?.provider),
+    providerId2 = normalizeProviderId(modelExecution?.executionManifest?.provider);
   return (
-    _0x5934cb === 'runninghubwf' ||
-    _0x5934cb === 'runninghub' ||
-    _0x286181 === 'runninghubwf' ||
-    _0x286181 === 'runninghub'
+    providerId === 'runninghubwf' ||
+    providerId === 'runninghub' ||
+    providerId2 === 'runninghubwf' ||
+    providerId2 === 'runninghub'
   );
 }
-function hasRunningHubTaskMarker(_0x2d3ecb) {
+function hasRunningHubTaskMarker(data) {
   return (
-    isRunningHubTaskProvider(_0x2d3ecb) ||
-    !!String(_0x2d3ecb?.rhTaskId || '').trim() ||
-    !!String(_0x2d3ecb?.rhTaskStatus || '').trim() ||
-    !!String(_0x2d3ecb?.rhSourceNodeId || '').trim() ||
-    !!String(_0x2d3ecb?.rhToolbarTaskType || '').trim()
+    isRunningHubTaskProvider(data) ||
+    !!String(data?.rhTaskId || '').trim() ||
+    !!String(data?.rhTaskStatus || '').trim() ||
+    !!String(data?.rhSourceNodeId || '').trim() ||
+    !!String(data?.rhToolbarTaskType || '').trim()
   );
 }
-export function notifyRunningHubToolbarTasksChanged(_0x387222 = {}) {
-  notifyToolbarTasksChanged(_0x387222, { eventName: RUNNING_HUB_TOOLBAR_TASK_EVENT });
+export function notifyRunningHubToolbarTasksChanged(options = {}) {
+  notifyToolbarTasksChanged(options, { eventName: RUNNING_HUB_TOOLBAR_TASK_EVENT });
 }
-export function isRunningHubToolbarTaskNode(_0xd0d5a3) {
-  if (!_0xd0d5a3 || typeof _0xd0d5a3 !== 'object') return false;
-  return hasRunningHubTaskMarker(_0xd0d5a3) && isTaskRunning(_0xd0d5a3);
+export function isRunningHubToolbarTaskNode(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
+  return hasRunningHubTaskMarker(enabled2) && isTaskRunning(enabled2);
 }
-export function isRunningHubToolbarTaskCancelled(_0x3a5222) {
-  const _0x28891a = String(_0x3a5222 || '').trim();
-  if (!_0x28891a) return false;
-  const _0x415795 = getStateSnapshot().nodes?.[_0x28891a];
-  return hasRunningHubTaskMarker(_0x415795) && isTaskCancelled(_0x415795);
+export function isRunningHubToolbarTaskCancelled(target) {
+  const enabled3 = String(target || '').trim();
+  if (!enabled3) return false;
+  const stateSnapshot = getStateSnapshot().nodes?.[enabled3];
+  return hasRunningHubTaskMarker(stateSnapshot) && isTaskCancelled(stateSnapshot);
 }
 export function findRunningHubToolbarTaskForNode(
-  _0x13a823,
+  source,
   {
     models: models = [],
     taskTypes: taskTypes = [],
@@ -78,7 +76,7 @@ export function findRunningHubToolbarTaskForNode(
     sourceField: sourceField = 'rhSourceNodeId',
   } = {},
 ) {
-  const _0x223c4a = findToolbarTaskForNode(_0x13a823, {
+  const args = findToolbarTaskForNode(source, {
     models: models,
     taskTypes: taskTypes,
     outputTextIncludes: outputTextIncludes,
@@ -87,19 +85,19 @@ export function findRunningHubToolbarTaskForNode(
     taskTypeField: 'rhToolbarTaskType',
     isTaskNode: isRunningHubToolbarTaskNode,
   });
-  return _0x223c4a ? { ..._0x223c4a, cancellable: true, resumable: true } : null;
+  return args ? { ...args, cancellable: true, resumable: true } : null;
 }
 export function bindRunningHubToolbarTaskButton({
-  button: _0x3c3ad1,
-  getTask: _0x3756c4,
-  cancelTask: _0x53846b,
+  button: button,
+  getTask: getTask,
+  cancelTask: cancelTask2,
   cancelTooltip: cancelTooltip = toolbarText('cancelTask'),
   eventTypes: eventTypes = ['click'],
 } = {}) {
   return bindToolbarTaskButton({
-    button: _0x3c3ad1,
-    getTask: _0x3756c4,
-    cancelTask: _0x53846b,
+    button: button,
+    getTask: getTask,
+    cancelTask: cancelTask2,
     cancelTooltip: cancelTooltip,
     eventTypes: eventTypes,
     eventName: RUNNING_HUB_TOOLBAR_TASK_EVENT,
@@ -114,56 +112,53 @@ async function resolveRunningHubWorkflowApiKey() {
   }
 }
 export async function cancelRunningHubRemoteTaskQuietly({
-  apiKey: _0x56603d,
-  taskId: _0x3321a0,
-  label: _0x2f7dc3,
+  apiKey: apiKey,
+  taskId: taskId,
+  label: label,
 } = {}) {
-  const _0x216e0f = String(_0x56603d || '').trim() || (await resolveRunningHubWorkflowApiKey()),
-    _0xa39d89 = String(_0x3321a0 || '').trim();
-  if (!_0x216e0f || !_0xa39d89) return false;
+  const apiKey2 = String(apiKey || '').trim() || (await resolveRunningHubWorkflowApiKey()),
+    taskId2 = String(taskId || '').trim();
+  if (!apiKey2 || !taskId2) return false;
   try {
-    return (await cancelRunningHubTask({ apiKey: _0x216e0f, taskId: _0xa39d89 }), true);
-  } catch (_0x5847ca) {
-    return (
-      console.warn('[' + (_0x2f7dc3 || 'RunningHubToolbarTask') + '] cancel request failed:', _0x5847ca),
-      false
-    );
+    return (await cancelRunningHubTask({ apiKey: apiKey2, taskId: taskId2 }), true);
+  } catch (next) {
+    return (console.warn('[' + (label || 'RunningHubToolbarTask') + '] cancel request failed:', next), false);
   }
 }
 export async function cancelRunningHubResultTask(
-  _0x3cbe28,
+  apiKey3,
   {
-    name: _0x49b34f,
-    outputText: _0x3b6fa4,
+    name: name,
+    outputText: outputText,
     notifyMessage: notifyMessage = toolbarText('taskCancelled'),
     notify: notify = true,
   } = {},
 ) {
-  const _0x35023f = String(_0x3cbe28?.outId || _0x3cbe28?.node?.id || '').trim();
-  if (!_0x35023f) return false;
-  const _0x5e4bea = getStateSnapshot().nodes?.[_0x35023f];
-  if (!_0x5e4bea) return false;
-  const _0xba1134 = String(_0x3cbe28?.taskId || _0x5e4bea.rhTaskId || '').trim();
-  (await cancelTask_2(_0x35023f, {
+  const outId = String(apiKey3?.outId || apiKey3?.node?.id || '').trim();
+  if (!outId) return false;
+  const error = getStateSnapshot().nodes?.[outId];
+  if (!error) return false;
+  const taskId3 = String(apiKey3?.taskId || error.rhTaskId || '').trim();
+  (await cancelTask_2(outId, {
     store: appStore,
     cancellable: true,
-    taskId: _0xba1134,
+    taskId: taskId3,
     spec: { provider: 'runninghubwf', adapterType: 'workflow' },
-    cancel: async ({ taskId: _0x48ac5b }) => {
+    cancel: async ({ taskId: taskId4 }) => {
       await cancelRunningHubRemoteTaskQuietly({
-        apiKey: _0x3cbe28?.apiKey,
-        taskId: _0x48ac5b,
+        apiKey: apiKey3?.apiKey,
+        taskId: taskId4,
         label: 'RunningHubToolbarTaskButton',
       });
     },
   }),
-    appStore.updateNodeData(_0x35023f, {
-      name: _0x49b34f || _0x5e4bea.name,
-      outputText: _0x3b6fa4 || _0x5e4bea.outputText,
+    appStore.updateNodeData(outId, {
+      name: name || error.name,
+      outputText: outputText || error.outputText,
     }),
     notifyRunningHubToolbarTasksChanged({
-      outId: _0x35023f,
-      sourceNodeId: String(_0x5e4bea.rhSourceNodeId || _0x3cbe28?.sourceNodeId || ''),
+      outId: outId,
+      sourceNodeId: String(error.rhSourceNodeId || apiKey3?.sourceNodeId || ''),
     }),
     window._triggerLocalCacheSave?.());
   if (notify) window.showToast?.(notifyMessage, 'info');

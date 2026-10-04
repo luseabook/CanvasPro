@@ -1,1 +1,124 @@
-import{replicationSpeechParts}from'./videoReplicationSpeechIntegrity.js';import{findReplicationAsrSpeechRange}from'./videoReplicationSpeechOrder.js';export{findReplicationAsrSpeechRange}from'./videoReplicationSpeechOrder.js';export function resolveReplicationSpeechTiming({clip:_0x217cf5,shot:_0x2e0989,kind:_0x2a4a3d,parts:_0x2c9e59,durationSec:_0x511a49}){const _0x2abb21=_0x2c9e59["map"](_0x37cb38=>_0x37cb38["text"])["join"](''),_0x3392bf=Number(_0x217cf5['sourceStartSec']||0x0),_0x17c5b4=_0x2c9e59["length"]===0x1?findReplicationAsrSpeechRange(_0x217cf5["replicationSpeechEvents"]||[],_0x2a4a3d,_0x2abb21):null;if(_0x17c5b4)return{'startSec':Math["max"](0x0,_0x17c5b4['startSec']-_0x3392bf),'endSec':Math['min'](_0x511a49,_0x17c5b4["endSec"]-_0x3392bf)};const _0x5e9de2=(_0x217cf5["replicationSpeechEvents"]||[])["flatMap"](_0x39af22=>{const _0x32629b=_0x39af22[_0x2a4a3d]||[];return _0x32629b["flatMap"]((_0x1e935e,_0x5bcf43)=>{let _0x545435='';for(let _0x51643f=_0x5bcf43;_0x51643f<_0x32629b['length'];_0x51643f++){_0x545435+=_0x32629b[_0x51643f]["text"]||'';if(_0x2abb21&&_0x545435===_0x2abb21)return[{'event':_0x39af22,'refs':_0x32629b['slice'](_0x5bcf43,_0x51643f+0x1)["map"]((_0x57378e,_0x73a342)=>_0x2a4a3d+':'+(_0x5bcf43+_0x73a342))}];if(_0x545435["length"]>=_0x2abb21["length"])break;}return[];});}),_0x526a8a=_0x5e9de2["length"]===0x1?_0x5e9de2[0x0]:null,_0x3be28d=_0x526a8a?.["event"],_0x11d145=_0xe12c6=>_0xe12c6&&Number["isFinite"](_0xe12c6["startSec"])&&Number["isFinite"](_0xe12c6["endSec"])&&_0xe12c6['startSec']>=_0x2e0989["startSec"]&&_0xe12c6["startSec"]<_0x2e0989["endSec"]&&_0xe12c6["endSec"]>_0xe12c6['startSec']&&_0xe12c6["endSec"]<=_0x511a49,_0x3ab294=new Set(_0x526a8a?.["refs"]||[]),_0x23a186=_0x526a8a?.["refs"]["map"](_0x57ab34=>_0x3be28d[_0x2a4a3d][Number(_0x57ab34["split"](':')[0x1])])||[];if(_0x23a186["length"]&&_0x23a186["every"](_0x46080d=>_0x46080d["timingSource"]==="asr"))return{'startSec':Math["max"](0x0,Math["min"](..._0x23a186["map"](_0x3a0f00=>_0x3a0f00["startSec"]))-_0x3392bf),'endSec':Math["min"](_0x511a49,Math['max'](..._0x23a186["map"](_0x2110ee=>_0x2110ee['endSec']))-_0x3392bf)};const _0x2f3557=(_0x3be28d?.["shots"]||[])["filter"](_0x2f01fc=>_0x2f01fc['speechRefs']?.["some"](_0x725080=>_0x3ab294["has"](_0x725080))),_0x58867f=_0x2a4a3d==="voiceover"?"dialogue":"voiceover",_0x21ad93=_0x2f3557["length"]?{'startSec':Math["min"](..._0x2f3557["map"](_0x1aaa31=>_0x1aaa31["startSec"]))-_0x3392bf,'endSec':Math['max'](..._0x2f3557["map"](_0x51bc62=>_0x51bc62['endSec']))-_0x3392bf}:_0x3be28d&&_0x3ab294["size"]===_0x3be28d[_0x2a4a3d]?.["length"]&&!_0x3be28d[_0x58867f]?.['length']&&!_0x3be28d["shots"]?.["length"]?{'startSec':_0x3be28d["startSec"]-_0x3392bf,'endSec':_0x3be28d["endSec"]-_0x3392bf}:null,_0x598aac=_0x2a4a3d==="voiceover"&&String(_0x2e0989["audio"]||'')["match"](/画外音时间[：:]\s*(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)秒?/u),_0x202fd4=_0x598aac&&{'startSec':Number(_0x598aac[0x1]),'endSec':Number(_0x598aac[0x2])};if(_0x11d145(_0x21ad93))return _0x11d145(_0x202fd4)&&_0x202fd4['startSec']>=_0x21ad93["startSec"]&&_0x202fd4["endSec"]<=_0x21ad93["endSec"]?_0x202fd4:_0x21ad93;if(_0x11d145(_0x202fd4))return _0x202fd4;return{'startSec':_0x2e0989["startSec"],'endSec':_0x2e0989["endSec"],..._0x598aac||/(?:延续|继续|接续)/u['test'](_0x2e0989["audio"]||'')?{'uncertain':!![]}:{}};}export function inspectReplicationSpeechTiming({clips:clips=[]}={},_0x20782f={}){return clips['flatMap'](_0x57a710=>{const _0x1ae404=_0x20782f["replication"]?.["segmentPlan"]?.["find"](_0x26da2c=>_0x26da2c["ref"]===_0x57a710["ref"])?.["events"];let _0x73f392=0x0;const _0xf8c3c7=(_0x57a710['shots']||[])['map'](_0x256051=>({..._0x256051,'startSec':_0x73f392,'endSec':_0x73f392+=Number(_0x256051["durationSec"])}));return _0xf8c3c7["flatMap"]((_0x38b93d,_0x5304bc)=>['voiceover',"dialogue"]["flatMap"](_0x1ba0df=>{const _0x30e9cb=replicationSpeechParts(_0x38b93d[_0x1ba0df],_0x1ba0df);if(!_0x30e9cb["length"])return[];const _0x349c55=resolveReplicationSpeechTiming({'clip':{..._0x57a710,'replicationSpeechEvents':_0x1ae404||_0x57a710["replicationSpeechEvents"]},'shot':_0x38b93d,'kind':_0x1ba0df,'parts':_0x30e9cb,'durationSec':_0x73f392});return _0x349c55["uncertain"]?[{'clipRef':_0x57a710['ref'],'shotIndex':_0x5304bc,'code':'replication_speech_timing_uncertain','message':'人声覆盖时间无法从原片证据定位，暂保留当前镜头范围，请核对声音时间。'}]:[];}));});}
+import { replicationSpeechParts } from './videoReplicationSpeechIntegrity.js';
+import { findReplicationAsrSpeechRange } from './videoReplicationSpeechOrder.js';
+export { findReplicationAsrSpeechRange } from './videoReplicationSpeechOrder.js';
+export function resolveReplicationSpeechTiming({
+  clip: clip,
+  shot: shot,
+  kind: kind,
+  parts: parts,
+  durationSec: durationSec,
+}) {
+  const value = parts['map']((item) => item['text'])['join'](''),
+    key = Number(clip['sourceStartSec'] || 0x0),
+    index =
+      parts['length'] === 0x1
+        ? findReplicationAsrSpeechRange(clip['replicationSpeechEvents'] || [], kind, value)
+        : null;
+  if (index)
+    return {
+      startSec: Math['max'](0x0, index['startSec'] - key),
+      endSec: Math['min'](durationSec, index['endSec'] - key),
+    };
+  const result = (clip['replicationSpeechEvents'] || [])['flatMap']((data) => {
+      const list = data[kind] || [];
+      return list['flatMap']((options, target) => {
+        let source = '';
+        for (let next = target; next < list['length']; next++) {
+          source += list[next]['text'] || '';
+          if (value && source === value)
+            return [
+              {
+                event: data,
+                refs: list['slice'](target, next + 0x1)['map'](
+                  (current, entry) => kind + ':' + (target + entry),
+                ),
+              },
+            ];
+          if (source['length'] >= value['length']) break;
+        }
+        return [];
+      });
+    }),
+    record = result['length'] === 0x1 ? result[0x0] : null,
+    enabled = record?.['event'],
+    handler = (payload) =>
+      payload &&
+      Number['isFinite'](payload['startSec']) &&
+      Number['isFinite'](payload['endSec']) &&
+      payload['startSec'] >= shot['startSec'] &&
+      payload['startSec'] < shot['endSec'] &&
+      payload['endSec'] > payload['startSec'] &&
+      payload['endSec'] <= durationSec,
+    handle = new Set(record?.['refs'] || []),
+    args = record?.['refs']['map']((state) => enabled[kind][Number(state['split'](':')[0x1])]) || [];
+  if (args['length'] && args['every']((config) => config['timingSource'] === 'asr'))
+    return {
+      startSec: Math['max'](0x0, Math['min'](...args['map']((scope) => scope['startSec'])) - key),
+      endSec: Math['min'](durationSec, Math['max'](...args['map']((input) => input['endSec'])) - key),
+    };
+  const args2 = (enabled?.['shots'] || [])['filter']((output) =>
+      output['speechRefs']?.['some']((value2) => handle['has'](value2)),
+    ),
+    value3 = kind === 'voiceover' ? 'dialogue' : 'voiceover',
+    value4 = args2['length']
+      ? {
+          startSec: Math['min'](...args2['map']((value5) => value5['startSec'])) - key,
+          endSec: Math['max'](...args2['map']((value6) => value6['endSec'])) - key,
+        }
+      : enabled &&
+          handle['size'] === enabled[kind]?.['length'] &&
+          !enabled[value3]?.['length'] &&
+          !enabled['shots']?.['length']
+        ? { startSec: enabled['startSec'] - key, endSec: enabled['endSec'] - key }
+        : null,
+    args3 =
+      kind === 'voiceover' &&
+      String(shot['audio'] || '')['match'](/画外音时间[：:]\s*(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)秒?/u),
+    value7 = args3 && { startSec: Number(args3[0x1]), endSec: Number(args3[0x2]) };
+  if (handler(value4))
+    return handler(value7) && value7['startSec'] >= value4['startSec'] && value7['endSec'] <= value4['endSec']
+      ? value7
+      : value4;
+  if (handler(value7)) return value7;
+  return {
+    startSec: shot['startSec'],
+    endSec: shot['endSec'],
+    ...(args3 || /(?:延续|继续|接续)/u['test'](shot['audio'] || '') ? { uncertain: !![] } : {}),
+  };
+}
+export function inspectReplicationSpeechTiming({ clips: clips = [] } = {}, value8 = {}) {
+  return clips['flatMap']((args4) => {
+    const value9 = value8['replication']?.['segmentPlan']?.['find'](
+      (value10) => value10['ref'] === args4['ref'],
+    )?.['events'];
+    let value11 = 0x0;
+    const value12 = (args4['shots'] || [])['map']((args5) => ({
+      ...args5,
+      startSec: value11,
+      endSec: (value11 += Number(args5['durationSec'])),
+    }));
+    return value12['flatMap']((value13, value14) =>
+      ['voiceover', 'dialogue']['flatMap']((value15) => {
+        const replicationSpeechParts2 = replicationSpeechParts(value13[value15], value15);
+        if (!replicationSpeechParts2['length']) return [];
+        const replicationSpeechTiming = resolveReplicationSpeechTiming({
+          clip: { ...args4, replicationSpeechEvents: value9 || args4['replicationSpeechEvents'] },
+          shot: value13,
+          kind: value15,
+          parts: replicationSpeechParts2,
+          durationSec: value11,
+        });
+        return replicationSpeechTiming['uncertain']
+          ? [
+              {
+                clipRef: args4['ref'],
+                shotIndex: value14,
+                code: 'replication_speech_timing_uncertain',
+                message: '人声覆盖时间无法从原片证据定位，暂保留当前镜头范围，请核对声音时间。',
+              },
+            ]
+          : [];
+      }),
+    );
+  });
+}

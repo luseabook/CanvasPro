@@ -3,95 +3,89 @@ import { configureInsideSpherePanoramaTexture } from './scene3dPanoramaTexture.j
 function panoramaLoadErrorText() {
   return t('panoramaSceneNode.errors.panoramaLoadFailed');
 }
-export function abortPanoramaTextureLoad(_0x1de88a) {
-  const _0x42e073 = _0x1de88a?.['_panoramaTextureAbortController'];
-  if (_0x1de88a) _0x1de88a['_panoramaTextureAbortController'] = null;
-  _0x42e073?.['abort']?.();
+export function abortPanoramaTextureLoad(value) {
+  const item = value?.['_panoramaTextureAbortController'];
+  if (value) value['_panoramaTextureAbortController'] = null;
+  item?.['abort']?.();
 }
 export function loadPanoramaBridgeTexture(
-  _0x40cad1,
-  _0x266837,
-  { token: _0x260c72, isPreview: isPreview = ![], fullUrl: fullUrl = '' } = {},
+  enabled,
+  enabled2,
+  { token: token, isPreview: isPreview = ![], fullUrl: fullUrl = '' } = {},
 ) {
-  if (!_0x40cad1 || !_0x266837 || _0x260c72 !== _0x40cad1['_panoramaLoadToken']) return;
-  _0x40cad1['_pendingPanoramaUrl'] = _0x266837;
-  !_0x40cad1['_panoramaSphere']['material']?.['map'] &&
-    _0x40cad1['onPanoramaStatusChange']?.({ isLoaded: ![], error: null });
-  let _0x1bf6dc = null;
-  const _0x144468 = (_0x4d4a49) => {
-      _0x1bf6dc &&
-        _0x40cad1['_panoramaTextureAbortController'] === _0x1bf6dc &&
-        (_0x40cad1['_panoramaTextureAbortController'] = null);
-      if (_0x260c72 !== _0x40cad1['_panoramaLoadToken']) {
-        _0x4d4a49?.['dispose']?.();
+  if (!enabled || !enabled2 || token !== enabled['_panoramaLoadToken']) return;
+  enabled['_pendingPanoramaUrl'] = enabled2;
+  !enabled['_panoramaSphere']['material']?.['map'] &&
+    enabled['onPanoramaStatusChange']?.({ isLoaded: ![], error: null });
+  let signal = null;
+  const key = (index) => {
+      signal &&
+        enabled['_panoramaTextureAbortController'] === signal &&
+        (enabled['_panoramaTextureAbortController'] = null);
+      if (token !== enabled['_panoramaLoadToken']) {
+        index?.['dispose']?.();
         return;
       }
-      (configureInsideSpherePanoramaTexture(_0x4d4a49, _0x40cad1['renderer'], { isPreview: isPreview }),
-        _0x40cad1['_panoramaTexture']?.['dispose']?.(),
-        (_0x40cad1['_panoramaTexture'] = _0x4d4a49),
-        (_0x40cad1['_loadedPanoramaUrl'] = _0x266837),
-        (_0x40cad1['_pendingPanoramaUrl'] = ''),
-        (_0x40cad1['_panoramaSphere']['material']['map'] = _0x4d4a49),
-        (_0x40cad1['_panoramaSphere']['material']['needsUpdate'] = !![]),
-        (_0x40cad1['_panoramaSphere']['visible'] = !![]),
-        _0x40cad1['_syncPanoramaCanvasVisibility'](),
-        _0x40cad1['onPanoramaStatusChange']?.({ isLoaded: !![], error: null }),
-        _0x40cad1['requestRender'](),
-        isPreview &&
-          fullUrl &&
-          fullUrl !== _0x266837 &&
-          _0x40cad1['_schedulePanoramaFullLoad'](fullUrl, _0x260c72));
+      (configureInsideSpherePanoramaTexture(index, enabled['renderer'], { isPreview: isPreview }),
+        enabled['_panoramaTexture']?.['dispose']?.(),
+        (enabled['_panoramaTexture'] = index),
+        (enabled['_loadedPanoramaUrl'] = enabled2),
+        (enabled['_pendingPanoramaUrl'] = ''),
+        (enabled['_panoramaSphere']['material']['map'] = index),
+        (enabled['_panoramaSphere']['material']['needsUpdate'] = !![]),
+        (enabled['_panoramaSphere']['visible'] = !![]),
+        enabled['_syncPanoramaCanvasVisibility'](),
+        enabled['onPanoramaStatusChange']?.({ isLoaded: !![], error: null }),
+        enabled['requestRender'](),
+        isPreview && fullUrl && fullUrl !== enabled2 && enabled['_schedulePanoramaFullLoad'](fullUrl, token));
     },
-    _0x31f4e8 = () => {
-      _0x1bf6dc &&
-        _0x40cad1['_panoramaTextureAbortController'] === _0x1bf6dc &&
-        (_0x40cad1['_panoramaTextureAbortController'] = null);
-      if (_0x1bf6dc?.['signal']?.['aborted'] || _0x260c72 !== _0x40cad1['_panoramaLoadToken']) return;
-      _0x40cad1['_pendingPanoramaUrl'] = '';
-      isPreview &&
-        fullUrl &&
-        fullUrl !== _0x266837 &&
-        _0x40cad1['_schedulePanoramaFullLoad'](fullUrl, _0x260c72);
-      const _0xb39826 = Boolean(_0x40cad1['_panoramaSphere']['material']?.['map']);
-      ((_0x40cad1['_panoramaSphere']['visible'] = _0xb39826),
-        _0x40cad1['_syncPanoramaCanvasVisibility'](),
-        _0x40cad1['onPanoramaStatusChange']?.({ isLoaded: _0xb39826, error: panoramaLoadErrorText() }));
+    result = () => {
+      signal &&
+        enabled['_panoramaTextureAbortController'] === signal &&
+        (enabled['_panoramaTextureAbortController'] = null);
+      if (signal?.['signal']?.['aborted'] || token !== enabled['_panoramaLoadToken']) return;
+      enabled['_pendingPanoramaUrl'] = '';
+      isPreview && fullUrl && fullUrl !== enabled2 && enabled['_schedulePanoramaFullLoad'](fullUrl, token);
+      const isLoaded = Boolean(enabled['_panoramaSphere']['material']?.['map']);
+      ((enabled['_panoramaSphere']['visible'] = isLoaded),
+        enabled['_syncPanoramaCanvasVisibility'](),
+        enabled['onPanoramaStatusChange']?.({ isLoaded: isLoaded, error: panoramaLoadErrorText() }));
     };
-  if (typeof _0x40cad1['_panoramaTextureSourceLoader'] === 'function') {
-    (abortPanoramaTextureLoad(_0x40cad1),
-      (_0x1bf6dc = new AbortController()),
-      (_0x40cad1['_panoramaTextureAbortController'] = _0x1bf6dc),
-      Promise['resolve'](
-        _0x40cad1['_panoramaTextureSourceLoader'](_0x266837, { signal: _0x1bf6dc['signal'] }),
-      )['then'](_0x144468, _0x31f4e8));
+  if (typeof enabled['_panoramaTextureSourceLoader'] === 'function') {
+    (abortPanoramaTextureLoad(enabled),
+      (signal = new AbortController()),
+      (enabled['_panoramaTextureAbortController'] = signal),
+      Promise['resolve'](enabled['_panoramaTextureSourceLoader'](enabled2, { signal: signal['signal'] }))[
+        'then'
+      ](key, result));
     return;
   }
-  _0x40cad1['_textureLoader']['load'](_0x266837, _0x144468, undefined, _0x31f4e8);
+  enabled['_textureLoader']['load'](enabled2, key, undefined, result);
 }
-export function schedulePanoramaFullLoad(_0x37d236, _0x3d82db, _0xee0772) {
+export function schedulePanoramaFullLoad(enabled3, enabled4, token2) {
   if (
-    !_0x37d236 ||
-    !_0x3d82db ||
-    _0xee0772 !== _0x37d236['_panoramaLoadToken'] ||
-    _0x3d82db === _0x37d236['_loadedPanoramaUrl'] ||
-    _0x3d82db === _0x37d236['_pendingPanoramaUrl'] ||
-    _0x37d236['_panoramaFullLoadFrame'] !== null
+    !enabled3 ||
+    !enabled4 ||
+    token2 !== enabled3['_panoramaLoadToken'] ||
+    enabled4 === enabled3['_loadedPanoramaUrl'] ||
+    enabled4 === enabled3['_pendingPanoramaUrl'] ||
+    enabled3['_panoramaFullLoadFrame'] !== null
   )
     return;
-  const _0x2fde33 =
+  const run =
     typeof globalThis['requestAnimationFrame'] === 'function'
       ? globalThis['requestAnimationFrame']['bind'](globalThis)
-      : (_0xcd6986) => setTimeout(_0xcd6986, 0x0);
-  _0x37d236['_panoramaFullLoadFrame'] = _0x2fde33(() => {
-    _0x37d236['_panoramaFullLoadFrame'] = null;
-    if (_0xee0772 !== _0x37d236['_panoramaLoadToken']) return;
-    _0x37d236['_loadPanoramaTexture'](_0x3d82db, { token: _0xee0772, isPreview: ![], fullUrl: '' });
+      : (data) => setTimeout(data, 0x0);
+  enabled3['_panoramaFullLoadFrame'] = run(() => {
+    enabled3['_panoramaFullLoadFrame'] = null;
+    if (token2 !== enabled3['_panoramaLoadToken']) return;
+    enabled3['_loadPanoramaTexture'](enabled4, { token: token2, isPreview: ![], fullUrl: '' });
   });
 }
-export function cancelPanoramaFullLoad(_0x20c4f5) {
-  if (!_0x20c4f5 || _0x20c4f5['_panoramaFullLoadFrame'] === null) return;
+export function cancelPanoramaFullLoad(enabled5) {
+  if (!enabled5 || enabled5['_panoramaFullLoadFrame'] === null) return;
   (typeof globalThis['cancelAnimationFrame'] === 'function'
-    ? globalThis['cancelAnimationFrame'](_0x20c4f5['_panoramaFullLoadFrame'])
-    : clearTimeout(_0x20c4f5['_panoramaFullLoadFrame']),
-    (_0x20c4f5['_panoramaFullLoadFrame'] = null));
+    ? globalThis['cancelAnimationFrame'](enabled5['_panoramaFullLoadFrame'])
+    : clearTimeout(enabled5['_panoramaFullLoadFrame']),
+    (enabled5['_panoramaFullLoadFrame'] = null));
 }

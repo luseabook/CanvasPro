@@ -1,128 +1,125 @@
 const sidebarSubmenus = new Map();
 let activeKey = '',
   globalsInstalled = false;
-function containsTarget(_0x43c49d, _0x4156eb) {
-  return !!_0x43c49d && (_0x43c49d === _0x4156eb || _0x43c49d.contains?.(_0x4156eb));
+function containsTarget(enabled, value) {
+  return !!enabled && (enabled === value || enabled.contains?.(value));
 }
-function shouldIgnorePointerDown(_0x17c852, _0x571671) {
-  if (typeof _0x17c852?.ignorePointerDown !== 'function') return false;
-  return _0x17c852.ignorePointerDown(_0x571671) === true;
+function shouldIgnorePointerDown(item, key) {
+  if (typeof item?.ignorePointerDown !== 'function') return false;
+  return item.ignorePointerDown(key) === true;
 }
-function isEntryOpen(_0x272eaf) {
-  if (!_0x272eaf) return false;
-  if (typeof _0x272eaf.isOpen === 'function') return _0x272eaf.isOpen();
-  return _0x272eaf.panel?.classList?.contains(_0x272eaf.openClass) === true;
+function isEntryOpen(enabled2) {
+  if (!enabled2) return false;
+  if (typeof enabled2.isOpen === 'function') return enabled2.isOpen();
+  return enabled2.panel?.classList?.contains(enabled2.openClass) === true;
 }
-function applyDefaultOpen(_0x4b981f) {
-  (_0x4b981f.panel?.classList?.add(_0x4b981f.openClass),
-    _0x4b981f.button?.classList?.add(_0x4b981f.activeClass),
-    _0x4b981f.button?.setAttribute?.('aria-expanded', 'true'));
+function applyDefaultOpen(event) {
+  (event.panel?.classList?.add(event.openClass),
+    event.button?.classList?.add(event.activeClass),
+    event.button?.setAttribute?.('aria-expanded', 'true'));
 }
-function applyDefaultClose(_0x2023d2) {
-  (_0x2023d2.panel?.classList?.remove(_0x2023d2.openClass),
-    _0x2023d2.button?.classList?.remove(_0x2023d2.activeClass),
-    _0x2023d2.button?.setAttribute?.('aria-expanded', 'false'));
+function applyDefaultClose(event2) {
+  (event2.panel?.classList?.remove(event2.openClass),
+    event2.button?.classList?.remove(event2.activeClass),
+    event2.button?.setAttribute?.('aria-expanded', 'false'));
 }
-function closeEntry(_0x39b7e3) {
-  if (!_0x39b7e3) return;
-  if (typeof _0x39b7e3.close === 'function') _0x39b7e3.close();
-  else applyDefaultClose(_0x39b7e3);
-  (_0x39b7e3.button?.classList?.remove(_0x39b7e3.activeClass),
-    _0x39b7e3.button?.setAttribute?.('aria-expanded', 'false'));
-  if (activeKey === _0x39b7e3.key) activeKey = '';
+function closeEntry(event3) {
+  if (!event3) return;
+  if (typeof event3.close === 'function') event3.close();
+  else applyDefaultClose(event3);
+  (event3.button?.classList?.remove(event3.activeClass),
+    event3.button?.setAttribute?.('aria-expanded', 'false'));
+  if (activeKey === event3.key) activeKey = '';
 }
 function installGlobals() {
   if (globalsInstalled) return;
   ((globalsInstalled = true),
     document.addEventListener(
       'pointerdown',
-      (_0x19dd57) => {
-        const _0x42e58e = sidebarSubmenus.get(activeKey);
-        if (!_0x42e58e) return;
-        if (containsTarget(_0x42e58e.button, _0x19dd57.target)) return;
-        if (containsTarget(_0x42e58e.panel, _0x19dd57.target)) return;
-        if (shouldIgnorePointerDown(_0x42e58e, _0x19dd57)) return;
-        closeEntry(_0x42e58e);
+      (event4) => {
+        const event5 = sidebarSubmenus.get(activeKey);
+        if (!event5) return;
+        if (containsTarget(event5.button, event4.target)) return;
+        if (containsTarget(event5.panel, event4.target)) return;
+        if (shouldIgnorePointerDown(event5, event4)) return;
+        closeEntry(event5);
       },
       true,
     ),
-    document.addEventListener('keydown', (_0x18bc23) => {
-      if (_0x18bc23.key !== 'Escape') return;
-      const _0x21b735 = sidebarSubmenus.get(activeKey);
-      if (!_0x21b735) return;
-      closeEntry(_0x21b735);
+    document.addEventListener('keydown', (event6) => {
+      if (event6.key !== 'Escape') return;
+      const enabled3 = sidebarSubmenus.get(activeKey);
+      if (!enabled3) return;
+      closeEntry(enabled3);
     }));
 }
-export function closeSidebarSubmenu(_0x3245f1) {
-  closeEntry(sidebarSubmenus.get(_0x3245f1));
+export function closeSidebarSubmenu(index) {
+  closeEntry(sidebarSubmenus.get(index));
 }
-export function closeAllSidebarSubmenus(_0x5e6ce4 = '') {
-  for (const [_0x2d7d95, _0x38c804] of sidebarSubmenus.entries()) {
-    if (_0x2d7d95 !== _0x5e6ce4) closeEntry(_0x38c804);
+export function closeAllSidebarSubmenus(result = '') {
+  for (const [data, options] of sidebarSubmenus.entries()) {
+    if (data !== result) closeEntry(options);
   }
 }
-export function openSidebarSubmenu(_0x48c532) {
-  const _0x296e7f = sidebarSubmenus.get(_0x48c532);
-  if (!_0x296e7f) return;
-  (closeAllSidebarSubmenus(_0x48c532), (activeKey = _0x48c532));
-  if (typeof _0x296e7f.open === 'function') _0x296e7f.open();
-  else applyDefaultOpen(_0x296e7f);
-  (_0x296e7f.button?.classList?.add(_0x296e7f.activeClass),
-    _0x296e7f.button?.setAttribute?.('aria-expanded', 'true'));
+export function openSidebarSubmenu(target) {
+  const event7 = sidebarSubmenus.get(target);
+  if (!event7) return;
+  (closeAllSidebarSubmenus(target), (activeKey = target));
+  if (typeof event7.open === 'function') event7.open();
+  else applyDefaultOpen(event7);
+  (event7.button?.classList?.add(event7.activeClass), event7.button?.setAttribute?.('aria-expanded', 'true'));
 }
-export function toggleSidebarSubmenu(_0x2c819d) {
-  const _0x59dd9c = sidebarSubmenus.get(_0x2c819d);
-  if (!_0x59dd9c) return;
-  if (activeKey === _0x2c819d && isEntryOpen(_0x59dd9c)) {
-    closeEntry(_0x59dd9c);
+export function toggleSidebarSubmenu(source) {
+  const enabled4 = sidebarSubmenus.get(source);
+  if (!enabled4) return;
+  if (activeKey === source && isEntryOpen(enabled4)) {
+    closeEntry(enabled4);
     return;
   }
-  openSidebarSubmenu(_0x2c819d);
+  openSidebarSubmenu(source);
 }
 export function registerSidebarSubmenu({
-  key: _0x14c398,
-  button: _0x124f77,
-  panel: _0x2681f5,
-  open: _0x519bbf,
-  close: _0x1371f6,
-  isOpen: _0x1ed309,
-  ignorePointerDown: _0x546de8,
+  key: key2,
+  button: button,
+  panel: panel,
+  open: open,
+  close: close,
+  isOpen: isOpen,
+  ignorePointerDown: ignorePointerDown,
   openClass: openClass = 'show',
   activeClass: activeClass = 'active',
 } = {}) {
-  if (!_0x14c398 || !_0x124f77 || !_0x2681f5) return;
+  if (!key2 || !button || !panel) return;
   installGlobals();
-  const _0x4f05a6 = sidebarSubmenus.get(_0x14c398);
-  _0x4f05a6?.button &&
-    _0x4f05a6.clickHandler &&
-    _0x4f05a6.button.removeEventListener?.('click', _0x4f05a6.clickHandler);
-  _0x4f05a6?.button &&
-    _0x4f05a6.dblClickHandler &&
-    _0x4f05a6.button.removeEventListener?.('dblclick', _0x4f05a6.dblClickHandler);
-  const _0x24f63f = {
-    key: _0x14c398,
-    button: _0x124f77,
-    panel: _0x2681f5,
-    open: _0x519bbf,
-    close: _0x1371f6,
-    isOpen: _0x1ed309,
-    ignorePointerDown: _0x546de8,
+  const event8 = sidebarSubmenus.get(key2);
+  event8?.button && event8.clickHandler && event8.button.removeEventListener?.('click', event8.clickHandler);
+  event8?.button &&
+    event8.dblClickHandler &&
+    event8.button.removeEventListener?.('dblclick', event8.dblClickHandler);
+  const next = {
+    key: key2,
+    button: button,
+    panel: panel,
+    open: open,
+    close: close,
+    isOpen: isOpen,
+    ignorePointerDown: ignorePointerDown,
     openClass: openClass,
     activeClass: activeClass,
     clickHandler: null,
     dblClickHandler: null,
   };
-  ((_0x24f63f.clickHandler = (_0x57e4b8) => {
-    (_0x57e4b8.preventDefault(), _0x57e4b8.stopPropagation());
-    if (Number(_0x57e4b8.detail || 0) > 1) return;
-    toggleSidebarSubmenu(_0x14c398);
+  ((next.clickHandler = (event9) => {
+    (event9.preventDefault(), event9.stopPropagation());
+    if (Number(event9.detail || 0) > 1) return;
+    toggleSidebarSubmenu(key2);
   }),
-    (_0x24f63f.dblClickHandler = (_0x2d272a) => {
-      (_0x2d272a.preventDefault(), _0x2d272a.stopPropagation(), closeEntry(_0x24f63f));
+    (next.dblClickHandler = (event10) => {
+      (event10.preventDefault(), event10.stopPropagation(), closeEntry(next));
     }),
-    sidebarSubmenus.set(_0x14c398, _0x24f63f),
-    _0x124f77.setAttribute?.('aria-haspopup', 'menu'),
-    _0x124f77.setAttribute?.('aria-expanded', isEntryOpen(_0x24f63f) ? 'true' : 'false'),
-    _0x124f77.addEventListener('click', _0x24f63f.clickHandler),
-    _0x124f77.addEventListener('dblclick', _0x24f63f.dblClickHandler));
+    sidebarSubmenus.set(key2, next),
+    button.setAttribute?.('aria-haspopup', 'menu'),
+    button.setAttribute?.('aria-expanded', isEntryOpen(next) ? 'true' : 'false'),
+    button.addEventListener('click', next.clickHandler),
+    button.addEventListener('dblclick', next.dblClickHandler));
 }

@@ -9,122 +9,122 @@ import {
 import { saveOutputBlob } from './projectService.js';
 import { localPathToUrl, normalizeLocalPath as normalizeLocalPath_2 } from '../utils/localMediaPath.js';
 import { t } from '../i18n/index.js';
-function panoramaSceneText(_0x75a025, _0x365033 = {}) {
-  return t('panoramaSceneNode.' + _0x75a025, _0x365033);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
-function normalizeMediaUrl(_0x1b1d17) {
-  const _0x1247fa = String(_0x1b1d17 || '').trim();
-  if (!_0x1247fa) return '';
-  if (/^(https?:|blob:|data:)/i.test(_0x1247fa)) return _0x1247fa;
-  return localPathToUrl(_0x1247fa);
+function normalizeMediaUrl(key) {
+  const enabled = String(key || '').trim();
+  if (!enabled) return '';
+  if (/^(https?:|blob:|data:)/i.test(enabled)) return enabled;
+  return localPathToUrl(enabled);
 }
-function normalizeLocalPath(_0x4169d8) {
-  return normalizeLocalPath_2(_0x4169d8);
+function normalizeLocalPath(index) {
+  return normalizeLocalPath_2(index);
 }
-function inferFileNameFromPath(_0x2a5ba8) {
-  const _0x43158f = String(_0x2a5ba8 || '').trim();
-  if (!_0x43158f) return '';
-  const _0x58bb0a = _0x43158f.split('#')[0].split('?')[0],
-    _0x526595 = _0x58bb0a.split(/[\\/]/).filter(Boolean);
-  return _0x526595[_0x526595.length - 1] || '';
+function inferFileNameFromPath(result) {
+  const enabled2 = String(result || '').trim();
+  if (!enabled2) return '';
+  const data = enabled2.split('#')[0].split('?')[0],
+    list = data.split(/[\\/]/).filter(Boolean);
+  return list[list.length - 1] || '';
 }
-function stripKnownImageExtension(_0x5dab8d) {
-  return String(_0x5dab8d || '').replace(/\.(png|jpg|jpeg|webp|gif|bmp|avif|svg)$/i, '');
+function stripKnownImageExtension(options) {
+  return String(options || '').replace(/\.(png|jpg|jpeg|webp|gif|bmp|avif|svg)$/i, '');
 }
-function ensurePngFileName(_0x87e184) {
-  const _0x2620d9 = stripKnownImageExtension(String(_0x87e184 || '').trim()) || 'panorama_input';
-  return _0x2620d9 + '.png';
+function ensurePngFileName(target) {
+  const stripKnownImageExtension2 = stripKnownImageExtension(String(target || '').trim()) || 'panorama_input';
+  return stripKnownImageExtension2 + '.png';
 }
-function isPngMimeType(_0x5eaf89) {
+function isPngMimeType(source) {
   return (
-    String(_0x5eaf89 || '')
+    String(source || '')
       .trim()
       .toLowerCase() === 'image/png'
   );
 }
-function isPngLikePath(_0x30abe5) {
-  const _0x215a97 = String(_0x30abe5 || '')
+function isPngLikePath(next) {
+  const current = String(next || '')
     .trim()
     .split('#')[0]
     .split('?')[0]
     .toLowerCase();
-  return _0x215a97.endsWith('.png');
+  return current.endsWith('.png');
 }
-function resolvePersistentPngSource(_0x135f86, _0xdbeca6) {
-  const _0x137582 = normalizeLocalPath(_0x135f86);
-  if (_0x137582 && isPngLikePath(_0x137582))
-    return { localPath: _0x137582, imageUrl: normalizeMediaUrl(_0x137582) };
-  const _0x142024 = normalizeMediaUrl(_0xdbeca6),
-    _0x107447 = normalizeLocalPath(_0x142024);
-  if (_0x107447 && isPngLikePath(_0x107447))
-    return { localPath: _0x107447, imageUrl: normalizeMediaUrl(_0x107447) };
+function resolvePersistentPngSource(entry, record) {
+  const localPath = normalizeLocalPath(entry);
+  if (localPath && isPngLikePath(localPath))
+    return { localPath: localPath, imageUrl: normalizeMediaUrl(localPath) };
+  const mediaUrl = normalizeMediaUrl(record),
+    localPath2 = normalizeLocalPath(mediaUrl);
+  if (localPath2 && isPngLikePath(localPath2))
+    return { localPath: localPath2, imageUrl: normalizeMediaUrl(localPath2) };
   return null;
 }
-function resolvePreferredSourceUrl(_0x55bb75, _0x2af710) {
-  const _0x146591 = normalizeMediaUrl(_0x55bb75);
-  if (_0x146591) return _0x146591;
-  return normalizeMediaUrl(_0x2af710);
+function resolvePreferredSourceUrl(payload, handle) {
+  const mediaUrl2 = normalizeMediaUrl(payload);
+  if (mediaUrl2) return mediaUrl2;
+  return normalizeMediaUrl(handle);
 }
-function normalizeSavedPngResult(_0x48582f, _0x14b3ed, _0x56a179) {
-  const _0x20be34 = normalizeLocalPath(
-      _0x48582f?.originalLocalPath || _0x48582f?.localPath || _0x48582f?.path || '',
+function normalizeSavedPngResult(response, state, sourceSignature) {
+  const localPath3 = normalizeLocalPath(
+      response?.originalLocalPath || response?.localPath || response?.path || '',
     ),
-    _0x5ca10f = normalizeMediaUrl(_0x48582f?.originalUrl || _0x48582f?.url || _0x20be34);
-  if (!_0x20be34 || !_0x5ca10f) throw new Error(panoramaSceneText('errors.pngSaveInvalidPath'));
-  const _0x555819 =
-    String(_0x48582f?.filename || '').trim() ||
-    inferFileNameFromPath(_0x20be34) ||
-    ensurePngFileName(_0x14b3ed);
+    imageUrl = normalizeMediaUrl(response?.originalUrl || response?.url || localPath3);
+  if (!localPath3 || !imageUrl) throw new Error(panoramaSceneText('errors.pngSaveInvalidPath'));
+  const fileName =
+    String(response?.filename || '').trim() || inferFileNameFromPath(localPath3) || ensurePngFileName(state);
   return {
-    localPath: _0x20be34,
-    imageUrl: _0x5ca10f,
-    fileName: _0x555819,
-    sourceSignature: _0x56a179 || null,
+    localPath: localPath3,
+    imageUrl: imageUrl,
+    fileName: fileName,
+    sourceSignature: sourceSignature || null,
   };
 }
 export async function ensurePersistedPanoramaInputPng({
-  localPath: _0x1f9746,
-  imageUrl: _0x4ec9c6,
-  fileName: _0x26f46b,
-  sourceSignature: _0x10077d,
+  localPath: localPath4,
+  imageUrl: imageUrl2,
+  fileName: fileName2,
+  sourceSignature: sourceSignature2,
 } = {}) {
-  const _0x4bce40 = normalizeLocalPath(_0x1f9746),
-    _0x5f04b1 = normalizeMediaUrl(_0x4ec9c6),
-    _0x40cbd9 =
-      String(_0x26f46b || '').trim() ||
-      inferFileNameFromPath(_0x4bce40) ||
-      inferFileNameFromPath(_0x5f04b1) ||
+  const localPath5 = normalizeLocalPath(localPath4),
+    mediaUrl3 = normalizeMediaUrl(imageUrl2),
+    config =
+      String(fileName2 || '').trim() ||
+      inferFileNameFromPath(localPath5) ||
+      inferFileNameFromPath(mediaUrl3) ||
       'panorama_input.png',
-    _0x527b4b = resolvePersistentPngSource(_0x4bce40, _0x5f04b1);
-  if (_0x527b4b)
+    localPath6 = resolvePersistentPngSource(localPath5, mediaUrl3);
+  if (localPath6)
     return {
-      localPath: _0x527b4b.localPath,
-      imageUrl: _0x527b4b.imageUrl,
-      fileName: inferFileNameFromPath(_0x527b4b.localPath) || ensurePngFileName(_0x40cbd9),
-      sourceSignature: _0x10077d || null,
+      localPath: localPath6.localPath,
+      imageUrl: localPath6.imageUrl,
+      fileName: inferFileNameFromPath(localPath6.localPath) || ensurePngFileName(config),
+      sourceSignature: sourceSignature2 || null,
     };
-  const _0x51e7aa = resolvePreferredSourceUrl(_0x4bce40, _0x5f04b1);
-  if (!_0x51e7aa) throw new Error(panoramaSceneText('errors.panoramaImageInputMissing'));
-  let _0x41bade = null;
+  const preferredSourceUrl = resolvePreferredSourceUrl(localPath5, mediaUrl3);
+  if (!preferredSourceUrl) throw new Error(panoramaSceneText('errors.panoramaImageInputMissing'));
+  let fetchRemoteBlob2 = null;
   try {
-    _0x41bade = await fetchRemoteBlob(_0x51e7aa, { timeout: 0x7530 });
-  } catch (_0x5b1f09) {
+    fetchRemoteBlob2 = await fetchRemoteBlob(preferredSourceUrl, { timeout: 0x7530 });
+  } catch (error) {
     throw new Error(
       panoramaSceneText('errors.readPanoramaInputFailed', {
-        error: String(_0x5b1f09?.message || _0x5b1f09 || panoramaSceneText('errors.unknown')),
+        error: String(error?.message || error || panoramaSceneText('errors.unknown')),
       }),
     );
   }
-  if (!isBlobLike(_0x41bade)) throw new Error(panoramaSceneText('errors.panoramaInputEmpty'));
-  const _0x27415e = resolveImageMimeType(_0x41bade, _0x51e7aa) || inferImageMimeTypeFromUrl(_0x51e7aa);
-  let _0x439f0b = _0x41bade;
-  !isPngMimeType(_0x27415e) && (_0x439f0b = await convertImageBlobToPngBlob(_0x41bade));
-  !isBlobLike(_0x439f0b) && (_0x439f0b = await convertImageUrlToPngBlob(_0x51e7aa));
-  if (!isBlobLike(_0x439f0b)) throw new Error(panoramaSceneText('errors.panoramaPngConvertFailed'));
-  const _0x34f2b7 = await saveOutputBlob(_0x439f0b, {
+  if (!isBlobLike(fetchRemoteBlob2)) throw new Error(panoramaSceneText('errors.panoramaInputEmpty'));
+  const imageMimeType =
+    resolveImageMimeType(fetchRemoteBlob2, preferredSourceUrl) ||
+    inferImageMimeTypeFromUrl(preferredSourceUrl);
+  let pngBlob = fetchRemoteBlob2;
+  !isPngMimeType(imageMimeType) && (pngBlob = await convertImageBlobToPngBlob(fetchRemoteBlob2));
+  !isBlobLike(pngBlob) && (pngBlob = await convertImageUrlToPngBlob(preferredSourceUrl));
+  if (!isBlobLike(pngBlob)) throw new Error(panoramaSceneText('errors.panoramaPngConvertFailed'));
+  const saveOutputBlob2 = await saveOutputBlob(pngBlob, {
     ext: 'png',
     subDir: 'panorama_input_png',
     kind: 'panorama-input-png',
   });
-  return normalizeSavedPngResult(_0x34f2b7, _0x40cbd9, _0x10077d);
+  return normalizeSavedPngResult(saveOutputBlob2, config, sourceSignature2);
 }

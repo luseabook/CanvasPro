@@ -7,83 +7,79 @@ const MAX_GOAL_CHARS = 0x320,
   MAX_ITEMS_PER_SECTION = 0xa,
   MAX_MESSAGE_CHARS = 0x7d0,
   DIGEST_ARRAY_FIELDS = Object['freeze'](['constraints', 'decisions', 'completed', 'pending']);
-function compactWhitespace(_0x10ce35 = '') {
-  return String(_0x10ce35 || '')
+function compactWhitespace(value = '') {
+  return String(value || '')
     ['replace'](/\s+/g, '\x20')
     ['trim']();
 }
-function truncateText(_0x2064dc, _0x1d16da) {
-  const _0x57c3ee = compactWhitespace(_0x2064dc);
-  if (_0x57c3ee['length'] <= _0x1d16da) return _0x57c3ee;
-  return _0x57c3ee['slice'](0x0, Math['max'](0x0, _0x1d16da - 0x3)) + '...';
+function truncateText(item, key) {
+  const list = compactWhitespace(item);
+  if (list['length'] <= key) return list;
+  return list['slice'](0x0, Math['max'](0x0, key - 0x3)) + '...';
 }
-function normalizeDigestItems(_0x97f3c0) {
-  if (!Array['isArray'](_0x97f3c0)) return [];
-  const _0x3c0bd6 = new Set(),
-    _0x5675b8 = [];
-  for (const _0x182402 of _0x97f3c0) {
-    const _0x35225f = truncateText(_0x182402, MAX_ITEM_CHARS);
-    if (!_0x35225f || _0x3c0bd6['has'](_0x35225f)) continue;
-    (_0x3c0bd6['add'](_0x35225f), _0x5675b8['push'](_0x35225f));
-    if (_0x5675b8['length'] >= MAX_ITEMS_PER_SECTION) break;
+function normalizeDigestItems(index) {
+  if (!Array['isArray'](index)) return [];
+  const map = new Set(),
+    list2 = [];
+  for (const result of index) {
+    const truncateText2 = truncateText(result, MAX_ITEM_CHARS);
+    if (!truncateText2 || map['has'](truncateText2)) continue;
+    (map['add'](truncateText2), list2['push'](truncateText2));
+    if (list2['length'] >= MAX_ITEMS_PER_SECTION) break;
   }
-  return _0x5675b8;
+  return list2;
 }
-export function normalizeAgentContextDigest(_0x52164a = null) {
-  if (!_0x52164a || typeof _0x52164a !== 'object' || Array['isArray'](_0x52164a)) return null;
-  const _0x49f568 = {
+export function normalizeAgentContextDigest(enabled = null) {
+  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled)) return null;
+  const data = {
       schemaVersion: AGENT_CONTEXT_DIGEST_SCHEMA_VERSION,
-      goal: truncateText(_0x52164a['goal'], MAX_GOAL_CHARS),
-      constraints: normalizeDigestItems(_0x52164a['constraints']),
-      decisions: normalizeDigestItems(_0x52164a['decisions']),
-      completed: normalizeDigestItems(_0x52164a['completed']),
-      pending: normalizeDigestItems(_0x52164a['pending']),
-      coveredThroughItemId: String(_0x52164a['coveredThroughItemId'] || '')
+      goal: truncateText(enabled['goal'], MAX_GOAL_CHARS),
+      constraints: normalizeDigestItems(enabled['constraints']),
+      decisions: normalizeDigestItems(enabled['decisions']),
+      completed: normalizeDigestItems(enabled['completed']),
+      pending: normalizeDigestItems(enabled['pending']),
+      coveredThroughItemId: String(enabled['coveredThroughItemId'] || '')
         ['trim']()
         ['slice'](0x0, 0xa0),
-      coveredThroughTs: Math['max'](0x0, Math['trunc'](Number(_0x52164a['coveredThroughTs'] || 0x0))),
-      coveredMessageCount: Math['max'](0x0, Math['trunc'](Number(_0x52164a['coveredMessageCount'] || 0x0))),
+      coveredThroughTs: Math['max'](0x0, Math['trunc'](Number(enabled['coveredThroughTs'] || 0x0))),
+      coveredMessageCount: Math['max'](0x0, Math['trunc'](Number(enabled['coveredMessageCount'] || 0x0))),
     },
-    _0x47dd3d = Boolean(
-      _0x49f568['goal'] || DIGEST_ARRAY_FIELDS['some']((_0x514e59) => _0x49f568[_0x514e59]['length'] > 0x0),
-    ),
-    _0x569a25 = Boolean(
-      _0x49f568['coveredThroughItemId'] || _0x49f568['coveredThroughTs'] || _0x49f568['coveredMessageCount'],
-    );
-  return _0x47dd3d || _0x569a25 ? _0x49f568 : null;
+    options = Boolean(data['goal'] || DIGEST_ARRAY_FIELDS['some']((target) => data[target]['length'] > 0x0)),
+    source = Boolean(data['coveredThroughItemId'] || data['coveredThroughTs'] || data['coveredMessageCount']);
+  return options || source ? data : null;
 }
-function getMessageItemId(_0x5ce761 = {}) {
-  return String(_0x5ce761['itemId'] || '')['trim']();
+function getMessageItemId(options2 = {}) {
+  return String(options2['itemId'] || '')['trim']();
 }
-function findCoveredMessageIndex(_0x1efed6, _0x110eed) {
-  const _0x23d6be = String(_0x110eed?.['coveredThroughItemId'] || '')['trim']();
-  if (_0x23d6be) {
-    const _0x542097 = _0x1efed6['findIndex']((_0x2e4c07) => getMessageItemId(_0x2e4c07) === _0x23d6be);
-    if (_0x542097 >= 0x0) return _0x542097;
+function findCoveredMessageIndex(list3, next) {
+  const current = String(next?.['coveredThroughItemId'] || '')['trim']();
+  if (current) {
+    const count = list3['findIndex']((entry) => getMessageItemId(entry) === current);
+    if (count >= 0x0) return count;
   }
-  const _0x37b394 = Number(_0x110eed?.['coveredThroughTs'] || 0x0);
-  if (_0x37b394 > 0x0)
-    for (let _0x2957e5 = _0x1efed6['length'] - 0x1; _0x2957e5 >= 0x0; _0x2957e5 -= 0x1) {
-      if (Number(_0x1efed6[_0x2957e5]?.['ts'] || 0x0) <= _0x37b394) return _0x2957e5;
+  const count2 = Number(next?.['coveredThroughTs'] || 0x0);
+  if (count2 > 0x0)
+    for (let count3 = list3['length'] - 0x1; count3 >= 0x0; count3 -= 0x1) {
+      if (Number(list3[count3]?.['ts'] || 0x0) <= count2) return count3;
     }
   return -0x1;
 }
-function normalizeDigestMessage(_0x58db5f = {}) {
-  const _0xaed4f8 = String(_0x58db5f['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
-    _0x1b007b = compactAgentConversationText(
-      _0x58db5f['content'] || _0x58db5f['reply'] || _0x58db5f['message'] || _0x58db5f['question'] || '',
+function normalizeDigestMessage(error = {}) {
+  const role = String(error['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
+    content = compactAgentConversationText(
+      error['content'] || error['reply'] || error['message'] || error['question'] || '',
       MAX_MESSAGE_CHARS,
     ),
-    _0xcc1e36 = String(_0x58db5f['status'] || '')
+    status = String(error['status'] || '')
       ['trim']()
       ['slice'](0x0, 0x50);
-  if (!_0x1b007b && !_0xcc1e36) return null;
+  if (!content && !status) return null;
   return {
-    role: _0xaed4f8,
-    content: _0x1b007b,
-    ...(_0xcc1e36 ? { status: _0xcc1e36 } : {}),
-    itemId: getMessageItemId(_0x58db5f),
-    ts: Math['max'](0x0, Math['trunc'](Number(_0x58db5f['ts'] || 0x0))),
+    role: role,
+    content: content,
+    ...(status ? { status: status } : {}),
+    itemId: getMessageItemId(error),
+    ts: Math['max'](0x0, Math['trunc'](Number(error['ts'] || 0x0))),
   };
 }
 export function selectAgentContextDigestBatch({
@@ -92,26 +88,26 @@ export function selectAgentContextDigestBatch({
   recentMessageLimit: recentMessageLimit = AGENT_CONTEXT_DIGEST_RECENT_MESSAGE_LIMIT,
   minBatchMessages: minBatchMessages = AGENT_CONTEXT_DIGEST_MIN_BATCH_MESSAGES,
 } = {}) {
-  const _0x358ca0 = Array['isArray'](history) ? history : [],
-    _0x393355 = normalizeAgentContextDigest(contextDigest),
-    _0x4dbcda = Math['max'](
+  const list4 = Array['isArray'](history) ? history : [],
+    contextDigest2 = normalizeAgentContextDigest(contextDigest),
+    record = Math['max'](
       0x0,
-      _0x358ca0['length'] - Math['max'](0x1, Math['trunc'](Number(recentMessageLimit) || 0x1)),
+      list4['length'] - Math['max'](0x1, Math['trunc'](Number(recentMessageLimit) || 0x1)),
     ),
-    _0xb82559 = findCoveredMessageIndex(_0x358ca0, _0x393355),
-    _0x1899da = _0xb82559 >= 0x0 ? _0xb82559 + 0x1 : 0x0,
-    _0x388273 = _0x358ca0['slice'](_0x1899da, _0x4dbcda)['map'](normalizeDigestMessage)['filter'](Boolean);
-  if (_0x388273['length'] < Math['max'](0x1, Math['trunc'](Number(minBatchMessages) || 0x1)))
-    return { contextDigest: _0x393355, messages: [], coveredThrough: null };
-  const _0x332a1e = _0x388273['at'](-0x1);
+    coveredMessageIndex = findCoveredMessageIndex(list4, contextDigest2),
+    payload = coveredMessageIndex >= 0x0 ? coveredMessageIndex + 0x1 : 0x0,
+    messages = list4['slice'](payload, record)['map'](normalizeDigestMessage)['filter'](Boolean);
+  if (messages['length'] < Math['max'](0x1, Math['trunc'](Number(minBatchMessages) || 0x1)))
+    return { contextDigest: contextDigest2, messages: [], coveredThrough: null };
+  const itemId = messages['at'](-0x1);
   return {
-    contextDigest: _0x393355,
-    messages: _0x388273,
-    coveredThrough: { itemId: _0x332a1e['itemId'], ts: _0x332a1e['ts'] },
+    contextDigest: contextDigest2,
+    messages: messages,
+    coveredThrough: { itemId: itemId['itemId'], ts: itemId['ts'] },
   };
 }
 export function attachAgentContextDigestCursor(
-  _0x4577e1,
+  handle,
   {
     previousDigest: previousDigest = null,
     coveredThrough: coveredThrough = null,
@@ -119,7 +115,7 @@ export function attachAgentContextDigestCursor(
   } = {},
 ) {
   return normalizeAgentContextDigest({
-    ...(_0x4577e1 || {}),
+    ...(handle || {}),
     coveredThroughItemId: String(coveredThrough?.['itemId'] || '')['trim'](),
     coveredThroughTs: Math['max'](0x0, Math['trunc'](Number(coveredThrough?.['ts'] || 0x0))),
     coveredMessageCount:
@@ -127,16 +123,16 @@ export function attachAgentContextDigestCursor(
       Math['max'](0x0, Math['trunc'](Number(messageCount || 0x0))),
   });
 }
-export function compactAgentContextDigestForPrompt(_0x3cfea9 = null) {
-  const _0x20d793 = normalizeAgentContextDigest(_0x3cfea9);
-  if (!_0x20d793) return null;
+export function compactAgentContextDigestForPrompt(value2 = null) {
+  const schemaVersion = normalizeAgentContextDigest(value2);
+  if (!schemaVersion) return null;
   return {
-    schemaVersion: _0x20d793['schemaVersion'],
-    goal: _0x20d793['goal'],
-    constraints: _0x20d793['constraints'],
-    decisions: _0x20d793['decisions'],
-    completed: _0x20d793['completed'],
-    pending: _0x20d793['pending'],
+    schemaVersion: schemaVersion['schemaVersion'],
+    goal: schemaVersion['goal'],
+    constraints: schemaVersion['constraints'],
+    decisions: schemaVersion['decisions'],
+    completed: schemaVersion['completed'],
+    pending: schemaVersion['pending'],
     instruction: 'This summarizes earlier turns. Prefer newer explicit user instructions when they conflict.',
   };
 }

@@ -1,1 +1,115 @@
-import{getModelManifest}from'../../manifests/index.js';import{buildModelProviderProfileSelectionPatch}from'../../modules/modelProviderProfileSelection.js';import{buildModelUiSchemaDefaultParams}from'../aigenImage/uiSchemaRenderer.js';import{buildAudioWorkflowGenerationParams}from'./audioWorkflowGenerationParams.js';function getPlainParams(_0x237430){return _0x237430&&typeof _0x237430==="object"&&!Array['isArray'](_0x237430)?{..._0x237430}:{};}function arePlainParamsEqual(_0xdd4818,_0x1eb20b){return JSON["stringify"](getPlainParams(_0xdd4818))===JSON["stringify"](getPlainParams(_0x1eb20b));}function getWorkflowKey(_0xf5533a={}){return String(_0xf5533a?.["key"]||_0xf5533a?.["modelId"]||'')['trim']();}function buildAudioWorkflowProviderProfilePatch(_0x1bc567,_0x174a07){return buildModelProviderProfileSelectionPatch(_0x1bc567,_0x174a07);}export function getAudioWorkflowUiSchemaField(_0x1cdb02='',_0x253312=''){const _0x5cd458=String(_0x253312||'')["trim"]();if(!_0x5cd458)return null;const _0x4ba4ae=getModelManifest(String(_0x1cdb02||'')["trim"]())?.["uiSchema"]?.["fields"];if(!Array["isArray"](_0x4ba4ae))return null;return _0x4ba4ae["find"](_0x4e1da9=>String(_0x4e1da9?.['id']||'')['trim']()===_0x5cd458)||null;}export function doesAudioWorkflowSchemaHaveField(_0x270a0c='',_0x2f0177=''){return!!getAudioWorkflowUiSchemaField(_0x270a0c,_0x2f0177);}export function buildAudioWorkflowGenerationParamsPatch({nodeData:nodeData={},workflowKey:workflowKey='',extraParams:extraParams={},currentModelKey:currentModelKey=''}={}){const _0x42a301=String(workflowKey||'')["trim"](),_0x25f42f=String(currentModelKey||nodeData?.["model"]||nodeData?.["audioWorkflowKey"]||'')["trim"](),_0x2edb36=getPlainParams(nodeData?.["generationParamsByModel"]),_0xc240c1=getPlainParams(nodeData?.["generationParams"]);_0x25f42f&&(_0x2edb36[_0x25f42f]=_0xc240c1);const _0x4d190a=buildAudioWorkflowGenerationParams({'schemaDefaults':buildModelUiSchemaDefaultParams(_0x42a301),'savedParams':getPlainParams(_0x2edb36[_0x42a301]),'currentParams':_0xc240c1,'extraParams':extraParams,'targetHasSpeakerId':doesAudioWorkflowSchemaHaveField(_0x42a301,"speakerId")});if(_0x42a301)_0x2edb36[_0x42a301]=_0x4d190a;return{'generationParams':_0x4d190a,'generationParamsByModel':_0x2edb36};}export function buildAudioWorkflowSelectionPatch({nodeData:nodeData={},workflow:workflow={},extraParams:extraParams={}}={}){const _0x2761c9=getWorkflowKey(workflow);if(!_0x2761c9)return{};const _0x5e312a=String(workflow?.['provider']||"runninghubwf")["trim"]();return{'provider':_0x5e312a,'audioWorkflowKey':_0x2761c9,'audioWorkflowLabel':workflow?.["label"]||'','model':_0x2761c9,...buildAudioWorkflowProviderProfilePatch(nodeData,_0x2761c9),...buildAudioWorkflowGenerationParamsPatch({'nodeData':nodeData,'workflowKey':_0x2761c9,'extraParams':extraParams})};}export function buildAudioWorkflowDefaultSyncPatch({nodeData:nodeData={},workflow:workflow={}}={}){const _0x36d49e=getWorkflowKey(workflow);if(!_0x36d49e)return{};const _0x5608c9={},_0x2b96b2=String(workflow?.["provider"]||"runninghubwf")["trim"]();if(nodeData["provider"]!==_0x2b96b2)_0x5608c9['provider']=_0x2b96b2;nodeData["audioWorkflowKey"]!==_0x36d49e&&(_0x5608c9['audioWorkflowKey']=_0x36d49e);nodeData["audioWorkflowLabel"]!==workflow?.["label"]&&(_0x5608c9["audioWorkflowLabel"]=workflow?.['label']||'');if(nodeData["model"]!==_0x36d49e)_0x5608c9["model"]=_0x36d49e;const _0x46fa43=buildAudioWorkflowProviderProfilePatch(nodeData,_0x36d49e);_0x46fa43["providerProfileId"]!==undefined&&_0x46fa43["providerProfileId"]!==nodeData['providerProfileId']&&(_0x5608c9["providerProfileId"]=_0x46fa43["providerProfileId"]);_0x46fa43['providerProfileIdByModel']!==undefined&&!arePlainParamsEqual(_0x46fa43['providerProfileIdByModel'],nodeData['providerProfileIdByModel'])&&(_0x5608c9['providerProfileIdByModel']=_0x46fa43["providerProfileIdByModel"]);_0x46fa43['rhProviderProfileId']!==undefined&&_0x46fa43['rhProviderProfileId']!==nodeData["rhProviderProfileId"]&&(_0x46fa43["rhProviderProfileId"]||Object['hasOwn'](nodeData,"rhProviderProfileId"))&&(_0x5608c9["rhProviderProfileId"]=_0x46fa43["rhProviderProfileId"]);const _0x3771d1=buildAudioWorkflowGenerationParamsPatch({'nodeData':nodeData,'workflowKey':_0x36d49e,'currentModelKey':_0x5608c9["model"]?_0x36d49e:''});return(!arePlainParamsEqual(_0x3771d1["generationParams"],nodeData['generationParams'])||!arePlainParamsEqual(_0x3771d1["generationParamsByModel"],nodeData["generationParamsByModel"]))&&(_0x5608c9["generationParams"]=_0x3771d1['generationParams'],_0x5608c9["generationParamsByModel"]=_0x3771d1["generationParamsByModel"]),_0x5608c9;}
+import { getModelManifest } from '../../manifests/index.js';
+import { buildModelProviderProfileSelectionPatch } from '../../modules/modelProviderProfileSelection.js';
+import { buildModelUiSchemaDefaultParams } from '../aigenImage/uiSchemaRenderer.js';
+import { buildAudioWorkflowGenerationParams } from './audioWorkflowGenerationParams.js';
+function getPlainParams(args) {
+  return args && typeof args === 'object' && !Array['isArray'](args) ? { ...args } : {};
+}
+function arePlainParamsEqual(value, item) {
+  return JSON['stringify'](getPlainParams(value)) === JSON['stringify'](getPlainParams(item));
+}
+function getWorkflowKey(options = {}) {
+  return String(options?.['key'] || options?.['modelId'] || '')['trim']();
+}
+function buildAudioWorkflowProviderProfilePatch(key, index) {
+  return buildModelProviderProfileSelectionPatch(key, index);
+}
+export function getAudioWorkflowUiSchemaField(result = '', data = '') {
+  const enabled = String(data || '')['trim']();
+  if (!enabled) return null;
+  const modelManifest = getModelManifest(String(result || '')['trim']())?.['uiSchema']?.['fields'];
+  if (!Array['isArray'](modelManifest)) return null;
+  return modelManifest['find']((target) => String(target?.['id'] || '')['trim']() === enabled) || null;
+}
+export function doesAudioWorkflowSchemaHaveField(source = '', next = '') {
+  return !!getAudioWorkflowUiSchemaField(source, next);
+}
+export function buildAudioWorkflowGenerationParamsPatch({
+  nodeData: nodeData = {},
+  workflowKey: workflowKey = '',
+  extraParams: extraParams = {},
+  currentModelKey: currentModelKey = '',
+} = {}) {
+  const current = String(workflowKey || '')['trim'](),
+    entry = String(currentModelKey || nodeData?.['model'] || nodeData?.['audioWorkflowKey'] || '')['trim'](),
+    plainParams = getPlainParams(nodeData?.['generationParamsByModel']),
+    plainParams2 = getPlainParams(nodeData?.['generationParams']);
+  entry && (plainParams[entry] = plainParams2);
+  const audioWorkflowGenerationParams = buildAudioWorkflowGenerationParams({
+    schemaDefaults: buildModelUiSchemaDefaultParams(current),
+    savedParams: getPlainParams(plainParams[current]),
+    currentParams: plainParams2,
+    extraParams: extraParams,
+    targetHasSpeakerId: doesAudioWorkflowSchemaHaveField(current, 'speakerId'),
+  });
+  if (current) plainParams[current] = audioWorkflowGenerationParams;
+  return { generationParams: audioWorkflowGenerationParams, generationParamsByModel: plainParams };
+}
+export function buildAudioWorkflowSelectionPatch({
+  nodeData: nodeData = {},
+  workflow: workflow = {},
+  extraParams: extraParams = {},
+} = {}) {
+  const workflowKey2 = getWorkflowKey(workflow);
+  if (!workflowKey2) return {};
+  const record = String(workflow?.['provider'] || 'runninghubwf')['trim']();
+  return {
+    provider: record,
+    audioWorkflowKey: workflowKey2,
+    audioWorkflowLabel: workflow?.['label'] || '',
+    model: workflowKey2,
+    ...buildAudioWorkflowProviderProfilePatch(nodeData, workflowKey2),
+    ...buildAudioWorkflowGenerationParamsPatch({
+      nodeData: nodeData,
+      workflowKey: workflowKey2,
+      extraParams: extraParams,
+    }),
+  };
+}
+export function buildAudioWorkflowDefaultSyncPatch({
+  nodeData: nodeData = {},
+  workflow: workflow = {},
+} = {}) {
+  const workflowKey3 = getWorkflowKey(workflow);
+  if (!workflowKey3) return {};
+  const payload = {},
+    handle = String(workflow?.['provider'] || 'runninghubwf')['trim']();
+  if (nodeData['provider'] !== handle) payload['provider'] = handle;
+  nodeData['audioWorkflowKey'] !== workflowKey3 && (payload['audioWorkflowKey'] = workflowKey3);
+  nodeData['audioWorkflowLabel'] !== workflow?.['label'] &&
+    (payload['audioWorkflowLabel'] = workflow?.['label'] || '');
+  if (nodeData['model'] !== workflowKey3) payload['model'] = workflowKey3;
+  const audioWorkflowProviderProfilePatch = buildAudioWorkflowProviderProfilePatch(nodeData, workflowKey3);
+  audioWorkflowProviderProfilePatch['providerProfileId'] !== undefined &&
+    audioWorkflowProviderProfilePatch['providerProfileId'] !== nodeData['providerProfileId'] &&
+    (payload['providerProfileId'] = audioWorkflowProviderProfilePatch['providerProfileId']);
+  audioWorkflowProviderProfilePatch['providerProfileIdByModel'] !== undefined &&
+    !arePlainParamsEqual(
+      audioWorkflowProviderProfilePatch['providerProfileIdByModel'],
+      nodeData['providerProfileIdByModel'],
+    ) &&
+    (payload['providerProfileIdByModel'] = audioWorkflowProviderProfilePatch['providerProfileIdByModel']);
+  audioWorkflowProviderProfilePatch['rhProviderProfileId'] !== undefined &&
+    audioWorkflowProviderProfilePatch['rhProviderProfileId'] !== nodeData['rhProviderProfileId'] &&
+    (audioWorkflowProviderProfilePatch['rhProviderProfileId'] ||
+      Object['hasOwn'](nodeData, 'rhProviderProfileId')) &&
+    (payload['rhProviderProfileId'] = audioWorkflowProviderProfilePatch['rhProviderProfileId']);
+  const audioWorkflowGenerationParamsPatch = buildAudioWorkflowGenerationParamsPatch({
+    nodeData: nodeData,
+    workflowKey: workflowKey3,
+    currentModelKey: payload['model'] ? workflowKey3 : '',
+  });
+  return (
+    (!arePlainParamsEqual(
+      audioWorkflowGenerationParamsPatch['generationParams'],
+      nodeData['generationParams'],
+    ) ||
+      !arePlainParamsEqual(
+        audioWorkflowGenerationParamsPatch['generationParamsByModel'],
+        nodeData['generationParamsByModel'],
+      )) &&
+      ((payload['generationParams'] = audioWorkflowGenerationParamsPatch['generationParams']),
+      (payload['generationParamsByModel'] = audioWorkflowGenerationParamsPatch['generationParamsByModel'])),
+    payload
+  );
+}

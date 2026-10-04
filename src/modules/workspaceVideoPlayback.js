@@ -7,60 +7,59 @@ import {
   acquireLocalVideoPlaybackObjectUrl,
   releaseLocalVideoPlaybackObjectUrlOwner,
 } from '../services/localVideoPlaybackObjectUrlService.js';
-function normalizeText(_0x549451) {
-  return String(_0x549451 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function requestWorkspaceVideoProgressFrame(_0x555d01) {
-  const _0x273ff9 = globalThis['window']?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
-  if (typeof _0x273ff9 === 'function')
-    return _0x273ff9['call'](globalThis['window'] || globalThis, _0x555d01);
-  return setTimeout(_0x555d01, 0x10);
+function requestWorkspaceVideoProgressFrame(item) {
+  const key = globalThis['window']?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
+  if (typeof key === 'function') return key['call'](globalThis['window'] || globalThis, item);
+  return setTimeout(item, 0x10);
 }
-function cancelWorkspaceVideoProgressFrame(_0x400b8f) {
-  const _0x107e1c = globalThis['window']?.['cancelAnimationFrame'] || globalThis['cancelAnimationFrame'];
-  if (typeof _0x107e1c === 'function') {
-    _0x107e1c['call'](globalThis['window'] || globalThis, _0x400b8f);
+function cancelWorkspaceVideoProgressFrame(index) {
+  const result = globalThis['window']?.['cancelAnimationFrame'] || globalThis['cancelAnimationFrame'];
+  if (typeof result === 'function') {
+    result['call'](globalThis['window'] || globalThis, index);
     return;
   }
-  clearTimeout(_0x400b8f);
+  clearTimeout(index);
 }
 export function createWorkspaceVideoProgressLoop({
-  videoEl: _0x343ed5,
-  onFrame: _0x4c9664,
+  videoEl: videoEl,
+  onFrame: onFrame,
   requestFrame: requestFrame = requestWorkspaceVideoProgressFrame,
   cancelFrame: cancelFrame = cancelWorkspaceVideoProgressFrame,
 } = {}) {
-  if (!_0x343ed5 || typeof _0x4c9664 !== 'function')
+  if (!videoEl || typeof onFrame !== 'function')
     throw new Error('workspace\x20video\x20progress\x20loop\x20requires\x20videoEl\x20and\x20onFrame');
-  let _0x4b3dff = ![],
-    _0x3b88ed = null;
-  const _0x4dc420 = () => {
-      if (_0x3b88ed == null) return;
-      (cancelFrame(_0x3b88ed), (_0x3b88ed = null));
+  let data = ![],
+    requestFrame2 = null;
+  const stop = () => {
+      if (requestFrame2 == null) return;
+      (cancelFrame(requestFrame2), (requestFrame2 = null));
     },
-    _0x582a10 = () => {
-      _0x3b88ed = null;
-      if (_0x4b3dff) return;
-      _0x4c9664();
-      if (_0x343ed5['paused'] || _0x343ed5['ended']) return;
-      _0x3b88ed = requestFrame(_0x582a10);
+    options = () => {
+      requestFrame2 = null;
+      if (data) return;
+      onFrame();
+      if (videoEl['paused'] || videoEl['ended']) return;
+      requestFrame2 = requestFrame(options);
     };
   return {
     start() {
-      if (_0x4b3dff || _0x3b88ed != null || _0x343ed5['paused'] || _0x343ed5['ended']) return;
-      _0x3b88ed = requestFrame(_0x582a10);
+      if (data || requestFrame2 != null || videoEl['paused'] || videoEl['ended']) return;
+      requestFrame2 = requestFrame(options);
     },
-    stop: _0x4dc420,
+    stop: stop,
     destroy() {
-      if (_0x4b3dff) return;
-      ((_0x4b3dff = !![]), _0x4dc420());
+      if (data) return;
+      ((data = !![]), stop());
     },
   };
 }
 export function createWorkspaceVideoPlayback({
-  videoEl: _0x5da243,
-  sourceUrl: _0x168ab7,
-  ownerId: _0x27ceb4,
+  videoEl: videoEl2,
+  sourceUrl: sourceUrl,
+  ownerId: ownerId,
   acquirePlaybackUrl: acquirePlaybackUrl = acquireLocalVideoPlaybackObjectUrl,
   releasePlaybackUrlOwner: releasePlaybackUrlOwner = releaseLocalVideoPlaybackObjectUrlOwner,
   attachSource: attachSource = attachMediaElementPlaybackSource,
@@ -71,101 +70,101 @@ export function createWorkspaceVideoPlayback({
   acquirePlaybackOptions: acquirePlaybackOptions = undefined,
   diagnosticsLabel: diagnosticsLabel = '',
 } = {}) {
-  if (!_0x5da243) throw new Error('workspace video playback requires videoEl');
-  const _0x1dcbcd = normalizeText(_0x168ab7),
-    _0x40dff8 = normalizeText(_0x27ceb4);
-  if (!_0x1dcbcd || !_0x40dff8) throw new Error('workspace video playback requires sourceUrl and ownerId');
-  const _0x47fd29 = normalizeText(diagnosticsLabel) || 'workspace-video:' + _0x40dff8;
-  let _0x276250 = ![],
-    _0x4007f2 = null;
-  const _0x11532d = () => {
-    let _0x509d35 = ![];
+  if (!videoEl2) throw new Error('workspace video playback requires videoEl');
+  const text = normalizeText(sourceUrl),
+    text2 = normalizeText(ownerId);
+  if (!text || !text2) throw new Error('workspace video playback requires sourceUrl and ownerId');
+  const label = normalizeText(diagnosticsLabel) || 'workspace-video:' + text2;
+  let enabled = ![],
+    target = null;
+  const run = () => {
+    let allowConcurrent = ![];
     try {
-      _0x509d35 =
+      allowConcurrent =
         typeof allowConcurrentPlayback === 'function'
           ? allowConcurrentPlayback() === !![]
           : allowConcurrentPlayback === !![];
     } catch {}
     return {
-      label: _0x47fd29,
-      ensureSrc: () => _0x49510e({ load: !![] }),
-      shouldContinue: () => !_0x276250,
-      shouldRecover: () => !_0x276250 && _0x5da243['isConnected'] !== ![] && _0x5da243['paused'] === ![],
-      allowConcurrent: _0x509d35,
+      label: label,
+      ensureSrc: () => run2({ load: !![] }),
+      shouldContinue: () => !enabled,
+      shouldRecover: () => !enabled && videoEl2['isConnected'] !== ![] && videoEl2['paused'] === ![],
+      allowConcurrent: allowConcurrent,
     };
   };
-  async function _0x49510e({ load: load = ![] } = {}) {
-    if (_0x276250) return ![];
-    if (normalizeText(_0x5da243['getAttribute']?.('src') || _0x5da243['src']))
-      return ((_0x5da243['preload'] = 'auto'), !![]);
+  async function run2({ load: load = ![] } = {}) {
+    if (enabled) return ![];
+    if (normalizeText(videoEl2['getAttribute']?.('src') || videoEl2['src']))
+      return ((videoEl2['preload'] = 'auto'), !![]);
     if (preferStreamingSource === !![]) {
-      if (_0x4007f2) return _0x4007f2;
-      _0x4007f2 = (async () => {
+      if (target) return target;
+      target = (async () => {
         return (
-          await attachSource(_0x5da243, _0x1dcbcd, {
+          await attachSource(videoEl2, text, {
             preload: 'auto',
             load: load,
-            shouldAssign: () => !_0x276250,
+            shouldAssign: () => !enabled,
           }),
-          !_0x276250 && !!normalizeText(_0x5da243['getAttribute']?.('src') || _0x5da243['src'])
+          !enabled && !!normalizeText(videoEl2['getAttribute']?.('src') || videoEl2['src'])
         );
       })();
-      const _0x448627 = await _0x4007f2;
-      if (!_0x448627 && !_0x276250) _0x4007f2 = null;
-      return _0x448627;
+      const enabled2 = await target;
+      if (!enabled2 && !enabled) target = null;
+      return enabled2;
     }
-    if (_0x4007f2) return _0x4007f2;
-    _0x4007f2 = (async () => {
-      let _0x35596d = '';
+    if (target) return target;
+    target = (async () => {
+      let playbackUrl = '';
       try {
-        _0x35596d = normalizeText(await acquirePlaybackUrl(_0x1dcbcd, _0x40dff8, acquirePlaybackOptions));
+        playbackUrl = normalizeText(await acquirePlaybackUrl(text, text2, acquirePlaybackOptions));
       } catch {}
-      if (_0x276250) return ![];
+      if (enabled) return ![];
       return (
-        await attachSource(_0x5da243, _0x1dcbcd, {
-          ...(_0x35596d ? { playbackUrl: _0x35596d } : {}),
+        await attachSource(videoEl2, text, {
+          ...(playbackUrl ? { playbackUrl: playbackUrl } : {}),
           preload: 'auto',
           load: load,
-          shouldAssign: () => !_0x276250,
+          shouldAssign: () => !enabled,
         }),
-        !_0x276250 && !!normalizeText(_0x5da243['getAttribute']?.('src') || _0x5da243['src'])
+        !enabled && !!normalizeText(videoEl2['getAttribute']?.('src') || videoEl2['src'])
       );
     })();
-    const _0x21ee57 = await _0x4007f2;
-    if (!_0x21ee57 && !_0x276250) _0x4007f2 = null;
-    return _0x21ee57;
+    const enabled3 = await target;
+    if (!enabled3 && !enabled) target = null;
+    return enabled3;
   }
   return {
     warm() {
-      return _0x49510e({ load: !![] });
+      return run2({ load: !![] });
     },
     play() {
-      if (_0x276250) return Promise['resolve'](![]);
-      const _0x305a74 = _0x11532d(),
-        _0x20e717 = normalizeText(_0x5da243['getAttribute']?.('src') || _0x5da243['src']);
-      if (!_0x20e717) return playWithRecovery(_0x5da243, _0x305a74);
-      ((_0x5da243['preload'] = 'auto'), attachRecovery(_0x5da243, _0x305a74));
+      if (enabled) return Promise['resolve'](![]);
+      const source = run(),
+        text3 = normalizeText(videoEl2['getAttribute']?.('src') || videoEl2['src']);
+      if (!text3) return playWithRecovery(videoEl2, source);
+      ((videoEl2['preload'] = 'auto'), attachRecovery(videoEl2, source));
       try {
-        const _0x47aa89 = _0x5da243['play']?.();
-        return Promise['resolve'](_0x47aa89)['then'](
+        const next = videoEl2['play']?.();
+        return Promise['resolve'](next)['then'](
           () =>
-            playWithRecovery(_0x5da243, _0x305a74)['then'](
+            playWithRecovery(videoEl2, source)['then'](
               () => !![],
               () => !![],
             ),
-          () => playWithRecovery(_0x5da243, _0x305a74),
+          () => playWithRecovery(videoEl2, source),
         );
       } catch {
-        return playWithRecovery(_0x5da243, _0x305a74);
+        return playWithRecovery(videoEl2, source);
       }
     },
     destroy() {
-      if (_0x276250) return;
-      _0x276250 = !![];
+      if (enabled) return;
+      enabled = !![];
       try {
-        _0x5da243['pause']?.();
+        videoEl2['pause']?.();
       } catch {}
-      releasePlaybackUrlOwner(_0x40dff8);
+      releasePlaybackUrlOwner(text2);
     },
   };
 }

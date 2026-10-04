@@ -1,18 +1,18 @@
 const CLIPBOARD_GRAPH_SCHEMA_VERSION = 1;
-function deepClone(_0x1d1bef) {
-  return JSON.parse(JSON.stringify(_0x1d1bef));
+function deepClone(value) {
+  return JSON.parse(JSON.stringify(value));
 }
-function normalizeNodeId(_0x517451) {
-  return String(_0x517451 || '').trim();
+function normalizeNodeId(item) {
+  return String(item || '').trim();
 }
-function normalizeEdgeList(_0x4e48d0) {
-  if (Array.isArray(_0x4e48d0)) return _0x4e48d0;
-  if (_0x4e48d0 && typeof _0x4e48d0 === 'object') return Object.values(_0x4e48d0);
+function normalizeEdgeList(key) {
+  if (Array.isArray(key)) return key;
+  if (key && typeof key === 'object') return Object.values(key);
   return [];
 }
-function normalizeNodeList(_0x5a5e61) {
-  if (Array.isArray(_0x5a5e61)) return _0x5a5e61;
-  if (Array.isArray(_0x5a5e61?.nodes)) return _0x5a5e61.nodes;
+function normalizeNodeList(index) {
+  if (Array.isArray(index)) return index;
+  if (Array.isArray(index?.nodes)) return index.nodes;
   return [];
 }
 export function buildClipboardGraphSnapshot({
@@ -21,102 +21,96 @@ export function buildClipboardGraphSnapshot({
   selectedIds: selectedIds = [],
   sanitizeNode: sanitizeNode = null,
 } = {}) {
-  const _0x42b7ac = Array.isArray(selectedIds) ? selectedIds : [],
-    _0x3a5529 = new Set(),
-    _0x29fbdd = [];
-  for (const _0xb6929b of _0x42b7ac) {
-    const _0x39b785 = normalizeNodeId(_0xb6929b);
-    if (!_0x39b785 || _0x3a5529.has(_0x39b785)) continue;
-    const _0x5c746e = nodesById?.[_0x39b785];
-    if (!_0x5c746e || typeof _0x5c746e !== 'object') continue;
-    const _0x18684b = deepClone(_0x5c746e),
-      _0x546306 = typeof sanitizeNode === 'function' ? sanitizeNode(_0x18684b) : _0x18684b;
-    if (!_0x546306 || typeof _0x546306 !== 'object') continue;
-    (_0x3a5529.add(_0x39b785), _0x29fbdd.push(_0x546306));
+  const result = Array.isArray(selectedIds) ? selectedIds : [],
+    map = new Set(),
+    nodes = [];
+  for (const data of result) {
+    const nodeId = normalizeNodeId(data);
+    if (!nodeId || map.has(nodeId)) continue;
+    const enabled = nodesById?.[nodeId];
+    if (!enabled || typeof enabled !== 'object') continue;
+    const deepClone2 = deepClone(enabled),
+      enabled2 = typeof sanitizeNode === 'function' ? sanitizeNode(deepClone2) : deepClone2;
+    if (!enabled2 || typeof enabled2 !== 'object') continue;
+    (map.add(nodeId), nodes.push(enabled2));
   }
-  const _0xadb3f1 = [];
-  for (const _0x3e057d of normalizeEdgeList(edgesById)) {
-    if (!_0x3e057d || typeof _0x3e057d !== 'object') continue;
-    const _0x5d51e6 = normalizeNodeId(_0x3e057d.sourceId),
-      _0x38dc0e = normalizeNodeId(_0x3e057d.targetId);
-    if (!_0x5d51e6 || !_0x38dc0e) continue;
-    if (!_0x3a5529.has(_0x5d51e6) || !_0x3a5529.has(_0x38dc0e)) continue;
-    _0xadb3f1.push(deepClone(_0x3e057d));
+  const edges = [];
+  for (const enabled3 of normalizeEdgeList(edgesById)) {
+    if (!enabled3 || typeof enabled3 !== 'object') continue;
+    const nodeId2 = normalizeNodeId(enabled3.sourceId),
+      nodeId3 = normalizeNodeId(enabled3.targetId);
+    if (!nodeId2 || !nodeId3) continue;
+    if (!map.has(nodeId2) || !map.has(nodeId3)) continue;
+    edges.push(deepClone(enabled3));
   }
-  return { schemaVersion: CLIPBOARD_GRAPH_SCHEMA_VERSION, nodes: _0x29fbdd, edges: _0xadb3f1 };
+  return { schemaVersion: CLIPBOARD_GRAPH_SCHEMA_VERSION, nodes: nodes, edges: edges };
 }
-export function normalizeClipboardGraphPayload(_0x3903a2) {
-  const _0x713262 = normalizeNodeList(_0x3903a2).filter(
-      (_0x1f05c1) => _0x1f05c1 && typeof _0x1f05c1 === 'object',
-    ),
-    _0x5bfeb1 = normalizeEdgeList(_0x3903a2?.edges).filter(
-      (_0x2f7490) => _0x2f7490 && typeof _0x2f7490 === 'object',
-    );
-  if (_0x713262.length === 0) return null;
+export function normalizeClipboardGraphPayload(options) {
+  const list = normalizeNodeList(options).filter((item2) => item2 && typeof item2 === 'object'),
+    edgeList = normalizeEdgeList(options?.edges).filter((item3) => item3 && typeof item3 === 'object');
+  if (list.length === 0) return null;
   return {
     schemaVersion: CLIPBOARD_GRAPH_SCHEMA_VERSION,
-    nodes: deepClone(_0x713262),
-    edges: deepClone(_0x5bfeb1),
+    nodes: deepClone(list),
+    edges: deepClone(edgeList),
   };
 }
 export function prepareClipboardGraphPaste({
-  graph: _0x465e4f,
+  graph: graph,
   x: x = 0,
   y: y = 0,
   generateNodeId: generateNodeId = null,
   generateEdgeId: generateEdgeId = null,
   sanitizeNode: sanitizeNode = null,
 } = {}) {
-  const _0x8687bb = normalizeClipboardGraphPayload(_0x465e4f);
-  if (!_0x8687bb) return { nodes: [], edges: [], newIds: [], idMap: {} };
-  const _0x259667 = Number.isFinite(Number(x)) ? Number(x) : 0,
-    _0x5b5105 = Number.isFinite(Number(y)) ? Number(y) : 0;
-  let _0x3015f3 = Infinity,
-    _0x4c151c = Infinity;
-  for (const _0x13f267 of _0x8687bb.nodes) {
-    const _0x340218 = Number(_0x13f267.x),
-      _0x2e145e = Number(_0x13f267.y);
-    if (Number.isFinite(_0x340218)) _0x3015f3 = Math.min(_0x3015f3, _0x340218);
-    if (Number.isFinite(_0x2e145e)) _0x4c151c = Math.min(_0x4c151c, _0x2e145e);
+  const clipboardGraphPayload = normalizeClipboardGraphPayload(graph);
+  if (!clipboardGraphPayload) return { nodes: [], edges: [], newIds: [], idMap: {} };
+  const target = Number.isFinite(Number(x)) ? Number(x) : 0,
+    source = Number.isFinite(Number(y)) ? Number(y) : 0;
+  let next = Infinity,
+    current = Infinity;
+  for (const box of clipboardGraphPayload.nodes) {
+    const entry = Number(box.x),
+      record = Number(box.y);
+    if (Number.isFinite(entry)) next = Math.min(next, entry);
+    if (Number.isFinite(record)) current = Math.min(current, record);
   }
-  if (!Number.isFinite(_0x3015f3)) _0x3015f3 = 0;
-  if (!Number.isFinite(_0x4c151c)) _0x4c151c = 0;
-  const _0x535723 = {},
-    _0x5eee9f = [],
-    _0x5d6268 = [],
-    _0xae7ee7 = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-  _0x8687bb.nodes.forEach((_0x33269e, _0x2686c9) => {
-    const _0x1d9d93 = deepClone(_0x33269e),
-      _0x243090 = normalizeNodeId(_0x1d9d93.id) || 'clipboard-node-' + _0x2686c9,
-      _0x29c8f6 =
+  if (!Number.isFinite(next)) next = 0;
+  if (!Number.isFinite(current)) current = 0;
+  const idMap = {},
+    nodes2 = [],
+    newIds = [],
+    payload = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  clipboardGraphPayload.nodes.forEach((item4, handle) => {
+    const box2 = deepClone(item4),
+      nodeId4 = normalizeNodeId(box2.id) || 'clipboard-node-' + handle,
+      state =
         typeof generateNodeId === 'function'
-          ? generateNodeId(_0x243090, _0x2686c9, _0x1d9d93)
-          : _0x243090 + '_copy_' + _0xae7ee7 + '_' + _0x2686c9,
-      _0xcf07a1 = Number(_0x1d9d93.x),
-      _0x453939 = Number(_0x1d9d93.y),
-      _0x5ba78d = Number.isFinite(_0xcf07a1) ? _0xcf07a1 - _0x3015f3 : 0,
-      _0xad4099 = Number.isFinite(_0x453939) ? _0x453939 - _0x4c151c : 0;
-    ((_0x1d9d93.id = _0x29c8f6),
-      (_0x1d9d93.x = _0x259667 + _0x5ba78d),
-      (_0x1d9d93.y = _0x5b5105 + _0xad4099));
-    const _0x38a25e = typeof sanitizeNode === 'function' ? sanitizeNode(_0x1d9d93) : _0x1d9d93;
-    if (!_0x38a25e || typeof _0x38a25e !== 'object') return;
-    ((_0x535723[_0x243090] = _0x29c8f6), _0x5eee9f.push(_0x38a25e), _0x5d6268.push(_0x29c8f6));
+          ? generateNodeId(nodeId4, handle, box2)
+          : nodeId4 + '_copy_' + payload + '_' + handle,
+      config = Number(box2.x),
+      scope = Number(box2.y),
+      input = Number.isFinite(config) ? config - next : 0,
+      output = Number.isFinite(scope) ? scope - current : 0;
+    ((box2.id = state), (box2.x = target + input), (box2.y = source + output));
+    const enabled4 = typeof sanitizeNode === 'function' ? sanitizeNode(box2) : box2;
+    if (!enabled4 || typeof enabled4 !== 'object') return;
+    ((idMap[nodeId4] = state), nodes2.push(enabled4), newIds.push(state));
   });
-  const _0x4fb567 = [];
+  const edges2 = [];
   return (
-    _0x8687bb.edges.forEach((_0x56c18f, _0x5bf73d) => {
-      const _0x1b738d = normalizeNodeId(_0x56c18f.sourceId),
-        _0x35a486 = normalizeNodeId(_0x56c18f.targetId),
-        _0x43c845 = _0x535723[_0x1b738d],
-        _0xb1e5fe = _0x535723[_0x35a486];
-      if (!_0x43c845 || !_0xb1e5fe) return;
-      const _0xf1709d =
+    clipboardGraphPayload.edges.forEach((item5, value2) => {
+      const nodeId5 = normalizeNodeId(item5.sourceId),
+        nodeId6 = normalizeNodeId(item5.targetId),
+        sourceId = idMap[nodeId5],
+        targetId = idMap[nodeId6];
+      if (!sourceId || !targetId) return;
+      const id =
         typeof generateEdgeId === 'function'
-          ? generateEdgeId(normalizeNodeId(_0x56c18f.id), _0x5bf73d, _0x56c18f)
-          : 'edge_copy_' + _0xae7ee7 + '_' + _0x5bf73d;
-      _0x4fb567.push({ ...deepClone(_0x56c18f), id: _0xf1709d, sourceId: _0x43c845, targetId: _0xb1e5fe });
+          ? generateEdgeId(normalizeNodeId(item5.id), value2, item5)
+          : 'edge_copy_' + payload + '_' + value2;
+      edges2.push({ ...deepClone(item5), id: id, sourceId: sourceId, targetId: targetId });
     }),
-    { nodes: _0x5eee9f, edges: _0x4fb567, newIds: _0x5d6268, idMap: _0x535723 }
+    { nodes: nodes2, edges: edges2, newIds: newIds, idMap: idMap }
   );
 }

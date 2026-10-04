@@ -12,115 +12,115 @@ const DEFAULT_MEDIA_EXTENSIONS = Object['freeze']({ image: 'png', video: 'mp4' }
     'video/quicktime': 'mov',
     'video/webm': 'webm',
   });
-function normalizeText(_0x527457) {
-  return String(_0x527457 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function escapeHtml(_0x472beb) {
-  return String(_0x472beb ?? '')
+function escapeHtml(item) {
+  return String(item ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&#39;');
 }
-function resolveMediaExtension(_0x4c4077, _0x868d5c) {
-  const _0x4ae243 = normalizeText(_0x4c4077),
-    _0x5ed50e = _0x4ae243['match'](/^data:([^;,]+)/i)?.[0x1]?.['toLowerCase']();
-  if (_0x5ed50e && MEDIA_MIME_EXTENSIONS[_0x5ed50e]) return MEDIA_MIME_EXTENSIONS[_0x5ed50e];
+function resolveMediaExtension(key, index) {
+  const text = normalizeText(key),
+    result = text['match'](/^data:([^;,]+)/i)?.[0x1]?.['toLowerCase']();
+  if (result && MEDIA_MIME_EXTENSIONS[result]) return MEDIA_MIME_EXTENSIONS[result];
   return (
-    _0x4ae243['split'](/[?#]/, 0x1)[0x0]
+    text['split'](/[?#]/, 0x1)[0x0]
       ['match'](/\.([a-z0-9]{2,5})$/i)?.[0x1]
-      ?.['toLowerCase']() || DEFAULT_MEDIA_EXTENSIONS[_0x868d5c]
+      ?.['toLowerCase']() || DEFAULT_MEDIA_EXTENSIONS[index]
   );
 }
-function sanitizeFilenameBase(_0x4ec8a1, _0x4cd448) {
+function sanitizeFilenameBase(data, options) {
   return (
-    normalizeText(_0x4ec8a1)
+    normalizeText(data)
       ['replace'](/[\\/:*?"<>|]+/g, '-')
       ['replace'](/-+/g, '-')
       ['replace'](/[.\s-]+$/g, '')
-      ['slice'](0x0, 0x60) || _0x4cd448
+      ['slice'](0x0, 0x60) || options
   );
 }
 export function buildWorkspaceMediaDownloadPayload({
   kind: kind = 'image',
-  mediaRef: _0x18b2ff,
-  filenameBase: _0x4cff71,
-  title: _0x231aee,
+  mediaRef: mediaRef,
+  filenameBase: filenameBase,
+  title: title,
 } = {}) {
-  const _0x49dd51 = Object['hasOwn'](DEFAULT_MEDIA_EXTENSIONS, kind) ? kind : '',
-    _0x1016ec = normalizeText(_0x18b2ff);
-  if (!_0x49dd51 || !_0x1016ec) return null;
-  const _0xa1b65b = normalizeLocalPath(_0x1016ec);
-  if (!_0xa1b65b) return null;
-  const _0x25057d = _0x49dd51 === 'video' ? '生成视频' : '生成图片',
-    _0x1d23d0 = _0x49dd51 === 'video' ? '下载视频' : '下载图片';
+  const kind2 = Object['hasOwn'](DEFAULT_MEDIA_EXTENSIONS, kind) ? kind : '',
+    text2 = normalizeText(mediaRef);
+  if (!kind2 || !text2) return null;
+  const localPath = normalizeLocalPath(text2);
+  if (!localPath) return null;
+  const target = kind2 === 'video' ? '生成视频' : '生成图片',
+    source = kind2 === 'video' ? '下载视频' : '下载图片';
   return {
-    kind: _0x49dd51,
-    localPath: _0xa1b65b,
-    url: localPathToUrl(_0xa1b65b),
-    filename: sanitizeFilenameBase(_0x4cff71, _0x25057d) + '.' + resolveMediaExtension(_0x1016ec, _0x49dd51),
-    title: normalizeText(_0x231aee) || _0x1d23d0,
+    kind: kind2,
+    localPath: localPath,
+    url: localPathToUrl(localPath),
+    filename: sanitizeFilenameBase(filenameBase, target) + '.' + resolveMediaExtension(text2, kind2),
+    title: normalizeText(title) || source,
   };
 }
 export async function saveWorkspaceMediaDownload({
   kind: kind = 'image',
-  mediaRef: _0x1536ff,
-  filenameBase: _0x27b480,
-  title: _0x45dbd9,
+  mediaRef: mediaRef2,
+  filenameBase: filenameBase2,
+  title: title2,
   saveMedia: saveMedia = saveMediaDownload,
 } = {}) {
-  const _0x34f8b0 = kind === 'video' ? 'video' : 'image',
-    _0x37b5bc = _0x34f8b0 === 'video' ? '视频' : '图片',
-    _0x1a30e2 = buildWorkspaceMediaDownloadPayload({
-      kind: _0x34f8b0,
-      mediaRef: _0x1536ff,
-      filenameBase: _0x27b480,
-      title: _0x45dbd9,
+  const kind3 = kind === 'video' ? 'video' : 'image',
+    next = kind3 === 'video' ? '视频' : '图片',
+    workspaceMediaDownloadPayload = buildWorkspaceMediaDownloadPayload({
+      kind: kind3,
+      mediaRef: mediaRef2,
+      filenameBase: filenameBase2,
+      title: title2,
     });
-  if (!_0x1a30e2) {
-    if (normalizeText(_0x1536ff)) throw new Error(_0x37b5bc + '尚未成功保存到本地，请重新生成后再下载。');
-    throw new Error('当前没有可下载的' + _0x37b5bc + '。');
+  if (!workspaceMediaDownloadPayload) {
+    if (normalizeText(mediaRef2)) throw new Error(next + '尚未成功保存到本地，请重新生成后再下载。');
+    throw new Error('当前没有可下载的' + next + '。');
   }
-  if (typeof saveMedia !== 'function') throw new Error(_0x37b5bc + '保存服务尚未初始化。');
-  return await saveMedia(_0x1a30e2);
+  if (typeof saveMedia !== 'function') throw new Error(next + '保存服务尚未初始化。');
+  return await saveMedia(workspaceMediaDownloadPayload);
 }
 export function renderWorkspaceMediaDownloadButton({
-  action: _0x24185a,
+  action: action,
   enabled: enabled = ![],
   className: className = '',
-  label: _0x225de4,
+  label: label,
 } = {}) {
   if (!enabled) return '';
-  const _0x474f3d = normalizeText(className),
-    _0x1f90a4 = normalizeText(_0x225de4) || '下载媒体';
+  const text3 = normalizeText(className),
+    text4 = normalizeText(label) || '下载媒体';
   return (
     '<button type="button" class="workspace-image-download-button' +
-    (_0x474f3d ? '\x20' + escapeHtml(_0x474f3d) : '') +
+    (text3 ? '\x20' + escapeHtml(text3) : '') +
     '\x22\x20data-story-action=\x22' +
-    escapeHtml(_0x24185a) +
+    escapeHtml(action) +
     '" aria-label="' +
-    escapeHtml(_0x1f90a4) +
+    escapeHtml(text4) +
     '\x22\x20title=\x22' +
-    escapeHtml(_0x1f90a4) +
+    escapeHtml(text4) +
     '"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v4h14v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'
   );
 }
-export async function runWorkspaceMediaDownloadAction(_0x4b176c, _0x2adfef) {
-  if (!_0x4b176c || typeof _0x2adfef !== 'function') return null;
-  if (_0x4b176c['classList']?.['contains']?.('is-pending')) return null;
-  const _0x5b8303 = Boolean(_0x4b176c['disabled']),
-    _0x310441 = _0x4b176c['getAttribute']?.('aria-busy');
-  ((_0x4b176c['disabled'] = !![]),
-    _0x4b176c['classList']?.['add']?.('is-pending'),
-    _0x4b176c['setAttribute']?.('aria-busy', 'true'));
+export async function runWorkspaceMediaDownloadAction(el, handler) {
+  if (!el || typeof handler !== 'function') return null;
+  if (el['classList']?.['contains']?.('is-pending')) return null;
+  const current = Boolean(el['disabled']),
+    entry = el['getAttribute']?.('aria-busy');
+  ((el['disabled'] = !![]),
+    el['classList']?.['add']?.('is-pending'),
+    el['setAttribute']?.('aria-busy', 'true'));
   try {
-    return await _0x2adfef();
+    return await handler();
   } finally {
-    ((_0x4b176c['disabled'] = _0x5b8303),
-      _0x4b176c['classList']?.['remove']?.('is-pending'),
-      _0x310441 === null || _0x310441 === undefined
-        ? _0x4b176c['removeAttribute']?.('aria-busy')
-        : _0x4b176c['setAttribute']?.('aria-busy', _0x310441));
+    ((el['disabled'] = current),
+      el['classList']?.['remove']?.('is-pending'),
+      entry === null || entry === undefined
+        ? el['removeAttribute']?.('aria-busy')
+        : el['setAttribute']?.('aria-busy', entry));
   }
 }

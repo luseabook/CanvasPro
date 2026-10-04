@@ -4,108 +4,108 @@ import { canManageCanvasShortcuts, createShortcutCatalogStore } from './shortcut
 import { captureShortcutGraph, insertShortcutGraph } from './shortcutGraph.js';
 import { createShortcutLibraryView } from './shortcutLibraryView.js';
 export function initEmptyCanvasShortcuts({
-  store: _0x4f2aea,
-  executeCommand: _0x57e2bc,
-  focusNodes: _0x13fc57,
-  commit: _0x6ad210,
-  getNodeDefaultSize: _0x32d7df,
+  store: store,
+  executeCommand: executeCommand,
+  focusNodes: focusNodes,
+  commit: commit,
+  getNodeDefaultSize: getNodeDefaultSize,
 }) {
-  const _0x5b01e3 = document['getElementById']('emptyHint');
-  if (!_0x5b01e3) return;
-  const _0x284c6d = createShortcutLibraryView(_0x5b01e3, { onActivate: _0x1dbb85 }),
-    _0x352e0e = createShortcutCatalogStore({
+  const el = document['getElementById']('emptyHint');
+  if (!el) return;
+  const shortcutLibraryView = createShortcutLibraryView(el, { onActivate: onActivate }),
+    catalogStore = createShortcutCatalogStore({
       load: fetchCanvasShortcuts,
       save: saveCanvasShortcuts,
       canManage: canManageCanvasShortcuts,
     }),
-    _0x19dabc = () => _0x284c6d['render'](_0x352e0e['getState']()['catalog']),
-    _0x23cd57 = (_0x3db4aa) => {
-      if (!window['_isAppLoaded'] || _0x3db4aa > 0x0) _0x284c6d['close']();
-      _0x5b01e3['classList']['toggle']('hidden', !window['_isAppLoaded'] || _0x3db4aa > 0x0);
+    handler = () => shortcutLibraryView['render'](catalogStore['getState']()['catalog']),
+    handler2 = (count) => {
+      if (!window['_isAppLoaded'] || count > 0x0) shortcutLibraryView['close']();
+      el['classList']['toggle']('hidden', !window['_isAppLoaded'] || count > 0x0);
     };
-  ((window['_checkEmptyHint'] = () => _0x23cd57(_0x4f2aea['getStateRaw']()['_nodeCount'] || 0x0)),
-    _0x4f2aea['subscribeSelector']((_0x2319cd) => _0x2319cd['_nodeCount'] || 0x0, _0x23cd57),
+  ((window['_checkEmptyHint'] = () => handler2(store['getStateRaw']()['_nodeCount'] || 0x0)),
+    store['subscribeSelector']((value) => value['_nodeCount'] || 0x0, handler2),
     window['_checkEmptyHint'](),
-    _0x352e0e['subscribe'](_0x19dabc),
-    _0x19dabc(),
-    _0x352e0e['load']()['catch']((_0x4311e4) => console['warn']('Canvas shortcuts:', _0x4311e4['message'])));
-  let _0x263dfc = ![];
-  (_0x5b01e3['addEventListener']('dblclick', (_0x369d02) => _0x369d02['stopPropagation']()),
-    _0x5b01e3['addEventListener']('click', (_0x4f0683) => {
-      _0x4f0683['stopPropagation']();
-      const _0x22b76d = _0x4f0683['target']['closest']('[data-shortcut-id]');
-      if (!_0x22b76d || _0x263dfc) return;
-      const _0x1bccde = _0x284c6d['resolveItem'](_0x22b76d);
-      if (_0x1bccde) _0x1dbb85(_0x1bccde, _0x22b76d);
+    catalogStore['subscribe'](handler),
+    handler(),
+    catalogStore['load']()['catch']((error) => console['warn']('Canvas shortcuts:', error['message'])));
+  let enabled = ![];
+  (el['addEventListener']('dblclick', (event) => event['stopPropagation']()),
+    el['addEventListener']('click', (event2) => {
+      event2['stopPropagation']();
+      const enabled2 = event2['target']['closest']('[data-shortcut-id]');
+      if (!enabled2 || enabled) return;
+      const item = shortcutLibraryView['resolveItem'](enabled2);
+      if (item) onActivate(item, enabled2);
     }));
-  async function _0x1dbb85(_0x594727, _0x9ece9) {
-    if (_0x263dfc) return;
-    ((_0x263dfc = !![]), (_0x9ece9['disabled'] = !![]));
+  async function onActivate(type, el2) {
+    if (enabled) return;
+    ((enabled = !![]), (el2['disabled'] = !![]));
     try {
-      const _0xc11216 = _0x4f2aea['getState']()['viewport'],
-        _0x4adb02 = getViewportScreenCenter(_0xc11216, window['innerWidth'], window['innerHeight']),
-        _0x395179 = screenToWorld(_0x4adb02['x'], _0x4adb02['y'], _0xc11216);
-      if (_0x594727['action']['kind'] === 'node') {
-        const _0x406982 = _0x32d7df(_0x594727['action']['nodeType']);
-        _0x57e2bc('create_node', {
-          type: _0x594727['action']['nodeType'],
-          x: _0x395179['x'] - _0x406982['width'] / 0x2,
-          y: _0x395179['y'] - _0x406982['height'] / 0x2,
+      const key = store['getState']()['viewport'],
+        box = getViewportScreenCenter(key, window['innerWidth'], window['innerHeight']),
+        x = screenToWorld(box['x'], box['y'], key);
+      if (type['action']['kind'] === 'node') {
+        const box2 = getNodeDefaultSize(type['action']['nodeType']);
+        executeCommand('create_node', {
+          type: type['action']['nodeType'],
+          x: x['x'] - box2['width'] / 0x2,
+          y: x['y'] - box2['height'] / 0x2,
         });
       } else {
-        const _0x44ada5 = insertShortcutGraph({
-          store: _0x4f2aea,
-          graph: _0x594727['action']['graph'],
-          center: _0x395179,
-          commit: _0x6ad210,
+        const insertShortcutGraph2 = insertShortcutGraph({
+          store: store,
+          graph: type['action']['graph'],
+          center: x,
+          commit: commit,
         });
-        _0x13fc57(_0x44ada5, 0x50, 0xfa);
+        focusNodes(insertShortcutGraph2, 0x50, 0xfa);
       }
-    } catch (_0x2b23e6) {
-      window['showToast']?.(_0x2b23e6['message'] || '模板添加失败', 'error');
+    } catch (error2) {
+      window['showToast']?.(error2['message'] || '模板添加失败', 'error');
     } finally {
-      ((_0x263dfc = ![]), (_0x9ece9['disabled'] = ![]));
+      ((enabled = ![]), (el2['disabled'] = ![]));
     }
   }
-  let _0x852743 = ![];
-  (window['addEventListener']('v2:canvas-node-menu-items', (_0x4603e3) => {
-    const { nodeIds: _0x1150cb, items: _0x1e7583 } = _0x4603e3['detail'] || {};
-    if (!canManageCanvasShortcuts() || !_0x1150cb?.['length'] || !Array['isArray'](_0x1e7583)) return;
-    const _0x1ad1e2 = [..._0x1150cb];
-    _0x1e7583['push']({
+  let enabled3 = ![];
+  (window['addEventListener']('v2:canvas-node-menu-items', (index) => {
+    const { nodeIds: nodeIds, items: items } = index['detail'] || {};
+    if (!canManageCanvasShortcuts() || !nodeIds?.['length'] || !Array['isArray'](items)) return;
+    const nodeIds2 = [...nodeIds];
+    items['push']({
       label: '加入快捷模板',
       icon: 'add-to-library',
       action: () =>
         window['dispatchEvent'](
-          new CustomEvent('canvas-shortcuts:manage', { detail: { nodeIds: _0x1ad1e2 } }),
+          new CustomEvent('canvas-shortcuts:manage', { detail: { nodeIds: nodeIds2 } }),
         ),
     });
   }),
-    window['addEventListener']('canvas-shortcuts:manage', async (_0x51d95a) => {
-      if (!canManageCanvasShortcuts() || _0x852743 || document['getElementById']('canvasShortcutsManager'))
+    window['addEventListener']('canvas-shortcuts:manage', async (result) => {
+      if (!canManageCanvasShortcuts() || enabled3 || document['getElementById']('canvasShortcutsManager'))
         return;
-      _0x852743 = !![];
-      const _0x254677 = document['getElementById']('devEntryShortcutsBtn');
-      _0x254677?.['setAttribute']('aria-busy', 'true');
-      if (_0x254677) _0x254677['disabled'] = !![];
+      enabled3 = !![];
+      const el3 = document['getElementById']('devEntryShortcutsBtn');
+      el3?.['setAttribute']('aria-busy', 'true');
+      if (el3) el3['disabled'] = !![];
       try {
-        const _0x14aadb = Array['isArray'](_0x51d95a['detail']?.['nodeIds'])
-          ? captureShortcutGraph(_0x4f2aea, _0x51d95a['detail']['nodeIds'])
+        const initialGraph = Array['isArray'](result['detail']?.['nodeIds'])
+          ? captureShortcutGraph(store, result['detail']['nodeIds'])
           : null;
-        await _0x352e0e['load']();
-        const { openShortcutManager: _0x1f6bb9 } = await import('./shortcutManager.js');
+        await catalogStore['load']();
+        const { openShortcutManager: openShortcutManager } = await import('./shortcutManager.js');
         if (canManageCanvasShortcuts())
-          _0x1f6bb9({
-            catalogStore: _0x352e0e,
-            canvasStore: _0x4f2aea,
-            initialGraph: _0x14aadb,
+          openShortcutManager({
+            catalogStore: catalogStore,
+            canvasStore: store,
+            initialGraph: initialGraph,
             returnFocus: document['getElementById']('devEntryShortcutsBtn'),
           });
-      } catch (_0x51ba1a) {
-        window['showToast']?.(_0x51ba1a['message'] || '快捷方式加载失败', 'error');
+      } catch (error3) {
+        window['showToast']?.(error3['message'] || '快捷方式加载失败', 'error');
       } finally {
-        ((_0x852743 = ![]), _0x254677?.['removeAttribute']('aria-busy'));
-        if (_0x254677) _0x254677['disabled'] = ![];
+        ((enabled3 = ![]), el3?.['removeAttribute']('aria-busy'));
+        if (el3) el3['disabled'] = ![];
       }
     }));
 }

@@ -5,7 +5,7 @@ export function createAgentSessionStore({
   traceLimit: traceLimit = DEFAULT_TRACE_LIMIT,
   conversationStore: conversationStore = null,
 } = {}) {
-  const _0x2ab3c8 = {
+  const pendingPlan = {
     history: [],
     recentCommands: [],
     debugTrace: [],
@@ -14,161 +14,159 @@ export function createAgentSessionStore({
     pendingClarification: null,
     currentRun: null,
   };
-  function _0x4eb9cd(_0x491121 = null) {
-    _0x2ab3c8.history = Array.isArray(_0x491121?.messages)
-      ? _0x491121.messages.map((_0x2c6334) => ({ ..._0x2c6334 }))
-      : [];
+  function run(value = null) {
+    pendingPlan.history = Array.isArray(value?.messages) ? value.messages.map((args) => ({ ...args })) : [];
   }
-  function _0x27c505() {
-    const _0x29317a = conversationStore?.ensureActiveConversation?.() || null;
-    if (_0x29317a) _0x4eb9cd(_0x29317a);
-    return _0x29317a;
+  function run2() {
+    const item = conversationStore?.ensureActiveConversation?.() || null;
+    if (item) run(item);
+    return item;
   }
-  function _0x29ce91() {
-    const _0x1a822d = conversationStore?.getActiveConversationId?.();
-    return _0x1a822d ? conversationStore?.getConversation?.(_0x1a822d) || null : null;
+  function activeConversation() {
+    const key = conversationStore?.getActiveConversationId?.();
+    return key ? conversationStore?.getConversation?.(key) || null : null;
   }
-  function _0xf1408(_0x89d54e = {}) {
-    const _0x21ba25 = conversationStore?.getActiveConversationId?.();
-    if (!_0x21ba25) return null;
-    return conversationStore?.updateConversation?.(_0x21ba25, _0x89d54e) || null;
+  function updateActiveConversation(options = {}) {
+    const enabled = conversationStore?.getActiveConversationId?.();
+    if (!enabled) return null;
+    return conversationStore?.updateConversation?.(enabled, options) || null;
   }
-  function _0x43aef6() {
-    ((_0x2ab3c8.recentCommands = []),
-      (_0x2ab3c8.debugTrace = []),
-      (_0x2ab3c8.pendingPlan = null),
-      (_0x2ab3c8.pendingRecovery = null),
-      (_0x2ab3c8.pendingClarification = null),
-      (_0x2ab3c8.currentRun = null));
+  function run3() {
+    ((pendingPlan.recentCommands = []),
+      (pendingPlan.debugTrace = []),
+      (pendingPlan.pendingPlan = null),
+      (pendingPlan.pendingRecovery = null),
+      (pendingPlan.pendingClarification = null),
+      (pendingPlan.currentRun = null));
   }
-  _0x27c505();
-  function _0xfa99a1(_0x3b1b92 = {}) {
-    const _0x15a8ab = { ..._0x3b1b92, ts: _0x3b1b92.ts || Date.now() };
-    _0x2ab3c8.history.push(_0x15a8ab);
-    if (_0x2ab3c8.history.length > 100) _0x2ab3c8.history.splice(0, _0x2ab3c8.history.length - 100);
-    const _0x12ac91 = conversationStore?.getActiveConversationId?.();
-    if (_0x12ac91) {
-      const _0x15fd31 = conversationStore?.appendMessage?.(_0x12ac91, _0x15a8ab);
-      if (_0x15fd31) _0x4eb9cd(_0x15fd31);
+  run2();
+  function pushHistory(ts = {}) {
+    const index = { ...ts, ts: ts.ts || Date.now() };
+    pendingPlan.history.push(index);
+    if (pendingPlan.history.length > 100) pendingPlan.history.splice(0, pendingPlan.history.length - 100);
+    const result = conversationStore?.getActiveConversationId?.();
+    if (result) {
+      const data = conversationStore?.appendMessage?.(result, index);
+      if (data) run(data);
     }
   }
   return {
     getState() {
       return {
-        history: [..._0x2ab3c8.history],
-        recentCommands: [..._0x2ab3c8.recentCommands],
-        debugTrace: [..._0x2ab3c8.debugTrace],
-        pendingPlan: _0x2ab3c8.pendingPlan,
-        pendingRecovery: _0x2ab3c8.pendingRecovery,
-        pendingClarification: _0x2ab3c8.pendingClarification,
-        currentRun: _0x2ab3c8.currentRun,
-        activeConversation: _0x29ce91(),
+        history: [...pendingPlan.history],
+        recentCommands: [...pendingPlan.recentCommands],
+        debugTrace: [...pendingPlan.debugTrace],
+        pendingPlan: pendingPlan.pendingPlan,
+        pendingRecovery: pendingPlan.pendingRecovery,
+        pendingClarification: pendingPlan.pendingClarification,
+        currentRun: pendingPlan.currentRun,
+        activeConversation: activeConversation(),
       };
     },
-    pushHistory: _0xfa99a1,
+    pushHistory: pushHistory,
     getHistory() {
-      return [..._0x2ab3c8.history];
+      return [...pendingPlan.history];
     },
-    recordCommand(_0x46b800 = {}) {
-      (_0x2ab3c8.recentCommands.push({
-        commandId: String(_0x46b800.commandId || ''),
-        ok: _0x46b800.result?.ok !== false,
-        errorCode: _0x46b800.result?.errorCode || '',
-        message: _0x46b800.result?.message || '',
-        riskLevel: _0x46b800.riskLevel || '',
-        ts: _0x46b800.ts || Date.now(),
+    recordCommand(ok = {}) {
+      (pendingPlan.recentCommands.push({
+        commandId: String(ok.commandId || ''),
+        ok: ok.result?.ok !== false,
+        errorCode: ok.result?.errorCode || '',
+        message: ok.result?.message || '',
+        riskLevel: ok.riskLevel || '',
+        ts: ok.ts || Date.now(),
       }),
-        _0x2ab3c8.recentCommands.length > recentCommandLimit &&
-          _0x2ab3c8.recentCommands.splice(0, _0x2ab3c8.recentCommands.length - recentCommandLimit));
+        pendingPlan.recentCommands.length > recentCommandLimit &&
+          pendingPlan.recentCommands.splice(0, pendingPlan.recentCommands.length - recentCommandLimit));
     },
     getRecentCommands() {
-      return [..._0x2ab3c8.recentCommands];
+      return [...pendingPlan.recentCommands];
     },
-    recordTrace(_0x20a331 = {}) {
-      const _0x19dd44 = String(_0x20a331.type || '').trim();
-      if (!_0x19dd44) return;
-      (_0x2ab3c8.debugTrace.push({ ..._0x20a331, type: _0x19dd44, ts: _0x20a331.ts || Date.now() }),
-        _0x2ab3c8.debugTrace.length > traceLimit &&
-          _0x2ab3c8.debugTrace.splice(0, _0x2ab3c8.debugTrace.length - traceLimit));
+    recordTrace(ts2 = {}) {
+      const type = String(ts2.type || '').trim();
+      if (!type) return;
+      (pendingPlan.debugTrace.push({ ...ts2, type: type, ts: ts2.ts || Date.now() }),
+        pendingPlan.debugTrace.length > traceLimit &&
+          pendingPlan.debugTrace.splice(0, pendingPlan.debugTrace.length - traceLimit));
     },
     getDebugTrace() {
-      return [..._0x2ab3c8.debugTrace];
+      return [...pendingPlan.debugTrace];
     },
-    setPendingPlan(_0x54a899) {
-      _0x2ab3c8.pendingPlan = _0x54a899 || null;
+    setPendingPlan(target) {
+      pendingPlan.pendingPlan = target || null;
     },
     getPendingPlan() {
-      return _0x2ab3c8.pendingPlan;
+      return pendingPlan.pendingPlan;
     },
     clearPendingPlan() {
-      _0x2ab3c8.pendingPlan = null;
+      pendingPlan.pendingPlan = null;
     },
-    setPendingRecovery(_0x55a42a) {
-      _0x2ab3c8.pendingRecovery = _0x55a42a || null;
+    setPendingRecovery(source) {
+      pendingPlan.pendingRecovery = source || null;
     },
     getPendingRecovery() {
-      return _0x2ab3c8.pendingRecovery;
+      return pendingPlan.pendingRecovery;
     },
     clearPendingRecovery() {
-      _0x2ab3c8.pendingRecovery = null;
+      pendingPlan.pendingRecovery = null;
     },
-    setPendingClarification(_0x392bf0) {
-      _0x2ab3c8.pendingClarification = _0x392bf0 || null;
+    setPendingClarification(next) {
+      pendingPlan.pendingClarification = next || null;
     },
     getPendingClarification() {
-      return _0x2ab3c8.pendingClarification;
+      return pendingPlan.pendingClarification;
     },
     clearPendingClarification() {
-      _0x2ab3c8.pendingClarification = null;
+      pendingPlan.pendingClarification = null;
     },
-    setCurrentRun(_0x293fc5) {
-      _0x2ab3c8.currentRun = _0x293fc5 || null;
+    setCurrentRun(current) {
+      pendingPlan.currentRun = current || null;
     },
     getCurrentRun() {
-      return _0x2ab3c8.currentRun;
+      return pendingPlan.currentRun;
     },
     stopCurrentRun() {
       return (
-        _0x2ab3c8.currentRun &&
-          (_0x2ab3c8.currentRun = { ..._0x2ab3c8.currentRun, stopped: true, status: 'stopped' }),
-        _0x2ab3c8.currentRun
+        pendingPlan.currentRun &&
+          (pendingPlan.currentRun = { ...pendingPlan.currentRun, stopped: true, status: 'stopped' }),
+        pendingPlan.currentRun
       );
     },
-    updateActiveConversation: _0xf1408,
+    updateActiveConversation: updateActiveConversation,
     markUnfinishedOperation({
       lastPlanSummary: lastPlanSummary = '',
       lastCanvasSnapshotDigest: lastCanvasSnapshotDigest = null,
     } = {}) {
-      return _0xf1408({
+      return updateActiveConversation({
         hasUnfinishedOperation: true,
         lastPlanSummary: lastPlanSummary,
         lastCanvasSnapshotDigest: lastCanvasSnapshotDigest,
       });
     },
     clearUnfinishedOperation() {
-      return _0xf1408({ hasUnfinishedOperation: false, lastPlanSummary: '' });
+      return updateActiveConversation({ hasUnfinishedOperation: false, lastPlanSummary: '' });
     },
-    getActiveConversation: _0x29ce91,
+    getActiveConversation: activeConversation,
     listConversations() {
       return conversationStore?.listConversations?.() || [];
     },
     startNewConversation() {
-      _0x43aef6();
-      const _0x5d9263 = conversationStore?.createConversation?.() || null;
-      return (_0x4eb9cd(_0x5d9263), _0x5d9263);
+      run3();
+      const entry = conversationStore?.createConversation?.() || null;
+      return (run(entry), entry);
     },
-    switchConversation(_0x2f64a8) {
-      const _0x3317ee = conversationStore?.setActiveConversationId?.(_0x2f64a8);
-      if (!_0x3317ee) return null;
-      return (_0x43aef6(), _0x4eb9cd(_0x3317ee), _0x3317ee);
+    switchConversation(record) {
+      const enabled2 = conversationStore?.setActiveConversationId?.(record);
+      if (!enabled2) return null;
+      return (run3(), run(enabled2), enabled2);
     },
-    deleteConversation(_0x338280) {
-      _0x43aef6();
-      const _0x1100aa = conversationStore?.deleteConversation?.(_0x338280) || null;
-      return (_0x4eb9cd(_0x1100aa), _0x1100aa);
+    deleteConversation(payload) {
+      run3();
+      const handle = conversationStore?.deleteConversation?.(payload) || null;
+      return (run(handle), handle);
     },
     reset() {
-      _0x43aef6();
+      run3();
     },
   };
 }

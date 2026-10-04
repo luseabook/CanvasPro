@@ -19,90 +19,116 @@ const loader = new GLTFLoader(),
     male: Object.freeze({ upperArmDropRadians: 1.34, lowerArmRelaxRadians: 0 }),
     female: Object.freeze({ upperArmDropRadians: 1.38, lowerArmRelaxRadians: 0 }),
   });
-export function resolvePanoramaCharacterGender(_0x5dd0f2) {
-  return _0x5dd0f2 === 'female' ? 'female' : 'male';
+export function resolvePanoramaCharacterGender(value) {
+  return value === 'female' ? 'female' : 'male';
 }
-export function resolvePanoramaCharacterModelUrl(_0x1f2216) {
-  return PANORAMA_CHARACTER_MODEL_SOURCES[resolvePanoramaCharacterGender(_0x1f2216)];
+export function resolvePanoramaCharacterModelUrl(item) {
+  return PANORAMA_CHARACTER_MODEL_SOURCES[resolvePanoramaCharacterGender(item)];
 }
-function loadCharacterTemplate(_0x5f42bd) {
-  const _0x3a5178 = resolvePanoramaCharacterGender(_0x5f42bd);
-  if (loadCache.has(_0x3a5178)) return loadCache.get(_0x3a5178);
+function loadCharacterTemplate(key) {
+  const panoramaCharacterGender = resolvePanoramaCharacterGender(key);
+  if (loadCache.has(panoramaCharacterGender)) return loadCache.get(panoramaCharacterGender);
   if (typeof window === 'undefined')
     return Promise.reject(new Error('Quaternius character models are only loaded in browser runtime'));
-  const _0x1e6f7d = new Promise((_0x251890, _0x563b0e) => {
+  const index = new Promise((handler, handler2) => {
     loader.load(
-      resolvePanoramaCharacterModelUrl(_0x3a5178),
-      (_0x1b4fe6) => {
-        if (!_0x1b4fe6?.scene) {
-          _0x563b0e(new Error('Quaternius ' + _0x3a5178 + ' model did not contain a scene'));
+      resolvePanoramaCharacterModelUrl(panoramaCharacterGender),
+      (enabled) => {
+        if (!enabled?.scene) {
+          handler2(new Error('Quaternius ' + panoramaCharacterGender + ' model did not contain a scene'));
           return;
         }
-        _0x251890(normalizeCharacterModel(_0x1b4fe6.scene, _0x3a5178));
+        handler(normalizeCharacterModel(enabled.scene, panoramaCharacterGender));
       },
       undefined,
-      _0x563b0e,
+      handler2,
     );
   });
-  return (loadCache.set(_0x3a5178, _0x1e6f7d), _0x1e6f7d);
+  return (loadCache.set(panoramaCharacterGender, index), index);
 }
-function cloneCharacterTemplate(_0x34ec55) {
-  return clone(_0x34ec55);
+function cloneCharacterTemplate(result) {
+  return clone(result);
 }
-function resolvePanoramaCharacterNaturalArmPose(_0x2df0ca) {
-  return NATURAL_ARM_POSE_BY_GENDER[resolvePanoramaCharacterGender(_0x2df0ca)];
+function resolvePanoramaCharacterNaturalArmPose(data) {
+  return NATURAL_ARM_POSE_BY_GENDER[resolvePanoramaCharacterGender(data)];
 }
-function rotateBoneLocal(_0x14ad36, _0x52f63a, _0x29752b, _0x2b7d1d) {
-  const _0x35dc0d = _0x14ad36?.getObjectByName?.(_0x52f63a);
-  if (!_0x35dc0d) return false;
-  const _0x1c827c = new threeRuntime['Quaternion']().setFromAxisAngle(_0x29752b, _0x2b7d1d);
-  return (_0x35dc0d.quaternion.multiply(_0x1c827c), true);
+function rotateBoneLocal(options, target, source, next) {
+  const enabled2 = options?.getObjectByName?.(target);
+  if (!enabled2) return false;
+  const current = new threeRuntime['Quaternion']().setFromAxisAngle(source, next);
+  return (enabled2.quaternion.multiply(current), true);
 }
-export function applyPanoramaCharacterNaturalArmPose(_0x577a8a, _0x2254ca) {
-  const _0x5cdbf2 = resolvePanoramaCharacterNaturalArmPose(_0x2254ca),
-    _0x1e1c71 = new threeRuntime['Vector3'](0, 0, 1);
+export function applyPanoramaCharacterNaturalArmPose(entry, record) {
+  const panoramaCharacterNaturalArmPose = resolvePanoramaCharacterNaturalArmPose(record),
+    payload = new threeRuntime['Vector3'](0, 0, 1);
   return (
-    rotateBoneLocal(_0x577a8a, 'upperarm_l', _0x1e1c71, -_0x5cdbf2.upperArmDropRadians),
-    rotateBoneLocal(_0x577a8a, 'upperarm_r', _0x1e1c71, _0x5cdbf2.upperArmDropRadians),
-    rotateBoneLocal(_0x577a8a, 'lowerarm_l', _0x1e1c71, -_0x5cdbf2.lowerArmRelaxRadians),
-    rotateBoneLocal(_0x577a8a, 'lowerarm_r', _0x1e1c71, _0x5cdbf2.lowerArmRelaxRadians),
-    _0x577a8a?.updateMatrixWorld?.(true),
-    _0x577a8a
+    rotateBoneLocal(entry, 'upperarm_l', payload, -panoramaCharacterNaturalArmPose.upperArmDropRadians),
+    rotateBoneLocal(entry, 'upperarm_r', payload, panoramaCharacterNaturalArmPose.upperArmDropRadians),
+    rotateBoneLocal(entry, 'lowerarm_l', payload, -panoramaCharacterNaturalArmPose.lowerArmRelaxRadians),
+    rotateBoneLocal(entry, 'lowerarm_r', payload, panoramaCharacterNaturalArmPose.lowerArmRelaxRadians),
+    entry?.updateMatrixWorld?.(true),
+    entry
   );
 }
-function normalizeCharacterModel(_0x54fc56, _0x45ce1a) {
-  (applyPanoramaCharacterNaturalArmPose(_0x54fc56, _0x45ce1a), _0x54fc56.updateMatrixWorld(true));
-  const _0x1e4612 = new threeRuntime['Box3']().setFromObject(_0x54fc56),
-    _0x2e8913 = new threeRuntime['Vector3']();
-  _0x1e4612.getSize(_0x2e8913);
-  const _0x34b6f2 = Math.max(0.001, _0x2e8913.y),
-    _0x693204 = TARGET_CHARACTER_HEIGHT / _0x34b6f2;
-  (_0x54fc56.scale.multiplyScalar(_0x693204), _0x54fc56.updateMatrixWorld(true));
-  const _0x585e2b = new threeRuntime['Box3']().setFromObject(_0x54fc56),
-    _0x1bcc27 = new threeRuntime['Vector3']();
+function normalizeCharacterModel(box, handle) {
+  (applyPanoramaCharacterNaturalArmPose(box, handle), box.updateMatrixWorld(true));
+  const state = new threeRuntime['Box3']().setFromObject(box),
+    box2 = new threeRuntime['Vector3']();
+  state.getSize(box2);
+  const config = Math.max(0.001, box2.y),
+    scope = TARGET_CHARACTER_HEIGHT / config;
+  (box.scale.multiplyScalar(scope), box.updateMatrixWorld(true));
+  const input = new threeRuntime['Box3']().setFromObject(box),
+    box3 = new threeRuntime['Vector3']();
   return (
-    _0x585e2b.getCenter(_0x1bcc27),
-    (_0x54fc56.position.x -= _0x1bcc27.x),
-    (_0x54fc56.position.y -= _0x585e2b.min.y),
-    (_0x54fc56.position.z -= _0x1bcc27.z),
-    _0x54fc56.traverse((_0x2cb2ef) => {
-      ((_0x2cb2ef.frustumCulled = false),
-        _0x2cb2ef.isMesh && ((_0x2cb2ef.castShadow = false), (_0x2cb2ef.receiveShadow = true)));
+    input.getCenter(box3),
+    (box.position.x -= box3.x),
+    (box.position.y -= input.min.y),
+    (box.position.z -= box3.z),
+    box.traverse((output) => {
+      ((output.frustumCulled = false),
+        output.isMesh && ((output.castShadow = false), (output.receiveShadow = true)));
     }),
-    _0x54fc56
+    box
   );
 }
-export function preloadPanoramaCharacterModels(_0x41d598 = ['male', 'female']) {
-  const _0x185e4d = Array.isArray(_0x41d598) ? _0x41d598 : [_0x41d598];
-  return Promise.all(
-    _0x185e4d.map((_0x436ad0) => loadCharacterTemplate(resolvePanoramaCharacterGender(_0x436ad0))),
-  );
+export function preloadPanoramaCharacterModels(value2 = ['male', 'female']) {
+  const list = Array.isArray(value2) ? value2 : [value2];
+  return Promise.all(list.map((item2) => loadCharacterTemplate(resolvePanoramaCharacterGender(item2))));
 }
-export async function createPanoramaCharacterModelInstance(_0x1e1883) {
-  const _0x2aa706 = await loadCharacterTemplate(_0x1e1883);
-  return cloneCharacterTemplate(_0x2aa706);
+export async function createPanoramaCharacterModelInstance(value3) {
+  const characterTemplate = await loadCharacterTemplate(value3);
+  return cloneCharacterTemplate(characterTemplate);
 }
 
-export function capturePanoramaCharacterBoneBase(_0x12857a){const _0x4b11b2={};for(const _0x1e97ed of PANORAMA_CHARACTER_BONES){const _0x8ce9d=_0x12857a?.['getObjectByName']?.(_0x1e97ed);if(!_0x8ce9d?.["quaternion"])continue;_0x4b11b2[_0x1e97ed]={'x':_0x8ce9d["quaternion"]['x'],'y':_0x8ce9d["quaternion"]['y'],'z':_0x8ce9d['quaternion']['z'],'w':_0x8ce9d["quaternion"]['w']};}return _0x4b11b2;}
+export function capturePanoramaCharacterBoneBase(value4) {
+  const value5 = {};
+  for (const value6 of PANORAMA_CHARACTER_BONES) {
+    const enabled3 = value4?.['getObjectByName']?.(value6);
+    if (!enabled3?.['quaternion']) continue;
+    value5[value6] = {
+      x: enabled3['quaternion']['x'],
+      y: enabled3['quaternion']['y'],
+      z: enabled3['quaternion']['z'],
+      w: enabled3['quaternion']['w'],
+    };
+  }
+  return value5;
+}
 
-export function applyPanoramaCharacterBonePose(_0x4f5e3e,_0x43eeef,_0x23f96b={}){const _0x1f1b0d=normalizeBonePose(_0x43eeef);for(const _0x393845 of PANORAMA_CHARACTER_BONES){const _0x52e33f=_0x4f5e3e?.["getObjectByName"]?.(_0x393845);if(!_0x52e33f?.["quaternion"])continue;const _0x258c19=_0x23f96b?.[_0x393845];if(_0x258c19)_0x52e33f["quaternion"]['set'](_0x258c19['x'],_0x258c19['y'],_0x258c19['z'],_0x258c19['w']);const _0x4c90af=_0x1f1b0d[_0x393845];if(!_0x4c90af)continue;const _0x27f85d=new threeRuntime[("Quaternion")]()["setFromEuler"](new threeRuntime[("Euler")](_0x4c90af['x'],_0x4c90af['y'],_0x4c90af['z'],"XYZ"));_0x52e33f['quaternion']["multiply"](_0x27f85d);}return _0x4f5e3e?.["updateMatrixWorld"]?.(!![]),_0x4f5e3e;}
+export function applyPanoramaCharacterBonePose(value7, value8, value9 = {}) {
+  const bonePose = normalizeBonePose(value8);
+  for (const value10 of PANORAMA_CHARACTER_BONES) {
+    const enabled4 = value7?.['getObjectByName']?.(value10);
+    if (!enabled4?.['quaternion']) continue;
+    const box4 = value9?.[value10];
+    if (box4) enabled4['quaternion']['set'](box4['x'], box4['y'], box4['z'], box4['w']);
+    const box5 = bonePose[value10];
+    if (!box5) continue;
+    const value11 = new threeRuntime['Quaternion']()['setFromEuler'](
+      new threeRuntime['Euler'](box5['x'], box5['y'], box5['z'], 'XYZ'),
+    );
+    enabled4['quaternion']['multiply'](value11);
+  }
+  return (value7?.['updateMatrixWorld']?.(!![]), value7);
+}

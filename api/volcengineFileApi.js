@@ -3,19 +3,19 @@ import { get, post } from './requester.js';
 const VOLCENGINE_DEFAULT_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3',
   VOLCENGINE_FILE_POLL_INTERVAL_MS = 0x7d0,
   VOLCENGINE_FILE_POLL_TIMEOUT_MS = 2 * 60 * 0x3e8;
-function normalizeBaseUrl(_0x3d1146) {
-  return String(_0x3d1146 || VOLCENGINE_DEFAULT_BASE_URL)
+function normalizeBaseUrl(value) {
+  return String(value || VOLCENGINE_DEFAULT_BASE_URL)
     .trim()
     .replace(/\/+$/, '');
 }
-function isVolcengineFileId(_0x360184) {
-  return /^file-[A-Za-z0-9_-]+/.test(String(_0x360184 || '').trim());
+function isVolcengineFileId(item) {
+  return /^file-[A-Za-z0-9_-]+/.test(String(item || '').trim());
 }
-function extensionFromContentType(_0x29642c, _0x4b8e23 = 'bin') {
-  const _0x33fd5b = String(_0x29642c || '')
+function extensionFromContentType(key, index = 'bin') {
+  const result = String(key || '')
       .trim()
       .toLowerCase(),
-    _0x3a3a4b = {
+    data = {
       'image/jpeg': 'jpg',
       'image/jpg': 'jpg',
       'image/png': 'png',
@@ -26,114 +26,109 @@ function extensionFromContentType(_0x29642c, _0x4b8e23 = 'bin') {
       'video/webm': 'webm',
       'video/x-matroska': 'mkv',
     };
-  return _0x3a3a4b[_0x33fd5b] || String(_0x4b8e23 || 'bin').replace(/^\./, '');
+  return data[result] || String(index || 'bin').replace(/^\./, '');
 }
-function guessFileName(_0x3f0d70, _0x451c63, _0x49108e) {
+function guessFileName(options, target, source) {
   try {
-    const _0x1e9520 = new URL(String(_0x3f0d70 || ''), 'http://local.invalid'),
-      _0x41cc34 = _0x1e9520.pathname.split('/').filter(Boolean).pop() || '';
-    if (_0x41cc34 && _0x41cc34.includes('.')) return _0x41cc34;
+    const uRL = new URL(String(options || ''), 'http://local.invalid'),
+      list = uRL.pathname.split('/').filter(Boolean).pop() || '';
+    if (list && list.includes('.')) return list;
   } catch {}
-  const _0x5be122 = extensionFromContentType(_0x49108e, _0x451c63 === 'video' ? 'mp4' : 'png');
-  return 'volcengine-input.' + _0x5be122;
+  const extensionFromContentType2 = extensionFromContentType(source, target === 'video' ? 'mp4' : 'png');
+  return 'volcengine-input.' + extensionFromContentType2;
 }
-function resolveInputFetchUrl(_0x2fd7f9) {
-  const _0x4ec5cd = String(_0x2fd7f9 || '').trim();
-  if (!_0x4ec5cd) return '';
-  if (/^(?:https?:|data:|blob:)/i.test(_0x4ec5cd)) return _0x4ec5cd;
-  if (_0x4ec5cd.startsWith('/')) return buildApiUrl(_0x4ec5cd);
-  return buildApiUrl('/' + _0x4ec5cd);
+function resolveInputFetchUrl(next) {
+  const enabled = String(next || '').trim();
+  if (!enabled) return '';
+  if (/^(?:https?:|data:|blob:)/i.test(enabled)) return enabled;
+  if (enabled.startsWith('/')) return buildApiUrl(enabled);
+  return buildApiUrl('/' + enabled);
 }
-function normalizeFileObject(_0x36ef7c) {
-  const _0x2ce301 = _0x36ef7c?.data && typeof _0x36ef7c.data === 'object' ? _0x36ef7c.data : _0x36ef7c;
-  return _0x2ce301 && typeof _0x2ce301 === 'object' ? _0x2ce301 : {};
+function normalizeFileObject(current) {
+  const entry = current?.data && typeof current.data === 'object' ? current.data : current;
+  return entry && typeof entry === 'object' ? entry : {};
 }
-async function fetchInputBlob(_0x34ec88) {
-  const _0x1c8cf8 = resolveInputFetchUrl(_0x34ec88);
-  if (!_0x1c8cf8) throw new Error('火山方舟上传文件地址为空');
-  return await get(_0x1c8cf8, {
+async function fetchInputBlob(record) {
+  const inputFetchUrl = resolveInputFetchUrl(record);
+  if (!inputFetchUrl) throw new Error('火山方舟上传文件地址为空');
+  return await get(inputFetchUrl, {
     provider: 'remote',
     buildUrl: false,
     responseType: 'blob',
     timeout: 5 * 60 * 0x3e8,
   });
 }
-export async function retrieveVolcengineFile(_0x1e1ee3, _0x2b51fd, _0x3eab15 = {}) {
-  const _0x3803da = String(_0x1e1ee3 || '').trim();
-  if (!_0x3803da) throw new Error('火山方舟文件 ID 为空');
-  if (!_0x2b51fd) throw new Error('火山方舟 API Key 未配置，无法检索文件');
-  const _0x32af6b = normalizeBaseUrl(_0x3eab15.baseUrl) + '/files/' + encodeURIComponent(_0x3803da),
-    _0x3f0cdd = await get('/api/v2/proxy/task?apiUrl=' + encodeURIComponent(_0x32af6b), {
-      headers: { Authorization: 'Bearer ' + _0x2b51fd },
+export async function retrieveVolcengineFile(payload, enabled2, timeout = {}) {
+  const enabled3 = String(payload || '').trim();
+  if (!enabled3) throw new Error('火山方舟文件 ID 为空');
+  if (!enabled2) throw new Error('火山方舟 API Key 未配置，无法检索文件');
+  const baseUrl = normalizeBaseUrl(timeout.baseUrl) + '/files/' + encodeURIComponent(enabled3),
+    get2 = await get('/api/v2/proxy/task?apiUrl=' + encodeURIComponent(baseUrl), {
+      headers: { Authorization: 'Bearer ' + enabled2 },
       provider: 'volcengine',
-      timeout: _0x3eab15.timeout || 0x7530,
+      timeout: timeout.timeout || 0x7530,
     });
-  return normalizeFileObject(_0x3f0cdd);
+  return normalizeFileObject(get2);
 }
-async function waitForVolcengineFileActive(_0x5e8426, _0x10006e, _0x21d50b = {}) {
-  let _0x1bd7cf = normalizeFileObject(_0x5e8426);
-  const _0x546a01 = String(_0x1bd7cf.id || '').trim();
-  if (!_0x546a01) throw new Error('火山方舟文件上传未返回 file id');
-  const _0x3c7470 = Date.now();
+async function waitForVolcengineFileActive(handle, state, config = {}) {
+  let error = normalizeFileObject(handle);
+  const enabled4 = String(error.id || '').trim();
+  if (!enabled4) throw new Error('火山方舟文件上传未返回 file id');
+  const scope = Date.now();
   while (true) {
-    const _0x189e19 = String(_0x1bd7cf.status || '')
+    const enabled5 = String(error.status || '')
       .trim()
       .toLowerCase();
-    if (!_0x189e19 || _0x189e19 === 'active') return _0x1bd7cf;
-    if (_0x189e19 === 'failed') {
-      const _0x210000 = _0x1bd7cf.error?.message || _0x1bd7cf.message || '火山方舟文件处理失败';
-      throw new Error(_0x210000);
+    if (!enabled5 || enabled5 === 'active') return error;
+    if (enabled5 === 'failed') {
+      const input = error.error?.message || error.message || '火山方舟文件处理失败';
+      throw new Error(input);
     }
-    if (Date.now() - _0x3c7470 > (_0x21d50b.timeout || VOLCENGINE_FILE_POLL_TIMEOUT_MS))
+    if (Date.now() - scope > (config.timeout || VOLCENGINE_FILE_POLL_TIMEOUT_MS))
       throw new Error('火山方舟文件处理超时，请稍后重试');
-    (await new Promise((_0x2f1c55) =>
-      setTimeout(_0x2f1c55, _0x21d50b.interval || VOLCENGINE_FILE_POLL_INTERVAL_MS),
-    ),
-      (_0x1bd7cf = await retrieveVolcengineFile(_0x546a01, _0x10006e, _0x21d50b)));
+    (await new Promise((output) => setTimeout(output, config.interval || VOLCENGINE_FILE_POLL_INTERVAL_MS)),
+      (error = await retrieveVolcengineFile(enabled4, state, config)));
   }
 }
-export async function uploadBlobToVolcengineFile(_0x5a191c, _0x2784e9, _0x26fd1b = {}) {
-  if (!_0x5a191c) throw new Error('火山方舟上传文件不能为空');
-  if (!_0x2784e9) throw new Error('火山方舟 API Key 未配置，无法上传文件');
-  const _0x4de626 = String(_0x26fd1b.kind || '')
+export async function uploadBlobToVolcengineFile(enabled6, enabled7, timeout2 = {}) {
+  if (!enabled6) throw new Error('火山方舟上传文件不能为空');
+  if (!enabled7) throw new Error('火山方舟 API Key 未配置，无法上传文件');
+  const value2 = String(timeout2.kind || '')
       .trim()
       .toLowerCase(),
-    _0x49f961 = String(_0x5a191c.type || _0x26fd1b.contentType || '').trim(),
-    _0x4bf855 =
-      _0x26fd1b.filename || guessFileName(_0x26fd1b.sourceUrl, _0x4de626, _0x49f961 || _0x26fd1b.contentType),
-    _0x557b10 = normalizeBaseUrl(_0x26fd1b.baseUrl) + '/files',
-    _0x32c32a = new FormData();
-  (_0x32c32a.append('purpose', 'user_data'), _0x32c32a.append('file', _0x5a191c, _0x4bf855));
-  _0x4de626 === 'video' &&
-    (_0x32c32a.append('preprocess_configs[video][fps]', String(_0x26fd1b.videoFps ?? 0.3)),
-    _0x26fd1b.model && _0x32c32a.append('preprocess_configs[video][model]', String(_0x26fd1b.model)));
-  const _0x1cda83 = await post('/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(_0x557b10), _0x32c32a, {
-    headers: { Authorization: 'Bearer ' + _0x2784e9 },
+    value3 = String(enabled6.type || timeout2.contentType || '').trim(),
+    value4 = timeout2.filename || guessFileName(timeout2.sourceUrl, value2, value3 || timeout2.contentType),
+    baseUrl2 = normalizeBaseUrl(timeout2.baseUrl) + '/files',
+    formData = new FormData();
+  (formData.append('purpose', 'user_data'), formData.append('file', enabled6, value4));
+  value2 === 'video' &&
+    (formData.append('preprocess_configs[video][fps]', String(timeout2.videoFps ?? 0.3)),
+    timeout2.model && formData.append('preprocess_configs[video][model]', String(timeout2.model)));
+  const post2 = await post('/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(baseUrl2), formData, {
+    headers: { Authorization: 'Bearer ' + enabled7 },
     provider: 'volcengine',
-    timeout: _0x26fd1b.uploadTimeout || 5 * 60 * 0x3e8,
+    timeout: timeout2.uploadTimeout || 5 * 60 * 0x3e8,
   });
-  return await waitForVolcengineFileActive(_0x1cda83, _0x2784e9, _0x26fd1b);
+  return await waitForVolcengineFileActive(post2, enabled7, timeout2);
 }
-export async function uploadInputToVolcengineFile(_0x4c874b, _0x21f09c, _0x2b35af = {}) {
-  const _0x506d0a = String(_0x4c874b || '').trim();
-  if (!_0x506d0a) return '';
-  if (isVolcengineFileId(_0x506d0a)) return _0x506d0a;
-  const _0x7b3cf1 = await fetchInputBlob(_0x506d0a),
-    _0x2870e2 = await uploadBlobToVolcengineFile(_0x7b3cf1, _0x21f09c, {
-      ..._0x2b35af,
-      sourceUrl: _0x506d0a,
+export async function uploadInputToVolcengineFile(value5, value6, args = {}) {
+  const sourceUrl = String(value5 || '').trim();
+  if (!sourceUrl) return '';
+  if (isVolcengineFileId(sourceUrl)) return sourceUrl;
+  const fetchInputBlob2 = await fetchInputBlob(sourceUrl),
+    volcengineFile = await uploadBlobToVolcengineFile(fetchInputBlob2, value6, {
+      ...args,
+      sourceUrl: sourceUrl,
     }),
-    _0x347093 = String(_0x2870e2.id || '').trim();
-  if (!_0x347093) throw new Error('火山方舟文件上传未返回 file id');
-  return _0x347093;
+    enabled8 = String(volcengineFile.id || '').trim();
+  if (!enabled8) throw new Error('火山方舟文件上传未返回 file id');
+  return enabled8;
 }
-export async function uploadInputsToVolcengineFiles(_0x1f8113, _0xfd1d78, _0xe39ac3 = {}) {
-  const _0x1334d7 = Array.isArray(_0x1f8113)
-      ? _0x1f8113.map((_0x445196) => String(_0x445196 || '').trim()).filter(Boolean)
-      : [],
-    _0x549626 = new Array(_0x1334d7.length).fill('');
-  for (let _0x4e6ad5 = 0; _0x4e6ad5 < _0x1334d7.length; _0x4e6ad5 += 1) {
-    _0x549626[_0x4e6ad5] = await uploadInputToVolcengineFile(_0x1334d7[_0x4e6ad5], _0xfd1d78, _0xe39ac3);
+export async function uploadInputsToVolcengineFiles(list2, value7, value8 = {}) {
+  const list3 = Array.isArray(list2) ? list2.map((item2) => String(item2 || '').trim()).filter(Boolean) : [],
+    value9 = new Array(list3.length).fill('');
+  for (let value10 = 0; value10 < list3.length; value10 += 1) {
+    value9[value10] = await uploadInputToVolcengineFile(list3[value10], value7, value8);
   }
-  return _0x549626;
+  return value9;
 }

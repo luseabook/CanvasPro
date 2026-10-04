@@ -4,8 +4,8 @@ import {
   createToolbarIconButton,
 } from '../nodeToolbar/buttonFactory.js';
 import { t } from '../../i18n/index.js';
-function panoramaSceneText(_0x3a8d62, _0x44bec1 = {}) {
-  return t('panoramaSceneNode.' + _0x3a8d62, _0x44bec1);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
 const ICONS = {
   close:

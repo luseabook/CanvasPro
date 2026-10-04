@@ -5,40 +5,40 @@ import {
 } from '../../core/generationResultRenderer.js';
 import { buildImageNodeStorageFields } from '../../services/imageDerivativeService.js';
 import { t } from '../../i18n/index.js';
-function asObject(_0x447cc) {
-  return _0x447cc && typeof _0x447cc === 'object' && !Array.isArray(_0x447cc) ? _0x447cc : null;
+function asObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
 }
-function firstString(..._0x452d6d) {
-  return firstNonEmptyString(..._0x452d6d);
+function firstString(...args) {
+  return firstNonEmptyString(...args);
 }
-function normalizeLegacyResultItems(_0x5d198b) {
-  return normalizeGenerationResultItems(_0x5d198b, {
+function normalizeLegacyResultItems(item) {
+  return normalizeGenerationResultItems(item, {
     collectionField: 'images',
     singleItemFields: ['sourceUrl', 'imageUrl', 'thumbUrl', 'localPath'],
   });
 }
-function normalizeImageResultItem(_0x1f4eda) {
-  const _0x1e42bf = asObject(_0x1f4eda);
-  if (!_0x1e42bf) throw new Error('[imageGenerationResult] item must be an object');
-  const _0x58c9c3 = firstString(_0x1e42bf.error),
-    _0x200ef2 = firstString(_0x1e42bf.url, _0x1e42bf.imageUrl, _0x1e42bf.sourceUrl, _0x1e42bf.thumbUrl),
-    _0xeba0d0 = {
-      ..._0x1e42bf,
+function normalizeImageResultItem(key) {
+  const metadata = asObject(key);
+  if (!metadata) throw new Error('[imageGenerationResult] item must be an object');
+  const string = firstString(metadata.error),
+    url = firstString(metadata.url, metadata.imageUrl, metadata.sourceUrl, metadata.thumbUrl),
+    index = {
+      ...metadata,
       outputType: 'image',
-      url: _0x200ef2,
-      sourceUrl: firstString(_0x1e42bf.sourceUrl, _0x1e42bf.url, _0x1e42bf.imageUrl),
-      imageUrl: firstString(_0x1e42bf.imageUrl, _0x1e42bf.url, _0x1e42bf.sourceUrl),
-      thumbUrl: firstString(_0x1e42bf.thumbUrl, _0x1e42bf.imageUrl, _0x1e42bf.url, _0x1e42bf.sourceUrl),
-      localPath: firstString(_0x1e42bf.localPath),
-      metadata: _0x1e42bf.metadata && typeof _0x1e42bf.metadata === 'object' ? { ..._0x1e42bf.metadata } : {},
-      ...buildImageNodeStorageFields(_0x1e42bf),
+      url: url,
+      sourceUrl: firstString(metadata.sourceUrl, metadata.url, metadata.imageUrl),
+      imageUrl: firstString(metadata.imageUrl, metadata.url, metadata.sourceUrl),
+      thumbUrl: firstString(metadata.thumbUrl, metadata.imageUrl, metadata.url, metadata.sourceUrl),
+      localPath: firstString(metadata.localPath),
+      metadata: metadata.metadata && typeof metadata.metadata === 'object' ? { ...metadata.metadata } : {},
+      ...buildImageNodeStorageFields(metadata),
     };
-  if (_0x58c9c3) _0xeba0d0.error = _0x58c9c3;
-  return _0xeba0d0;
+  if (string) index.error = string;
+  return index;
 }
-function removeMediaFieldPatch(_0xa0f5e) {
-  if (!_0xa0f5e || typeof _0xa0f5e !== 'object') return _0xa0f5e;
-  for (const _0x23ac03 of [
+function removeMediaFieldPatch(enabled) {
+  if (!enabled || typeof enabled !== 'object') return enabled;
+  for (const result of [
     'imageUrl',
     'sourceUrl',
     'thumbUrl',
@@ -51,53 +51,53 @@ function removeMediaFieldPatch(_0xa0f5e) {
     'originalWidth',
     'originalHeight',
   ]) {
-    delete _0xa0f5e[_0x23ac03];
+    delete enabled[result];
   }
-  return _0xa0f5e;
+  return enabled;
 }
-export function normalizeImageGenerationResult(_0x3a4012) {
-  const _0x508c20 = normalizeLegacyResultItems(_0x3a4012);
-  if (_0x508c20.length === 0) return { outputType: 'image', items: [] };
-  return { outputType: 'image', items: _0x508c20.map((_0x4f4892) => normalizeImageResultItem(_0x4f4892)) };
+export function normalizeImageGenerationResult(data) {
+  const items = normalizeLegacyResultItems(data);
+  if (items.length === 0) return { outputType: 'image', items: [] };
+  return { outputType: 'image', items: items.map((item2) => normalizeImageResultItem(item2)) };
 }
-export function getImageGenerationResultError(_0x162828) {
-  const _0x893564 = normalizeImageGenerationResult(_0x162828),
-    _0x2f1881 = getSuccessfulImageGenerationItems(_0x893564);
-  if (_0x2f1881.length > 0) return '';
-  const _0x38fe92 = _0x893564.items.find((_0x44a81b) => _0x44a81b?.error)?.error;
-  return String(_0x38fe92 || '').trim();
+export function getImageGenerationResultError(options) {
+  const imageGenerationResult = normalizeImageGenerationResult(options),
+    list = getSuccessfulImageGenerationItems(imageGenerationResult);
+  if (list.length > 0) return '';
+  const target = imageGenerationResult.items.find((item3) => item3?.error)?.error;
+  return String(target || '').trim();
 }
-export function getSuccessfulImageGenerationItems(_0x581f67) {
-  const _0xf2d460 =
-    _0x581f67?.outputType === 'image' && Array.isArray(_0x581f67.items)
-      ? _0x581f67
-      : normalizeImageGenerationResult(_0x581f67);
-  return _0xf2d460.items.filter((_0x2ece48) => _0x2ece48 && !_0x2ece48.error);
+export function getSuccessfulImageGenerationItems(source) {
+  const next =
+    source?.outputType === 'image' && Array.isArray(source.items)
+      ? source
+      : normalizeImageGenerationResult(source);
+  return next.items.filter((enabled2) => enabled2 && !enabled2.error);
 }
 export function buildImageGenerationResultPatch(
-  _0x2cfe2c,
+  current,
   { startedAt: startedAt = 0, duration: duration = null } = {},
 ) {
-  const _0x3ece3f =
-    _0x2cfe2c?.outputType === 'image' && Array.isArray(_0x2cfe2c.items)
-      ? _0x2cfe2c
-      : normalizeImageGenerationResult(_0x2cfe2c);
-  return buildGenerationCollectionResultPatch(_0x3ece3f, {
+  const entry =
+    current?.outputType === 'image' && Array.isArray(current.items)
+      ? current
+      : normalizeImageGenerationResult(current);
+  return buildGenerationCollectionResultPatch(entry, {
     collectionField: 'images',
     mainIndexField: 'mainImageIndex',
     expandedField: 'isImagesExpanded',
     startedAt: startedAt,
-    selectMainIndex: (_0x2a3173) => {
-      const _0x395b5d = _0x2a3173.findIndex((_0x2c45fc) => _0x2c45fc && !_0x2c45fc.error);
-      return _0x395b5d >= 0 ? _0x395b5d : 0;
+    selectMainIndex: (list2) => {
+      const count = list2.findIndex((enabled3) => enabled3 && !enabled3.error);
+      return count >= 0 ? count : 0;
     },
-    buildFirstItemPatch: (_0x373e7c) => ({
-      imageUrl: _0x373e7c.imageUrl,
-      sourceUrl: _0x373e7c.sourceUrl,
-      thumbUrl: _0x373e7c.thumbUrl,
-      sourceId: _0x373e7c.sourceId,
-      thumbId: _0x373e7c.thumbId,
-      ...buildImageNodeStorageFields(_0x373e7c),
+    buildFirstItemPatch: (imageUrl) => ({
+      imageUrl: imageUrl.imageUrl,
+      sourceUrl: imageUrl.sourceUrl,
+      thumbUrl: imageUrl.thumbUrl,
+      sourceId: imageUrl.sourceId,
+      thumbId: imageUrl.thumbId,
+      ...buildImageNodeStorageFields(imageUrl),
     }),
     duration: duration,
     extraPatch: { rhStatusMessage: null, rhStatusCode: null },
@@ -109,10 +109,10 @@ export function buildImageGenerationFailurePatch({
   duration: duration = null,
   clearMediaFields: clearMediaFields = true,
 } = {}) {
-  const _0x349abf = firstString(error, t('aigenImage.result.generationFailed')),
-    _0x448806 = buildImageGenerationResultPatch(
-      { error: _0x349abf, thumbUrl: '', imageUrl: '' },
+  const error2 = firstString(error, t('aigenImage.result.generationFailed')),
+    imageGenerationResultPatch = buildImageGenerationResultPatch(
+      { error: error2, thumbUrl: '', imageUrl: '' },
       { startedAt: startedAt, duration: duration },
     );
-  return clearMediaFields ? _0x448806 : removeMediaFieldPatch(_0x448806);
+  return clearMediaFields ? imageGenerationResultPatch : removeMediaFieldPatch(imageGenerationResultPatch);
 }

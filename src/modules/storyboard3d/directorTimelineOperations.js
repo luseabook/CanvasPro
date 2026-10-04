@@ -1,143 +1,137 @@
-export function collectDirectorKeys(_0x362e2e) {
+export function collectDirectorKeys(args) {
   return [
-    ..._0x362e2e['cameraKeyframes']['map']((_0x5d515c) => ({
-      key: _0x5d515c,
+    ...args['cameraKeyframes']['map']((key) => ({
+      key: key,
       type: 'camera',
       objectId: '',
       property: '',
     })),
-    ..._0x362e2e['objectTracks']['flatMap']((_0x3405a6) =>
-      ['position', 'rotation', 'scale']['flatMap']((_0x3deb25) =>
-        _0x3405a6[_0x3deb25 + 'Keyframes']['map']((_0x580902) => ({
-          key: _0x580902,
+    ...args['objectTracks']['flatMap']((objectId) =>
+      ['position', 'rotation', 'scale']['flatMap']((property) =>
+        objectId[property + 'Keyframes']['map']((key2) => ({
+          key: key2,
           type: 'object',
-          objectId: _0x3405a6['objectId'],
-          property: _0x3deb25,
+          objectId: objectId['objectId'],
+          property: property,
         })),
       ),
     ),
   ];
 }
-export function directorKeyIdentity(_0x3af02f) {
+export function directorKeyIdentity(event) {
   return (
-    _0x3af02f['type'] +
+    event['type'] +
     ':' +
-    (_0x3af02f['objectId'] || '') +
+    (event['objectId'] || '') +
     ':' +
-    (_0x3af02f['property'] || '') +
+    (event['property'] || '') +
     ':' +
-    (_0x3af02f['key']?.['id'] || _0x3af02f['keyframeId'])
+    (event['key']?.['id'] || event['keyframeId'])
   );
 }
-export function shiftDirectorKeys(_0x573f5b, _0x574020, _0x2cd960) {
-  const _0x4772ba = structuredClone(_0x573f5b),
-    _0x50c1d0 = new Set(_0x574020),
-    _0x3708e5 = collectDirectorKeys(_0x4772ba),
-    _0x3f5f82 = _0x3708e5['filter']((_0x39f52e) => _0x50c1d0['has'](directorKeyIdentity(_0x39f52e)));
-  if (!_0x3f5f82['length']) return _0x4772ba;
-  const _0x1090ed = Math['round'](Number(_0x2cd960) * _0x4772ba['fps']) / _0x4772ba['fps'];
-  if (!Number['isFinite'](_0x1090ed)) throw new Error('请输入有效时间。');
-  const _0x241d96 = _0x3f5f82['map'](({ key: _0x213d4c }) => _0x213d4c['time'] + _0x1090ed);
-  if (Math['min'](..._0x241d96) < 0x0 || Math['max'](..._0x241d96) > 0xe10)
+export function shiftDirectorKeys(value, item, index) {
+  const structuredClone2 = structuredClone(value),
+    map = new Set(item),
+    list = collectDirectorKeys(structuredClone2),
+    list2 = list['filter']((result) => map['has'](directorKeyIdentity(result)));
+  if (!list2['length']) return structuredClone2;
+  const data = Math['round'](Number(index) * structuredClone2['fps']) / structuredClone2['fps'];
+  if (!Number['isFinite'](data)) throw new Error('请输入有效时间。');
+  const args2 = list2['map'](({ key: key3 }) => key3['time'] + data);
+  if (Math['min'](...args2) < 0x0 || Math['max'](...args2) > 0xe10)
     throw new Error('移动后关键帧超出 0–3600 秒范围。');
-  for (const _0x365adf of _0x3f5f82) {
+  for (const event2 of list2) {
     if (
-      _0x3708e5['some'](
-        (_0x30638f) =>
-          !_0x50c1d0['has'](directorKeyIdentity(_0x30638f)) &&
-          _0x30638f['type'] === _0x365adf['type'] &&
-          _0x30638f['objectId'] === _0x365adf['objectId'] &&
-          _0x30638f['property'] === _0x365adf['property'] &&
-          Math['abs'](_0x30638f['key']['time'] - _0x365adf['key']['time'] - _0x1090ed) <
-            0.5 / _0x4772ba['fps'],
+      list['some'](
+        (event3) =>
+          !map['has'](directorKeyIdentity(event3)) &&
+          event3['type'] === event2['type'] &&
+          event3['objectId'] === event2['objectId'] &&
+          event3['property'] === event2['property'] &&
+          Math['abs'](event3['key']['time'] - event2['key']['time'] - data) < 0.5 / structuredClone2['fps'],
       )
     )
       throw new Error('移动后与已有关键帧冲突。');
   }
   return (
-    _0x3f5f82['forEach'](({ key: _0x5952cb }) => {
-      _0x5952cb['time'] += _0x1090ed;
+    list2['forEach'](({ key: key4 }) => {
+      key4['time'] += data;
     }),
-    _0x4772ba
+    structuredClone2
   );
 }
-export function copyDirectorKeys(_0xca0621, _0x33c131) {
-  const _0x30d02f = new Set(_0x33c131),
-    _0x2ca6d1 = collectDirectorKeys(_0xca0621)['filter']((_0x265c60) =>
-      _0x30d02f['has'](directorKeyIdentity(_0x265c60)),
-    );
-  if (!_0x2ca6d1['length']) return [];
-  const _0x597091 = Math['min'](..._0x2ca6d1['map'](({ key: _0x5fa4c2 }) => _0x5fa4c2['time']));
-  return _0x2ca6d1['map']((_0x49c464) => ({
-    ...structuredClone(_0x49c464),
-    key: { ...structuredClone(_0x49c464['key']), time: _0x49c464['key']['time'] - _0x597091 },
+export function copyDirectorKeys(options, target) {
+  const map2 = new Set(target),
+    list3 = collectDirectorKeys(options)['filter']((source) => map2['has'](directorKeyIdentity(source)));
+  if (!list3['length']) return [];
+  const next = Math['min'](...list3['map'](({ key: key5 }) => key5['time']));
+  return list3['map']((time) => ({
+    ...structuredClone(time),
+    key: { ...structuredClone(time['key']), time: time['key']['time'] - next },
   }));
 }
-export function pasteDirectorKeys(_0x40c8f1, _0x32ae5d, _0x474080) {
-  const _0x322351 = structuredClone(_0x40c8f1);
-  for (const _0x5eaa30 of _0x32ae5d) {
-    const _0x471078 = {
-      ...structuredClone(_0x5eaa30['key']),
+export function pasteDirectorKeys(current, entry, record) {
+  const structuredClone3 = structuredClone(current);
+  for (const event4 of entry) {
+    const payload = {
+      ...structuredClone(event4['key']),
       id: 'key-' + globalThis['crypto']['randomUUID'](),
-      time: Math['round']((_0x5eaa30['key']['time'] + _0x474080) * _0x322351['fps']) / _0x322351['fps'],
+      time:
+        Math['round']((event4['key']['time'] + record) * structuredClone3['fps']) / structuredClone3['fps'],
     };
-    if (_0x471078['time'] < 0x0 || _0x471078['time'] > 0xe10) throw new Error('粘贴超出镜头时长范围。');
-    const _0x4f6d18 = _0x322351['objectTracks']['find'](
-        (_0x278087) => _0x278087['objectId'] === _0x5eaa30['objectId'],
+    if (payload['time'] < 0x0 || payload['time'] > 0xe10) throw new Error('粘贴超出镜头时长范围。');
+    const handle = structuredClone3['objectTracks']['find'](
+        (state) => state['objectId'] === event4['objectId'],
       ),
-      _0x2575c3 =
-        _0x5eaa30['type'] === 'camera'
-          ? _0x322351['cameraKeyframes']
-          : _0x4f6d18?.[_0x5eaa30['property'] + 'Keyframes'];
-    if (!_0x2575c3) throw new Error('粘贴目标轨道已不存在。');
+      list4 =
+        event4['type'] === 'camera'
+          ? structuredClone3['cameraKeyframes']
+          : handle?.[event4['property'] + 'Keyframes'];
+    if (!list4) throw new Error('粘贴目标轨道已不存在。');
     if (
-      _0x2575c3['some'](
-        (_0x12e396) => Math['abs'](_0x12e396['time'] - _0x471078['time']) < 0.5 / _0x322351['fps'],
-      )
+      list4['some']((config) => Math['abs'](config['time'] - payload['time']) < 0.5 / structuredClone3['fps'])
     )
       throw new Error('粘贴位置已有关键帧，请移动播放头。');
-    _0x2575c3['push'](_0x471078);
+    list4['push'](payload);
   }
-  return _0x322351;
+  return structuredClone3;
 }
-export function deleteDirectorKeys(_0x116ea8, _0x2a9c59) {
-  const _0x4501fd = structuredClone(_0x116ea8),
-    _0x283bd1 = new Set(_0x2a9c59);
-  for (const _0x4db3ed of collectDirectorKeys(_0x4501fd)) {
-    if (!_0x283bd1['has'](directorKeyIdentity(_0x4db3ed))) continue;
-    const _0x27d531 =
-      _0x4db3ed['type'] === 'camera'
-        ? _0x4501fd['cameraKeyframes']
-        : _0x4501fd['objectTracks']['find']((_0x2b5ce6) => _0x2b5ce6['objectId'] === _0x4db3ed['objectId'])[
-            _0x4db3ed['property'] + 'Keyframes'
+export function deleteDirectorKeys(scope, input) {
+  const structuredClone4 = structuredClone(scope),
+    map3 = new Set(input);
+  for (const event5 of collectDirectorKeys(structuredClone4)) {
+    if (!map3['has'](directorKeyIdentity(event5))) continue;
+    const list5 =
+      event5['type'] === 'camera'
+        ? structuredClone4['cameraKeyframes']
+        : structuredClone4['objectTracks']['find']((output) => output['objectId'] === event5['objectId'])[
+            event5['property'] + 'Keyframes'
           ];
-    if (_0x4db3ed['type'] === 'camera' && _0x27d531['length'] <= 0x1)
-      throw new Error('至少保留一个摄像机关键帧。');
-    _0x27d531['splice'](
-      _0x27d531['findIndex']((_0x1dc831) => _0x1dc831['id'] === _0x4db3ed['key']['id']),
+    if (event5['type'] === 'camera' && list5['length'] <= 0x1) throw new Error('至少保留一个摄像机关键帧。');
+    list5['splice'](
+      list5['findIndex']((value2) => value2['id'] === event5['key']['id']),
       0x1,
     );
   }
-  return _0x4501fd;
+  return structuredClone4;
 }
-export function directorSnapTime(_0x586f5c, _0x2335d6, _0x47918b = 0x0, _0x2c1317 = []) {
-  const _0x5c282c = Math['round'](_0x586f5c * _0x2335d6['fps']) / _0x2335d6['fps'],
-    _0x19e9b0 = new Set(_0x2c1317),
-    _0x1793f3 = [
+export function directorSnapTime(value3, args3, value4 = 0x0, value5 = []) {
+  const value6 = Math['round'](value3 * args3['fps']) / args3['fps'],
+    map4 = new Set(value5),
+    list6 = [
       0x0,
-      _0x2335d6['duration'],
-      ...collectDirectorKeys(_0x2335d6)
-        ['filter']((_0x23170b) => !_0x19e9b0['has'](_0x23170b['key']['id']))
-        ['map'](({ key: _0x4cdfa4 }) => _0x4cdfa4['time']),
-      ...[..._0x2335d6['actionClips'], ...(_0x2335d6['motionClips'] || [])]['flatMap']((_0x19f335) => [
-        _0x19f335['start'],
-        _0x19f335['end'],
+      args3['duration'],
+      ...collectDirectorKeys(args3)
+        ['filter']((event6) => !map4['has'](event6['key']['id']))
+        ['map'](({ key: key6 }) => key6['time']),
+      ...[...args3['actionClips'], ...(args3['motionClips'] || [])]['flatMap']((value7) => [
+        value7['start'],
+        value7['end'],
       ]),
     ],
-    _0x40512f = _0x1793f3['reduce'](
-      (_0x368e88, _0x1c3b93) =>
-        Math['abs'](_0x1c3b93 - _0x5c282c) < Math['abs'](_0x368e88 - _0x5c282c) ? _0x1c3b93 : _0x368e88,
-      _0x5c282c + _0x47918b + 0x1,
+    value8 = list6['reduce'](
+      (value9, value10) => (Math['abs'](value10 - value6) < Math['abs'](value9 - value6) ? value10 : value9),
+      value6 + value4 + 0x1,
     );
-  return Math['abs'](_0x40512f - _0x5c282c) <= _0x47918b ? _0x40512f : _0x5c282c;
+  return Math['abs'](value8 - value6) <= value4 ? value8 : value6;
 }

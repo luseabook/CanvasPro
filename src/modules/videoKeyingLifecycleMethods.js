@@ -4,10 +4,10 @@ import { videoKeyingText } from './videoKeyingTextHelpers.js';
 export const videoKeyingLifecycleMethods = {
   exit({ silent: silent = false, preserveRh: preserveRh = false } = {}) {
     if (!this.active) return;
-    const _0x4f1669 = this.nodeId,
-      _0x325d3b = this._isRemoveUiMode();
+    const value = this.nodeId,
+      item = this._isRemoveUiMode();
     this.active = false;
-    !preserveRh && void this._cancelRhTaskForSourceNode(_0x4f1669);
+    !preserveRh && void this._cancelRhTaskForSourceNode(value);
     this._onKeyingSettingsDocDown &&
       (document.removeEventListener('pointerdown', this._onKeyingSettingsDocDown, true),
       (this._onKeyingSettingsDocDown = null));
@@ -26,13 +26,11 @@ export const videoKeyingLifecycleMethods = {
     this._onKeyDown &&
       (window.removeEventListener('keydown', this._onKeyDown, true), (this._onKeyDown = null));
     this._onResize && (window.removeEventListener('resize', this._onResize), (this._onResize = null));
-    const _0x2f3fe5 = this.trackEl;
-    if (_0x2f3fe5 && this._onPointerMove) _0x2f3fe5.removeEventListener('pointermove', this._onPointerMove);
-    if (_0x2f3fe5 && this._onPointerUp) _0x2f3fe5.removeEventListener('pointerup', this._onPointerUp);
-    if (_0x2f3fe5 && this._onPointerCancel)
-      _0x2f3fe5.removeEventListener('pointercancel', this._onPointerCancel);
-    if (_0x2f3fe5 && this._onPointerCancel)
-      _0x2f3fe5.removeEventListener('lostpointercapture', this._onPointerCancel);
+    const el = this.trackEl;
+    if (el && this._onPointerMove) el.removeEventListener('pointermove', this._onPointerMove);
+    if (el && this._onPointerUp) el.removeEventListener('pointerup', this._onPointerUp);
+    if (el && this._onPointerCancel) el.removeEventListener('pointercancel', this._onPointerCancel);
+    if (el && this._onPointerCancel) el.removeEventListener('lostpointercapture', this._onPointerCancel);
     ((this._onPointerMove = null), (this._onPointerUp = null), (this._onPointerCancel = null));
     this._onDocClick &&
       (document.removeEventListener('pointerdown', this._onDocClick, true), (this._onDocClick = null));
@@ -96,7 +94,7 @@ export const videoKeyingLifecycleMethods = {
       (this.wrapperEl = null),
       !silent &&
         window.showToast?.(
-          _0x325d3b ? videoKeyingText('toasts.removeClosed') : videoKeyingText('toasts.keyingClosed'),
+          item ? videoKeyingText('toasts.removeClosed') : videoKeyingText('toasts.keyingClosed'),
           'info',
         ));
   },

@@ -1,5 +1,5 @@
-function escapeHtml(_0x497ba4) {
-  return String(_0x497ba4 ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
@@ -12,50 +12,50 @@ export const WORKSPACE_ASSET_SPLIT_RATIO_DEFAULT = 0x32;
 export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MIN = 0x20;
 export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MAX = 0x44;
 export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT = 0x32;
-export function normalizeWorkspaceAssetSplitRatio(_0x3fc543) {
-  const _0x6ce6bb = Number(_0x3fc543);
+export function normalizeWorkspaceAssetSplitRatio(item) {
+  const key = Number(item);
   return Math['max'](
     WORKSPACE_ASSET_SPLIT_RATIO_MIN,
     Math['min'](
       WORKSPACE_ASSET_SPLIT_RATIO_MAX,
-      Number['isFinite'](_0x6ce6bb) ? _0x6ce6bb : WORKSPACE_ASSET_SPLIT_RATIO_DEFAULT,
+      Number['isFinite'](key) ? key : WORKSPACE_ASSET_SPLIT_RATIO_DEFAULT,
     ),
   );
 }
-export function normalizeWorkspaceAssetDetailSplitRatio(_0x3adcfa) {
-  const _0xfd6808 = Number(_0x3adcfa);
+export function normalizeWorkspaceAssetDetailSplitRatio(index) {
+  const result = Number(index);
   return Math['max'](
     WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MIN,
     Math['min'](
       WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MAX,
-      Number['isFinite'](_0xfd6808) ? _0xfd6808 : WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT,
+      Number['isFinite'](result) ? result : WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT,
     ),
   );
 }
 export function applyWorkspaceAssetSplitRatioToLayout(
-  _0x5c03c2,
-  _0x4f1833,
-  _0x20d977,
+  el,
+  el2,
+  data,
   { styleProperty: styleProperty = '--story-assets-left' } = {},
 ) {
-  const _0x5015f0 = normalizeWorkspaceAssetSplitRatio(_0x20d977);
+  const workspaceAssetSplitRatio = normalizeWorkspaceAssetSplitRatio(data);
   return (
-    _0x5c03c2?.['style']?.['setProperty']?.(styleProperty, _0x5015f0 + '%'),
-    _0x4f1833?.['setAttribute']?.('aria-valuenow', String(Math['round'](_0x5015f0))),
-    _0x5015f0
+    el?.['style']?.['setProperty']?.(styleProperty, workspaceAssetSplitRatio + '%'),
+    el2?.['setAttribute']?.('aria-valuenow', String(Math['round'](workspaceAssetSplitRatio))),
+    workspaceAssetSplitRatio
   );
 }
 export function applyWorkspaceAssetDetailSplitRatioToLayout(
-  _0xab68a2,
-  _0x53c309,
-  _0x55d7b9,
+  el3,
+  el4,
+  options,
   { styleProperty: styleProperty = '--workspace-asset-detail-top' } = {},
 ) {
-  const _0x1151d3 = normalizeWorkspaceAssetDetailSplitRatio(_0x55d7b9);
+  const workspaceAssetDetailSplitRatio = normalizeWorkspaceAssetDetailSplitRatio(options);
   return (
-    _0xab68a2?.['style']?.['setProperty']?.(styleProperty, _0x1151d3 + '%'),
-    _0x53c309?.['setAttribute']?.('aria-valuenow', String(Math['round'](_0x1151d3))),
-    _0x1151d3
+    el3?.['style']?.['setProperty']?.(styleProperty, workspaceAssetDetailSplitRatio + '%'),
+    el4?.['setAttribute']?.('aria-valuenow', String(Math['round'](workspaceAssetDetailSplitRatio))),
+    workspaceAssetDetailSplitRatio
   );
 }
 export function renderWorkspaceAssetSettingsShell({
@@ -76,13 +76,13 @@ export function renderWorkspaceAssetSettingsShell({
   activeTab: activeTab = '',
   tabCount: tabCount = 0x1,
 } = {}) {
-  const _0x219397 = normalizeWorkspaceAssetSplitRatio(splitRatio),
-    _0x1c96dc = Math['max'](0x1, Math['trunc'](Number(tabCount) || 0x1)),
-    _0x504c56 =
+  const workspaceAssetSplitRatio2 = normalizeWorkspaceAssetSplitRatio(splitRatio),
+    target = Math['max'](0x1, Math['trunc'](Number(tabCount) || 0x1)),
+    source =
       activeTab === 'library'
         ? 'story-asset-grid story-asset-grid--workspace-library'
         : 'story-asset-grid workspace-project-asset-grid',
-    _0x1b9889 =
+    next =
       '<div class="story-assets-callout' +
       (calloutInHeading ? ' story-assets-callout--toolbar' : '') +
       '\x22>\x0a\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20' +
@@ -99,37 +99,37 @@ export function renderWorkspaceAssetSettingsShell({
       '\n    </div>\n    <div class="story-assets-callout-actions">' +
       calloutActionsHtml +
       '</div>\n  </div>',
-    _0x2aff91 =
+    current =
       '<header\x20class=\x22story-page-heading\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-asset-tabs\x22\x20role=\x22tablist\x22\x20aria-label=\x22' +
       escapeHtml(tablistLabel) +
       '\x22\x20data-active-tab=\x22' +
       escapeHtml(activeTab) +
       '" data-tab-count="' +
-      _0x1c96dc +
+      target +
       '">\n        ' +
       tabsHtml +
       '\n      </div>\n      ' +
-      (calloutInHeading ? _0x1b9889 : '') +
+      (calloutInHeading ? next : '') +
       '\n    </header>';
   return (
     '<div class="story-assets-page story-content-page' +
     (className ? '\x20' + escapeHtml(className) : '') +
     '\x22\x20data-story-marquee-page-surface=\x22assets\x22\x20data-workspace-marquee-page-surface=\x22assets\x22>\x0a\x20\x20\x20\x20' +
-    (headingInListColumn ? '' : _0x2aff91) +
+    (headingInListColumn ? '' : current) +
     '\n    <div class="story-assets-switch-region" data-story-assets-switch-region data-workspace-assets-switch-region>\n      <div class="story-assets-layout' +
     (headingInListColumn ? ' story-assets-layout--column-heading' : '') +
     '" style="--story-assets-left: ' +
-    _0x219397 +
+    workspaceAssetSplitRatio2 +
     '%;">\n        ' +
-    (headingInListColumn ? _0x2aff91 : '') +
+    (headingInListColumn ? current : '') +
     '\n        <section class="story-assets-list" data-story-marquee-surface="assets" data-workspace-marquee-surface="assets">\n          ' +
-    (calloutInHeading ? '' : _0x1b9889) +
+    (calloutInHeading ? '' : next) +
     '\n          <div class="' +
-    _0x504c56 +
+    source +
     '">\n            ' +
     (cardsHtml || '<div\x20class=\x22story-inline-empty\x22>' + escapeHtml(emptyText) + '</div>') +
     '\n          </div>\n        </section>\n        <div class="story-assets-splitter panel-resize-handle panel-resize-handle--transient" data-story-assets-splitter data-workspace-assets-splitter role="separator" aria-orientation="vertical" aria-label="调整素材列表与详情区域宽度" aria-valuemin="28" aria-valuemax="72" aria-valuenow="' +
-    Math['round'](_0x219397) +
+    Math['round'](workspaceAssetSplitRatio2) +
     '" tabindex="0"></div>\n        ' +
     detailHtml +
     '\n      </div>\n      ' +

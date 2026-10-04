@@ -4,111 +4,108 @@ import { resolveCanvasVideoPosterUrl } from '../services/canvasMediaLocalService
 import { t } from '../i18n/index.js';
 export const MATERIAL_COMPARISON_KIND_IMAGE = 'image';
 export const MATERIAL_COMPARISON_KIND_VIDEO = 'video';
-function getEntryLabel(_0x26b605, _0x5698fa, _0x4b734e, _0x31d32c) {
+function getEntryLabel(error, value, index, handler) {
   return String(
-    _0x5698fa?.['label'] ||
-      _0x26b605?.['name'] ||
-      _0x26b605?.['fileName'] ||
-      _0x31d32c('canvasInteraction.materialComparison.untitled', { index: _0x4b734e + 0x1 }),
+    value?.['label'] ||
+      error?.['name'] ||
+      error?.['fileName'] ||
+      handler('canvasInteraction.materialComparison.untitled', { index: index + 0x1 }),
   )['trim']();
 }
-function getEntryAspectRatio(_0x2e7f53, _0x18b877) {
-  const _0x2679cb = Number(
-      _0x18b877?.['originalWidth'] ||
-        _0x18b877?.['videoWidth'] ||
-        _0x18b877?.['imageWidth'] ||
-        _0x18b877?.['sourceWidth'] ||
-        _0x18b877?.['width'] ||
-        _0x2e7f53?.['originalWidth'] ||
-        _0x2e7f53?.['videoWidth'] ||
-        _0x2e7f53?.['imageWidth'] ||
-        _0x2e7f53?.['sourceWidth'] ||
+function getEntryAspectRatio(item, box) {
+  const count = Number(
+      box?.['originalWidth'] ||
+        box?.['videoWidth'] ||
+        box?.['imageWidth'] ||
+        box?.['sourceWidth'] ||
+        box?.['width'] ||
+        item?.['originalWidth'] ||
+        item?.['videoWidth'] ||
+        item?.['imageWidth'] ||
+        item?.['sourceWidth'] ||
         0x0,
     ),
-    _0x39864f = Number(
-      _0x18b877?.['originalHeight'] ||
-        _0x18b877?.['videoHeight'] ||
-        _0x18b877?.['imageHeight'] ||
-        _0x18b877?.['sourceHeight'] ||
-        _0x18b877?.['height'] ||
-        _0x2e7f53?.['originalHeight'] ||
-        _0x2e7f53?.['videoHeight'] ||
-        _0x2e7f53?.['imageHeight'] ||
-        _0x2e7f53?.['sourceHeight'] ||
+    count2 = Number(
+      box?.['originalHeight'] ||
+        box?.['videoHeight'] ||
+        box?.['imageHeight'] ||
+        box?.['sourceHeight'] ||
+        box?.['height'] ||
+        item?.['originalHeight'] ||
+        item?.['videoHeight'] ||
+        item?.['imageHeight'] ||
+        item?.['sourceHeight'] ||
         0x0,
     );
-  if (_0x2679cb <= 0x0 || _0x39864f <= 0x0) return 0x0;
-  return _0x2679cb / _0x39864f;
+  if (count <= 0x0 || count2 <= 0x0) return 0x0;
+  return count / count2;
 }
-function resolveImageEntry(_0x4e940e, _0x2d5a9d, _0x35c771) {
-  if (!isCollageImageNode(_0x4e940e)) return null;
-  const _0x76e0cd = resolveCollageNodeImage(_0x4e940e),
-    _0x5bb657 = String(_0x76e0cd?.['url'] || '')['trim']();
-  if (!_0x5bb657) return null;
+function resolveImageEntry(node, key, result) {
+  if (!isCollageImageNode(node)) return null;
+  const response = resolveCollageNodeImage(node),
+    thumbnailUrl = String(response?.['url'] || '')['trim']();
+  if (!thumbnailUrl) return null;
   return {
-    id: String(_0x4e940e?.['id'] || 'comparison-image-' + _0x2d5a9d),
-    node: _0x4e940e,
+    id: String(node?.['id'] || 'comparison-image-' + key),
+    node: node,
     kind: MATERIAL_COMPARISON_KIND_IMAGE,
-    label: getEntryLabel(_0x4e940e, _0x76e0cd, _0x2d5a9d, _0x35c771),
-    thumbnailUrl: _0x5bb657,
+    label: getEntryLabel(node, response, key, result),
+    thumbnailUrl: thumbnailUrl,
     sourceUrl: '',
-    aspectRatio: getEntryAspectRatio(_0x4e940e, _0x76e0cd),
+    aspectRatio: getEntryAspectRatio(node, response),
     originalPromise: null,
     originalUrl: '',
     revokeUrlOnClose: ![],
   };
 }
-function resolveVideoEntry(_0x1b7644, _0x38ede5, _0x1daf52) {
-  const _0x55e629 = resolveCanvasNodePlayableVideoEntry(_0x1b7644);
-  if (!_0x55e629?.['source']) return null;
-  const _0x554141 = _0x55e629['record'] || _0x1b7644;
+function resolveVideoEntry(node2, data, options) {
+  const canvasNodePlayableVideoEntry = resolveCanvasNodePlayableVideoEntry(node2);
+  if (!canvasNodePlayableVideoEntry?.['source']) return null;
+  const target = canvasNodePlayableVideoEntry['record'] || node2;
   return {
-    id: String(_0x1b7644?.['id'] || 'comparison-video-' + _0x38ede5),
-    node: _0x1b7644,
+    id: String(node2?.['id'] || 'comparison-video-' + data),
+    node: node2,
     kind: MATERIAL_COMPARISON_KIND_VIDEO,
-    label: getEntryLabel(_0x1b7644, _0x554141, _0x38ede5, _0x1daf52),
-    thumbnailUrl: String(
-      resolveCanvasVideoPosterUrl(_0x554141) || resolveCanvasVideoPosterUrl(_0x1b7644) || '',
-    )['trim'](),
-    sourceUrl: String(_0x55e629['source'] || '')['trim'](),
-    videoIndex: Number(_0x55e629['videoIndex']) || 0x0,
-    aspectRatio: getEntryAspectRatio(_0x1b7644, _0x554141),
+    label: getEntryLabel(node2, target, data, options),
+    thumbnailUrl: String(resolveCanvasVideoPosterUrl(target) || resolveCanvasVideoPosterUrl(node2) || '')[
+      'trim'
+    ](),
+    sourceUrl: String(canvasNodePlayableVideoEntry['source'] || '')['trim'](),
+    videoIndex: Number(canvasNodePlayableVideoEntry['videoIndex']) || 0x0,
+    aspectRatio: getEntryAspectRatio(node2, target),
     originalPromise: null,
     originalUrl: '',
     revokeUrlOnClose: ![],
   };
 }
-export function resolveMaterialComparisonEntries(_0x3e7d28 = [], _0x11c764 = {}) {
-  const _0x53171e = typeof _0x11c764['translate'] === 'function' ? _0x11c764['translate'] : t;
-  return (Array['isArray'](_0x3e7d28) ? _0x3e7d28 : [])
+export function resolveMaterialComparisonEntries(list = [], source = {}) {
+  const next = typeof source['translate'] === 'function' ? source['translate'] : t;
+  return (Array['isArray'](list) ? list : [])
     ['map'](
-      (_0x3b7aff, _0x2ae158) =>
-        resolveImageEntry(_0x3b7aff, _0x2ae158, _0x53171e) ||
-        resolveVideoEntry(_0x3b7aff, _0x2ae158, _0x53171e),
+      (current, entry) => resolveImageEntry(current, entry, next) || resolveVideoEntry(current, entry, next),
     )
     ['filter'](Boolean);
 }
-export function getMaterialComparisonKindCounts(_0x32466a = []) {
-  const _0x4e7e2b = new Map();
-  for (const _0xf22492 of Array['isArray'](_0x32466a) ? _0x32466a : []) {
-    const _0x207ef8 = String(_0xf22492?.['kind'] || '')['trim']();
-    if (!_0x207ef8) continue;
-    _0x4e7e2b['set'](_0x207ef8, (_0x4e7e2b['get'](_0x207ef8) || 0x0) + 0x1);
+export function getMaterialComparisonKindCounts(list2 = []) {
+  const map = new Map();
+  for (const record of Array['isArray'](list2) ? list2 : []) {
+    const enabled = String(record?.['kind'] || '')['trim']();
+    if (!enabled) continue;
+    map['set'](enabled, (map['get'](enabled) || 0x0) + 0x1);
   }
-  return _0x4e7e2b;
+  return map;
 }
-export function findInitialMaterialComparisonPair(_0x3181e0 = []) {
-  const _0x826bf0 = Array['isArray'](_0x3181e0) ? _0x3181e0 : [],
-    _0x140aba = getMaterialComparisonKindCounts(_0x826bf0),
-    _0x299ab3 = _0x826bf0['findIndex']((_0x17661f) => (_0x140aba['get'](_0x17661f?.['kind']) || 0x0) >= 0x2);
-  if (_0x299ab3 < 0x0) return null;
-  const _0x29728d = _0x826bf0['findIndex'](
-    (_0x414be0, _0x233e6a) =>
-      _0x233e6a !== _0x299ab3 && _0x414be0?.['kind'] === _0x826bf0[_0x299ab3]?.['kind'],
+export function findInitialMaterialComparisonPair(list3 = []) {
+  const list4 = Array['isArray'](list3) ? list3 : [],
+    map2 = getMaterialComparisonKindCounts(list4),
+    leftIndex = list4['findIndex']((payload) => (map2['get'](payload?.['kind']) || 0x0) >= 0x2);
+  if (leftIndex < 0x0) return null;
+  const rightIndex = list4['findIndex'](
+    (handle, state) => state !== leftIndex && handle?.['kind'] === list4[leftIndex]?.['kind'],
   );
-  if (_0x29728d < 0x0) return null;
-  return { leftIndex: _0x299ab3, rightIndex: _0x29728d };
+  if (rightIndex < 0x0) return null;
+  return { leftIndex: leftIndex, rightIndex: rightIndex };
 }
-export function hasMaterialComparisonPair(_0x286b69 = []) {
-  return !!findInitialMaterialComparisonPair(resolveMaterialComparisonEntries(_0x286b69));
+export function hasMaterialComparisonPair(list5 = []) {
+  return !!findInitialMaterialComparisonPair(resolveMaterialComparisonEntries(list5));
 }

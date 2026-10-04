@@ -21,93 +21,89 @@ const TEXT_NODE_TRANSFER_PATTERNS = Object['freeze']([
     九: 0x9,
     十: 0xa,
   });
-function parseVersionNumber(_0x1f5272 = '') {
-  const _0x4b9b1e = String(_0x1f5272 || '')['trim']();
-  if (/^\d+$/['test'](_0x4b9b1e)) return Number(_0x4b9b1e);
-  return VERSION_NUMBER_MAP[_0x4b9b1e] || 0x0;
+function parseVersionNumber(value = '') {
+  const item = String(value || '')['trim']();
+  if (/^\d+$/['test'](item)) return Number(item);
+  return VERSION_NUMBER_MAP[item] || 0x0;
 }
-function getRequestedVersion(_0x29bbe2 = '') {
-  const _0x7d8cd5 = String(_0x29bbe2 || '')['match'](/第\s*([一二三四五六七八九十\d]+)\s*版/iu);
-  return _0x7d8cd5 ? parseVersionNumber(_0x7d8cd5[0x1]) : 0x0;
+function getRequestedVersion(key = '') {
+  const index = String(key || '')['match'](/第\s*([一二三四五六七八九十\d]+)\s*版/iu);
+  return index ? parseVersionNumber(index[0x1]) : 0x0;
 }
-function collectVersionBlocks(_0x475060 = '') {
-  const _0x16fcc2 = String(_0x475060 || '')['trim']();
-  if (!_0x16fcc2) return [];
-  const _0x5409fa = _0x16fcc2['split'](/\r?\n/),
-    _0x5332f = [];
-  let _0x55432a = null;
-  for (const _0x30ba66 of _0x5409fa) {
-    const _0x21c5bd = _0x30ba66['match'](
+function collectVersionBlocks(result = '') {
+  const enabled = String(result || '')['trim']();
+  if (!enabled) return [];
+  const data = enabled['split'](/\r?\n/),
+    list = [];
+  let options = null;
+  for (const target of data) {
+    const source = target['match'](
       /^\s*(?:(?:修改|调整|优化|改写)后(?:的)?\s*)?(?:第\s*([一二三四五六七八九十\d]+)\s*版|([1-9]\d*)[.、])\s*[：:]?\s*(.*)$/u,
     );
-    if (_0x21c5bd) {
-      if (_0x55432a) _0x5332f['push'](_0x55432a);
-      _0x55432a = {
-        version: parseVersionNumber(_0x21c5bd[0x1] || _0x21c5bd[0x2]),
-        lines: [_0x30ba66['trim']()],
+    if (source) {
+      if (options) list['push'](options);
+      options = {
+        version: parseVersionNumber(source[0x1] || source[0x2]),
+        lines: [target['trim']()],
       };
-    } else _0x55432a && _0x55432a['lines']['push'](_0x30ba66);
+    } else options && options['lines']['push'](target);
   }
-  if (_0x55432a) _0x5332f['push'](_0x55432a);
-  return _0x5332f;
+  if (options) list['push'](options);
+  return list;
 }
-function extractVersionBlock(_0x3e4f8c = '', _0x10ca9e = 0x0) {
-  const _0x292de8 = String(_0x3e4f8c || '')['trim']();
-  if (!_0x292de8 || _0x10ca9e <= 0x0) return _0x292de8;
-  const _0x174a8c = collectVersionBlocks(_0x292de8)['find'](
-    (_0x5702d6) => _0x5702d6['version'] === _0x10ca9e,
-  );
-  return _0x174a8c ? _0x174a8c['lines']['join']('\x0a')['trim']() : _0x292de8;
+function extractVersionBlock(next = '', count = 0x0) {
+  const enabled2 = String(next || '')['trim']();
+  if (!enabled2 || count <= 0x0) return enabled2;
+  const versionBlocks = collectVersionBlocks(enabled2)['find']((current) => current['version'] === count);
+  return versionBlocks ? versionBlocks['lines']['join']('\x0a')['trim']() : enabled2;
 }
-function getAssistantText(_0x1752c4 = {}) {
-  return String(
-    _0x1752c4['content'] || _0x1752c4['reply'] || _0x1752c4['message'] || _0x1752c4['question'] || '',
-  )['trim']();
+function getAssistantText(error = {}) {
+  return String(error['content'] || error['reply'] || error['message'] || error['question'] || '')['trim']();
 }
-function resolveSourceEntry(_0x408778 = [], _0x59b099 = 0x0) {
-  if (_0x59b099 > 0x0)
-    for (let _0x2dfb00 = _0x408778['length'] - 0x1; _0x2dfb00 >= 0x0; _0x2dfb00 -= 0x1) {
-      const _0x397951 = _0x408778[_0x2dfb00],
-        _0x59e771 = collectVersionBlocks(getAssistantText(_0x397951))['find'](
-          (_0x28ed5d) => _0x28ed5d['version'] === _0x59b099,
+function resolveSourceEntry(list2 = [], count2 = 0x0) {
+  if (count2 > 0x0)
+    for (let count3 = list2['length'] - 0x1; count3 >= 0x0; count3 -= 0x1) {
+      const entry = list2[count3],
+        content = collectVersionBlocks(getAssistantText(entry))['find'](
+          (record) => record['version'] === count2,
         );
-      if (_0x59e771) return { entry: _0x397951, content: _0x59e771['lines']['join']('\x0a')['trim']() };
+      if (content) return { entry: entry, content: content['lines']['join']('\x0a')['trim']() };
     }
-  const _0x24c940 = _0x408778['at'](-0x1) || null;
-  return { entry: _0x24c940, content: extractVersionBlock(getAssistantText(_0x24c940), _0x59b099) };
+  const entry2 = list2['at'](-0x1) || null;
+  return { entry: entry2, content: extractVersionBlock(getAssistantText(entry2), count2) };
 }
 export function resolveAgentConversationCanvasTransfer({
   message: message = '',
   history: history = [],
 } = {}) {
-  const _0x1a7081 = String(message || '')['trim'](),
-    _0x2674b9 = SELECTED_PROMPT_TRANSFER_PATTERNS['some']((_0xcd09ad) => _0xcd09ad['test'](_0x1a7081)),
-    _0x2a9b38 = TEXT_NODE_TRANSFER_PATTERNS['some']((_0x189e83) => _0x189e83['test'](_0x1a7081));
-  if (!_0x2674b9 && !_0x2a9b38) return null;
-  const _0x2606f7 = (Array['isArray'](history) ? history : [])['filter'](
-      (_0x4b5d39) =>
-        String(_0x4b5d39?.['role'] || '') === 'assistant' &&
-        String(_0x4b5d39?.['status'] || 'chat') === 'chat' &&
-        getAssistantText(_0x4b5d39),
+  const payload = String(message || '')['trim'](),
+    enabled3 = SELECTED_PROMPT_TRANSFER_PATTERNS['some']((handle) => handle['test'](payload)),
+    enabled4 = TEXT_NODE_TRANSFER_PATTERNS['some']((state) => state['test'](payload));
+  if (!enabled3 && !enabled4) return null;
+  const config = (Array['isArray'](history) ? history : [])['filter'](
+      (response) =>
+        String(response?.['role'] || '') === 'assistant' &&
+        String(response?.['status'] || 'chat') === 'chat' &&
+        getAssistantText(response),
     ),
-    _0x4cc385 = getRequestedVersion(_0x1a7081),
-    _0x2db77a = resolveSourceEntry(_0x2606f7, _0x4cc385);
-  if (_0x2674b9)
+    requestedVersion = getRequestedVersion(payload),
+    content2 = resolveSourceEntry(config, requestedVersion);
+  if (enabled3)
     return {
       matched: !![],
       target: 'selected_prompt',
-      mode: APPEND_PROMPT_PATTERN['test'](_0x1a7081) ? 'append' : 'replace',
-      content: _0x2db77a['content'],
-      requestedVersion: _0x4cc385,
-      sourceItemId: String(_0x2db77a['entry']?.['itemId'] || '')['trim'](),
-      sourceTurnId: String(_0x2db77a['entry']?.['turnId'] || '')['trim'](),
+      mode: APPEND_PROMPT_PATTERN['test'](payload) ? 'append' : 'replace',
+      content: content2['content'],
+      requestedVersion: requestedVersion,
+      sourceItemId: String(content2['entry']?.['itemId'] || '')['trim'](),
+      sourceTurnId: String(content2['entry']?.['turnId'] || '')['trim'](),
     };
   return {
     matched: !![],
     nodeType: 'ai-text',
-    content: _0x2db77a['content'],
-    requestedVersion: _0x4cc385,
-    sourceItemId: String(_0x2db77a['entry']?.['itemId'] || '')['trim'](),
-    sourceTurnId: String(_0x2db77a['entry']?.['turnId'] || '')['trim'](),
+    content: content2['content'],
+    requestedVersion: requestedVersion,
+    sourceItemId: String(content2['entry']?.['itemId'] || '')['trim'](),
+    sourceTurnId: String(content2['entry']?.['turnId'] || '')['trim'](),
   };
 }

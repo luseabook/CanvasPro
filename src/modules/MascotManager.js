@@ -41,8 +41,8 @@ const TIP_KEYS = Object.freeze([
   'settingsShortcuts',
   'hintEsc',
 ]);
-function mascotText(_0x1f711a, _0x1fb47a = {}) {
-  return t('mascot.' + _0x1f711a, _0x1fb47a);
+function mascotText(value, item = {}) {
+  return t('mascot.' + value, item);
 }
 const MascotManager = {
   _lastIdx: -1,
@@ -54,8 +54,8 @@ const MascotManager = {
   _mascotFigure: null,
   _unsubscribeLocale: null,
   _bindFabButton: true,
-  init(_0x44f6b3 = {}) {
-    ((this._bindFabButton = _0x44f6b3.bindFabButton !== false),
+  init(options = {}) {
+    ((this._bindFabButton = options.bindFabButton !== false),
       (this._fabBtn = document.getElementById('fabBtn')),
       (this._mascotWrap = document.getElementById('mascotWrap')),
       (this._mascotText = document.getElementById('mascotText')),
@@ -64,11 +64,11 @@ const MascotManager = {
     (this._subscribeLocaleChanges(), this._bindEvents());
   },
   _getRandTip() {
-    let _0x25f4c8;
+    let key;
     do {
-      _0x25f4c8 = Math.floor(Math.random() * TIP_KEYS.length);
-    } while (_0x25f4c8 === this._lastIdx && TIP_KEYS.length > 1);
-    return ((this._lastIdx = _0x25f4c8), mascotText('tips.' + TIP_KEYS[_0x25f4c8]));
+      key = Math.floor(Math.random() * TIP_KEYS.length);
+    } while (key === this._lastIdx && TIP_KEYS.length > 1);
+    return ((this._lastIdx = key), mascotText('tips.' + TIP_KEYS[key]));
   },
   _updateTip() {
     if (!this._mascotText) return;
@@ -128,8 +128,8 @@ const MascotManager = {
   },
   _bindEvents() {
     (this._bindFabButton &&
-      this._fabBtn.addEventListener('click', (_0x5634d1) => {
-        (_0x5634d1.stopPropagation(),
+      this._fabBtn.addEventListener('click', (event) => {
+        (event.stopPropagation(),
           !this._visible
             ? this._showMascot()
             : (this._updateTip(),
@@ -138,8 +138,8 @@ const MascotManager = {
                 if (this._visible) this._updateTip();
               }, 0x1f40))));
       }),
-      this._mascotWrap.addEventListener('click', (_0xc7839a) => {
-        (_0xc7839a.stopPropagation(), this._hideMascot());
+      this._mascotWrap.addEventListener('click', (event2) => {
+        (event2.stopPropagation(), this._hideMascot());
       }));
   },
   show() {

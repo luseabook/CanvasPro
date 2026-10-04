@@ -5,117 +5,117 @@ import {
 } from './shortcutCatalog.js';
 import { createShortcutCard } from './shortcutPresentation.js';
 import { showContextMenu } from '../interaction/contextMenuPresenter.js';
-export function createShortcutLibraryView(_0x40d8ff, { onActivate: _0x24712b }) {
-  const _0x48b1a9 = _0x40d8ff['querySelector']('.canvas-shortcuts-rail');
-  _0x48b1a9['classList']['add']('v2-node-menu-compact');
-  const _0x5d9cf5 = createDefaultShortcutCatalog()['items'];
-  let _0x4d4818,
-    _0xb416d0 = ![],
-    _0x31c9e8 = null,
-    _0x3b2b24 = null;
-  function _0x2ec9f9() {
-    _0x31c9e8?.['close']({ restoreFocus: ![] });
+export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate }) {
+  const ownerElement = ownerRoot['querySelector']('.canvas-shortcuts-rail');
+  ownerElement['classList']['add']('v2-node-menu-compact');
+  const list = createDefaultShortcutCatalog()['items'];
+  let args,
+    enabled = ![],
+    showContextMenu2 = null,
+    value = null;
+  function close() {
+    showContextMenu2?.['close']({ restoreFocus: ![] });
   }
-  function _0x461a0b(_0x2e3b07, _0x2c8507 = ![]) {
-    if (_0x3b2b24 === _0x2e3b07) {
-      _0x2ec9f9();
+  function run(restoreTarget, autoFocus = ![]) {
+    if (value === restoreTarget) {
+      close();
       return;
     }
-    _0x2ec9f9();
-    const _0xde0d0 = _0x2e3b07['dataset']['shortcutCategory'],
-      _0x419fd7 = _0x5d9cf5['find']((_0xffd416) => _0xffd416['icon'] === _0xde0d0),
-      _0x128c88 = [
-        { ..._0x419fd7, name: _0x419fd7['name'] + '节点' },
-        ...getAvailableShortcutTemplates(_0x4d4818)['filter'](
-          (_0x792f81) => resolveShortcutCategory(_0x792f81) === _0xde0d0,
-        ),
+    close();
+    const item = restoreTarget['dataset']['shortcutCategory'],
+      name = list['find']((key) => key['icon'] === item),
+      list2 = [
+        { ...name, name: name['name'] + '节点' },
+        ...getAvailableShortcutTemplates(args)['filter']((index) => resolveShortcutCategory(index) === item),
       ],
-      _0x790001 = _0x2e3b07['getBoundingClientRect']();
-    ((_0x3b2b24 = _0x2e3b07),
-      _0x2e3b07['setAttribute']('aria-expanded', 'true'),
-      (_0x31c9e8 = showContextMenu(
-        _0x790001['left'],
-        _0x790001['top'] - 0x8,
-        _0x128c88['map']((_0x39d1d4) => {
-          const _0x182bdf = createShortcutCard(_0x39d1d4, { preview: !![] });
+      box = restoreTarget['getBoundingClientRect']();
+    ((value = restoreTarget),
+      restoreTarget['setAttribute']('aria-expanded', 'true'),
+      (showContextMenu2 = showContextMenu(
+        box['left'],
+        box['top'] - 0x8,
+        list2['map']((label) => {
+          const desc = createShortcutCard(label, { preview: !![] });
           return {
-            label: _0x39d1d4['name'],
-            desc: _0x182bdf['querySelector']('.canvas-shortcut-description')['textContent'],
-            iconEl: _0x182bdf['querySelector']('.canvas-shortcut-icon')['firstElementChild'],
-            badge: _0x39d1d4['badge'],
-            action: () => _0x24712b(_0x39d1d4, _0x2e3b07),
+            label: label['name'],
+            desc: desc['querySelector']('.canvas-shortcut-description')['textContent'],
+            iconEl: desc['querySelector']('.canvas-shortcut-icon')['firstElementChild'],
+            badge: label['badge'],
+            action: () => onActivate(label, restoreTarget),
           };
         }),
         {
           className: 'v2-canvas-ctx-menu v2-node-menu-compact canvas-shortcuts-menu',
-          ariaLabel: _0x419fd7['name'] + '模板',
+          ariaLabel: name['name'] + '模板',
           preferredPlacement: 'top',
-          restoreTarget: _0x2e3b07,
-          ownerElement: _0x48b1a9,
-          ownerRoot: _0x40d8ff,
+          restoreTarget: restoreTarget,
+          ownerElement: ownerElement,
+          ownerRoot: ownerRoot,
           dismissOnOwnerPointerDown: ![],
-          autoFocus: _0x2c8507,
+          autoFocus: autoFocus,
           onClose: () => {
-            (_0x2e3b07['setAttribute']('aria-expanded', 'false'), (_0x3b2b24 = null), (_0x31c9e8 = null));
+            (restoreTarget['setAttribute']('aria-expanded', 'false'),
+              (value = null),
+              (showContextMenu2 = null));
           },
         },
       )));
   }
   return (
-    _0x48b1a9['addEventListener']('click', (_0x38999d) => {
-      const _0x57bece = _0x38999d['target']['closest']('[data-shortcut-category]');
-      if (!_0x57bece) return;
-      (_0x38999d['stopPropagation'](), _0x461a0b(_0x57bece, _0x38999d['detail'] === 0x0));
+    ownerElement['addEventListener']('click', (event) => {
+      const enabled2 = event['target']['closest']('[data-shortcut-category]');
+      if (!enabled2) return;
+      (event['stopPropagation'](), run(enabled2, event['detail'] === 0x0));
     }),
-    _0x48b1a9['addEventListener']('keydown', (_0x8a47a6) => {
-      const _0x4685da = _0x8a47a6['target']['closest']('[data-shortcut-category]');
-      if (!_0x4685da) return;
-      if (_0x8a47a6['key'] === 'Escape')
-        (_0x8a47a6['preventDefault'](), _0x8a47a6['stopPropagation'](), _0x2ec9f9());
+    ownerElement['addEventListener']('keydown', (event2) => {
+      const enabled3 = event2['target']['closest']('[data-shortcut-category]');
+      if (!enabled3) return;
+      if (event2['key'] === 'Escape') (event2['preventDefault'](), event2['stopPropagation'](), close());
       else {
-        if (_0x8a47a6['key'] === 'ArrowUp' || _0x8a47a6['key'] === 'ArrowDown') {
-          (_0x8a47a6['preventDefault'](), _0x8a47a6['stopPropagation']());
-          if (_0x3b2b24 === _0x4685da) _0x31c9e8?.['menu']['querySelector']('[role="menuitem"]')?.['focus']();
-          else _0x461a0b(_0x4685da, !![]);
+        if (event2['key'] === 'ArrowUp' || event2['key'] === 'ArrowDown') {
+          (event2['preventDefault'](), event2['stopPropagation']());
+          if (value === enabled3)
+            showContextMenu2?.['menu']['querySelector']('[role="menuitem"]')?.['focus']();
+          else run(enabled3, !![]);
         }
       }
     }),
-    window['addEventListener']('resize', _0x2ec9f9),
+    window['addEventListener']('resize', close),
     {
-      close: _0x2ec9f9,
-      render(_0x54e32f) {
-        (_0x2ec9f9(), (_0x4d4818 = _0x54e32f));
-        const _0x370024 = getAvailableShortcutTemplates(_0x4d4818)['length'] > 0x0;
-        (_0x40d8ff['classList']['toggle']('has-template-library', _0x370024),
-          _0x370024
-            ? !_0xb416d0 &&
-              (_0x48b1a9['setAttribute']('aria-label', '模板分类'),
-              _0x48b1a9['replaceChildren'](
-                ..._0x5d9cf5['map']((_0xb8279d) => {
-                  const _0x252f7f = createShortcutCard({
-                    ..._0xb8279d,
-                    subtitle: '查看' + _0xb8279d['name'] + '模板',
+      close: close,
+      render(result) {
+        (close(), (args = result));
+        const availableShortcutTemplates = getAvailableShortcutTemplates(args)['length'] > 0x0;
+        (ownerRoot['classList']['toggle']('has-template-library', availableShortcutTemplates),
+          availableShortcutTemplates
+            ? !enabled &&
+              (ownerElement['setAttribute']('aria-label', '模板分类'),
+              ownerElement['replaceChildren'](
+                ...list['map']((error) => {
+                  const el = createShortcutCard({
+                    ...error,
+                    subtitle: '查看' + error['name'] + '模板',
                   });
                   return (
-                    delete _0x252f7f['dataset']['shortcutId'],
-                    (_0x252f7f['dataset']['shortcutCategory'] = _0xb8279d['icon']),
-                    _0x252f7f['setAttribute']('aria-haspopup', 'menu'),
-                    _0x252f7f['setAttribute']('aria-expanded', 'false'),
-                    _0x252f7f
+                    delete el['dataset']['shortcutId'],
+                    (el['dataset']['shortcutCategory'] = error['icon']),
+                    el['setAttribute']('aria-haspopup', 'menu'),
+                    el['setAttribute']('aria-expanded', 'false'),
+                    el
                   );
                 }),
               ))
-            : (_0x48b1a9['setAttribute']('aria-label', '快捷方式'),
-              _0x48b1a9['replaceChildren'](
-                ..._0x4d4818['items']
-                  ['filter']((_0x3d5283) => _0x3d5283['enabled'])
-                  ['map']((_0x55b3aa) => createShortcutCard(_0x55b3aa)),
+            : (ownerElement['setAttribute']('aria-label', '快捷方式'),
+              ownerElement['replaceChildren'](
+                ...args['items']
+                  ['filter']((data) => data['enabled'])
+                  ['map']((options) => createShortcutCard(options)),
               )),
-          (_0xb416d0 = _0x370024));
+          (enabled = availableShortcutTemplates));
       },
-      resolveItem(_0x4b3cbb) {
-        return _0x4d4818['items']['find'](
-          (_0x56d47f) => _0x56d47f['enabled'] && _0x56d47f['id'] === _0x4b3cbb['dataset']['shortcutId'],
+      resolveItem(el2) {
+        return args['items']['find'](
+          (target) => target['enabled'] && target['id'] === el2['dataset']['shortcutId'],
         );
       },
     }

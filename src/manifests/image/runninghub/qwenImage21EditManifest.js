@@ -6,16 +6,16 @@ import { ASPECT_RATIO_FIELD } from '../modelApi/sharedImageModelApiFields.js';
 export const QWEN_IMAGE_21_EDIT_MODEL_ID = 'runninghub/2102016235713159169';
 export const QWEN_IMAGE_21_EDIT_EXECUTION_ID = 'runninghub.workflow.qwen-image-21-edit.v1';
 const QWEN_IMAGE_21_EDIT_IMAGE_NODES = Object['freeze'](
-    ['490', '487', '541', '544', '543', '545', '548', '547', '546']['map']((_0x2bafa8, _0x63e6b8) =>
-      Object['freeze']({ nodeId: _0x2bafa8, fieldName: 'image', description: '图像' + (_0x63e6b8 + 0x1) }),
+    ['490', '487', '541', '544', '543', '545', '548', '547', '546']['map']((nodeId, value) =>
+      Object['freeze']({ nodeId: nodeId, fieldName: 'image', description: '图像' + (value + 0x1) }),
     ),
   ),
   QWEN_IMAGE_21_EDIT_CONDITIONING_FIELDS = Object['freeze'](
-    Array['from']({ length: 0x9 }, (_0x170631, _0x24f233) =>
+    Array['from']({ length: 0x9 }, (item, key) =>
       Object['freeze']({
         nodeId: '518',
-        fieldName: 'images.image_' + (_0x24f233 + 0x1),
-        description: '图像' + (_0x24f233 + 0x1) + '输入',
+        fieldName: 'images.image_' + (key + 0x1),
+        description: '图像' + (key + 0x1) + '输入',
       }),
     ),
   );

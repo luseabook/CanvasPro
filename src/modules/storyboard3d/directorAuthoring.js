@@ -1,1 +1,141 @@
-import{normalizeStoryboard3DShotAnimation,upsertStoryboard3DCameraKeyframe,upsertStoryboard3DObjectKeyframe}from'./shotAnimation.js';export const DIRECTOR_CAMERA_MOTIONS=Object['freeze']([["orbit",'环绕'],['arc','半弧'],["push",'推进'],["pull",'拉远'],["crane",'升降'],['slide','横移'],["spiral","螺旋上升"]]);export function applyDirectorCameraMotion(_0x4281ee,{camera:_0x5d7751,preset:_0x4b9c02,duration:duration=0x3,amount:amount=0x3,append:append=![],start:_0x40dd34}={}){if(!DIRECTOR_CAMERA_MOTIONS["some"](([_0x1c920e])=>_0x1c920e===_0x4b9c02))throw new Error('请选择运镜预设。');let _0x197027=normalizeStoryboard3DShotAnimation(_0x4281ee,{'camera':_0x5d7751});const _0x1ab451=append?_0x197027["cameraKeyframes"]['at'](-0x1)["time"]:Math["max"](0x0,Number(_0x40dd34)||0x0),_0x6706ce=append?_0x197027["cameraKeyframes"]['at'](-0x1)["camera"]:_0x5d7751||_0x197027['cameraKeyframes'][0x0]["camera"],_0x2f71d5=Math["max"](0.1,Math["min"](0xe10-_0x1ab451,Number(duration)||0x3));if(_0x1ab451+_0x2f71d5>0xe10)throw new Error("运镜已达到镜头时长上限。");const _0x2ce99c=Math["max"](0.1,Math["min"](0x64,Number(amount)||0x3)),_0x5ce5ca=_0x6706ce["position"]["map"]((_0x564ee0,_0x53b22b)=>_0x564ee0-_0x6706ce["target"][_0x53b22b]),_0x257c11=Math["max"](0.01,Math['hypot'](_0x5ce5ca[0x0],_0x5ce5ca[0x2])),_0x351cc3=["orbit","arc","spiral"]["includes"](_0x4b9c02)?0x30:0x1;if(!append)_0x197027["cameraKeyframes"]=_0x40dd34==null?[]:_0x197027['cameraKeyframes']["filter"](_0x45f47f=>_0x45f47f["time"]<_0x1ab451||_0x45f47f['time']>_0x1ab451+_0x2f71d5);for(let _0x5ea694=0x0;_0x5ea694<=_0x351cc3;_0x5ea694+=0x1){const _0x5240c6=_0x5ea694/_0x351cc3,_0x51a0e8=structuredClone(_0x6706ce);if(["orbit","arc",'spiral']["includes"](_0x4b9c02)){const _0x23e064=_0x5240c6*Math['PI']*(_0x4b9c02==="arc"?0x1:0x2);_0x51a0e8["position"][0x0]=_0x6706ce['target'][0x0]+_0x5ce5ca[0x0]*Math["cos"](_0x23e064)+_0x5ce5ca[0x2]*Math["sin"](_0x23e064),_0x51a0e8["position"][0x2]=_0x6706ce["target"][0x2]-_0x5ce5ca[0x0]*Math['sin'](_0x23e064)+_0x5ce5ca[0x2]*Math["cos"](_0x23e064);if(_0x4b9c02==='spiral')_0x51a0e8["position"][0x1]+=_0x5240c6*_0x2ce99c;}else{if(_0x4b9c02==='push'||_0x4b9c02==="pull"){const _0x357736=Math['max'](0.01,Math["hypot"](..._0x5ce5ca)),_0x2dd67c=_0x4b9c02==="push"?-Math['min'](_0x2ce99c,_0x357736*0.9):_0x2ce99c;_0x51a0e8["position"]=_0x6706ce["position"]["map"]((_0xcf3541,_0x9034c3)=>_0xcf3541+_0x5ce5ca[_0x9034c3]/_0x357736*_0x2dd67c*_0x5240c6);}else{const _0x159d16=_0x4b9c02==="crane"?[0x0,_0x2ce99c*_0x5240c6,0x0]:[_0x5ce5ca[0x2]/_0x257c11*_0x2ce99c*_0x5240c6,0x0,-_0x5ce5ca[0x0]/_0x257c11*_0x2ce99c*_0x5240c6];_0x51a0e8["position"]=_0x6706ce["position"]['map']((_0x13d3e6,_0x4e25de)=>_0x13d3e6+_0x159d16[_0x4e25de]),_0x51a0e8["target"]=_0x6706ce['target']["map"]((_0x2b6d8e,_0x4a48a0)=>_0x2b6d8e+_0x159d16[_0x4a48a0]);}}_0x197027=upsertStoryboard3DCameraKeyframe(_0x197027,{'camera':_0x51a0e8,'time':_0x1ab451+_0x2f71d5*_0x5240c6,'easing':'linear'});}return normalizeStoryboard3DShotAnimation(_0x197027);}export function applyDirectorObjectPath(_0x20a91e,{object:_0x57e1e5,points:_0x266c9e,start:start=0x0,duration:duration=0x3,orient:orient=!![]}={}){if(!_0x57e1e5||_0x57e1e5["locked"])throw new Error('请先选择一个未锁定的角色或物体。');const _0x5a2fb8=(_0x266c9e||[])["filter"](_0x5b67e3=>Array["isArray"](_0x5b67e3)&&_0x5b67e3["length"]===0x3&&_0x5b67e3["every"](Number["isFinite"]));if(_0x5a2fb8["length"]<0x2)throw new Error("走位至少需要两个路径点。");const _0x29ae68=_0x5a2fb8["map"]((_0xa9fc,_0xf3792c)=>_0xf3792c?Math["hypot"](..._0xa9fc["map"]((_0x1ee091,_0x21e564)=>_0x1ee091-_0x5a2fb8[_0xf3792c-0x1][_0x21e564])):0x0),_0x35efbb=_0x29ae68["reduce"]((_0x38c588,_0x49b638)=>_0x38c588+_0x49b638,0x0);if(_0x35efbb<0.001)throw new Error("路径点之间需要有距离。");const _0x59074e=Math["max"](0x0,Math["min"](3599.9,Number(start)||0x0)),_0x6cd872=Math["max"](0.1,Math["min"](0xe10-_0x59074e,Number(duration)||0x3));let _0x3f6c8f=normalizeStoryboard3DShotAnimation(_0x20a91e);const _0x2b486c=_0x3f6c8f["objectTracks"]["find"](_0x4696d5=>_0x4696d5["objectId"]===_0x57e1e5['id']);for(const _0x14201b of["positionKeyframes",...orient?['rotationKeyframes']:[]]){if(_0x2b486c)_0x2b486c[_0x14201b]=_0x2b486c[_0x14201b]["filter"](_0x28ed12=>_0x28ed12["time"]<_0x59074e||_0x28ed12["time"]>_0x59074e+_0x6cd872);}let _0x51d5c1=0x0;return _0x5a2fb8['forEach']((_0x3dbf7a,_0x9db3f2)=>{_0x51d5c1+=_0x29ae68[_0x9db3f2];const _0x1dfa62=_0x59074e+_0x6cd872*_0x51d5c1/_0x35efbb;_0x3f6c8f=upsertStoryboard3DObjectKeyframe(_0x3f6c8f,{'objectId':_0x57e1e5['id'],'property':"position",'time':_0x1dfa62,'value':_0x3dbf7a,'easing':"linear"});if(orient){const _0x31cc05=_0x9db3f2===_0x5a2fb8['length']-0x1?_0x5a2fb8[_0x9db3f2-0x1]:_0x3dbf7a,_0x2e561e=_0x9db3f2===_0x5a2fb8["length"]-0x1?_0x3dbf7a:_0x5a2fb8[_0x9db3f2+0x1],_0x2f6a3c=[..._0x57e1e5["transform"]['rotation']];_0x2f6a3c[0x1]=Math["atan2"](_0x2e561e[0x0]-_0x31cc05[0x0],_0x2e561e[0x2]-_0x31cc05[0x2]),_0x3f6c8f=upsertStoryboard3DObjectKeyframe(_0x3f6c8f,{'objectId':_0x57e1e5['id'],'property':"rotation",'time':_0x1dfa62,'value':_0x2f6a3c,'easing':'linear'});}}),_0x3f6c8f;}
+import {
+  normalizeStoryboard3DShotAnimation,
+  upsertStoryboard3DCameraKeyframe,
+  upsertStoryboard3DObjectKeyframe,
+} from './shotAnimation.js';
+export const DIRECTOR_CAMERA_MOTIONS = Object['freeze']([
+  ['orbit', '环绕'],
+  ['arc', '半弧'],
+  ['push', '推进'],
+  ['pull', '拉远'],
+  ['crane', '升降'],
+  ['slide', '横移'],
+  ['spiral', '螺旋上升'],
+]);
+export function applyDirectorCameraMotion(
+  value,
+  {
+    camera: camera,
+    preset: preset,
+    duration: duration = 0x3,
+    amount: amount = 0x3,
+    append: append = ![],
+    start: start2,
+  } = {},
+) {
+  if (!DIRECTOR_CAMERA_MOTIONS['some'](([item]) => item === preset)) throw new Error('请选择运镜预设。');
+  let storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(value, { camera: camera });
+  const key = append
+      ? storyboard3DShotAnimation['cameraKeyframes']['at'](-0x1)['time']
+      : Math['max'](0x0, Number(start2) || 0x0),
+    event = append
+      ? storyboard3DShotAnimation['cameraKeyframes']['at'](-0x1)['camera']
+      : camera || storyboard3DShotAnimation['cameraKeyframes'][0x0]['camera'],
+    count = Math['max'](0.1, Math['min'](0xe10 - key, Number(duration) || 0x3));
+  if (key + count > 0xe10) throw new Error('运镜已达到镜头时长上限。');
+  const index = Math['max'](0.1, Math['min'](0x64, Number(amount) || 0x3)),
+    args = event['position']['map']((result, data) => result - event['target'][data]),
+    options = Math['max'](0.01, Math['hypot'](args[0x0], args[0x2])),
+    target = ['orbit', 'arc', 'spiral']['includes'](preset) ? 0x30 : 0x1;
+  if (!append)
+    storyboard3DShotAnimation['cameraKeyframes'] =
+      start2 == null
+        ? []
+        : storyboard3DShotAnimation['cameraKeyframes']['filter'](
+            (source) => source['time'] < key || source['time'] > key + count,
+          );
+  for (let next = 0x0; next <= target; next += 0x1) {
+    const current = next / target,
+      structuredClone2 = structuredClone(event);
+    if (['orbit', 'arc', 'spiral']['includes'](preset)) {
+      const entry = current * Math['PI'] * (preset === 'arc' ? 0x1 : 0x2);
+      ((structuredClone2['position'][0x0] =
+        event['target'][0x0] + args[0x0] * Math['cos'](entry) + args[0x2] * Math['sin'](entry)),
+        (structuredClone2['position'][0x2] =
+          event['target'][0x2] - args[0x0] * Math['sin'](entry) + args[0x2] * Math['cos'](entry)));
+      if (preset === 'spiral') structuredClone2['position'][0x1] += current * index;
+    } else {
+      if (preset === 'push' || preset === 'pull') {
+        const record = Math['max'](0.01, Math['hypot'](...args)),
+          payload = preset === 'push' ? -Math['min'](index, record * 0.9) : index;
+        structuredClone2['position'] = event['position']['map'](
+          (handle, state) => handle + (args[state] / record) * payload * current,
+        );
+      } else {
+        const config =
+          preset === 'crane'
+            ? [0x0, index * current, 0x0]
+            : [(args[0x2] / options) * index * current, 0x0, (-args[0x0] / options) * index * current];
+        ((structuredClone2['position'] = event['position']['map']((scope, input) => scope + config[input])),
+          (structuredClone2['target'] = event['target']['map']((output, value2) => output + config[value2])));
+      }
+    }
+    storyboard3DShotAnimation = upsertStoryboard3DCameraKeyframe(storyboard3DShotAnimation, {
+      camera: structuredClone2,
+      time: key + count * current,
+      easing: 'linear',
+    });
+  }
+  return normalizeStoryboard3DShotAnimation(storyboard3DShotAnimation);
+}
+export function applyDirectorObjectPath(
+  value3,
+  {
+    object: object,
+    points: points,
+    start: start = 0x0,
+    duration: duration = 0x3,
+    orient: orient = !![],
+  } = {},
+) {
+  if (!object || object['locked']) throw new Error('请先选择一个未锁定的角色或物体。');
+  const list = (points || [])['filter'](
+    (value4) => Array['isArray'](value4) && value4['length'] === 0x3 && value4['every'](Number['isFinite']),
+  );
+  if (list['length'] < 0x2) throw new Error('走位至少需要两个路径点。');
+  const value5 = list['map']((args2, value6) =>
+      value6 ? Math['hypot'](...args2['map']((value7, value8) => value7 - list[value6 - 0x1][value8])) : 0x0,
+    ),
+    count2 = value5['reduce']((value9, value10) => value9 + value10, 0x0);
+  if (count2 < 0.001) throw new Error('路径点之间需要有距离。');
+  const value11 = Math['max'](0x0, Math['min'](3599.9, Number(start) || 0x0)),
+    value12 = Math['max'](0.1, Math['min'](0xe10 - value11, Number(duration) || 0x3));
+  let storyboard3DShotAnimation2 = normalizeStoryboard3DShotAnimation(value3);
+  const value13 = storyboard3DShotAnimation2['objectTracks']['find'](
+    (value14) => value14['objectId'] === object['id'],
+  );
+  for (const value15 of ['positionKeyframes', ...(orient ? ['rotationKeyframes'] : [])]) {
+    if (value13)
+      value13[value15] = value13[value15]['filter'](
+        (value16) => value16['time'] < value11 || value16['time'] > value11 + value12,
+      );
+  }
+  let value17 = 0x0;
+  return (
+    list['forEach']((value18, value19) => {
+      value17 += value5[value19];
+      const value20 = value11 + (value12 * value17) / count2;
+      storyboard3DShotAnimation2 = upsertStoryboard3DObjectKeyframe(storyboard3DShotAnimation2, {
+        objectId: object['id'],
+        property: 'position',
+        time: value20,
+        value: value18,
+        easing: 'linear',
+      });
+      if (orient) {
+        const value21 = value19 === list['length'] - 0x1 ? list[value19 - 0x1] : value18,
+          value22 = value19 === list['length'] - 0x1 ? value18 : list[value19 + 0x1],
+          value23 = [...object['transform']['rotation']];
+        ((value23[0x1] = Math['atan2'](value22[0x0] - value21[0x0], value22[0x2] - value21[0x2])),
+          (storyboard3DShotAnimation2 = upsertStoryboard3DObjectKeyframe(storyboard3DShotAnimation2, {
+            objectId: object['id'],
+            property: 'rotation',
+            time: value20,
+            value: value23,
+            easing: 'linear',
+          })));
+      }
+    }),
+    storyboard3DShotAnimation2
+  );
+}

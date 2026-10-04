@@ -55,10 +55,10 @@ const VOICES = [
     ['Eric', '四川-程川'],
     ['Rocky', '粤语-阿强'],
     ['Kiki', '粤语-阿清'],
-  ]['map'](([_0x43dac1, _0xfbfe83]) => ({
-    value: _0x43dac1,
-    label: _0xfbfe83 + ' · ' + _0x43dac1,
-    selectedLabel: _0xfbfe83,
+  ]['map'](([value, label]) => ({
+    value: value,
+    label: label + ' · ' + value,
+    selectedLabel: label,
   })),
   INSTRUCT_VOICES = new Set([
     'Cherry',
@@ -101,29 +101,29 @@ const VOICES = [
       ['Korean', '韩语'],
       ['French', '法语'],
       ['Russian', '俄语'],
-    ]['map'](([_0x2ed020, _0x404fcd]) => ({ value: _0x2ed020, label: _0x404fcd, selectedLabel: _0x404fcd })),
+    ]['map'](([value2, label2]) => ({ value: value2, label: label2, selectedLabel: label2 })),
     'Auto',
   );
 export const runningHubQwenAudioEntries = Object['freeze']([
-  ...[![], !![]]['map']((_0x4c7824) =>
+  ...[![], !![]]['map']((docId) =>
     createRunningHubAudioCatalogEntry({
-      id: 'qwen3-tts-' + (_0x4c7824 ? 'instruct-flash' : 'flash'),
-      name: '千问3 语音合成 ' + (_0x4c7824 ? 'Instruct-Flash' : 'Flash'),
-      endpoint: '/openapi/v2/alibaba/qwen3-tts-' + (_0x4c7824 ? 'instruct-flash' : 'flash'),
-      docId: _0x4c7824 ? 0x1d8b7a75 : 0x1d8b7a76,
-      order: _0x4c7824 ? 0xc9 : 0xc8,
+      id: 'qwen3-tts-' + (docId ? 'instruct-flash' : 'flash'),
+      name: '千问3 语音合成 ' + (docId ? 'Instruct-Flash' : 'Flash'),
+      endpoint: '/openapi/v2/alibaba/qwen3-tts-' + (docId ? 'instruct-flash' : 'flash'),
+      docId: docId ? 0x1d8b7a75 : 0x1d8b7a76,
+      order: docId ? 0xc9 : 0xc8,
       promptMaxLength: 0x258,
       promptPlaceholder: '输入朗读文本，最多 600 字符（汉字按 2 字符计）',
       fields: [
         audioSelect(
           'voice',
           '音色',
-          _0x4c7824 ? VOICES['filter']((_0x20caeb) => INSTRUCT_VOICES['has'](_0x20caeb['value'])) : VOICES,
+          docId ? VOICES['filter']((el) => INSTRUCT_VOICES['has'](el['value'])) : VOICES,
           'Cherry',
           { placement: 'mode' },
         ),
         LANGUAGE,
-        ...(_0x4c7824
+        ...(docId
           ? [
               audioTextarea('instructions', '声音指令', '用中文或英文描述语气、语速、情感和音色。', {
                 maxLength: 0x7d0,
@@ -137,11 +137,11 @@ export const runningHubQwenAudioEntries = Object['freeze']([
       mapping: [
         paramMapping('voice'),
         paramMapping('languageType'),
-        ...(_0x4c7824 ? [paramMapping('instructions'), paramMapping('optimizeInstructions')] : []),
+        ...(docId ? [paramMapping('instructions'), paramMapping('optimizeInstructions')] : []),
       ],
       rules: {
         weightedChinesePrompt: !![],
-        ...(_0x4c7824 ? { dependencies: [{ field: 'optimizeInstructions', requires: 'instructions' }] } : {}),
+        ...(docId ? { dependencies: [{ field: 'optimizeInstructions', requires: 'instructions' }] } : {}),
       },
     }),
   ),

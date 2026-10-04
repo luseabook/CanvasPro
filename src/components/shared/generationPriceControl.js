@@ -5,143 +5,138 @@ import { priceText } from '../../services/modelPricingText.js';
 import { onLocaleChange } from '../../i18n/index.js';
 import { bindModelPriceDetails } from './modelPriceDetails.js';
 export function bindGenerationPriceControl(
-  _0x1b2278,
-  { getContext: _0x2e4cc8, subscribe: _0x3f923c, cache: cache = modelPricingCache } = {},
+  el,
+  { getContext: getContext, subscribe: subscribe, cache: cache = modelPricingCache } = {},
 ) {
-  if (!_0x1b2278?.['ownerDocument']?.['createElement'] || !_0x1b2278['parentNode'])
-    return { sync() {}, destroy() {} };
-  const _0x27ace2 = _0x1b2278['ownerDocument'],
-    _0x3fc1ad = _0x27ace2['defaultView'],
-    _0x35bf72 = _0x27ace2['createElement']('button');
-  ((_0x35bf72['type'] = 'button'),
-    (_0x35bf72['className'] = 'generation-model-price'),
-    (_0x35bf72['hidden'] = !![]));
-  const _0x1a254c = _0x27ace2['createElement']('span');
-  _0x1a254c['className'] = 'generation-model-price-label';
-  const _0xc42852 = _0x27ace2['createElement']('span');
-  _0xc42852['className'] = 'generation-model-price-amount';
-  const _0x5416dc = _0x27ace2['createElement']('span');
-  ((_0x5416dc['className'] = 'generation-model-price-icon'),
-    (_0x5416dc['textContent'] = 'ⓘ'),
-    _0x5416dc['setAttribute']('aria-hidden', 'true'),
-    _0x35bf72['append'](_0x1a254c, _0xc42852, _0x5416dc),
-    _0x1b2278['before'](_0x35bf72));
-  let _0xcc9c97 = null,
-    _0x5a9767 = null,
-    _0x930641 = ![],
-    _0x4fd803 = '',
-    _0x4bac4f = ![],
-    _0x2412a7 = ![],
-    _0x1b710c = ![],
-    _0x2b2df0 = 0x0,
-    _0x367fbc = ![],
-    _0x109fa8,
-    _0x4fc5c6;
-  const _0x30a77b = () => ({
-      ...(_0x5a9767 && _0xcc9c97
-        ? buildModelPriceView(_0x5a9767['data'], _0xcc9c97)
+  if (!el?.['ownerDocument']?.['createElement'] || !el['parentNode']) return { sync() {}, destroy() {} };
+  const el2 = el['ownerDocument'],
+    el3 = el2['defaultView'],
+    el4 = el2['createElement']('button');
+  ((el4['type'] = 'button'), (el4['className'] = 'generation-model-price'), (el4['hidden'] = !![]));
+  const el5 = el2['createElement']('span');
+  el5['className'] = 'generation-model-price-label';
+  const el6 = el2['createElement']('span');
+  el6['className'] = 'generation-model-price-amount';
+  const el7 = el2['createElement']('span');
+  ((el7['className'] = 'generation-model-price-icon'),
+    (el7['textContent'] = 'ⓘ'),
+    el7['setAttribute']('aria-hidden', 'true'),
+    el4['append'](el5, el6, el7),
+    el['before'](el4));
+  let title = null,
+    value = null,
+    enabled = ![],
+    item = '',
+    enabled2 = ![],
+    enabled3 = ![],
+    enabled4 = ![],
+    key = 0x0,
+    enabled5 = ![],
+    setTimeout2,
+    bindModelPriceDetails2;
+  const run = () => ({
+      ...(value && title
+        ? buildModelPriceView(value['data'], title)
         : { label: priceText('price'), rows: [], notes: [], estimate: null }),
-      title: _0xcc9c97 ? _0xcc9c97['label'] + ' · ' + _0xcc9c97['model'] : priceText('price'),
+      title: title ? title['label'] + ' · ' + title['model'] : priceText('price'),
       status: [
-        _0x4bac4f ? priceText('loading') : '',
-        _0x930641 ? priceText(_0x5a9767 ? 'refreshFailed' : 'unavailable') : '',
-        _0x930641 ? _0x4fd803 : '',
-        _0x5a9767
-          ? (cache['stale'](_0x5a9767) ? priceText('stale') : priceText('updated')) +
+        enabled2 ? priceText('loading') : '',
+        enabled ? priceText(value ? 'refreshFailed' : 'unavailable') : '',
+        enabled ? item : '',
+        value
+          ? (cache['stale'](value) ? priceText('stale') : priceText('updated')) +
             ' · ' +
-            new Date(_0x5a9767['fetchedAt'])['toLocaleString']()
+            new Date(value['fetchedAt'])['toLocaleString']()
           : '',
       ]
         ['filter'](Boolean)
         ['join']('\x0a'),
     }),
-    _0x1e0b7f = () => {
-      if (_0x2412a7) return;
-      ((_0x35bf72['hidden'] = !_0xcc9c97), _0x35bf72['setAttribute']('aria-busy', String(_0x4bac4f)));
-      const _0x5d0eb6 = _0x5a9767 ? _0x30a77b() : null;
-      ((_0x1a254c['textContent'] = _0x5d0eb6?.['amountText']
-        ? _0x5d0eb6['prefix'] + '\x20'
-        : _0x5d0eb6?.['label'] || priceText(_0x930641 ? 'unavailable' : 'price')),
-        (_0xc42852['textContent'] = _0x5d0eb6?.['amountText'] || ''),
-        (_0xc42852['hidden'] = !_0x5d0eb6?.['amountText']),
-        (_0x5416dc['hidden'] = _0xcc9c97?.['kind'] !== 'text' && !_0x4bac4f),
-        (_0x5416dc['textContent'] = _0xcc9c97?.['kind'] === 'text' ? 'ⓘ' : ''),
-        _0x35bf72['setAttribute']('aria-label', priceText('price') + ' · ' + (_0xcc9c97?.['label'] || '')),
-        _0x4fc5c6?.['render']());
+    handler = () => {
+      if (enabled3) return;
+      ((el4['hidden'] = !title), el4['setAttribute']('aria-busy', String(enabled2)));
+      const enabled6 = value ? run() : null;
+      ((el5['textContent'] = enabled6?.['amountText']
+        ? enabled6['prefix'] + '\x20'
+        : enabled6?.['label'] || priceText(enabled ? 'unavailable' : 'price')),
+        (el6['textContent'] = enabled6?.['amountText'] || ''),
+        (el6['hidden'] = !enabled6?.['amountText']),
+        (el7['hidden'] = title?.['kind'] !== 'text' && !enabled2),
+        (el7['textContent'] = title?.['kind'] === 'text' ? 'ⓘ' : ''),
+        el4['setAttribute']('aria-label', priceText('price') + ' · ' + (title?.['label'] || '')),
+        bindModelPriceDetails2?.['render']());
     },
-    _0x10f615 = () => {
-      if (_0x2412a7 || !_0xcc9c97 || _0x4bac4f || !_0x1b710c) return;
-      _0x5a9767 = cache['peek'](_0xcc9c97);
-      if (!cache['stale'](_0x5a9767)) {
-        _0x1e0b7f();
+    handler2 = () => {
+      if (enabled3 || !title || enabled2 || !enabled4) return;
+      value = cache['peek'](title);
+      if (!cache['stale'](value)) {
+        handler();
         return;
       }
-      ((_0x4bac4f = !![]), _0x1e0b7f());
-      const _0x16871a = _0x2b2df0;
-      cache['ensure'](_0xcc9c97)
-        ['then']((_0x4d83d2) => {
-          if (_0x2412a7 || _0x16871a !== _0x2b2df0) return;
-          ((_0x5a9767 = _0x4d83d2), (_0x930641 = cache['stale'](_0x4d83d2)));
+      ((enabled2 = !![]), handler());
+      const index = key;
+      cache['ensure'](title)
+        ['then']((result) => {
+          if (enabled3 || index !== key) return;
+          ((value = result), (enabled = cache['stale'](result)));
         })
-        ['catch']((_0x417f68) => {
-          !_0x2412a7 &&
-            _0x16871a === _0x2b2df0 &&
-            ((_0x930641 = !![]), (_0x4fd803 = _0x417f68['message'] || ''));
+        ['catch']((error) => {
+          !enabled3 && index === key && ((enabled = !![]), (item = error['message'] || ''));
         })
         ['finally'](() => {
-          !_0x2412a7 && _0x16871a === _0x2b2df0 && ((_0x4bac4f = ![]), _0x1e0b7f());
+          !enabled3 && index === key && ((enabled2 = ![]), handler());
         });
     },
-    _0xcaa95c = () => {
-      if (_0x2412a7) return;
-      const _0x399fe7 = _0x2e4cc8();
-      (_0x399fe7?.['key'] !== _0xcc9c97?.['key'] &&
-        ((_0x2b2df0 += 0x1),
-        (_0x4bac4f = ![]),
-        (_0x930641 = ![]),
-        (_0x4fd803 = ''),
-        _0x4fc5c6?.['close'](),
-        (_0x5a9767 = _0x399fe7 ? cache['peek'](_0x399fe7) : null)),
-        (_0xcc9c97 = _0x399fe7),
-        _0x1e0b7f(),
-        clearTimeout(_0x109fa8),
-        (_0x109fa8 = setTimeout(_0x10f615, _0xcc9c97?.['debounceMs'] || 0x0)));
+    handler3 = () => {
+      if (enabled3) return;
+      const event = getContext();
+      (event?.['key'] !== title?.['key'] &&
+        ((key += 0x1),
+        (enabled2 = ![]),
+        (enabled = ![]),
+        (item = ''),
+        bindModelPriceDetails2?.['close'](),
+        (value = event ? cache['peek'](event) : null)),
+        (title = event),
+        handler(),
+        clearTimeout(setTimeout2),
+        (setTimeout2 = setTimeout(handler2, title?.['debounceMs'] || 0x0)));
     },
-    _0x382f6f = () => {
-      if (_0x367fbc) return;
-      ((_0x367fbc = !![]),
+    sync2 = () => {
+      if (enabled5) return;
+      ((enabled5 = !![]),
         queueMicrotask(() => {
-          ((_0x367fbc = ![]), _0xcaa95c());
+          ((enabled5 = ![]), handler3());
         }));
     };
-  _0x4fc5c6 = bindModelPriceDetails(_0x35bf72, _0x30a77b, () => {
-    ((_0x1b710c = !![]), _0x10f615());
+  bindModelPriceDetails2 = bindModelPriceDetails(el4, run, () => {
+    ((enabled4 = !![]), handler2());
   });
-  const _0x51c1e1 = _0x3fc1ad['IntersectionObserver']
-    ? new _0x3fc1ad['IntersectionObserver'](([_0x3c9439]) => {
-        _0x1b710c = _0x3c9439['isIntersecting'];
-        if (_0x1b710c) _0xcaa95c();
-        else _0x4fc5c6['close']();
+  const data = el3['IntersectionObserver']
+    ? new el3['IntersectionObserver'](([options]) => {
+        enabled4 = options['isIntersecting'];
+        if (enabled4) handler3();
+        else bindModelPriceDetails2['close']();
       })
     : null;
-  _0x51c1e1?.['observe'](_0x1b2278);
-  const _0x744ea4 = _0x3f923c?.(_0x382f6f);
-  _0x3fc1ad['addEventListener'](API_CONFIG_CHANGED_EVENT, _0x382f6f);
-  const _0x5d496a = onLocaleChange(_0x1e0b7f);
+  data?.['observe'](el);
+  const target = subscribe?.(sync2);
+  el3['addEventListener'](API_CONFIG_CHANGED_EVENT, sync2);
+  const run2 = onLocaleChange(handler);
   return (
-    _0xcaa95c(),
+    handler3(),
     {
-      sync: _0x382f6f,
+      sync: sync2,
       destroy() {
-        ((_0x2412a7 = !![]),
-          (_0x2b2df0 += 0x1),
-          clearTimeout(_0x109fa8),
-          _0x51c1e1?.['disconnect'](),
-          _0x744ea4?.(),
-          _0x5d496a(),
-          _0x3fc1ad['removeEventListener'](API_CONFIG_CHANGED_EVENT, _0x382f6f),
-          _0x4fc5c6['destroy'](),
-          _0x35bf72['remove']());
+        ((enabled3 = !![]),
+          (key += 0x1),
+          clearTimeout(setTimeout2),
+          data?.['disconnect'](),
+          target?.(),
+          run2(),
+          el3['removeEventListener'](API_CONFIG_CHANGED_EVENT, sync2),
+          bindModelPriceDetails2['destroy'](),
+          el4['remove']());
       },
     }
   );

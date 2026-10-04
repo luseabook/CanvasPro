@@ -6,89 +6,89 @@ import {
 } from '../../core/generationResultRenderer.js';
 import { localPathToUrl, pickResultLocalPath } from '../../utils/localMediaPath.js';
 import { t } from '../../i18n/index.js';
-function videoGenerationResultText(_0x23356b, _0x182de6 = {}) {
-  return t('videoGenerationResult.' + _0x23356b, _0x182de6);
+function videoGenerationResultText(value, item = {}) {
+  return t('videoGenerationResult.' + value, item);
 }
-function asObject(_0x5e7372) {
-  return _0x5e7372 && typeof _0x5e7372 === 'object' && !Array.isArray(_0x5e7372) ? _0x5e7372 : null;
+function asObject(key) {
+  return key && typeof key === 'object' && !Array.isArray(key) ? key : null;
 }
-function normalizeVideoGenerationResultItem(_0x39ae4d) {
-  const _0xd34aaf = asObject(_0x39ae4d);
-  if (!_0xd34aaf) throw new Error('[videoGenerationResult] item must be an object');
-  const _0x1b7136 = firstNonEmptyString(_0xd34aaf.localPath, pickResultLocalPath(_0xd34aaf)),
-    _0x53e614 = firstNonEmptyString(
-      _0xd34aaf.videoUrl,
-      _0xd34aaf.url,
-      _0xd34aaf.localUrl,
-      localPathToUrl(_0x1b7136),
+function normalizeVideoGenerationResultItem(index) {
+  const metadata = asObject(index);
+  if (!metadata) throw new Error('[videoGenerationResult] item must be an object');
+  const localPath = firstNonEmptyString(metadata.localPath, pickResultLocalPath(metadata)),
+    videoUrl = firstNonEmptyString(
+      metadata.videoUrl,
+      metadata.url,
+      metadata.localUrl,
+      localPathToUrl(localPath),
     ),
-    _0x43a0f4 = {
-      ..._0xd34aaf,
+    result = {
+      ...metadata,
       outputType: 'video',
-      videoUrl: _0x53e614,
-      localPath: _0x1b7136,
-      thumbUrl: firstNonEmptyString(_0xd34aaf.thumbUrl, _0xd34aaf.posterUrl),
-      thumbId: firstNonEmptyString(_0xd34aaf.thumbId, _0xd34aaf.assetId),
-      metadata: _0xd34aaf.metadata && typeof _0xd34aaf.metadata === 'object' ? { ..._0xd34aaf.metadata } : {},
+      videoUrl: videoUrl,
+      localPath: localPath,
+      thumbUrl: firstNonEmptyString(metadata.thumbUrl, metadata.posterUrl),
+      thumbId: firstNonEmptyString(metadata.thumbId, metadata.assetId),
+      metadata: metadata.metadata && typeof metadata.metadata === 'object' ? { ...metadata.metadata } : {},
     },
-    _0x44b593 = firstNonEmptyString(_0xd34aaf.error);
-  if (_0x44b593) _0x43a0f4.error = _0x44b593;
-  return _0x43a0f4;
+    nonEmptyString = firstNonEmptyString(metadata.error);
+  if (nonEmptyString) result.error = nonEmptyString;
+  return result;
 }
-function removeMediaFieldPatch(_0x4f9d12) {
-  if (!_0x4f9d12 || typeof _0x4f9d12 !== 'object') return _0x4f9d12;
-  for (const _0x270c25 of ['videoUrl', 'localPath', 'thumbId', 'thumbUrl']) {
-    delete _0x4f9d12[_0x270c25];
+function removeMediaFieldPatch(enabled) {
+  if (!enabled || typeof enabled !== 'object') return enabled;
+  for (const data of ['videoUrl', 'localPath', 'thumbId', 'thumbUrl']) {
+    delete enabled[data];
   }
-  return _0x4f9d12;
+  return enabled;
 }
-export function normalizeVideoGenerationResult(_0x2cf4c3) {
-  const _0x2557f9 = normalizeGenerationResultItems(_0x2cf4c3, {
+export function normalizeVideoGenerationResult(options) {
+  const items = normalizeGenerationResultItems(options, {
     collectionField: 'videos',
     singleItemFields: ['videoUrl', 'url', 'localUrl', 'localPath', 'thumbUrl'],
   });
-  if (_0x2557f9.length === 0) return { outputType: 'video', items: [] };
+  if (items.length === 0) return { outputType: 'video', items: [] };
   return {
     outputType: 'video',
-    items: _0x2557f9.map((_0xca2d9b) => normalizeVideoGenerationResultItem(_0xca2d9b)),
+    items: items.map((item2) => normalizeVideoGenerationResultItem(item2)),
   };
 }
-export function getVideoGenerationResultError(_0x45aa84) {
+export function getVideoGenerationResultError(target) {
   return getFirstGenerationResultError(
-    _0x45aa84?.outputType === 'video' && Array.isArray(_0x45aa84.items) ? _0x45aa84.items : _0x45aa84,
+    target?.outputType === 'video' && Array.isArray(target.items) ? target.items : target,
     { collectionField: 'videos', singleItemFields: ['videoUrl', 'url', 'localUrl', 'localPath', 'thumbUrl'] },
   );
 }
-export function getSuccessfulVideoGenerationItems(_0x29dd88) {
-  const _0x2b56ac =
-    _0x29dd88?.outputType === 'video' && Array.isArray(_0x29dd88.items)
-      ? _0x29dd88
-      : normalizeVideoGenerationResult(_0x29dd88);
-  return _0x2b56ac.items.filter((_0x435ad7) => _0x435ad7 && !_0x435ad7.error);
+export function getSuccessfulVideoGenerationItems(source) {
+  const next =
+    source?.outputType === 'video' && Array.isArray(source.items)
+      ? source
+      : normalizeVideoGenerationResult(source);
+  return next.items.filter((enabled2) => enabled2 && !enabled2.error);
 }
 export function buildVideoGenerationResultPatch(
-  _0x322d19,
+  current,
   { startedAt: startedAt = 0, duration: duration = null } = {},
 ) {
-  const _0x1315b5 =
-    _0x322d19?.outputType === 'video' && Array.isArray(_0x322d19.items)
-      ? _0x322d19
-      : normalizeVideoGenerationResult(_0x322d19);
-  return buildGenerationCollectionResultPatch(_0x1315b5, {
+  const entry =
+    current?.outputType === 'video' && Array.isArray(current.items)
+      ? current
+      : normalizeVideoGenerationResult(current);
+  return buildGenerationCollectionResultPatch(entry, {
     collectionField: 'videos',
     mainIndexField: 'mainVideoIndex',
     expandedField: 'isVideosExpanded',
     startedAt: startedAt,
     duration: duration,
-    buildFirstItemPatch: (_0x488fd9) => ({
-      videoUrl: _0x488fd9.videoUrl,
-      localPath: _0x488fd9.localPath,
-      displayLocalPath: _0x488fd9.displayLocalPath || '',
-      posterLocalPath: _0x488fd9.posterLocalPath || '',
-      videoProxyStatus: _0x488fd9.videoProxyStatus || '',
-      videoCodec: _0x488fd9.videoCodec || '',
-      thumbId: _0x488fd9.thumbId,
-      thumbUrl: _0x488fd9.thumbUrl,
+    buildFirstItemPatch: (videoUrl2) => ({
+      videoUrl: videoUrl2.videoUrl,
+      localPath: videoUrl2.localPath,
+      displayLocalPath: videoUrl2.displayLocalPath || '',
+      posterLocalPath: videoUrl2.posterLocalPath || '',
+      videoProxyStatus: videoUrl2.videoProxyStatus || '',
+      videoCodec: videoUrl2.videoCodec || '',
+      thumbId: videoUrl2.thumbId,
+      thumbUrl: videoUrl2.thumbUrl,
     }),
     extraPatch: { rhStatusMessage: null, rhStatusCode: null },
   });
@@ -99,9 +99,9 @@ export function buildVideoGenerationFailurePatch({
   duration: duration = null,
   clearMediaFields: clearMediaFields = true,
 } = {}) {
-  const _0x3ab4d0 = firstNonEmptyString(error, videoGenerationResultText('failed')),
-    _0x57e864 = buildGenerationCollectionResultPatch(
-      { outputType: 'video', items: [{ error: _0x3ab4d0, thumbUrl: '', videoUrl: '', localPath: '' }] },
+  const error2 = firstNonEmptyString(error, videoGenerationResultText('failed')),
+    generationCollectionResultPatch = buildGenerationCollectionResultPatch(
+      { outputType: 'video', items: [{ error: error2, thumbUrl: '', videoUrl: '', localPath: '' }] },
       {
         collectionField: 'videos',
         mainIndexField: 'mainVideoIndex',
@@ -110,5 +110,7 @@ export function buildVideoGenerationFailurePatch({
         buildFirstItemPatch: () => ({ videoUrl: '', localPath: '', thumbId: '', thumbUrl: '' }),
       },
     );
-  return clearMediaFields ? _0x57e864 : removeMediaFieldPatch(_0x57e864);
+  return clearMediaFields
+    ? generationCollectionResultPatch
+    : removeMediaFieldPatch(generationCollectionResultPatch);
 }

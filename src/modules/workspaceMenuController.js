@@ -1,128 +1,112 @@
-function getEnabledOptions(_0xd097fc, _0x4ad817) {
-  return Array['from'](_0xd097fc?.['querySelectorAll']?.(_0x4ad817) || [])['filter'](
-    (_0x317459) =>
-      _0x317459?.['disabled'] !== !![] && _0x317459?.['getAttribute']?.('aria-disabled') !== 'true',
+function getEnabledOptions(el, value) {
+  return Array['from'](el?.['querySelectorAll']?.(value) || [])['filter'](
+    (el2) => el2?.['disabled'] !== !![] && el2?.['getAttribute']?.('aria-disabled') !== 'true',
   );
 }
-function focusMenuOption(_0x182c3c) {
+function focusMenuOption(el3) {
   try {
-    _0x182c3c?.['focus']?.({ preventScroll: !![] });
+    el3?.['focus']?.({ preventScroll: !![] });
   } catch {
-    _0x182c3c?.['focus']?.();
+    el3?.['focus']?.();
   }
-  if (!_0x182c3c?.['ownerDocument'] || _0x182c3c['ownerDocument']['activeElement'] === _0x182c3c) return;
-  const _0x380bc7 = _0x182c3c['ownerDocument']['defaultView'],
-    _0x323c0a = () => {
+  if (!el3?.['ownerDocument'] || el3['ownerDocument']['activeElement'] === el3) return;
+  const item = el3['ownerDocument']['defaultView'],
+    handler = () => {
       try {
-        _0x182c3c?.['focus']?.({ preventScroll: !![] });
+        el3?.['focus']?.({ preventScroll: !![] });
       } catch {
-        _0x182c3c?.['focus']?.();
+        el3?.['focus']?.();
       }
     };
-  _0x380bc7?.['requestAnimationFrame']?.(() => {
-    _0x323c0a();
-    if (_0x182c3c['ownerDocument']['activeElement'] === _0x182c3c) return;
-    _0x380bc7?.['requestAnimationFrame']?.(_0x323c0a);
+  item?.['requestAnimationFrame']?.(() => {
+    handler();
+    if (el3['ownerDocument']['activeElement'] === el3) return;
+    item?.['requestAnimationFrame']?.(handler);
   });
 }
-export function syncWorkspaceInlineMenuExpandedWidth(_0x361a64) {
-  const _0x267964 = Math['ceil'](Number(_0x361a64?.['scrollWidth']) || 0x0);
-  if (_0x267964 <= 0x0) return 0x0;
-  return (
-    _0x361a64['style']?.['setProperty']?.('--workspace-inline-menu-expanded-width', _0x267964 + 'px'),
-    _0x267964
-  );
+export function syncWorkspaceInlineMenuExpandedWidth(el4) {
+  const count = Math['ceil'](Number(el4?.['scrollWidth']) || 0x0);
+  if (count <= 0x0) return 0x0;
+  return (el4['style']?.['setProperty']?.('--workspace-inline-menu-expanded-width', count + 'px'), count);
 }
 export function createWorkspaceMenuController({
-  root: _0x47cdb9,
-  wrapperSelector: _0x2ffc15,
-  triggerSelector: _0x511e59,
-  menuSelector: _0x35711a,
-  optionSelector: _0x16d440,
+  root: root,
+  wrapperSelector: wrapperSelector,
+  triggerSelector: triggerSelector,
+  menuSelector: menuSelector,
+  optionSelector: optionSelector,
   openClass: openClass = 'is-open',
 } = {}) {
-  const _0x41bb2d = () => (typeof _0x47cdb9 === 'function' ? _0x47cdb9() : _0x47cdb9),
-    _0x44d971 = (_0x3eb616 = null) => {
-      _0x41bb2d()
-        ?.['querySelectorAll']?.(_0x2ffc15)
-        ?.['forEach']?.((_0x5e26c5) => {
-          if (_0x5e26c5 === _0x3eb616 || !_0x5e26c5['classList']?.['contains']?.(openClass)) return;
-          (_0x5e26c5['classList']?.['remove']?.(openClass),
-            _0x5e26c5['querySelector']?.(_0x511e59)?.['setAttribute']?.('aria-expanded', 'false'),
-            _0x5e26c5['querySelector']?.(_0x35711a)?.['setAttribute']?.('aria-hidden', 'true'));
+  const run = () => (typeof root === 'function' ? root() : root),
+    close = (value2 = null) => {
+      run()
+        ?.['querySelectorAll']?.(wrapperSelector)
+        ?.['forEach']?.((el5) => {
+          if (el5 === value2 || !el5['classList']?.['contains']?.(openClass)) return;
+          (el5['classList']?.['remove']?.(openClass),
+            el5['querySelector']?.(triggerSelector)?.['setAttribute']?.('aria-expanded', 'false'),
+            el5['querySelector']?.(menuSelector)?.['setAttribute']?.('aria-hidden', 'true'));
         });
     },
-    _0x1d7099 = (_0x3594f3, _0x3e4c8b = _0x3594f3?.['querySelector']?.(_0x511e59)) => {
-      const _0x3cc3b5 = _0x3594f3?.['querySelector']?.(_0x35711a);
-      if (!_0x3594f3 || !_0x3e4c8b || !_0x3cc3b5 || _0x3e4c8b['disabled'] === !![]) return ![];
+    open = (el6, el7 = el6?.['querySelector']?.(triggerSelector)) => {
+      const el8 = el6?.['querySelector']?.(menuSelector);
+      if (!el6 || !el7 || !el8 || el7['disabled'] === !![]) return ![];
       return (
-        _0x44d971(_0x3594f3),
-        _0x3594f3['classList']?.['add']?.(openClass),
-        _0x3e4c8b['setAttribute']?.('aria-expanded', 'true'),
-        _0x3cc3b5['setAttribute']?.('aria-hidden', 'false'),
+        close(el6),
+        el6['classList']?.['add']?.(openClass),
+        el7['setAttribute']?.('aria-expanded', 'true'),
+        el8['setAttribute']?.('aria-hidden', 'false'),
         !![]
       );
     },
-    _0x34f5dc = (_0x2edd69) => {
-      const _0x126885 = _0x2edd69?.['closest']?.(_0x2ffc15);
-      if (!_0x126885 || _0x2edd69?.['disabled'] === !![]) return ![];
-      if (_0x126885['classList']?.['contains']?.(openClass)) return (_0x44d971(), ![]);
-      return _0x1d7099(_0x126885, _0x2edd69);
+    toggle = (el9) => {
+      const el10 = el9?.['closest']?.(wrapperSelector);
+      if (!el10 || el9?.['disabled'] === !![]) return ![];
+      if (el10['classList']?.['contains']?.(openClass)) return (close(), ![]);
+      return open(el10, el9);
     },
-    _0x406df1 = (_0x232923) => {
-      const _0x2f281b = _0x232923?.['target']?.['closest']?.(_0x511e59),
-        _0xa9b85e = _0x232923?.['target']?.['closest']?.(_0x16d440);
-      if (_0x2f281b && ['ArrowDown', 'ArrowUp']['includes'](_0x232923['key'])) {
-        const _0x50a988 = _0x2f281b['closest']?.(_0x2ffc15),
-          _0x1ab783 = getEnabledOptions(_0x50a988, _0x16d440);
-        if (!_0x1d7099(_0x50a988, _0x2f281b)) return ![];
+    handleKeyDown = (event) => {
+      const el11 = event?.['target']?.['closest']?.(triggerSelector),
+        el12 = event?.['target']?.['closest']?.(optionSelector);
+      if (el11 && ['ArrowDown', 'ArrowUp']['includes'](event['key'])) {
+        const key = el11['closest']?.(wrapperSelector),
+          list = getEnabledOptions(key, optionSelector);
+        if (!open(key, el11)) return ![];
         return (
-          _0x232923['preventDefault']?.(),
-          _0x232923['stopPropagation']?.(),
-          focusMenuOption(_0x1ab783[_0x232923['key'] === 'ArrowUp' ? _0x1ab783['length'] - 0x1 : 0x0]),
+          event['preventDefault']?.(),
+          event['stopPropagation']?.(),
+          focusMenuOption(list[event['key'] === 'ArrowUp' ? list['length'] - 0x1 : 0x0]),
           !![]
         );
       }
-      const _0x4cba15 = _0xa9b85e?.['closest']?.(_0x2ffc15) || _0x2f281b?.['closest']?.(_0x2ffc15);
-      if (_0x2f281b && _0x232923['key'] === 'Escape' && _0x4cba15?.['classList']?.['contains']?.(openClass))
+      const el13 = el12?.['closest']?.(wrapperSelector) || el11?.['closest']?.(wrapperSelector);
+      if (el11 && event['key'] === 'Escape' && el13?.['classList']?.['contains']?.(openClass))
+        return (event['preventDefault']?.(), event['stopPropagation']?.(), close(), el11['focus']?.(), !![]);
+      if (!el12 || !el13) return ![];
+      if (event['key'] === 'Escape')
         return (
-          _0x232923['preventDefault']?.(),
-          _0x232923['stopPropagation']?.(),
-          _0x44d971(),
-          _0x2f281b['focus']?.(),
+          event['preventDefault']?.(),
+          event['stopPropagation']?.(),
+          close(),
+          el13['querySelector']?.(triggerSelector)?.['focus']?.(),
           !![]
         );
-      if (!_0xa9b85e || !_0x4cba15) return ![];
-      if (_0x232923['key'] === 'Escape')
-        return (
-          _0x232923['preventDefault']?.(),
-          _0x232923['stopPropagation']?.(),
-          _0x44d971(),
-          _0x4cba15['querySelector']?.(_0x511e59)?.['focus']?.(),
-          !![]
-        );
-      const _0x1e28a6 = getEnabledOptions(_0x4cba15, _0x16d440),
-        _0x18a6cd = _0x1e28a6['indexOf'](_0xa9b85e);
-      if (_0x18a6cd < 0x0 || !_0x1e28a6['length']) return ![];
-      let _0x8241bb = _0x18a6cd;
-      if (_0x232923['key'] === 'ArrowDown') _0x8241bb = (_0x18a6cd + 0x1) % _0x1e28a6['length'];
+      const list2 = getEnabledOptions(el13, optionSelector),
+        count2 = list2['indexOf'](el12);
+      if (count2 < 0x0 || !list2['length']) return ![];
+      let index = count2;
+      if (event['key'] === 'ArrowDown') index = (count2 + 0x1) % list2['length'];
       else {
-        if (_0x232923['key'] === 'ArrowUp')
-          _0x8241bb = (_0x18a6cd - 0x1 + _0x1e28a6['length']) % _0x1e28a6['length'];
+        if (event['key'] === 'ArrowUp') index = (count2 - 0x1 + list2['length']) % list2['length'];
         else {
-          if (_0x232923['key'] === 'Home') _0x8241bb = 0x0;
+          if (event['key'] === 'Home') index = 0x0;
           else {
-            if (_0x232923['key'] === 'End') _0x8241bb = _0x1e28a6['length'] - 0x1;
+            if (event['key'] === 'End') index = list2['length'] - 0x1;
             else return ![];
           }
         }
       }
-      return (
-        _0x232923['preventDefault']?.(),
-        _0x232923['stopPropagation']?.(),
-        focusMenuOption(_0x1e28a6[_0x8241bb]),
-        !![]
-      );
+      return (event['preventDefault']?.(), event['stopPropagation']?.(), focusMenuOption(list2[index]), !![]);
     };
-  return Object['freeze']({ close: _0x44d971, open: _0x1d7099, toggle: _0x34f5dc, handleKeyDown: _0x406df1 });
+  return Object['freeze']({ close: close, open: open, toggle: toggle, handleKeyDown: handleKeyDown });
 }

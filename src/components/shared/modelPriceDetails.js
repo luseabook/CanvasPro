@@ -2,132 +2,124 @@ import { computeTooltipPosition } from '../../modules/tooltipUnifier.js';
 import { formatPrice, priceText } from '../../services/modelPricingText.js';
 import { registerEscapeScope } from '../../services/escapeScope.js';
 let nextId = 0x0;
-export function bindModelPriceDetails(_0x411619, _0x368f53, _0x24c201) {
-  const _0x1133e6 = _0x411619['ownerDocument'],
-    _0x3b63d6 = _0x1133e6['defaultView'];
-  let _0x4c1d7a = null,
-    _0x57303f = null,
-    _0x50cb1a = ![],
-    _0x225716 = null;
-  const _0x2dcc9f = 'model-price-details-' + ++nextId,
-    _0x9b1cea = () => {
-      if (!_0x4c1d7a) return;
-      const _0x375807 = computeTooltipPosition(
-        _0x411619['getBoundingClientRect'](),
-        _0x4c1d7a['getBoundingClientRect'](),
-        { width: _0x3b63d6['innerWidth'], height: _0x3b63d6['innerHeight'] },
-      );
-      ((_0x4c1d7a['style']['left'] = _0x375807['left'] + 'px'),
-        (_0x4c1d7a['style']['top'] = _0x375807['top'] + 'px'));
+export function bindModelPriceDetails(el, handler, handler2) {
+  const el2 = el['ownerDocument'],
+    width = el2['defaultView'];
+  let el3 = null,
+    setTimeout2 = null,
+    enabled = ![],
+    registerEscapeScope2 = null;
+  const value = 'model-price-details-' + ++nextId,
+    handler3 = () => {
+      if (!el3) return;
+      const box = computeTooltipPosition(el['getBoundingClientRect'](), el3['getBoundingClientRect'](), {
+        width: width['innerWidth'],
+        height: width['innerHeight'],
+      });
+      ((el3['style']['left'] = box['left'] + 'px'), (el3['style']['top'] = box['top'] + 'px'));
     },
-    _0x22cf44 = () => {
-      (clearTimeout(_0x57303f),
-        (_0x50cb1a = ![]),
-        _0x225716?.(),
-        (_0x225716 = null),
-        _0x4c1d7a?.['remove'](),
-        (_0x4c1d7a = null),
-        _0x411619['setAttribute']('aria-expanded', 'false'),
-        _0x3b63d6['removeEventListener']('resize', _0x9b1cea),
-        _0x3b63d6['removeEventListener']('scroll', _0x9b1cea, !![]),
-        _0x1133e6['removeEventListener']('pointerdown', _0x534db1, !![]));
+    close = () => {
+      (clearTimeout(setTimeout2),
+        (enabled = ![]),
+        registerEscapeScope2?.(),
+        (registerEscapeScope2 = null),
+        el3?.['remove'](),
+        (el3 = null),
+        el['setAttribute']('aria-expanded', 'false'),
+        width['removeEventListener']('resize', handler3),
+        width['removeEventListener']('scroll', handler3, !![]),
+        el2['removeEventListener']('pointerdown', item, !![]));
     },
-    _0x534db1 = (_0xc4a0) => {
-      if (!_0x411619['contains'](_0xc4a0['target']) && !_0x4c1d7a?.['contains'](_0xc4a0['target']))
-        _0x22cf44();
+    item = (event) => {
+      if (!el['contains'](event['target']) && !el3?.['contains'](event['target'])) close();
     },
-    _0x5ba715 = () => {
-      if (!_0x50cb1a) _0x57303f = setTimeout(_0x22cf44, 0xb4);
+    key = () => {
+      if (!enabled) setTimeout2 = setTimeout(close, 0xb4);
     },
-    _0x51471a = () => clearTimeout(_0x57303f),
-    _0x572ba4 = () => {
-      if (!_0x4c1d7a) return;
-      const _0x5dfc48 = _0x368f53(),
-        _0x16cee4 = _0x4c1d7a['scrollTop'],
-        _0x501db2 = _0x1133e6['createDocumentFragment'](),
-        _0x4c6496 = (_0x234a6b, _0xb36c08, _0x47d876) => {
-          const _0x1ec1d9 = _0x1133e6['createElement'](_0x234a6b);
-          _0x1ec1d9['textContent'] = _0xb36c08;
-          if (_0x47d876) _0x1ec1d9['className'] = _0x47d876;
-          return (_0x501db2['appendChild'](_0x1ec1d9), _0x1ec1d9);
+    handler4 = () => clearTimeout(setTimeout2),
+    render = () => {
+      if (!el3) return;
+      const response = handler(),
+        index = el3['scrollTop'],
+        el4 = el2['createDocumentFragment'](),
+        handler5 = (result, data, options) => {
+          const el5 = el2['createElement'](result);
+          el5['textContent'] = data;
+          if (options) el5['className'] = options;
+          return (el4['appendChild'](el5), el5);
         };
-      _0x4c6496('strong', _0x5dfc48['title'], 'model-price-details-title');
-      if (_0x5dfc48['status']) _0x4c6496('p', _0x5dfc48['status'], 'model-price-details-note');
-      if (_0x5dfc48['estimate'] !== null && _0x5dfc48['estimate'] !== undefined)
-        _0x4c6496(
-          'p',
-          priceText('total') + '\x20' + formatPrice(_0x5dfc48['estimate'], _0x5dfc48['currency']),
-        );
-      let _0x2f78da = null;
-      for (const _0x54a1f2 of _0x5dfc48['rows'] || []) {
-        if (_0x54a1f2['section'] && _0x54a1f2['section'] !== _0x2f78da)
-          _0x4c6496('p', _0x54a1f2['section'], 'model-price-details-section');
-        _0x2f78da = _0x54a1f2['section'];
-        const _0x50664f = _0x4c6496('div', '', 'model-price-details-row'),
-          _0x3fd51b = _0x1133e6['createElement']('span');
-        _0x3fd51b['textContent'] = _0x54a1f2['label'];
-        const _0x17f0aa = _0x1133e6['createElement']('span');
-        ((_0x17f0aa['textContent'] =
-          formatPrice(_0x54a1f2['amount'], _0x54a1f2['currency'] || _0x5dfc48['currency']) +
-          ' · ' +
-          _0x54a1f2['unit']),
-          _0x50664f['append'](_0x3fd51b, _0x17f0aa));
+      handler5('strong', response['title'], 'model-price-details-title');
+      if (response['status']) handler5('p', response['status'], 'model-price-details-note');
+      if (response['estimate'] !== null && response['estimate'] !== undefined)
+        handler5('p', priceText('total') + '\x20' + formatPrice(response['estimate'], response['currency']));
+      let target = null;
+      for (const source of response['rows'] || []) {
+        if (source['section'] && source['section'] !== target)
+          handler5('p', source['section'], 'model-price-details-section');
+        target = source['section'];
+        const next = handler5('div', '', 'model-price-details-row'),
+          el6 = el2['createElement']('span');
+        el6['textContent'] = source['label'];
+        const el7 = el2['createElement']('span');
+        ((el7['textContent'] =
+          formatPrice(source['amount'], source['currency'] || response['currency']) + ' · ' + source['unit']),
+          next['append'](el6, el7));
       }
-      for (const _0x4a24b7 of _0x5dfc48['notes'] || []) _0x4c6496('p', _0x4a24b7, 'model-price-details-note');
-      (_0x4c1d7a['replaceChildren'](_0x501db2), (_0x4c1d7a['scrollTop'] = _0x16cee4), _0x9b1cea());
+      for (const current of response['notes'] || []) handler5('p', current, 'model-price-details-note');
+      (el3['replaceChildren'](el4), (el3['scrollTop'] = index), handler3());
     },
-    _0x377c6e = () => {
-      _0x51471a();
-      if (_0x411619['hidden']) return;
-      (!_0x4c1d7a &&
-        ((_0x4c1d7a = _0x1133e6['createElement']('div')),
-        (_0x4c1d7a['id'] = _0x2dcc9f),
-        (_0x4c1d7a['className'] = 'model-price-details'),
-        _0x4c1d7a['setAttribute']('role', 'region'),
-        _0x4c1d7a['setAttribute']('aria-label', priceText('price')),
-        (_0x4c1d7a['tabIndex'] = 0x0),
-        _0x4c1d7a['addEventListener']('mouseenter', _0x51471a),
-        _0x4c1d7a['addEventListener']('mouseleave', _0x5ba715),
-        _0x4c1d7a['addEventListener']('focusin', _0x51471a),
-        _0x4c1d7a['addEventListener']('focusout', _0x5ba715),
-        _0x1133e6['body']['appendChild'](_0x4c1d7a),
-        _0x411619['setAttribute']('aria-expanded', 'true'),
-        _0x3b63d6['addEventListener']('resize', _0x9b1cea),
-        _0x3b63d6['addEventListener']('scroll', _0x9b1cea, !![]),
-        _0x1133e6['addEventListener']('pointerdown', _0x534db1, !![]),
-        (_0x225716 = registerEscapeScope(() => {
-          (_0x411619['focus']({ preventScroll: !![] }), _0x22cf44());
+    handler6 = () => {
+      handler4();
+      if (el['hidden']) return;
+      (!el3 &&
+        ((el3 = el2['createElement']('div')),
+        (el3['id'] = value),
+        (el3['className'] = 'model-price-details'),
+        el3['setAttribute']('role', 'region'),
+        el3['setAttribute']('aria-label', priceText('price')),
+        (el3['tabIndex'] = 0x0),
+        el3['addEventListener']('mouseenter', handler4),
+        el3['addEventListener']('mouseleave', key),
+        el3['addEventListener']('focusin', handler4),
+        el3['addEventListener']('focusout', key),
+        el2['body']['appendChild'](el3),
+        el['setAttribute']('aria-expanded', 'true'),
+        width['addEventListener']('resize', handler3),
+        width['addEventListener']('scroll', handler3, !![]),
+        el2['addEventListener']('pointerdown', item, !![]),
+        (registerEscapeScope2 = registerEscapeScope(() => {
+          (el['focus']({ preventScroll: !![] }), close());
         }))),
-        _0x572ba4(),
-        _0x24c201());
+        render(),
+        handler2());
     },
-    _0x32541a = (_0x272a92) => {
-      (_0x272a92['preventDefault'](), _0x272a92['stopPropagation'](), _0x377c6e(), (_0x50cb1a = !![]));
+    entry = (event2) => {
+      (event2['preventDefault'](), event2['stopPropagation'](), handler6(), (enabled = !![]));
     },
-    _0x224e28 = (_0x54acbd) => _0x54acbd['stopPropagation']();
+    record = (event3) => event3['stopPropagation']();
   return (
-    _0x411619['setAttribute']('aria-controls', _0x2dcc9f),
-    _0x411619['setAttribute']('aria-expanded', 'false'),
-    _0x411619['addEventListener']('mouseenter', _0x377c6e),
-    _0x411619['addEventListener']('mouseleave', _0x5ba715),
-    _0x411619['addEventListener']('focus', _0x377c6e),
-    _0x411619['addEventListener']('blur', _0x5ba715),
-    _0x411619['addEventListener']('click', _0x32541a),
-    _0x411619['addEventListener']('pointerdown', _0x224e28),
+    el['setAttribute']('aria-controls', value),
+    el['setAttribute']('aria-expanded', 'false'),
+    el['addEventListener']('mouseenter', handler6),
+    el['addEventListener']('mouseleave', key),
+    el['addEventListener']('focus', handler6),
+    el['addEventListener']('blur', key),
+    el['addEventListener']('click', entry),
+    el['addEventListener']('pointerdown', record),
     {
-      render: _0x572ba4,
-      close: _0x22cf44,
+      render: render,
+      close: close,
       destroy() {
-        _0x22cf44();
-        for (const [_0x25772d, _0x459785] of [
-          ['mouseenter', _0x377c6e],
-          ['mouseleave', _0x5ba715],
-          ['focus', _0x377c6e],
-          ['blur', _0x5ba715],
-          ['click', _0x32541a],
-          ['pointerdown', _0x224e28],
+        close();
+        for (const [payload, handle] of [
+          ['mouseenter', handler6],
+          ['mouseleave', key],
+          ['focus', handler6],
+          ['blur', key],
+          ['click', entry],
+          ['pointerdown', record],
         ])
-          _0x411619['removeEventListener'](_0x25772d, _0x459785);
+          el['removeEventListener'](payload, handle);
       },
     }
   );

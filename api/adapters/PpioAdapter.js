@@ -25,119 +25,116 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
     Object.freeze({ label: '4:5', w: 4, h: 5 }),
     Object.freeze({ label: '21:9', w: 21, h: 9 }),
   ]),
-  PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS.map((_0x32e0e1) => _0x32e0e1.label));
-function normalizePpioQuality(_0x2c0244) {
-  const _0x277a0c = String(_0x2c0244 || '')
+  PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS.map((item) => item.label));
+function normalizePpioQuality(value) {
+  const key = String(value || '')
     .trim()
     .toUpperCase();
-  return PPIO_QUALITY_PIXEL_MAP[_0x277a0c] ? _0x277a0c : PPIO_DEFAULT_QUALITY;
+  return PPIO_QUALITY_PIXEL_MAP[key] ? key : PPIO_DEFAULT_QUALITY;
 }
-function normalizePpioAspectRatioLabel(_0x28c198) {
-  const _0x3262a8 = String(_0x28c198 || '').trim();
-  if (!_0x3262a8) return PPIO_DEFAULT_RATIO;
-  const _0x299b01 = _0x3262a8.replace(/[：∶]/g, ':').replace(/\s+/g, ''),
-    _0x56807e = _0x299b01.toLowerCase();
-  if (_0x56807e === 'auto' || _0x56807e === 'adaptive' || _0x299b01 === '自适应' || _0x299b01 === '默认')
+function normalizePpioAspectRatioLabel(index) {
+  const enabled = String(index || '').trim();
+  if (!enabled) return PPIO_DEFAULT_RATIO;
+  const list = enabled.replace(/[：∶]/g, ':').replace(/\s+/g, ''),
+    result = list.toLowerCase();
+  if (result === 'auto' || result === 'adaptive' || list === '自适应' || list === '默认')
     return PPIO_DEFAULT_RATIO;
-  if (!_0x299b01.includes(':')) return PPIO_DEFAULT_RATIO;
-  const [_0x162ccd, _0x2d823f] = _0x299b01.split(':'),
-    _0x57730d = Number.parseFloat(_0x162ccd),
-    _0x3ff2c7 = Number.parseFloat(_0x2d823f);
-  if (!(_0x57730d > 0 && _0x3ff2c7 > 0)) return PPIO_DEFAULT_RATIO;
-  const _0x369169 = pickClosestRatio(_0x57730d, _0x3ff2c7, PPIO_RATIO_OPTIONS);
-  return PPIO_RATIO_LABEL_SET.has(_0x369169) ? _0x369169 : PPIO_DEFAULT_RATIO;
+  if (!list.includes(':')) return PPIO_DEFAULT_RATIO;
+  const [data, options] = list.split(':'),
+    count = Number.parseFloat(data),
+    count2 = Number.parseFloat(options);
+  if (!(count > 0 && count2 > 0)) return PPIO_DEFAULT_RATIO;
+  const closestRatio = pickClosestRatio(count, count2, PPIO_RATIO_OPTIONS);
+  return PPIO_RATIO_LABEL_SET.has(closestRatio) ? closestRatio : PPIO_DEFAULT_RATIO;
 }
-function calculatePpioSizeFromTargetPixels(_0x400c0b, _0x20bccc) {
-  const [_0x243d49, _0x47a0ad] = String(_0x20bccc || PPIO_DEFAULT_RATIO).split(':'),
-    _0xe87be4 = Number.parseFloat(_0x243d49) || 1,
-    _0x2f4d22 = Number.parseFloat(_0x47a0ad) || 1,
-    _0x51c6cf = Math.max(PPIO_MIN_RATIO, Math.min(PPIO_MAX_RATIO, _0xe87be4 / _0x2f4d22)),
-    _0x5d047f = Math.max(
+function calculatePpioSizeFromTargetPixels(target, source) {
+  const [next, current] = String(source || PPIO_DEFAULT_RATIO).split(':'),
+    entry = Number.parseFloat(next) || 1,
+    record = Number.parseFloat(current) || 1,
+    payload = Math.max(PPIO_MIN_RATIO, Math.min(PPIO_MAX_RATIO, entry / record)),
+    handle = Math.max(
       PPIO_MIN_PIXELS,
-      Math.min(PPIO_MAX_PIXELS, Number(_0x400c0b) || PPIO_QUALITY_PIXEL_MAP['2K']),
+      Math.min(PPIO_MAX_PIXELS, Number(target) || PPIO_QUALITY_PIXEL_MAP['2K']),
     );
-  let _0x175035 = Math.round(Math.sqrt(_0x5d047f / _0x51c6cf)),
-    _0x5f0587 = Math.round(_0x175035 * _0x51c6cf);
+  let state = Math.round(Math.sqrt(handle / payload)),
+    config = Math.round(state * payload);
   return (
-    (_0x5f0587 = Math.max(PPIO_ALIGN_STEP, Math.round(_0x5f0587 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
-    (_0x175035 = Math.max(PPIO_ALIGN_STEP, Math.round(_0x175035 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
-    _0x5f0587 + 'x' + _0x175035
+    (config = Math.max(PPIO_ALIGN_STEP, Math.round(config / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
+    (state = Math.max(PPIO_ALIGN_STEP, Math.round(state / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
+    config + 'x' + state
   );
 }
 function buildPpioSizeTable() {
-  const _0x4ae2d9 = Object.entries(PPIO_QUALITY_PIXEL_MAP).map(([_0x45fed8, _0x42a47f]) => {
-    const _0x480404 = PPIO_RATIO_OPTIONS.map((_0x57b577) => [
-      _0x57b577.label,
-      calculatePpioSizeFromTargetPixels(_0x42a47f, _0x57b577.label),
+  const scope = Object.entries(PPIO_QUALITY_PIXEL_MAP).map(([input, output]) => {
+    const value2 = PPIO_RATIO_OPTIONS.map((item2) => [
+      item2.label,
+      calculatePpioSizeFromTargetPixels(output, item2.label),
     ]);
-    return [_0x45fed8, Object.freeze(Object.fromEntries(_0x480404))];
+    return [input, Object.freeze(Object.fromEntries(value2))];
   });
-  return Object.freeze(Object.fromEntries(_0x4ae2d9));
+  return Object.freeze(Object.fromEntries(scope));
 }
 const PPIO_SIZE_TABLE = buildPpioSizeTable();
-function resolvePpioSize(_0x240ecc, _0x16b3e8) {
-  const _0x5d9e36 = normalizePpioQuality(_0x240ecc),
-    _0x31f3e7 = normalizePpioAspectRatioLabel(_0x16b3e8);
+function resolvePpioSize(value3, value4) {
+  const ppioQuality = normalizePpioQuality(value3),
+    ppioAspectRatioLabel = normalizePpioAspectRatioLabel(value4);
   return (
-    PPIO_SIZE_TABLE?.[_0x5d9e36]?.[_0x31f3e7] ||
+    PPIO_SIZE_TABLE?.[ppioQuality]?.[ppioAspectRatioLabel] ||
     PPIO_SIZE_TABLE?.[PPIO_DEFAULT_QUALITY]?.[PPIO_DEFAULT_RATIO] ||
     PPIO_DEFAULT_SIZE
   );
 }
-async function buildPpioSeedreamRequest(_0x132434, _0x45f150, _0xe87ef3, _0x5c04bf, _0x13d763 = {}) {
-  const { imageField: imageField = 'image', supportBatch: supportBatch = false } = _0x13d763,
-    _0x23af95 = _0x5c04bf.getProviderConfig('ppio'),
-    _0x5080a3 = _0x23af95.apiUrl.replace(/\/+$/, ''),
-    _0x2b18f8 = _0x23af95.apiKey || _0x45f150.apiKey;
-  if (!_0x2b18f8) throw new Error('PPIO API Key 未配置，无法发起图像生成请求');
-  const _0x178668 = _0x5c04bf.getProviderConfig('grsai'),
-    _0x2c3783 = _0x178668.apiKey || _0x45f150.apiKey,
-    _0x46a917 = await _0x5c04bf.processInputImages(_0x45f150.inputUrls, _0x2c3783, {
+async function buildPpioSeedreamRequest(value5, model, prompt, value6, value7 = {}) {
+  const { imageField: imageField = 'image', supportBatch: supportBatch = false } = value7,
+    value8 = value6.getProviderConfig('ppio'),
+    apiUrl = value8.apiUrl.replace(/\/+$/, ''),
+    apiKey = value8.apiKey || model.apiKey;
+  if (!apiKey) throw new Error('PPIO API Key 未配置，无法发起图像生成请求');
+  const value9 = value6.getProviderConfig('grsai'),
+    value10 = value9.apiKey || model.apiKey,
+    list2 = await value6.processInputImages(model.inputUrls, value10, {
       applyInputQualityProfile: true,
       provider: 'grsai',
     });
-  if (_0x45f150.inputUrls?.length > 0 && _0x46a917.length === 0)
+  if (model.inputUrls?.length > 0 && list2.length === 0)
     throw new Error('参考素材上传云端失败，无法继续生成');
-  const _0x4a9e2e = resolveProviderRatioPayload({
+  const providerRatioPayload = resolveProviderRatioPayload({
       provider: 'ppio',
-      model: _0x45f150.model,
-      ratioLabel: _0x45f150.resolvedRatioLabel || _0x45f150.aspectRatio,
-      imageSize: _0x45f150.imageSize,
-      suppressAspectRatio: _0x45f150.suppressAspectRatio,
+      model: model.model,
+      ratioLabel: model.resolvedRatioLabel || model.aspectRatio,
+      imageSize: model.imageSize,
+      suppressAspectRatio: model.suppressAspectRatio,
     }),
-    _0x3cdab9 = {
-      prompt: _0xe87ef3,
+    args = {
+      prompt: prompt,
       watermark: false,
-      ...(!_0x45f150.suppressImageSize && {
-        size: resolvePpioSize(_0x45f150.imageSize, _0x4a9e2e?.resolvedRatioLabel || _0x45f150.aspectRatio),
+      ...(!model.suppressImageSize && {
+        size: resolvePpioSize(model.imageSize, providerRatioPayload?.resolvedRatioLabel || model.aspectRatio),
       }),
     };
   return (
-    _0x132434 !== '4.0' && (_0x3cdab9.optimize_prompt_options = { mode: 'standard' }),
-    supportBatch &&
-      _0x45f150.batchSize &&
-      _0x45f150.batchSize > 1 &&
-      (_0x3cdab9.max_images = _0x45f150.batchSize),
-    _0x46a917.length > 0 && (_0x3cdab9[imageField] = _0x46a917),
+    value5 !== '4.0' && (args.optimize_prompt_options = { mode: 'standard' }),
+    supportBatch && model.batchSize && model.batchSize > 1 && (args.max_images = model.batchSize),
+    list2.length > 0 && (args[imageField] = list2),
     {
       url: '/api/v2/proxy/image',
       headers: { 'Content-Type': 'application/json' },
-      body: { apiUrl: _0x5080a3 + '/v3/seedream-' + _0x132434, apiKey: _0x2b18f8, ..._0x3cdab9 },
+      body: { apiUrl: apiUrl + '/v3/seedream-' + value5, apiKey: apiKey, ...args },
     }
   );
 }
-export async function buildImageRequest(_0x24bad0, _0x8201d8, _0xc38a03) {
-  if (_0x24bad0.model === 'ppio/seedream-5.0-lite')
-    return buildPpioSeedreamRequest('5.0-lite', _0x24bad0, _0x8201d8, _0xc38a03, { imageField: 'image' });
-  if (_0x24bad0.model === 'ppio/seedream-4.5')
-    return buildPpioSeedreamRequest('4.5', _0x24bad0, _0x8201d8, _0xc38a03, { imageField: 'image' });
-  if (_0x24bad0.model === 'ppio/seedream-4.0')
-    return buildPpioSeedreamRequest('4.0', _0x24bad0, _0x8201d8, _0xc38a03, {
+export async function buildImageRequest(value11, value12, value13) {
+  if (value11.model === 'ppio/seedream-5.0-lite')
+    return buildPpioSeedreamRequest('5.0-lite', value11, value12, value13, { imageField: 'image' });
+  if (value11.model === 'ppio/seedream-4.5')
+    return buildPpioSeedreamRequest('4.5', value11, value12, value13, { imageField: 'image' });
+  if (value11.model === 'ppio/seedream-4.0')
+    return buildPpioSeedreamRequest('4.0', value11, value12, value13, {
       imageField: 'images',
       supportBatch: true,
     });
-  throw new Error('PPIO 暂不支持模型 ' + (_0x24bad0.model || '(未指定)'));
+  throw new Error('PPIO 暂不支持模型 ' + (value11.model || '(未指定)'));
 }
-export function getTextProxyApiUrl(_0x4100a2) {
-  return _0x4100a2 + '/openai/v1';
+export function getTextProxyApiUrl(value14) {
+  return value14 + '/openai/v1';
 }

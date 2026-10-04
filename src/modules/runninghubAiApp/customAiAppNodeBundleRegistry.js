@@ -3,113 +3,115 @@ import {
   resolveModelExecution,
   unregisterManifestBundle,
 } from '../../manifests/index.js';
-export function getCustomAiAppBundleModelId(_0x1ff068) {
-  return String(_0x1ff068?.['models']?.[0x0]?.['modelId'] || '')['trim']();
+export function getCustomAiAppBundleModelId(value) {
+  return String(value?.['models']?.[0x0]?.['modelId'] || '')['trim']();
 }
-export function getCustomAiAppBundleKey(_0x3a87a3) {
-  return String(_0x3a87a3?.['sourceId'] || getCustomAiAppBundleModelId(_0x3a87a3))['trim']();
+export function getCustomAiAppBundleKey(item) {
+  return String(item?.['sourceId'] || getCustomAiAppBundleModelId(item))['trim']();
 }
-function canReuseRegisteredBundle(_0x2be481) {
-  const _0x307095 = getCustomAiAppBundleModelId(_0x2be481);
-  if (!_0x307095) return ![];
-  return Boolean(resolveModelExecution(_0x307095));
+function canReuseRegisteredBundle(key) {
+  const customAiAppBundleModelId = getCustomAiAppBundleModelId(key);
+  if (!customAiAppBundleModelId) return ![];
+  return Boolean(resolveModelExecution(customAiAppBundleModelId));
 }
-export function registerCustomAiAppBundle(_0x1c262f, _0x5da91f, { replace: replace = ![] } = {}) {
-  const _0x1ed4ed = getCustomAiAppBundleKey(_0x1c262f);
-  if (!_0x1ed4ed) return !![];
-  if (!replace && _0x5da91f['has'](_0x1ed4ed)) return !![];
-  if (replace) unregisterCustomAiAppBundle(_0x1c262f, _0x5da91f);
+export function registerCustomAiAppBundle(index, map, { replace: replace = ![] } = {}) {
+  const customAiAppBundleKey = getCustomAiAppBundleKey(index);
+  if (!customAiAppBundleKey) return !![];
+  if (!replace && map['has'](customAiAppBundleKey)) return !![];
+  if (replace) unregisterCustomAiAppBundle(index, map);
   try {
-    return (registerManifestBundle(_0x1c262f), _0x5da91f['add'](_0x1ed4ed), !![]);
-  } catch (_0x455174) {
+    return (registerManifestBundle(index), map['add'](customAiAppBundleKey), !![]);
+  } catch (error) {
     if (
-      String(_0x455174?.['message'] || '')['includes']('duplicate key') &&
+      String(error?.['message'] || '')['includes']('duplicate key') &&
       !replace &&
-      canReuseRegisteredBundle(_0x1c262f)
+      canReuseRegisteredBundle(index)
     )
-      return (_0x5da91f['add'](_0x1ed4ed), !![]);
-    throw _0x455174;
+      return (map['add'](customAiAppBundleKey), !![]);
+    throw error;
   }
 }
-export function unregisterCustomAiAppBundle(_0x25ea98, _0x4bda12) {
-  const _0x37742d = getCustomAiAppBundleKey(_0x25ea98);
-  if (!_0x37742d) return !![];
+export function unregisterCustomAiAppBundle(result, map2) {
+  const customAiAppBundleKey2 = getCustomAiAppBundleKey(result);
+  if (!customAiAppBundleKey2) return !![];
   try {
-    return (unregisterManifestBundle(_0x25ea98), _0x4bda12['delete'](_0x37742d), !![]);
-  } catch (_0x1b44bb) {
-    return (console['warn']('[Custom AI App] unregister manifest failed:', _0x1b44bb), ![]);
+    return (unregisterManifestBundle(result), map2['delete'](customAiAppBundleKey2), !![]);
+  } catch (data) {
+    return (console['warn']('[Custom AI App] unregister manifest failed:', data), ![]);
   }
 }
-export function projectCustomAiAppBundleForNodeRuntime(_0x25d028) {
-  const _0x244ff1 = Array['isArray'](_0x25d028?.['models']) ? _0x25d028['models'] : [];
-  let _0x10de12 = ![];
-  const _0x3b7cc3 = _0x244ff1['map']((_0x8aed33) => {
-    const _0x4f9b20 = _0x8aed33?.['extensions'];
-    if (!_0x4f9b20 || typeof _0x4f9b20 !== 'object') return _0x8aed33;
-    let _0x158659 = _0x4f9b20;
+export function projectCustomAiAppBundleForNodeRuntime(args) {
+  const list = Array['isArray'](args?.['models']) ? args['models'] : [];
+  let options = ![];
+  const models = list['map']((args2) => {
+    const args3 = args2?.['extensions'];
+    if (!args3 || typeof args3 !== 'object') return args2;
+    let extensions = args3;
     return (
-      ['rhAiApp', 'comfyUiWorkflow']['forEach']((_0x1edabd) => {
-        const _0x1dec37 = _0x4f9b20[_0x1edabd];
-        if (!_0x1dec37 || typeof _0x1dec37 !== 'object') return;
-        if (_0x158659 === _0x4f9b20) _0x158659 = { ..._0x4f9b20 };
-        ((_0x158659[_0x1edabd] = { ..._0x1dec37, appKey: '', isSavedApp: ![] }), (_0x10de12 = !![]));
+      ['rhAiApp', 'comfyUiWorkflow']['forEach']((target) => {
+        const args4 = args3[target];
+        if (!args4 || typeof args4 !== 'object') return;
+        if (extensions === args3) extensions = { ...args3 };
+        ((extensions[target] = { ...args4, appKey: '', isSavedApp: ![] }), (options = !![]));
       }),
-      _0x158659 === _0x4f9b20 ? _0x8aed33 : { ..._0x8aed33, extensions: _0x158659 }
+      extensions === args3 ? args2 : { ...args2, extensions: extensions }
     );
   });
-  return _0x10de12 ? { ..._0x25d028, models: _0x3b7cc3 } : _0x25d028;
+  return options ? { ...args, models: models } : args;
 }
 export function createCustomAiAppNodeBundleRegistry({
-  registerBundle: _0x109454,
-  unregisterBundle: _0x1d4da0,
+  registerBundle: registerBundle,
+  unregisterBundle: unregisterBundle,
   isBundleRegistered: isBundleRegistered = () => ![],
-  onWarning: onWarning = (..._0x124ba6) => console['warn'](..._0x124ba6),
+  onWarning: onWarning = (...args5) => console['warn'](...args5),
 } = {}) {
-  const _0x87296b = new Map();
+  const map3 = new Map();
   return Object['freeze']({
     reconcile({ bundles: bundles = [], savedBundleKeys: savedBundleKeys = [] } = {}) {
-      const _0x49af5c = new Set(
+      const map4 = new Set(
           Array['from'](savedBundleKeys || [])
-            ['map']((_0xfb45ec) => String(_0xfb45ec || '')['trim']())
+            ['map']((source) => String(source || '')['trim']())
             ['filter'](Boolean),
         ),
-        _0x490c49 = new Map();
+        map5 = new Map();
       return (
-        (Array['isArray'](bundles) ? bundles : [])['forEach']((_0x230555) => {
-          const _0x32b847 = getCustomAiAppBundleKey(_0x230555);
-          if (!_0x32b847 || !_0x230555?.['models'] || !_0x230555?.['executions']) return;
-          if (!_0x490c49['has'](_0x32b847)) _0x490c49['set'](_0x32b847, _0x230555);
+        (Array['isArray'](bundles) ? bundles : [])['forEach']((enabled) => {
+          const customAiAppBundleKey3 = getCustomAiAppBundleKey(enabled);
+          if (!customAiAppBundleKey3 || !enabled?.['models'] || !enabled?.['executions']) return;
+          if (!map5['has'](customAiAppBundleKey3)) map5['set'](customAiAppBundleKey3, enabled);
         }),
-        _0x87296b['forEach']((_0xad167c, _0x27bc5c) => {
-          if (_0x49af5c['has'](_0x27bc5c)) {
-            _0x87296b['delete'](_0x27bc5c);
+        map3['forEach']((next, current) => {
+          if (map4['has'](current)) {
+            map3['delete'](current);
             return;
           }
-          if (_0x490c49['has'](_0x27bc5c)) return;
+          if (map5['has'](current)) return;
           try {
-            const _0x4c464e = _0x1d4da0?.(_0xad167c);
-            if (_0x4c464e === ![]) return;
-          } catch (_0x2bfa67) {
-            onWarning('[Custom AI App] unregister stale node manifest failed:', _0x2bfa67);
+            const entry = unregisterBundle?.(next);
+            if (entry === ![]) return;
+          } catch (record) {
+            onWarning('[Custom AI App] unregister stale node manifest failed:', record);
             return;
           }
-          _0x87296b['delete'](_0x27bc5c);
+          map3['delete'](current);
         }),
-        _0x490c49['forEach']((_0x54853a, _0x39d986) => {
-          if (_0x49af5c['has'](_0x39d986)) return;
-          const _0x344583 = _0x87296b['get'](_0x39d986);
-          if (_0x344583 && isBundleRegistered(_0x39d986)) return;
-          const _0x359029 = projectCustomAiAppBundleForNodeRuntime(_0x54853a);
+        map5['forEach']((payload, handle) => {
+          if (map4['has'](handle)) return;
+          const enabled2 = map3['get'](handle);
+          if (enabled2 && isBundleRegistered(handle)) return;
+          const projectCustomAiAppBundleForNodeRuntime2 = projectCustomAiAppBundleForNodeRuntime(payload);
           try {
-            (_0x109454?.(_0x359029, { replace: !_0x344583 && isBundleRegistered(_0x39d986) }),
-              _0x87296b['set'](_0x39d986, _0x359029));
-          } catch (_0x1de98c) {
-            onWarning('[Custom AI App] register node manifest failed:', _0x1de98c);
+            (registerBundle?.(projectCustomAiAppBundleForNodeRuntime2, {
+              replace: !enabled2 && isBundleRegistered(handle),
+            }),
+              map3['set'](handle, projectCustomAiAppBundleForNodeRuntime2));
+          } catch (state) {
+            onWarning('[Custom AI App] register node manifest failed:', state);
           }
         }),
         {
-          liveBundleKeys: Array['from'](_0x490c49['keys']()),
-          trackedBundleKeys: Array['from'](_0x87296b['keys']()),
+          liveBundleKeys: Array['from'](map5['keys']()),
+          trackedBundleKeys: Array['from'](map3['keys']()),
         }
       );
     },

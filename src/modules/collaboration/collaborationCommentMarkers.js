@@ -2,121 +2,103 @@ import { worldToScreen } from '../../core/math.js';
 import { readNodeGeometryPreview } from '../../core/nodeGeometryPreview.js';
 import { createContextMenuIcon } from '../../components/contextMenuIcon.js';
 const moreMenus = new WeakMap();
-function chatButton(_0x13e3a0, _0x392505, _0x23d944) {
-  const _0x3183e6 = document['createElement']('button');
+function chatButton(value, handler, item) {
+  const el = document['createElement']('button');
   return (
-    (_0x3183e6['type'] = 'button'),
-    (_0x3183e6['className'] = 'ftb-btn icon-only collaboration-chat-node-add'),
-    _0x3183e6['setAttribute']('aria-label', _0x23d944),
-    _0x3183e6['append'](createContextMenuIcon('add-to-canvas')),
-    _0x3183e6['addEventListener']('pointerdown', (_0x5da5fc) => _0x5da5fc['stopPropagation']()),
-    _0x3183e6['addEventListener']('click', (_0xe94bb3) => {
-      (_0xe94bb3['stopPropagation'](), _0x13e3a0['addNodes'](_0x392505()));
+    (el['type'] = 'button'),
+    (el['className'] = 'ftb-btn icon-only collaboration-chat-node-add'),
+    el['setAttribute']('aria-label', item),
+    el['append'](createContextMenuIcon('add-to-canvas')),
+    el['addEventListener']('pointerdown', (event) => event['stopPropagation']()),
+    el['addEventListener']('click', (event2) => {
+      (event2['stopPropagation'](), value['addNodes'](handler()));
     }),
-    _0x3183e6
+    el
   );
 }
 export function drawCollaborationCommentMarkers({
-  state: _0x349794,
-  nodes: _0x20a478,
-  selected: _0x3efc6a,
-  viewport: _0x1fd36e,
-  bounds: _0x429288,
-  entryFor: _0x4a37b2,
-  comments: _0x3d5b7a,
-  chat: _0x2cccee,
+  state: state,
+  nodes: nodes,
+  selected: selected,
+  viewport: viewport,
+  bounds: bounds,
+  entryFor: entryFor,
+  comments: comments,
+  chat: chat,
 }) {
-  if (!_0x349794) return;
-  const _0x3300fc = [...(_0x3efc6a || [])]['filter']((_0x339f76) => _0x20a478[_0x339f76]),
-    _0x30cb57 = readNodeGeometryPreview(_0x3d5b7a['nodeId'](), _0x20a478[_0x3d5b7a['nodeId']()]);
-  if (_0x30cb57)
-    _0x3d5b7a['position'](
-      worldToScreen(_0x30cb57['x'] + (_0x30cb57['width'] || 0xc8), _0x30cb57['y'], _0x1fd36e),
-    );
-  if (_0x3300fc['length'] > 0x1) {
-    const _0x56bea1 = document['querySelector']('#v2-multi-select-box .v2-multi-select-tab');
-    if (!_0x56bea1 || !_0x2cccee) return;
-    const _0x4ee1a7 = _0x4a37b2('chat:selection', 'collaboration-toolbar-actions');
-    _0x4ee1a7['dataset']['nodeIds'] = JSON['stringify'](_0x3300fc);
-    if (!_0x4ee1a7['firstChild'])
-      _0x4ee1a7['append'](
-        chatButton(_0x2cccee, () => JSON['parse'](_0x4ee1a7['dataset']['nodeIds']), '将所选节点加入聊天'),
-      );
-    if (_0x4ee1a7['parentElement'] !== _0x56bea1) _0x56bea1['append'](_0x4ee1a7);
+  if (!state) return;
+  const list = [...(selected || [])]['filter']((key) => nodes[key]),
+    box = readNodeGeometryPreview(comments['nodeId'](), nodes[comments['nodeId']()]);
+  if (box) comments['position'](worldToScreen(box['x'] + (box['width'] || 0xc8), box['y'], viewport));
+  if (list['length'] > 0x1) {
+    const enabled = document['querySelector']('#v2-multi-select-box .v2-multi-select-tab');
+    if (!enabled || !chat) return;
+    const el2 = entryFor('chat:selection', 'collaboration-toolbar-actions');
+    el2['dataset']['nodeIds'] = JSON['stringify'](list);
+    if (!el2['firstChild'])
+      el2['append'](chatButton(chat, () => JSON['parse'](el2['dataset']['nodeIds']), '将所选节点加入聊天'));
+    if (el2['parentElement'] !== enabled) enabled['append'](el2);
     return;
   }
-  const _0x593abf = _0x3300fc[0x0],
-    _0x5d6e28 = readNodeGeometryPreview(_0x593abf, _0x20a478[_0x593abf]);
-  if (!_0x5d6e28) return;
-  const _0x461acf = document['querySelector']('.v2-node[data-node-id="' + CSS['escape'](_0x593abf) + '\x22]'),
-    _0x3f01df =
+  const index = list[0x0],
+    error = readNodeGeometryPreview(index, nodes[index]);
+  if (!error) return;
+  const el3 = document['querySelector']('.v2-node[data-node-id="' + CSS['escape'](index) + '\x22]'),
+    el4 =
       document['querySelector'](
-        '.group-toolbar--detached[data-group-toolbar-for=\x22' + CSS['escape'](_0x593abf) + '\x22]',
-      ) || _0x461acf?.['querySelector']('.node-floating-toolbar,\x20.group-toolbar');
-  if (!_0x3f01df) return;
-  const _0x409cd0 = _0x3f01df['querySelector']('.act-more-tools'),
-    _0x379b1c = _0x409cd0?.['parentElement'] || _0x3f01df,
-    _0x29047d = _0x4a37b2(
-      'comment:' + _0x593abf,
-      'collaboration-comment-marker collaboration-toolbar-actions',
-    );
-  if (_0x29047d['parentElement'] !== _0x379b1c) _0x379b1c['insertBefore'](_0x29047d, _0x409cd0 || null);
-  if (!_0x29047d['firstChild']) {
-    const _0x5bb34b = document['createElement']('button');
-    ((_0x5bb34b['type'] = 'button'),
-      (_0x5bb34b['className'] = 'ftb-btn\x20icon-only\x20collaboration-comment-button'),
-      _0x5bb34b['append'](createContextMenuIcon('comment'), document['createElement']('span')),
-      _0x5bb34b['addEventListener']('pointerdown', (_0x203551) => _0x203551['stopPropagation']()),
-      _0x5bb34b['addEventListener']('click', (_0x513e23) => {
-        (_0x513e23['stopPropagation'](), _0x3d5b7a['open'](_0x593abf, _0x5bb34b));
-        const _0x157518 = document['querySelector'](
-          '.v2-node[data-node-id="' + CSS['escape'](_0x593abf) + '\x22]',
-        );
-        if (_0x157518) {
-          const _0x55df69 = _0x157518['getBoundingClientRect']();
-          _0x3d5b7a['position']?.({ x: _0x55df69['right'], y: _0x55df69['top'] });
+        '.group-toolbar--detached[data-group-toolbar-for=\x22' + CSS['escape'](index) + '\x22]',
+      ) || el3?.['querySelector']('.node-floating-toolbar,\x20.group-toolbar');
+  if (!el4) return;
+  const result = el4['querySelector']('.act-more-tools'),
+    el5 = result?.['parentElement'] || el4,
+    el6 = entryFor('comment:' + index, 'collaboration-comment-marker collaboration-toolbar-actions');
+  if (el6['parentElement'] !== el5) el5['insertBefore'](el6, result || null);
+  if (!el6['firstChild']) {
+    const el7 = document['createElement']('button');
+    ((el7['type'] = 'button'),
+      (el7['className'] = 'ftb-btn\x20icon-only\x20collaboration-comment-button'),
+      el7['append'](createContextMenuIcon('comment'), document['createElement']('span')),
+      el7['addEventListener']('pointerdown', (event3) => event3['stopPropagation']()),
+      el7['addEventListener']('click', (event4) => {
+        (event4['stopPropagation'](), comments['open'](index, el7));
+        const el8 = document['querySelector']('.v2-node[data-node-id="' + CSS['escape'](index) + '\x22]');
+        if (el8) {
+          const x = el8['getBoundingClientRect']();
+          comments['position']?.({ x: x['right'], y: x['top'] });
         }
       }),
-      _0x29047d['append'](_0x5bb34b));
-    if (_0x2cccee)
-      _0x29047d['append'](
-        chatButton(_0x2cccee, () => [_0x593abf], '将' + (_0x5d6e28['name'] || _0x593abf) + '加入聊天'),
-      );
+      el6['append'](el7));
+    if (chat) el6['append'](chatButton(chat, () => [index], '将' + (error['name'] || index) + '加入聊天'));
   }
-  _0x29047d['dataset']['nodeId'] = _0x593abf;
-  const _0x51e0b1 = _0x3f01df['classList']['contains']('group-toolbar');
-  for (const _0x2ac636 of _0x29047d['querySelectorAll']('button')) {
-    (_0x2ac636['classList']['toggle']('gt-btn', _0x51e0b1),
-      _0x2ac636['classList']['toggle']('ftb-btn', !_0x51e0b1),
-      _0x2ac636['classList']['toggle']('icon-only', !_0x51e0b1));
+  el6['dataset']['nodeId'] = index;
+  const enabled2 = el4['classList']['contains']('group-toolbar');
+  for (const el9 of el6['querySelectorAll']('button')) {
+    (el9['classList']['toggle']('gt-btn', enabled2),
+      el9['classList']['toggle']('ftb-btn', !enabled2),
+      el9['classList']['toggle']('icon-only', !enabled2));
   }
-  const _0xdf4e52 = _0x349794['review']?.['summaries']?.['find'](
-      (_0x58e694) => _0x58e694['node'] === _0x593abf,
-    ),
-    _0xdde8f6 = _0xdf4e52?.['unresolved'] || 0x0;
-  ((_0x29047d['dataset']['status'] = _0xdde8f6 ? 'unresolved' : _0xdf4e52?.['count'] ? 'resolved' : 'empty'),
-    (_0x29047d['firstChild']['lastChild']['textContent'] = _0xdde8f6 ? String(_0xdde8f6) : ''),
-    _0x29047d['firstChild']['setAttribute'](
+  const data = state['review']?.['summaries']?.['find']((options) => options['node'] === index),
+    target = data?.['unresolved'] || 0x0;
+  ((el6['dataset']['status'] = target ? 'unresolved' : data?.['count'] ? 'resolved' : 'empty'),
+    (el6['firstChild']['lastChild']['textContent'] = target ? String(target) : ''),
+    el6['firstChild']['setAttribute'](
       'aria-label',
-      (_0x5d6e28['name'] || _0x593abf) + '的评论，' + _0xdde8f6 + '\x20条未解决',
+      (error['name'] || index) + '的评论，' + target + '\x20条未解决',
     ));
-  if (!_0x2cccee) return;
-  _0x29047d['lastChild']['setAttribute']('aria-label', '将' + (_0x5d6e28['name'] || _0x593abf) + '加入聊天');
-  const _0x316dee = _0x3f01df['querySelector']('[data-role="more-menu"] .v2-img-toolbar-zone-more');
-  if (_0x316dee) moreMenus['set'](_0x3f01df, _0x316dee);
-  const _0x57e188 = _0x316dee || moreMenus['get'](_0x3f01df);
-  _0x29047d['lastChild']['hidden'] = ![];
-  if (_0x57e188) {
-    const _0x46326e =
-      _0x3f01df['getBoundingClientRect']()['width'] >
-      Math['min'](_0x429288['width'], window['innerWidth']) - 0x30;
-    _0x29047d['lastChild']['hidden'] = _0x46326e;
-    const _0x5db357 = _0x4a37b2('chat:more:' + _0x593abf, 'collaboration-toolbar-overflow');
-    if (_0x5db357['parentElement'] !== _0x57e188) _0x57e188['append'](_0x5db357);
-    if (!_0x5db357['firstChild'])
-      _0x5db357['append'](
-        chatButton(_0x2cccee, () => [_0x593abf], '将' + (_0x5d6e28['name'] || _0x593abf) + '加入聊天'),
-      );
-    _0x5db357['hidden'] = !_0x46326e;
+  if (!chat) return;
+  el6['lastChild']['setAttribute']('aria-label', '将' + (error['name'] || index) + '加入聊天');
+  const source = el4['querySelector']('[data-role="more-menu"] .v2-img-toolbar-zone-more');
+  if (source) moreMenus['set'](el4, source);
+  const next = source || moreMenus['get'](el4);
+  el6['lastChild']['hidden'] = ![];
+  if (next) {
+    const enabled3 =
+      el4['getBoundingClientRect']()['width'] > Math['min'](bounds['width'], window['innerWidth']) - 0x30;
+    el6['lastChild']['hidden'] = enabled3;
+    const el10 = entryFor('chat:more:' + index, 'collaboration-toolbar-overflow');
+    if (el10['parentElement'] !== next) next['append'](el10);
+    if (!el10['firstChild'])
+      el10['append'](chatButton(chat, () => [index], '将' + (error['name'] || index) + '加入聊天'));
+    el10['hidden'] = !enabled3;
   }
 }

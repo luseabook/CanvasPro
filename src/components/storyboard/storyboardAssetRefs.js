@@ -3,131 +3,129 @@ import {
   isStoryboardCellEmpty,
   resolveStoryboardCellPreviewSrc,
 } from '../../core/storyboardCellUtils.js';
-export function normalizeStoryboardLocalImageUrl(_0x43c8d7) {
-  const _0xb80075 = typeof _0x43c8d7 === 'string' ? _0x43c8d7.trim() : '';
-  if (!_0xb80075) return '';
+export function normalizeStoryboardLocalImageUrl(value) {
+  const enabled = typeof value === 'string' ? value.trim() : '';
+  if (!enabled) return '';
   if (
-    _0xb80075.startsWith('/') ||
-    _0xb80075.startsWith('http://') ||
-    _0xb80075.startsWith('https://') ||
-    _0xb80075.startsWith('blob:') ||
-    _0xb80075.startsWith('data:')
+    enabled.startsWith('/') ||
+    enabled.startsWith('http://') ||
+    enabled.startsWith('https://') ||
+    enabled.startsWith('blob:') ||
+    enabled.startsWith('data:')
   )
-    return _0xb80075;
-  return '/' + _0xb80075;
+    return enabled;
+  return '/' + enabled;
 }
-export function getStoryboardCellSourceImageUrl(_0x563720) {
-  if (!_0x563720 || typeof _0x563720 !== 'object') return '';
-  if (isStoryboardCellEmpty(_0x563720)) return '';
+export function getStoryboardCellSourceImageUrl(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return '';
+  if (isStoryboardCellEmpty(enabled2)) return '';
   return (
-    normalizeStoryboardLocalImageUrl(_0x563720.sourceLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x563720.sourceUrl)
+    normalizeStoryboardLocalImageUrl(enabled2.sourceLocalPath) ||
+    normalizeStoryboardLocalImageUrl(enabled2.sourceUrl)
   );
 }
-export function getStoryboardPuzzleSourceImageUrl(_0x2f0274) {
-  const _0x369b79 =
-    normalizeStoryboardLocalImageUrl(_0x2f0274?.storyboardSourceLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x2f0274?.storyboardSourceUrl) ||
-    normalizeStoryboardLocalImageUrl(_0x2f0274?.storyboardBackdropLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x2f0274?.storyboardBackdropUrl) ||
-    normalizeStoryboardLocalImageUrl(_0x2f0274?.sourceLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x2f0274?.sourceUrl);
-  if (_0x369b79) return _0x369b79;
-  const _0x30a872 = Array.isArray(_0x2f0274?.cells) ? _0x2f0274.cells : [];
-  for (const _0x17c99c of _0x30a872) {
-    const _0x285ab6 =
-      normalizeStoryboardLocalImageUrl(_0x17c99c?.sourceLocalPath) ||
-      normalizeStoryboardLocalImageUrl(_0x17c99c?.sourceUrl);
-    if (_0x285ab6) return _0x285ab6;
+export function getStoryboardPuzzleSourceImageUrl(item) {
+  const storyboardLocalImageUrl =
+    normalizeStoryboardLocalImageUrl(item?.storyboardSourceLocalPath) ||
+    normalizeStoryboardLocalImageUrl(item?.storyboardSourceUrl) ||
+    normalizeStoryboardLocalImageUrl(item?.storyboardBackdropLocalPath) ||
+    normalizeStoryboardLocalImageUrl(item?.storyboardBackdropUrl) ||
+    normalizeStoryboardLocalImageUrl(item?.sourceLocalPath) ||
+    normalizeStoryboardLocalImageUrl(item?.sourceUrl);
+  if (storyboardLocalImageUrl) return storyboardLocalImageUrl;
+  const key = Array.isArray(item?.cells) ? item.cells : [];
+  for (const index of key) {
+    const storyboardLocalImageUrl2 =
+      normalizeStoryboardLocalImageUrl(index?.sourceLocalPath) ||
+      normalizeStoryboardLocalImageUrl(index?.sourceUrl);
+    if (storyboardLocalImageUrl2) return storyboardLocalImageUrl2;
   }
   return '';
 }
-export function getStoryboardCellLiveSourceImageUrl(_0xe742f9, _0x58f2bd) {
-  if (isFrozenStoryboardDisplayCell(_0xe742f9)) return '';
-  const _0x1056a8 = getStoryboardCellSourceImageUrl(_0xe742f9);
-  if (_0x1056a8) return _0x1056a8;
-  if (!_0xe742f9 || typeof _0xe742f9 !== 'object' || isStoryboardCellEmpty(_0xe742f9)) return '';
-  if (_0xe742f9.storyboardPiece === true) return getStoryboardPuzzleSourceImageUrl(_0x58f2bd);
+export function getStoryboardCellLiveSourceImageUrl(enabled3, result) {
+  if (isFrozenStoryboardDisplayCell(enabled3)) return '';
+  const storyboardCellSourceImageUrl = getStoryboardCellSourceImageUrl(enabled3);
+  if (storyboardCellSourceImageUrl) return storyboardCellSourceImageUrl;
+  if (!enabled3 || typeof enabled3 !== 'object' || isStoryboardCellEmpty(enabled3)) return '';
+  if (enabled3.storyboardPiece === true) return getStoryboardPuzzleSourceImageUrl(result);
   return '';
 }
-export function getStoryboardCellSourceDisplayUrl(_0x55da17, _0x1c5d73) {
-  if (isFrozenStoryboardDisplayCell(_0x55da17)) return '';
-  const _0x2b4f7f = getStoryboardCellLiveSourceImageUrl(_0x55da17, _0x1c5d73);
-  if (!_0x2b4f7f || !_0x55da17 || typeof _0x55da17 !== 'object') return '';
-  if (isStoryboardCellEmpty(_0x55da17)) return '';
-  const _0x450738 = !!getStoryboardCellSourceImageUrl(_0x55da17);
+export function getStoryboardCellSourceDisplayUrl(enabled4, data) {
+  if (isFrozenStoryboardDisplayCell(enabled4)) return '';
+  const storyboardCellLiveSourceImageUrl = getStoryboardCellLiveSourceImageUrl(enabled4, data);
+  if (!storyboardCellLiveSourceImageUrl || !enabled4 || typeof enabled4 !== 'object') return '';
+  if (isStoryboardCellEmpty(enabled4)) return '';
+  const options = !!getStoryboardCellSourceImageUrl(enabled4);
   if (
-    _0x450738 ||
-    _0x55da17.storyboardSourceCrop === true ||
-    _0x55da17.storyboardPiece === true ||
-    _0x55da17.storyboardLockedCell === true
+    options ||
+    enabled4.storyboardSourceCrop === true ||
+    enabled4.storyboardPiece === true ||
+    enabled4.storyboardLockedCell === true
   )
-    return _0x2b4f7f;
+    return storyboardCellLiveSourceImageUrl;
   return '';
 }
-export function getStoryboardCellDisplayImageUrl(_0x4f7d78, _0x950076) {
+export function getStoryboardCellDisplayImageUrl(target, source) {
+  return getStoryboardCellSourceDisplayUrl(target, source) || resolveStoryboardCellPreviewSrc(target);
+}
+export function getStoryboardCellResidualImageUrl(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object') return '';
   return (
-    getStoryboardCellSourceDisplayUrl(_0x4f7d78, _0x950076) || resolveStoryboardCellPreviewSrc(_0x4f7d78)
+    normalizeStoryboardLocalImageUrl(enabled5.residualImageLocalPath) ||
+    normalizeStoryboardLocalImageUrl(enabled5.residualImageUrl)
   );
 }
-export function getStoryboardCellResidualImageUrl(_0x2567f7) {
-  if (!_0x2567f7 || typeof _0x2567f7 !== 'object') return '';
-  return (
-    normalizeStoryboardLocalImageUrl(_0x2567f7.residualImageLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x2567f7.residualImageUrl)
-  );
-}
-export function getStoryboardBackdropImageUrl(_0x337c05) {
-  const _0x5af9fd =
-    normalizeStoryboardLocalImageUrl(_0x337c05?.storyboardBackdropLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x337c05?.storyboardBackdropUrl) ||
-    normalizeStoryboardLocalImageUrl(_0x337c05?.storyboardSourceLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x337c05?.storyboardSourceUrl) ||
-    normalizeStoryboardLocalImageUrl(_0x337c05?.sourceLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x337c05?.sourceUrl);
-  if (_0x5af9fd) return _0x5af9fd;
-  const _0x47e217 = Array.isArray(_0x337c05?.cells) ? _0x337c05.cells : [];
-  for (const _0xccf873 of _0x47e217) {
-    const _0x1f44e2 =
-      normalizeStoryboardLocalImageUrl(_0xccf873?.sourceLocalPath) ||
-      normalizeStoryboardLocalImageUrl(_0xccf873?.sourceUrl);
-    if (_0x1f44e2) return _0x1f44e2;
+export function getStoryboardBackdropImageUrl(next) {
+  const storyboardLocalImageUrl3 =
+    normalizeStoryboardLocalImageUrl(next?.storyboardBackdropLocalPath) ||
+    normalizeStoryboardLocalImageUrl(next?.storyboardBackdropUrl) ||
+    normalizeStoryboardLocalImageUrl(next?.storyboardSourceLocalPath) ||
+    normalizeStoryboardLocalImageUrl(next?.storyboardSourceUrl) ||
+    normalizeStoryboardLocalImageUrl(next?.sourceLocalPath) ||
+    normalizeStoryboardLocalImageUrl(next?.sourceUrl);
+  if (storyboardLocalImageUrl3) return storyboardLocalImageUrl3;
+  const current = Array.isArray(next?.cells) ? next.cells : [];
+  for (const entry of current) {
+    const storyboardLocalImageUrl4 =
+      normalizeStoryboardLocalImageUrl(entry?.sourceLocalPath) ||
+      normalizeStoryboardLocalImageUrl(entry?.sourceUrl);
+    if (storyboardLocalImageUrl4) return storyboardLocalImageUrl4;
   }
-  const _0x1bc79d =
-    normalizeStoryboardLocalImageUrl(_0x337c05?.localPath) ||
-    normalizeStoryboardLocalImageUrl(_0x337c05?.imageUrl) ||
-    normalizeStoryboardLocalImageUrl(_0x337c05?.src);
-  if (_0x1bc79d) return _0x1bc79d;
-  for (const _0x12589f of _0x47e217) {
-    const _0x557b6a = getStoryboardCellResidualImageUrl(_0x12589f);
-    if (_0x557b6a) return _0x557b6a;
+  const storyboardLocalImageUrl5 =
+    normalizeStoryboardLocalImageUrl(next?.localPath) ||
+    normalizeStoryboardLocalImageUrl(next?.imageUrl) ||
+    normalizeStoryboardLocalImageUrl(next?.src);
+  if (storyboardLocalImageUrl5) return storyboardLocalImageUrl5;
+  for (const record of current) {
+    const storyboardCellResidualImageUrl = getStoryboardCellResidualImageUrl(record);
+    if (storyboardCellResidualImageUrl) return storyboardCellResidualImageUrl;
   }
   return '';
 }
-export function getStoryboardCellCommitSourceUrl(_0x242277, _0x25388b) {
-  if (isFrozenStoryboardDisplayCell(_0x242277)) return '';
-  const _0x5d57a5 =
-    normalizeStoryboardLocalImageUrl(_0x242277?.sourceLocalPath) ||
-    normalizeStoryboardLocalImageUrl(_0x242277?.sourceUrl);
-  if (_0x5d57a5) return _0x5d57a5;
-  if (!_0x242277 || isStoryboardCellEmpty(_0x242277)) return '';
-  if (_0x242277.storyboardPiece === true || _0x242277.storyboardLockedCell === true)
+export function getStoryboardCellCommitSourceUrl(enabled6, payload) {
+  if (isFrozenStoryboardDisplayCell(enabled6)) return '';
+  const storyboardLocalImageUrl6 =
+    normalizeStoryboardLocalImageUrl(enabled6?.sourceLocalPath) ||
+    normalizeStoryboardLocalImageUrl(enabled6?.sourceUrl);
+  if (storyboardLocalImageUrl6) return storyboardLocalImageUrl6;
+  if (!enabled6 || isStoryboardCellEmpty(enabled6)) return '';
+  if (enabled6.storyboardPiece === true || enabled6.storyboardLockedCell === true)
     return (
-      normalizeStoryboardLocalImageUrl(_0x25388b?.storyboardSourceLocalPath) ||
-      normalizeStoryboardLocalImageUrl(_0x25388b?.storyboardSourceUrl) ||
-      normalizeStoryboardLocalImageUrl(_0x25388b?.storyboardBackdropLocalPath) ||
-      normalizeStoryboardLocalImageUrl(_0x25388b?.storyboardBackdropUrl) ||
-      normalizeStoryboardLocalImageUrl(_0x25388b?.sourceLocalPath) ||
-      normalizeStoryboardLocalImageUrl(_0x25388b?.sourceUrl)
+      normalizeStoryboardLocalImageUrl(payload?.storyboardSourceLocalPath) ||
+      normalizeStoryboardLocalImageUrl(payload?.storyboardSourceUrl) ||
+      normalizeStoryboardLocalImageUrl(payload?.storyboardBackdropLocalPath) ||
+      normalizeStoryboardLocalImageUrl(payload?.storyboardBackdropUrl) ||
+      normalizeStoryboardLocalImageUrl(payload?.sourceLocalPath) ||
+      normalizeStoryboardLocalImageUrl(payload?.sourceUrl)
     );
   return '';
 }
-export function isStoryboardCellSourceCropRequired(_0xef798) {
-  if (!_0xef798 || typeof _0xef798 !== 'object' || isStoryboardCellEmpty(_0xef798)) return false;
-  if (isFrozenStoryboardDisplayCell(_0xef798)) return false;
+export function isStoryboardCellSourceCropRequired(enabled7) {
+  if (!enabled7 || typeof enabled7 !== 'object' || isStoryboardCellEmpty(enabled7)) return false;
+  if (isFrozenStoryboardDisplayCell(enabled7)) return false;
   return (
-    _0xef798.storyboardPiece === true ||
-    _0xef798.storyboardLockedCell === true ||
-    _0xef798.storyboardSourceCrop === true
+    enabled7.storyboardPiece === true ||
+    enabled7.storyboardLockedCell === true ||
+    enabled7.storyboardSourceCrop === true
   );
 }

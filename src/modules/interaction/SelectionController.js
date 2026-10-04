@@ -5,125 +5,110 @@ import {
   updateSelectionBoxPreview,
 } from '../../core/selectionBoxPreview.js';
 export function createSelectionController({
-  store: _0x4d01f3,
-  screenToWorld: _0x5d66e3,
-  isNodeType: _0x325f33,
-  isValidConnection: _0x1c6aa8,
+  store: store,
+  screenToWorld: screenToWorld,
+  isNodeType: isNodeType,
+  isValidConnection: isValidConnection,
 }) {
-  function _0x25f597(_0x3b3cc6, _0x15d180, _0x29a2ec) {
-    ((_0x3b3cc6.isBoxSelecting = true),
-      (_0x3b3cc6.boxStartX = _0x15d180),
-      (_0x3b3cc6.boxStartY = _0x29a2ec),
-      (_0x3b3cc6._boxSelectionActivated = false),
+  function startBoxSelecting(value, item, key) {
+    ((value.isBoxSelecting = true),
+      (value.boxStartX = item),
+      (value.boxStartY = key),
+      (value._boxSelectionActivated = false),
       cancelSelectionBoxPreview());
   }
-  function _0x555776(_0x28ad43, _0x801455, _0x31cea4) {
-    const _0x47fd34 = {
-      x1: Math.min(_0x28ad43.boxStartX, _0x801455),
-      y1: Math.min(_0x28ad43.boxStartY, _0x31cea4),
-      x2: Math.max(_0x28ad43.boxStartX, _0x801455),
-      y2: Math.max(_0x28ad43.boxStartY, _0x31cea4),
+  function updateBoxSelecting(enabled, index, result) {
+    const args = {
+      x1: Math.min(enabled.boxStartX, index),
+      y1: Math.min(enabled.boxStartY, result),
+      x2: Math.max(enabled.boxStartX, index),
+      y2: Math.max(enabled.boxStartY, result),
     };
-    if (!_0x28ad43._boxSelectionActivated) {
-      const _0x1546a1 = Math.hypot(_0x801455 - _0x28ad43.boxStartX, _0x31cea4 - _0x28ad43.boxStartY);
-      _0x1546a1 > 3 &&
-        ((_0x28ad43._boxSelectionActivated = true), beginSelectionBoxPreview({ active: true, ..._0x47fd34 }));
+    if (!enabled._boxSelectionActivated) {
+      const count = Math.hypot(index - enabled.boxStartX, result - enabled.boxStartY);
+      count > 3 &&
+        ((enabled._boxSelectionActivated = true), beginSelectionBoxPreview({ active: true, ...args }));
     }
-    _0x28ad43._boxSelectionActivated && updateSelectionBoxPreview({ active: true, ..._0x47fd34 });
+    enabled._boxSelectionActivated && updateSelectionBoxPreview({ active: true, ...args });
   }
-  function _0xb049ad(_0x5c603f, _0x3369b6, _0x3c935d) {
+  function finishBoxSelecting(data, options, target) {
     cancelSelectionBoxPreview();
-    const _0x4ae228 = _0x4d01f3.getState(),
-      _0x5444c6 = _0x4ae228.pickConnectMode,
-      { viewport: _0x51939b, nodes: _0x1dea02 } = _0x4ae228,
-      { boxStartX: _0x150dfb, boxStartY: _0x5e9961 } = _0x5c603f;
+    const source = store.getState(),
+      enabled2 = source.pickConnectMode,
+      { viewport: viewport, nodes: nodes } = source,
+      { boxStartX: boxStartX, boxStartY: boxStartY } = data;
     if (
-      !Number.isFinite(_0x150dfb) ||
-      !Number.isFinite(_0x5e9961) ||
-      !Number.isFinite(_0x3369b6) ||
-      !Number.isFinite(_0x3c935d)
+      !Number.isFinite(boxStartX) ||
+      !Number.isFinite(boxStartY) ||
+      !Number.isFinite(options) ||
+      !Number.isFinite(target)
     )
       return (
-        _0x4d01f3.setSelectionBox({ active: false }),
-        (_0x5c603f.isBoxSelecting = false),
+        store.setSelectionBox({ active: false }),
+        (data.isBoxSelecting = false),
         { earlyReturn: false, didAct: false }
       );
-    const _0x1267a3 = Math.min(_0x150dfb, _0x3369b6),
-      _0x160891 = Math.max(_0x150dfb, _0x3369b6),
-      _0x3f3462 = Math.min(_0x5e9961, _0x3c935d),
-      _0x110cba = Math.max(_0x5e9961, _0x3c935d),
-      { x: _0x247b67, y: _0x1639f1 } = _0x5d66e3(_0x1267a3, _0x3f3462, _0x51939b),
-      { x: _0x2c80ac, y: _0x27e779 } = _0x5d66e3(_0x160891, _0x110cba, _0x51939b);
-    if (
-      !Number.isFinite(_0x247b67) ||
-      !Number.isFinite(_0x1639f1) ||
-      !Number.isFinite(_0x2c80ac) ||
-      !Number.isFinite(_0x27e779)
-    )
+    const next = Math.min(boxStartX, options),
+      current = Math.max(boxStartX, options),
+      entry = Math.min(boxStartY, target),
+      record = Math.max(boxStartY, target),
+      { x: x, y: y } = screenToWorld(next, entry, viewport),
+      { x: x2, y: y2 } = screenToWorld(current, record, viewport);
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(x2) || !Number.isFinite(y2))
       return (
-        _0x4d01f3.setSelectionBox({ active: false }),
-        (_0x5c603f.isBoxSelecting = false),
+        store.setSelectionBox({ active: false }),
+        (data.isBoxSelecting = false),
         { earlyReturn: false, didAct: false }
       );
-    if (!_0x5444c6?.active && _0x4ae228.connOverlay?.srcId)
+    if (!enabled2?.active && source.connOverlay?.srcId)
       return (
-        _0x4d01f3.setSelectionBox({ active: false }),
-        (_0x5c603f.isBoxSelecting = false),
+        store.setSelectionBox({ active: false }),
+        (data.isBoxSelecting = false),
         { earlyReturn: false, didAct: false }
       );
-    if (_0x5444c6 && _0x5444c6.active) {
-      for (const _0x3bb871 of Object.values(_0x1dea02)) {
-        if (_0x3bb871.id === _0x5444c6.sourceNodeId || _0x325f33(_0x3bb871, 'group')) continue;
-        const _0x3d9f41 = _0x3bb871.x + (_0x3bb871.width || 0x104) / 2,
-          _0x2e9c05 = _0x3bb871.y + (_0x3bb871.height || 100) / 2;
-        if (
-          _0x3d9f41 >= _0x247b67 &&
-          _0x3d9f41 <= _0x2c80ac &&
-          _0x2e9c05 >= _0x1639f1 &&
-          _0x2e9c05 <= _0x27e779
-        ) {
-          const _0x1131d7 = _0x5444c6.handleDirection === 'left',
-            _0x1eee6d = _0x1131d7 ? _0x3bb871.id : _0x5444c6.sourceNodeId,
-            _0x1416c5 = _0x1131d7 ? _0x5444c6.sourceNodeId : _0x3bb871.id;
-          if (_0x1dea02[_0x1eee6d] && _0x1dea02[_0x1eee6d].type === 'group') continue;
-          if (!_0x1c6aa8(_0x1dea02[_0x1eee6d], _0x1dea02[_0x1416c5])) continue;
-          addEdgeWithPolicies({ sourceId: _0x1eee6d, targetId: _0x1416c5 });
+    if (enabled2 && enabled2.active) {
+      for (const box of Object.values(nodes)) {
+        if (box.id === enabled2.sourceNodeId || isNodeType(box, 'group')) continue;
+        const payload = box.x + (box.width || 0x104) / 2,
+          handle = box.y + (box.height || 100) / 2;
+        if (payload >= x && payload <= x2 && handle >= y && handle <= y2) {
+          const state = enabled2.handleDirection === 'left',
+            sourceId = state ? box.id : enabled2.sourceNodeId,
+            targetId = state ? enabled2.sourceNodeId : box.id;
+          if (nodes[sourceId] && nodes[sourceId].type === 'group') continue;
+          if (!isValidConnection(nodes[sourceId], nodes[targetId])) continue;
+          addEdgeWithPolicies({ sourceId: sourceId, targetId: targetId });
         }
       }
       return (
-        _0x4d01f3.setSelectionBox({ active: false }),
-        (_0x5c603f.isBoxSelecting = false),
+        store.setSelectionBox({ active: false }),
+        (data.isBoxSelecting = false),
         { earlyReturn: true, didAct: true }
       );
     }
-    const _0x4928e6 = [];
-    for (const _0xaa03f8 of Object.values(_0x1dea02)) {
-      const _0x10fdf1 = _0xaa03f8.x + (_0xaa03f8.width || 0x104),
-        _0x4ecbc7 = _0xaa03f8.y + (_0xaa03f8.height || 100);
-      if (_0x325f33(_0xaa03f8, 'group')) {
-        const _0x1906d6 =
-          _0xaa03f8.x >= _0x247b67 &&
-          _0x10fdf1 <= _0x2c80ac &&
-          _0xaa03f8.y >= _0x1639f1 &&
-          _0x4ecbc7 <= _0x27e779;
-        if (_0x1906d6) _0x4928e6.push(_0xaa03f8.id);
+    const list = [];
+    for (const box2 of Object.values(nodes)) {
+      const config = box2.x + (box2.width || 0x104),
+        scope = box2.y + (box2.height || 100);
+      if (isNodeType(box2, 'group')) {
+        const input = box2.x >= x && config <= x2 && box2.y >= y && scope <= y2;
+        if (input) list.push(box2.id);
       } else {
-        const _0x41f238 = !(
-          _0xaa03f8.x > _0x2c80ac ||
-          _0x10fdf1 < _0x247b67 ||
-          _0xaa03f8.y > _0x27e779 ||
-          _0x4ecbc7 < _0x1639f1
-        );
-        if (_0x41f238) _0x4928e6.push(_0xaa03f8.id);
+        const output = !(box2.x > x2 || config < x || box2.y > y2 || scope < y);
+        if (output) list.push(box2.id);
       }
     }
     return (
-      _0x4d01f3.setSelectionMeta({ source: 'box' }),
-      _0x4d01f3.setSelectedNodes(_0x4928e6),
-      _0x4d01f3.setSelectionBox({ active: false }),
-      (_0x5c603f.isBoxSelecting = false),
+      store.setSelectionMeta({ source: 'box' }),
+      store.setSelectedNodes(list),
+      store.setSelectionBox({ active: false }),
+      (data.isBoxSelecting = false),
       { earlyReturn: false, didAct: true }
     );
   }
-  return { startBoxSelecting: _0x25f597, updateBoxSelecting: _0x555776, finishBoxSelecting: _0xb049ad };
+  return {
+    startBoxSelecting: startBoxSelecting,
+    updateBoxSelecting: updateBoxSelecting,
+    finishBoxSelecting: finishBoxSelecting,
+  };
 }

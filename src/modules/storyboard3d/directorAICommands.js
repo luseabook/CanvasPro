@@ -1,1 +1,112 @@
-import{authorDirectorPath}from'./directorPathAuthoring.js';import{applyDirectorCameraMotion,DIRECTOR_CAMERA_MOTIONS}from'./directorAuthoring.js';import{STORYBOARD_3D_ACTIONS}from'./characterRig.js';import{normalizeStoryboard3DShotAnimation}from'./shotAnimation.js';export const DIRECTOR_AI_TOOLS=["setCameraPath","setObjectPath","setCameraMotion","setCameraFollow",'addActionClip'];export function normalizeDirectorAIArgs(_0x2caf9c,_0x4516c0,{requiredId:_0x509171,vector3:_0x2ea910,finiteNumber:_0x4a5488}){if(!DIRECTOR_AI_TOOLS["includes"](_0x2caf9c))return null;const _0x1b03fd={'shotId':_0x509171(_0x4516c0["shotId"],'args.shotId'),'start':_0x4a5488(_0x4516c0["start"]??0x0,'args.start',{'min':0x0,'max':3599.9}),'duration':_0x4a5488(_0x4516c0["duration"]??0x3,"args.duration",{'min':0.1,'max':0xe10})};if(_0x1b03fd['start']+_0x1b03fd['duration']>0xe10)throw new Error('导演命令结束时间超过\x203600\x20秒。');if(_0x2caf9c==="setObjectPath"||_0x2caf9c==="addActionClip")_0x1b03fd["objectId"]=_0x509171(_0x4516c0['objectId'],"args.objectId");if(_0x2caf9c==="setCameraPath"||_0x2caf9c==="setObjectPath"){if(!Array["isArray"](_0x4516c0["points"])||_0x4516c0["points"]["length"]<0x2||_0x4516c0["points"]["length"]>0x64)throw new Error("轨迹需要 2–100 个三维控制点。");_0x1b03fd["points"]=_0x4516c0["points"]['map']((_0x13361f,_0x36c253)=>_0x2ea910(_0x13361f,"args.points["+_0x36c253+']',[0x0,0x0,0x0])),_0x1b03fd['smooth']=_0x4516c0['smooth']===!![];}if(_0x2caf9c==='setCameraMotion'){if(!DIRECTOR_CAMERA_MOTIONS["some"](([_0x2903af])=>_0x2903af===_0x4516c0["preset"]))throw new Error("运镜预设不存在。");_0x1b03fd["preset"]=_0x4516c0["preset"],_0x1b03fd["amount"]=_0x4a5488(_0x4516c0["amount"]??0x3,"args.amount",{'min':0.1,'max':0x64});}if(_0x2caf9c==="setCameraFollow"){if(!["relative","path","fixed"]['includes'](_0x4516c0["mode"]))throw new Error('跟拍模式必须为\x20relative、path\x20或\x20fixed。');Object["assign"](_0x1b03fd,{'mode':_0x4516c0["mode"],'followObjectId':_0x4516c0["followObjectId"]?_0x509171(_0x4516c0["followObjectId"],"args.followObjectId"):'','lookAtObjectId':_0x4516c0["lookAtObjectId"]?_0x509171(_0x4516c0["lookAtObjectId"],"args.lookAtObjectId"):'','followOffset':_0x2ea910(_0x4516c0['followOffset'],"args.followOffset",[0x0,0x2,0x5]),'lookAtOffset':_0x2ea910(_0x4516c0["lookAtOffset"],'args.lookAtOffset',[0x0,1.2,0x0]),'followHeading':_0x4516c0["followHeading"]===!![]});}if(_0x2caf9c==="addActionClip"){if(!STORYBOARD_3D_ACTIONS["some"](_0x16f98c=>_0x16f98c['id']===_0x4516c0["actionId"]))throw new Error("动作不存在。");_0x1b03fd["actionId"]=_0x4516c0["actionId"],_0x1b03fd["speed"]=_0x4a5488(_0x4516c0["speed"]??0x1,"args.speed",{'min':0.1,'max':0x4});}return _0x1b03fd;}export function executeDirectorAICommand(_0x51014c,_0x434ad8,_0x4c3e7e){if(!DIRECTOR_AI_TOOLS['includes'](_0x434ad8))return null;const _0x32d307=_0x51014c["shots"]["find"](_0x35079d=>_0x35079d['id']===_0x4c3e7e["shotId"]);if(!_0x32d307)throw new Error('导演命令镜头不存在。');const _0x9598eb=_0x4c3e7e["objectId"]&&_0x51014c['objects']["find"](_0x4dfc88=>_0x4dfc88['id']===_0x4c3e7e["objectId"]);if(_0x4c3e7e['objectId']&&(!_0x9598eb||_0x9598eb["locked"]))throw new Error("导演命令对象不存在或已锁定。");let _0x1f589f=normalizeStoryboard3DShotAnimation(_0x32d307['animation']);if(_0x434ad8==="setCameraPath"||_0x434ad8==="setObjectPath")_0x1f589f=authorDirectorPath(_0x1f589f,{..._0x4c3e7e,'camera':_0x32d307['camera'],'object':_0x9598eb||undefined});if(_0x434ad8==='setCameraMotion')_0x1f589f=applyDirectorCameraMotion(_0x1f589f,{..._0x4c3e7e,'camera':_0x32d307['camera']});if(_0x434ad8==="setCameraFollow"){for(const _0x246b9c of[_0x4c3e7e["followObjectId"],_0x4c3e7e["lookAtObjectId"]]['filter'](Boolean))if(!_0x51014c['objects']["some"](_0x6fa7f9=>_0x6fa7f9['id']===_0x246b9c))throw new Error("跟拍目标不存在。");_0x1f589f["cameraConstraintClips"]["push"]({..._0x4c3e7e,'id':"follow-"+globalThis['crypto']['randomUUID'](),'end':_0x4c3e7e["start"]+_0x4c3e7e['duration']});}if(_0x434ad8==="addActionClip"){if(_0x9598eb['type']!=="character")throw new Error("动作片段只能用于角色。");_0x1f589f["actionClips"]["push"]({..._0x4c3e7e,'id':"action-"+globalThis["crypto"]['randomUUID'](),'end':_0x4c3e7e["start"]+_0x4c3e7e["duration"],'offset':0x0});}return _0x32d307['animation']=normalizeStoryboard3DShotAnimation(_0x1f589f),{'changed':!![],'result':{'shotId':_0x32d307['id'],'keyframes':_0x32d307["animation"]["cameraKeyframes"]['length'],'actionClips':_0x32d307['animation']["actionClips"]["length"]}};}
+import { authorDirectorPath } from './directorPathAuthoring.js';
+import { applyDirectorCameraMotion, DIRECTOR_CAMERA_MOTIONS } from './directorAuthoring.js';
+import { STORYBOARD_3D_ACTIONS } from './characterRig.js';
+import { normalizeStoryboard3DShotAnimation } from './shotAnimation.js';
+export const DIRECTOR_AI_TOOLS = [
+  'setCameraPath',
+  'setObjectPath',
+  'setCameraMotion',
+  'setCameraFollow',
+  'addActionClip',
+];
+export function normalizeDirectorAIArgs(
+  value,
+  item,
+  { requiredId: requiredId, vector3: vector3, finiteNumber: finiteNumber },
+) {
+  if (!DIRECTOR_AI_TOOLS['includes'](value)) return null;
+  const key = {
+    shotId: requiredId(item['shotId'], 'args.shotId'),
+    start: finiteNumber(item['start'] ?? 0x0, 'args.start', { min: 0x0, max: 3599.9 }),
+    duration: finiteNumber(item['duration'] ?? 0x3, 'args.duration', { min: 0.1, max: 0xe10 }),
+  };
+  if (key['start'] + key['duration'] > 0xe10) throw new Error('导演命令结束时间超过\x203600\x20秒。');
+  if (value === 'setObjectPath' || value === 'addActionClip')
+    key['objectId'] = requiredId(item['objectId'], 'args.objectId');
+  if (value === 'setCameraPath' || value === 'setObjectPath') {
+    if (
+      !Array['isArray'](item['points']) ||
+      item['points']['length'] < 0x2 ||
+      item['points']['length'] > 0x64
+    )
+      throw new Error('轨迹需要 2–100 个三维控制点。');
+    ((key['points'] = item['points']['map']((index, result) =>
+      vector3(index, 'args.points[' + result + ']', [0x0, 0x0, 0x0]),
+    )),
+      (key['smooth'] = item['smooth'] === !![]));
+  }
+  if (value === 'setCameraMotion') {
+    if (!DIRECTOR_CAMERA_MOTIONS['some'](([data]) => data === item['preset']))
+      throw new Error('运镜预设不存在。');
+    ((key['preset'] = item['preset']),
+      (key['amount'] = finiteNumber(item['amount'] ?? 0x3, 'args.amount', { min: 0.1, max: 0x64 })));
+  }
+  if (value === 'setCameraFollow') {
+    if (!['relative', 'path', 'fixed']['includes'](item['mode']))
+      throw new Error('跟拍模式必须为\x20relative、path\x20或\x20fixed。');
+    Object['assign'](key, {
+      mode: item['mode'],
+      followObjectId: item['followObjectId'] ? requiredId(item['followObjectId'], 'args.followObjectId') : '',
+      lookAtObjectId: item['lookAtObjectId'] ? requiredId(item['lookAtObjectId'], 'args.lookAtObjectId') : '',
+      followOffset: vector3(item['followOffset'], 'args.followOffset', [0x0, 0x2, 0x5]),
+      lookAtOffset: vector3(item['lookAtOffset'], 'args.lookAtOffset', [0x0, 1.2, 0x0]),
+      followHeading: item['followHeading'] === !![],
+    });
+  }
+  if (value === 'addActionClip') {
+    if (!STORYBOARD_3D_ACTIONS['some']((options) => options['id'] === item['actionId']))
+      throw new Error('动作不存在。');
+    ((key['actionId'] = item['actionId']),
+      (key['speed'] = finiteNumber(item['speed'] ?? 0x1, 'args.speed', { min: 0.1, max: 0x4 })));
+  }
+  return key;
+}
+export function executeDirectorAICommand(enabled, target, args) {
+  if (!DIRECTOR_AI_TOOLS['includes'](target)) return null;
+  const enabled2 = enabled['shots']['find']((source) => source['id'] === args['shotId']);
+  if (!enabled2) throw new Error('导演命令镜头不存在。');
+  const enabled3 = args['objectId'] && enabled['objects']['find']((next) => next['id'] === args['objectId']);
+  if (args['objectId'] && (!enabled3 || enabled3['locked'])) throw new Error('导演命令对象不存在或已锁定。');
+  let storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(enabled2['animation']);
+  if (target === 'setCameraPath' || target === 'setObjectPath')
+    storyboard3DShotAnimation = authorDirectorPath(storyboard3DShotAnimation, {
+      ...args,
+      camera: enabled2['camera'],
+      object: enabled3 || undefined,
+    });
+  if (target === 'setCameraMotion')
+    storyboard3DShotAnimation = applyDirectorCameraMotion(storyboard3DShotAnimation, {
+      ...args,
+      camera: enabled2['camera'],
+    });
+  if (target === 'setCameraFollow') {
+    for (const current of [args['followObjectId'], args['lookAtObjectId']]['filter'](Boolean))
+      if (!enabled['objects']['some']((entry) => entry['id'] === current))
+        throw new Error('跟拍目标不存在。');
+    storyboard3DShotAnimation['cameraConstraintClips']['push']({
+      ...args,
+      id: 'follow-' + globalThis['crypto']['randomUUID'](),
+      end: args['start'] + args['duration'],
+    });
+  }
+  if (target === 'addActionClip') {
+    if (enabled3['type'] !== 'character') throw new Error('动作片段只能用于角色。');
+    storyboard3DShotAnimation['actionClips']['push']({
+      ...args,
+      id: 'action-' + globalThis['crypto']['randomUUID'](),
+      end: args['start'] + args['duration'],
+      offset: 0x0,
+    });
+  }
+  return (
+    (enabled2['animation'] = normalizeStoryboard3DShotAnimation(storyboard3DShotAnimation)),
+    {
+      changed: !![],
+      result: {
+        shotId: enabled2['id'],
+        keyframes: enabled2['animation']['cameraKeyframes']['length'],
+        actionClips: enabled2['animation']['actionClips']['length'],
+      },
+    }
+  );
+}

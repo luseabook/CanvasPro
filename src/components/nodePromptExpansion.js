@@ -8,112 +8,108 @@ import {
 import { closeSlashMenu, handleSlashKeyboardNavigation } from '../modules/slashMenu.js';
 import { closeNodeFooterMenus } from './shared/nodeFooterControls.js';
 import { createPromptExpansionController } from './promptExpansionController.js';
-export function attachNodePromptExpansion(_0x4ef3ad, { panel: _0x3d4bfc }) {
-  _0x4ef3ad['_promptExpansion']?.['remove']();
-  let _0x904df3 = null,
-    _0x1495f4 = null,
-    _0xea53ad = ![],
-    _0x7bac13 = ![],
-    _0xea8d6d = null;
-  const _0x248a7d = _0x4ef3ad['_root'],
-    _0x5e78ee = () => appStore['getStateRaw'](),
-    _0x3c8f4c = () => {
-      (_0x904df3?.(), (_0x904df3 = null), _0xea8d6d?.['disconnect'](), (_0xea8d6d = null));
+export function attachNodePromptExpansion(promptEl, { panel: panel }) {
+  promptEl['_promptExpansion']?.['remove']();
+  let enabled = null,
+    value = null,
+    enabled2 = ![],
+    enabled3 = ![],
+    mutationObserver = null;
+  const el = promptEl['_root'],
+    handler = () => appStore['getStateRaw'](),
+    handler2 = () => {
+      (enabled?.(), (enabled = null), mutationObserver?.['disconnect'](), (mutationObserver = null));
     },
-    _0x73a808 = createPromptExpansionController({
-      panel: _0x3d4bfc,
-      promptEl: _0x4ef3ad['promptEl'],
+    open = createPromptExpansionController({
+      panel: panel,
+      promptEl: promptEl['promptEl'],
       mountRoot: document['getElementById']('v2-wrap') || document['body'],
       externalDialogSelector: '.preset-modal-overlay',
       floatingSurfaceSelector:
         '.at-mention-menu, .preset-slash-menu, .preset-slash-submenu, .preset-slash-cover-preview, .global-tooltip, .generation-node-help-tooltip-portal, .ref-hover-preview, .v2-text-input-context-menu, .v2-submenu',
       getTitle: () => {
-        const _0x392189 = _0x5e78ee()['nodes']?.[_0x4ef3ad['nodeId']];
-        return _0x392189?.['name'] || _0x392189?.['label'] || t('promptExpansion.title');
+        const error = handler()['nodes']?.[promptEl['nodeId']];
+        return error?.['name'] || error?.['label'] || t('promptExpansion.title');
       },
       flush: () => {
-        if (_0x4ef3ad['_hasPendingPromptHtmlCommit']) _0x4ef3ad['_flushPromptHtmlCommit']?.();
+        if (promptEl['_hasPendingPromptHtmlCommit']) promptEl['_flushPromptHtmlCommit']?.();
       },
       closeMenus: () => {
-        (_closeMentionMenu(), closeSlashMenu(), closeNodeFooterMenus(_0x3d4bfc));
+        (_closeMentionMenu(), closeSlashMenu(), closeNodeFooterMenus(panel));
       },
-      consumeEscape: (_0x515c03) => {
-        if (_handleMentionMenuKeyboard(_0x515c03) || handleSlashKeyboardNavigation(_0x515c03)) return !![];
+      consumeEscape: (item) => {
+        if (_handleMentionMenuKeyboard(item) || handleSlashKeyboardNavigation(item)) return !![];
         if (
-          _0x3d4bfc['querySelector'](
+          panel['querySelector'](
             '.floating-menu.show, .img-model-menu.show, .node-model-menu.show, .ui-schema-floating-menu.show, .rh-adv-panel.show:not(.is-rh-ai-app-persistent), .rh-vram-adv-panel.show:not(.is-rh-ai-app-persistent)',
           )
         )
-          return (closeNodeFooterMenus(_0x3d4bfc), !![]);
+          return (closeNodeFooterMenus(panel), !![]);
         return ![];
       },
       onOpen: () => {
-        _0x1495f4 = _0x5e78ee()['nodes'];
-        if (!_0x904df3) _0x904df3 = appStore['subscribeRaw'](_0x40177f);
-        if (!_0xea8d6d) {
-          _0xea8d6d = new MutationObserver(() => {
-            _0x73a808['expanded'] &&
-              (!_0x248a7d['getClientRects']()['length'] || !_0x4ef3ad['promptEl']['isContentEditable']) &&
-              _0x73a808['close']({ restoreFocus: ![] });
+        value = handler()['nodes'];
+        if (!enabled) enabled = appStore['subscribeRaw'](run);
+        if (!mutationObserver) {
+          mutationObserver = new MutationObserver(() => {
+            open['expanded'] &&
+              (!el['getClientRects']()['length'] || !promptEl['promptEl']['isContentEditable']) &&
+              open['close']({ restoreFocus: ![] });
           });
-          for (let _0x49e4bc = _0x248a7d; _0x49e4bc; _0x49e4bc = _0x49e4bc['parentElement']) {
-            _0xea8d6d['observe'](_0x49e4bc, {
+          for (let key = el; key; key = key['parentElement']) {
+            mutationObserver['observe'](key, {
               attributes: !![],
               attributeFilter: ['hidden', 'aria-hidden', 'class', 'style'],
             });
           }
-          _0xea8d6d['observe'](_0x4ef3ad['promptEl'], {
+          mutationObserver['observe'](promptEl['promptEl'], {
             attributes: !![],
             attributeFilter: ['contenteditable'],
           });
         }
       },
       onClose: () => {
-        if (!_0xea53ad) _0x3c8f4c();
+        if (!enabled2) handler2();
       },
     });
-  function _0x40177f() {
-    if (_0x7bac13) return;
-    const _0x5dabb7 = _0x5e78ee();
-    if (
-      _0x5dabb7['nodes'] !== _0x1495f4 ||
-      !_0x5dabb7['nodes'][_0x4ef3ad['nodeId']] ||
-      !_0x248a7d['isConnected']
-    ) {
-      (cancelPromptHtmlCommit(_0x4ef3ad),
-        (_0xea53ad = ![]),
-        _0x73a808['close']({ commit: ![], restoreFocus: ![] }),
-        _0x3c8f4c());
+  function run() {
+    if (enabled3) return;
+    const enabled4 = handler();
+    if (enabled4['nodes'] !== value || !enabled4['nodes'][promptEl['nodeId']] || !el['isConnected']) {
+      (cancelPromptHtmlCommit(promptEl),
+        (enabled2 = ![]),
+        open['close']({ commit: ![], restoreFocus: ![] }),
+        handler2());
       return;
     }
     if (
-      _0x5dabb7['pickConnectMode']?.['active'] &&
-      _0x5dabb7['pickConnectMode']['sourceNodeId'] === _0x4ef3ad['nodeId']
+      enabled4['pickConnectMode']?.['active'] &&
+      enabled4['pickConnectMode']['sourceNodeId'] === promptEl['nodeId']
     ) {
-      ((_0xea53ad = !![]), _0x73a808['close']({ restoreFocus: ![] }));
+      ((enabled2 = !![]), open['close']({ restoreFocus: ![] }));
       return;
     }
-    if (_0xea53ad && !_0x5dabb7['pickConnectMode']?.['active'])
-      ((_0xea53ad = ![]),
+    if (enabled2 && !enabled4['pickConnectMode']?.['active'])
+      ((enabled2 = ![]),
         queueMicrotask(() => {
           if (
-            !_0x7bac13 &&
-            _0x248a7d['isConnected'] &&
-            _0x5e78ee()['nodes'] === _0x1495f4 &&
-            _0x5e78ee()['selectedNodeIds']?.['includes'](_0x4ef3ad['nodeId'])
+            !enabled3 &&
+            el['isConnected'] &&
+            handler()['nodes'] === value &&
+            handler()['selectedNodeIds']?.['includes'](promptEl['nodeId'])
           )
-            _0x73a808['open']();
-          else _0x3c8f4c();
+            open['open']();
+          else handler2();
         }));
     else
-      !_0x5dabb7['selectedNodeIds']?.['includes'](_0x4ef3ad['nodeId'])
-        ? _0x73a808['close']({ restoreFocus: ![] })
-        : _0x73a808['sync']();
+      !enabled4['selectedNodeIds']?.['includes'](promptEl['nodeId'])
+        ? open['close']({ restoreFocus: ![] })
+        : open['sync']();
   }
-  _0x4ef3ad['_promptExpansion'] = {
-    open: _0x73a808['open'],
+  promptEl['_promptExpansion'] = {
+    open: open['open'],
     remove() {
-      ((_0x7bac13 = !![]), (_0xea53ad = ![]), _0x3c8f4c(), _0x73a808['remove']());
+      ((enabled3 = !![]), (enabled2 = ![]), handler2(), open['remove']());
     },
   };
 }

@@ -16,7 +16,7 @@ export const AGENT_CONTEXT_DIGEST_SYSTEM_PROMPT = [
   'Return one strict JSON object and no Markdown.',
 ]['join']('\x0a');
 function createStructuredOutput() {
-  const _0x4bb932 = { type: 'array', maxItems: 0xa, items: { type: 'string' } };
+  const constraints = { type: 'array', maxItems: 0xa, items: { type: 'string' } };
   return {
     name: 'agent_context_digest',
     fallback: 'prompt',
@@ -26,10 +26,10 @@ function createStructuredOutput() {
       required: ['goal', 'constraints', 'decisions', 'completed', 'pending'],
       properties: {
         goal: { type: 'string' },
-        constraints: _0x4bb932,
-        decisions: _0x4bb932,
-        completed: _0x4bb932,
-        pending: _0x4bb932,
+        constraints: constraints,
+        decisions: constraints,
+        completed: constraints,
+        pending: constraints,
       },
     },
   };
@@ -48,10 +48,10 @@ function buildPrompt({
       : '摘要内容使用简体中文。',
     existingDigest: compactAgentContextDigestForPrompt(existingDigest),
     projectMemory: compactAgentProjectMemoryForPrompt(projectMemory),
-    newMessages: (Array['isArray'](messages) ? messages : [])['map']((_0x161dbc = {}) => ({
-      role: String(_0x161dbc['role'] || 'assistant'),
-      content: String(_0x161dbc['content'] || ''),
-      ...(_0x161dbc['status'] ? { status: String(_0x161dbc['status']) } : {}),
+    newMessages: (Array['isArray'](messages) ? messages : [])['map']((response = {}) => ({
+      role: String(response['role'] || 'assistant'),
+      content: String(response['content'] || ''),
+      ...(response['status'] ? { status: String(response['status']) } : {}),
     })),
     outputContract: {
       goal: 'The\x20current\x20primary\x20user\x20goal,\x20or\x20an\x20empty\x20string.',
@@ -62,20 +62,20 @@ function buildPrompt({
     },
   });
 }
-function getResultText(_0x2b36cc) {
-  return typeof _0x2b36cc === 'string'
-    ? _0x2b36cc
-    : _0x2b36cc?.['text'] || _0x2b36cc?.['outputText'] || _0x2b36cc?.['content'] || '';
+function getResultText(response2) {
+  return typeof response2 === 'string'
+    ? response2
+    : response2?.['text'] || response2?.['outputText'] || response2?.['content'] || '';
 }
-function parseDigestResult(_0x779a4a) {
-  const _0x57cc3c =
-    _0x779a4a &&
-    typeof _0x779a4a === 'object' &&
-    !Array['isArray'](_0x779a4a) &&
-    !Object['prototype']['hasOwnProperty']['call'](_0x779a4a, 'text')
-      ? _0x779a4a
-      : JSON['parse'](String(getResultText(_0x779a4a) || '')['trim']());
-  return normalizeAgentContextDigest(_0x57cc3c);
+function parseDigestResult(value) {
+  const item =
+    value &&
+    typeof value === 'object' &&
+    !Array['isArray'](value) &&
+    !Object['prototype']['hasOwnProperty']['call'](value, 'text')
+      ? value
+      : JSON['parse'](String(getResultText(value) || '')['trim']());
+  return normalizeAgentContextDigest(item);
 }
 export async function requestAgentContextDigest({
   existingDigest: existingDigest = null,
@@ -88,46 +88,46 @@ export async function requestAgentContextDigest({
 } = {}) {
   if (!Array['isArray'](messages) || messages['length'] === 0x0)
     return normalizeAgentContextDigest(existingDigest);
-  const _0x10e910 = String(settings['model'] || '')['trim'](),
-    _0x53f0d3 = String(settings['provider'] || '')['trim'](),
-    _0xf7c419 = String(settings['providerProfileId'] || '')['trim']();
-  if (!_0x10e910 || !_0x53f0d3) throw new Error('Agent\x20model\x20is\x20not\x20configured.');
-  const _0x396f9a = buildPrompt({
+  const model = String(settings['model'] || '')['trim'](),
+    provider = String(settings['provider'] || '')['trim'](),
+    providerProfileId = String(settings['providerProfileId'] || '')['trim']();
+  if (!model || !provider) throw new Error('Agent\x20model\x20is\x20not\x20configured.');
+  const prompt = buildPrompt({
       existingDigest: existingDigest,
       messages: messages,
       projectMemory: projectMemory,
       locale: settings['locale'],
     }),
-    _0x47c850 = {
-      model: _0x10e910,
-      provider: _0x53f0d3,
+    args = {
+      model: model,
+      provider: provider,
       ...buildAgentModelRequestParams(settings),
-      ...(_0xf7c419 ? { providerProfileId: _0xf7c419 } : {}),
-      prompt: _0x396f9a,
+      ...(providerProfileId ? { providerProfileId: providerProfileId } : {}),
+      prompt: prompt,
       systemPrompt: AGENT_CONTEXT_DIGEST_SYSTEM_PROMPT,
       structuredOutput: createStructuredOutput(),
       temperature: 0x0,
       ...(signal ? { signal: signal } : {}),
     };
-  onTrace?.({ type: 'agent_context_digest_model_selected', provider: _0x53f0d3, model: _0x10e910 });
-  const _0x4422b6 = await request(_0x47c850);
+  onTrace?.({ type: 'agent_context_digest_model_selected', provider: provider, model: model });
+  const request2 = await request(args);
   try {
-    return parseDigestResult(_0x4422b6) || normalizeAgentContextDigest(existingDigest);
-  } catch (_0x56311b) {
+    return parseDigestResult(request2) || normalizeAgentContextDigest(existingDigest);
+  } catch (error) {
     onTrace?.({
       type: 'agent_context_digest_json_retry',
-      reason: String(_0x56311b?.['message'] || 'invalid JSON')['slice'](0x0, 0xa0),
+      reason: String(error?.['message'] || 'invalid JSON')['slice'](0x0, 0xa0),
     });
-    const _0x2027f5 = await request({
-      ..._0x47c850,
+    const request3 = await request({
+      ...args,
       prompt: JSON['stringify']({
-        ...JSON['parse'](_0x396f9a),
+        ...JSON['parse'](prompt),
         retry: {
           previousAttemptRejected: !![],
           instruction: 'Return the corrected strict JSON object only.',
         },
       }),
     });
-    return parseDigestResult(_0x2027f5) || normalizeAgentContextDigest(existingDigest);
+    return parseDigestResult(request3) || normalizeAgentContextDigest(existingDigest);
   }
 }

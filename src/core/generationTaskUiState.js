@@ -23,124 +23,124 @@ const RUNNING_STATUSES = new Set(['running', 'processing', 'generating', 'in_pro
     'statusMessage',
   ]),
   IDLE_STATUSES = new Set(['idle', '']);
-function normalizeStatus(_0x323e1b) {
-  return String(_0x323e1b || '')
+function normalizeStatus(value) {
+  return String(value || '')
     .trim()
     .toLowerCase();
 }
-function isNonIdleStatus(_0x366c48) {
-  return !IDLE_STATUSES.has(normalizeStatus(_0x366c48));
+function isNonIdleStatus(item) {
+  return !IDLE_STATUSES.has(normalizeStatus(item));
 }
-function hasActiveTaskFamily(_0x553657) {
-  if (!_0x553657 || typeof _0x553657 !== 'object') return false;
+function hasActiveTaskFamily(enabled) {
+  if (!enabled || typeof enabled !== 'object') return false;
   return (
-    _0x553657.rhTaskRecovering === true ||
-    _0x553657.dreaminaTaskRecovering === true ||
-    _0x553657.asyncTaskRecovering === true ||
-    !!String(_0x553657.rhTaskId || '').trim() ||
-    !!String(_0x553657.dreaminaSubmitId || '').trim() ||
-    !!String(_0x553657.asyncTaskId || '').trim() ||
-    isNonIdleStatus(_0x553657.rhTaskStatus) ||
-    isNonIdleStatus(_0x553657.dreaminaTaskStatus) ||
-    isNonIdleStatus(_0x553657.asyncTaskStatus)
+    enabled.rhTaskRecovering === true ||
+    enabled.dreaminaTaskRecovering === true ||
+    enabled.asyncTaskRecovering === true ||
+    !!String(enabled.rhTaskId || '').trim() ||
+    !!String(enabled.dreaminaSubmitId || '').trim() ||
+    !!String(enabled.asyncTaskId || '').trim() ||
+    isNonIdleStatus(enabled.rhTaskStatus) ||
+    isNonIdleStatus(enabled.dreaminaTaskStatus) ||
+    isNonIdleStatus(enabled.asyncTaskStatus)
   );
 }
-function collectStatuses(_0x1c86a9) {
-  if (!_0x1c86a9 || typeof _0x1c86a9 !== 'object') return [];
-  if (hasActiveTaskFamily(_0x1c86a9)) {
-    const _0x89983 = [_0x1c86a9.jobStatus];
+function collectStatuses(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return [];
+  if (hasActiveTaskFamily(enabled2)) {
+    const list = [enabled2.jobStatus];
     return (
-      (_0x1c86a9.rhTaskRecovering === true ||
-        !!String(_0x1c86a9.rhTaskId || '').trim() ||
-        isNonIdleStatus(_0x1c86a9.rhTaskStatus)) &&
-        _0x89983.push(_0x1c86a9.rhTaskStatus),
-      (_0x1c86a9.dreaminaTaskRecovering === true ||
-        !!String(_0x1c86a9.dreaminaSubmitId || '').trim() ||
-        isNonIdleStatus(_0x1c86a9.dreaminaTaskStatus)) &&
-        _0x89983.push(_0x1c86a9.dreaminaTaskStatus, _0x1c86a9.dreaminaTaskPhase),
-      (_0x1c86a9.asyncTaskRecovering === true ||
-        !!String(_0x1c86a9.asyncTaskId || '').trim() ||
-        isNonIdleStatus(_0x1c86a9.asyncTaskStatus)) &&
-        _0x89983.push(_0x1c86a9.asyncTaskStatus),
-      _0x89983.map(normalizeStatus).filter(Boolean)
+      (enabled2.rhTaskRecovering === true ||
+        !!String(enabled2.rhTaskId || '').trim() ||
+        isNonIdleStatus(enabled2.rhTaskStatus)) &&
+        list.push(enabled2.rhTaskStatus),
+      (enabled2.dreaminaTaskRecovering === true ||
+        !!String(enabled2.dreaminaSubmitId || '').trim() ||
+        isNonIdleStatus(enabled2.dreaminaTaskStatus)) &&
+        list.push(enabled2.dreaminaTaskStatus, enabled2.dreaminaTaskPhase),
+      (enabled2.asyncTaskRecovering === true ||
+        !!String(enabled2.asyncTaskId || '').trim() ||
+        isNonIdleStatus(enabled2.asyncTaskStatus)) &&
+        list.push(enabled2.asyncTaskStatus),
+      list.map(normalizeStatus).filter(Boolean)
     );
   }
-  return STATUS_FIELDS.map((_0x4a8f30) => normalizeStatus(_0x1c86a9[_0x4a8f30])).filter(Boolean);
+  return STATUS_FIELDS.map((item2) => normalizeStatus(enabled2[item2])).filter(Boolean);
 }
-function hasAnyStatus(_0xa4a3b4, _0x4d5355) {
-  return _0xa4a3b4.some((_0x2daa4d) => _0x4d5355.has(_0x2daa4d));
+function hasAnyStatus(list2, map) {
+  return list2.some((item3) => map.has(item3));
 }
-function hasRecoveringFlag(_0x29b1d6) {
-  if (!_0x29b1d6 || typeof _0x29b1d6 !== 'object') return false;
-  return RECOVERING_FIELDS.some((_0x2d9191) => _0x29b1d6[_0x2d9191] === true);
+function hasRecoveringFlag(enabled3) {
+  if (!enabled3 || typeof enabled3 !== 'object') return false;
+  return RECOVERING_FIELDS.some((item4) => enabled3[item4] === true);
 }
-export function resolveGenerationUiState(_0x59c44d) {
-  const _0x19446e = collectStatuses(_0x59c44d);
-  if (hasAnyStatus(_0x19446e, ERROR_STATUSES)) return 'error';
-  if (hasAnyStatus(_0x19446e, CANCELLED_STATUSES)) return 'cancelled';
-  if (hasAnyStatus(_0x19446e, SUCCESS_STATUSES)) return 'success';
-  if (hasRecoveringFlag(_0x59c44d)) return 'recovering';
-  if (hasAnyStatus(_0x19446e, RUNNING_STATUSES)) return 'running';
-  if (hasAnyStatus(_0x19446e, QUEUED_STATUSES)) return 'queued';
-  if (hasAnyStatus(_0x19446e, SUBMITTING_STATUSES)) return 'submitting';
-  if (_0x59c44d?.isGenerating === true) return 'running';
+export function resolveGenerationUiState(key) {
+  const statuses = collectStatuses(key);
+  if (hasAnyStatus(statuses, ERROR_STATUSES)) return 'error';
+  if (hasAnyStatus(statuses, CANCELLED_STATUSES)) return 'cancelled';
+  if (hasAnyStatus(statuses, SUCCESS_STATUSES)) return 'success';
+  if (hasRecoveringFlag(key)) return 'recovering';
+  if (hasAnyStatus(statuses, RUNNING_STATUSES)) return 'running';
+  if (hasAnyStatus(statuses, QUEUED_STATUSES)) return 'queued';
+  if (hasAnyStatus(statuses, SUBMITTING_STATUSES)) return 'submitting';
+  if (key?.isGenerating === true) return 'running';
   return 'idle';
 }
-export function isTaskRunning(_0x41e2f0) {
-  return ['submitting', 'queued', 'running', 'recovering'].includes(resolveGenerationUiState(_0x41e2f0));
+export function isTaskRunning(index) {
+  return ['submitting', 'queued', 'running', 'recovering'].includes(resolveGenerationUiState(index));
 }
-export function isTaskTerminal(_0x597c02) {
-  return ['success', 'error', 'cancelled'].includes(resolveGenerationUiState(_0x597c02));
+export function isTaskTerminal(result) {
+  return ['success', 'error', 'cancelled'].includes(resolveGenerationUiState(result));
 }
-export function isTaskFailed(_0x4459cd) {
-  return resolveGenerationUiState(_0x4459cd) === 'error';
+export function isTaskFailed(data) {
+  return resolveGenerationUiState(data) === 'error';
 }
-export function isTaskCancelled(_0x516e3b) {
-  return resolveGenerationUiState(_0x516e3b) === 'cancelled';
+export function isTaskCancelled(options) {
+  return resolveGenerationUiState(options) === 'cancelled';
 }
-export function shouldShowGenerationBusyUi(_0x2e5e5f) {
-  return isTaskRunning(_0x2e5e5f);
+export function shouldShowGenerationBusyUi(target) {
+  return isTaskRunning(target);
 }
-export function shouldShowGenerationResultLoadingUi(_0x1d14dc, { hasResult: hasResult = false } = {}) {
-  return hasResult !== true && shouldShowGenerationBusyUi(_0x1d14dc);
+export function shouldShowGenerationResultLoadingUi(source, { hasResult: hasResult = false } = {}) {
+  return hasResult !== true && shouldShowGenerationBusyUi(source);
 }
 export function shouldAllowCancel(
-  _0x38b886,
+  next,
   { cancellable: cancellable = false, cancelInFlight: cancelInFlight = false } = {},
 ) {
-  return cancellable === true && isTaskRunning(_0x38b886) && cancelInFlight !== true;
+  return cancellable === true && isTaskRunning(next) && cancelInFlight !== true;
 }
 export function resolveGenerationButtonMode(
-  _0xa12ef2,
+  current,
   { cancellable: cancellable = false, cancelInFlight: cancelInFlight = false } = {},
 ) {
-  const _0x216f88 = resolveGenerationUiState(_0xa12ef2),
-    _0xd344e7 = isTaskRunning(_0xa12ef2),
-    _0x270e21 = shouldAllowCancel(_0xa12ef2, { cancellable: cancellable, cancelInFlight: cancelInFlight });
+  const state = resolveGenerationUiState(current),
+    busy = isTaskRunning(current),
+    canCancel = shouldAllowCancel(current, { cancellable: cancellable, cancelInFlight: cancelInFlight });
   return {
-    state: _0x216f88,
-    busy: _0xd344e7,
-    canCancel: _0x270e21,
-    disabled: _0xd344e7 ? !_0x270e21 || cancelInFlight === true : false,
-    cursor: _0xd344e7 && (!_0x270e21 || cancelInFlight === true) ? 'var(--unavailable-cursor)' : '',
+    state: state,
+    busy: busy,
+    canCancel: canCancel,
+    disabled: busy ? !canCancel || cancelInFlight === true : false,
+    cursor: busy && (!canCancel || cancelInFlight === true) ? 'var(--unavailable-cursor)' : '',
   };
 }
-export function getTaskMessage(_0x2c40f2) {
-  if (!_0x2c40f2 || typeof _0x2c40f2 !== 'object') return '';
-  for (const _0x470bfa of MESSAGE_FIELDS) {
-    const _0x112e49 = String(_0x2c40f2[_0x470bfa] || '').trim();
-    if (_0x112e49) return _0x112e49;
+export function getTaskMessage(enabled4) {
+  if (!enabled4 || typeof enabled4 !== 'object') return '';
+  for (const entry of MESSAGE_FIELDS) {
+    const record = String(enabled4[entry] || '').trim();
+    if (record) return record;
   }
   return '';
 }
-export function isDreaminaTaskTerminal(_0x2c53c0) {
-  const _0x32db93 = [
-    normalizeStatus(_0x2c53c0?.dreaminaTaskStatus),
-    normalizeStatus(_0x2c53c0?.dreaminaTaskPhase),
+export function isDreaminaTaskTerminal(payload) {
+  const handle = [
+    normalizeStatus(payload?.dreaminaTaskStatus),
+    normalizeStatus(payload?.dreaminaTaskPhase),
   ].filter(Boolean);
   return (
-    hasAnyStatus(_0x32db93, ERROR_STATUSES) ||
-    hasAnyStatus(_0x32db93, CANCELLED_STATUSES) ||
-    hasAnyStatus(_0x32db93, SUCCESS_STATUSES)
+    hasAnyStatus(handle, ERROR_STATUSES) ||
+    hasAnyStatus(handle, CANCELLED_STATUSES) ||
+    hasAnyStatus(handle, SUCCESS_STATUSES)
   );
 }

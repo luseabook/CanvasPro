@@ -1,22 +1,25 @@
-function getRecognitionConstructor(_0x2639cb) {
-  return _0x2639cb?.['SpeechRecognition'] || _0x2639cb?.['webkitSpeechRecognition'] || null;
+function getRecognitionConstructor(value) {
+  return value?.['SpeechRecognition'] || value?.['webkitSpeechRecognition'] || null;
 }
-export function isStoryboard3DVoiceInputSupported(_0x1688b0 = globalThis['window']) {
-  return typeof getRecognitionConstructor(_0x1688b0) === 'function';
+export function isStoryboard3DVoiceInputSupported(item = globalThis['window']) {
+  return typeof getRecognitionConstructor(item) === 'function';
 }
-function collectRecognitionText(_0x4fa1ad) {
-  const _0x5c8505 = [],
-    _0x5c6726 = [],
-    _0x2449cb = _0x4fa1ad?.['results'] || [],
-    _0xc8d74f = Math['max'](0x0, Number(_0x4fa1ad?.['resultIndex'] || 0x0));
-  for (let _0x3d148f = _0xc8d74f; _0x3d148f < _0x2449cb['length']; _0x3d148f += 0x1) {
-    const _0x48402f = _0x2449cb[_0x3d148f],
-      _0x55101f = String(_0x48402f?.[0x0]?.['transcript'] || '')['trim']();
-    if (!_0x55101f) continue;
-    if (_0x48402f['isFinal']) _0x5c8505['push'](_0x55101f);
-    else _0x5c6726['push'](_0x55101f);
+function collectRecognitionText(key) {
+  const finalText = [],
+    interimText = [],
+    list = key?.['results'] || [],
+    index = Math['max'](0x0, Number(key?.['resultIndex'] || 0x0));
+  for (let result = index; result < list['length']; result += 0x1) {
+    const data = list[result],
+      enabled = String(data?.[0x0]?.['transcript'] || '')['trim']();
+    if (!enabled) continue;
+    if (data['isFinal']) finalText['push'](enabled);
+    else interimText['push'](enabled);
   }
-  return { finalText: _0x5c8505['join']('\x20')['trim'](), interimText: _0x5c6726['join']('\x20')['trim']() };
+  return {
+    finalText: finalText['join']('\x20')['trim'](),
+    interimText: interimText['join']('\x20')['trim'](),
+  };
 }
 export class Storyboard3DVoiceInputService {
   constructor({
@@ -24,17 +27,17 @@ export class Storyboard3DVoiceInputService {
     lang: lang = 'zh-CN',
     continuous: continuous = ![],
     interimResults: interimResults = !![],
-    onStateChange: _0x172605,
-    onTranscript: _0x4f9035,
-    onError: _0x41bc09,
+    onStateChange: onStateChange,
+    onTranscript: onTranscript,
+    onError: onError,
   } = {}) {
     ((this['window'] = windowObject),
       (this['lang'] = lang),
       (this['continuous'] = Boolean(continuous)),
       (this['interimResults'] = Boolean(interimResults)),
-      (this['onStateChange'] = _0x172605),
-      (this['onTranscript'] = _0x4f9035),
-      (this['onError'] = _0x41bc09),
+      (this['onStateChange'] = onStateChange),
+      (this['onTranscript'] = onTranscript),
+      (this['onError'] = onError),
       (this['recognition'] = null),
       (this['state'] = 'idle'),
       (this['finalTranscript'] = ''),
@@ -43,39 +46,43 @@ export class Storyboard3DVoiceInputService {
   ['isSupported']() {
     return isStoryboard3DVoiceInputSupported(this['window']);
   }
-  ['_setState'](_0x5ce201, _0x22fd1b = {}) {
-    if (this['state'] === _0x5ce201 && Object['keys'](_0x22fd1b)['length'] === 0x0) return;
-    ((this['state'] = _0x5ce201), this['onStateChange']?.({ state: _0x5ce201, ..._0x22fd1b }));
+  ['_setState'](state, args = {}) {
+    if (this['state'] === state && Object['keys'](args)['length'] === 0x0) return;
+    ((this['state'] = state), this['onStateChange']?.({ state: state, ...args }));
   }
-  ['_bindRecognition'](_0x18d891) {
-    ((_0x18d891['lang'] = this['lang']),
-      (_0x18d891['continuous'] = this['continuous']),
-      (_0x18d891['interimResults'] = this['interimResults']),
-      (_0x18d891['maxAlternatives'] = 0x1),
-      (_0x18d891['onstart'] = () => {
+  ['_bindRecognition'](options) {
+    ((options['lang'] = this['lang']),
+      (options['continuous'] = this['continuous']),
+      (options['interimResults'] = this['interimResults']),
+      (options['maxAlternatives'] = 0x1),
+      (options['onstart'] = () => {
         ((this['_stopping'] = ![]), this['_setState']('listening'));
       }),
-      (_0x18d891['onspeechstart'] = () => this['_setState']('transcribing')),
-      (_0x18d891['onresult'] = (_0x373f6d) => {
-        const { finalText: _0x2bb2c7, interimText: _0x3855a8 } = collectRecognitionText(_0x373f6d);
-        _0x2bb2c7 &&
-          (this['finalTranscript'] = [this['finalTranscript'], _0x2bb2c7]['filter'](Boolean)['join']('\x20'));
-        const _0x5a9a48 = [this['finalTranscript'], _0x3855a8]['filter'](Boolean)['join']('\x20')['trim']();
+      (options['onspeechstart'] = () => this['_setState']('transcribing')),
+      (options['onresult'] = (target) => {
+        const { finalText: finalText2, interimText: interimText2 } = collectRecognitionText(target);
+        finalText2 &&
+          (this['finalTranscript'] = [this['finalTranscript'], finalText2]
+            ['filter'](Boolean)
+            ['join']('\x20'));
+        const transcript = [this['finalTranscript'], interimText2]
+          ['filter'](Boolean)
+          ['join']('\x20')
+          ['trim']();
         this['onTranscript']?.({
-          transcript: _0x5a9a48,
+          transcript: transcript,
           finalText: this['finalTranscript'],
-          interimText: _0x3855a8,
-          isFinal: Boolean(_0x2bb2c7 && !_0x3855a8),
+          interimText: interimText2,
+          isFinal: Boolean(finalText2 && !interimText2),
         });
       }),
-      (_0x18d891['onerror'] = (_0x340050) => {
-        const _0x521bcf = String(_0x340050?.['error'] || 'recognition-error'),
-          _0x52259a = ['no-speech', 'aborted']['includes'](_0x521bcf);
-        this['_setState'](_0x52259a ? 'idle' : 'error', { error: _0x521bcf });
-        if (!_0x52259a)
-          this['onError']?.({ error: _0x521bcf, message: String(_0x340050?.['message'] || '') });
+      (options['onerror'] = (error) => {
+        const error2 = String(error?.['error'] || 'recognition-error'),
+          enabled2 = ['no-speech', 'aborted']['includes'](error2);
+        this['_setState'](enabled2 ? 'idle' : 'error', { error: error2 });
+        if (!enabled2) this['onError']?.({ error: error2, message: String(error?.['message'] || '') });
       }),
-      (_0x18d891['onend'] = () => {
+      (options['onend'] = () => {
         ((this['recognition'] = null),
           this['_setState']('idle', { transcript: this['finalTranscript'], stopped: this['_stopping'] }),
           (this['_stopping'] = ![]));
@@ -83,24 +90,24 @@ export class Storyboard3DVoiceInputService {
   }
   ['start']({ resetTranscript: resetTranscript = !![] } = {}) {
     if (!this['isSupported']()) {
-      const _0x1185d0 = new Error('当前运行环境不支持语音转文字。');
-      ((_0x1185d0['code'] = 'speech-recognition-unsupported'),
-        this['_setState']('error', { error: _0x1185d0['code'] }),
-        this['onError']?.({ error: _0x1185d0['code'], message: _0x1185d0['message'] }));
-      throw _0x1185d0;
+      const error3 = new Error('当前运行环境不支持语音转文字。');
+      ((error3['code'] = 'speech-recognition-unsupported'),
+        this['_setState']('error', { error: error3['code'] }),
+        this['onError']?.({ error: error3['code'], message: error3['message'] }));
+      throw error3;
     }
     if (this['recognition']) return ![];
     if (resetTranscript) this['finalTranscript'] = '';
-    const _0x379add = getRecognitionConstructor(this['window']),
-      _0x5af29e = new _0x379add();
-    ((this['recognition'] = _0x5af29e), this['_bindRecognition'](_0x5af29e), this['_setState']('starting'));
+    const run = getRecognitionConstructor(this['window']),
+      source = new run();
+    ((this['recognition'] = source), this['_bindRecognition'](source), this['_setState']('starting'));
     try {
-      return (_0x5af29e['start'](), !![]);
-    } catch (_0x5d3f1f) {
+      return (source['start'](), !![]);
+    } catch (message) {
       ((this['recognition'] = null),
         this['_setState']('error', { error: 'start-failed' }),
-        this['onError']?.({ error: 'start-failed', message: _0x5d3f1f?.['message'] || String(_0x5d3f1f) }));
-      throw _0x5d3f1f;
+        this['onError']?.({ error: 'start-failed', message: message?.['message'] || String(message) }));
+      throw message;
     }
   }
   ['stop']() {
@@ -112,18 +119,18 @@ export class Storyboard3DVoiceInputService {
     return ((this['_stopping'] = !![]), this['recognition']['abort']?.(), !![]);
   }
   ['destroy']() {
-    const _0x539103 = this['recognition'];
+    const next = this['recognition'];
     ((this['recognition'] = null),
-      _0x539103?.['abort']?.(),
-      _0x539103 &&
-        ((_0x539103['onstart'] = null),
-        (_0x539103['onspeechstart'] = null),
-        (_0x539103['onresult'] = null),
-        (_0x539103['onerror'] = null),
-        (_0x539103['onend'] = null)),
+      next?.['abort']?.(),
+      next &&
+        ((next['onstart'] = null),
+        (next['onspeechstart'] = null),
+        (next['onresult'] = null),
+        (next['onerror'] = null),
+        (next['onend'] = null)),
       this['_setState']('idle'));
   }
 }
-export function createStoryboard3DVoiceInputService(_0xaac445 = {}) {
-  return new Storyboard3DVoiceInputService(_0xaac445);
+export function createStoryboard3DVoiceInputService(options2 = {}) {
+  return new Storyboard3DVoiceInputService(options2);
 }

@@ -4,92 +4,92 @@ import {
   searchSceneAssets,
 } from '../../modules/panoramaSceneNode/sceneAssetCatalog.js';
 import { t } from '../../i18n/index.js';
-function sceneText(_0x51dbc5, _0x5b13a1 = {}) {
-  return t('panoramaSceneNode.assets.' + _0x51dbc5, _0x5b13a1);
+function sceneText(value, item = {}) {
+  return t('panoramaSceneNode.assets.' + value, item);
 }
-function syncStaticText(_0x302e35) {
-  const _0xab4c4b = _0x302e35['querySelector']('.panorama-asset-browser__title');
-  if (_0xab4c4b) _0xab4c4b['textContent'] = sceneText('title', { count: SCENE_ASSET_COUNT });
-  const _0x210178 = _0x302e35['querySelector']('.panorama-asset-browser__category');
-  _0x210178 &&
-    (_0x210178['setAttribute']('aria-label', sceneText('categoryAria')),
-    Array['from'](_0x210178['options'])['forEach']((_0x5e33aa) => {
-      _0x5e33aa['textContent'] = sceneText('categories.' + _0x5e33aa['value']);
+function syncStaticText(el) {
+  const el2 = el['querySelector']('.panorama-asset-browser__title');
+  if (el2) el2['textContent'] = sceneText('title', { count: SCENE_ASSET_COUNT });
+  const el3 = el['querySelector']('.panorama-asset-browser__category');
+  el3 &&
+    (el3['setAttribute']('aria-label', sceneText('categoryAria')),
+    Array['from'](el3['options'])['forEach']((el4) => {
+      el4['textContent'] = sceneText('categories.' + el4['value']);
     }));
-  const _0x510ff0 = _0x302e35['querySelector']('.panorama-asset-browser__search');
-  _0x510ff0 &&
-    ((_0x510ff0['placeholder'] = sceneText('searchPlaceholder')),
-    _0x510ff0['setAttribute']('aria-label', sceneText('searchAria')));
-  const _0x16ff4b = _0x302e35['querySelector']('.panorama-asset-browser__empty');
-  if (_0x16ff4b) _0x16ff4b['textContent'] = sceneText('empty');
+  const el5 = el['querySelector']('.panorama-asset-browser__search');
+  el5 &&
+    ((el5['placeholder'] = sceneText('searchPlaceholder')),
+    el5['setAttribute']('aria-label', sceneText('searchAria')));
+  const el6 = el['querySelector']('.panorama-asset-browser__empty');
+  if (el6) el6['textContent'] = sceneText('empty');
 }
-function renderResults(_0x4bdfcb) {
-  const _0xe8fc8c = _0x4bdfcb['querySelector']('.panorama-asset-browser__results');
-  if (!_0xe8fc8c) return;
-  const _0x37948f = _0x4bdfcb['querySelector']('.panorama-asset-browser__search')?.['value'] || '',
-    _0x5986e0 = _0x4bdfcb['querySelector']('.panorama-asset-browser__category')?.['value'] || 'all',
-    _0xe0b3a8 = searchSceneAssets({ query: _0x37948f, category: _0x5986e0, limit: 0x78 });
-  _0xe8fc8c['replaceChildren'](
-    ..._0xe0b3a8['map']((_0xc4b878) => {
-      const _0x2b2c7b = document['createElement']('button');
-      ((_0x2b2c7b['type'] = 'button'),
-        (_0x2b2c7b['className'] = 'panorama-asset-browser__item'),
-        (_0x2b2c7b['dataset']['assetId'] = _0xc4b878['id']),
-        (_0x2b2c7b['dataset']['assetPrimitive'] = _0xc4b878['parts'][0x0]?.['primitive'] || 'box'),
-        (_0x2b2c7b['title'] = _0xc4b878['name']));
-      const _0x4310c0 = document['createElement']('span');
-      ((_0x4310c0['className'] = 'panorama-asset-browser__preview'),
-        (_0x4310c0['dataset']['assetPrimitive'] = _0xc4b878['parts'][0x0]?.['primitive'] || 'box'));
-      const _0x242f44 = document['createElement']('span');
+function renderResults(el7) {
+  const enabled = el7['querySelector']('.panorama-asset-browser__results');
+  if (!enabled) return;
+  const query = el7['querySelector']('.panorama-asset-browser__search')?.['value'] || '',
+    category = el7['querySelector']('.panorama-asset-browser__category')?.['value'] || 'all',
+    list = searchSceneAssets({ query: query, category: category, limit: 0x78 });
+  enabled['replaceChildren'](
+    ...list['map']((error) => {
+      const el8 = document['createElement']('button');
+      ((el8['type'] = 'button'),
+        (el8['className'] = 'panorama-asset-browser__item'),
+        (el8['dataset']['assetId'] = error['id']),
+        (el8['dataset']['assetPrimitive'] = error['parts'][0x0]?.['primitive'] || 'box'),
+        (el8['title'] = error['name']));
+      const el9 = document['createElement']('span');
+      ((el9['className'] = 'panorama-asset-browser__preview'),
+        (el9['dataset']['assetPrimitive'] = error['parts'][0x0]?.['primitive'] || 'box'));
+      const el10 = document['createElement']('span');
       return (
-        (_0x242f44['className'] = 'panorama-asset-browser__label'),
-        (_0x242f44['textContent'] = _0xc4b878['name']),
-        _0x2b2c7b['append'](_0x4310c0, _0x242f44),
-        _0x2b2c7b
+        (el10['className'] = 'panorama-asset-browser__label'),
+        (el10['textContent'] = error['name']),
+        el8['append'](el9, el10),
+        el8
       );
     }),
   );
-  const _0x64f4b2 = _0x4bdfcb['querySelector']('.panorama-asset-browser__empty');
-  if (_0x64f4b2) _0x64f4b2['hidden'] = _0xe0b3a8['length'] > 0x0;
+  const el11 = el7['querySelector']('.panorama-asset-browser__empty');
+  if (el11) el11['hidden'] = list['length'] > 0x0;
 }
-export function createSceneAssetBrowser({ onSelect: _0x21eed6 } = {}) {
-  const _0x1c98e6 = document['createElement']('div');
-  ((_0x1c98e6['className'] = 'panorama-asset-browser'), (_0x1c98e6['dataset']['uiStop'] = '1'));
-  const _0x284391 = document['createElement']('div');
-  _0x284391['className'] = 'panorama-asset-browser__header';
-  const _0x5ac18c = document['createElement']('strong');
-  _0x5ac18c['className'] = 'panorama-asset-browser__title';
-  const _0x5f3c7c = document['createElement']('select');
-  ((_0x5f3c7c['className'] = 'panorama-asset-browser__category'),
-    _0x5f3c7c['append'](
-      ...['all', ...getSceneAssetCategories()]['map']((_0xd7df9d) => {
-        const _0x416498 = document['createElement']('option');
-        return ((_0x416498['value'] = _0xd7df9d), _0x416498);
+export function createSceneAssetBrowser({ onSelect: onSelect } = {}) {
+  const el12 = document['createElement']('div');
+  ((el12['className'] = 'panorama-asset-browser'), (el12['dataset']['uiStop'] = '1'));
+  const key = document['createElement']('div');
+  key['className'] = 'panorama-asset-browser__header';
+  const index = document['createElement']('strong');
+  index['className'] = 'panorama-asset-browser__title';
+  const el13 = document['createElement']('select');
+  ((el13['className'] = 'panorama-asset-browser__category'),
+    el13['append'](
+      ...['all', ...getSceneAssetCategories()]['map']((result) => {
+        const el14 = document['createElement']('option');
+        return ((el14['value'] = result), el14);
       }),
     ),
-    _0x284391['append'](_0x5ac18c, _0x5f3c7c));
-  const _0x2b8126 = document['createElement']('input');
-  ((_0x2b8126['type'] = 'search'), (_0x2b8126['className'] = 'panorama-asset-browser__search'));
-  const _0x1143dd = document['createElement']('div');
-  _0x1143dd['className'] = 'panorama-asset-browser__results';
-  const _0xf0ff67 = document['createElement']('div');
+    key['append'](index, el13));
+  const el15 = document['createElement']('input');
+  ((el15['type'] = 'search'), (el15['className'] = 'panorama-asset-browser__search'));
+  const el16 = document['createElement']('div');
+  el16['className'] = 'panorama-asset-browser__results';
+  const el17 = document['createElement']('div');
   return (
-    (_0xf0ff67['className'] = 'panorama-asset-browser__empty'),
-    (_0xf0ff67['hidden'] = !![]),
-    _0x1c98e6['append'](_0x284391, _0x2b8126, _0x1143dd, _0xf0ff67),
-    _0x2b8126['addEventListener']('input', () => renderResults(_0x1c98e6)),
-    _0x5f3c7c['addEventListener']('change', () => renderResults(_0x1c98e6)),
-    _0x1143dd['addEventListener']('click', (_0x1ef462) => {
-      const _0xa2e321 = _0x1ef462['target']?.['closest']?.('[data-asset-id]');
-      if (!_0xa2e321) return;
-      _0x21eed6?.(_0xa2e321['dataset']['assetId']);
+    (el17['className'] = 'panorama-asset-browser__empty'),
+    (el17['hidden'] = !![]),
+    el12['append'](key, el15, el16, el17),
+    el15['addEventListener']('input', () => renderResults(el12)),
+    el13['addEventListener']('change', () => renderResults(el12)),
+    el16['addEventListener']('click', (event) => {
+      const el18 = event['target']?.['closest']?.('[data-asset-id]');
+      if (!el18) return;
+      onSelect?.(el18['dataset']['assetId']);
     }),
-    syncStaticText(_0x1c98e6),
-    renderResults(_0x1c98e6),
-    _0x1c98e6
+    syncStaticText(el12),
+    renderResults(el12),
+    el12
   );
 }
-export function renderSceneAssetBrowser(_0x2e5605) {
-  if (!_0x2e5605) return;
-  (syncStaticText(_0x2e5605), renderResults(_0x2e5605));
+export function renderSceneAssetBrowser(enabled2) {
+  if (!enabled2) return;
+  (syncStaticText(enabled2), renderResults(enabled2));
 }

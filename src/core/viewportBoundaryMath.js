@@ -1,101 +1,93 @@
-export function projectPointToViewportEdge(_0xde57d8, _0x39395a, _0x54a023 = 0x18) {
-  const _0x923a90 = _0x39395a['left'] + Math['min'](_0x54a023, _0x39395a['width'] / 0x2),
-    _0x4f3e68 = _0x39395a['top'] + Math['min'](_0x54a023, _0x39395a['height'] / 0x2),
-    _0x2055f7 = _0x39395a['left'] + _0x39395a['width'] - Math['min'](_0x54a023, _0x39395a['width'] / 0x2),
-    _0x3b31b9 = _0x39395a['top'] + _0x39395a['height'] - Math['min'](_0x54a023, _0x39395a['height'] / 0x2),
-    _0x1328f1 = (_0x923a90 + _0x2055f7) / 0x2,
-    _0x3b1e5f = (_0x4f3e68 + _0x3b31b9) / 0x2,
-    _0x29bf61 = _0xde57d8['x'] - _0x1328f1,
-    _0x4f567f = _0xde57d8['y'] - _0x3b1e5f,
-    _0x2859d5 =
-      _0xde57d8['x'] < _0x39395a['left'] ||
-      _0xde57d8['x'] > _0x39395a['left'] + _0x39395a['width'] ||
-      _0xde57d8['y'] < _0x39395a['top'] ||
-      _0xde57d8['y'] > _0x39395a['top'] + _0x39395a['height'],
-    _0x326b29 = Math['min'](
+export function projectPointToViewportEdge(box, box2, value = 0x18) {
+  const item = box2['left'] + Math['min'](value, box2['width'] / 0x2),
+    key = box2['top'] + Math['min'](value, box2['height'] / 0x2),
+    index = box2['left'] + box2['width'] - Math['min'](value, box2['width'] / 0x2),
+    result = box2['top'] + box2['height'] - Math['min'](value, box2['height'] / 0x2),
+    x = (item + index) / 0x2,
+    y = (key + result) / 0x2,
+    data = box['x'] - x,
+    options = box['y'] - y,
+    outside =
+      box['x'] < box2['left'] ||
+      box['x'] > box2['left'] + box2['width'] ||
+      box['y'] < box2['top'] ||
+      box['y'] > box2['top'] + box2['height'],
+    target = Math['min'](
       0x1,
-      _0x29bf61 ? (_0x2055f7 - _0x923a90) / 0x2 / Math['abs'](_0x29bf61) : Infinity,
-      _0x4f567f ? (_0x3b31b9 - _0x4f3e68) / 0x2 / Math['abs'](_0x4f567f) : Infinity,
+      data ? (index - item) / 0x2 / Math['abs'](data) : Infinity,
+      options ? (result - key) / 0x2 / Math['abs'](options) : Infinity,
     );
   return {
-    x: _0x1328f1 + _0x29bf61 * _0x326b29,
-    y: _0x3b1e5f + _0x4f567f * _0x326b29,
-    outside: _0x2859d5,
-    angle: (Math['atan2'](_0x4f567f, _0x29bf61) * 0xb4) / Math['PI'],
+    x: x + data * target,
+    y: y + options * target,
+    outside: outside,
+    angle: (Math['atan2'](options, data) * 0xb4) / Math['PI'],
   };
 }
-export function spreadViewportBoundaryPoint(_0x26aaf5, _0x39d555, _0x43b340, _0x39f8a2 = 0x2c) {
-  const _0x371c3f =
-      Math['min'](
-        _0x26aaf5['x'] - _0x39d555['left'],
-        _0x39d555['left'] + _0x39d555['width'] - _0x26aaf5['x'],
-      ) <
-      Math['min'](_0x26aaf5['y'] - _0x39d555['top'], _0x39d555['top'] + _0x39d555['height'] - _0x26aaf5['y']),
-    _0x24466b = _0x371c3f ? 'y' : 'x',
-    _0xa8d571 = _0x371c3f ? 'x' : 'y',
-    _0x3c0927 = Math['min'](0xa0, _0x39d555['width'] / 0x2),
-    _0x57ad1b = _0x371c3f ? _0x39f8a2 : _0x3c0927,
-    _0x5516d1 = (_0x371c3f ? _0x39d555['top'] : _0x39d555['left']) + 0x20,
-    _0x544916 = _0x5516d1 + (_0x371c3f ? _0x39d555['height'] : _0x39d555['width']) - 0x40,
-    _0x394976 = [],
-    _0x39f988 = Math['max'](
+export function spreadViewportBoundaryPoint(box3, box4, list, source = 0x2c) {
+  const next =
+      Math['min'](box3['x'] - box4['left'], box4['left'] + box4['width'] - box3['x']) <
+      Math['min'](box3['y'] - box4['top'], box4['top'] + box4['height'] - box3['y']),
+    current = next ? 'y' : 'x',
+    entry = next ? 'x' : 'y',
+    record = Math['min'](0xa0, box4['width'] / 0x2),
+    payload = next ? source : record,
+    handle = (next ? box4['top'] : box4['left']) + 0x20,
+    state = handle + (next ? box4['height'] : box4['width']) - 0x40,
+    list2 = [],
+    config = Math['max'](
       0x1,
-      Math['ceil'](
-        (_0x371c3f ? _0x39d555['width'] : _0x39d555['height']) / (_0x371c3f ? _0x3c0927 : _0x39f8a2),
-      ),
+      Math['ceil']((next ? box4['width'] : box4['height']) / (next ? record : source)),
     );
-  for (let _0x4dbf93 = 0x0; _0x4dbf93 < _0x39f988; _0x4dbf93++)
-    for (let _0x56deaa = _0x5516d1; _0x56deaa <= _0x544916; _0x56deaa += _0x57ad1b) {
-      _0x394976['push']({
-        ..._0x26aaf5,
-        [_0x24466b]: _0x56deaa,
-        [_0xa8d571]:
-          _0x26aaf5[_0xa8d571] +
-          _0x4dbf93 *
-            (_0x371c3f ? _0x3c0927 : _0x39f8a2) *
-            (_0x26aaf5[_0xa8d571] <
-            (_0x371c3f
-              ? _0x39d555['left'] + _0x39d555['width'] / 0x2
-              : _0x39d555['top'] + _0x39d555['height'] / 0x2)
+  for (let scope = 0x0; scope < config; scope++)
+    for (let input = handle; input <= state; input += payload) {
+      list2['push']({
+        ...box3,
+        [current]: input,
+        [entry]:
+          box3[entry] +
+          scope *
+            (next ? record : source) *
+            (box3[entry] < (next ? box4['left'] + box4['width'] / 0x2 : box4['top'] + box4['height'] / 0x2)
               ? 0x1
               : -0x1),
       });
     }
-  (_0x394976['unshift'](_0x26aaf5),
-    _0x394976['sort'](
-      (_0x487a1a, _0x2c8ff6) =>
-        Math['hypot'](_0x487a1a['x'] - _0x26aaf5['x'], _0x487a1a['y'] - _0x26aaf5['y']) -
-        Math['hypot'](_0x2c8ff6['x'] - _0x26aaf5['x'], _0x2c8ff6['y'] - _0x26aaf5['y']),
+  (list2['unshift'](box3),
+    list2['sort'](
+      (box5, box6) =>
+        Math['hypot'](box5['x'] - box3['x'], box5['y'] - box3['y']) -
+        Math['hypot'](box6['x'] - box3['x'], box6['y'] - box3['y']),
     ));
-  const _0x291649 = (_0x411fd3) => {
-      const _0x282827 = Math['min'](0x88, _0x39d555['width'] * 0.25 + 0x10),
-        _0x4a8cc3 = _0x411fd3['x'] > _0x39d555['left'] + _0x39d555['width'] / 0x2,
-        _0x37fabd = _0x411fd3['y'] > _0x39d555['top'] + _0x39d555['height'] - 0x3c;
+  const run = (box7) => {
+      const output = Math['min'](0x88, box4['width'] * 0.25 + 0x10),
+        left = box7['x'] > box4['left'] + box4['width'] / 0x2,
+        top = box7['y'] > box4['top'] + box4['height'] - 0x3c;
       return {
-        left: _0x4a8cc3 ? _0x411fd3['x'] - 0xa - _0x282827 : _0x411fd3['x'],
-        right: _0x4a8cc3 ? _0x411fd3['x'] + 0xc : _0x411fd3['x'] + 0xe + _0x282827,
-        top: _0x37fabd ? _0x411fd3['y'] - 0x28 : _0x411fd3['y'],
-        bottom: _0x37fabd ? _0x411fd3['y'] + 0xc : _0x411fd3['y'] + 0x28,
+        left: left ? box7['x'] - 0xa - output : box7['x'],
+        right: left ? box7['x'] + 0xc : box7['x'] + 0xe + output,
+        top: top ? box7['y'] - 0x28 : box7['y'],
+        bottom: top ? box7['y'] + 0xc : box7['y'] + 0x28,
       };
     },
-    _0x4083d9 =
-      _0x394976['find']((_0x52e415) => {
-        const _0x4f38c7 = _0x291649(_0x52e415);
+    value2 =
+      list2['find']((value3) => {
+        const box8 = run(value3);
         return (
-          _0x4f38c7['left'] >= _0x39d555['left'] &&
-          _0x4f38c7['right'] <= _0x39d555['left'] + _0x39d555['width'] &&
-          _0x4f38c7['top'] >= _0x39d555['top'] &&
-          _0x4f38c7['bottom'] <= _0x39d555['top'] + _0x39d555['height'] &&
-          _0x43b340['every']((_0x2a8aaa) => {
-            const _0x4bc257 = _0x291649(_0x2a8aaa);
+          box8['left'] >= box4['left'] &&
+          box8['right'] <= box4['left'] + box4['width'] &&
+          box8['top'] >= box4['top'] &&
+          box8['bottom'] <= box4['top'] + box4['height'] &&
+          list['every']((value4) => {
+            const box9 = run(value4);
             return (
-              _0x4f38c7['right'] + 0x4 <= _0x4bc257['left'] ||
-              _0x4bc257['right'] + 0x4 <= _0x4f38c7['left'] ||
-              _0x4f38c7['bottom'] + 0x4 <= _0x4bc257['top'] ||
-              _0x4bc257['bottom'] + 0x4 <= _0x4f38c7['top']
+              box8['right'] + 0x4 <= box9['left'] ||
+              box9['right'] + 0x4 <= box8['left'] ||
+              box8['bottom'] + 0x4 <= box9['top'] ||
+              box9['bottom'] + 0x4 <= box8['top']
             );
           })
         );
-      }) || _0x26aaf5;
-  return (_0x43b340['push'](_0x4083d9), _0x4083d9);
+      }) || box3;
+  return (list['push'](value2), value2);
 }
