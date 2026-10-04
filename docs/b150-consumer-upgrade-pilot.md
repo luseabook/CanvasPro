@@ -167,3 +167,29 @@ HEAD 原件同样必挂，属循环导入 + 求值顺序的环境性产物；应
 新代 api 层包含密集真实行为变化（轮询策略、错误分类、请求体组装、探针顺序），
 其单测恰好逐条编码了旧行为。**后续 api 消费方升代（含 `api/index.js` 门面）必须按依赖闭包
 分组推进，先把行为差异当作规格差异逐条裁决，而不是当作「测试侧预期」修正。**
+
+## 9. 第 153 批续：授权目录干净件（7 取 4）
+
+对 `src/modules` + `src/components` 剩余干净候选取收益最高的 7 件升代：
+
+| 文件 | 改名 | 归因失败 | 结果 |
+| --- | --- | --- | --- |
+| `components/MediaClipNode.js` | 1,034 | 0 | **保留** |
+| `components/PanoramaSceneNode.js` | 527 | 0 | **保留** |
+| `modules/SettingsManager.js` | 1 | 0 | **保留** |
+| `modules/app/appPanels.js` | 264 | 0 | **保留** |
+| `modules/interaction/DragController.js` | 693 | 10 | **回滚** |
+| `components/nodeToolbar/videoToolbar.js` | 134 | 3 | **回滚** |
+| `modules/nodePromptShared.js` | 833 | 1 | **回滚**（aigenImage stateSync 连带） |
+
+机械工序 7/7 全过（共改名 3,486、闸门 PASS、导出面 0 丢弃、`_0x` 残留 0）。
+保留 4 件后：孤立 341 → **313**（368 口径累计接通 55）；483 口径删 11 件为 461/1238，
+`canvasShortcuts` 与 `tutorials` 两组清零。全量 11185/11181/4，唯一新增失败即 nodePromptShared
+归因件，回滚后复验绿、失败名单与基线一致。
+
+**两条新教训**：
+1. **目录测试必须覆盖全部受影响子目录**——nodePromptShared 下游 31 个导入方含
+   `aigenImage/` 子目录，首轮目录测试只跑了顶层 glob，漏网 1 例，靠全量回归兜住。
+   后续升代批的目录测试按「落地文件的全部下游所在目录」枚举。
+2. **`window is not defined`（bare 导入）是浏览器目标文件的既有环境特征**——HEAD 同样
+   必挂（videoToolbar 18 处、interaction.js 60 处 window 引用），不作为闸门失败依据。
