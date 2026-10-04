@@ -6,17 +6,17 @@ const MASK_BADGE_HTML = '<span class="ref-thumb-mask-badge">遮罩</span>',
     'maskUrl',
     'maskLocalPath',
   ]);
-function resolveSourceData(_0x481fb1 = null) {
-  return _0x481fb1?.nodeData && typeof _0x481fb1.nodeData === 'object' ? _0x481fb1.nodeData : _0x481fb1;
+function resolveSourceData(nodeData = null) {
+  return nodeData?.nodeData && typeof nodeData.nodeData === 'object' ? nodeData.nodeData : nodeData;
 }
-export function hasReferenceMask(_0x5adfc7 = null) {
-  const _0x399a01 = resolveSourceData(_0x5adfc7);
-  if (!_0x399a01 || typeof _0x399a01 !== 'object') return false;
-  return REFERENCE_MASK_FIELDS.some((_0x3b6cab) => !!String(_0x399a01?.[_0x3b6cab] || '').trim());
+export function hasReferenceMask(value = null) {
+  const sourceData = resolveSourceData(value);
+  if (!sourceData || typeof sourceData !== 'object') return false;
+  return REFERENCE_MASK_FIELDS.some((item) => !!String(sourceData?.[item] || '').trim());
 }
-export function createReferenceMaskBadgeHtml(_0x4ba073 = null) {
-  return hasReferenceMask(_0x4ba073) ? MASK_BADGE_HTML : '';
+export function createReferenceMaskBadgeHtml(value2 = null) {
+  return hasReferenceMask(value2) ? MASK_BADGE_HTML : '';
 }
-export function getReferenceMaskSignaturePart(_0x1a5414 = null) {
-  return hasReferenceMask(_0x1a5414) ? 'm1' : 'm0';
+export function getReferenceMaskSignaturePart(value3 = null) {
+  return hasReferenceMask(value3) ? 'm1' : 'm0';
 }

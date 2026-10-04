@@ -1,14 +1,14 @@
-function subscribeToStateSlice(_0x41e3f4, _0x1fe576, _0x33830d) {
-  if (typeof _0x33830d !== 'function') return () => {};
-  if (typeof _0x41e3f4?.['subscribeSelector'] === 'function')
-    return _0x41e3f4['subscribeSelector'](_0x1fe576, _0x33830d);
-  _0x33830d(_0x1fe576(_0x41e3f4?.['getStateRaw']?.()));
-  if (typeof _0x41e3f4?.['subscribe'] !== 'function') return () => {};
-  return _0x41e3f4['subscribe']((_0x53b563) => _0x33830d(_0x1fe576(_0x53b563)));
+function subscribeToStateSlice(store, handler, handler2) {
+  if (typeof handler2 !== 'function') return () => {};
+  if (typeof store?.['subscribeSelector'] === 'function')
+    return store['subscribeSelector'](handler, handler2);
+  handler2(handler(store?.['getStateRaw']?.()));
+  if (typeof store?.['subscribe'] !== 'function') return () => {};
+  return store['subscribe']((value) => handler2(handler(value)));
 }
-export function subscribeToSubscriptionState(_0x9a4b6c, _0x590e60) {
-  return subscribeToStateSlice(_0x9a4b6c, (_0x530948) => _0x530948?.['subscription'] || {}, _0x590e60);
+export function subscribeToSubscriptionState(item, key) {
+  return subscribeToStateSlice(item, (index) => index?.['subscription'] || {}, key);
 }
-export function subscribeToModelCatalogState(_0x55cd12, _0x1714d6) {
-  return subscribeToStateSlice(_0x55cd12, (_0x149da3) => _0x149da3?.['modelCatalog'] || {}, _0x1714d6);
+export function subscribeToModelCatalogState(result, data) {
+  return subscribeToStateSlice(result, (options) => options?.['modelCatalog'] || {}, data);
 }

@@ -5,9 +5,9 @@ function nowMs() {
     return performance['now']();
   return Date['now']();
 }
-export function markRendererNodeDragCommitHint(_0x5581b0 = DEFAULT_HINT_TTL_MS) {
-  const _0x30b2ad = Math['max'](0x0, Number(_0x5581b0) || 0x0);
-  nodeDragCommitHintUntil = nowMs() + _0x30b2ad;
+export function markRendererNodeDragCommitHint(value = DEFAULT_HINT_TTL_MS) {
+  const item = Math['max'](0x0, Number(value) || 0x0);
+  nodeDragCommitHintUntil = nowMs() + item;
 }
 export function consumeRendererNodeDragCommitHint() {
   if (nodeDragCommitHintUntil <= 0x0) return ![];

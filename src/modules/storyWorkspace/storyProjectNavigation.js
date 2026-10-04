@@ -1,15 +1,14 @@
 export function openStoryProjectPage(
-  { state: _0x13aac4, canEnterStep: _0x16f2c2, render: _0x15ef9d },
+  { state: state, canEnterStep: canEnterStep, render: render },
   { resetStep: resetStep = ![], restoreView: restoreView = ![] } = {},
 ) {
-  if (!restoreView || !['project', 'episode']['includes'](_0x13aac4['view'])) _0x13aac4['view'] = 'project';
+  if (!restoreView || !['project', 'episode']['includes'](state['view'])) state['view'] = 'project';
   if (
     resetStep ||
-    (_0x13aac4['step'] > 0x0 && _0x13aac4['data']?.['project']?.['outlineStatus'] === 'stale') ||
-    !_0x16f2c2(_0x13aac4['data'], _0x13aac4['step'])
+    (state['step'] > 0x0 && state['data']?.['project']?.['outlineStatus'] === 'stale') ||
+    !canEnterStep(state['data'], state['step'])
   )
-    _0x13aac4['step'] =
-      _0x13aac4['data']?.['project']?.['collaboration']?.['stage'] === 'writing' ? 0x0 : 0x1;
-  if (_0x13aac4['view'] === 'episode' && !_0x16f2c2(_0x13aac4['data'], 0x3)) _0x13aac4['view'] = 'project';
-  _0x15ef9d({ direction: 'forward' });
+    state['step'] = state['data']?.['project']?.['collaboration']?.['stage'] === 'writing' ? 0x0 : 0x1;
+  if (state['view'] === 'episode' && !canEnterStep(state['data'], 0x3)) state['view'] = 'project';
+  render({ direction: 'forward' });
 }

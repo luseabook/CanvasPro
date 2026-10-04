@@ -1,21 +1,21 @@
-function normalizeBatchId(_0x2f8418) {
-  return String(_0x2f8418 || '')['trim']();
+function normalizeBatchId(value) {
+  return String(value || '')['trim']();
 }
 export function createStoryTaskBatchCancellationRegistry() {
-  const _0x113057 = new Set();
+  const map = new Set();
   return {
-    request(_0x1b5d7d) {
-      const _0xa93bb5 = normalizeBatchId(_0x1b5d7d);
-      if (!_0xa93bb5) return ![];
-      return (_0x113057['add'](_0xa93bb5), !![]);
+    request(item) {
+      const batchId = normalizeBatchId(item);
+      if (!batchId) return ![];
+      return (map['add'](batchId), !![]);
     },
-    isRequested(_0x59fb24) {
-      const _0x149960 = normalizeBatchId(_0x59fb24);
-      return Boolean(_0x149960 && _0x113057['has'](_0x149960));
+    isRequested(key) {
+      const batchId2 = normalizeBatchId(key);
+      return Boolean(batchId2 && map['has'](batchId2));
     },
-    clear(_0x2570a5) {
-      const _0x100047 = normalizeBatchId(_0x2570a5);
-      return Boolean(_0x100047 && _0x113057['delete'](_0x100047));
+    clear(index) {
+      const batchId3 = normalizeBatchId(index);
+      return Boolean(batchId3 && map['delete'](batchId3));
     },
   };
 }

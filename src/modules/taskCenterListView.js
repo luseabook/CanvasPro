@@ -1,106 +1,100 @@
 import { startLoading, stopLoading } from './loadingOverlay.js';
-function element(tagName, className) {
-  const node = document['createElement'](tagName);
-  return ((node['className'] = className), node);
+function element(value, item) {
+  const key = document['createElement'](value);
+  return ((key['className'] = item), key);
 }
-export function syncTaskElements(container, desired) {
-  const keep = new Set(desired);
-  for (const child of [...container['children']]) {
-    if (!keep['has'](child)) container['removeChild'](child);
+export function syncTaskElements(el, list) {
+  const map = new Set(list);
+  for (const index of [...el['children']]) {
+    if (!map['has'](index)) el['removeChild'](index);
   }
-  desired['forEach']((element, index) => {
-    if (container['children'][index] !== element)
-      container['insertBefore'](element, container['children'][index] || null);
+  list['forEach']((result, data) => {
+    if (el['children'][data] !== result) el['insertBefore'](result, el['children'][data] || null);
   });
 }
-export function createTaskCardView(taskId) {
+export function createTaskCardView(options) {
   const card = element('article', 'v2-task-card');
-  card['dataset']['taskId'] = taskId;
-  const header = element('div', 'v2-task-card-header'),
-    main = element('div', 'v2-task-card-main'),
-    title = element('div', 'v2-task-card-title'),
-    context = element('div', 'v2-task-card-context'),
-    meta = element('div', 'v2-task-card-meta'),
-    status = element('span', 'v2-task-status'),
-    progress = element('div', 'v2-task-progress'),
-    progressFill = element('div', 'v2-task-progress-fill'),
-    error = element('div', 'v2-task-card-error'),
-    remoteId = element('div', 'v2-task-card-context'),
-    actions = element('div', 'v2-task-card-actions'),
-    actionButtons = new Map(),
-    thumbnail = element('div', 'v2-task-thumbnail'),
-    thumbnailImage = element('img', 'v2-task-thumbnail-image');
-  ((thumbnailImage['alt'] = ''),
-    (thumbnailImage['decoding'] = 'async'),
-    (thumbnailImage['draggable'] = ![]),
-    (thumbnailImage['hidden'] = !![]));
-  const thumbnailFallback = element('span', 'v2-task-thumbnail-fallback');
-  thumbnailFallback['setAttribute']('aria-hidden', 'true');
-  const thumbnailCount = element('span', 'v2-task-thumbnail-count'),
-    thumbnailApi = { wrap: thumbnail, image: thumbnailImage, src: '' };
+  card['dataset']['taskId'] = options;
+  const element2 = element('div', 'v2-task-card-header'),
+    element3 = element('div', 'v2-task-card-main'),
+    el2 = element('div', 'v2-task-card-title'),
+    el3 = element('div', 'v2-task-card-context'),
+    el4 = element('div', 'v2-task-card-meta'),
+    el5 = element('span', 'v2-task-status'),
+    el6 = element('div', 'v2-task-progress'),
+    el7 = element('div', 'v2-task-progress-fill'),
+    el8 = element('div', 'v2-task-card-error'),
+    el9 = element('div', 'v2-task-card-context'),
+    el10 = element('div', 'v2-task-card-actions'),
+    map2 = new Map(),
+    wrap = element('div', 'v2-task-thumbnail'),
+    image = element('img', 'v2-task-thumbnail-image');
+  ((image['alt'] = ''), (image['decoding'] = 'async'), (image['draggable'] = ![]), (image['hidden'] = !![]));
+  const el11 = element('span', 'v2-task-thumbnail-fallback');
+  el11['setAttribute']('aria-hidden', 'true');
+  const el12 = element('span', 'v2-task-thumbnail-count'),
+    thumbnail = { wrap: wrap, image: image, src: '' };
   return (
-    thumbnail['append'](thumbnailFallback, thumbnailImage, thumbnailCount),
-    progress['append'](progressFill),
-    main['append'](title, context, meta),
-    header['append'](thumbnail, main, status),
-    card['append'](header, progress, error, remoteId, actions),
+    wrap['append'](el11, image, el12),
+    el6['append'](el7),
+    element3['append'](el2, el3, el4),
+    element2['append'](wrap, element3, el5),
+    card['append'](element2, el6, el8, el9, el10),
     {
       card: card,
-      thumbnail: thumbnailApi,
-      update(state) {
-        ((thumbnail['hidden'] = !state['thumbnail']),
-          (thumbnailApi['src'] = state['thumbnail']?.['src'] || ''),
-          thumbnail['setAttribute']('aria-label', state['thumbnailLabel'] || ''),
-          thumbnail['setAttribute']('role', 'img'),
-          (thumbnailFallback['textContent'] =
-            { image: '▧', video: '▷', audio: '♫', text: '≡' }[state['thumbnail']?.['kind']] || '▧'),
-          (thumbnailCount['textContent'] =
-            state['thumbnail']?.['count'] > 0x1 ? String(state['thumbnail']['count']) : ''),
-          (thumbnailCount['hidden'] = !thumbnailCount['textContent']),
-          (title['textContent'] = state['title']),
-          (context['textContent'] = state['context']),
-          (context['hidden'] = !state['context']),
-          (meta['textContent'] = state['meta']),
-          (status['textContent'] = state['statusLabel']),
-          (status['className'] = 'v2-task-status v2-task-status--' + state['status']),
-          (error['textContent'] = state['error']),
-          (error['hidden'] = !state['error']),
-          (remoteId['textContent'] = state['remoteId'] ? 'API ID: ' + state['remoteId'] : ''),
-          (remoteId['hidden'] = !state['remoteId']),
-          card['setAttribute']('aria-busy', String(state['active'])),
-          (progress['hidden'] = !state['active']),
-          progress['setAttribute']('role', 'progressbar'),
-          progress['setAttribute']('aria-label', state['statusLabel']));
-        state['active'] && state['progress'] === null
-          ? ((progressFill['hidden'] = !![]),
-            progress['removeAttribute']('aria-valuenow'),
-            startLoading(progress))
-          : (stopLoading(progress),
-            (progressFill['hidden'] = ![]),
-            (progressFill['style']['width'] = Math['round']((state['progress'] || 0x0) * 0x64) + '%'),
-            progress['setAttribute'](
+      thumbnail: thumbnail,
+      update(response) {
+        ((wrap['hidden'] = !response['thumbnail']),
+          (thumbnail['src'] = response['thumbnail']?.['src'] || ''),
+          wrap['setAttribute']('aria-label', response['thumbnailLabel'] || ''),
+          wrap['setAttribute']('role', 'img'),
+          (el11['textContent'] =
+            { image: '▧', video: '▷', audio: '♫', text: '≡' }[response['thumbnail']?.['kind']] || '▧'),
+          (el12['textContent'] =
+            response['thumbnail']?.['count'] > 0x1 ? String(response['thumbnail']['count']) : ''),
+          (el12['hidden'] = !el12['textContent']),
+          (el2['textContent'] = response['title']),
+          (el3['textContent'] = response['context']),
+          (el3['hidden'] = !response['context']),
+          (el4['textContent'] = response['meta']),
+          (el5['textContent'] = response['statusLabel']),
+          (el5['className'] = 'v2-task-status v2-task-status--' + response['status']),
+          (el8['textContent'] = response['error']),
+          (el8['hidden'] = !response['error']),
+          (el9['textContent'] = response['remoteId'] ? 'API ID: ' + response['remoteId'] : ''),
+          (el9['hidden'] = !response['remoteId']),
+          card['setAttribute']('aria-busy', String(response['active'])),
+          (el6['hidden'] = !response['active']),
+          el6['setAttribute']('role', 'progressbar'),
+          el6['setAttribute']('aria-label', response['statusLabel']));
+        response['active'] && response['progress'] === null
+          ? ((el7['hidden'] = !![]), el6['removeAttribute']('aria-valuenow'), startLoading(el6))
+          : (stopLoading(el6),
+            (el7['hidden'] = ![]),
+            (el7['style']['width'] = Math['round']((response['progress'] || 0x0) * 0x64) + '%'),
+            el6['setAttribute'](
               'aria-valuenow',
-              String(Math['round']((state['progress'] || 0x0) * 0x64)),
+              String(Math['round']((response['progress'] || 0x0) * 0x64)),
             ));
-        const buttons = state['actions']['map']((action) => {
-          let button = actionButtons['get'](action['id']);
-          !button &&
-            ((button = element('button', 'v2-task-card-action')),
-            (button['type'] = 'button'),
-            (button['dataset']['taskAction'] = action['id']),
-            (button['dataset']['taskId'] = taskId),
-            actionButtons['set'](action['id'], button));
-          button['className'] =
-            'v2-task-card-action' + (action['danger'] ? ' v2-task-card-action--danger' : '');
-          if (button['textContent'] !== action['label']) button['textContent'] = action['label'];
-          ((button['disabled'] = action['pending'] === !![]),
-            button['setAttribute']('aria-busy', String(action['pending'] === !![])),
-            (button['dataset']['localPath'] = action['localPath'] || ''));
-          if (action['pending']) startLoading(button);
-          else stopLoading(button);
-          return button;
+        const list2 = response['actions']['map']((target) => {
+          let el13 = map2['get'](target['id']);
+          !el13 &&
+            ((el13 = element('button', 'v2-task-card-action')),
+            (el13['type'] = 'button'),
+            (el13['dataset']['taskAction'] = target['id']),
+            (el13['dataset']['taskId'] = options),
+            map2['set'](target['id'], el13));
+          el13['className'] =
+            'v2-task-card-action' + (target['danger'] ? ' v2-task-card-action--danger' : '');
+          if (el13['textContent'] !== target['label']) el13['textContent'] = target['label'];
+          ((el13['disabled'] = target['pending'] === !![]),
+            el13['setAttribute']('aria-busy', String(target['pending'] === !![])),
+            (el13['dataset']['localPath'] = target['localPath'] || ''));
+          if (target['pending']) startLoading(el13);
+          else stopLoading(el13);
+          return el13;
         });
-        (syncTaskElements(actions, buttons), (actions['hidden'] = !buttons['length']));
+        (syncTaskElements(el10, list2), (el10['hidden'] = !list2['length']));
       },
     }
   );

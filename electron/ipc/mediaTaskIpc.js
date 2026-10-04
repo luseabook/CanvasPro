@@ -1,13 +1,20 @@
 import { registerMediaTaskHistoryIpc } from '../mediaTaskHistoryIpc.js';
-export function registerMediaTaskIpcHandlers({ ipcMain: _0x311421, getMediaTaskQueue: _0x5e1cd1, ...historyDependencies }) {
-  registerMediaTaskHistoryIpc({ ipcMain: _0x311421, ...historyDependencies });
-  (_0x311421.handle('mediaTask:enqueue', (_0x57cab5, _0x24c70b) => {
-    return _0x5e1cd1().enqueue(_0x24c70b || {});
+export function registerMediaTaskIpcHandlers({
+  ipcMain: ipcMain,
+  getMediaTaskQueue: getMediaTaskQueue,
+  ...historyDependencies
+}) {
+  registerMediaTaskHistoryIpc({ ipcMain: ipcMain, ...historyDependencies });
+  (ipcMain.handle('mediaTask:enqueue', (value, item) => {
+    return getMediaTaskQueue().enqueue(item || {});
   }),
-    _0x311421.handle('mediaTask:cancel', (_0x589c51, _0x3f0605) => {
-      return _0x5e1cd1().cancel(_0x3f0605?.taskId || '');
+    ipcMain.handle('mediaTask:cancel', (key, index) => {
+      return getMediaTaskQueue().cancel(index?.taskId || '');
     }),
-    _0x311421.handle('mediaTask:list', (_0x346cd2, _0x4be91f) => {
-      return _0x5e1cd1().list({ limit: _0x4be91f?.limit || 100, ...(_0x4be91f?.taskId !== undefined ? { taskId: _0x4be91f.taskId } : {}) });
+    ipcMain.handle('mediaTask:list', (result, limit) => {
+      return getMediaTaskQueue().list({
+        limit: limit?.limit || 100,
+        ...(limit?.taskId !== undefined ? { taskId: limit.taskId } : {}),
+      });
     }));
 }

@@ -6,7 +6,7 @@ export const MODEL_PROVIDER_PROFILES = Object['freeze']({
   ...AGNES_MODEL_API_PROFILES,
   ...MINIMAX_MODEL_API_PROFILES,
 });
-export function getModelProviderProfile(_0x6f153d) {
-  const _0x3ceb08 = String(_0x6f153d || '')['trim']();
-  return MODEL_PROVIDER_PROFILES[_0x3ceb08] || null;
+export function getModelProviderProfile(value) {
+  const item = String(value || '')['trim']();
+  return MODEL_PROVIDER_PROFILES[item] || null;
 }

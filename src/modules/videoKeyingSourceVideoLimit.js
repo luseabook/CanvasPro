@@ -6,16 +6,16 @@ const SOURCE_VIDEO_SIZE_BYTE_FIELDS = Object['freeze']([
   'sizeBytes',
   'byteSize',
 ]);
-export function resolveVideoKeyingSourceVideoSizeBytes(_0x3fffe2 = {}) {
-  for (const _0x4aadd9 of SOURCE_VIDEO_SIZE_BYTE_FIELDS) {
-    const _0x955bbd = Number(_0x3fffe2?.[_0x4aadd9]);
-    if (Number['isFinite'](_0x955bbd) && _0x955bbd > 0x0) return _0x955bbd;
+export function resolveVideoKeyingSourceVideoSizeBytes(options = {}) {
+  for (const value of SOURCE_VIDEO_SIZE_BYTE_FIELDS) {
+    const count = Number(options?.[value]);
+    if (Number['isFinite'](count) && count > 0x0) return count;
   }
   return 0x0;
 }
-export function isVideoKeyingSourceVideoTooLarge(_0x348be9 = {}) {
-  const _0x7d0f98 = resolveVideoKeyingSourceVideoSizeBytes(_0x348be9);
-  return _0x7d0f98 > VIDEO_KEYING_MAX_SOURCE_VIDEO_BYTES;
+export function isVideoKeyingSourceVideoTooLarge(options2 = {}) {
+  const videoKeyingSourceVideoSizeBytes = resolveVideoKeyingSourceVideoSizeBytes(options2);
+  return videoKeyingSourceVideoSizeBytes > VIDEO_KEYING_MAX_SOURCE_VIDEO_BYTES;
 }
 export function getVideoKeyingMaxSourceVideoMB() {
   return Math['round'](VIDEO_KEYING_MAX_SOURCE_VIDEO_BYTES / 0x400 / 0x400);

@@ -6,8 +6,8 @@ export async function fetchReplacementStudioWorkspaceFromServer() {
     provider: 'local',
   });
 }
-export async function saveReplacementStudioWorkspaceToServer(_0x5b9796) {
-  return await post(PERSON_REPLACEMENT_WORKSPACE_USER_FILE, _0x5b9796 || {}, {
+export async function saveReplacementStudioWorkspaceToServer(value) {
+  return await post(PERSON_REPLACEMENT_WORKSPACE_USER_FILE, value || {}, {
     provider: 'local',
   });
 }

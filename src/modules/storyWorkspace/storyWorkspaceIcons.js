@@ -7,8 +7,8 @@ import {
   renderWorkspaceSplitIcon,
   renderWorkspaceUploadIcon,
 } from '../workspaceActionIcons.js';
-export function renderStoryActionIcon(_0x1de620) {
-  return renderWorkspaceActionIcon(_0x1de620);
+export function renderStoryActionIcon(value) {
+  return renderWorkspaceActionIcon(value);
 }
 export function renderStoryConfirmIcon() {
   return renderWorkspaceConfirmIcon();

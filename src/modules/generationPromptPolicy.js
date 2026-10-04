@@ -6,31 +6,30 @@ export const PROMPT_EMPTY_POLICIES = Object['freeze']({
 });
 export const PROMPT_EMPTY_POLICY_VALUES = Object['freeze'](Object['values'](PROMPT_EMPTY_POLICIES));
 const DEFAULT_PROMPT_MIN_LENGTH = 0x1;
-function isPlainObject(value) {
-  return !!value && typeof value === 'object' && !Array['isArray'](value);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array['isArray'](enabled);
 }
 function normalizePromptEmptyPolicy(value) {
-  const normalized = String(value || '')['trim']();
-  return PROMPT_EMPTY_POLICY_VALUES['includes'](normalized) ? normalized : '';
+  const item = String(value || '')['trim']();
+  return PROMPT_EMPTY_POLICY_VALUES['includes'](item) ? item : '';
 }
-function normalizePromptMinLength(value) {
-  if (value === undefined || value === null || value === '') return DEFAULT_PROMPT_MIN_LENGTH;
-  const numeric = Number(value);
-  return Number['isInteger'](numeric) && numeric >= 0x0 ? numeric : DEFAULT_PROMPT_MIN_LENGTH;
+function normalizePromptMinLength(key) {
+  if (key === undefined || key === null || key === '') return DEFAULT_PROMPT_MIN_LENGTH;
+  const count = Number(key);
+  return Number['isInteger'](count) && count >= 0x0 ? count : DEFAULT_PROMPT_MIN_LENGTH;
 }
 function resolveDefaultEmptyPolicy({
-  modelManifest: modelManifest,
-  executionManifest: executionManifest,
-  provider: provider,
+  modelManifest: modelManifest2,
+  executionManifest: executionManifest2,
+  provider: provider2,
 }) {
-  const adapterType = String(modelManifest?.['adapterType'] || executionManifest?.['adapterType'] || '')[
+  const index = String(modelManifest2?.['adapterType'] || executionManifest2?.['adapterType'] || '')[
       'trim'
     ](),
-    providers = [provider, modelManifest?.['provider'], executionManifest?.['provider']]['map'](
+    list = [provider2, modelManifest2?.['provider'], executionManifest2?.['provider']]['map'](
       normalizeProviderId,
     );
-  if (adapterType === 'workflow' && providers['includes']('runninghubwf'))
-    return PROMPT_EMPTY_POLICIES['ALLOW'];
+  if (index === 'workflow' && list['includes']('runninghubwf')) return PROMPT_EMPTY_POLICIES['ALLOW'];
   return PROMPT_EMPTY_POLICIES['BLOCK'];
 }
 export function resolveGenerationPromptPolicy({
@@ -39,40 +38,40 @@ export function resolveGenerationPromptPolicy({
   modelManifest: modelManifest = null,
   executionManifest: executionManifest = null,
 } = {}) {
-  const resolved =
+  const result =
       modelManifest && executionManifest
         ? { modelManifest: modelManifest, executionManifest: executionManifest }
         : resolveModelExecution(model, { providerHint: provider }) || resolveModelExecution(model),
-    manifest = modelManifest || resolved?.['modelManifest'] || null,
-    execution = executionManifest || resolved?.['executionManifest'] || null,
-    promptConfig = isPlainObject(manifest?.['prompt']) ? manifest['prompt'] : {},
-    manifestPolicy = normalizePromptEmptyPolicy(promptConfig['emptyPolicy']),
+    modelManifest3 = modelManifest || result?.['modelManifest'] || null,
+    executionManifest3 = executionManifest || result?.['executionManifest'] || null,
+    isPlainObject2 = isPlainObject(modelManifest3?.['prompt']) ? modelManifest3['prompt'] : {},
+    source = normalizePromptEmptyPolicy(isPlainObject2['emptyPolicy']),
     emptyPolicy =
-      manifestPolicy ||
+      source ||
       resolveDefaultEmptyPolicy({
-        modelManifest: manifest,
-        executionManifest: execution,
+        modelManifest: modelManifest3,
+        executionManifest: executionManifest3,
         provider: provider,
       });
   return {
     emptyPolicy: emptyPolicy,
-    minLength: normalizePromptMinLength(promptConfig['minLength']),
-    modelManifest: manifest,
-    executionManifest: execution,
-    source: manifestPolicy ? 'manifest' : 'default',
+    minLength: normalizePromptMinLength(isPlainObject2['minLength']),
+    modelManifest: modelManifest3,
+    executionManifest: executionManifest3,
+    source: source ? 'manifest' : 'default',
   };
 }
-export function countPromptCharacters(text = '') {
-  const normalized = String(text || '')['trim']();
-  let count = normalized['length'];
-  for (let index = 0x0; index < normalized['length'] - 0x1; index += 0x1) {
-    const high = normalized['charCodeAt'](index);
-    if (high < 0xd800 || high > 0xdbff) continue;
-    const low = normalized['charCodeAt'](index + 0x1);
-    if (low < 0xdc00 || low > 0xdfff) continue;
-    ((count -= 0x1), (index += 0x1));
+export function countPromptCharacters(data = '') {
+  const list2 = String(data || '')['trim']();
+  let options = list2['length'];
+  for (let target = 0x0; target < list2['length'] - 0x1; target += 0x1) {
+    const count2 = list2['charCodeAt'](target);
+    if (count2 < 0xd800 || count2 > 0xdbff) continue;
+    const count3 = list2['charCodeAt'](target + 0x1);
+    if (count3 < 0xdc00 || count3 > 0xdfff) continue;
+    ((options -= 0x1), (target += 0x1));
   }
-  return count;
+  return options;
 }
 export function evaluateGenerationPromptBoundary({
   model: model = '',
@@ -82,27 +81,27 @@ export function evaluateGenerationPromptBoundary({
   modelManifest: modelManifest = null,
   executionManifest: executionManifest = null,
 } = {}) {
-  const policy = resolveGenerationPromptPolicy({
+  const reason = resolveGenerationPromptPolicy({
       model: model,
       provider: provider,
       modelManifest: modelManifest,
       executionManifest: executionManifest,
     }),
     promptLength = countPromptCharacters(promptText);
-  if (promptLength >= policy['minLength'])
-    return { ok: !![], reason: '', promptLength: promptLength, ...policy };
-  if (promptLength > 0x0) return { ok: ![], reason: 'promptTooShort', promptLength: promptLength, ...policy };
-  if (policy['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW'])
-    return { ok: !![], reason: '', promptLength: promptLength, ...policy };
-  if (policy['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT'] && hasInput === !![])
-    return { ok: !![], reason: '', promptLength: promptLength, ...policy };
+  if (promptLength >= reason['minLength'])
+    return { ok: !![], reason: '', promptLength: promptLength, ...reason };
+  if (promptLength > 0x0) return { ok: ![], reason: 'promptTooShort', promptLength: promptLength, ...reason };
+  if (reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW'])
+    return { ok: !![], reason: '', promptLength: promptLength, ...reason };
+  if (reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT'] && hasInput === !![])
+    return { ok: !![], reason: '', promptLength: promptLength, ...reason };
   return {
     ok: ![],
     reason:
-      policy['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT']
+      reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT']
         ? 'promptOrInputRequired'
         : 'promptRequired',
     promptLength: promptLength,
-    ...policy,
+    ...reason,
   };
 }

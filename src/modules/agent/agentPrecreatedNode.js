@@ -3,10 +3,10 @@ const EXISTING_TARGET_PATTERN =
     /(?:当前|选中|这个|该|刚才|上一个|已有|原有).{0,8}(?:节点|图片|图像|视频|音频|文本)|(?:重新生成|再次生成|重做|重生成)|\b(?:current|selected|existing|this|that)\s+(?:node|image|video|audio|text)\b|\b(?:regenerate|rerun)\b/i,
   EXPLICIT_NEW_TARGET_PATTERN =
     /(?:创建|新建|添加|新增|插入|制作)(?:一|1|个|张|幅|段|份|些|几|两|三|四|五|六|七|八|九|十|新的?){0,6}|(?:来|做|画)(?:一|1|个|张|幅|段|份|些|几|两|三|四|五|六|七|八|九|十)|出(?:图|一张|一个|一段)|\b(?:create|add|insert|new|make|draw)\b/i;
-export function normalizeAgentPrecreatedNode(value = {}) {
-  if (!value || typeof value !== 'object' || Array['isArray'](value)) return null;
-  const nodeId = String(value['nodeId'] || '')['trim'](),
-    type = String(value['type'] || '')['trim']();
+export function normalizeAgentPrecreatedNode(enabled = {}) {
+  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled)) return null;
+  const nodeId = String(enabled['nodeId'] || '')['trim'](),
+    type = String(enabled['type'] || '')['trim']();
   if (!nodeId || !type) return null;
   return { nodeId: nodeId, type: type };
 }
@@ -15,38 +15,30 @@ export function deriveAgentPrecreatedNodeType({
   plannerExtra: plannerExtra = {},
   canvasState: canvasState = {},
 } = {}) {
-  const normalizedMessage = String(message || '')['trim'](),
-    requestedType = deriveRequestedCreatedNodeType(normalizedMessage, plannerExtra, {
+  const list = String(message || '')['trim'](),
+    requestedCreatedNodeType = deriveRequestedCreatedNodeType(list, plannerExtra, {
       includeGenerateVerb: !![],
     });
-  if (!requestedType) return '';
-  const selectedNodeIds = Array['isArray'](canvasState?.['selectedNodeIds'])
-      ? canvasState['selectedNodeIds']
-      : [],
-    hasSelectedType = selectedNodeIds['some'](
-      (nodeId) => String(canvasState?.['nodes']?.[nodeId]?.['type'] || '')['trim']() === requestedType,
+  if (!requestedCreatedNodeType) return '';
+  const list2 = Array['isArray'](canvasState?.['selectedNodeIds']) ? canvasState['selectedNodeIds'] : [],
+    value = list2['some'](
+      (item) => String(canvasState?.['nodes']?.[item]?.['type'] || '')['trim']() === requestedCreatedNodeType,
     );
-  if (
-    hasSelectedType &&
-    EXISTING_TARGET_PATTERN['test'](normalizedMessage) &&
-    !EXPLICIT_NEW_TARGET_PATTERN['test'](normalizedMessage)
-  )
-    return '';
-  const hasNamedMatch = Object['values'](canvasState?.['nodes'] || {})['some']((node) => {
-    if (String(node?.['type'] || '')['trim']() !== requestedType) return ![];
-    const name = String(node?.['name'] || '')['trim']();
-    return name['length'] >= 0x2 && normalizedMessage['includes'](name);
+  if (value && EXISTING_TARGET_PATTERN['test'](list) && !EXPLICIT_NEW_TARGET_PATTERN['test'](list)) return '';
+  const key = Object['values'](canvasState?.['nodes'] || {})['some']((error) => {
+    if (String(error?.['type'] || '')['trim']() !== requestedCreatedNodeType) return ![];
+    const list3 = String(error?.['name'] || '')['trim']();
+    return list3['length'] >= 0x2 && list['includes'](list3);
   });
-  if (!EXPLICIT_NEW_TARGET_PATTERN['test'](normalizedMessage) && (hasSelectedType || hasNamedMatch))
-    return '';
-  return requestedType;
+  if (!EXPLICIT_NEW_TARGET_PATTERN['test'](list) && (value || key)) return '';
+  return requestedCreatedNodeType;
 }
-export function doesActionConsumePrecreatedNode(action = {}, precreatedNode = null) {
-  const normalized = normalizeAgentPrecreatedNode(precreatedNode);
-  if (!normalized) return ![];
-  const actionType = String(action['type'] || action['commandId'] || '')['trim'](),
-    argType = String(action['args']?.['type'] || '')['trim']();
-  return actionType === 'node.create' && argType === normalized['type'];
+export function doesActionConsumePrecreatedNode(options = {}, index = null) {
+  const agentPrecreatedNode = normalizeAgentPrecreatedNode(index);
+  if (!agentPrecreatedNode) return ![];
+  const result = String(options['type'] || options['commandId'] || '')['trim'](),
+    data = String(options['args']?.['type'] || '')['trim']();
+  return result === 'node.create' && data === agentPrecreatedNode['type'];
 }
 export function createAgentPrecreatedNodeRuntime({
   plannerAvailable: plannerAvailable = () => ![],
@@ -60,52 +52,55 @@ export function createAgentPrecreatedNodeRuntime({
   commandContext: commandContext = {},
 } = {}) {
   return {
-    async reserve(request = {}) {
-      if (!plannerAvailable() || !hasCanvasActionIntent(request['originalMessage'], request['plannerExtra']))
-        return request;
-      const canvasState = readCanvasState() || {},
-        nodeType = deriveAgentPrecreatedNodeType({
-          message: request['originalMessage'],
-          plannerExtra: request['plannerExtra'],
-          canvasState: canvasState,
+    async reserve(message2 = {}) {
+      if (
+        !plannerAvailable() ||
+        !hasCanvasActionIntent(message2['originalMessage'], message2['plannerExtra'])
+      )
+        return message2;
+      const canvasState2 = readCanvasState() || {},
+        type2 = deriveAgentPrecreatedNodeType({
+          message: message2['originalMessage'],
+          plannerExtra: message2['plannerExtra'],
+          canvasState: canvasState2,
         });
-      if (!nodeType) return request;
-      const previousSelection = Array['isArray'](canvasState['selectedNodeIds'])
-          ? [...canvasState['selectedNodeIds']]
+      if (!type2) return message2;
+      const ids = Array['isArray'](canvasState2['selectedNodeIds'])
+          ? [...canvasState2['selectedNodeIds']]
           : [],
-        result = await executeActions([{ type: 'node.create', args: { type: nodeType } }], {
+        response = await executeActions([{ type: 'node.create', args: { type: type2 } }], {
           commandContext: commandContext,
           precreateReservation: !![],
-          ...buildExecutionOptions(request['runId']),
+          ...buildExecutionOptions(message2['runId']),
         });
-      if (!isActiveRun(request['runId'])) return request;
-      const createdNodeId = String(result?.['createdNodeIds']?.[0x0] || '')['trim']();
-      if (result?.['ok'] !== !![] || !createdNodeId)
+      if (!isActiveRun(message2['runId'])) return message2;
+      const nodeId2 = String(response?.['createdNodeIds']?.[0x0] || '')['trim']();
+      if (response?.['ok'] !== !![] || !nodeId2)
         return (
           sessionStore?.['recordTrace']?.({
             type: 'agent_precreated_node_failed',
             commandId: 'node.create',
-            nodeType: nodeType,
-            errorCode: String(result?.['errorCode'] || ''),
+            nodeType: type2,
+            errorCode: String(response?.['errorCode'] || ''),
           }),
-          request
+          message2
         );
-      previousSelection['length'] > 0x0 &&
-        (await executeActions([{ type: 'node.select', args: { ids: previousSelection } }], {
+      ids['length'] > 0x0 &&
+        (await executeActions([{ type: 'node.select', args: { ids: ids } }], {
           commandContext: commandContext,
-          ...buildExecutionOptions(request['runId']),
+          ...buildExecutionOptions(message2['runId']),
         }));
-      const reservedRequest = { ...request, precreatedNode: { nodeId: createdNodeId, type: nodeType } };
+      const args = { ...message2, precreatedNode: { nodeId: nodeId2, type: type2 } };
       return (
-        sessionStore?.['setPendingLoopRun']?.({ ...reservedRequest, pendingKind: 'interrupted' }),
-        markUnfinishedOperation(reservedRequest['originalMessage']),
+        sessionStore?.['setPendingLoopRun']?.({ ...args, pendingKind: 'interrupted' }),
+        markUnfinishedOperation(args['originalMessage']),
         sessionStore?.['recordTrace']?.({
           type: 'agent_precreated_node_ready',
           commandId: 'node.create',
-          nodeId: createdNodeId,
-          nodeType: nodeType,
+          nodeId: nodeId2,
+          nodeType: type2,
         }),
-        reservedRequest
+        args
       );
     },
   };

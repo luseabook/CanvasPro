@@ -9,10 +9,8 @@ const entries = [
   ...runningHubMinimaxAudioEntries,
   ...runningHubMurekaAudioEntries,
 ];
-export const runningHubAudioCatalogModels = Object['freeze'](
-  entries['map']((_0x6fcbaf) => _0x6fcbaf['model']),
-);
+export const runningHubAudioCatalogModels = Object['freeze'](entries['map']((value) => value['model']));
 export const runningHubAudioCatalogExecutions = Object['freeze']([
-  ...entries['map']((_0x3e4c06) => _0x3e4c06['execution']),
+  ...entries['map']((item) => item['execution']),
   ...runningHubAudioHelperExecutionManifests,
 ]);

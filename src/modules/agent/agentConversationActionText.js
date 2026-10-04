@@ -21,6 +21,6 @@ const copy = {
     limit: 'Answer version limit reached. Send a new message to continue.',
   },
 };
-export function agentConversationActionText(_0x140774, _0x3e3b41 = getLocale()) {
-  return copy[String(_0x3e3b41)['startsWith']('en') ? 'en-US' : 'zh-CN'][_0x140774] || _0x140774;
+export function agentConversationActionText(value, locale = getLocale()) {
+  return copy[String(locale)['startsWith']('en') ? 'en-US' : 'zh-CN'][value] || value;
 }

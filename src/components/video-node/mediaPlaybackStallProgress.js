@@ -1,11 +1,11 @@
-export function observePlaybackStallProgress(_0x3c9f4f, _0x5b25a2, _0x466fc3 = Date['now']()) {
-  const _0x1590b9 = JSON['stringify']([_0x5b25a2['src'], _0x5b25a2['currentTime'], _0x5b25a2['buffered']]);
+export function observePlaybackStallProgress(value, item, changedAt = Date['now']()) {
+  const signature = JSON['stringify']([item['src'], item['currentTime'], item['buffered']]);
   return (
-    _0x3c9f4f['stallProgress']?.['signature'] !== _0x1590b9 &&
-      (_0x3c9f4f['stallProgress'] = { signature: _0x1590b9, changedAt: _0x466fc3 }),
+    value['stallProgress']?.['signature'] !== signature &&
+      (value['stallProgress'] = { signature: signature, changedAt: changedAt }),
     Math['max'](
       0x0,
-      Number(_0x3c9f4f['stallTimeoutMs'] ?? 0xfa0) - (_0x466fc3 - _0x3c9f4f['stallProgress']['changedAt']),
+      Number(value['stallTimeoutMs'] ?? 0xfa0) - (changedAt - value['stallProgress']['changedAt']),
     )
   );
 }

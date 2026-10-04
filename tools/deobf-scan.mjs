@@ -16,7 +16,7 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const SCAN_DIRS = ['src', 'electron', 'api'];
 const ROOT_CONSUMERS = ['index.html', 'main.js', 'server.py', 'playwright.config.js'];
-const SKIP = /^(node_modules|dist[^/]*|deobfuscated|\.git|\.kilo|playwright-report|test-results|build|\.workbuddy)(\/|$)/;
+const SKIP = /^(node_modules|dist[^/]*|deobfuscated|release|test-artifacts|\.git|\.kilo|playwright-report|test-results|build|\.workbuddy|vendor)(\/|$)/;
 const OBFUSCATED = /_0x[0-9a-f]{4,}/;
 // Text files that may reference a module. Consumers are searched across the
 // whole repository, not just the source directories: a module can be pulled in

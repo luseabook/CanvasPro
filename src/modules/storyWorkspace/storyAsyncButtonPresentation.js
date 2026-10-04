@@ -5,14 +5,14 @@ export function renderStoryGenerationSpinner({ button: button = ![] } = {}) {
     '" aria-hidden="true"></span>'
   );
 }
-export function syncStoryAsyncButton(_0x506f8f, _0x5a5cbf, { spinnerOnly: spinnerOnly = ![] } = {}) {
-  if (!_0x506f8f) return ![];
-  const _0x252d67 = _0x5a5cbf === !![];
-  (_0x506f8f['setAttribute']?.('aria-busy', String(_0x252d67)),
-    _0x506f8f['classList']?.['toggle']?.('is-story-spinner-only', _0x252d67 && spinnerOnly));
-  const _0x547e0d = _0x506f8f['querySelector']?.('.story-action-button-spinner');
-  if (_0x252d67 && !_0x547e0d)
-    _0x506f8f['insertAdjacentHTML']?.('afterbegin', renderStoryGenerationSpinner({ button: !![] }));
-  else !_0x252d67 && _0x547e0d?.['remove']?.();
-  return _0x252d67;
+export function syncStoryAsyncButton(el, value, { spinnerOnly: spinnerOnly = ![] } = {}) {
+  if (!el) return ![];
+  const enabled = value === !![];
+  (el['setAttribute']?.('aria-busy', String(enabled)),
+    el['classList']?.['toggle']?.('is-story-spinner-only', enabled && spinnerOnly));
+  const enabled2 = el['querySelector']?.('.story-action-button-spinner');
+  if (enabled && !enabled2)
+    el['insertAdjacentHTML']?.('afterbegin', renderStoryGenerationSpinner({ button: !![] }));
+  else !enabled && enabled2?.['remove']?.();
+  return enabled;
 }

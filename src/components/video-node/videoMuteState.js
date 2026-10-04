@@ -1,16 +1,15 @@
 export const VIDEO_MUTED_FIELD = 'videoMuted';
-export function resolveVideoMutedPreference(_0x3945bf = {}) {
-  return _0x3945bf?.[VIDEO_MUTED_FIELD] === false ? false : true;
+export function resolveVideoMutedPreference(options = {}) {
+  return options?.[VIDEO_MUTED_FIELD] === false ? false : true;
 }
-export function buildVideoMutedPatch(_0x5b8e73 = {}, _0x23225f) {
-  const _0x131dc9 = !!_0x23225f;
-  return _0x5b8e73?.[VIDEO_MUTED_FIELD] === _0x131dc9 ? null : { [VIDEO_MUTED_FIELD]: _0x131dc9 };
+export function buildVideoMutedPatch(options2 = {}, enabled) {
+  const value = !!enabled;
+  return options2?.[VIDEO_MUTED_FIELD] === value ? null : { [VIDEO_MUTED_FIELD]: value };
 }
-export function readVideoAudioDefaultEnabledFromStore(_0x27d6ec) {
+export function readVideoAudioDefaultEnabledFromStore(store) {
   try {
-    const _0x7b58b1 =
-      typeof _0x27d6ec?.getStateRaw === 'function' ? _0x27d6ec.getStateRaw() : _0x27d6ec?.getState?.();
-    return _0x7b58b1?.ui?.videoAudioDefaultEnabled === true;
+    const item = typeof store?.getStateRaw === 'function' ? store.getStateRaw() : store?.getState?.();
+    return item?.ui?.videoAudioDefaultEnabled === true;
   } catch {
     return false;
   }

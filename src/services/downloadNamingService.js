@@ -6,11 +6,11 @@ export function getDownloadUseOriginalFilename() {
     return ![];
   }
 }
-export function setDownloadUseOriginalFilename(_0x1e3dc6) {
+export function setDownloadUseOriginalFilename(value) {
   try {
     globalThis['localStorage']?.['setItem'](
       DOWNLOAD_ORIGINAL_FILENAME_STORAGE_KEY,
-      _0x1e3dc6 === !![] ? '1' : '0',
+      value === !![] ? '1' : '0',
     );
   } catch {}
   return getDownloadUseOriginalFilename();

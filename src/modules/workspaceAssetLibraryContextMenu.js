@@ -1,5 +1,5 @@
-export function resolveWorkspaceLibraryContextSelection(_0x1cbf61, _0x778994, _0x4f6a0e = []) {
-  return _0x778994 && _0x4f6a0e['includes'](_0x1cbf61) ? [..._0x4f6a0e] : [_0x1cbf61];
+export function resolveWorkspaceLibraryContextSelection(value, item, list = []) {
+  return item && list['includes'](value) ? [...list] : [value];
 }
 export function createWorkspaceAssetLibraryContextMenuItems({
   selectedCount: selectedCount = 0x0,

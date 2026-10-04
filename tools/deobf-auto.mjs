@@ -18,6 +18,7 @@
 // The map is injective: no two names collapse onto the same identifier, so a
 // rename can never introduce a redeclaration in an overlapping scope.
 import fs from 'node:fs';
+import { lex, withBrackets, dataPositions } from './deobf-lex.mjs';
 
 const OBF = /_0x[0-9a-f]{4,}/g;
 
@@ -82,14 +83,25 @@ function main() {
     return;
   }
 
-  // Identifiers must never be renamed where they name data rather than a binding.
-  const protectedNames = new Set();
-  for (const match of source.matchAll(/\.\s*(_0x[0-9a-f]{4,})\b/g)) protectedNames.add(match[1]);
-  for (const match of source.matchAll(/([{,]\s*)(_0x[0-9a-f]{4,})\s*:/g)) protectedNames.add(match[2]);
-  // `...spread` is not a member access; keep those names eligible.
-  for (const name of [...protectedNames]) {
-    const memberUses = source.match(new RegExp('(?<!\\.)\\.\\s*' + name + '\\b', 'g')) || [];
-    if (!memberUses.length) protectedNames.delete(name);
+  // Identifiers must never be renamed where they name data rather than a binding:
+  // member access, object keys and shorthand properties (`{ _0x1 }`, where the key
+  // is the binding name). The lexer decides this, so the rule matches the gate's.
+  const tokens = withBrackets(lex(source));
+  const positions = dataPositions(tokens);
+  const protectedNames = new Set([...positions.memberOrKey, ...positions.shorthand]);
+
+  // Seed the name pool with every identifier the file already uses as a binding or
+  // reference, so a generated name can never shadow an existing one — `const
+  // isPlainObject = isPlainObject(item) ? ...` was a real defect this prevents.
+  // Occurrences that name data are skipped, so a generated name may still match a
+  // property name, which is harmless.
+  const used = new Set();
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
+    if (token.kind !== 'identifier') continue;
+    if (positions.dataIndices.has(index)) continue;
+    if (/_0x[0-9a-f]{4,}/.test(token.value)) continue;
+    used.add(token.value);
   }
 
   const props = new Map();
@@ -101,9 +113,12 @@ function main() {
   const booleanOnly = new Set();
   const declarationKind = new Map();
 
-  for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*\[\s*'([^']+)'\s*\]/g)) collect(match, match[2], props);
-  for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*(?!\[)\.\s*([A-Za-z_$][\w$]*)/g)) collect(match, match[2], props);
-  for (const match of source.matchAll(/([A-Za-z_$][\w$]*)\s*:\s*(_0x[0-9a-f]{4,})\b/g)) {
+  // `x['p']` and `x?.['p']`, `x.p` and `x?.p` are the same evidence.
+  for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*(?:\?\.)?\s*\[\s*'([^']+)'\s*\]/g)) collect(match, match[2], props);
+  for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*\??\.\s*([A-Za-z_$][\w$]*)/g)) collect(match, match[2], props);
+  // Object/destructuring key only. The leading `{` or `,` is what separates
+  // `{ nodeId: _0x12ab }` from the identical-looking ternary `cond ? x : _0x12ab`.
+  for (const match of source.matchAll(/[{,]\s*([A-Za-z_$][\w$]*)\s*:\s*(_0x[0-9a-f]{4,})\b/g)) {
     if (!destructured.has(match[2])) destructured.set(match[2], match[1]);
   }
   for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*\(/g)) called.add(match[1]);
@@ -151,7 +166,6 @@ function main() {
   const stateLike = new Set();
   for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*\[\s*'(?:nodes|edges|selectedNodeIds)'\s*\]/g)) stateLike.add(match[1]);
 
-  const used = new Set();
   const map = {};
   const reasons = {};
   for (const name of names) {
@@ -243,6 +257,14 @@ function main() {
 
     map[name] = unique(FALLBACKS.find(candidate => !used.has(candidate)) || 'value', used);
     reasons[name] = 'fallback';
+  }
+
+  // Safety net: a target must be a readable name that actually renames. Anything
+  // that is still obfuscated, or identical to its source, falls back.
+  for (const [from, to] of Object.entries(map)) {
+    if (!/^_0x/.test(to) && to !== from) continue;
+    map[from] = unique(FALLBACKS.find(candidate => !used.has(candidate)) || 'value', used);
+    reasons[from] = (reasons[from] || 'fallback') + ' (sanitised)';
   }
 
   console.log(JSON.stringify(map, null, 2));

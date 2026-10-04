@@ -5,22 +5,22 @@ import { buildRunningHubVideoFixedSlotSummaryPatch } from './runningHubVideoSubm
 function readStoreState() {
   return typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
 }
-function buildStorePatch(nodeData, patch) {
-  const next = { ...patch };
-  if (!patch['rhBerniniFunction']) return next;
-  const generationParams = {
-    ...(nodeData?.['generationParams'] || {}),
-    rhBerniniFunction: patch['rhBerniniFunction'],
+function buildStorePatch(value, rhBerniniFunction) {
+  const item = { ...rhBerniniFunction };
+  if (!rhBerniniFunction['rhBerniniFunction']) return item;
+  const key = {
+    ...(value?.['generationParams'] || {}),
+    rhBerniniFunction: rhBerniniFunction['rhBerniniFunction'],
   };
-  next['generationParams'] = generationParams;
-  const model = String(nodeData?.['model'] || '')['trim']();
+  item['generationParams'] = key;
+  const index = String(value?.['model'] || '')['trim']();
   return (
-    model &&
-      (next['generationParamsByModel'] = {
-        ...(nodeData?.['generationParamsByModel'] || {}),
-        [model]: generationParams,
+    index &&
+      (item['generationParamsByModel'] = {
+        ...(value?.['generationParamsByModel'] || {}),
+        [index]: key,
       }),
-    next
+    item
   );
 }
 export function syncVideoNodeFixedInputSummary({
@@ -33,9 +33,9 @@ export function syncVideoNodeFixedInputSummary({
   let inEdges = appStore['getIncomingEdges'](nodeId);
   if (!fixedInputConfig)
     return { nodeData: nodeData, fixedInputConfig: null, inEdges: inEdges, changed: ![] };
-  inEdges = inEdges['filter']((edge) => edge?.['targetId'] === nodeId);
+  inEdges = inEdges['filter']((result) => result?.['targetId'] === nodeId);
   const model = String(nodeData?.['model'] || '')['trim'](),
-    summaryPatch = buildRunningHubVideoFixedSlotSummaryPatch({
+    runningHubVideoFixedSlotSummaryPatch = buildRunningHubVideoFixedSlotSummaryPatch({
       model: model,
       nodeData: nodeData,
       slotEntries: buildVideoFixedSlotEntriesForSummary({
@@ -46,19 +46,22 @@ export function syncVideoNodeFixedInputSummary({
         nodeData: nodeData,
       }),
     }),
-    changed =
-      Object['entries'](summaryPatch)['some'](([key, value]) => nodeData?.[key] !== value) ||
-      (summaryPatch['rhBerniniFunction'] &&
-        nodeData?.['generationParams']?.['rhBerniniFunction'] !== summaryPatch['rhBerniniFunction']);
-  if (!changed)
+    enabled =
+      Object['entries'](runningHubVideoFixedSlotSummaryPatch)['some'](
+        ([data, options]) => nodeData?.[data] !== options,
+      ) ||
+      (runningHubVideoFixedSlotSummaryPatch['rhBerniniFunction'] &&
+        nodeData?.['generationParams']?.['rhBerniniFunction'] !==
+          runningHubVideoFixedSlotSummaryPatch['rhBerniniFunction']);
+  if (!enabled)
     return { nodeData: nodeData, fixedInputConfig: fixedInputConfig, inEdges: inEdges, changed: ![] };
-  const storePatch = buildStorePatch(nodeData, summaryPatch);
-  if (syncStore) appStore['updateNodeData'](nodeId, storePatch);
+  const patch = buildStorePatch(nodeData, runningHubVideoFixedSlotSummaryPatch);
+  if (syncStore) appStore['updateNodeData'](nodeId, patch);
   return {
-    nodeData: { ...nodeData, ...storePatch },
+    nodeData: { ...nodeData, ...patch },
     fixedInputConfig: fixedInputConfig,
     inEdges: inEdges,
     changed: !![],
-    patch: storePatch,
+    patch: patch,
   };
 }

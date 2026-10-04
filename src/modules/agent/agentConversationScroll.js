@@ -1,15 +1,15 @@
-export function scrollAgentMessageListToEnd(_0x1c81a1) {
-  scrollAgentMessageListTo(_0x1c81a1, _0x1c81a1?.['scrollHeight'] || 0x0);
+export function scrollAgentMessageListToEnd(value) {
+  scrollAgentMessageListTo(value, value?.['scrollHeight'] || 0x0);
 }
-export function scrollAgentMessageListTo(_0x546be1, _0x3f8d11) {
-  if (!_0x546be1) return;
-  const _0x935dc7 = _0x546be1['style']?.['scrollBehavior'] || '';
-  if (_0x546be1['style']) _0x546be1['style']['scrollBehavior'] = 'auto';
-  _0x546be1['scrollTop'] = _0x3f8d11;
-  if (!_0x546be1['style']) return;
-  if (_0x935dc7) _0x546be1['style']['scrollBehavior'] = _0x935dc7;
+export function scrollAgentMessageListTo(el, item) {
+  if (!el) return;
+  const key = el['style']?.['scrollBehavior'] || '';
+  if (el['style']) el['style']['scrollBehavior'] = 'auto';
+  el['scrollTop'] = item;
+  if (!el['style']) return;
+  if (key) el['style']['scrollBehavior'] = key;
   else
-    typeof _0x546be1['style']['removeProperty'] === 'function'
-      ? _0x546be1['style']['removeProperty']('scroll-behavior')
-      : (_0x546be1['style']['scrollBehavior'] = '');
+    typeof el['style']['removeProperty'] === 'function'
+      ? el['style']['removeProperty']('scroll-behavior')
+      : (el['style']['scrollBehavior'] = '');
 }

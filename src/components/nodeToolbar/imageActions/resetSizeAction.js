@@ -1,15 +1,15 @@
-export function bindImageResetSizeAction(_0x10b0fb) {
+export function bindImageResetSizeAction(value) {
   const {
-      toolbarEl: _0x12f7bd,
-      nodeId: _0x18e1fb,
-      getStateSnapshot: _0x255e1f,
-      executeCommand: _0xb12360,
-    } = _0x10b0fb,
-    _0x59e78e = _0x12f7bd.querySelector('.act-reset-size');
-  _0x59e78e &&
-    _0x59e78e.addEventListener('click', (_0x2fc9c9) => {
-      _0x2fc9c9.stopPropagation();
-      if (_0x255e1f().ui?.imageVideoNodeResizeEnabled !== true) return;
-      _0xb12360('reset_source_media_size', { ids: [_0x18e1fb] });
+      toolbarEl: toolbarEl,
+      nodeId: nodeId,
+      getStateSnapshot: getStateSnapshot,
+      executeCommand: executeCommand,
+    } = value,
+    el = toolbarEl.querySelector('.act-reset-size');
+  el &&
+    el.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (getStateSnapshot().ui?.imageVideoNodeResizeEnabled !== true) return;
+      executeCommand('reset_source_media_size', { ids: [nodeId] });
     });
 }

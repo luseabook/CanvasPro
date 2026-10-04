@@ -7,185 +7,19 @@
 // and literal values, and the identifier positions must form a consistent
 // rename map (one old name always maps to the same new name).
 //
+// On top of the token stream it rejects the three ways a rename can still change
+// behaviour without changing tokens:
+//   - renaming an exported name, or an identifier an export clause refers to;
+//   - renaming an identifier used as a member name or an object key;
+//   - renaming an identifier that would collide with a name the file already
+//     uses, which silently shadows it (`const isPlainObject = isPlainObject(x)`).
+//
 // Deliberately lexical rather than AST based: no parser dependency is available
 // in this repository, and a pure rename is exactly what a token stream proves.
 // Anything the lexer cannot see (comment edits, formatting) is ignored on
 // purpose; every other transformation is rejected.
 import fs from 'node:fs';
-
-const PUNCTUATORS = [
-  '>>>=', '...', '===', '!==', '**=', '<<=', '>>=', '>>>', '&&=', '||=', '??=',
-  '=>', '==', '!=', '<=', '>=', '&&', '||', '??', '?.', '++', '--', '+=', '-=',
-  '*=', '/=', '%=', '&=', '|=', '^=', '**', '<<', '>>',
-  '{', '}', '(', ')', '[', ']', ';', ',', '<', '>', '+', '-', '*', '/', '%', '&',
-  '|', '^', '!', '~', '?', ':', '=', '.', '@', '#',
-].sort((a, b) => b.length - a.length);
-
-// A `/` is division when the previous token can end an expression, otherwise a
-// regex literal starts. Both files are lexed by the same rule, so even a wrong
-// guess stays consistent for comparison purposes.
-const EXPRESSION_END = new Set(['identifier', 'number', 'string', 'template', 'regex']);
-const KEYWORDS_BEFORE_REGEX = new Set([
-  'return', 'typeof', 'instanceof', 'in', 'of', 'new', 'delete', 'void', 'do',
-  'else', 'case', 'yield', 'await', 'throw',
-]);
-
-function lex(source) {
-  const tokens = [];
-  let i = 0;
-  let previous = null;
-  const push = (kind, value) => {
-    const token = {
-      kind,
-      value,
-      offset: i,
-      // `obj.name` / `obj?.name`: the identifier is a member name, part of the
-      // data being addressed, not a binding. Renaming it changes behaviour.
-      member: previous !== null && previous.kind === 'punct' && (previous.value === '.' || previous.value === '?.'),
-    };
-    tokens.push(token);
-    previous = token;
-    return token;
-  };
-  const regexAllowed = () => {
-    if (!previous) return true;
-    if (previous.kind === 'punct') return ![')', ']', '}'].includes(previous.value);
-    if (previous.kind === 'identifier') return KEYWORDS_BEFORE_REGEX.has(previous.value);
-    return false;
-  };
-
-  while (i < source.length) {
-    const char = source[i];
-
-    if (char === '\n' || char === ' ' || char === '\t' || char === '\r' || char === '\f' || char === '\v') {
-      i += 1;
-      continue;
-    }
-
-    if (char === '/' && source[i + 1] === '/') {
-      while (i < source.length && source[i] !== '\n') i += 1;
-      continue;
-    }
-    if (char === '/' && source[i + 1] === '*') {
-      i += 2;
-      while (i < source.length && !(source[i] === '*' && source[i + 1] === '/')) i += 1;
-      i += 2;
-      continue;
-    }
-
-    if (char === '"' || char === "'") {
-      const start = i;
-      i += 1;
-      while (i < source.length && source[i] !== char) {
-        if (source[i] === '\\') i += 1;
-        i += 1;
-      }
-      i += 1;
-      push('string', source.slice(start, i));
-      continue;
-    }
-
-    if (char === '`') {
-      const start = i;
-      i += 1;
-      while (i < source.length && source[i] !== '`') {
-        if (source[i] === '\\') {
-          i += 2;
-          continue;
-        }
-        if (source[i] === '$' && source[i + 1] === '{') {
-          push('template', source.slice(start, i));
-          i += 2;
-          let depth = 1;
-          const expressionStart = i;
-          while (i < source.length && depth > 0) {
-            if (source[i] === '{') depth += 1;
-            else if (source[i] === '}') depth -= 1;
-            if (depth === 0) break;
-            i += 1;
-          }
-          const inner = lex(source.slice(expressionStart, i));
-          for (const token of inner) {
-            token.offset += expressionStart;
-            tokens.push(token);
-          }
-          if (inner.length) previous = inner[inner.length - 1];
-          i += 1;
-          push('template', '${}');
-          continue;
-        }
-        i += 1;
-      }
-      i += 1;
-      push('template', source.slice(start, i));
-      continue;
-    }
-
-    if (/[0-9]/.test(char) || (char === '.' && /[0-9]/.test(source[i + 1] || ''))) {
-      const start = i;
-      if (char === '0' && /[xXbBoO]/.test(source[i + 1] || '')) {
-        i += 2;
-        while (i < source.length && /[0-9a-fA-F_]/.test(source[i])) i += 1;
-      } else {
-        while (i < source.length && /[0-9_]/.test(source[i])) i += 1;
-        if (source[i] === '.') {
-          i += 1;
-          while (i < source.length && /[0-9_]/.test(source[i])) i += 1;
-        }
-        if (/[eE]/.test(source[i] || '')) {
-          i += 1;
-          if (/[+-]/.test(source[i] || '')) i += 1;
-          while (i < source.length && /[0-9_]/.test(source[i])) i += 1;
-        }
-      }
-      if (source[i] === 'n') i += 1;
-      const text = source.slice(start, i).replace(/_/g, '');
-      // Compare numbers by value so `0x200` and `512` count as the same literal.
-      push('number', 'n' === text.slice(-1) ? text : String(Number(text)));
-      continue;
-    }
-
-    if (/[A-Za-z_$\\]/.test(char)) {
-      const start = i;
-      while (i < source.length && /[A-Za-z0-9_$\\]/.test(source[i])) i += 1;
-      push('identifier', source.slice(start, i));
-      continue;
-    }
-
-    if (char === '/' && regexAllowed()) {
-      const start = i;
-      i += 1;
-      let inClass = false;
-      while (i < source.length) {
-        const current = source[i];
-        if (current === '\\') {
-          i += 2;
-          continue;
-        }
-        if (current === '[') inClass = true;
-        else if (current === ']') inClass = false;
-        else if (current === '/' && !inClass) break;
-        else if (current === '\n') break;
-        i += 1;
-      }
-      i += 1;
-      while (i < source.length && /[a-z]/i.test(source[i])) i += 1;
-      push('regex', source.slice(start, i));
-      continue;
-    }
-
-    const punctuator = PUNCTUATORS.find(candidate => source.startsWith(candidate, i));
-    if (!punctuator) {
-      push('punct', char);
-      i += 1;
-      continue;
-    }
-    i += punctuator.length;
-    push('punct', punctuator);
-  }
-
-  return tokens;
-}
+import { lex, withBrackets, dataPositions, stringValue } from './deobf-lex.mjs';
 
 // Prettier only emits a trailing comma in multi-line argument lists, arrays,
 // object literals and parameter lists. Whether the list ended up on one line is
@@ -230,12 +64,7 @@ function exportSurface(source) {
   while ((match = declaration.exec(source))) {
     names.add(match[2]);
   }
-  if (/\bexport\s+default\b/.test(source) && !/\bexport\s+default\s+(?:async\s+)?(?:function|class)\s/.test(source)) {
-    names.add('default');
-  }
-  if (/\bexport\s+default\s+(?:async\s+)?(?:function|class)\s/.test(source)) {
-    names.add('default');
-  }
+  if (/\bexport\s+default\b/.test(source)) names.add('default');
 
   const clause = /\bexport\s*\{([^}]*)\}/g;
   while ((match = clause.exec(source))) {
@@ -264,8 +93,8 @@ function main() {
   const [originalPath, rewrittenPath] = args;
   const originalSource = fs.readFileSync(originalPath, 'utf8');
   const rewrittenSource = fs.readFileSync(rewrittenPath, 'utf8');
-  const original = dropNonSemanticTrailingCommas(lex(originalSource));
-  const rewritten = dropNonSemanticTrailingCommas(lex(rewrittenSource));
+  const original = withBrackets(dropNonSemanticTrailingCommas(lex(originalSource)));
+  const rewritten = withBrackets(dropNonSemanticTrailingCommas(lex(rewrittenSource)));
 
   const failures = [];
 
@@ -288,7 +117,11 @@ function main() {
       continue;
     }
     if (before.kind === 'identifier') continue;
-    if (before.value !== after.value) {
+    // Compare string literals by value: prettier rewrites `"a"` to `'a'`.
+    const same = before.kind === 'string'
+      ? stringValue(before.value) === stringValue(after.value)
+      : before.value === after.value;
+    if (!same) {
       failures.push(
         'token ' + index + ' value changed at line ' + lineOf(originalSource, before.offset) +
           ': ' + describe(before) + ' -> ' + describe(after),
@@ -298,7 +131,6 @@ function main() {
 
   // Identifier positions must form a consistent rename map.
   const rename = new Map();
-  const renamedTargets = new Set();
   for (let index = 0; index < limit; index += 1) {
     const before = original[index];
     const after = rewritten[index];
@@ -306,7 +138,6 @@ function main() {
     const known = rename.get(before.value);
     if (known === undefined) {
       rename.set(before.value, after.value);
-      if (before.value !== after.value) renamedTargets.add(after.value);
       continue;
     }
     if (known !== after.value) {
@@ -333,32 +164,43 @@ function main() {
     }
   }
 
+  // Renaming an identifier where it names data rather than a binding.
+  const positions = dataPositions(original);
   const badPositions = [];
-  for (let index = 0; index < limit; index += 1) {
-    const token = original[index];
-    if (token.kind !== 'identifier') continue;
-    if (token.member) {
-      if (rename.get(token.value) !== token.value) badPositions.push('member access `.' + token.value + '`');
-      continue;
-    }
-    const colon = original[index + 1];
-    const opener = original[index - 1];
-    if (
-      colon &&
-      colon.kind === 'punct' &&
-      colon.value === ':' &&
-      opener &&
-      opener.kind === 'punct' &&
-      (opener.value === '{' || opener.value === ',') &&
-      rename.get(token.value) !== token.value
-    ) {
-      badPositions.push('object key `' + token.value + ':`');
-    }
+  for (const [from, to] of rename) {
+    if (from === to) continue;
+    if (positions.memberOrKey.has(from)) badPositions.push('member name or object key `' + from + '`');
+    if (positions.shorthand.has(from)) badPositions.push('shorthand property `{ ' + from + ' }`');
   }
   if (badPositions.length) {
     failures.push(
       'identifiers used as member names or object keys must not be renamed: ' +
         [...new Set(badPositions)].slice(0, 10).join(', '),
+    );
+  }
+
+  // A rename target must be a name the file did not already use as a binding or
+  // reference. Otherwise the rename silently shadows an existing name and later
+  // references keep the new meaning: `const isPlainObject = isPlainObject(x)`.
+  // Occurrences that name data are excluded, so a local binding may legitimately
+  // take its name from a destructuring key (`{ sanitizePromptHtml: sanitizePromptHtml }`).
+  const renamedFrom = new Set([...rename.entries()].filter(([from, to]) => from !== to).map(([from]) => from));
+  const existing = new Set();
+  for (let index = 0; index < original.length; index += 1) {
+    const token = original[index];
+    if (token.kind !== 'identifier') continue;
+    if (positions.dataIndices.has(index)) continue;
+    if (renamedFrom.has(token.value)) continue;
+    existing.add(token.value);
+  }
+  const shadowing = [];
+  for (const [from, to] of rename) {
+    if (from === to) continue;
+    if (existing.has(to)) shadowing.push(from + ' -> ' + to);
+  }
+  if (shadowing.length) {
+    failures.push(
+      'rename target shadows a name the file already uses: ' + shadowing.slice(0, 10).join(', '),
     );
   }
 
@@ -381,12 +223,12 @@ function main() {
       ' tokens); ' + renamed.length + ' identifiers renamed',
   );
   if (explain) {
-    for (const [from, to] of renamed.sort()) console.log('  ' + from + ' -> ' + to);
+    for (const [from, to] of [...renamed].sort()) console.log('  ' + from + ' -> ' + to);
   }
   if (collisions.length) {
     // Usually a destructuring property key such as `itemKey: _0x30c878`, which is
     // safe. Anything else deserves a manual look before the batch lands.
-    console.log('REVIEW ' + collisions.length + ' rename target shares a name with an existing identifier:');
+    console.log('REVIEW ' + collisions.length + ' rename target shares a name with another rename target:');
     for (const collision of collisions.slice(0, 20)) console.log('  ' + collision);
   }
 }

@@ -1,12 +1,12 @@
 import { bindModelCredentialButtonState } from '../../modules/modelCredentialUi.js';
-export function bindGenerationNodeCredentialLifecycle(_0x3c3003, _0x53140d = () => {}) {
-  const _0x268376 = bindModelCredentialButtonState(_0x3c3003?.['btnEl'], {
+export function bindGenerationNodeCredentialLifecycle(value, item = () => {}) {
+  const run = bindModelCredentialButtonState(value?.['btnEl'], {
     syncOnBind: ![],
-    onRefresh: () => _0x3c3003?.['_updateSubmitButtonState']?.(),
+    onRefresh: () => value?.['_updateSubmitButtonState']?.(),
   });
   return () => {
-    (_0x268376(), _0x3c3003?.['_modelCredentialMenuCleanup']?.());
-    if (_0x3c3003) _0x3c3003['_modelCredentialMenuCleanup'] = null;
-    _0x53140d?.();
+    (run(), value?.['_modelCredentialMenuCleanup']?.());
+    if (value) value['_modelCredentialMenuCleanup'] = null;
+    item?.();
   };
 }

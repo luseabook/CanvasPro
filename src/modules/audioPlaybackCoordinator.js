@@ -1,24 +1,24 @@
 const clients = new Map();
-function normalizeClientId(_0x447675) {
-  return String(_0x447675 || '').trim();
+function normalizeClientId(value) {
+  return String(value || '').trim();
 }
-export function registerAudioPlaybackClient(_0x222071, _0x2b95da = {}) {
-  const _0x2c5d45 = normalizeClientId(_0x222071);
-  if (!_0x2c5d45) return () => {};
+export function registerAudioPlaybackClient(item, key = {}) {
+  const clientId = normalizeClientId(item);
+  if (!clientId) return () => {};
   return (
-    clients.set(_0x2c5d45, _0x2b95da),
+    clients.set(clientId, key),
     () => {
-      if (clients.get(_0x2c5d45) === _0x2b95da) clients.delete(_0x2c5d45);
+      if (clients.get(clientId) === key) clients.delete(clientId);
     }
   );
 }
-export function beginAudioPlayback(_0x5eaae6) {
-  const _0x5ae610 = normalizeClientId(_0x5eaae6);
-  if (!_0x5ae610) return;
-  for (const [_0x1c9641, _0x97d9] of clients.entries()) {
-    if (_0x1c9641 === _0x5ae610) continue;
+export function beginAudioPlayback(index) {
+  const clientId2 = normalizeClientId(index);
+  if (!clientId2) return;
+  for (const [result, data] of clients.entries()) {
+    if (result === clientId2) continue;
     try {
-      _0x97d9?.stopForExternalPlayback?.();
+      data?.stopForExternalPlayback?.();
     } catch {}
   }
 }

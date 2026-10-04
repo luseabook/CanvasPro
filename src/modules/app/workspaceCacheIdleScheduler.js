@@ -1,33 +1,31 @@
 const DEFAULT_RETRY_DELAY_MS = 0xfa,
   DEFAULT_MIN_IDLE_BUDGET_MS = 0xc,
   DEFAULT_IDLE_TIMEOUT_MS = 0x5dc;
-function normalizeDelay(value, fallback = 0x0) {
-  const numeric = Number(value);
-  return Number['isFinite'](numeric) && numeric >= 0x0 ? numeric : fallback;
+function normalizeDelay(value, item = 0x0) {
+  const count = Number(value);
+  return Number['isFinite'](count) && count >= 0x0 ? count : item;
 }
-function hasIdleBudget(deadline, minBudgetMs) {
-  if (!deadline || typeof deadline !== 'object') return !![];
-  if (deadline['didTimeout'] === !![]) return ![];
-  return (
-    typeof deadline['timeRemaining'] !== 'function' || Number(deadline['timeRemaining']()) >= minBudgetMs
-  );
+function hasIdleBudget(enabled, key) {
+  if (!enabled || typeof enabled !== 'object') return !![];
+  if (enabled['didTimeout'] === !![]) return ![];
+  return typeof enabled['timeRemaining'] !== 'function' || Number(enabled['timeRemaining']()) >= key;
 }
 export function isWorkspaceCacheInteractionBusy({
   documentRef: documentRef = globalThis['document'],
   CanvasTabManager: CanvasTabManager = null,
 } = {}) {
   if (CanvasTabManager?.['_isVisualSnapshotInteractionBusy']?.() === !![]) return !![];
-  const bodyClassList = documentRef?.['body']?.['classList'],
-    rootClassList = documentRef?.['documentElement']?.['classList'],
-    canvasClassList = documentRef?.['getElementById']?.('v2-canvas')?.['classList'];
+  const index = documentRef?.['body']?.['classList'],
+    result = documentRef?.['documentElement']?.['classList'],
+    data = documentRef?.['getElementById']?.('v2-canvas')?.['classList'];
   return Boolean(
-    bodyClassList?.['contains']?.('is-dragging') ||
-    bodyClassList?.['contains']?.('is-panning') ||
-    bodyClassList?.['contains']?.('is-zooming') ||
-    bodyClassList?.['contains']?.('is-viewport-animating') ||
-    bodyClassList?.['contains']?.('pick-connect-active') ||
-    rootClassList?.['contains']?.('is-connecting-mode') ||
-    canvasClassList?.['contains']?.('is-connecting'),
+    index?.['contains']?.('is-dragging') ||
+    index?.['contains']?.('is-panning') ||
+    index?.['contains']?.('is-zooming') ||
+    index?.['contains']?.('is-viewport-animating') ||
+    index?.['contains']?.('pick-connect-active') ||
+    result?.['contains']?.('is-connecting-mode') ||
+    data?.['contains']?.('is-connecting'),
   );
 }
 export function createWorkspaceCacheIdleScheduler({
@@ -42,85 +40,86 @@ export function createWorkspaceCacheIdleScheduler({
   cancelIdleCallbackFn: cancelIdleCallbackFn = globalThis['cancelIdleCallback']?.['bind'](globalThis),
   onError: onError = () => {},
 } = {}) {
-  const retryDelay = normalizeDelay(retryDelayMs, DEFAULT_RETRY_DELAY_MS),
-    minIdleBudget = normalizeDelay(minIdleBudgetMs, DEFAULT_MIN_IDLE_BUDGET_MS),
-    idleTimeout = normalizeDelay(idleTimeoutMs, DEFAULT_IDLE_TIMEOUT_MS);
-  let generation = 0x0,
-    timeoutHandle = null,
-    idleHandle = null,
-    pending = ![];
-  const clearTimer = () => {
-      (timeoutHandle !== null && typeof clearTimeoutFn === 'function' && clearTimeoutFn(timeoutHandle),
-        (timeoutHandle = null));
+  const delay = normalizeDelay(retryDelayMs, DEFAULT_RETRY_DELAY_MS),
+    delay2 = normalizeDelay(minIdleBudgetMs, DEFAULT_MIN_IDLE_BUDGET_MS),
+    timeout = normalizeDelay(idleTimeoutMs, DEFAULT_IDLE_TIMEOUT_MS);
+  let options = 0x0,
+    timer = null,
+    requestIdleCallbackFn2 = null,
+    enabled2 = ![];
+  const run2 = () => {
+      (timer !== null && typeof clearTimeoutFn === 'function' && clearTimeoutFn(timer), (timer = null));
     },
-    clearIdle = () => {
-      (idleHandle !== null && typeof cancelIdleCallbackFn === 'function' && cancelIdleCallbackFn(idleHandle),
-        (idleHandle = null));
+    handler = () => {
+      (requestIdleCallbackFn2 !== null &&
+        typeof cancelIdleCallbackFn === 'function' &&
+        cancelIdleCallbackFn(requestIdleCallbackFn2),
+        (requestIdleCallbackFn2 = null));
     },
-    clearAll = () => {
-      (clearTimer(), clearIdle());
+    handler2 = () => {
+      (run2(), handler());
     },
-    invokeRun = () => {
+    handler3 = () => {
       try {
-        const result = run?.();
-        result && typeof result['catch'] === 'function' && void result['catch'](onError);
-      } catch (error) {
-        onError(error);
+        const promise = run?.();
+        promise && typeof promise['catch'] === 'function' && void promise['catch'](onError);
+      } catch (target) {
+        onError(target);
       }
     },
-    isCurrent = (candidate) => pending && candidate === generation;
-  let scheduleAfterDelay;
-  const runIfIdle = (candidate, deadline = null) => {
-      if (!isCurrent(candidate)) return;
-      if (!hasIdleBudget(deadline, minIdleBudget) || isBusy()) {
-        scheduleAfterDelay(candidate, retryDelay);
+    handler4 = (source) => enabled2 && source === options;
+  let run3;
+  const run4 = (next, current = null) => {
+      if (!handler4(next)) return;
+      if (!hasIdleBudget(current, delay2) || isBusy()) {
+        run3(next, delay);
         return;
       }
-      ((pending = ![]), invokeRun());
+      ((enabled2 = ![]), handler3());
     },
-    scheduleIdleRun = (candidate) => {
-      if (!isCurrent(candidate)) return;
+    handler5 = (entry) => {
+      if (!handler4(entry)) return;
       if (typeof requestIdleCallbackFn === 'function') {
-        idleHandle = requestIdleCallbackFn(
-          (deadline) => {
-            ((idleHandle = null), runIfIdle(candidate, deadline));
+        requestIdleCallbackFn2 = requestIdleCallbackFn(
+          (record) => {
+            ((requestIdleCallbackFn2 = null), run4(entry, record));
           },
-          { timeout: idleTimeout },
+          { timeout: timeout },
         );
         return;
       }
       if (typeof setTimeoutFn === 'function') {
-        ((timeoutHandle = setTimeoutFn(() => {
-          ((timeoutHandle = null), runIfIdle(candidate));
+        ((timer = setTimeoutFn(() => {
+          ((timer = null), run4(entry));
         }, 0x0)),
-          timeoutHandle?.['unref']?.());
+          timer?.['unref']?.());
         return;
       }
-      runIfIdle(candidate);
+      run4(entry);
     };
-  scheduleAfterDelay = (candidate, delayMs) => {
-    if (!isCurrent(candidate)) return;
+  run3 = (payload, handle) => {
+    if (!handler4(payload)) return;
     if (typeof setTimeoutFn !== 'function') {
-      scheduleIdleRun(candidate);
+      handler5(payload);
       return;
     }
-    ((timeoutHandle = setTimeoutFn(() => {
-      ((timeoutHandle = null), scheduleIdleRun(candidate));
-    }, normalizeDelay(delayMs))),
-      timeoutHandle?.['unref']?.());
+    ((timer = setTimeoutFn(() => {
+      ((timer = null), handler5(payload));
+    }, normalizeDelay(handle))),
+      timer?.['unref']?.());
   };
   const cancel = () => {
-      ((generation += 0x1), (pending = ![]), clearAll());
+      ((options += 0x1), (enabled2 = ![]), handler2());
     },
     schedule = ({ delayMs: delayMs = 0x0 } = {}) => {
-      ((generation += 0x1), (pending = !![]), clearAll());
-      const scheduled = generation;
-      return (scheduleAfterDelay(scheduled, delayMs), scheduled);
+      ((options += 0x1), (enabled2 = !![]), handler2());
+      const state = options;
+      return (run3(state, delayMs), state);
     };
   return Object['freeze']({
     schedule: schedule,
     cancel: cancel,
-    isPending: () => pending,
-    getGeneration: () => generation,
+    isPending: () => enabled2,
+    getGeneration: () => options,
   });
 }

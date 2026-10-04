@@ -1,22 +1,22 @@
 const ALLOWED_EXTERNAL_PROTOCOLS = new Set(['http:', 'https:']);
-export function normalizeExternalUrl(_0x3dd91f) {
+export function normalizeExternalUrl(value) {
   try {
-    const _0x20630c = new URL(String(_0x3dd91f || '').trim());
-    if (!ALLOWED_EXTERNAL_PROTOCOLS.has(_0x20630c.protocol)) return '';
-    return ((_0x20630c.username = ''), (_0x20630c.password = ''), _0x20630c.toString());
+    const uRL = new URL(String(value || '').trim());
+    if (!ALLOWED_EXTERNAL_PROTOCOLS.has(uRL.protocol)) return '';
+    return ((uRL.username = ''), (uRL.password = ''), uRL.toString());
   } catch {
     return '';
   }
 }
-export function isExternalUrlAllowed(_0x472f19) {
-  return Boolean(normalizeExternalUrl(_0x472f19));
+export function isExternalUrlAllowed(item) {
+  return Boolean(normalizeExternalUrl(item));
 }
-export function formatExternalUrlForLog(_0x354114) {
-  const _0x318290 = normalizeExternalUrl(_0x354114);
-  if (!_0x318290) return '';
+export function formatExternalUrlForLog(key) {
+  const externalUrl = normalizeExternalUrl(key);
+  if (!externalUrl) return '';
   try {
-    const _0x23ccda = new URL(_0x318290);
-    return '' + _0x23ccda.origin + _0x23ccda.pathname;
+    const uRL2 = new URL(externalUrl);
+    return '' + uRL2.origin + uRL2.pathname;
   } catch {
     return '';
   }

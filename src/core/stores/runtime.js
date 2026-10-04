@@ -6,9 +6,9 @@ function createStore() {
   return createFacadeStore();
 }
 function createDomainStores() {
-  const _0x358d01 = createLegacyKernelStore(),
-    _0x2d9569 = createFacadeStoreFromCore(_0x358d01);
-  return _0x2d9569.getDomainStores();
+  const legacyKernelStore2 = createLegacyKernelStore(),
+    facadeStoreFromCore = createFacadeStoreFromCore(legacyKernelStore2);
+  return facadeStoreFromCore.getDomainStores();
 }
 export {
   facadeStore,
