@@ -65,20 +65,20 @@ const MAX_DRAFT_CHARS = 0xfa0,
       changeModel: 'Change model',
     }),
   });
-function normalizeLocale(_0x1cc773 = '') {
-  return String(_0x1cc773 || '')
+function normalizeLocale(value = '') {
+  return String(value || '')
     ['toLowerCase']()
     ['startsWith']('en')
     ? 'en-US'
     : 'zh-CN';
 }
-function normalizeErrorCode(_0x278d49 = '', _0x530cae = '') {
-  const _0xad876 = String(_0x278d49 || '')
+function normalizeErrorCode(item = '', key = '') {
+  const index = String(item || '')
     ['trim']()
     ['toUpperCase']()
     ['replace'](/[^A-Z0-9_.-]/g, '_')
     ['slice'](0x0, 0x50);
-  return _0xad876 || _0x530cae;
+  return index || key;
 }
 function classifyPlannerFailure({
   validation: validation = null,
@@ -86,29 +86,27 @@ function classifyPlannerFailure({
   reason: reason = '',
 } = {}) {
   if (reason === 'no_action') return 'PLANNER_NO_ACTION';
-  const _0x20a2dc = normalizeErrorCode(validation?.['errorCode']);
-  if (_0x20a2dc === 'AGENT_PLAN_FAILED') return 'PLANNER_REPORTED_FAILURE';
-  if (['UNKNOWN_AGENT_ACTION', 'DEFERRED_AGENT_ACTION', 'BLOCKED_AGENT_ACTION']['includes'](_0x20a2dc))
+  const errorCode = normalizeErrorCode(validation?.['errorCode']);
+  if (errorCode === 'AGENT_PLAN_FAILED') return 'PLANNER_REPORTED_FAILURE';
+  if (['UNKNOWN_AGENT_ACTION', 'DEFERRED_AGENT_ACTION', 'BLOCKED_AGENT_ACTION']['includes'](errorCode))
     return 'PLANNER_UNSUPPORTED_ACTION';
-  if (_0x20a2dc) return 'PLANNER_INVALID_ACTION';
-  const _0x544399 = String(cause || '')['toLowerCase']();
-  if (/\b(?:401|403)\b|unauthori[sz]ed|forbidden|api[ _-]?key|authentication/['test'](_0x544399))
+  if (errorCode) return 'PLANNER_INVALID_ACTION';
+  const result = String(cause || '')['toLowerCase']();
+  if (/\b(?:401|403)\b|unauthori[sz]ed|forbidden|api[ _-]?key|authentication/['test'](result))
     return 'PLANNER_AUTH_ERROR';
-  if (/\b429\b|rate.?limit|too many requests|quota/['test'](_0x544399)) return 'PLANNER_RATE_LIMITED';
-  if (/timeout|timed out|deadline/['test'](_0x544399)) return 'PLANNER_TIMEOUT';
-  if (/fetch|network|econn|enotfound|socket|offline|connection/['test'](_0x544399))
+  if (/\b429\b|rate.?limit|too many requests|quota/['test'](result)) return 'PLANNER_RATE_LIMITED';
+  if (/timeout|timed out|deadline/['test'](result)) return 'PLANNER_TIMEOUT';
+  if (/fetch|network|econn|enotfound|socket|offline|connection/['test'](result))
     return 'PLANNER_NETWORK_ERROR';
   return 'PLANNER_REQUEST_ERROR';
 }
-function getDiagnosticCopy(_0x1399a7, _0x49b651, _0x54ebc9) {
-  const _0x4705b2 = DIAGNOSTIC_COPY[normalizeLocale(_0x1399a7)],
-    [_0xe4a283, _0x4b5905] = _0x4705b2[_0x54ebc9] || _0x4705b2['PLANNER_REQUEST_ERROR'];
-  return { phaseLabel: _0x4705b2[_0x49b651] || _0x4705b2['planning'], summary: _0xe4a283, detail: _0x4b5905 };
+function getDiagnosticCopy(data, options, target) {
+  const phaseLabel = DIAGNOSTIC_COPY[normalizeLocale(data)],
+    [summary, detail] = phaseLabel[target] || phaseLabel['PLANNER_REQUEST_ERROR'];
+  return { phaseLabel: phaseLabel[options] || phaseLabel['planning'], summary: summary, detail: detail };
 }
-function countCompletedSteps(_0x457caa = []) {
-  return (Array['isArray'](_0x457caa) ? _0x457caa : [])['filter']((_0x40764d) => _0x40764d?.['ok'] === !![])[
-    'length'
-  ];
+function countCompletedSteps(list = []) {
+  return (Array['isArray'](list) ? list : [])['filter']((response) => response?.['ok'] === !![])['length'];
 }
 export function buildAgentPlannerDiagnostic({
   loopState: loopState = {},
@@ -117,19 +115,19 @@ export function buildAgentPlannerDiagnostic({
   reason: reason = '',
   locale: locale = 'zh-CN',
 } = {}) {
-  const _0x59ff40 = classifyPlannerFailure({ validation: validation, cause: cause, reason: reason }),
-    _0x3a66d7 = getDiagnosticCopy(locale, 'planning', _0x59ff40),
-    _0x278788 = Array['isArray'](loopState['validationFeedback'])
+  const errorCode2 = classifyPlannerFailure({ validation: validation, cause: cause, reason: reason }),
+    phaseLabel2 = getDiagnosticCopy(locale, 'planning', errorCode2),
+    source = Array['isArray'](loopState['validationFeedback'])
       ? loopState['validationFeedback']['at'](-0x1)
       : null;
   return {
     phase: 'planning',
-    phaseLabel: _0x3a66d7['phaseLabel'],
-    summary: _0x3a66d7['summary'],
-    detail: _0x3a66d7['detail'],
-    errorCode: _0x59ff40,
-    sourceErrorCode: normalizeErrorCode(validation?.['errorCode'] || _0x278788?.['errorCode']),
-    commandId: String(validation?.['plan']?.['actions']?.[0x0]?.['type'] || _0x278788?.['commandId'] || '')
+    phaseLabel: phaseLabel2['phaseLabel'],
+    summary: phaseLabel2['summary'],
+    detail: phaseLabel2['detail'],
+    errorCode: errorCode2,
+    sourceErrorCode: normalizeErrorCode(validation?.['errorCode'] || source?.['errorCode']),
+    commandId: String(validation?.['plan']?.['actions']?.[0x0]?.['type'] || source?.['commandId'] || '')
       ['trim']()
       ['slice'](0x0, 0x78),
     step: Math['max'](0x1, Math['trunc'](Number(loopState['step'] || 0x0)) + 0x1),
@@ -141,33 +139,33 @@ export function buildAgentExecutionDiagnostic({
   execution: execution = {},
   recovery: recovery = null,
   step: step = 0x0,
-  completedSteps: _0x31095c = null,
+  completedSteps: completedSteps = null,
   locale: locale = 'zh-CN',
 } = {}) {
-  const _0x3e8091 = normalizeErrorCode(
+  const errorCode3 = normalizeErrorCode(
       execution['errorCode'] || execution['raw']?.['errorCode'],
       'EXECUTION_ACTION_FAILED',
     ),
-    _0x53d2c3 = getDiagnosticCopy(locale, 'execution', 'EXECUTION_ACTION_FAILED'),
-    _0x334cfc = (Array['isArray'](execution['results']) ? execution['results'] : [])['filter'](
-      (_0x3a7977) => _0x3a7977?.['ok'] !== ![],
+    phaseLabel3 = getDiagnosticCopy(locale, 'execution', 'EXECUTION_ACTION_FAILED'),
+    next = (Array['isArray'](execution['results']) ? execution['results'] : [])['filter'](
+      (response2) => response2?.['ok'] !== ![],
     )['length'],
-    _0x5bbf97 =
-      _0x31095c != null && Number['isFinite'](Number(_0x31095c))
-        ? Math['max'](0x0, Math['trunc'](Number(_0x31095c)))
-        : _0x334cfc;
+    completedSteps2 =
+      completedSteps != null && Number['isFinite'](Number(completedSteps))
+        ? Math['max'](0x0, Math['trunc'](Number(completedSteps)))
+        : next;
   return {
     phase: 'execution',
-    phaseLabel: _0x53d2c3['phaseLabel'],
-    summary: _0x53d2c3['summary'],
-    detail: _0x53d2c3['detail'],
-    errorCode: _0x3e8091,
+    phaseLabel: phaseLabel3['phaseLabel'],
+    summary: phaseLabel3['summary'],
+    detail: phaseLabel3['detail'],
+    errorCode: errorCode3,
     sourceErrorCode: '',
     commandId: String(recovery?.['failedAction']?.['type'] || '')
       ['trim']()
       ['slice'](0x0, 0x78),
     step: Math['max'](0x1, Math['trunc'](Number(step || 0x0)) + 0x1),
-    completedSteps: _0x5bbf97,
+    completedSteps: completedSteps2,
     retryable: Boolean(recovery),
   };
 }
@@ -175,19 +173,19 @@ export function buildAgentPlannerRecovery({
   originalMessage: originalMessage = '',
   locale: locale = 'zh-CN',
 } = {}) {
-  const _0x400475 = DIAGNOSTIC_COPY[normalizeLocale(locale)];
+  const label = DIAGNOSTIC_COPY[normalizeLocale(locale)];
   return {
     kind: 'planner',
     options: [
-      { id: 'retryPlanner', label: _0x400475['retryPlanner'] },
+      { id: 'retryPlanner', label: label['retryPlanner'] },
       {
         id: 'editRequest',
-        label: _0x400475['editRequest'],
+        label: label['editRequest'],
         draft: String(originalMessage || '')
           ['trim']()
           ['slice'](0x0, MAX_DRAFT_CHARS),
       },
-      { id: 'changeModel', label: _0x400475['changeModel'] },
+      { id: 'changeModel', label: label['changeModel'] },
     ],
   };
 }

@@ -6,104 +6,170 @@ import {
 } from '../imageFunctionModelMenu.js';
 export const ERASE_SELECTION_STATE_KEY = 'eraseSelectionState';
 const ERASE_SELECTION_TOOLS = new Set(['brush', 'eraser']),
-  clampPersistedEraseBrushSize = (_0x494207) => Math.max(1, Math.min(120, Number(_0x494207) || 40)),
-  normalizePersistedEraseTool = (_0x14380c) => {
-    const _0x4d84a3 = String(_0x14380c || '').trim();
-    return ERASE_SELECTION_TOOLS.has(_0x4d84a3) ? _0x4d84a3 : 'brush';
+  clampPersistedEraseBrushSize = (value) => Math.max(1, Math.min(120, Number(value) || 40)),
+  normalizePersistedEraseTool = (item) => {
+    const key = String(item || '').trim();
+    return ERASE_SELECTION_TOOLS.has(key) ? key : 'brush';
   };
-export const buildGenerationModelCatalog = (_0x4f23ae = IMAGE_MODELS) => {
-  return buildImageFunctionModelCatalog(_0x4f23ae);
+export const buildGenerationModelCatalog = (index = IMAGE_MODELS) => {
+  return buildImageFunctionModelCatalog(index);
 };
-export const findProviderKeyByModel = (_0x3875ed, _0x5464db) => {
-  const _0x402f06 = String(_0x5464db || '').trim();
-  if (!_0x402f06) return null;
-  for (const [_0x131f38, _0x27f421] of Object.entries(_0x3875ed || {})) {
-    const _0x21a9f4 = Array.isArray(_0x27f421?.models) ? _0x27f421.models : [];
-    if (_0x21a9f4.some((_0x534479) => _0x534479?.id === _0x402f06)) return _0x131f38;
+export const findProviderKeyByModel = (result, data) => {
+  const enabled = String(data || '').trim();
+  if (!enabled) return null;
+  for (const [options, target] of Object.entries(result || {})) {
+    const list = Array.isArray(target?.models) ? target.models : [];
+    if (list.some((item2) => item2?.id === enabled)) return options;
   }
-  return findImageFunctionProviderByModel(_0x3875ed, _0x402f06);
+  return findImageFunctionProviderByModel(result, enabled);
 };
-export const buildSeedreamMigrationPatch = (_0x181dd3) => {
-  return (void _0x181dd3, null);
+export const buildSeedreamMigrationPatch = (source) => {
+  return (void source, null);
 };
-export const normalizePersistedEraseCommand = (_0x50e53b) => {
-  if (!_0x50e53b || typeof _0x50e53b !== 'object') return null;
-  const _0x531a79 = String(_0x50e53b.type || '').trim();
-  if (_0x531a79 === 'brush' || _0x531a79 === 'eraser') {
-    const _0x328801 = Array.isArray(_0x50e53b.points) ? _0x50e53b.points : [],
-      _0x14e54b = _0x328801
-        .map((_0x6df511) => ({ x: Number(_0x6df511?.x), y: Number(_0x6df511?.y) }))
-        .filter((_0x14a999) => Number.isFinite(_0x14a999.x) && Number.isFinite(_0x14a999.y)),
-      _0xc777e8 = Number(_0x50e53b.sizeWorld);
-    if (!_0x14e54b.length || !Number.isFinite(_0xc777e8)) return null;
-    return { type: _0x531a79, sizeWorld: _0xc777e8, points: _0x14e54b };
+export const normalizePersistedEraseCommand = (box) => {
+  if (!box || typeof box !== 'object') return null;
+  const type = String(box.type || '').trim();
+  if (type === 'brush' || type === 'eraser') {
+    const list2 = Array.isArray(box.points) ? box.points : [],
+      points = list2
+        .map((box2) => ({ x: Number(box2?.x), y: Number(box2?.y) }))
+        .filter((box3) => Number.isFinite(box3.x) && Number.isFinite(box3.y)),
+      sizeWorld = Number(box.sizeWorld);
+    if (!points.length || !Number.isFinite(sizeWorld)) return null;
+    return { type: type, sizeWorld: sizeWorld, points: points };
   }
-  if (_0x531a79 === 'rect') {
-    const _0x428a21 = Number(_0x50e53b.x1),
-      _0x3e5fa6 = Number(_0x50e53b.y1),
-      _0x3b24ed = Number(_0x50e53b.x2),
-      _0x308505 = Number(_0x50e53b.y2),
-      _0x26adaa = Number(_0x50e53b.sizeWorld);
+  if (type === 'rect') {
+    const x1 = Number(box.x1),
+      y1 = Number(box.y1),
+      x2 = Number(box.x2),
+      y2 = Number(box.y2),
+      sizeWorld2 = Number(box.sizeWorld);
     if (
-      !Number.isFinite(_0x428a21) ||
-      !Number.isFinite(_0x3e5fa6) ||
-      !Number.isFinite(_0x3b24ed) ||
-      !Number.isFinite(_0x308505) ||
-      !Number.isFinite(_0x26adaa)
+      !Number.isFinite(x1) ||
+      !Number.isFinite(y1) ||
+      !Number.isFinite(x2) ||
+      !Number.isFinite(y2) ||
+      !Number.isFinite(sizeWorld2)
     )
       return null;
     return {
-      type: _0x531a79,
-      color: String(_0x50e53b.color || ''),
-      sizeWorld: _0x26adaa,
-      x1: _0x428a21,
-      y1: _0x3e5fa6,
-      x2: _0x3b24ed,
-      y2: _0x308505,
+      type: type,
+      color: String(box.color || ''),
+      sizeWorld: sizeWorld2,
+      x1: x1,
+      y1: y1,
+      x2: x2,
+      y2: y2,
     };
   }
-  if (_0x531a79 === 'fill') {
-    const _0x43de79 = Number(_0x50e53b.x),
-      _0x1432a5 = Number(_0x50e53b.y);
-    if (!Number.isFinite(_0x43de79) || !Number.isFinite(_0x1432a5)) return null;
-    return { type: _0x531a79, x: _0x43de79, y: _0x1432a5, color: String(_0x50e53b.color || '') };
+  if (type === 'fill') {
+    const x = Number(box.x),
+      y = Number(box.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    return { type: type, x: x, y: y, color: String(box.color || '') };
   }
   return null;
 };
-export const readPersistedEraseSelectionState = (_0x1a779f) => {
-  const _0x5d4468 = _0x1a779f?.[ERASE_SELECTION_STATE_KEY];
-  if (!_0x5d4468 || typeof _0x5d4468 !== 'object') return null;
-  const _0x248bba = Array.isArray(_0x5d4468.commands)
-      ? _0x5d4468.commands.map((_0x2e004c) => normalizePersistedEraseCommand(_0x2e004c)).filter(Boolean)
+export const readPersistedEraseSelectionState = (next) => {
+  const enabled2 = next?.[ERASE_SELECTION_STATE_KEY];
+  if (!enabled2 || typeof enabled2 !== 'object') return null;
+  const commands = Array.isArray(enabled2.commands)
+      ? enabled2.commands.map((item3) => normalizePersistedEraseCommand(item3)).filter(Boolean)
       : [],
-    _0x168660 = String(_0x5d4468.tool || '').trim();
+    current = String(enabled2.tool || '').trim();
   return {
-    commands: _0x248bba,
-    tool: normalizePersistedEraseTool(_0x168660),
-    brushSizePx: clampPersistedEraseBrushSize(_0x5d4468.brushSizePx),
+    commands: commands,
+    tool: normalizePersistedEraseTool(current),
+    brushSizePx: clampPersistedEraseBrushSize(enabled2.brushSizePx),
   };
 };
 export const buildPersistedEraseSelectionState = ({
-  commands: _0x19e417,
-  tool: _0x583626,
-  brushSizePx: _0x1a1e2d,
+  commands: commands2,
+  tool: tool,
+  brushSizePx: brushSizePx,
 } = {}) => ({
-  commands: Array.isArray(_0x19e417)
-    ? _0x19e417.map((_0x3ffbbb) => normalizePersistedEraseCommand(_0x3ffbbb)).filter(Boolean)
+  commands: Array.isArray(commands2)
+    ? commands2.map((item4) => normalizePersistedEraseCommand(item4)).filter(Boolean)
     : [],
-  tool: normalizePersistedEraseTool(_0x583626),
-  brushSizePx: clampPersistedEraseBrushSize(_0x1a1e2d),
+  tool: normalizePersistedEraseTool(tool),
+  brushSizePx: clampPersistedEraseBrushSize(brushSizePx),
 });
-export const getDefaultGenerationModelState = (_0x3f6cf9 = buildGenerationModelCatalog()) => {
-  return getDefaultImageFunctionModelState(_0x3f6cf9);
+export const getDefaultGenerationModelState = (generationModelCatalog = buildGenerationModelCatalog()) => {
+  return getDefaultImageFunctionModelState(generationModelCatalog);
 };
 
-export const LOCAL_EDIT_STATE_KEY='localEditState';
+export const LOCAL_EDIT_STATE_KEY = 'localEditState';
 
-const LOCAL_EDIT_TOOLS=new Set(['brush',"eraser"]),clampPersistedLocalEditBrushSize=_0x34044c=>Math["max"](0x1,Math["min"](0x78,Number(_0x34044c)||0x28)),normalizePersistedLocalEditTool=_0x598115=>{const _0x3ac8b6=String(_0x598115||'')['trim']();return LOCAL_EDIT_TOOLS['has'](_0x3ac8b6)?_0x3ac8b6:"brush";};
+const LOCAL_EDIT_TOOLS = new Set(['brush', 'eraser']),
+  clampPersistedLocalEditBrushSize = (entry) => Math['max'](0x1, Math['min'](0x78, Number(entry) || 0x28)),
+  normalizePersistedLocalEditTool = (record) => {
+    const payload = String(record || '')['trim']();
+    return LOCAL_EDIT_TOOLS['has'](payload) ? payload : 'brush';
+  };
 
-export const normalizePersistedLocalEditCommand=_0x5a9961=>{if(!_0x5a9961||typeof _0x5a9961!=="object")return null;const _0x58de70=String(_0x5a9961['type']||'')["trim"]();if(_0x58de70==='brush'||_0x58de70==="eraser"){const _0x2b68d0=Array["isArray"](_0x5a9961["points"])?_0x5a9961["points"]:[],_0x12bb5c=_0x2b68d0["map"](_0x201ea4=>({'x':Number(_0x201ea4?.['x']),'y':Number(_0x201ea4?.['y'])}))['filter'](_0x3e4b76=>Number["isFinite"](_0x3e4b76['x'])&&Number["isFinite"](_0x3e4b76['y'])),_0xa95b10=Number(_0x5a9961["sizeWorld"]);if(!_0x12bb5c["length"]||!Number["isFinite"](_0xa95b10))return null;return{'type':_0x58de70,'sizeWorld':_0xa95b10,'points':_0x12bb5c};}if(_0x58de70==="rect"){const _0xeca749=Number(_0x5a9961['x1']),_0x315caa=Number(_0x5a9961['y1']),_0x5f58d9=Number(_0x5a9961['x2']),_0x596fe4=Number(_0x5a9961['y2']),_0x9c0a5b=Number(_0x5a9961["sizeWorld"]);if(!Number['isFinite'](_0xeca749)||!Number["isFinite"](_0x315caa)||!Number['isFinite'](_0x5f58d9)||!Number['isFinite'](_0x596fe4)||!Number["isFinite"](_0x9c0a5b))return null;return{'type':_0x58de70,'color':String(_0x5a9961["color"]||''),'sizeWorld':_0x9c0a5b,'x1':_0xeca749,'y1':_0x315caa,'x2':_0x5f58d9,'y2':_0x596fe4};}if(_0x58de70==="fill"){const _0x232841=Number(_0x5a9961['x']),_0x18687c=Number(_0x5a9961['y']);if(!Number["isFinite"](_0x232841)||!Number["isFinite"](_0x18687c))return null;return{'type':_0x58de70,'x':_0x232841,'y':_0x18687c,'color':String(_0x5a9961["color"]||'')};}return null;};
+export const normalizePersistedLocalEditCommand = (box4) => {
+  if (!box4 || typeof box4 !== 'object') return null;
+  const handle = String(box4['type'] || '')['trim']();
+  if (handle === 'brush' || handle === 'eraser') {
+    const state = Array['isArray'](box4['points']) ? box4['points'] : [],
+      enabled3 = state['map']((box5) => ({ x: Number(box5?.['x']), y: Number(box5?.['y']) }))['filter'](
+        (box6) => Number['isFinite'](box6['x']) && Number['isFinite'](box6['y']),
+      ),
+      config = Number(box4['sizeWorld']);
+    if (!enabled3['length'] || !Number['isFinite'](config)) return null;
+    return { type: handle, sizeWorld: config, points: enabled3 };
+  }
+  if (handle === 'rect') {
+    const scope = Number(box4['x1']),
+      input = Number(box4['y1']),
+      output = Number(box4['x2']),
+      value2 = Number(box4['y2']),
+      value3 = Number(box4['sizeWorld']);
+    if (
+      !Number['isFinite'](scope) ||
+      !Number['isFinite'](input) ||
+      !Number['isFinite'](output) ||
+      !Number['isFinite'](value2) ||
+      !Number['isFinite'](value3)
+    )
+      return null;
+    return {
+      type: handle,
+      color: String(box4['color'] || ''),
+      sizeWorld: value3,
+      x1: scope,
+      y1: input,
+      x2: output,
+      y2: value2,
+    };
+  }
+  if (handle === 'fill') {
+    const value4 = Number(box4['x']),
+      value5 = Number(box4['y']);
+    if (!Number['isFinite'](value4) || !Number['isFinite'](value5)) return null;
+    return { type: handle, x: value4, y: value5, color: String(box4['color'] || '') };
+  }
+  return null;
+};
 
-export const readLocalEditState=_0x5c8fa2=>{const _0x1fe718=_0x5c8fa2?.[LOCAL_EDIT_STATE_KEY];if(!_0x1fe718||typeof _0x1fe718!=='object')return null;return buildLocalEditState(_0x1fe718);};
+export const readLocalEditState = (value6) => {
+  const enabled4 = value6?.[LOCAL_EDIT_STATE_KEY];
+  if (!enabled4 || typeof enabled4 !== 'object') return null;
+  return buildLocalEditState(enabled4);
+};
 
-export const buildLocalEditState=({scene:_0x219ea3,promptText:_0x140b45,commands:_0x321ba9,tool:_0x3a279e,brushSizePx:_0x2ca523}={})=>({'scene':_0x219ea3==="erase"?"erase":"repaint",'promptText':String(_0x140b45||''),'commands':Array["isArray"](_0x321ba9)?_0x321ba9["map"](_0x43cff2=>normalizePersistedLocalEditCommand(_0x43cff2))["filter"](Boolean):[],'tool':normalizePersistedLocalEditTool(_0x3a279e),'brushSizePx':clampPersistedLocalEditBrushSize(_0x2ca523)});
+export const buildLocalEditState = ({
+  scene: scene,
+  promptText: promptText,
+  commands: commands3,
+  tool: tool2,
+  brushSizePx: brushSizePx2,
+} = {}) => ({
+  scene: scene === 'erase' ? 'erase' : 'repaint',
+  promptText: String(promptText || ''),
+  commands: Array['isArray'](commands3)
+    ? commands3['map']((value7) => normalizePersistedLocalEditCommand(value7))['filter'](Boolean)
+    : [],
+  tool: normalizePersistedLocalEditTool(tool2),
+  brushSizePx: clampPersistedLocalEditBrushSize(brushSizePx2),
+});

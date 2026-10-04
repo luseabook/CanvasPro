@@ -1,1 +1,213 @@
-import{createMentionMenuItem,positionMentionMenu}from'./mentionMenu.js';let nextMenuId=0x0;export function bindTextareaMentions({input:_0x34fa2e,trigger:_0x395c9b,menu:_0x59ca52,getCandidates:_0x42f3ff,onSelect:_0x1dfb54,optionRole:optionRole="option"}){_0x59ca52["classList"]["add"]("at-mention-menu"),_0x59ca52["setAttribute"]("popover","manual"),_0x59ca52['id']="textarea-mentions-"+ ++nextMenuId,_0x59ca52['setAttribute']("role","listbox"),_0x59ca52['hidden']=!![],_0x395c9b["setAttribute"]("aria-controls",_0x59ca52['id']),_0x395c9b['setAttribute']("aria-expanded","false"),_0x34fa2e["setAttribute"]("aria-controls",_0x59ca52['id']),_0x34fa2e["setAttribute"]('aria-autocomplete',"list");const _0x365c27=document["createElement"]("div");_0x365c27["className"]="at-mention-caret-mirror",_0x365c27["setAttribute"]("aria-hidden","true"),document["body"]["append"](_0x365c27);let _0x39cebe=null,_0x420947=0x0,_0x110630='',_0x12729a=[],_0x177222=[],_0x27ef85=0x0,_0x14b3f1=0x0;const _0x4b94db=()=>!_0x59ca52["hidden"];function _0x23951d(){cancelAnimationFrame(_0x14b3f1),_0x14b3f1=0x0;if(_0x59ca52["matches"](":popover-open"))_0x59ca52["hidePopover"]();_0x59ca52["hidden"]=!![],_0x59ca52['style']["display"]="none",_0x395c9b["setAttribute"]("aria-expanded",'false'),_0x34fa2e["removeAttribute"]("aria-activedescendant");}function _0x3ed52a(){const _0x444eda=_0x34fa2e["getBoundingClientRect"](),_0x512073=getComputedStyle(_0x34fa2e);for(const _0x39f61d of["fontFamily","fontSize","fontWeight","fontStyle","lineHeight",'letterSpacing','paddingTop',"paddingRight","paddingBottom",'paddingLeft',"borderTopWidth","borderRightWidth","borderBottomWidth",'borderLeftWidth','boxSizing',"wordSpacing","textIndent","tabSize"])_0x365c27["style"][_0x39f61d]=_0x512073[_0x39f61d];_0x365c27["style"]["width"]=_0x444eda['width']+'px',_0x365c27['textContent']=_0x34fa2e["value"]["slice"](0x0,_0x39cebe??_0x420947);const _0x4a6cea=document["createElement"]("span");_0x4a6cea["textContent"]=_0x34fa2e["value"]["slice"](_0x39cebe??_0x420947)||'​',_0x365c27["append"](_0x4a6cea);const _0x5a2a0a=document["createRange"]();_0x5a2a0a["setStart"](_0x4a6cea['firstChild'],0x0),_0x5a2a0a["setEnd"](_0x4a6cea['firstChild'],0x0);const _0x510aa9=_0x5a2a0a["getBoundingClientRect"](),_0x36d769=_0x365c27['getBoundingClientRect'](),_0xcb5061=Math["max"](_0x444eda['top'],Math["min"](_0x444eda["bottom"],_0x444eda['top']+_0x510aa9["top"]-_0x36d769['top']-_0x34fa2e["scrollTop"])),_0x3501a8=Math["max"](_0x444eda["left"],Math["min"](_0x444eda["right"],_0x444eda["left"]+_0x510aa9["left"]-_0x36d769["left"]-_0x34fa2e["scrollLeft"]));return{'left':_0x3501a8,'anchorTop':_0xcb5061,'top':_0xcb5061+(_0x510aa9["height"]||parseFloat(_0x512073["lineHeight"])||0x14)+0x5};}function _0x3ba80f(){if(!_0x4b94db())return;if(!_0x34fa2e["isConnected"]||_0x34fa2e["disabled"]||!_0x34fa2e["getClientRects"]()["length"])return _0x23951d();positionMentionMenu(_0x59ca52,_0x3ed52a()),_0x14b3f1=requestAnimationFrame(_0x3ba80f);}function _0x361695(_0x1de47f,_0x5ecd56=![]){_0x27ef85=Math["max"](0x0,Math["min"](_0x1de47f,_0x177222['length']-0x1)),_0x177222["forEach"]((_0x22d52a,_0x14aa43)=>{_0x22d52a["classList"]["toggle"]("active",_0x14aa43===_0x27ef85),_0x22d52a["classList"]['toggle']('at-mention-keyboard-active',_0x14aa43===_0x27ef85),_0x22d52a["setAttribute"]("aria-selected",String(_0x14aa43===_0x27ef85));});if(_0x177222[_0x27ef85]){_0x34fa2e["setAttribute"]("aria-activedescendant",_0x177222[_0x27ef85]['id']);if(_0x5ecd56)_0x177222[_0x27ef85]["scrollIntoView"]({'block':'nearest'});}else _0x34fa2e["removeAttribute"]("aria-activedescendant");}function _0x19c86e(_0x1218f5){if(!_0x12729a[_0x1218f5]||_0x34fa2e['disabled'])return;const _0x4e174a=_0x12729a[_0x1218f5],_0xd0cc54={'start':_0x39cebe??_0x420947,'end':_0x420947,'typed':_0x39cebe!==null};_0x23951d(),_0x1dfb54(_0x4e174a,_0xd0cc54),_0x34fa2e["focus"]({'preventScroll':!![]});}function _0x387be3(_0x10d720=''){if(_0x34fa2e['disabled'])return;_0x110630=_0x10d720,_0x12729a=_0x42f3ff(_0x110630),_0x59ca52["replaceChildren"](),_0x177222=_0x12729a['map']((_0xf824c,_0xbea3f3)=>{const {item:_0x1adb9b,copyEl:_0x3ec318}=createMentionMenuItem(_0xf824c);_0x1adb9b["appendChild"](_0x3ec318),_0x1adb9b['id']=_0x59ca52['id']+'-'+_0xbea3f3,_0x1adb9b["setAttribute"]("role",optionRole),_0x1adb9b["tabIndex"]=-0x1;if(_0xf824c['visual']){const _0x31e836=document["createElement"]('span');_0x31e836["className"]="at-mention-visual",_0x31e836['setAttribute']('aria-hidden',"true"),_0x31e836["append"](_0xf824c["visual"]),_0x1adb9b["insertBefore"](_0x31e836,_0x3ec318);}return _0x1adb9b["addEventListener"]("pointerdown",_0x585072=>_0x585072["preventDefault"]()),_0x1adb9b["addEventListener"]("click",()=>_0x19c86e(_0xbea3f3)),_0x59ca52["append"](_0x1adb9b),_0x1adb9b;});if(!_0x177222["length"]){const _0x284c2a=document["createElement"]("div");_0x284c2a["className"]="at-mention-empty",_0x284c2a["textContent"]="没有匹配的结果",_0x59ca52["append"](_0x284c2a);}_0x59ca52["hidden"]=![],_0x59ca52["style"]["display"]='flex';if(!_0x59ca52["matches"](':popover-open'))_0x59ca52["showPopover"]();_0x395c9b["setAttribute"]('aria-expanded',"true"),_0x361695(0x0),cancelAnimationFrame(_0x14b3f1),_0x3ba80f();}function _0x1e4bf7(_0x53dab2){if(_0x53dab2["isComposing"]){_0x23951d();return;}_0x420947=_0x34fa2e["selectionStart"];const _0x2dbdfe=_0x34fa2e["value"]["slice"](0x0,_0x420947)["match"](/[@＠]([^@＠\s]*)$/);if(_0x2dbdfe&&_0x420947===_0x34fa2e["selectionEnd"])_0x39cebe=_0x420947-_0x2dbdfe[0x0]['length'],_0x387be3(_0x2dbdfe[0x1]);else _0x23951d();}function _0x408bc7(_0x1790f6){if(!_0x4b94db()||_0x1790f6["isComposing"])return;if(['ArrowDown','ArrowUp',"Enter","Escape"]['includes'](_0x1790f6["key"])){_0x1790f6["preventDefault"](),_0x1790f6['stopImmediatePropagation']();if(_0x1790f6['key']==="Escape")_0x23951d();else{if(_0x1790f6['key']==='Enter')_0x19c86e(_0x27ef85);else _0x361695((_0x27ef85+(_0x1790f6['key']==="ArrowDown"?0x1:-0x1)+_0x177222['length'])%(_0x177222["length"]||0x1),!![]);}}else{if(_0x1790f6["key"]==="Tab")_0x23951d();}}function _0x5261a4(){if(_0x4b94db())return _0x23951d();_0x39cebe=null,_0x420947=_0x34fa2e["selectionStart"],_0x34fa2e["focus"]({'preventScroll':!![]}),_0x387be3();}function _0xa7ac9a(_0x4427ad){if(!_0x59ca52['contains'](_0x4427ad["target"])&&_0x4427ad['target']!==_0x34fa2e&&!_0x395c9b["contains"](_0x4427ad['target']))_0x23951d();}return _0x34fa2e['addEventListener']("input",_0x1e4bf7),_0x34fa2e['addEventListener']("compositionend",_0x1e4bf7),_0x34fa2e['addEventListener']("keydown",_0x408bc7,!![]),_0x34fa2e["addEventListener"]("click",_0x23951d),_0x395c9b["addEventListener"]("click",_0x5261a4),document["addEventListener"]("pointerdown",_0xa7ac9a,!![]),{'close':_0x23951d,'isOpen':_0x4b94db,'refresh'(){if(_0x4b94db())_0x387be3(_0x110630);},'destroy'(){_0x23951d(),_0x365c27["remove"](),_0x59ca52["remove"](),_0x34fa2e['removeEventListener']("input",_0x1e4bf7),_0x34fa2e["removeEventListener"]("compositionend",_0x1e4bf7),_0x34fa2e['removeEventListener']("keydown",_0x408bc7,!![]),_0x34fa2e["removeEventListener"]('click',_0x23951d),_0x395c9b["removeEventListener"]("click",_0x5261a4),document['removeEventListener']('pointerdown',_0xa7ac9a,!![]);}};}
+import { createMentionMenuItem, positionMentionMenu } from './mentionMenu.js';
+let nextMenuId = 0x0;
+export function bindTextareaMentions({
+  input: input,
+  trigger: trigger,
+  menu: menu,
+  getCandidates: getCandidates,
+  onSelect: onSelect,
+  optionRole: optionRole = 'option',
+}) {
+  (menu['classList']['add']('at-mention-menu'),
+    menu['setAttribute']('popover', 'manual'),
+    (menu['id'] = 'textarea-mentions-' + ++nextMenuId),
+    menu['setAttribute']('role', 'listbox'),
+    (menu['hidden'] = !![]),
+    trigger['setAttribute']('aria-controls', menu['id']),
+    trigger['setAttribute']('aria-expanded', 'false'),
+    input['setAttribute']('aria-controls', menu['id']),
+    input['setAttribute']('aria-autocomplete', 'list'));
+  const el = document['createElement']('div');
+  ((el['className'] = 'at-mention-caret-mirror'),
+    el['setAttribute']('aria-hidden', 'true'),
+    document['body']['append'](el));
+  let value = null,
+    item = 0x0,
+    key = '',
+    list = [],
+    list2 = [],
+    index = 0x0,
+    requestAnimationFrame2 = 0x0;
+  const run = () => !menu['hidden'];
+  function run2() {
+    (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = 0x0));
+    if (menu['matches'](':popover-open')) menu['hidePopover']();
+    ((menu['hidden'] = !![]),
+      (menu['style']['display'] = 'none'),
+      trigger['setAttribute']('aria-expanded', 'false'),
+      input['removeAttribute']('aria-activedescendant'));
+  }
+  function run3() {
+    const box = input['getBoundingClientRect'](),
+      computedStyle = getComputedStyle(input);
+    for (const result of [
+      'fontFamily',
+      'fontSize',
+      'fontWeight',
+      'fontStyle',
+      'lineHeight',
+      'letterSpacing',
+      'paddingTop',
+      'paddingRight',
+      'paddingBottom',
+      'paddingLeft',
+      'borderTopWidth',
+      'borderRightWidth',
+      'borderBottomWidth',
+      'borderLeftWidth',
+      'boxSizing',
+      'wordSpacing',
+      'textIndent',
+      'tabSize',
+    ])
+      el['style'][result] = computedStyle[result];
+    ((el['style']['width'] = box['width'] + 'px'),
+      (el['textContent'] = input['value']['slice'](0x0, value ?? item)));
+    const el2 = document['createElement']('span');
+    ((el2['textContent'] = input['value']['slice'](value ?? item) || '​'), el['append'](el2));
+    const data = document['createRange']();
+    (data['setStart'](el2['firstChild'], 0x0), data['setEnd'](el2['firstChild'], 0x0));
+    const options = data['getBoundingClientRect'](),
+      box2 = el['getBoundingClientRect'](),
+      target = Math['max'](
+        box['top'],
+        Math['min'](box['bottom'], box['top'] + options['top'] - box2['top'] - input['scrollTop']),
+      ),
+      source = Math['max'](
+        box['left'],
+        Math['min'](box['right'], box['left'] + options['left'] - box2['left'] - input['scrollLeft']),
+      );
+    return {
+      left: source,
+      anchorTop: target,
+      top: target + (options['height'] || parseFloat(computedStyle['lineHeight']) || 0x14) + 0x5,
+    };
+  }
+  function run4() {
+    if (!run()) return;
+    if (!input['isConnected'] || input['disabled'] || !input['getClientRects']()['length']) return run2();
+    (positionMentionMenu(menu, run3()), (requestAnimationFrame2 = requestAnimationFrame(run4)));
+  }
+  function run5(next, current = ![]) {
+    ((index = Math['max'](0x0, Math['min'](next, list2['length'] - 0x1))),
+      list2['forEach']((entry, record) => {
+        (entry['classList']['toggle']('active', record === index),
+          entry['classList']['toggle']('at-mention-keyboard-active', record === index),
+          entry['setAttribute']('aria-selected', String(record === index)));
+      }));
+    if (list2[index]) {
+      input['setAttribute']('aria-activedescendant', list2[index]['id']);
+      if (current) list2[index]['scrollIntoView']({ block: 'nearest' });
+    } else input['removeAttribute']('aria-activedescendant');
+  }
+  function run6(payload) {
+    if (!list[payload] || input['disabled']) return;
+    const handle = list[payload],
+      state = { start: value ?? item, end: item, typed: value !== null };
+    (run2(), onSelect(handle, state), input['focus']({ preventScroll: !![] }));
+  }
+  function run7(config = '') {
+    if (input['disabled']) return;
+    ((key = config),
+      (list = getCandidates(key)),
+      menu['replaceChildren'](),
+      (list2 = list['map']((scope, output) => {
+        const { item: item2, copyEl: copyEl } = createMentionMenuItem(scope);
+        (item2['appendChild'](copyEl),
+          (item2['id'] = menu['id'] + '-' + output),
+          item2['setAttribute']('role', optionRole),
+          (item2['tabIndex'] = -0x1));
+        if (scope['visual']) {
+          const el3 = document['createElement']('span');
+          ((el3['className'] = 'at-mention-visual'),
+            el3['setAttribute']('aria-hidden', 'true'),
+            el3['append'](scope['visual']),
+            item2['insertBefore'](el3, copyEl));
+        }
+        return (
+          item2['addEventListener']('pointerdown', (value2) => value2['preventDefault']()),
+          item2['addEventListener']('click', () => run6(output)),
+          menu['append'](item2),
+          item2
+        );
+      })));
+    if (!list2['length']) {
+      const value3 = document['createElement']('div');
+      ((value3['className'] = 'at-mention-empty'),
+        (value3['textContent'] = '没有匹配的结果'),
+        menu['append'](value3));
+    }
+    ((menu['hidden'] = ![]), (menu['style']['display'] = 'flex'));
+    if (!menu['matches'](':popover-open')) menu['showPopover']();
+    (trigger['setAttribute']('aria-expanded', 'true'),
+      run5(0x0),
+      cancelAnimationFrame(requestAnimationFrame2),
+      run4());
+  }
+  function run8(value4) {
+    if (value4['isComposing']) {
+      run2();
+      return;
+    }
+    item = input['selectionStart'];
+    const value5 = input['value']['slice'](0x0, item)['match'](/[@＠]([^@＠\s]*)$/);
+    if (value5 && item === input['selectionEnd']) ((value = item - value5[0x0]['length']), run7(value5[0x1]));
+    else run2();
+  }
+  function run9(event) {
+    if (!run() || event['isComposing']) return;
+    if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape']['includes'](event['key'])) {
+      (event['preventDefault'](), event['stopImmediatePropagation']());
+      if (event['key'] === 'Escape') run2();
+      else {
+        if (event['key'] === 'Enter') run6(index);
+        else
+          run5(
+            (index + (event['key'] === 'ArrowDown' ? 0x1 : -0x1) + list2['length']) %
+              (list2['length'] || 0x1),
+            !![],
+          );
+      }
+    } else {
+      if (event['key'] === 'Tab') run2();
+    }
+  }
+  function run10() {
+    if (run()) return run2();
+    ((value = null), (item = input['selectionStart']), input['focus']({ preventScroll: !![] }), run7());
+  }
+  function run11(event2) {
+    if (
+      !menu['contains'](event2['target']) &&
+      event2['target'] !== input &&
+      !trigger['contains'](event2['target'])
+    )
+      run2();
+  }
+  return (
+    input['addEventListener']('input', run8),
+    input['addEventListener']('compositionend', run8),
+    input['addEventListener']('keydown', run9, !![]),
+    input['addEventListener']('click', run2),
+    trigger['addEventListener']('click', run10),
+    document['addEventListener']('pointerdown', run11, !![]),
+    {
+      close: run2,
+      isOpen: run,
+      refresh() {
+        if (run()) run7(key);
+      },
+      destroy() {
+        (run2(),
+          el['remove'](),
+          menu['remove'](),
+          input['removeEventListener']('input', run8),
+          input['removeEventListener']('compositionend', run8),
+          input['removeEventListener']('keydown', run9, !![]),
+          input['removeEventListener']('click', run2),
+          trigger['removeEventListener']('click', run10),
+          document['removeEventListener']('pointerdown', run11, !![]));
+      },
+    }
+  );
+}

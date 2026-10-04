@@ -59,97 +59,97 @@ export const RUNNINGHUB_MODEL_API_PROFILES = Object['freeze']({
     apiUrl: 'https://www.runninghub.ai',
   }),
 });
-export function normalizeRunningHubModelApiProfileId(_0xb64f9d) {
-  const _0x162276 = String(_0xb64f9d || '')
+export function normalizeRunningHubModelApiProfileId(value) {
+  const item = String(value || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x162276 === RUNNINGHUB_INTERNATIONAL_PROFILE_ID
+  return item === RUNNINGHUB_INTERNATIONAL_PROFILE_ID
     ? RUNNINGHUB_INTERNATIONAL_PROFILE_ID
     : RUNNINGHUB_DOMESTIC_PROFILE_ID;
 }
-export function getRunningHubProviderProfileId(_0x85b531 = {}) {
-  const _0x2fe12c = String(_0x85b531?.['providerProfileId'] || '')['trim']();
+export function getRunningHubProviderProfileId(options = {}) {
+  const key = String(options?.['providerProfileId'] || '')['trim']();
   return (
-    _0x2fe12c ||
-    String(_0x85b531?.['rhProviderProfileId'] || '')['trim']() ||
-    String(_0x85b531?.['taskProviderProfileId'] || '')['trim']()
+    key ||
+    String(options?.['rhProviderProfileId'] || '')['trim']() ||
+    String(options?.['taskProviderProfileId'] || '')['trim']()
   );
 }
-export function getRunningHubTaskProviderProfileId(_0x44dc48 = {}) {
+export function getRunningHubTaskProviderProfileId(options2 = {}) {
   return (
-    String(_0x44dc48?.['taskProviderProfileId'] || '')['trim']() || getRunningHubProviderProfileId(_0x44dc48)
+    String(options2?.['taskProviderProfileId'] || '')['trim']() || getRunningHubProviderProfileId(options2)
   );
 }
-export function resolveRunningHubSiteProfileIdFromUrl(_0x110799) {
-  const _0x2c2d62 = String(_0x110799 || '')['match'](/https?:\/\/[^\s'"`\\]+/i);
-  if (!_0x2c2d62) return '';
+export function resolveRunningHubSiteProfileIdFromUrl(index) {
+  const enabled = String(index || '')['match'](/https?:\/\/[^\s'"`\\]+/i);
+  if (!enabled) return '';
   try {
-    const _0x1a5018 = new URL(_0x2c2d62[0x0])['hostname']['toLowerCase']();
-    if (/(^|\.)runninghub\.ai$/['test'](_0x1a5018)) return RUNNINGHUB_INTERNATIONAL_PROFILE_ID;
-    if (/(^|\.)runninghub\.cn$/['test'](_0x1a5018)) return RUNNINGHUB_DOMESTIC_PROFILE_ID;
+    const uRL = new URL(enabled[0x0])['hostname']['toLowerCase']();
+    if (/(^|\.)runninghub\.ai$/['test'](uRL)) return RUNNINGHUB_INTERNATIONAL_PROFILE_ID;
+    if (/(^|\.)runninghub\.cn$/['test'](uRL)) return RUNNINGHUB_DOMESTIC_PROFILE_ID;
   } catch {
     return '';
   }
   return '';
 }
-export function getRunningHubWorkflowDefaultProfileId(_0x22ab62 = {}) {
+export function getRunningHubWorkflowDefaultProfileId(options3 = {}) {
   return normalizeRunningHubModelApiProfileId(
-    _0x22ab62?.[RUNNINGHUB_WORKFLOW_SETTINGS_KEY]?.[RUNNINGHUB_WORKFLOW_DEFAULT_PROFILE_FIELD],
+    options3?.[RUNNINGHUB_WORKFLOW_SETTINGS_KEY]?.[RUNNINGHUB_WORKFLOW_DEFAULT_PROFILE_FIELD],
   );
 }
 export function applyRunningHubWorkflowDefaultProfileId(
-  _0x29f34c = {},
-  _0x569bb7 = RUNNINGHUB_DOMESTIC_PROFILE_ID,
+  options4 = {},
+  result = RUNNINGHUB_DOMESTIC_PROFILE_ID,
 ) {
   return {
-    ...(_0x29f34c || {}),
+    ...(options4 || {}),
     [RUNNINGHUB_WORKFLOW_SETTINGS_KEY]: {
-      ...(_0x29f34c?.[RUNNINGHUB_WORKFLOW_SETTINGS_KEY] || {}),
-      [RUNNINGHUB_WORKFLOW_DEFAULT_PROFILE_FIELD]: normalizeRunningHubModelApiProfileId(_0x569bb7),
+      ...(options4?.[RUNNINGHUB_WORKFLOW_SETTINGS_KEY] || {}),
+      [RUNNINGHUB_WORKFLOW_DEFAULT_PROFILE_FIELD]: normalizeRunningHubModelApiProfileId(result),
     },
   };
 }
-export function isRunningHubInternationalOnlyModel(_0x366b2c) {
-  return RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_ID_SET['has'](String(_0x366b2c || '')['trim']());
+export function isRunningHubInternationalOnlyModel(data) {
+  return RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_ID_SET['has'](String(data || '')['trim']());
 }
-export function getRunningHubModelApiProfileIds(_0x24ac89) {
-  if (isRunningHubInternationalOnlyModel(_0x24ac89)) return RUNNINGHUB_INTERNATIONAL_ONLY_PROFILE_IDS;
+export function getRunningHubModelApiProfileIds(target) {
+  if (isRunningHubInternationalOnlyModel(target)) return RUNNINGHUB_INTERNATIONAL_ONLY_PROFILE_IDS;
   return RUNNINGHUB_MODEL_API_PROFILE_IDS;
 }
-export function resolveRunningHubModelApiProfileId(_0x580f9a, _0x229c8b) {
-  const _0x2390be = getRunningHubModelApiProfileIds(_0x580f9a),
-    _0x1124e0 = normalizeRunningHubModelApiProfileId(_0x229c8b);
-  return _0x2390be['includes'](_0x1124e0) ? _0x1124e0 : _0x2390be[0x0];
+export function resolveRunningHubModelApiProfileId(source, next) {
+  const list = getRunningHubModelApiProfileIds(source),
+    runningHubModelApiProfileId = normalizeRunningHubModelApiProfileId(next);
+  return list['includes'](runningHubModelApiProfileId) ? runningHubModelApiProfileId : list[0x0];
 }
-export function getRunningHubModelApiProfile(_0x295808) {
-  return RUNNINGHUB_MODEL_API_PROFILES[normalizeRunningHubModelApiProfileId(_0x295808)];
+export function getRunningHubModelApiProfile(current) {
+  return RUNNINGHUB_MODEL_API_PROFILES[normalizeRunningHubModelApiProfileId(current)];
 }
-export function resolveRunningHubModelApiBaseUrl(_0x56e2e1, _0x492246 = '') {
-  const _0xe5388a = getRunningHubModelApiProfile(_0x56e2e1);
-  return String(_0x492246 || _0xe5388a['apiUrl'])
+export function resolveRunningHubModelApiBaseUrl(entry, record = '') {
+  const runningHubModelApiProfile = getRunningHubModelApiProfile(entry);
+  return String(record || runningHubModelApiProfile['apiUrl'])
     ['trim']()
     ['replace'](/\/+$/, '');
 }
-export function buildRunningHubModelApiUrl(_0xe5eef3, _0x4265a5, _0x2b4d0a = '') {
-  const _0x5205d5 = resolveRunningHubModelApiBaseUrl(_0xe5eef3, _0x2b4d0a),
-    _0x48aa75 = String(_0x4265a5 || '')['trim']();
-  if (!_0x48aa75) return _0x5205d5;
-  return _0x5205d5 + '/' + _0x48aa75['replace'](/^\/+/, '');
+export function buildRunningHubModelApiUrl(payload, handle, state = '') {
+  const runningHubModelApiBaseUrl = resolveRunningHubModelApiBaseUrl(payload, state),
+    enabled2 = String(handle || '')['trim']();
+  if (!enabled2) return runningHubModelApiBaseUrl;
+  return runningHubModelApiBaseUrl + '/' + enabled2['replace'](/^\/+/, '');
 }
-export function remapRunningHubModelApiUrl(_0x15b167, _0x2e84d1, _0x578cb7 = '') {
-  const _0x13a9b3 = String(_0x15b167 || '')['trim']();
-  if (!_0x13a9b3) return '';
-  const _0x1b3b23 = resolveRunningHubModelApiBaseUrl(_0x2e84d1, _0x578cb7);
+export function remapRunningHubModelApiUrl(config, scope, input = '') {
+  const enabled3 = String(config || '')['trim']();
+  if (!enabled3) return '';
+  const runningHubModelApiBaseUrl2 = resolveRunningHubModelApiBaseUrl(scope, input);
   try {
-    const _0x54deb2 = new URL(_0x13a9b3, _0x1b3b23 + '/'),
-      _0x5d4be4 = new URL(_0x1b3b23)['hostname'];
-    if (/(^|\.)runninghub\.(?:cn|ai)$/i['test'](_0x54deb2['hostname'])) {
-      const _0x32453f = _0x54deb2['hostname']['replace'](/runninghub\.(?:cn|ai)$/i, ''),
-        _0x28a617 = _0x5d4be4['endsWith']('.ai') ? 'runninghub.ai' : 'runninghub.cn';
-      _0x54deb2['hostname'] = '' + _0x32453f + _0x28a617;
+    const uRL2 = new URL(enabled3, runningHubModelApiBaseUrl2 + '/'),
+      uRL3 = new URL(runningHubModelApiBaseUrl2)['hostname'];
+    if (/(^|\.)runninghub\.(?:cn|ai)$/i['test'](uRL2['hostname'])) {
+      const output = uRL2['hostname']['replace'](/runninghub\.(?:cn|ai)$/i, ''),
+        value2 = uRL3['endsWith']('.ai') ? 'runninghub.ai' : 'runninghub.cn';
+      uRL2['hostname'] = '' + output + value2;
     }
-    return _0x54deb2['toString']()['replace'](/\/$/, '');
+    return uRL2['toString']()['replace'](/\/$/, '');
   } catch {
-    return buildRunningHubModelApiUrl(_0x2e84d1, _0x13a9b3, _0x578cb7);
+    return buildRunningHubModelApiUrl(scope, enabled3, input);
   }
 }

@@ -2,215 +2,193 @@ import { getRefKindByNodeType, normalizeNodeType } from '../nodeMeta.js';
 export const NODE_MANAGER_FILTERS = Object['freeze'](['all', 'text', 'image', 'video', 'audio']);
 const FILTER_SET = new Set(NODE_MANAGER_FILTERS),
   CONTENT_CATEGORY_SET = new Set(NODE_MANAGER_FILTERS['slice'](0x1));
-function normalizeId(_0x46885b) {
-  return typeof _0x46885b === 'string' || typeof _0x46885b === 'number' ? String(_0x46885b)['trim']() : '';
+function normalizeId(value) {
+  return typeof value === 'string' || typeof value === 'number' ? String(value)['trim']() : '';
 }
-function normalizeSearchText(_0x574f4f) {
-  return String(_0x574f4f ?? '')
+function normalizeSearchText(item) {
+  return String(item ?? '')
     ['trim']()
     ['toLocaleLowerCase']();
 }
-function readNodesInStableOrder(_0x390483) {
-  const _0x28b600 = Array['isArray'](_0x390483)
-      ? _0x390483['map']((_0x469829, _0x339ab6) => [String(_0x339ab6), _0x469829])
-      : _0x390483 && typeof _0x390483 === 'object'
-        ? Object['entries'](_0x390483)
+function readNodesInStableOrder(list) {
+  const list2 = Array['isArray'](list)
+      ? list['map']((key, index) => [String(index), key])
+      : list && typeof list === 'object'
+        ? Object['entries'](list)
         : [],
-    _0x4087ad = new Set(),
-    _0x2b7630 = [];
+    map = new Set(),
+    list3 = [];
   return (
-    _0x28b600['forEach'](([_0x36d7ae, _0x3f84f6], _0x16fe01) => {
-      if (!_0x3f84f6 || typeof _0x3f84f6 !== 'object') return;
-      const _0x5e09e3 = normalizeId(_0x3f84f6['id']) || normalizeId(_0x36d7ae);
-      if (!_0x5e09e3 || _0x4087ad['has'](_0x5e09e3)) return;
-      (_0x4087ad['add'](_0x5e09e3),
-        _0x2b7630['push']({ id: _0x5e09e3, node: _0x3f84f6, sourceIndex: _0x16fe01 }));
+    list2['forEach'](([result, node], sourceIndex) => {
+      if (!node || typeof node !== 'object') return;
+      const id = normalizeId(node['id']) || normalizeId(result);
+      if (!id || map['has'](id)) return;
+      (map['add'](id), list3['push']({ id: id, node: node, sourceIndex: sourceIndex }));
     }),
-    _0x2b7630
+    list3
   );
 }
-function firstDisplayText(..._0x1349e7) {
-  for (const _0x381949 of _0x1349e7) {
-    const _0x1080c0 = String(_0x381949 ?? '')['trim']();
-    if (_0x1080c0) return _0x1080c0;
+function firstDisplayText(...args) {
+  for (const data of args) {
+    const options = String(data ?? '')['trim']();
+    if (options) return options;
   }
   return '';
 }
-function toCollapsedIdSet(_0x3b4f34) {
-  if (_0x3b4f34 == null) return new Set();
-  const _0x3eebac =
-      typeof _0x3b4f34 === 'string'
-        ? [_0x3b4f34]
-        : typeof _0x3b4f34[Symbol['iterator']] === 'function'
-          ? _0x3b4f34
-          : [],
-    _0x960fe1 = new Set();
-  for (const _0x4100cf of _0x3eebac) {
-    const _0x402eca = normalizeId(_0x4100cf);
-    if (_0x402eca) _0x960fe1['add'](_0x402eca);
+function toCollapsedIdSet(target) {
+  if (target == null) return new Set();
+  const source =
+      typeof target === 'string' ? [target] : typeof target[Symbol['iterator']] === 'function' ? target : [],
+    next = new Set();
+  for (const current of source) {
+    const id2 = normalizeId(current);
+    if (id2) next['add'](id2);
   }
-  return _0x960fe1;
+  return next;
 }
-function breakGroupParentCycles(_0x58185e, _0x3981b3) {
-  const _0x12359a = new Map(_0x58185e['map']((_0x460ec7) => [_0x460ec7['id'], _0x460ec7])),
-    _0x3a0288 = new Set();
-  for (const _0x1d59ef of _0x58185e) {
-    if (!_0x1d59ef['isGroup'] || _0x3a0288['has'](_0x1d59ef['id'])) continue;
-    const _0x101be1 = [],
-      _0x29dba1 = new Map();
-    let _0xc0910e = _0x1d59ef['id'];
-    while (_0xc0910e && !_0x3a0288['has'](_0xc0910e)) {
-      if (_0x29dba1['has'](_0xc0910e)) {
-        const _0x3d4c6f = _0x101be1['slice'](_0x29dba1['get'](_0xc0910e)),
-          _0x1cc504 = _0x3d4c6f['reduce']((_0x49813a, _0x33dc2b) => {
-            return _0x12359a['get'](_0x33dc2b)['sourceIndex'] < _0x12359a['get'](_0x49813a)['sourceIndex']
-              ? _0x33dc2b
-              : _0x49813a;
-          }, _0x3d4c6f[0x0]);
-        _0x3981b3['set'](_0x1cc504, '');
+function breakGroupParentCycles(list4, map2) {
+  const map3 = new Map(list4['map']((entry) => [entry['id'], entry])),
+    map4 = new Set();
+  for (const enabled of list4) {
+    if (!enabled['isGroup'] || map4['has'](enabled['id'])) continue;
+    const list5 = [],
+      map5 = new Map();
+    let record = enabled['id'];
+    while (record && !map4['has'](record)) {
+      if (map5['has'](record)) {
+        const list6 = list5['slice'](map5['get'](record)),
+          payload = list6['reduce']((handle, state) => {
+            return map3['get'](state)['sourceIndex'] < map3['get'](handle)['sourceIndex'] ? state : handle;
+          }, list6[0x0]);
+        map2['set'](payload, '');
         break;
       }
-      (_0x29dba1['set'](_0xc0910e, _0x101be1['length']),
-        _0x101be1['push'](_0xc0910e),
-        (_0xc0910e = _0x3981b3['get'](_0xc0910e) || ''));
+      (map5['set'](record, list5['length']), list5['push'](record), (record = map2['get'](record) || ''));
     }
-    _0x101be1['forEach']((_0x4fe71b) => _0x3a0288['add'](_0x4fe71b));
+    list5['forEach']((config) => map4['add'](config));
   }
 }
-function countContentNodes(_0x22b804) {
-  let _0x4510de = 0x0;
-  for (const _0x2d1de3 of _0x22b804) {
-    if (_0x2d1de3['isGroup']) _0x4510de += countContentNodes(_0x2d1de3['children']);
-    else _0x4510de += 0x1;
+function countContentNodes(scope) {
+  let input = 0x0;
+  for (const el of scope) {
+    if (el['isGroup']) input += countContentNodes(el['children']);
+    else input += 0x1;
   }
-  return _0x4510de;
+  return input;
 }
-function addDescendantCounts(_0x5c7ced) {
-  if (!_0x5c7ced['isGroup']) return ((_0x5c7ced['descendantContentCount'] = 0x0), 0x1);
-  let _0x14ab20 = 0x0;
-  for (const _0x417ce4 of _0x5c7ced['children']) {
-    _0x14ab20 += addDescendantCounts(_0x417ce4);
+function addDescendantCounts(el2) {
+  if (!el2['isGroup']) return ((el2['descendantContentCount'] = 0x0), 0x1);
+  let output = 0x0;
+  for (const value2 of el2['children']) {
+    output += addDescendantCounts(value2);
   }
-  return (
-    (_0x5c7ced['descendantContentCount'] = _0x14ab20),
-    (_0x5c7ced['childCount'] = _0x14ab20),
-    _0x14ab20
-  );
+  return ((el2['descendantContentCount'] = output), (el2['childCount'] = output), output);
 }
-function filterTreeItem(_0x3b4355, { filter: _0x440c99, query: _0x370632, inheritedQueryMatch: _0x2b630f }) {
-  const _0x556edd = _0x440c99 === 'all' || _0x3b4355['category'] === _0x440c99,
-    _0x2cd523 = !_0x370632 || normalizeSearchText(_0x3b4355['name'])['includes'](_0x370632);
-  if (!_0x3b4355['isGroup']) {
-    if (!_0x556edd || (!_0x2b630f && !_0x2cd523)) return null;
-    return { ..._0x3b4355, children: [] };
+function filterTreeItem(el3, { filter: filter2, query: query2, inheritedQueryMatch: inheritedQueryMatch }) {
+  const enabled2 = filter2 === 'all' || el3['category'] === filter2,
+    enabled3 = !query2 || normalizeSearchText(el3['name'])['includes'](query2);
+  if (!el3['isGroup']) {
+    if (!enabled2 || (!inheritedQueryMatch && !enabled3)) return null;
+    return { ...el3, children: [] };
   }
-  const _0x57a71d = Boolean(_0x370632) && _0x2cd523,
-    _0x440384 = _0x2b630f || _0x57a71d,
-    _0x1e9af6 = _0x3b4355['children']
-      ['map']((_0x5cfc02) =>
-        filterTreeItem(_0x5cfc02, { filter: _0x440c99, query: _0x370632, inheritedQueryMatch: _0x440384 }),
+  const value3 = Boolean(query2) && enabled3,
+    inheritedQueryMatch2 = inheritedQueryMatch || value3,
+    children = el3['children']
+      ['map']((value4) =>
+        filterTreeItem(value4, { filter: filter2, query: query2, inheritedQueryMatch: inheritedQueryMatch2 }),
       )
       ['filter'](Boolean),
-    _0x41093b = _0x440c99 === 'all' && !_0x370632;
-  if (!_0x41093b && !_0x440384 && _0x1e9af6['length'] === 0x0) return null;
-  return { ..._0x3b4355, children: _0x1e9af6, matchingDescendantContentCount: countContentNodes(_0x1e9af6) };
+    enabled4 = filter2 === 'all' && !query2;
+  if (!enabled4 && !inheritedQueryMatch2 && children['length'] === 0x0) return null;
+  return { ...el3, children: children, matchingDescendantContentCount: countContentNodes(children) };
 }
-function flattenTree(_0x4ab0e8, _0x53468b, _0x5a6ba2 = 0x0, _0x342390 = []) {
-  for (const _0x21464a of _0x4ab0e8) {
-    const _0x5d77c1 = _0x21464a['isGroup'] && _0x53468b['has'](_0x21464a['id']);
-    (_0x342390['push']({ ..._0x21464a, depth: _0x5a6ba2, collapsed: _0x5d77c1 }),
-      _0x21464a['isGroup'] &&
-        !_0x5d77c1 &&
-        flattenTree(_0x21464a['children'], _0x53468b, _0x5a6ba2 + 0x1, _0x342390));
+function flattenTree(value5, map6, depth = 0x0, list7 = []) {
+  for (const el4 of value5) {
+    const collapsed = el4['isGroup'] && map6['has'](el4['id']);
+    (list7['push']({ ...el4, depth: depth, collapsed: collapsed }),
+      el4['isGroup'] && !collapsed && flattenTree(el4['children'], map6, depth + 0x1, list7));
   }
-  return _0x342390;
+  return list7;
 }
-export function normalizeNodeManagerFilter(_0x4960e5) {
-  const _0x92fa93 = String(_0x4960e5 ?? '')
+export function normalizeNodeManagerFilter(value6) {
+  const value7 = String(value6 ?? '')
     ['trim']()
     ['toLocaleLowerCase']();
-  return FILTER_SET['has'](_0x92fa93) ? _0x92fa93 : 'all';
+  return FILTER_SET['has'](value7) ? value7 : 'all';
 }
-export function getNodeManagerCategory(_0x114f01) {
-  const _0x57d205 = normalizeNodeType(_0x114f01?.['type']);
-  if (_0x57d205 === 'group') return 'group';
-  const _0x3575d4 = getRefKindByNodeType(_0x57d205);
-  return CONTENT_CATEGORY_SET['has'](_0x3575d4) ? _0x3575d4 : 'other';
+export function getNodeManagerCategory(value8) {
+  const nodeType = normalizeNodeType(value8?.['type']);
+  if (nodeType === 'group') return 'group';
+  const refKindByNodeType = getRefKindByNodeType(nodeType);
+  return CONTENT_CATEGORY_SET['has'](refKindByNodeType) ? refKindByNodeType : 'other';
 }
 export const resolveNodeManagerCategory = getNodeManagerCategory;
-export function resolveNodeManagerName(_0x4d8a0c, _0x298b1b = '') {
-  return firstDisplayText(_0x4d8a0c?.['name'], _0x4d8a0c?.['title'], _0x4d8a0c?.['label'], _0x298b1b);
+export function resolveNodeManagerName(error, value9 = '') {
+  return firstDisplayText(error?.['name'], error?.['title'], error?.['label'], value9);
 }
 export function buildNodeManagerModel({
-  nodes: _0x2e4a58,
+  nodes: nodes,
   filter: filter = 'all',
   query: query = '',
   collapsedGroupIds: collapsedGroupIds = [],
 } = {}) {
-  const _0x11b6bc = normalizeNodeManagerFilter(filter),
-    _0xcd3979 = normalizeSearchText(query),
-    _0x58a895 = readNodesInStableOrder(_0x2e4a58)['map'](
-      ({ id: _0x45931b, node: _0x1976fe, sourceIndex: _0x5c5993 }) => {
-        const _0x34914d = normalizeNodeType(_0x1976fe['type']),
-          _0x2b30e7 = _0x34914d === 'group';
-        return {
-          kind: _0x2b30e7 ? 'group' : 'node',
-          id: _0x45931b,
-          node: _0x1976fe,
-          sourceIndex: _0x5c5993,
-          type: _0x34914d,
-          isGroup: _0x2b30e7,
-          category: getNodeManagerCategory(_0x1976fe),
-          name: resolveNodeManagerName(_0x1976fe, _0x45931b),
-          parentId: '',
-          children: [],
-          descendantContentCount: 0x0,
-          matchingDescendantContentCount: 0x0,
-        };
-      },
-    ),
-    _0x47c919 = new Map(_0x58a895['map']((_0x10b3c9) => [_0x10b3c9['id'], _0x10b3c9])),
-    _0x383814 = new Map();
-  for (const _0x21d4f1 of _0x58a895) {
-    const _0x5ec74b = normalizeId(_0x21d4f1['node']['parentId']),
-      _0x442999 = _0x47c919['get'](_0x5ec74b);
-    _0x383814['set'](
-      _0x21d4f1['id'],
-      _0x5ec74b && _0x442999?.['isGroup'] && _0x5ec74b !== _0x21d4f1['id'] ? _0x5ec74b : '',
-    );
+  const filter3 = normalizeNodeManagerFilter(filter),
+    query3 = normalizeSearchText(query),
+    list8 = readNodesInStableOrder(nodes)['map'](({ id: id3, node: node2, sourceIndex: sourceIndex2 }) => {
+      const type = normalizeNodeType(node2['type']),
+        kind = type === 'group';
+      return {
+        kind: kind ? 'group' : 'node',
+        id: id3,
+        node: node2,
+        sourceIndex: sourceIndex2,
+        type: type,
+        isGroup: kind,
+        category: getNodeManagerCategory(node2),
+        name: resolveNodeManagerName(node2, id3),
+        parentId: '',
+        children: [],
+        descendantContentCount: 0x0,
+        matchingDescendantContentCount: 0x0,
+      };
+    }),
+    map7 = new Map(list8['map']((value10) => [value10['id'], value10])),
+    map8 = new Map();
+  for (const value11 of list8) {
+    const id4 = normalizeId(value11['node']['parentId']),
+      value12 = map7['get'](id4);
+    map8['set'](value11['id'], id4 && value12?.['isGroup'] && id4 !== value11['id'] ? id4 : '');
   }
-  breakGroupParentCycles(_0x58a895, _0x383814);
-  const _0x5822c8 = [];
-  for (const _0x574810 of _0x58a895) {
-    _0x574810['parentId'] = _0x383814['get'](_0x574810['id']) || '';
-    if (_0x574810['parentId']) _0x47c919['get'](_0x574810['parentId'])['children']['push'](_0x574810);
-    else _0x5822c8['push'](_0x574810);
+  breakGroupParentCycles(list8, map8);
+  const list9 = [];
+  for (const value13 of list8) {
+    value13['parentId'] = map8['get'](value13['id']) || '';
+    if (value13['parentId']) map7['get'](value13['parentId'])['children']['push'](value13);
+    else list9['push'](value13);
   }
-  _0x5822c8['forEach'](addDescendantCounts);
-  const _0x4a78ad = _0x5822c8['map']((_0x3d689d) =>
-      filterTreeItem(_0x3d689d, { filter: _0x11b6bc, query: _0xcd3979, inheritedQueryMatch: ![] }),
+  list9['forEach'](addDescendantCounts);
+  const roots = list9['map']((value14) =>
+      filterTreeItem(value14, { filter: filter3, query: query3, inheritedQueryMatch: ![] }),
     )['filter'](Boolean),
-    _0x2cfc36 = toCollapsedIdSet(collapsedGroupIds),
-    _0xdfb8c3 = flattenTree(_0x4a78ad, _0x2cfc36),
-    _0x3bdfae = _0x58a895['filter']((_0x4eb428) => !_0x4eb428['isGroup'])['length'],
-    _0x25c4e8 = _0xdfb8c3['filter']((_0x4a624d) => !_0x4a624d['isGroup'])['length'],
-    _0x2d9ed3 = _0x58a895['filter']((_0x1c6293) => _0x1c6293['isGroup'])['map'](
-      (_0x42fb26) => _0x42fb26['id'],
-    );
+    toCollapsedIdSet2 = toCollapsedIdSet(collapsedGroupIds),
+    items = flattenTree(roots, toCollapsedIdSet2),
+    totalNodeCount = list8['filter']((enabled5) => !enabled5['isGroup'])['length'],
+    visibleNodeCount = items['filter']((enabled6) => !enabled6['isGroup'])['length'],
+    groupIds = list8['filter']((value15) => value15['isGroup'])['map']((value16) => value16['id']);
   return {
-    filter: _0x11b6bc,
+    filter: filter3,
     query: String(query ?? '')['trim'](),
-    roots: _0x4a78ad,
-    items: _0xdfb8c3,
-    rows: _0xdfb8c3,
-    groupIds: _0x2d9ed3,
-    totalNodeCount: _0x3bdfae,
-    visibleNodeCount: _0x25c4e8,
-    totalContentCount: _0x3bdfae,
-    matchingContentCount: countContentNodes(_0x4a78ad),
-    visibleContentCount: _0x25c4e8,
-    totalGroupCount: _0x2d9ed3['length'],
-    visibleGroupCount: _0xdfb8c3['filter']((_0x379fe9) => _0x379fe9['isGroup'])['length'],
+    roots: roots,
+    items: items,
+    rows: items,
+    groupIds: groupIds,
+    totalNodeCount: totalNodeCount,
+    visibleNodeCount: visibleNodeCount,
+    totalContentCount: totalNodeCount,
+    matchingContentCount: countContentNodes(roots),
+    visibleContentCount: visibleNodeCount,
+    totalGroupCount: groupIds['length'],
+    visibleGroupCount: items['filter']((value17) => value17['isGroup'])['length'],
   };
 }
 export const buildNodeManagerListModel = buildNodeManagerModel;

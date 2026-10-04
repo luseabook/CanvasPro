@@ -1,189 +1,189 @@
 import { PERSON_REPLACEMENT_CUT_EPSILON_SEC } from './personReplacementShotCutModel.js';
 import { materializePersonReplacementShotPlayback } from './personReplacementShotReverse.js';
-function normalizeText(_0x46e12c) {
-  return String(_0x46e12c ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function cloneJson(_0x4bd911) {
-  return JSON['parse'](JSON['stringify'](_0x4bd911));
+function cloneJson(item) {
+  return JSON['parse'](JSON['stringify'](item));
 }
 export function createPersonReplacementVideoPreparationRunner({
-  getProject: _0x271341,
+  getProject: getProject,
   getProjectById: getProjectById = null,
-  setProject: _0x5c47f4,
+  setProject: setProject,
   setProjectById: setProjectById = null,
   isDestroyed: isDestroyed = () => ![],
-  waitForActiveReverse: _0x5c07ed,
-  fetchVideoMeta: _0x3fc8da,
-  resolveDurationSec: _0x49d86e,
-  enqueueMediaTask: _0xfa6e38,
-  resolveMediaRef: _0x17596d,
-  showToast: _0x195cde,
+  waitForActiveReverse: waitForActiveReverse,
+  fetchVideoMeta: fetchVideoMeta,
+  resolveDurationSec: resolveDurationSec,
+  enqueueMediaTask: enqueueMediaTask,
+  resolveMediaRef: resolveMediaRef,
+  showToast: showToast,
 } = {}) {
-  return async function _0x1090c0({
-    projectId: _0x37b9c9 = '',
+  return async function run({
+    projectId: projectId = '',
     shotIds: shotIds = null,
     notify: notify = !![],
     renderWorkspace: renderWorkspace = !![],
   } = {}) {
-    const _0x1db302 =
+    const shotIds2 =
         Array['isArray'](shotIds) && shotIds['length']
           ? new Set(shotIds['map'](normalizeText)['filter'](Boolean))
           : null,
-      _0x1831d4 = () => {
-        const _0x287643 = normalizeText(_0x37b9c9);
-        return _0x287643 && typeof getProjectById === 'function' ? getProjectById(_0x287643) : _0x271341();
+      handler = () => {
+        const text = normalizeText(projectId);
+        return text && typeof getProjectById === 'function' ? getProjectById(text) : getProject();
       },
-      _0x4d6654 = (_0xebd13b, _0x3b9150 = {}) =>
+      handler2 = (key, index = {}) =>
         typeof setProjectById === 'function'
-          ? setProjectById(_0xebd13b?.['id'], _0xebd13b, _0x3b9150)
-          : _0x5c47f4(_0xebd13b, _0x3b9150),
-      _0x429f4f = normalizeText(_0x37b9c9 || _0x1831d4()?.['id']);
-    await _0x5c07ed({ projectId: _0x429f4f, shotIds: _0x1db302 });
-    let _0x2226b3 = _0x1831d4();
-    if (isDestroyed() || normalizeText(_0x2226b3['id']) !== _0x429f4f)
-      return { ok: ![], stale: !![], failures: [], project: cloneJson(_0x2226b3) };
-    const _0x46e10e = _0x2226b3['shots']['filter'](
-      (_0x7c912e) =>
-        (!_0x1db302 || _0x1db302['has'](_0x7c912e['id'])) &&
-        (!_0x7c912e['videoRef'] ||
-          _0x7c912e['materializationStatus'] !== 'succeeded' ||
-          Boolean(_0x7c912e['materializedIsReversed']) !== Boolean(_0x7c912e['isReversed'])),
+          ? setProjectById(key?.['id'], key, index)
+          : setProject(key, index),
+      projectId2 = normalizeText(projectId || handler()?.['id']);
+    await waitForActiveReverse({ projectId: projectId2, shotIds: shotIds2 });
+    let shots = handler();
+    if (isDestroyed() || normalizeText(shots['id']) !== projectId2)
+      return { ok: ![], stale: !![], failures: [], project: cloneJson(shots) };
+    const list = shots['shots']['filter'](
+      (enabled) =>
+        (!shotIds2 || shotIds2['has'](enabled['id'])) &&
+        (!enabled['videoRef'] ||
+          enabled['materializationStatus'] !== 'succeeded' ||
+          Boolean(enabled['materializedIsReversed']) !== Boolean(enabled['isReversed'])),
     );
-    if (!_0x46e10e['length'])
+    if (!list['length'])
       return (
-        (_0x2226b3['workspace']['videoPreparation']?.['status'] !== 'succeeded' ||
-          Number(_0x2226b3['workspace']['videoPreparation']?.['progress']) !== 0x64 ||
-          normalizeText(_0x2226b3['workspace']['videoPreparation']?.['error'])) &&
-          (_0x2226b3 = _0x4d6654(
+        (shots['workspace']['videoPreparation']?.['status'] !== 'succeeded' ||
+          Number(shots['workspace']['videoPreparation']?.['progress']) !== 0x64 ||
+          normalizeText(shots['workspace']['videoPreparation']?.['error'])) &&
+          (shots = handler2(
             {
-              ..._0x2226b3,
+              ...shots,
               workspace: {
-                ..._0x2226b3['workspace'],
+                ...shots['workspace'],
                 videoPreparation: { status: 'succeeded', progress: 0x64, error: '' },
               },
             },
             { renderWorkspace: renderWorkspace },
           )),
-        { ok: !![], project: cloneJson(_0x2226b3) }
+        { ok: !![], project: cloneJson(shots) }
       );
-    _0x2226b3 = _0x4d6654(
+    shots = handler2(
       {
-        ..._0x2226b3,
+        ...shots,
         workspace: {
-          ..._0x2226b3['workspace'],
+          ...shots['workspace'],
           videoPreparation: { status: 'running', progress: 0x0, error: '' },
         },
-        shots: _0x2226b3['shots']['map']((_0x73bb37) =>
-          _0x46e10e['some']((_0x1ed6d4) => _0x1ed6d4['id'] === _0x73bb37['id'])
+        shots: shots['shots']['map']((error) =>
+          list['some']((result) => result['id'] === error['id'])
             ? {
-                ..._0x73bb37,
+                ...error,
                 materializationStatus: 'running',
                 materializationProgress: 0x0,
-                error: _0x73bb37['analysisStatus'] === 'failed' ? _0x73bb37['error'] : '',
+                error: error['analysisStatus'] === 'failed' ? error['error'] : '',
               }
-            : _0x73bb37,
+            : error,
         ),
       },
       { renderWorkspace: renderWorkspace },
     );
-    const _0x3e7fd2 = [];
-    for (let _0x1eccc0 = 0x0; _0x1eccc0 < _0x46e10e['length']; _0x1eccc0 += 0x1) {
-      const _0x257111 = _0x46e10e[_0x1eccc0]['id'],
-        _0x240f63 = _0x2226b3['shots']['find']((_0x15fa7d) => _0x15fa7d['id'] === _0x257111),
-        _0x37555d = _0x2226b3['sources']['find']((_0x4b6ae2) => _0x4b6ae2['id'] === _0x240f63?.['sourceId']),
-        _0x50709b = _0x240f63?.['sourceVideoRef'] || _0x37555d?.['videoRef'] || '';
+    const failures = [];
+    for (let data = 0x0; data < list['length']; data += 0x1) {
+      const shotId = list[data]['id'],
+        shotId2 = shots['shots']['find']((options) => options['id'] === shotId),
+        target = shots['sources']['find']((source) => source['id'] === shotId2?.['sourceId']),
+        sourceVideoRef = shotId2?.['sourceVideoRef'] || target?.['videoRef'] || '';
       try {
-        if (!_0x240f63 || !_0x50709b) throw new Error('镜头缺少原始视频地址');
-        let _0x2311a8 = Number(_0x240f63['endTimeSec']) || 0x0;
-        if (!(_0x2311a8 > _0x240f63['startTimeSec'])) {
-          if (typeof _0x3fc8da !== 'function') throw new Error('无法读取镜头结束时间');
-          const _0x40937f = _0x49d86e(await _0x3fc8da(_0x50709b));
-          if (!(_0x40937f > _0x240f63['startTimeSec'])) throw new Error('无法读取原视频时长');
-          _0x2311a8 = _0x40937f;
+        if (!shotId2 || !sourceVideoRef) throw new Error('镜头缺少原始视频地址');
+        let endSec = Number(shotId2['endTimeSec']) || 0x0;
+        if (!(endSec > shotId2['startTimeSec'])) {
+          if (typeof fetchVideoMeta !== 'function') throw new Error('无法读取镜头结束时间');
+          const next = resolveDurationSec(await fetchVideoMeta(sourceVideoRef));
+          if (!(next > shotId2['startTimeSec'])) throw new Error('无法读取原视频时长');
+          endSec = next;
         }
-        const _0x3665e9 = [0x10, 0x18, 0x1e]['includes'](Math['round'](Number(_0x240f63['outputFps'])))
-            ? Math['round'](Number(_0x240f63['outputFps']))
+        const outputFps = [0x10, 0x18, 0x1e]['includes'](Math['round'](Number(shotId2['outputFps'])))
+            ? Math['round'](Number(shotId2['outputFps']))
             : 0x18,
-          _0x564a78 = {
-            shotId: _0x240f63['id'],
-            sourceId: _0x240f63['sourceId'],
-            startSec: _0x240f63['startTimeSec'],
-            endSec: _0x2311a8,
-            ...(_0x240f63['isReversed'] === !![] ? { isReversed: !![] } : {}),
+          range = {
+            shotId: shotId2['id'],
+            sourceId: shotId2['sourceId'],
+            startSec: shotId2['startTimeSec'],
+            endSec: endSec,
+            ...(shotId2['isReversed'] === !![] ? { isReversed: !![] } : {}),
           },
-          { videoRef: _0x4b8cb7, videoRefIsCropped: _0x545884 } =
+          { videoRef: videoRef, videoRefIsCropped: videoRefIsCropped } =
             await materializePersonReplacementShotPlayback({
-              currentShot: { ..._0x240f63, endTimeSec: _0x2311a8 },
-              range: _0x564a78,
+              currentShot: { ...shotId2, endTimeSec: endSec },
+              range: range,
               isNewShot: ![],
-              sourceVideoRef: _0x50709b,
-              outputFps: _0x3665e9,
+              sourceVideoRef: sourceVideoRef,
+              outputFps: outputFps,
               epsilonSec: PERSON_REPLACEMENT_CUT_EPSILON_SEC,
-              enqueueMediaTask: _0xfa6e38,
-              resolveMediaRef: _0x17596d,
+              enqueueMediaTask: enqueueMediaTask,
+              resolveMediaRef: resolveMediaRef,
             }),
-          _0x7540f = _0x1831d4(),
-          _0x3f9e0a = _0x7540f['shots']['find']((_0x259cdd) => _0x259cdd['id'] === _0x257111);
-        if (isDestroyed() || normalizeText(_0x7540f['id']) !== _0x429f4f)
-          return { ok: ![], stale: !![], failures: _0x3e7fd2, project: cloneJson(_0x7540f) };
-        if (!_0x3f9e0a || Boolean(_0x3f9e0a['isReversed']) !== Boolean(_0x240f63['isReversed'])) {
-          _0x2226b3 = _0x7540f;
+          shots2 = handler(),
+          enabled2 = shots2['shots']['find']((current) => current['id'] === shotId);
+        if (isDestroyed() || normalizeText(shots2['id']) !== projectId2)
+          return { ok: ![], stale: !![], failures: failures, project: cloneJson(shots2) };
+        if (!enabled2 || Boolean(enabled2['isReversed']) !== Boolean(shotId2['isReversed'])) {
+          shots = shots2;
           continue;
         }
-        const _0x9a249a = Math['round'](((_0x1eccc0 + 0x1) / _0x46e10e['length']) * 0x64);
-        _0x2226b3 = _0x4d6654(
+        const progress = Math['round'](((data + 0x1) / list['length']) * 0x64);
+        shots = handler2(
           {
-            ..._0x7540f,
-            shots: _0x7540f['shots']['map']((_0x4b8e71) =>
-              _0x4b8e71['id'] === _0x257111
+            ...shots2,
+            shots: shots2['shots']['map']((error2) =>
+              error2['id'] === shotId
                 ? {
-                    ..._0x4b8e71,
-                    sourceVideoRef: _0x50709b,
-                    endTimeSec: _0x2311a8,
-                    durationSec: Math['max'](0x0, _0x2311a8 - _0x4b8e71['startTimeSec']),
-                    videoRef: _0x4b8cb7,
-                    videoRefIsCropped: _0x545884,
-                    outputFps: _0x3665e9,
-                    materializedIsReversed: _0x240f63['isReversed'] === !![],
+                    ...error2,
+                    sourceVideoRef: sourceVideoRef,
+                    endTimeSec: endSec,
+                    durationSec: Math['max'](0x0, endSec - error2['startTimeSec']),
+                    videoRef: videoRef,
+                    videoRefIsCropped: videoRefIsCropped,
+                    outputFps: outputFps,
+                    materializedIsReversed: shotId2['isReversed'] === !![],
                     materializationStatus: 'succeeded',
                     materializationProgress: 0x64,
-                    error: _0x4b8e71['analysisStatus'] === 'failed' ? _0x4b8e71['error'] : '',
+                    error: error2['analysisStatus'] === 'failed' ? error2['error'] : '',
                   }
-                : _0x4b8e71,
+                : error2,
             ),
             workspace: {
-              ..._0x7540f['workspace'],
-              videoPreparation: { status: 'running', progress: _0x9a249a, error: '' },
+              ...shots2['workspace'],
+              videoPreparation: { status: 'running', progress: progress, error: '' },
             },
           },
           { renderWorkspace: ![] },
         );
-      } catch (_0x260c07) {
-        const _0x43c0ac = _0x260c07?.['message'] || '镜头切片失败';
-        _0x3e7fd2['push']({ shotId: _0x257111, message: _0x43c0ac });
-        const _0x37fd82 = _0x1831d4();
-        _0x2226b3 = _0x4d6654(
+      } catch (error3) {
+        const message = error3?.['message'] || '镜头切片失败';
+        failures['push']({ shotId: shotId, message: message });
+        const shots3 = handler();
+        shots = handler2(
           {
-            ..._0x37fd82,
-            shots: _0x37fd82['shots']['map']((_0x19b3e6) =>
-              _0x19b3e6['id'] === _0x257111
+            ...shots3,
+            shots: shots3['shots']['map']((error4) =>
+              error4['id'] === shotId
                 ? {
-                    ..._0x19b3e6,
+                    ...error4,
                     materializationStatus: 'failed',
                     materializationProgress: 0x0,
                     error:
-                      _0x19b3e6['analysisStatus'] === 'failed'
-                        ? [_0x19b3e6['error'], _0x43c0ac]['filter'](Boolean)['join']('；')
-                        : _0x43c0ac,
+                      error4['analysisStatus'] === 'failed'
+                        ? [error4['error'], message]['filter'](Boolean)['join']('；')
+                        : message,
                   }
-                : _0x19b3e6,
+                : error4,
             ),
             workspace: {
-              ..._0x37fd82['workspace'],
+              ...shots3['workspace'],
               videoPreparation: {
                 status: 'running',
-                progress: Math['round'](((_0x1eccc0 + 0x1) / _0x46e10e['length']) * 0x64),
-                error: _0x43c0ac,
+                progress: Math['round'](((data + 0x1) / list['length']) * 0x64),
+                error: message,
               },
             },
           },
@@ -191,23 +191,23 @@ export function createPersonReplacementVideoPreparationRunner({
         );
       }
     }
-    const _0xe56dc2 = _0x3e7fd2['length'] ? 'failed' : 'succeeded',
-      _0x12854b = _0x3e7fd2['map']((_0x3ec4eb) => _0x3ec4eb['message'])['join']('；'),
-      _0x13d9bc = _0x1831d4();
-    _0x2226b3 = _0x4d6654(
+    const status = failures['length'] ? 'failed' : 'succeeded',
+      error5 = failures['map']((error6) => error6['message'])['join']('；'),
+      args = handler();
+    shots = handler2(
       {
-        ..._0x13d9bc,
+        ...args,
         workspace: {
-          ..._0x13d9bc['workspace'],
-          videoPreparation: { status: _0xe56dc2, progress: 0x64, error: _0x12854b },
+          ...args['workspace'],
+          videoPreparation: { status: status, progress: 0x64, error: error5 },
         },
       },
       { renderWorkspace: renderWorkspace },
     );
     if (notify) {
-      if (_0x3e7fd2['length']) _0x195cde(_0x12854b || '部分镜头切片失败。', 'error');
-      else _0x195cde('已准备\x20' + _0x46e10e['length'] + ' 个固定帧率镜头。', 'success');
+      if (failures['length']) showToast(error5 || '部分镜头切片失败。', 'error');
+      else showToast('已准备\x20' + list['length'] + ' 个固定帧率镜头。', 'success');
     }
-    return { ok: _0x3e7fd2['length'] === 0x0, failures: _0x3e7fd2, project: _0x2226b3 };
+    return { ok: failures['length'] === 0x0, failures: failures, project: shots };
   };
 }

@@ -7,8 +7,8 @@ const VIDEO_ADAPTIVE_RATIO_VALUE = '自适应';
 export const VIDEO_MODE_ALL_REFERENCE_VALUE = '全能参考';
 export const VIDEO_MODE_FIRST_LAST_VALUE = '首尾帧';
 export const DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER = Object['freeze'](['resolution', 'mode']);
-export function videoPanelText(_0x51d1e1, _0x43eabb = {}) {
-  return t('videoNode.parameterPanel.' + _0x51d1e1, _0x43eabb);
+export function videoPanelText(value, item = {}) {
+  return t('videoNode.parameterPanel.' + value, item);
 }
 export function getVideoGenerateTitle() {
   return videoPanelText('generateTitle');
@@ -19,15 +19,15 @@ export function getVideoCancelTooltip() {
 function getDefaultVideoPromptPlaceholder() {
   return videoPanelText('defaultPromptPlaceholder');
 }
-function formatVideoAspectRatioLabel(_0x2e62dd) {
-  const _0x48f87c = String(_0x2e62dd || '')['trim']();
-  if (!_0x48f87c || _0x48f87c === VIDEO_ADAPTIVE_RATIO_VALUE) return videoPanelText('adaptive');
-  return _0x48f87c;
+function formatVideoAspectRatioLabel(key) {
+  const enabled = String(key || '')['trim']();
+  if (!enabled || enabled === VIDEO_ADAPTIVE_RATIO_VALUE) return videoPanelText('adaptive');
+  return enabled;
 }
-export function formatVideoRatioResolutionLabel(_0xbc7d71, _0x432a62) {
+export function formatVideoRatioResolutionLabel(index, resolution) {
   return videoPanelText('ratioResolutionLabel', {
-    aspectRatio: formatVideoAspectRatioLabel(_0xbc7d71),
-    resolution: _0x432a62,
+    aspectRatio: formatVideoAspectRatioLabel(index),
+    resolution: resolution,
   });
 }
 export function resolveVideoAdaptiveRatioSource({
@@ -36,156 +36,151 @@ export function resolveVideoAdaptiveRatioSource({
   nodeData: nodeData = {},
   adaptivePolicy: adaptivePolicy = {},
 } = {}) {
-  const _0x4b4494 = Array['isArray'](inEdges) ? inEdges : [];
-  let _0x4ebb58 = pickGenerationRatioSourceEdge(_0x4b4494, nodeData) || _0x4b4494[0x0] || null;
-  const _0xac04b6 = String(adaptivePolicy?.['preferSlot'] || '')['trim'](),
-    _0x3057b8 = adaptivePolicy?.['preferVideoKind'] === !![],
-    _0x46d168 = adaptivePolicy?.['fallbackSquareWhenNoVideo'] === !![];
-  if (_0xac04b6) {
-    const _0x2861bb = _0x4b4494['find']((_0x1421fa) => String(_0x1421fa?.['refSlot'] || '') === _0xac04b6);
-    if (_0x2861bb) _0x4ebb58 = _0x2861bb;
+  const list = Array['isArray'](inEdges) ? inEdges : [];
+  let edge = pickGenerationRatioSourceEdge(list, nodeData) || list[0x0] || null;
+  const result = String(adaptivePolicy?.['preferSlot'] || '')['trim'](),
+    data = adaptivePolicy?.['preferVideoKind'] === !![],
+    fallbackSquare = adaptivePolicy?.['fallbackSquareWhenNoVideo'] === !![];
+  if (result) {
+    const options = list['find']((target) => String(target?.['refSlot'] || '') === result);
+    if (options) edge = options;
     else {
-      if (_0x3057b8) {
-        const _0x122aca = _0x4b4494['find'](
-          (_0x3edee7) => resolveEffectiveInputKind(nodes?.[_0x3edee7?.['sourceId']], _0x3edee7) === 'video',
+      if (data) {
+        const source = list['find'](
+          (next) => resolveEffectiveInputKind(nodes?.[next?.['sourceId']], next) === 'video',
         );
-        if (_0x122aca) _0x4ebb58 = _0x122aca;
-        else return { edge: null, fallbackSquare: _0x46d168 };
+        if (source) edge = source;
+        else return { edge: null, fallbackSquare: fallbackSquare };
       }
     }
   }
-  return { edge: _0x4ebb58, fallbackSquare: ![] };
+  return { edge: edge, fallbackSquare: ![] };
 }
-export function getVideoModeLabel(_0x37e2e4) {
-  const _0x15f5bb = String(_0x37e2e4 || '')['trim']() || VIDEO_MODE_ALL_REFERENCE_VALUE;
-  if (_0x15f5bb === VIDEO_MODE_ALL_REFERENCE_VALUE) return videoPanelText('mode.allReference');
-  if (_0x15f5bb === VIDEO_MODE_FIRST_LAST_VALUE) return videoPanelText('mode.firstLastFrame');
-  return _0x15f5bb;
+export function getVideoModeLabel(current) {
+  const entry = String(current || '')['trim']() || VIDEO_MODE_ALL_REFERENCE_VALUE;
+  if (entry === VIDEO_MODE_ALL_REFERENCE_VALUE) return videoPanelText('mode.allReference');
+  if (entry === VIDEO_MODE_FIRST_LAST_VALUE) return videoPanelText('mode.firstLastFrame');
+  return entry;
 }
-export function getDreaminaProviderLabel(_0x9b326c) {
-  const _0x4a11ac = String(_0x9b326c || '')
+export function getDreaminaProviderLabel(record) {
+  const payload = String(record || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x4a11ac === 'dreamina') return videoPanelText('providers.dreamina');
-  if (_0x4a11ac === 'volcengine') return videoPanelText('providers.volcengine');
+  if (payload === 'dreamina') return videoPanelText('providers.dreamina');
+  if (payload === 'volcengine') return videoPanelText('providers.volcengine');
   return videoPanelText('providers.default');
 }
-function getManifestConditionFieldValue(_0x2a921c = {}, _0x248aaf = '') {
-  const _0x552324 = String(_0x248aaf || '')['trim']();
-  if (!_0x552324) return undefined;
-  const _0x5c0ab6 = getPlainGenerationParams(_0x2a921c?.['generationParams']);
-  if (Object['prototype']['hasOwnProperty']['call'](_0x5c0ab6, _0x552324)) return _0x5c0ab6[_0x552324];
-  if (Object['prototype']['hasOwnProperty']['call'](_0x2a921c || {}, _0x552324)) return _0x2a921c[_0x552324];
-  const _0xd401c9 = _0x552324['split']('.')['filter'](Boolean);
-  if (_0xd401c9['length'] <= 0x1) return undefined;
-  let _0x2905b6 = _0x2a921c;
-  for (const _0x280cd7 of _0xd401c9) {
-    if (!_0x2905b6 || typeof _0x2905b6 !== 'object') return undefined;
-    _0x2905b6 = _0x2905b6[_0x280cd7];
+function getManifestConditionFieldValue(options2 = {}, handle = '') {
+  const enabled2 = String(handle || '')['trim']();
+  if (!enabled2) return undefined;
+  const plainGenerationParams = getPlainGenerationParams(options2?.['generationParams']);
+  if (Object['prototype']['hasOwnProperty']['call'](plainGenerationParams, enabled2))
+    return plainGenerationParams[enabled2];
+  if (Object['prototype']['hasOwnProperty']['call'](options2 || {}, enabled2)) return options2[enabled2];
+  const list2 = enabled2['split']('.')['filter'](Boolean);
+  if (list2['length'] <= 0x1) return undefined;
+  let enabled3 = options2;
+  for (const state of list2) {
+    if (!enabled3 || typeof enabled3 !== 'object') return undefined;
+    enabled3 = enabled3[state];
   }
-  return _0x2905b6;
+  return enabled3;
 }
-function manifestConditionMatches(_0x318571, _0x4e72d6 = {}) {
-  if (Array['isArray'](_0x318571))
-    return _0x318571['some']((_0x2184c3) => manifestConditionMatches(_0x2184c3, _0x4e72d6));
-  if (!_0x318571 || typeof _0x318571 !== 'object') return ![];
-  if (Array['isArray'](_0x318571['any']))
-    return _0x318571['any']['some']((_0xb6ab88) => manifestConditionMatches(_0xb6ab88, _0x4e72d6));
-  if (Array['isArray'](_0x318571['all']))
-    return _0x318571['all']['every']((_0xaa4159) => manifestConditionMatches(_0xaa4159, _0x4e72d6));
-  const _0x46cebc = String(_0x318571['field'] || _0x318571['param'] || '')['trim']();
-  if (!_0x46cebc) return ![];
-  const _0x4027c9 = getManifestConditionFieldValue(_0x4e72d6, _0x46cebc),
-    _0x5aced6 = Array['isArray'](_0x318571['values'])
-      ? _0x318571['values']
-      : Object['prototype']['hasOwnProperty']['call'](_0x318571, 'value')
-        ? [_0x318571['value']]
+function manifestConditionMatches(el, config = {}) {
+  if (Array['isArray'](el)) return el['some']((scope) => manifestConditionMatches(scope, config));
+  if (!el || typeof el !== 'object') return ![];
+  if (Array['isArray'](el['any']))
+    return el['any']['some']((input) => manifestConditionMatches(input, config));
+  if (Array['isArray'](el['all']))
+    return el['all']['every']((output) => manifestConditionMatches(output, config));
+  const enabled4 = String(el['field'] || el['param'] || '')['trim']();
+  if (!enabled4) return ![];
+  const manifestConditionFieldValue = getManifestConditionFieldValue(config, enabled4),
+    list3 = Array['isArray'](el['values'])
+      ? el['values']
+      : Object['prototype']['hasOwnProperty']['call'](el, 'value')
+        ? [el['value']]
         : [];
-  if (_0x5aced6['length'] === 0x0) return Boolean(_0x4027c9);
-  return _0x5aced6['some'](
-    (_0x2631e1) => _0x4027c9 === _0x2631e1 || String(_0x4027c9 ?? '') === String(_0x2631e1 ?? ''),
+  if (list3['length'] === 0x0) return Boolean(manifestConditionFieldValue);
+  return list3['some'](
+    (value2) =>
+      manifestConditionFieldValue === value2 ||
+      String(manifestConditionFieldValue ?? '') === String(value2 ?? ''),
   );
 }
-function resolveManifestPromptPlaceholder(_0x21d48e, _0x384a3b = {}) {
-  if (!_0x21d48e || typeof _0x21d48e !== 'object') return '';
-  const _0x48379d = Array['isArray'](_0x21d48e['variants']) ? _0x21d48e['variants'] : [];
-  for (const _0x2745cb of _0x48379d) {
-    if (
-      _0x2745cb &&
-      typeof _0x2745cb === 'object' &&
-      manifestConditionMatches(_0x2745cb['when'], _0x384a3b)
-    ) {
-      const _0x1e9656 = translateManifestText(_0x2745cb['placeholder'] || '')['trim']();
-      if (_0x1e9656) return _0x1e9656;
+function resolveManifestPromptPlaceholder(enabled5, value3 = {}) {
+  if (!enabled5 || typeof enabled5 !== 'object') return '';
+  const value4 = Array['isArray'](enabled5['variants']) ? enabled5['variants'] : [];
+  for (const value5 of value4) {
+    if (value5 && typeof value5 === 'object' && manifestConditionMatches(value5['when'], value3)) {
+      const translateManifestText2 = translateManifestText(value5['placeholder'] || '')['trim']();
+      if (translateManifestText2) return translateManifestText2;
     }
   }
-  return translateManifestText(_0x21d48e['placeholder'] || '')['trim']();
+  return translateManifestText(enabled5['placeholder'] || '')['trim']();
 }
 export function resolveVideoPromptPlaceholder(
-  _0x2fb26a,
-  _0x3471ff = {},
-  _0x411f42 = getDefaultVideoPromptPlaceholder(),
+  value6,
+  value7 = {},
+  defaultVideoPromptPlaceholder = getDefaultVideoPromptPlaceholder(),
 ) {
-  const _0xdd18f2 = resolveManifestPromptPlaceholder(_0x2fb26a?.['prompt'], _0x3471ff);
-  return _0xdd18f2 || String(_0x411f42 || '')['trim']();
+  const manifestPromptPlaceholder = resolveManifestPromptPlaceholder(value6?.['prompt'], value7);
+  return manifestPromptPlaceholder || String(defaultVideoPromptPlaceholder || '')['trim']();
 }
-export function shouldShowVideoPromptInput(_0x44cbb2) {
-  if (!_0x44cbb2 || typeof _0x44cbb2 !== 'object') return !![];
-  if (_0x44cbb2?.['prompt']?.['visible'] === ![]) return ![];
-  if (_0x44cbb2?.['prompt']?.['hidden'] === !![]) return ![];
+export function shouldShowVideoPromptInput(enabled6) {
+  if (!enabled6 || typeof enabled6 !== 'object') return !![];
+  if (enabled6?.['prompt']?.['visible'] === ![]) return ![];
+  if (enabled6?.['prompt']?.['hidden'] === !![]) return ![];
   return !![];
 }
-function fieldConditionReferences(_0x328619, _0x59bf42) {
-  const _0x123688 = String(_0x59bf42 || '')['trim']();
-  if (Array['isArray'](_0x328619))
-    return _0x328619['some']((_0x3d2762) => fieldConditionReferences(_0x3d2762, _0x123688));
-  if (!_0x123688 || !_0x328619 || typeof _0x328619 !== 'object') return ![];
-  if (String(_0x328619['field'] || _0x328619['param'] || '')['trim']() === _0x123688) return !![];
+function fieldConditionReferences(list4, value8) {
+  const enabled7 = String(value8 || '')['trim']();
+  if (Array['isArray'](list4)) return list4['some']((value9) => fieldConditionReferences(value9, enabled7));
+  if (!enabled7 || !list4 || typeof list4 !== 'object') return ![];
+  if (String(list4['field'] || list4['param'] || '')['trim']() === enabled7) return !![];
   return ['all', 'any']['some'](
-    (_0x5ef6fb) =>
-      Array['isArray'](_0x328619[_0x5ef6fb]) &&
-      _0x328619[_0x5ef6fb]['some']((_0x518ab5) => fieldConditionReferences(_0x518ab5, _0x123688)),
+    (value10) =>
+      Array['isArray'](list4[value10]) &&
+      list4[value10]['some']((value11) => fieldConditionReferences(value11, enabled7)),
   );
 }
-export function manifestHelpVariantsReferenceField(_0x3cfe0f, _0x281447) {
-  const _0x284105 = Array['isArray'](_0x3cfe0f?.['help']?.['variants']) ? _0x3cfe0f['help']['variants'] : [];
-  return _0x284105['some']((_0x3a890a) => fieldConditionReferences(_0x3a890a?.['when'], _0x281447));
+export function manifestHelpVariantsReferenceField(value12, value13) {
+  const list5 = Array['isArray'](value12?.['help']?.['variants']) ? value12['help']['variants'] : [];
+  return list5['some']((value14) => fieldConditionReferences(value14?.['when'], value13));
 }
-export function manifestPromptVariantsReferenceField(_0x181239, _0xa22169) {
-  const _0x1f4b18 = Array['isArray'](_0x181239?.['prompt']?.['variants'])
-    ? _0x181239['prompt']['variants']
-    : [];
-  return _0x1f4b18['some']((_0x505b41) => fieldConditionReferences(_0x505b41?.['when'], _0xa22169));
+export function manifestPromptVariantsReferenceField(value15, value16) {
+  const list6 = Array['isArray'](value15?.['prompt']?.['variants']) ? value15['prompt']['variants'] : [];
+  return list6['some']((value17) => fieldConditionReferences(value17?.['when'], value16));
 }
-export function manifestFixedSlotVisibilityReferencesField(_0x18bc80, _0x568556) {
-  const _0x19fd4a = Array['isArray'](_0x18bc80?.['inputSlots']?.['fixedSlots'])
-    ? _0x18bc80['inputSlots']['fixedSlots']
+export function manifestFixedSlotVisibilityReferencesField(value18, value19) {
+  const list7 = Array['isArray'](value18?.['inputSlots']?.['fixedSlots'])
+    ? value18['inputSlots']['fixedSlots']
     : [];
-  return _0x19fd4a['some'](
-    (_0x1ddf80) =>
-      fieldConditionReferences(_0x1ddf80?.['showWhen'], _0x568556) ||
-      fieldConditionReferences(_0x1ddf80?.['hideWhen'], _0x568556),
+  return list7['some'](
+    (value20) =>
+      fieldConditionReferences(value20?.['showWhen'], value19) ||
+      fieldConditionReferences(value20?.['hideWhen'], value19),
   );
 }
-export function resolveVideoModelApiFooterPlacementOrder(_0x59e9a6 = {}) {
-  const _0xec3d43 = new Set(DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER),
-    _0x9e7e24 = [],
-    _0x341bd6 = Array['isArray'](_0x59e9a6?.['uiSchema']?.['footerPlacementOrder'])
-      ? _0x59e9a6['uiSchema']['footerPlacementOrder']
+export function resolveVideoModelApiFooterPlacementOrder(options3 = {}) {
+  const map = new Set(DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER),
+    list8 = [],
+    list9 = Array['isArray'](options3?.['uiSchema']?.['footerPlacementOrder'])
+      ? options3['uiSchema']['footerPlacementOrder']
       : [];
   return (
-    _0x341bd6['forEach']((_0x2200aa) => {
-      const _0x253c98 = String(_0x2200aa || '')
+    list9['forEach']((value21) => {
+      const value22 = String(value21 || '')
         ['trim']()
         ['toLowerCase']();
-      _0xec3d43['has'](_0x253c98) && !_0x9e7e24['includes'](_0x253c98) && _0x9e7e24['push'](_0x253c98);
+      map['has'](value22) && !list8['includes'](value22) && list8['push'](value22);
     }),
-    DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER['forEach']((_0x124285) => {
-      if (!_0x9e7e24['includes'](_0x124285)) _0x9e7e24['push'](_0x124285);
+    DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER['forEach']((value23) => {
+      if (!list8['includes'](value23)) list8['push'](value23);
     }),
-    _0x9e7e24
+    list8
   );
 }
-export function wrapUiSchemaPlacementControls(_0x10d20a) {
-  return _0x10d20a ? '<div class="ui-schema-placement">' + _0x10d20a + '</div>' : '';
+export function wrapUiSchemaPlacementControls(value24) {
+  return value24 ? '<div class="ui-schema-placement">' + value24 + '</div>' : '';
 }

@@ -16,13 +16,13 @@ import {
   normalizeWorkspaceAssetDetailSplitRatio,
   normalizeWorkspaceAssetSplitRatio,
 } from '../workspaceAssetSettingsShell.js';
-export function isStoryGenerateShortcut(_0x28baf8) {
+export function isStoryGenerateShortcut(event) {
   return (
-    String(_0x28baf8?.['key'] || '') === 'Enter' &&
-    (_0x28baf8?.['ctrlKey'] === !![] || _0x28baf8?.['metaKey'] === !![]) &&
-    _0x28baf8?.['altKey'] !== !![] &&
-    _0x28baf8?.['shiftKey'] !== !![] &&
-    _0x28baf8?.['isComposing'] !== !![]
+    String(event?.['key'] || '') === 'Enter' &&
+    (event?.['ctrlKey'] === !![] || event?.['metaKey'] === !![]) &&
+    event?.['altKey'] !== !![] &&
+    event?.['shiftKey'] !== !![] &&
+    event?.['isComposing'] !== !![]
   );
 }
 const STORY_WORKSPACE_NESTED_WHEEL_SELECTOR =
@@ -41,119 +41,100 @@ const STORY_WORKSPACE_NESTED_WHEEL_SELECTOR =
   ]);
 export const STORY_ASSET_HOVER_CARD_SELECTOR =
   '[data-story-asset-id], [data-story-reference-asset], [data-story-asset-hover-id]';
-export function shouldPreserveStoryWorkspaceNestedWheel(_0x10eaf8, _0x209a1d = {}) {
-  return shouldPreserveWorkspaceNestedWheel(_0x10eaf8, {
-    ..._0x209a1d,
+export function shouldPreserveStoryWorkspaceNestedWheel(value, args = {}) {
+  return shouldPreserveWorkspaceNestedWheel(value, {
+    ...args,
     nestedSelector: STORY_WORKSPACE_NESTED_WHEEL_SELECTOR,
     boundarySelector: '.story-workspace-root',
   });
 }
-export function captureStoryAssetListScrollPosition(_0x1b29aa) {
-  const _0x4bba53 = _0x1b29aa?.['querySelector']?.('.story-assets-list');
-  return captureWorkspaceScrollPosition(_0x4bba53);
+export function captureStoryAssetListScrollPosition(el) {
+  const item = el?.['querySelector']?.('.story-assets-list');
+  return captureWorkspaceScrollPosition(item);
 }
-export function restoreStoryAssetListScrollPosition(_0x2bcbd5, _0x16ffdb) {
-  const _0x626362 = _0x2bcbd5?.['querySelector']?.('.story-assets-list');
-  return restoreWorkspaceScrollPosition(_0x626362, _0x16ffdb);
+export function restoreStoryAssetListScrollPosition(el2, key) {
+  const index = el2?.['querySelector']?.('.story-assets-list');
+  return restoreWorkspaceScrollPosition(index, key);
 }
-export function captureStoryWorkspaceNestedScrollPositions(_0x2b28c9) {
-  return captureWorkspaceNestedScrollPositions(_0x2b28c9, STORY_WORKSPACE_PERSISTENT_NESTED_SCROLL_SELECTORS);
+export function captureStoryWorkspaceNestedScrollPositions(result) {
+  return captureWorkspaceNestedScrollPositions(result, STORY_WORKSPACE_PERSISTENT_NESTED_SCROLL_SELECTORS);
 }
-export function restoreStoryWorkspaceNestedScrollPositions(_0x2ac0ef, _0x12f75e) {
-  return restoreWorkspaceNestedScrollPositions(_0x2ac0ef, _0x12f75e);
+export function restoreStoryWorkspaceNestedScrollPositions(data, options) {
+  return restoreWorkspaceNestedScrollPositions(data, options);
 }
-export function scrollStoryClipStripWithWheel(_0x3247ec) {
-  return scrollWorkspaceTrackWithWheel(_0x3247ec, '.story-clip-strip');
+export function scrollStoryClipStripWithWheel(target) {
+  return scrollWorkspaceTrackWithWheel(target, '.story-clip-strip');
 }
-export function scrollStoryClipPromptHistoryWithWheel(_0x2eb1fa) {
-  const _0x4e4e9b = _0x2eb1fa?.['target']?.['closest']?.('.story-clip-prompt-history-list');
-  if (!_0x4e4e9b) return ![];
-  const _0x467d40 = Math['max'](
-    0x0,
-    Number(_0x4e4e9b['scrollHeight'] || 0x0) - Number(_0x4e4e9b['clientHeight'] || 0x0),
-  );
-  if (_0x467d40 <= 0x0) return ![];
-  const _0x1d468d = Math['max'](0x0, Number(_0x4e4e9b['scrollTop']) || 0x0),
-    _0x448a06 = Math['max'](0x0, Math['min'](_0x467d40, _0x1d468d + Number(_0x2eb1fa['deltaY'] || 0x0)));
-  return (
-    _0x2eb1fa['preventDefault']?.(),
-    _0x2eb1fa['stopPropagation']?.(),
-    (_0x4e4e9b['scrollTop'] = _0x448a06),
-    !![]
-  );
+export function scrollStoryClipPromptHistoryWithWheel(event2) {
+  const el3 = event2?.['target']?.['closest']?.('.story-clip-prompt-history-list');
+  if (!el3) return ![];
+  const count = Math['max'](0x0, Number(el3['scrollHeight'] || 0x0) - Number(el3['clientHeight'] || 0x0));
+  if (count <= 0x0) return ![];
+  const source = Math['max'](0x0, Number(el3['scrollTop']) || 0x0),
+    next = Math['max'](0x0, Math['min'](count, source + Number(event2['deltaY'] || 0x0)));
+  return (event2['preventDefault']?.(), event2['stopPropagation']?.(), (el3['scrollTop'] = next), !![]);
 }
-export function getStoryAssetHoverCard(_0x5592ff) {
-  return _0x5592ff?.['closest']?.(STORY_ASSET_HOVER_CARD_SELECTOR) || null;
+export function getStoryAssetHoverCard(el4) {
+  return el4?.['closest']?.(STORY_ASSET_HOVER_CARD_SELECTOR) || null;
 }
-export function getStoryAssetHoverCardId(_0x4310cf) {
+export function getStoryAssetHoverCardId(el5) {
   return String(
-    _0x4310cf?.['dataset']?.['storyAssetHoverId'] ||
-      _0x4310cf?.['dataset']?.['storyAssetId'] ||
-      _0x4310cf?.['dataset']?.['storyReferenceAsset'] ||
+    el5?.['dataset']?.['storyAssetHoverId'] ||
+      el5?.['dataset']?.['storyAssetId'] ||
+      el5?.['dataset']?.['storyReferenceAsset'] ||
       '',
   );
 }
-export function getStoryAssetHoverCardAppearanceId(_0x1d683e) {
-  return String(_0x1d683e?.['dataset']?.['storyAssetHoverAppearanceId'] || '');
+export function getStoryAssetHoverCardAppearanceId(el6) {
+  return String(el6?.['dataset']?.['storyAssetHoverAppearanceId'] || '');
 }
-export function findStoryAssetForHover(_0x5b9d22, _0x3d96f8, _0x3fcd3b = []) {
-  const _0x1045ca = String(_0x3d96f8 || '');
+export function findStoryAssetForHover(current, entry, record = []) {
+  const payload = String(entry || '');
   return (
-    (Array['isArray'](_0x5b9d22?.['data']?.['assets']) ? _0x5b9d22['data']['assets'] : [])['find'](
-      (_0x278bea) => String(_0x278bea?.['id']) === _0x1045ca,
+    (Array['isArray'](current?.['data']?.['assets']) ? current['data']['assets'] : [])['find'](
+      (handle) => String(handle?.['id']) === payload,
     ) ||
-    (Array['isArray'](_0x3fcd3b) ? _0x3fcd3b : [])['find'](
-      (_0x46514f) => String(_0x46514f?.['id']) === _0x1045ca,
-    ) ||
+    (Array['isArray'](record) ? record : [])['find']((state) => String(state?.['id']) === payload) ||
     null
   );
 }
-export function normalizeStoryAssetSplitRatio(_0x215f66) {
-  return normalizeWorkspaceAssetSplitRatio(_0x215f66);
+export function normalizeStoryAssetSplitRatio(config) {
+  return normalizeWorkspaceAssetSplitRatio(config);
 }
-export function normalizeStoryAssetDetailSplitRatio(_0x164969) {
-  return normalizeWorkspaceAssetDetailSplitRatio(_0x164969);
+export function normalizeStoryAssetDetailSplitRatio(scope) {
+  return normalizeWorkspaceAssetDetailSplitRatio(scope);
 }
-export function normalizeStoryEpisodePanelRatios(_0x5f01b0, _0x84e28b) {
-  const _0x33362d = Math['max'](
-      0xe,
-      Math['min'](0x22, Number['isFinite'](Number(_0x5f01b0)) ? Number(_0x5f01b0) : 0x16),
-    ),
-    _0xdd0397 = Math['max'](
-      0x18,
-      Math['min'](0x32, Number['isFinite'](Number(_0x84e28b)) ? Number(_0x84e28b) : 0x22),
-    );
-  return { left: _0x33362d, center: Math['min'](_0xdd0397, 0x4c - _0x33362d) };
+export function normalizeStoryEpisodePanelRatios(input, output) {
+  const left = Math['max'](0xe, Math['min'](0x22, Number['isFinite'](Number(input)) ? Number(input) : 0x16)),
+    value2 = Math['max'](0x18, Math['min'](0x32, Number['isFinite'](Number(output)) ? Number(output) : 0x22));
+  return { left: left, center: Math['min'](value2, 0x4c - left) };
 }
-export function applyStoryAssetSplitRatioToLayout(_0x261491, _0xfe402a, _0x5cf65d) {
-  return applyWorkspaceAssetSplitRatioToLayout(_0x261491, _0xfe402a, _0x5cf65d);
+export function applyStoryAssetSplitRatioToLayout(value3, value4, value5) {
+  return applyWorkspaceAssetSplitRatioToLayout(value3, value4, value5);
 }
-export function applyStoryAssetDetailSplitRatioToLayout(_0x2d641c, _0x1a19b3, _0x355fc3) {
-  return applyWorkspaceAssetDetailSplitRatioToLayout(_0x2d641c, _0x1a19b3, _0x355fc3, {
+export function applyStoryAssetDetailSplitRatioToLayout(value6, value7, value8) {
+  return applyWorkspaceAssetDetailSplitRatioToLayout(value6, value7, value8, {
     styleProperty: '--story-asset-detail-top',
   });
 }
 export function applyStoryEpisodePanelRatiosToLayout(
-  _0x2ae4c2,
+  el7,
   { assetSplitter: assetSplitter = null, previewSplitter: previewSplitter = null } = {},
-  _0x4c8115,
-  _0x2e3cb9,
+  value9,
+  value10,
 ) {
-  const _0x2d04fc = normalizeStoryEpisodePanelRatios(_0x4c8115, _0x2e3cb9);
+  const box = normalizeStoryEpisodePanelRatios(value9, value10);
   return (
-    _0x2ae4c2?.['style']?.['setProperty']?.('--story-episode-assets-width', _0x2d04fc['left'] + '%'),
-    _0x2ae4c2?.['style']?.['setProperty']?.('--story-episode-editor-width', _0x2d04fc['center'] + '%'),
-    assetSplitter?.['setAttribute']?.('aria-valuenow', String(Math['round'](_0x2d04fc['left']))),
-    previewSplitter?.['setAttribute']?.(
-      'aria-valuenow',
-      String(Math['round'](_0x2d04fc['left'] + _0x2d04fc['center'])),
-    ),
-    _0x2d04fc
+    el7?.['style']?.['setProperty']?.('--story-episode-assets-width', box['left'] + '%'),
+    el7?.['style']?.['setProperty']?.('--story-episode-editor-width', box['center'] + '%'),
+    assetSplitter?.['setAttribute']?.('aria-valuenow', String(Math['round'](box['left']))),
+    previewSplitter?.['setAttribute']?.('aria-valuenow', String(Math['round'](box['left'] + box['center']))),
+    box
   );
 }
-export function beginStoryHorizontalResizeSession({ ..._0x450071 } = {}) {
-  return beginWorkspaceHorizontalResizeSession(_0x450071);
+export function beginStoryHorizontalResizeSession({ ...args2 } = {}) {
+  return beginWorkspaceHorizontalResizeSession(args2);
 }
-export function beginStoryVerticalResizeSession({ ..._0x3a2ae4 } = {}) {
-  return beginWorkspaceVerticalResizeSession(_0x3a2ae4);
+export function beginStoryVerticalResizeSession({ ...args3 } = {}) {
+  return beginWorkspaceVerticalResizeSession(args3);
 }

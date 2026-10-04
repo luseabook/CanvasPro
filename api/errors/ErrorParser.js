@@ -15,142 +15,141 @@ const PARSERS = {
   'ppio/gemini': PpioErrorParser,
   'runninghub-model': RunningHubModelErrorParser,
 };
-function getParser(_0x135297) {
-  if (!_0x135297) return null;
-  const _0x45b3c0 = _0x135297.toLowerCase().trim();
-  return PARSERS[_0x45b3c0] || null;
+function getParser(enabled) {
+  if (!enabled) return null;
+  const value = enabled.toLowerCase().trim();
+  return PARSERS[value] || null;
 }
-function isPlainObject(_0x30d1b6) {
-  return !!_0x30d1b6 && typeof _0x30d1b6 === 'object' && !Array.isArray(_0x30d1b6);
+function isPlainObject(enabled2) {
+  return !!enabled2 && typeof enabled2 === 'object' && !Array.isArray(enabled2);
 }
-function stringifyErrorValue(_0x1f722f) {
-  if (_0x1f722f === undefined || _0x1f722f === null) return '';
-  if (typeof _0x1f722f === 'string') return _0x1f722f;
-  if (typeof _0x1f722f === 'number' || typeof _0x1f722f === 'boolean') return String(_0x1f722f);
-  if (isPlainObject(_0x1f722f)) {
-    const _0x1c5b35 =
-      _0x1f722f.message ||
-      _0x1f722f.errorMessage ||
-      _0x1f722f.error_message ||
-      _0x1f722f.reason ||
-      _0x1f722f.detail ||
-      _0x1f722f.details ||
-      _0x1f722f.msg;
-    if (_0x1c5b35 !== undefined && _0x1c5b35 !== null && _0x1c5b35 !== _0x1f722f) {
-      const _0x51d051 = stringifyErrorValue(_0x1c5b35);
-      if (_0x51d051) return _0x51d051;
+function stringifyErrorValue(error) {
+  if (error === undefined || error === null) return '';
+  if (typeof error === 'string') return error;
+  if (typeof error === 'number' || typeof error === 'boolean') return String(error);
+  if (isPlainObject(error)) {
+    const item =
+      error.message ||
+      error.errorMessage ||
+      error.error_message ||
+      error.reason ||
+      error.detail ||
+      error.details ||
+      error.msg;
+    if (item !== undefined && item !== null && item !== error) {
+      const stringifyErrorValue2 = stringifyErrorValue(item);
+      if (stringifyErrorValue2) return stringifyErrorValue2;
     }
     try {
-      return JSON.stringify(_0x1f722f);
+      return JSON.stringify(error);
     } catch {
       return '';
     }
   }
-  return String(_0x1f722f || '');
+  return String(error || '');
 }
-function firstErrorText(..._0xa148bc) {
-  for (const _0x56531a of _0xa148bc) {
-    const _0x3b7b7e = stringifyErrorValue(_0x56531a).trim();
-    if (_0x3b7b7e) return _0x3b7b7e;
+function firstErrorText(...args) {
+  for (const key of args) {
+    const stringifyErrorValue3 = stringifyErrorValue(key).trim();
+    if (stringifyErrorValue3) return stringifyErrorValue3;
   }
   return '';
 }
-export function parseError(_0x5d9386, _0x327a34, _0x8e9b3a) {
-  const _0x33ff44 = getParser(_0x5d9386);
-  if (_0x33ff44?.parseError) {
-    const _0x58747a = _0x33ff44.parseError(_0x327a34, _0x8e9b3a);
-    if (_0x58747a) return _0x58747a;
+export function parseError(index, result, data) {
+  const parser = getParser(index);
+  if (parser?.parseError) {
+    const options = parser.parseError(result, data);
+    if (options) return options;
   }
-  return parseGenericError(_0x5d9386, _0x327a34, _0x8e9b3a);
+  return parseGenericError(index, result, data);
 }
-export function parseTaskError(_0x48ba52, _0x6ebe2e) {
-  const _0x5ada69 = getParser(_0x48ba52);
-  if (_0x5ada69?.parseTaskError) return _0x5ada69.parseTaskError(_0x6ebe2e);
-  if (_0x6ebe2e) {
-    const _0x191dae = (_0x6ebe2e.status || '').toLowerCase();
-    if (_0x191dae === 'failed' || _0x191dae === 'error') {
-      const _0x4dc664 = firstErrorText(
-        _0x6ebe2e.error,
-        _0x6ebe2e.errorMessage,
-        _0x6ebe2e.message,
-        _0x6ebe2e.failure_reason,
+export function parseTaskError(target, error2) {
+  const parser2 = getParser(target);
+  if (parser2?.parseTaskError) return parser2.parseTaskError(error2);
+  if (error2) {
+    const source = (error2.status || '').toLowerCase();
+    if (source === 'failed' || source === 'error') {
+      const errorText = firstErrorText(
+        error2.error,
+        error2.errorMessage,
+        error2.message,
+        error2.failure_reason,
         '未知错误',
       );
-      return ApiError.taskFailed(_0x48ba52, _0x4dc664);
+      return ApiError.taskFailed(target, errorText);
     }
   }
   return null;
 }
-export function parseNetworkError(_0x2da862, _0x5ae9e6, _0x3610b3) {
-  const _0x448346 = _0x5ae9e6?.message || '';
-  if (_0x5ae9e6?.name === 'AbortError' || _0x448346.includes('timeout') || _0x448346.includes('TIMEOUT'))
-    return ApiError.timeout(_0x2da862, _0x3610b3);
-  if (_0x448346.includes('DNS') || _0x448346.includes('ENOTFOUND') || _0x448346.includes('getaddrinfo'))
+export function parseNetworkError(provider, raw, next) {
+  const list = raw?.message || '';
+  if (raw?.name === 'AbortError' || list.includes('timeout') || list.includes('TIMEOUT'))
+    return ApiError.timeout(provider, next);
+  if (list.includes('DNS') || list.includes('ENOTFOUND') || list.includes('getaddrinfo'))
     return new ApiError({
       type: ErrorType.DNS_ERROR,
-      provider: _0x2da862,
+      provider: provider,
       message: '无法解析服务器地址，请检查网络配置',
-      raw: _0x5ae9e6,
+      raw: raw,
       retryable: true,
     });
   if (
-    _0x448346.includes('Failed to fetch') ||
-    _0x448346.includes('NETWORK') ||
-    _0x448346.includes('ECONNREFUSED') ||
-    _0x448346.includes('ECONNRESET')
+    list.includes('Failed to fetch') ||
+    list.includes('NETWORK') ||
+    list.includes('ECONNREFUSED') ||
+    list.includes('ECONNRESET')
   )
     return new ApiError({
       type: ErrorType.NETWORK_ERROR,
-      provider: _0x2da862,
+      provider: provider,
       message: '网络连接失败，请检查网络或代理设置',
-      raw: _0x5ae9e6,
+      raw: raw,
       retryable: true,
     });
-  return ApiError.networkError(_0x2da862, _0x5ae9e6);
+  return ApiError.networkError(provider, raw);
 }
-function parseGenericError(_0x790df8, _0x23af9e, _0x209aa0) {
-  let _0x3c79f0 = '',
-    _0x5bdf9e = _0x209aa0;
-  if (typeof _0x23af9e === 'string') _0x3c79f0 = _0x23af9e;
+function parseGenericError(provider2, error3, status) {
+  let message = '',
+    code = status;
+  if (typeof error3 === 'string') message = error3;
   else
-    _0x23af9e &&
-      typeof _0x23af9e === 'object' &&
-      ((_0x3c79f0 = firstErrorText(
-        _0x23af9e.error?.message,
-        _0x23af9e.error,
-        _0x23af9e.message,
-        _0x23af9e.errorMessage,
-        _0x23af9e.error_message,
-        _0x23af9e.failure_reason,
-        _0x23af9e.reason,
-        _0x23af9e,
+    error3 &&
+      typeof error3 === 'object' &&
+      ((message = firstErrorText(
+        error3.error?.message,
+        error3.error,
+        error3.message,
+        error3.errorMessage,
+        error3.error_message,
+        error3.failure_reason,
+        error3.reason,
+        error3,
       )),
-      (_0x5bdf9e =
-        _0x23af9e.code || _0x23af9e.error?.code || _0x23af9e.errorCode || _0x23af9e.error_code || _0x209aa0));
-  const _0xea5540 = String(_0x3c79f0).toUpperCase();
-  if (_0xea5540.includes('BALANCE') || _0xea5540.includes('余额') || _0xea5540.includes('QUOTA'))
-    return ApiError.insufficientBalance(_0x790df8, _0x5bdf9e);
-  if (_0xea5540.includes('RATE') || _0xea5540.includes('LIMIT') || _0x209aa0 === 0x1ad)
-    return ApiError.rateLimit(_0x790df8, _0x5bdf9e);
-  if (_0xea5540.includes('AUTH') || _0xea5540.includes('KEY') || _0x209aa0 === 0x191)
-    return ApiError.authError(_0x790df8, _0x5bdf9e, _0x3c79f0);
-  if (_0xea5540.includes('CONTENT') || _0xea5540.includes('FILTER') || _0xea5540.includes('SAFETY'))
-    return ApiError.contentFiltered(_0x790df8, _0x3c79f0);
-  if (_0x209aa0 >= 0x190) return ApiError.fromHttpStatus(_0x209aa0, _0x790df8, _0x3c79f0);
+      (code = error3.code || error3.error?.code || error3.errorCode || error3.error_code || status));
+  const list2 = String(message).toUpperCase();
+  if (list2.includes('BALANCE') || list2.includes('余额') || list2.includes('QUOTA'))
+    return ApiError.insufficientBalance(provider2, code);
+  if (list2.includes('RATE') || list2.includes('LIMIT') || status === 0x1ad)
+    return ApiError.rateLimit(provider2, code);
+  if (list2.includes('AUTH') || list2.includes('KEY') || status === 0x191)
+    return ApiError.authError(provider2, code, message);
+  if (list2.includes('CONTENT') || list2.includes('FILTER') || list2.includes('SAFETY'))
+    return ApiError.contentFiltered(provider2, message);
+  if (status >= 0x190) return ApiError.fromHttpStatus(status, provider2, message);
   return new ApiError({
     type: ErrorType.UNKNOWN,
-    provider: _0x790df8,
-    code: _0x5bdf9e,
-    message: _0x3c79f0 || '未知错误',
-    status: _0x209aa0,
+    provider: provider2,
+    code: code,
+    message: message || '未知错误',
+    status: status,
   });
 }
-export function parseBatchErrors(_0x2bf211, _0x1f8960) {
-  return _0x1f8960
-    .map((_0x44e541, _0x12b54f) => {
-      if (_0x44e541.success) return null;
-      const _0x4a9b7f = parseError(_0x2bf211, _0x44e541.error, _0x44e541.status);
-      return ((_0x4a9b7f.batchIndex = _0x12b54f), _0x4a9b7f);
+export function parseBatchErrors(current, list3) {
+  return list3
+    .map((response, entry) => {
+      if (response.success) return null;
+      const error4 = parseError(current, response.error, response.status);
+      return ((error4.batchIndex = entry), error4);
     })
     .filter(Boolean);
 }
@@ -161,6 +160,74 @@ export default {
   parseBatchErrors: parseBatchErrors,
 };
 
-function preserveRawErrorContext(_0x4bfbc4,_0x5f0375,_0x445a96){if(!_0x4bfbc4)return _0x4bfbc4;if(_0x4bfbc4["raw"]===undefined)_0x4bfbc4["raw"]=_0x5f0375;const _0x40a672=Number(_0x445a96);return _0x4bfbc4["status"]==null&&_0x445a96!==null&&_0x445a96!==undefined&&_0x445a96!==''&&Number['isFinite'](_0x40a672)&&(_0x4bfbc4["status"]=_0x40a672),_0x4bfbc4;}
+function preserveRawErrorContext(enabled3, record, payload) {
+  if (!enabled3) return enabled3;
+  if (enabled3['raw'] === undefined) enabled3['raw'] = record;
+  const handle = Number(payload);
+  return (
+    enabled3['status'] == null &&
+      payload !== null &&
+      payload !== undefined &&
+      payload !== '' &&
+      Number['isFinite'](handle) &&
+      (enabled3['status'] = handle),
+    enabled3
+  );
+}
 
-export function applyManifestErrorRules(_0x458cf2,_0x5e1a5b,_0x53779c={}){if(!_0x458cf2||!Array["isArray"](_0x5e1a5b)||_0x5e1a5b["length"]===0x0)return _0x458cf2;const _0x305bf2=String(_0x53779c["phase"]||"any")["trim"]()["toLowerCase"](),_0x5b9c13=String(_0x53779c["provider"]||_0x458cf2["provider"]||'unknown')["trim"](),_0x9007ab=Number(_0x458cf2["status"]??_0x458cf2["code"]),_0x3dec4c=Number["isInteger"](_0x9007ab)?_0x9007ab:null,_0x294c3c=firstErrorText(_0x458cf2['message'],_0x458cf2['raw']?.["error"]?.["message"],_0x458cf2["raw"]?.["error"],_0x458cf2["raw"]?.["message"],_0x458cf2["raw"]),_0x21502a=_0x294c3c['toLocaleLowerCase']();for(const _0x2e3dc8 of _0x5e1a5b){if(!_0x2e3dc8||typeof _0x2e3dc8!=="object"||Array["isArray"](_0x2e3dc8))continue;const _0x5d1987=String(_0x2e3dc8["phase"]||"any")['trim']()["toLowerCase"]();if(_0x5d1987!=="any"&&_0x5d1987!==_0x305bf2)continue;const _0x4ba856=Array['isArray'](_0x2e3dc8["httpStatuses"])?_0x2e3dc8["httpStatuses"]["map"](Number)["filter"](Number['isInteger']):[];if(_0x4ba856["length"]>0x0&&(_0x3dec4c===null||!_0x4ba856["includes"](_0x3dec4c)))continue;const _0x9dcefc=Array['isArray'](_0x2e3dc8["messageIncludesAny"])?_0x2e3dc8["messageIncludesAny"]["map"](_0x3af0fd=>String(_0x3af0fd||'')["trim"]()['toLocaleLowerCase']())["filter"](Boolean):[];if(_0x9dcefc['length']>0x0&&!_0x9dcefc["some"](_0x597ff3=>_0x21502a["includes"](_0x597ff3)))continue;if(_0x4ba856['length']===0x0&&_0x9dcefc['length']===0x0)continue;const _0x4dca5a=String(_0x2e3dc8["userMessage"]||'')["trim"](),_0x242c3d=String(_0x2e3dc8["hint"]||'')["trim"](),_0x5b743c=_0x4dca5a||_0x294c3c||_0x458cf2["message"]||"请求失败",_0x2cab26=_0x242c3d&&!_0x5b743c['includes'](_0x242c3d)?_0x5b743c+'；'+_0x242c3d:_0x5b743c,_0x58fc33=new ApiError({'type':String(_0x2e3dc8["type"]||ErrorType["UNKNOWN"])["trim"]()["toUpperCase"](),'provider':_0x5b9c13,'code':_0x458cf2["code"],'status':_0x3dec4c??_0x458cf2['status'],'message':_0x2cab26,'retryable':_0x2e3dc8["retryable"]===!![],'raw':_0x458cf2["raw"]??_0x458cf2});return _0x58fc33['hint']=_0x242c3d,_0x58fc33["manifestRuleMatched"]=!![],_0x58fc33;}return _0x458cf2;}
+export function applyManifestErrorRules(error5, state, config = {}) {
+  if (!error5 || !Array['isArray'](state) || state['length'] === 0x0) return error5;
+  const scope = String(config['phase'] || 'any')
+      ['trim']()
+      ['toLowerCase'](),
+    input = String(config['provider'] || error5['provider'] || 'unknown')['trim'](),
+    output = Number(error5['status'] ?? error5['code']),
+    value2 = Number['isInteger'](output) ? output : null,
+    errorText2 = firstErrorText(
+      error5['message'],
+      error5['raw']?.['error']?.['message'],
+      error5['raw']?.['error'],
+      error5['raw']?.['message'],
+      error5['raw'],
+    ),
+    value3 = errorText2['toLocaleLowerCase']();
+  for (const enabled4 of state) {
+    if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4)) continue;
+    const value4 = String(enabled4['phase'] || 'any')
+      ['trim']()
+      ['toLowerCase']();
+    if (value4 !== 'any' && value4 !== scope) continue;
+    const list4 = Array['isArray'](enabled4['httpStatuses'])
+      ? enabled4['httpStatuses']['map'](Number)['filter'](Number['isInteger'])
+      : [];
+    if (list4['length'] > 0x0 && (value2 === null || !list4['includes'](value2))) continue;
+    const list5 = Array['isArray'](enabled4['messageIncludesAny'])
+      ? enabled4['messageIncludesAny']
+          ['map']((value5) =>
+            String(value5 || '')
+              ['trim']()
+              ['toLocaleLowerCase'](),
+          )
+          ['filter'](Boolean)
+      : [];
+    if (list5['length'] > 0x0 && !list5['some']((value6) => value3['includes'](value6))) continue;
+    if (list4['length'] === 0x0 && list5['length'] === 0x0) continue;
+    const value7 = String(enabled4['userMessage'] || '')['trim'](),
+      value8 = String(enabled4['hint'] || '')['trim'](),
+      list6 = value7 || errorText2 || error5['message'] || '请求失败',
+      value9 = value8 && !list6['includes'](value8) ? list6 + '；' + value8 : list6,
+      apiError = new ApiError({
+        type: String(enabled4['type'] || ErrorType['UNKNOWN'])
+          ['trim']()
+          ['toUpperCase'](),
+        provider: input,
+        code: error5['code'],
+        status: value2 ?? error5['status'],
+        message: value9,
+        retryable: enabled4['retryable'] === !![],
+        raw: error5['raw'] ?? error5,
+      });
+    return ((apiError['hint'] = value8), (apiError['manifestRuleMatched'] = !![]), apiError);
+  }
+  return error5;
+}

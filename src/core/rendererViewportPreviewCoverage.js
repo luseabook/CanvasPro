@@ -7,71 +7,70 @@ export const RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG = Object['freeze']({
   minRasterVisibleShare: 0.5,
   rasterAssistedImmediateCreateLimit: 0x10,
 });
-function finiteNumber(_0x2eb80f, _0x31bafe = 0x0) {
-  const _0x754c53 = Number(_0x2eb80f);
-  return Number['isFinite'](_0x754c53) ? _0x754c53 : _0x31bafe;
+function finiteNumber(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
 }
-function finiteRevision(_0x4fd8bb) {
-  const _0x176722 = Number(_0x4fd8bb);
-  return Number['isFinite'](_0x176722) ? _0x176722 : null;
+function finiteRevision(index) {
+  const result = Number(index);
+  return Number['isFinite'](result) ? result : null;
 }
-function normalizeIds(_0x4deed) {
-  if (!_0x4deed || typeof _0x4deed[Symbol['iterator']] !== 'function') return '';
-  return Array['from'](_0x4deed, (_0x263883) => String(_0x263883 || ''))
+function normalizeIds(enabled) {
+  if (!enabled || typeof enabled[Symbol['iterator']] !== 'function') return '';
+  return Array['from'](enabled, (data) => String(data || ''))
     ['filter'](Boolean)
     ['sort']()
     ['join']('\x1f');
 }
-function buildInteractionSignature(_0x1282a6 = {}) {
-  const _0x4adb80 = _0x1282a6['connOverlay'] || {},
-    _0x3d8dfa = _0x1282a6['pickConnectMode'] || {};
+function buildInteractionSignature(state = {}) {
+  const options = state['connOverlay'] || {},
+    target = state['pickConnectMode'] || {};
   return [
-    normalizeIds(_0x1282a6['selectedNodeIds']),
-    _0x4adb80['active'] === !![] ? 0x1 : 0x0,
-    _0x4adb80['srcId'] || '',
-    _0x4adb80['hoverId'] || '',
-    normalizeIds(_0x4adb80['invalidNodeIds']),
-    _0x3d8dfa['active'] === !![] ? 0x1 : 0x0,
-    _0x3d8dfa['sourceNodeId'] || _0x3d8dfa['srcId'] || '',
-    _0x3d8dfa['hoverNodeId'] || _0x3d8dfa['hoverId'] || '',
-    _0x1282a6['ui']?.['showVideoMeta'] === !![] ? 0x1 : 0x0,
+    normalizeIds(state['selectedNodeIds']),
+    options['active'] === !![] ? 0x1 : 0x0,
+    options['srcId'] || '',
+    options['hoverId'] || '',
+    normalizeIds(options['invalidNodeIds']),
+    target['active'] === !![] ? 0x1 : 0x0,
+    target['sourceNodeId'] || target['srcId'] || '',
+    target['hoverNodeId'] || target['hoverId'] || '',
+    state['ui']?.['showVideoMeta'] === !![] ? 0x1 : 0x0,
   ]['join']('\x1e');
 }
-function containsBounds(_0x4f653f, _0x4c58fb) {
-  if (!_0x4f653f || !_0x4c58fb) return ![];
+function containsBounds(enabled2, enabled3) {
+  if (!enabled2 || !enabled3) return ![];
   return (
-    finiteNumber(_0x4c58fb['minX'], Number['NEGATIVE_INFINITY']) >=
-      finiteNumber(_0x4f653f['minX'], Number['POSITIVE_INFINITY']) - BOUNDS_EPSILON &&
-    finiteNumber(_0x4c58fb['minY'], Number['NEGATIVE_INFINITY']) >=
-      finiteNumber(_0x4f653f['minY'], Number['POSITIVE_INFINITY']) - BOUNDS_EPSILON &&
-    finiteNumber(_0x4c58fb['maxX'], Number['POSITIVE_INFINITY']) <=
-      finiteNumber(_0x4f653f['maxX'], Number['NEGATIVE_INFINITY']) + BOUNDS_EPSILON &&
-    finiteNumber(_0x4c58fb['maxY'], Number['POSITIVE_INFINITY']) <=
-      finiteNumber(_0x4f653f['maxY'], Number['NEGATIVE_INFINITY']) + BOUNDS_EPSILON
+    finiteNumber(enabled3['minX'], Number['NEGATIVE_INFINITY']) >=
+      finiteNumber(enabled2['minX'], Number['POSITIVE_INFINITY']) - BOUNDS_EPSILON &&
+    finiteNumber(enabled3['minY'], Number['NEGATIVE_INFINITY']) >=
+      finiteNumber(enabled2['minY'], Number['POSITIVE_INFINITY']) - BOUNDS_EPSILON &&
+    finiteNumber(enabled3['maxX'], Number['POSITIVE_INFINITY']) <=
+      finiteNumber(enabled2['maxX'], Number['NEGATIVE_INFINITY']) + BOUNDS_EPSILON &&
+    finiteNumber(enabled3['maxY'], Number['POSITIVE_INFINITY']) <=
+      finiteNumber(enabled2['maxY'], Number['NEGATIVE_INFINITY']) + BOUNDS_EPSILON
   );
 }
 export function shouldPrepareRendererViewportPreviewCoverage({
-  viewport: _0x165ac3,
+  viewport: viewport,
   nodeCount: nodeCount = 0x0,
   visibleNodeCount: visibleNodeCount = 0x0,
   rasterVisibleNodeCount: rasterVisibleNodeCount = 0x0,
 } = {}) {
-  const _0x1d6c95 = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0))),
-    _0x100980 = Math['max'](0x0, Math['trunc'](finiteNumber(visibleNodeCount, 0x0)));
-  if (resolveRendererVirtualizationTier({ viewport: _0x165ac3, nodeCount: _0x1d6c95 }) === 'default')
+  const nodeCount2 = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0))),
+    source = Math['max'](0x0, Math['trunc'](finiteNumber(visibleNodeCount, 0x0)));
+  if (resolveRendererVirtualizationTier({ viewport: viewport, nodeCount: nodeCount2 }) === 'default')
     return ![];
-  if (_0x100980 <= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount']) return !![];
-  if (_0x100980 > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxRasterAssistedVisibleNodeCount']) return ![];
-  const _0x2e82b0 = Math['max'](0x0, Math['trunc'](finiteNumber(rasterVisibleNodeCount, 0x0)));
+  if (source <= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount']) return !![];
+  if (source > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxRasterAssistedVisibleNodeCount']) return ![];
+  const next = Math['max'](0x0, Math['trunc'](finiteNumber(rasterVisibleNodeCount, 0x0)));
   return (
-    _0x2e82b0 / Math['max'](0x1, _0x100980) >=
-    RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['minRasterVisibleShare']
+    next / Math['max'](0x1, source) >= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['minRasterVisibleShare']
   );
 }
 export function createRendererViewportPreviewCoverage({
-  viewport: _0x1e678f,
-  containerWidth: _0x1dab5a,
-  containerHeight: _0x605a84,
+  viewport: viewport2,
+  containerWidth: containerWidth,
+  containerHeight: containerHeight,
   padding: padding = 0x0,
   nodeCount: nodeCount = 0x0,
   snapshot: snapshot = {},
@@ -80,19 +79,19 @@ export function createRendererViewportPreviewCoverage({
   ready: ready = !![],
 } = {}) {
   if (ready !== !![]) return null;
-  const _0x16698f = Math['max'](0x1, finiteNumber(_0x1dab5a, 0x1)),
-    _0x21fccd = Math['max'](0x1, finiteNumber(_0x605a84, 0x1)),
-    _0x23f08f = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0)));
+  const containerWidth2 = Math['max'](0x1, finiteNumber(containerWidth, 0x1)),
+    containerHeight2 = Math['max'](0x1, finiteNumber(containerHeight, 0x1)),
+    nodeCount3 = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0)));
   return {
     bounds: screenViewportToWorldBounds({
-      viewport: _0x1e678f,
-      containerWidth: _0x16698f,
-      containerHeight: _0x21fccd,
+      viewport: viewport2,
+      containerWidth: containerWidth2,
+      containerHeight: containerHeight2,
       padding: padding,
     }),
-    containerWidth: _0x16698f,
-    containerHeight: _0x21fccd,
-    nodeCount: _0x23f08f,
+    containerWidth: containerWidth2,
+    containerHeight: containerHeight2,
+    nodeCount: nodeCount3,
     nodesRef: snapshot?.['nodes'] || null,
     nodesRev: finiteRevision(snapshot?.['_nodesRev']),
     nodeGeometryRev: finiteRevision(snapshot?.['_nodeGeometryRev']),
@@ -103,52 +102,58 @@ export function createRendererViewportPreviewCoverage({
       presentedNodeIds && typeof presentedNodeIds[Symbol['iterator']] === 'function'
         ? new Set(presentedNodeIds)
         : null,
-    tier: resolveRendererVirtualizationTier({ viewport: _0x1e678f, nodeCount: _0x23f08f }),
+    tier: resolveRendererVirtualizationTier({ viewport: viewport2, nodeCount: nodeCount3 }),
   };
 }
 export function canReuseRendererViewportPreviewCoverage(
-  _0x2ef779,
-  { viewport: _0x2ec1c5, nodeCount: nodeCount = 0x0, snapshot: snapshot = {} } = {},
+  containerWidth3,
+  { viewport: viewport3, nodeCount: nodeCount = 0x0, snapshot: snapshot = {} } = {},
 ) {
-  if (!_0x2ef779?.['bounds']) return ![];
-  const _0x17ccde = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0))),
-    _0x3e8535 = resolveRendererVirtualizationTier({ viewport: _0x2ec1c5, nodeCount: _0x17ccde });
-  if (_0x3e8535 === 'default' || _0x2ef779['tier'] === 'default') return ![];
-  if (Number(_0x2ef779['nodeCount']) !== _0x17ccde) return ![];
-  if (_0x2ef779['nodesRef'] && _0x2ef779['nodesRef'] !== snapshot?.['nodes']) return ![];
+  if (!containerWidth3?.['bounds']) return ![];
+  const nodeCount4 = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0))),
+    rendererVirtualizationTier = resolveRendererVirtualizationTier({
+      viewport: viewport3,
+      nodeCount: nodeCount4,
+    });
+  if (rendererVirtualizationTier === 'default' || containerWidth3['tier'] === 'default') return ![];
+  if (Number(containerWidth3['nodeCount']) !== nodeCount4) return ![];
+  if (containerWidth3['nodesRef'] && containerWidth3['nodesRef'] !== snapshot?.['nodes']) return ![];
   if (
-    Object['prototype']['hasOwnProperty']['call'](_0x2ef779, 'nodesRev') &&
-    _0x2ef779['nodesRev'] !== finiteRevision(snapshot?.['_nodesRev'])
+    Object['prototype']['hasOwnProperty']['call'](containerWidth3, 'nodesRev') &&
+    containerWidth3['nodesRev'] !== finiteRevision(snapshot?.['_nodesRev'])
   )
     return ![];
   if (
-    Object['prototype']['hasOwnProperty']['call'](_0x2ef779, 'nodeGeometryRev') &&
-    _0x2ef779['nodeGeometryRev'] !== finiteRevision(snapshot?.['_nodeGeometryRev'])
+    Object['prototype']['hasOwnProperty']['call'](containerWidth3, 'nodeGeometryRev') &&
+    containerWidth3['nodeGeometryRev'] !== finiteRevision(snapshot?.['_nodeGeometryRev'])
   )
     return ![];
   if (
-    Object['prototype']['hasOwnProperty']['call'](_0x2ef779, 'persistRev') &&
-    _0x2ef779['persistRev'] !== finiteRevision(snapshot?.['_persistRev'])
+    Object['prototype']['hasOwnProperty']['call'](containerWidth3, 'persistRev') &&
+    containerWidth3['persistRev'] !== finiteRevision(snapshot?.['_persistRev'])
   )
     return ![];
   if (
-    typeof _0x2ef779['interactionSignature'] === 'string' &&
-    _0x2ef779['interactionSignature'] !== buildInteractionSignature(snapshot)
+    typeof containerWidth3['interactionSignature'] === 'string' &&
+    containerWidth3['interactionSignature'] !== buildInteractionSignature(snapshot)
   )
     return ![];
-  const _0x2e1503 = screenViewportToWorldBounds({
-    viewport: _0x2ec1c5,
-    containerWidth: _0x2ef779['containerWidth'],
-    containerHeight: _0x2ef779['containerHeight'],
+  const worldBounds = screenViewportToWorldBounds({
+    viewport: viewport3,
+    containerWidth: containerWidth3['containerWidth'],
+    containerHeight: containerWidth3['containerHeight'],
     padding: 0x0,
   });
-  if (_0x2ef779['presentedNodeIds'] instanceof Set) {
-    if (!_0x2ef779['spatialIndex']) return ![];
-    const _0x343371 = queryRendererSpatialIndexIds(_0x2ef779['spatialIndex'], _0x2e1503);
-    for (const _0x21080b of _0x343371) {
-      if (!_0x2ef779['presentedNodeIds']['has'](_0x21080b)) return ![];
+  if (containerWidth3['presentedNodeIds'] instanceof Set) {
+    if (!containerWidth3['spatialIndex']) return ![];
+    const queryRendererSpatialIndexIds2 = queryRendererSpatialIndexIds(
+      containerWidth3['spatialIndex'],
+      worldBounds,
+    );
+    for (const current of queryRendererSpatialIndexIds2) {
+      if (!containerWidth3['presentedNodeIds']['has'](current)) return ![];
     }
     return !![];
   }
-  return containsBounds(_0x2ef779['bounds'], _0x2e1503);
+  return containsBounds(containerWidth3['bounds'], worldBounds);
 }

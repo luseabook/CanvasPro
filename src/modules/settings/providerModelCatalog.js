@@ -13,26 +13,26 @@ export const PROVIDER_MODEL_CATALOG_OWNER_PROVIDER_ID = Object.freeze({
   agnes: 'agnes',
 });
 
-function normalizeText(_0x2f31a0) {
-  return String(_0x2f31a0 ?? '').trim();
+function normalizeText(value) {
+  return String(value ?? '').trim();
 }
 
-function normalizeKind(_0x1f42c8) {
-  const _0x9f2d = normalizeText(_0x1f42c8).toLowerCase();
-  return PROVIDER_MODEL_KINDS.includes(_0x9f2d) ? _0x9f2d : '';
+function normalizeKind(item) {
+  const text = normalizeText(item).toLowerCase();
+  return PROVIDER_MODEL_KINDS.includes(text) ? text : '';
 }
 
-export function isProviderModelCatalogProvider(_0x5a1f7e) {
-  return PROVIDER_MODEL_CATALOG_PROVIDER_IDS.includes(normalizeText(_0x5a1f7e));
+export function isProviderModelCatalogProvider(key) {
+  return PROVIDER_MODEL_CATALOG_PROVIDER_IDS.includes(normalizeText(key));
 }
 
-export function getProviderModelCatalogOwnerProviderId(_0x3d2f8f) {
-  const _0x1a2b4c = normalizeText(_0x3d2f8f);
-  return PROVIDER_MODEL_CATALOG_OWNER_PROVIDER_ID[_0x1a2b4c] || _0x1a2b4c;
+export function getProviderModelCatalogOwnerProviderId(index) {
+  const text2 = normalizeText(index);
+  return PROVIDER_MODEL_CATALOG_OWNER_PROVIDER_ID[text2] || text2;
 }
 
-export function normalizeProviderModelBaseUrl(_0x4b1c9e) {
-  return normalizeText(_0x4b1c9e).replace(/\/+$/, '');
+export function normalizeProviderModelBaseUrl(result) {
+  return normalizeText(result).replace(/\/+$/, '');
 }
 
 /**
@@ -42,117 +42,116 @@ export function normalizeProviderModelBaseUrl(_0x4b1c9e) {
  *   https://apihub.agnes-ai.com/v1/chat/completions
  *                                      -> https://apihub.agnes-ai.com/v1/models
  */
-export function buildProviderModelsUrl(_0x1e7d33, _0x30c5b1) {
-  const _0x5d1e9 = PROVIDERS_META?.[normalizeText(_0x1e7d33)]?.defaultUrl || '',
-    _0x4a7f22 = normalizeProviderModelBaseUrl(_0x30c5b1 || _0x5d1e9)
+export function buildProviderModelsUrl(data, options) {
+  const target = PROVIDERS_META?.[normalizeText(data)]?.defaultUrl || '',
+    list = normalizeProviderModelBaseUrl(options || target)
       .replace(/\/chat\/completions$/i, '')
       .replace(/\/models$/i, '');
-  if (!_0x4a7f22 || _0x4a7f22.includes(':generateContent')) return '';
-  if (/\/v\d+(?:beta)?$/i.test(_0x4a7f22)) return _0x4a7f22 + '/models';
-  return _0x4a7f22 + '/v1/models';
+  if (!list || list.includes(':generateContent')) return '';
+  if (/\/v\d+(?:beta)?$/i.test(list)) return list + '/models';
+  return list + '/v1/models';
 }
 
 /**
  * 厂商只返回模型 id，不返回模态。按命名推断：agnes-image-* 是图片，agnes-video-* 是视频，
  * 其余按文本处理。用户可以在设置里改。
  */
-export function inferProviderModelKind(_0x4d9b1a, _0x2c3e70) {
-  const _0x18f7b2 = normalizeText(_0x2c3e70).toLowerCase();
-  if (!_0x18f7b2) return 'text';
-  if (/(?:^|[-_/])video(?:[-_/]|\d|$)/.test(_0x18f7b2)) return 'video';
-  if (/(?:^|[-_/])image(?:[-_/]|\d|$)/.test(_0x18f7b2)) return 'image';
+export function inferProviderModelKind(source, next) {
+  const text3 = normalizeText(next).toLowerCase();
+  if (!text3) return 'text';
+  if (/(?:^|[-_/])video(?:[-_/]|\d|$)/.test(text3)) return 'video';
+  if (/(?:^|[-_/])image(?:[-_/]|\d|$)/.test(text3)) return 'image';
   return 'text';
 }
 
 /** 兼容 {data:[{id}]} / {models:[{id}]} / [{id}] / ['id'] 四种返回形态。 */
-export function normalizeProviderModelListPayload(_0x3f8c21) {
-  const _0x2a1d4f = Array.isArray(_0x3f8c21?.['data'])
-      ? _0x3f8c21['data']
-      : Array.isArray(_0x3f8c21?.['models'])
-        ? _0x3f8c21['models']
-        : Array.isArray(_0x3f8c21)
-          ? _0x3f8c21
+export function normalizeProviderModelListPayload(current) {
+  const entry = Array.isArray(current?.['data'])
+      ? current['data']
+      : Array.isArray(current?.['models'])
+        ? current['models']
+        : Array.isArray(current)
+          ? current
           : [],
-    _0x5b0e6c = new Set(),
-    _0x4471d5 = [];
-  for (const _0xed3a0f of _0x2a1d4f) {
-    const _0x4fb6e9 = normalizeText(
-      typeof _0xed3a0f === 'string' ? _0xed3a0f : _0xed3a0f?.['id'] || _0xed3a0f?.['model'] || _0xed3a0f?.['name'],
+    map = new Set(),
+    list2 = [];
+  for (const error of entry) {
+    const id2 = normalizeText(
+      typeof error === 'string' ? error : error?.['id'] || error?.['model'] || error?.['name'],
     );
-    if (!_0x4fb6e9 || _0x5b0e6c.has(_0x4fb6e9)) continue;
-    _0x5b0e6c.add(_0x4fb6e9);
-    _0x4471d5.push({ id: _0x4fb6e9, created: Number(_0xed3a0f?.['created']) || 0 });
+    if (!id2 || map.has(id2)) continue;
+    map.add(id2);
+    list2.push({ id: id2, created: Number(error?.['created']) || 0 });
   }
-  return _0x4471d5.sort((_0x4ef1a4, _0x2d4fbf) => _0x4ef1a4.id.localeCompare(_0x2d4fbf.id, 'en'));
+  return list2.sort((item2, record) => item2.id.localeCompare(record.id, 'en'));
 }
 
-export function readProviderModelCatalog(_0x39a2b7) {
-  const _0x2f3ae1 = _0x39a2b7?.['modelCatalog'],
-    _0x1c0d6a = Array.isArray(_0x2f3ae1?.['models']) ? _0x2f3ae1['models'] : [],
-    _0x2b7e5c = new Set(),
-    _0x3b3b1c = [];
-  for (const _0x2c7f0e of _0x1c0d6a) {
-    const _0x4a5ea1 = normalizeText(_0x2c7f0e?.['id']);
-    if (!_0x4a5ea1 || _0x2b7e5c.has(_0x4a5ea1)) continue;
-    _0x2b7e5c.add(_0x4a5ea1);
-    _0x3b3b1c.push({
-      id: _0x4a5ea1,
-      kind: normalizeKind(_0x2c7f0e?.['kind']) || inferProviderModelKind('', _0x4a5ea1),
-      enabled: _0x2c7f0e?.['enabled'] === true,
+export function readProviderModelCatalog(payload) {
+  const handle = payload?.['modelCatalog'],
+    state = Array.isArray(handle?.['models']) ? handle['models'] : [],
+    map2 = new Set(),
+    models = [];
+  for (const enabled of state) {
+    const id3 = normalizeText(enabled?.['id']);
+    if (!id3 || map2.has(id3)) continue;
+    map2.add(id3);
+    models.push({
+      id: id3,
+      kind: normalizeKind(enabled?.['kind']) || inferProviderModelKind('', id3),
+      enabled: enabled?.['enabled'] === true,
     });
   }
-  return { fetchedAt: normalizeText(_0x2f3ae1?.['fetchedAt']), models: _0x3b3b1c };
+  return { fetchedAt: normalizeText(handle?.['fetchedAt']), models: models };
 }
 
 /** 重新拉取后合并：已有条目的勾选状态和模态被保留，新条目默认不勾选。 */
-export function mergeProviderModelCatalog(_0x1c8e5c, _0x4a0d1b, _0x2dfb7c) {
-  const _0x5744c8 = new Map();
-  for (const _0x1e5cbf of readProviderModelCatalog({ modelCatalog: { models: _0x4a0d1b } }).models) {
-    _0x5744c8.set(_0x1e5cbf.id, _0x1e5cbf);
+export function mergeProviderModelCatalog(config, models2, scope) {
+  const map3 = new Map();
+  for (const input of readProviderModelCatalog({ modelCatalog: { models: models2 } }).models) {
+    map3.set(input.id, input);
   }
-  return normalizeProviderModelListPayload(_0x2dfb7c)
-    .map((_0x2e0d6a) => {
-      const _0x112f3f = _0x5744c8.get(_0x2e0d6a.id);
-      return {
-        id: _0x2e0d6a.id,
-        kind: _0x112f3f?.['kind'] || inferProviderModelKind(_0x1c8e5c, _0x2e0d6a.id),
-        enabled: _0x112f3f?.['enabled'] === true,
-      };
-    });
+  return normalizeProviderModelListPayload(scope).map((id4) => {
+    const kind2 = map3.get(id4.id);
+    return {
+      id: id4.id,
+      kind: kind2?.['kind'] || inferProviderModelKind(config, id4.id),
+      enabled: kind2?.['enabled'] === true,
+    };
+  });
 }
 
-export function applyProviderModelCatalog(_0x1d5e0d, _0x104d64) {
-  const _0x33d7b3 = _0x1d5e0d && typeof _0x1d5e0d === 'object' ? { ..._0x1d5e0d } : {};
-  if (!_0x104d64 || !Array.isArray(_0x104d64['models']) || _0x104d64['models'].length === 0) {
-    delete _0x33d7b3['modelCatalog'];
-    return _0x33d7b3;
+export function applyProviderModelCatalog(args, modelCatalog) {
+  const output = args && typeof args === 'object' ? { ...args } : {};
+  if (!modelCatalog || !Array.isArray(modelCatalog['models']) || modelCatalog['models'].length === 0) {
+    delete output['modelCatalog'];
+    return output;
   }
-  _0x33d7b3['modelCatalog'] = {
-    fetchedAt: normalizeText(_0x104d64['fetchedAt']) || new Date().toISOString(),
-    models: readProviderModelCatalog({ modelCatalog: _0x104d64 }).models,
+  output['modelCatalog'] = {
+    fetchedAt: normalizeText(modelCatalog['fetchedAt']) || new Date().toISOString(),
+    models: readProviderModelCatalog({ modelCatalog: modelCatalog }).models,
   };
-  return _0x33d7b3;
+  return output;
 }
 
 /**
  * 把配置里所有线路的勾选合并成待登记的模型清单。
  * 返回 Map<厂商模型 id, { kind, providerIds: 启用了它的线路 }>。
  */
-export function collectEnabledVendorModels(_0x1b04f6) {
-  const _0x4f0c7a = _0x1b04f6?.['providers'] || {},
-    _0x2538f7 = new Map();
-  for (const _0x1f0c4d of PROVIDER_MODEL_CATALOG_PROVIDER_IDS) {
-    const _0x4a6e93 = readProviderModelCatalog(_0x4f0c7a[_0x1f0c4d]);
-    for (const _0x21b6e3 of _0x4a6e93.models) {
-      if (!_0x21b6e3.enabled) continue;
-      const _0x479be8 = _0x2538f7.get(_0x21b6e3.id) || {
-        id: _0x21b6e3.id,
-        kind: _0x21b6e3.kind,
+export function collectEnabledVendorModels(value2) {
+  const value3 = value2?.['providers'] || {},
+    map4 = new Map();
+  for (const value4 of PROVIDER_MODEL_CATALOG_PROVIDER_IDS) {
+    const providerModelCatalog = readProviderModelCatalog(value3[value4]);
+    for (const id5 of providerModelCatalog.models) {
+      if (!id5.enabled) continue;
+      const value5 = map4.get(id5.id) || {
+        id: id5.id,
+        kind: id5.kind,
         providerIds: [],
       };
-      _0x479be8.providerIds.push(_0x1f0c4d);
-      _0x2538f7.set(_0x21b6e3.id, _0x479be8);
+      value5.providerIds.push(value4);
+      map4.set(id5.id, value5);
     }
   }
-  return _0x2538f7;
+  return map4;
 }

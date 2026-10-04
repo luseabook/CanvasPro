@@ -11,136 +11,126 @@ import {
   getStoryboardCellSourceImageUrl,
   isStoryboardCellSourceCropRequired,
 } from './storyboardAssetRefs.js';
-function drawStoryboardCropToDataUrl(_0x1e2061, _0x23c419) {
-  const _0x175c99 = document.createElement('canvas');
-  if (!_0x175c99 || typeof _0x175c99.getContext !== 'function') return '';
-  ((_0x175c99.width = _0x23c419.sw), (_0x175c99.height = _0x23c419.sh));
-  const _0x10db83 = _0x175c99.getContext('2d', { alpha: false });
-  if (!_0x10db83 || typeof _0x10db83.drawImage !== 'function') return '';
-  ((_0x10db83.imageSmoothingEnabled = true),
-    (_0x10db83.imageSmoothingQuality = 'high'),
-    _0x10db83.drawImage(
-      _0x1e2061,
-      _0x23c419.sx,
-      _0x23c419.sy,
-      _0x23c419.sw,
-      _0x23c419.sh,
-      0,
-      0,
-      _0x23c419.sw,
-      _0x23c419.sh,
-    ));
-  const _0x21b932 = _0x175c99.toDataURL('image/jpeg', 0.9);
-  return String(_0x21b932 || '').startsWith('data:image/') ? _0x21b932 : '';
+function drawStoryboardCropToDataUrl(value, item) {
+  const box = document.createElement('canvas');
+  if (!box || typeof box.getContext !== 'function') return '';
+  ((box.width = item.sw), (box.height = item.sh));
+  const ctx = box.getContext('2d', { alpha: false });
+  if (!ctx || typeof ctx.drawImage !== 'function') return '';
+  ((ctx.imageSmoothingEnabled = true),
+    (ctx.imageSmoothingQuality = 'high'),
+    ctx.drawImage(value, item.sx, item.sy, item.sw, item.sh, 0, 0, item.sw, item.sh));
+  const key = box.toDataURL('image/jpeg', 0.9);
+  return String(key || '').startsWith('data:image/') ? key : '';
 }
 export function buildStoryboardMaterializedCellCrop({
-  cell: _0x42bc2a,
-  index: _0x4701f4,
-  img: _0x215ca4,
-  sourceNode: _0x4b8ea8,
+  cell: cell,
+  index: index,
+  img: img,
+  sourceNode: sourceNode,
 } = {}) {
-  if (!_0x215ca4 || typeof document === 'undefined') return null;
-  const _0x1fb6e9 = Math.max(1, Math.trunc(Number(_0x215ca4.naturalWidth) || 0)),
-    _0x63a532 = Math.max(1, Math.trunc(Number(_0x215ca4.naturalHeight) || 0));
-  if (_0x1fb6e9 <= 0 || _0x63a532 <= 0) return null;
-  const _0x3acbde = resolveStoryboardCellSourceIndex(_0x42bc2a, _0x4701f4, _0x4b8ea8),
-    _0x114d66 = buildStoryboardCropRect(_0x4b8ea8, _0x3acbde, {
-      width: _0x1fb6e9,
-      height: _0x63a532,
+  if (!img || typeof document === 'undefined') return null;
+  const width = Math.max(1, Math.trunc(Number(img.naturalWidth) || 0)),
+    height = Math.max(1, Math.trunc(Number(img.naturalHeight) || 0));
+  if (width <= 0 || height <= 0) return null;
+  const storyboardCellSourceIndex = resolveStoryboardCellSourceIndex(cell, index, sourceNode),
+    originalWidth = buildStoryboardCropRect(sourceNode, storyboardCellSourceIndex, {
+      width: width,
+      height: height,
       inset: 0,
     });
-  if (!_0x114d66 || _0x114d66.sw <= 0 || _0x114d66.sh <= 0) return null;
+  if (!originalWidth || originalWidth.sw <= 0 || originalWidth.sh <= 0) return null;
   try {
-    const _0x3d4c97 = drawStoryboardCropToDataUrl(_0x215ca4, _0x114d66);
-    if (!_0x3d4c97) return null;
+    const capturePreviewUrl = drawStoryboardCropToDataUrl(img, originalWidth);
+    if (!capturePreviewUrl) return null;
     return {
-      capturePreviewUrl: _0x3d4c97,
-      fileName: _0x42bc2a?.fileName || 'storyboard_piece_' + generateId('storyboard-cell') + '.jpg',
-      originalWidth: _0x114d66.sw,
-      originalHeight: _0x114d66.sh,
-      imageWidth: _0x114d66.sw,
-      imageHeight: _0x114d66.sh,
-      w: _0x114d66.sw,
-      h: _0x114d66.sh,
+      capturePreviewUrl: capturePreviewUrl,
+      fileName: cell?.fileName || 'storyboard_piece_' + generateId('storyboard-cell') + '.jpg',
+      originalWidth: originalWidth.sw,
+      originalHeight: originalWidth.sh,
+      imageWidth: originalWidth.sw,
+      imageHeight: originalWidth.sh,
+      w: originalWidth.sw,
+      h: originalWidth.sh,
     };
   } catch {
     return null;
   }
 }
 export function materializeStoryboardSourceBackedCellsForEditing({
-  node: _0x22a5ae,
-  cells: _0x51955f,
-  getLoadedSourceImageForCell: _0x175295,
+  node: node,
+  cells: cells,
+  getLoadedSourceImageForCell: getLoadedSourceImageForCell,
 } = {}) {
-  const _0x1ced46 = Array.isArray(_0x51955f) ? _0x51955f : [];
-  let _0x57d441 = false;
-  const _0x416692 = _0x22a5ae,
-    _0x510498 = _0x1ced46.map((_0x3abb9c, _0x3dedbd) => {
-      const _0x32d870 = getStoryboardCellSourceImageUrl(_0x3abb9c);
-      if (!_0x32d870 || isStoryboardCellEmpty(_0x3abb9c)) return _0x3abb9c;
-      const _0x3271e0 = _0x175295(_0x3dedbd, _0x32d870),
-        _0x528744 = buildStoryboardMaterializedCellCrop({
-          cell: _0x3abb9c,
-          index: _0x3dedbd,
-          img: _0x3271e0,
-          sourceNode: _0x416692,
+  const list = Array.isArray(cells) ? cells : [];
+  let result = false;
+  const sourceNode2 = node,
+    data = list.map((cell2, index2) => {
+      const storyboardCellSourceImageUrl = getStoryboardCellSourceImageUrl(cell2);
+      if (!storyboardCellSourceImageUrl || isStoryboardCellEmpty(cell2)) return cell2;
+      const img2 = getLoadedSourceImageForCell(index2, storyboardCellSourceImageUrl),
+        localPath = buildStoryboardMaterializedCellCrop({
+          cell: cell2,
+          index: index2,
+          img: img2,
+          sourceNode: sourceNode2,
         }),
-        _0x5b1717 = !!(_0x528744?.capturePreviewUrl || resolveStoryboardCellPreviewSrc(_0x3abb9c));
-      if (!_0x5b1717) return _0x3abb9c;
+        enabled = !!(localPath?.capturePreviewUrl || resolveStoryboardCellPreviewSrc(cell2));
+      if (!enabled) return cell2;
       return (
-        (_0x57d441 = true),
+        (result = true),
         detachStoryboardCellSourceContext(
           {
-            ...(_0x3abb9c && typeof _0x3abb9c === 'object' ? _0x3abb9c : {}),
-            ...(_0x528744 || {}),
-            localPath: _0x528744?.capturePreviewUrl ? null : _0x3abb9c.localPath || null,
-            originalLocalPath: _0x528744?.capturePreviewUrl ? null : _0x3abb9c.originalLocalPath || null,
-            displayLocalPath: _0x528744?.capturePreviewUrl ? '' : _0x3abb9c.displayLocalPath || '',
-            thumbLocalPath: _0x528744?.capturePreviewUrl ? '' : _0x3abb9c.thumbLocalPath || '',
-            thumbUrl: _0x528744?.capturePreviewUrl ? '' : _0x3abb9c.thumbUrl || '',
+            ...(cell2 && typeof cell2 === 'object' ? cell2 : {}),
+            ...(localPath || {}),
+            localPath: localPath?.capturePreviewUrl ? null : cell2.localPath || null,
+            originalLocalPath: localPath?.capturePreviewUrl ? null : cell2.originalLocalPath || null,
+            displayLocalPath: localPath?.capturePreviewUrl ? '' : cell2.displayLocalPath || '',
+            thumbLocalPath: localPath?.capturePreviewUrl ? '' : cell2.thumbLocalPath || '',
+            thumbUrl: localPath?.capturePreviewUrl ? '' : cell2.thumbUrl || '',
             thumbId: null,
-            storyboardSourceIndex: resolveStoryboardCellSourceIndex(_0x3abb9c, _0x3dedbd, _0x416692),
+            storyboardSourceIndex: resolveStoryboardCellSourceIndex(cell2, index2, sourceNode2),
             storyboardLockedCell: true,
             isEmpty: false,
           },
-          { locked: true, extracted: _0x3abb9c.storyboardExtractedCell === true },
+          { locked: true, extracted: cell2.storyboardExtractedCell === true },
         )
       );
     });
-  return _0x57d441 ? _0x510498 : null;
+  return result ? data : null;
 }
 export async function cropStoryboardCellFromSource({
-  cell: _0x43df0f,
-  index: _0x1641f8,
-  sourceNode: _0x3e5668,
-  imageCache: _0x247c57,
-  resolveSourceImage: _0x5494a2,
+  cell: cell3,
+  index: index3,
+  sourceNode: sourceNode3,
+  imageCache: imageCache,
+  resolveSourceImage: resolveSourceImage,
 } = {}) {
-  const _0x1417cd = getStoryboardCellCommitSourceUrl(_0x43df0f, _0x3e5668);
-  if (!_0x1417cd) {
-    if (isStoryboardCellSourceCropRequired(_0x43df0f)) return { cell: _0x43df0f, ok: false, skipped: false };
-    return { cell: _0x43df0f, ok: true, skipped: true };
+  const storyboardCellCommitSourceUrl = getStoryboardCellCommitSourceUrl(cell3, sourceNode3);
+  if (!storyboardCellCommitSourceUrl) {
+    if (isStoryboardCellSourceCropRequired(cell3)) return { cell: cell3, ok: false, skipped: false };
+    return { cell: cell3, ok: true, skipped: true };
   }
-  const _0x933f98 = await _0x5494a2(_0x1641f8, _0x1417cd, _0x247c57);
-  if (!_0x933f98) return { cell: _0x43df0f, ok: false, skipped: false };
-  const _0x5b31c6 = resolveStoryboardCellSourceIndex(_0x43df0f, _0x1641f8, _0x3e5668),
-    _0x7e5ff4 = buildStoryboardCropRect(_0x3e5668, _0x5b31c6, {
-      width: _0x933f98.naturalWidth,
-      height: _0x933f98.naturalHeight,
+  const width2 = await resolveSourceImage(index3, storyboardCellCommitSourceUrl, imageCache);
+  if (!width2) return { cell: cell3, ok: false, skipped: false };
+  const storyboardSourceIndex = resolveStoryboardCellSourceIndex(cell3, index3, sourceNode3),
+    originalWidth2 = buildStoryboardCropRect(sourceNode3, storyboardSourceIndex, {
+      width: width2.naturalWidth,
+      height: width2.naturalHeight,
       inset: 0,
     });
-  if (!_0x7e5ff4 || _0x7e5ff4.sw <= 0 || _0x7e5ff4.sh <= 0)
-    return { cell: _0x43df0f, ok: false, skipped: false };
-  let _0x68f81b = '';
+  if (!originalWidth2 || originalWidth2.sw <= 0 || originalWidth2.sh <= 0)
+    return { cell: cell3, ok: false, skipped: false };
+  let capturePreviewUrl2 = '';
   try {
-    _0x68f81b = drawStoryboardCropToDataUrl(_0x933f98, _0x7e5ff4);
+    capturePreviewUrl2 = drawStoryboardCropToDataUrl(width2, originalWidth2);
   } catch {
-    _0x68f81b = '';
+    capturePreviewUrl2 = '';
   }
-  if (!_0x68f81b) return { cell: _0x43df0f, ok: false, skipped: false };
-  const _0x26ff83 = detachStoryboardCellSourceContext(
+  if (!capturePreviewUrl2) return { cell: cell3, ok: false, skipped: false };
+  const cell4 = detachStoryboardCellSourceContext(
     {
-      ...(_0x43df0f && typeof _0x43df0f === 'object' ? _0x43df0f : {}),
+      ...(cell3 && typeof cell3 === 'object' ? cell3 : {}),
       url: '',
       localPath: null,
       originalLocalPath: null,
@@ -148,51 +138,51 @@ export async function cropStoryboardCellFromSource({
       thumbLocalPath: '',
       thumbUrl: '',
       thumbId: null,
-      capturePreviewUrl: _0x68f81b,
+      capturePreviewUrl: capturePreviewUrl2,
       fileName: 'storyboard_cell_' + generateId('storyboard-cell') + '.jpg',
-      originalWidth: _0x7e5ff4.sw,
-      originalHeight: _0x7e5ff4.sh,
-      imageWidth: _0x7e5ff4.sw,
-      imageHeight: _0x7e5ff4.sh,
-      w: _0x7e5ff4.sw,
-      h: _0x7e5ff4.sh,
+      originalWidth: originalWidth2.sw,
+      originalHeight: originalWidth2.sh,
+      imageWidth: originalWidth2.sw,
+      imageHeight: originalWidth2.sh,
+      w: originalWidth2.sw,
+      h: originalWidth2.sh,
       storyboardPiece: true,
-      storyboardSourceIndex: _0x5b31c6,
+      storyboardSourceIndex: storyboardSourceIndex,
       storyboardLockedCell: true,
       storyboardExtractedCell: false,
       isEmpty: false,
     },
     { locked: true, extracted: false },
   );
-  return { cell: _0x26ff83, ok: true, skipped: false };
+  return { cell: cell4, ok: true, skipped: false };
 }
 export async function materializeStoryboardCellsForConfirmedGrid({
-  node: _0xc848a3,
-  gridLayout: _0x44bbb9,
-  gridGap: _0x58fbfd,
+  node: node2,
+  gridLayout: gridLayout,
+  gridGap: gridGap,
   cellsOverride: cellsOverride = null,
-  cropCell: _0x123f80,
+  cropCell: cropCell,
 } = {}) {
-  const _0x5da144 = Array.isArray(cellsOverride)
+  const cells2 = Array.isArray(cellsOverride)
     ? cellsOverride
-    : Array.isArray(_0xc848a3?.cells)
-      ? _0xc848a3.cells
+    : Array.isArray(node2?.cells)
+      ? node2.cells
       : [];
-  if (!Array.isArray(_0x5da144) || _0x5da144.length <= 0) return { cells: _0x5da144, partialFailure: false };
-  const _0x459de2 = { ..._0xc848a3, gridLayout: _0x44bbb9, gridGap: _0x58fbfd },
-    _0x25d128 = new Map(),
-    _0x58825c = [],
-    _0x5a21d8 = [..._0x5da144];
-  for (let _0x9c5ac5 = 0; _0x9c5ac5 < _0x5da144.length; _0x9c5ac5 += 1) {
-    const _0x5018a9 = _0x5da144[_0x9c5ac5];
-    if (isStoryboardCellEmpty(_0x5018a9)) continue;
-    const _0xd73126 = await _0x123f80(_0x5018a9, _0x9c5ac5, _0x459de2, _0x25d128);
-    if (!_0xd73126.ok && !_0xd73126.skipped) {
-      _0x58825c.push(_0x9c5ac5);
+  if (!Array.isArray(cells2) || cells2.length <= 0) return { cells: cells2, partialFailure: false };
+  const options = { ...node2, gridLayout: gridLayout, gridGap: gridGap },
+    target = new Map(),
+    failedIndices = [],
+    source = [...cells2];
+  for (let next = 0; next < cells2.length; next += 1) {
+    const current = cells2[next];
+    if (isStoryboardCellEmpty(current)) continue;
+    const response = await cropCell(current, next, options, target);
+    if (!response.ok && !response.skipped) {
+      failedIndices.push(next);
       continue;
     }
-    _0x5a21d8[_0x9c5ac5] = _0xd73126.cell;
+    source[next] = response.cell;
   }
-  const _0x42ca5f = _0x58825c.length === 0;
-  return { ok: _0x42ca5f, cells: _0x42ca5f ? _0x5a21d8 : _0x5da144, failedIndices: _0x58825c };
+  const ok = failedIndices.length === 0;
+  return { ok: ok, cells: ok ? source : cells2, failedIndices: failedIndices };
 }

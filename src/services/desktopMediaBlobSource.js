@@ -14,159 +14,155 @@ const DESKTOP_PREVIEW_URL_CACHE_TTL_MS = 30 * 60 * 0x3e8,
     ogg: 'audio/ogg',
     flac: 'audio/flac',
   };
-function normalizeUrl(_0x65547) {
-  const _0x500638 = String(_0x65547 || '').trim();
-  if (!_0x500638) return '';
+function normalizeUrl(value) {
+  const enabled = String(value || '').trim();
+  if (!enabled) return '';
   try {
-    return new URL(_0x500638, globalThis.location?.href || 'http://127.0.0.1/').href;
+    return new URL(enabled, globalThis.location?.href || 'http://127.0.0.1/').href;
   } catch {
-    return _0x500638;
+    return enabled;
   }
 }
 function isDesktopRenderer() {
   return !!globalThis.window?.electronAPI;
 }
-function isDesktopBlobCandidate(_0x2471ec) {
-  return (void _0x2471ec, false);
+function isDesktopBlobCandidate(item) {
+  return (void item, false);
 }
-function isLoopbackHost(_0x5565f6) {
-  const _0x1eb245 = String(_0x5565f6 || '').toLowerCase();
-  return (
-    _0x1eb245 === 'localhost' || _0x1eb245 === '127.0.0.1' || _0x1eb245 === '::1' || _0x1eb245 === '[::1]'
-  );
+function isLoopbackHost(key) {
+  const index = String(key || '').toLowerCase();
+  return index === 'localhost' || index === '127.0.0.1' || index === '::1' || index === '[::1]';
 }
-function normalizeDesktopLocalMediaPath(_0x55a773) {
-  const _0x3dac0b = String(_0x55a773 || '').trim();
-  if (!_0x3dac0b || /^(?:blob:|data:|file:)/i.test(_0x3dac0b) || LOCAL_PREVIEW_SCHEME_RE.test(_0x3dac0b))
+function normalizeDesktopLocalMediaPath(result) {
+  const enabled2 = String(result || '').trim();
+  if (!enabled2 || /^(?:blob:|data:|file:)/i.test(enabled2) || LOCAL_PREVIEW_SCHEME_RE.test(enabled2))
     return '';
-  let _0x58e461 = _0x3dac0b;
+  let data = enabled2;
   try {
-    const _0x3133e2 = new URL(_0x3dac0b, globalThis.location?.href || 'http://127.0.0.1:8777/'),
-      _0x50f5ef = String(globalThis.location?.origin || ''),
-      _0x3476a6 =
-        /^https?:$/i.test(_0x3133e2.protocol) &&
-        ((_0x50f5ef && _0x3133e2.origin === _0x50f5ef) || isLoopbackHost(_0x3133e2.hostname));
-    if (!_0x3476a6) return '';
-    _0x58e461 = _0x3133e2.pathname;
+    const uRL = new URL(enabled2, globalThis.location?.href || 'http://127.0.0.1:8777/'),
+      options = String(globalThis.location?.origin || ''),
+      enabled3 =
+        /^https?:$/i.test(uRL.protocol) &&
+        ((options && uRL.origin === options) || isLoopbackHost(uRL.hostname));
+    if (!enabled3) return '';
+    data = uRL.pathname;
   } catch {
-    _0x58e461 = _0x3dac0b.split(/[?#]/, 1)[0];
+    data = enabled2.split(/[?#]/, 1)[0];
   }
-  _0x58e461 = String(_0x58e461 || '')
+  data = String(data || '')
     .replace(/\\/g, '/')
     .split(/[?#]/, 1)[0];
   try {
-    _0x58e461 = decodeURIComponent(_0x58e461);
+    data = decodeURIComponent(data);
   } catch {}
-  _0x58e461 = _0x58e461.replace(/^\/+/, '');
-  if (!LOCAL_MEDIA_PATH_PREFIX_RE.test(_0x58e461)) return '';
-  return '/' + _0x58e461;
+  data = data.replace(/^\/+/, '');
+  if (!LOCAL_MEDIA_PATH_PREFIX_RE.test(data)) return '';
+  return '/' + data;
 }
-function inferMediaMimeType(_0x302863) {
-  const _0x1d5bc = String(_0x302863 || '')
+function inferMediaMimeType(target) {
+  const enabled4 = String(target || '')
     .split(/[?#]/, 1)[0]
     .match(/\.([a-z0-9]+)$/i);
-  if (!_0x1d5bc) return '';
-  return MEDIA_MIME_BY_EXT[String(_0x1d5bc[1] || '').toLowerCase()] || '';
+  if (!enabled4) return '';
+  return MEDIA_MIME_BY_EXT[String(enabled4[1] || '').toLowerCase()] || '';
 }
-function readPreviewCache(_0x3c6d45) {
-  const _0x439ee3 = desktopPreviewUrlCache.get(_0x3c6d45);
-  if (!_0x439ee3) return '';
-  if (Number(_0x439ee3.expiresAt || 0) <= Date.now()) return (desktopPreviewUrlCache.delete(_0x3c6d45), '');
-  return String(_0x439ee3.url || '');
+function readPreviewCache(source) {
+  const response = desktopPreviewUrlCache.get(source);
+  if (!response) return '';
+  if (Number(response.expiresAt || 0) <= Date.now()) return (desktopPreviewUrlCache.delete(source), '');
+  return String(response.url || '');
 }
-function writePreviewCache(_0x572851, _0x132e98) {
-  if (!_0x572851 || !_0x132e98) return;
-  desktopPreviewUrlCache.set(_0x572851, {
-    url: _0x132e98,
+function writePreviewCache(enabled5, url) {
+  if (!enabled5 || !url) return;
+  desktopPreviewUrlCache.set(enabled5, {
+    url: url,
     expiresAt: Date.now() + DESKTOP_PREVIEW_URL_CACHE_TTL_MS,
   });
 }
-function getMediaElementSource(_0x170e1f) {
-  return String(_0x170e1f?.getAttribute?.('src') || _0x170e1f?.currentSrc || _0x170e1f?.src || '').trim();
+function getMediaElementSource(next) {
+  return String(next?.getAttribute?.('src') || next?.currentSrc || next?.src || '').trim();
 }
-export function getMediaElementCurrentSource(_0x42dabd) {
-  return getMediaElementSource(_0x42dabd);
+export function getMediaElementCurrentSource(current) {
+  return getMediaElementSource(current);
 }
-export function getMediaElementPlaybackSourceKey(_0xdab4de) {
-  const _0xa79e1b = getMediaElementSource(_0xdab4de);
-  if (!_0xa79e1b) return '';
-  const _0x2628a7 = String(_0xdab4de?.dataset?.desktopMediaSourceUrl || '').trim();
-  if (_0x2628a7) return _0x2628a7;
-  return _0xa79e1b;
+export function getMediaElementPlaybackSourceKey(el) {
+  const mediaElementSource = getMediaElementSource(el);
+  if (!mediaElementSource) return '';
+  const entry = String(el?.dataset?.desktopMediaSourceUrl || '').trim();
+  if (entry) return entry;
+  return mediaElementSource;
 }
-export function normalizeMediaPlaybackSourceUrl(_0x285f5e) {
-  return normalizeUrl(_0x285f5e);
+export function normalizeMediaPlaybackSourceUrl(record) {
+  return normalizeUrl(record);
 }
-export function isMediaElementPlaybackSource(_0x4edced, _0x20099c) {
-  const _0xbf99f5 = getMediaElementPlaybackSourceKey(_0x4edced),
-    _0x294b75 = normalizeUrl(_0x20099c);
-  return !!_0xbf99f5 && !!_0x294b75 && normalizeUrl(_0xbf99f5) === _0x294b75;
+export function isMediaElementPlaybackSource(payload, handle) {
+  const mediaElementPlaybackSourceKey = getMediaElementPlaybackSourceKey(payload),
+    url2 = normalizeUrl(handle);
+  return !!mediaElementPlaybackSourceKey && !!url2 && normalizeUrl(mediaElementPlaybackSourceKey) === url2;
 }
-export function clearDesktopMediaPlaybackSourceMetadata(_0x4adf39) {
-  if (!_0x4adf39?.dataset) return;
-  delete _0x4adf39.dataset.desktopMediaSourceUrl;
+export function clearDesktopMediaPlaybackSourceMetadata(el2) {
+  if (!el2?.dataset) return;
+  delete el2.dataset.desktopMediaSourceUrl;
 }
-function assignMediaElementSource(_0x594aa6, _0xd655b5, _0x53581c = 'auto', _0x233723 = {}) {
-  if (!_0x594aa6 || !_0xd655b5) return '';
-  const _0x2d9dd9 = normalizeUrl(_0x233723.originalSourceUrl || _0xd655b5),
-    _0x4746c0 = normalizeUrl(_0xd655b5),
-    _0x22c28c = getMediaElementSource(_0x594aa6),
-    _0xf43d3f = String(_0x594aa6?.dataset?.desktopMediaSourceUrl || '').trim();
+function assignMediaElementSource(el3, enabled6, state = 'auto', config = {}) {
+  if (!el3 || !enabled6) return '';
+  const url3 = normalizeUrl(config.originalSourceUrl || enabled6),
+    url4 = normalizeUrl(enabled6),
+    mediaElementSource2 = getMediaElementSource(el3),
+    scope = String(el3?.dataset?.desktopMediaSourceUrl || '').trim();
   if (
-    _0x22c28c &&
-    (normalizeUrl(_0x22c28c) === _0x4746c0 || (_0xf43d3f && normalizeUrl(_0xf43d3f) === _0x2d9dd9))
+    mediaElementSource2 &&
+    (normalizeUrl(mediaElementSource2) === url4 || (scope && normalizeUrl(scope) === url3))
   )
-    return _0x22c28c;
-  _0x594aa6.preload = _0x53581c || _0x594aa6.preload || 'auto';
-  _0x594aa6.dataset &&
-    (_0x2d9dd9 && _0x4746c0 !== _0x2d9dd9
-      ? (_0x594aa6.dataset.desktopMediaSourceUrl = _0x2d9dd9)
-      : delete _0x594aa6.dataset.desktopMediaSourceUrl);
-  typeof _0x594aa6.setAttribute === 'function'
-    ? _0x594aa6.setAttribute('src', _0xd655b5)
-    : (_0x594aa6.src = _0xd655b5);
-  if (_0x233723.load !== false)
+    return mediaElementSource2;
+  el3.preload = state || el3.preload || 'auto';
+  el3.dataset &&
+    (url3 && url4 !== url3
+      ? (el3.dataset.desktopMediaSourceUrl = url3)
+      : delete el3.dataset.desktopMediaSourceUrl);
+  typeof el3.setAttribute === 'function' ? el3.setAttribute('src', enabled6) : (el3.src = enabled6);
+  if (config.load !== false)
     try {
-      _0x594aa6.load?.();
+      el3.load?.();
     } catch {}
-  return _0xd655b5;
+  return enabled6;
 }
-export async function resolveDesktopMediaPlaybackUrl(_0x3cd22b) {
-  const _0x55ac06 = normalizeUrl(_0x3cd22b);
-  if (!isDesktopRenderer()) return _0x55ac06;
-  const _0x4797b6 = normalizeDesktopLocalMediaPath(_0x55ac06 || _0x3cd22b);
-  if (!_0x4797b6) return _0x55ac06;
-  const _0x5566d3 = readPreviewCache(_0x4797b6);
-  if (_0x5566d3) return _0x5566d3;
-  const _0xa17de3 = globalThis.window?.electronAPI;
-  if (typeof _0xa17de3?.getLocalPreviewUrl !== 'function') return _0x55ac06;
+export async function resolveDesktopMediaPlaybackUrl(input) {
+  const url5 = normalizeUrl(input);
+  if (!isDesktopRenderer()) return url5;
+  const localPath = normalizeDesktopLocalMediaPath(url5 || input);
+  if (!localPath) return url5;
+  const previewCache = readPreviewCache(localPath);
+  if (previewCache) return previewCache;
+  const output = globalThis.window?.electronAPI;
+  if (typeof output?.getLocalPreviewUrl !== 'function') return url5;
   try {
-    const _0x8f7d1a = await _0xa17de3.getLocalPreviewUrl({
-        localPath: _0x4797b6,
-        type: inferMediaMimeType(_0x4797b6),
+    const response2 = await output.getLocalPreviewUrl({
+        localPath: localPath,
+        type: inferMediaMimeType(localPath),
       }),
-      _0x1eb623 = String(_0x8f7d1a?.url || _0x8f7d1a || '').trim();
-    if (_0x1eb623) return (writePreviewCache(_0x4797b6, _0x1eb623), _0x1eb623);
+      value2 = String(response2?.url || response2 || '').trim();
+    if (value2) return (writePreviewCache(localPath, value2), value2);
   } catch {}
-  return _0x55ac06;
+  return url5;
 }
-export async function attachDesktopMediaPlaybackSource(_0xf35ce4, _0x542964, _0x44655e = {}) {
-  if (!_0xf35ce4) return '';
-  const _0xd31daf = normalizeUrl(_0x542964),
-    _0x3c0e27 = isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(_0x542964) : _0x542964;
-  return assignMediaElementSource(_0xf35ce4, _0x3c0e27, _0x44655e.preload || _0xf35ce4.preload, {
-    originalSourceUrl: _0xd31daf,
-    load: _0x44655e.load,
+export async function attachDesktopMediaPlaybackSource(enabled7, value3, load = {}) {
+  if (!enabled7) return '';
+  const originalSourceUrl = normalizeUrl(value3),
+    isDesktopRenderer2 = isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(value3) : value3;
+  return assignMediaElementSource(enabled7, isDesktopRenderer2, load.preload || enabled7.preload, {
+    originalSourceUrl: originalSourceUrl,
+    load: load.load,
   });
 }
-export async function attachMediaElementPlaybackSource(_0x51bc2b, _0x14f001, _0x7d62ed = {}) {
-  if (!_0x51bc2b) return '';
-  const _0x3411ce = normalizeUrl(_0x14f001);
-  if (!_0x3411ce) return '';
-  const _0x5003b5 = isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(_0x14f001) : _0x14f001;
-  return assignMediaElementSource(_0x51bc2b, _0x5003b5, _0x7d62ed.preload || _0x51bc2b.preload, {
-    originalSourceUrl: _0x3411ce,
-    load: _0x7d62ed.load,
+export async function attachMediaElementPlaybackSource(enabled8, value4, load2 = {}) {
+  if (!enabled8) return '';
+  const originalSourceUrl2 = normalizeUrl(value4);
+  if (!originalSourceUrl2) return '';
+  const isDesktopRenderer3 = isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(value4) : value4;
+  return assignMediaElementSource(enabled8, isDesktopRenderer3, load2.preload || enabled8.preload, {
+    originalSourceUrl: originalSourceUrl2,
+    load: load2.load,
   });
 }
 export const __desktopMediaBlobSourceForTest = {

@@ -1,1 +1,236 @@
-import{getExecutionManifest,sanitizeModelUiSchemaParams}from'../../src/manifests/index.js';import{buildBodyFromMapping}from'./modelApiMappingEngine.js';import{uploadModelApiMediaInputs}from'../mediaInputUploadRouter.js';import{processInputAudiosPreserveOrder}from'../audioUploadApi.js';import{processInputImagesPreserveOrder}from'../imageUploadApi.js';import{buildRunningHubModelApiUrl,getRunningHubProviderProfileId,resolveRunningHubModelApiProfileId,resolveRunningHubModelApiBaseUrl}from'../../src/modules/runningHubProviderProfiles.js';import{validateRunningHubAudioParameters}from'./runningHubAudioValidation.js';function throwIfAborted(_0x37906d){if(_0x37906d?.["aborted"])throw new DOMException("生成已中断",'AbortError');}function normalizeRefs(_0x1b5739,_0x1f3dda,_0x54cc24){const _0x23555d=(_0x1f3dda["inputSlots"]?.['fixedSlots']||[])["filter"](_0x49ec0e=>_0x49ec0e["kind"]===_0x54cc24),_0x53525f=_0x1b5739[_0x54cc24+'Refs']||_0x1b5739["input"+_0x54cc24[0x0]['toUpperCase']()+_0x54cc24["slice"](0x1)+"Urls"]||[],_0x117fa8=new Set();return _0x53525f['map'](_0x4f4bd9=>{const _0xda8b47=typeof _0x4f4bd9==='string'?{'url':_0x4f4bd9}:{..._0x4f4bd9};let _0x1a9846=String(_0xda8b47["refSlot"]||'')["trim"]();if(_0x1a9846&&!_0x23555d['some'](_0x7821b=>_0x7821b['id']===_0x1a9846))throw new Error('参考素材槽位无效，请重新连接');if(!_0x1a9846)_0x1a9846=_0x23555d["find"](_0x41dea1=>!_0x117fa8['has'](_0x41dea1['id']))?.['id']||'';return _0x117fa8['add'](_0x1a9846),{..._0xda8b47,'refSlot':_0x1a9846,'url':String(_0xda8b47['url']||'')["trim"]()};});}const TRANSFORMS=Object["freeze"]({'audioSlot':(_0x51cf58,{context:_0x22d991,spec:_0x155bf4})=>_0x22d991['audioBySlot'][_0x155bf4["slot"]],'first':_0x1effc1=>_0x1effc1?.[0x0],'lines':_0x1972aa=>String(_0x1972aa||'')['split'](/\r?\n/)["map"](_0x50ebf4=>_0x50ebf4['trim']())["filter"](Boolean),'secondsToMilliseconds':_0xf3f552=>Math['round'](Number(_0xf3f552)*0x3e8),'parenthesisFilter':_0x347b7a=>_0x347b7a?0x64:0x0});export async function buildRunningHubCatalogRequest(_0x9bd97a,_0x1aa316,_0x4b0c39,_0x2f4066={}){const {modelManifest:_0x320eb0,executionManifest:_0x41e49f}=_0x4b0c39,_0xbe585=_0x41e49f['extensions']?.['audioModelApi'];if(!_0xbe585||_0x320eb0["provider"]!=="runninghub"||_0x41e49f["adapterType"]!=="modelApi")throw new Error("RunningHub 音频执行配置缺失");throwIfAborted(_0x9bd97a["signal"]);const _0x93f3a0=resolveRunningHubModelApiProfileId(_0x320eb0['modelId'],getRunningHubProviderProfileId(_0x9bd97a)),_0x3b516c=_0x2f4066["getProviderConfig"]?.(_0x93f3a0)||{},_0x5805a5=String(_0x3b516c['modelApiKey']||_0x9bd97a["apiKey"]||_0x3b516c["apiKey"]||'')["trim"]();if(!_0x5805a5)throw new Error("RunningHub API Key 未配置，请在设置中配置");const _0x25f801=normalizeRefs(_0x9bd97a,_0x320eb0,"audio"),_0x333023=normalizeRefs(_0x9bd97a,_0x320eb0,"image"),_0x44f80f=_0x9bd97a["generationParams"]||{};validateRunningHubAudioParameters(_0x320eb0,_0xbe585,_0x1aa316,_0x44f80f,_0x25f801,_0x333023);const _0x301596=sanitizeModelUiSchemaParams(_0x320eb0['modelId'],_0x44f80f,{'includeDefaults':!![]}),_0x61b34f={'getProviderConfig':_0x2f4066['getProviderConfig'],'processInputAudios':_0x2f4066['processInputAudios']||processInputAudiosPreserveOrder,'processInputImages':_0x2f4066['processInputImages']||processInputImagesPreserveOrder},_0x1bcecc={'apiKey':_0x5805a5,'providerProfileId':_0x93f3a0,'apiUrl':resolveRunningHubModelApiBaseUrl(_0x93f3a0),'strictUpload':!![],'uploadOptions':{'signal':_0x9bd97a["signal"]}},_0x3860bf=_0x25f801["length"]?await uploadModelApiMediaInputs("audio",_0x25f801["map"](_0x3879a0=>_0x3879a0["url"]),_0x61b34f,_0x1bcecc):[];throwIfAborted(_0x9bd97a['signal']);const _0x5c8a7f=_0x333023["length"]?await uploadModelApiMediaInputs('image',_0x333023["map"](_0x257323=>_0x257323["url"]),_0x61b34f,_0x1bcecc):[];throwIfAborted(_0x9bd97a['signal']);if(_0x3860bf["length"]!==_0x25f801["length"]||_0x3860bf["some"](_0x4a909a=>!_0x4a909a)||_0x5c8a7f["length"]!==_0x333023["length"])throw new Error("参考素材上传不完整");const _0x3716fc=Object['fromEntries'](_0x25f801["map"]((_0x104aa3,_0x4881a7)=>[_0x104aa3['refSlot'],_0x3860bf[_0x4881a7]])),_0x258e6d=await buildBodyFromMapping({'bodyMapping':_0x41e49f["bodyMapping"],'context':{'payload':{..._0x9bd97a,'generationParams':_0x301596},'finalPrompt':_0x1aa316,'inputAudios':_0x3860bf,'inputImages':_0x5c8a7f,'audioBySlot':_0x3716fc},'transforms':TRANSFORMS}),_0x66b674=_0xbe585["rules"]?.["voiceOverride"];if(_0x66b674&&(!_0x66b674["mode"]||_0x44f80f[_0x66b674["mode"]]==="custom")&&String(_0x301596[_0x66b674["custom"]]||'')["trim"]())_0x258e6d[_0x66b674["target"]]=String(_0x301596[_0x66b674["custom"]])["trim"]();if(_0xbe585["rules"]?.["controlMode"]==="murekaBgm"&&!_0x1aa316)delete _0x258e6d["prompt"];const _0x42c4eb=[];for(const _0x4e1681 of _0xbe585['preparations']||[]){if(_0x4e1681["toggle"]&&_0x301596[_0x4e1681["toggle"]]!==!![])continue;if(_0x258e6d[_0x4e1681["targetField"]])continue;const _0x3280b9=_0x3716fc[_0x4e1681["slot"]];if(!_0x3280b9)continue;const _0x25dfa0=getExecutionManifest(_0x4e1681["executionId"]);if(!_0x25dfa0?.["extensions"]?.['audioPreparation']||_0x25dfa0['provider']!=="runninghub")throw new Error("RunningHub 音频前处理配置缺失");_0x42c4eb["push"]({..._0x4e1681,'apiUrl':buildRunningHubModelApiUrl(_0x93f3a0,_0x25dfa0["endpoint"]),'body':{[_0x4e1681["inputField"]]:_0x3280b9,..._0x4e1681["purpose"]?{'purpose':_0x4e1681["purpose"]}:{}}});}const _0x1fa610=String(_0x9bd97a["installId"]||'')["trim"]();return{'url':"/api/v2/proxy/image",'headers':{'Content-Type':'application/json',..._0x1fa610?{'X-AIC-Install-Id':_0x1fa610}:{}},'body':{'apiUrl':buildRunningHubModelApiUrl(_0x93f3a0,_0x41e49f["endpoint"]),'apiKey':_0x5805a5,..._0x258e6d},'responseMapping':_0x41e49f["responseMapping"],'isProxy':!![],'adapterTrace':{'source':"manifest",'modelId':_0x320eb0['modelId'],'executionId':_0x41e49f['id']},'meta':{'provider':'runninghub','adapterType':"modelApi",'model':_0x320eb0['modelId'],'executionId':_0x41e49f['id'],'providerProfileId':_0x93f3a0,'rhProviderProfileId':_0x93f3a0,'apiUrl':resolveRunningHubModelApiBaseUrl(_0x93f3a0),'isRunningHubAudioModelApi':!![],'audioWorkflowKey':_0x320eb0["modelId"],'audioWorkflowLabel':_0x320eb0["displayName"],'nodeId':String(_0x9bd97a['nodeId']||''),'installId':_0x1fa610,'prompt':_0x1aa316,'preparations':_0x42c4eb}};}function extractPreparationValue(_0xdae1fc,_0x5c519){const _0x1525de=Array["isArray"](_0xdae1fc?.["results"])?_0xdae1fc["results"]:[],_0x5aeb08=_0x1525de["filter"](_0x57a1b4=>_0x57a1b4?.["outputType"]==="text"&&typeof _0x57a1b4['text']==="string")['map'](_0x1553a7=>_0x1553a7['text']["trim"]())["filter"](Boolean);if(_0x5c519==='id'){if(_0x5aeb08['length']!==0x1||!/^[A-Za-z0-9_-]{1,64}$/["test"](_0x5aeb08[0x0]))throw new Error('Mureka\x20前处理未返回有效素材\x20ID');return{'id':_0x5aeb08[0x0]};}for(const _0x48e802 of _0x5aeb08){let _0x29d036;try{_0x29d036=JSON["parse"](_0x48e802);}catch{continue;}if(_0x29d036&&typeof _0x29d036==='object'&&typeof _0x29d036['coverFeatureId']==="string"&&_0x29d036["coverFeatureId"]["trim"]())return _0x29d036;}throw new Error('翻唱前处理未返回\x20coverFeatureId；请核对厂商返回格式，或关闭先提取原曲特征使用直接翻唱');}export async function prepareRunningHubCatalogRequest(_0x2e07db,{submitAndPoll:_0x234874,signal:_0x5f32bf}={}){const _0x546096=_0x2e07db["meta"]?.["preparations"]||[];if(!_0x546096['length'])return _0x2e07db;const _0x279032={..._0x2e07db['body']};for(const _0x397555 of _0x546096){throwIfAborted(_0x5f32bf);const _0x2194df=await _0x234874({..._0x2e07db,'body':{'apiUrl':_0x397555["apiUrl"],'apiKey':_0x279032["apiKey"],..._0x397555["body"]},'meta':{..._0x2e07db["meta"],'preparations':[]}});throwIfAborted(_0x5f32bf);const _0x367c8a=extractPreparationValue(_0x2194df,_0x397555["resultType"]);_0x279032[_0x397555['targetField']]=_0x397555["resultType"]==='id'?_0x367c8a['id']:_0x367c8a['coverFeatureId']["trim"]();if(_0x397555["resultType"]==="coverFeatures"&&!_0x279032["lyrics"])_0x279032['lyrics']=String(_0x367c8a["lyrics"]||'')["trim"]();if(_0x397555['resultType']==='coverFeatures'&&(_0x279032["lyrics"]['length']<0xa||_0x279032["lyrics"]["length"]>0x3e8))throw new Error('翻唱前处理后的歌词必须为\x2010–1000\x20字符');}return{..._0x2e07db,'body':_0x279032,'meta':{..._0x2e07db["meta"],'preparations':[]}};}
+import { getExecutionManifest, sanitizeModelUiSchemaParams } from '../../src/manifests/index.js';
+import { buildBodyFromMapping } from './modelApiMappingEngine.js';
+import { uploadModelApiMediaInputs } from '../mediaInputUploadRouter.js';
+import { processInputAudiosPreserveOrder } from '../audioUploadApi.js';
+import { processInputImagesPreserveOrder } from '../imageUploadApi.js';
+import {
+  buildRunningHubModelApiUrl,
+  getRunningHubProviderProfileId,
+  resolveRunningHubModelApiProfileId,
+  resolveRunningHubModelApiBaseUrl,
+} from '../../src/modules/runningHubProviderProfiles.js';
+import { validateRunningHubAudioParameters } from './runningHubAudioValidation.js';
+function throwIfAborted(value) {
+  if (value?.['aborted']) throw new DOMException('生成已中断', 'AbortError');
+}
+function normalizeRefs(item, key, index) {
+  const list = (key['inputSlots']?.['fixedSlots'] || [])['filter']((result) => result['kind'] === index),
+    list2 =
+      item[index + 'Refs'] ||
+      item['input' + index[0x0]['toUpperCase']() + index['slice'](0x1) + 'Urls'] ||
+      [],
+    map = new Set();
+  return list2['map']((args) => {
+    const response = typeof args === 'string' ? { url: args } : { ...args };
+    let enabled = String(response['refSlot'] || '')['trim']();
+    if (enabled && !list['some']((data) => data['id'] === enabled))
+      throw new Error('参考素材槽位无效，请重新连接');
+    if (!enabled) enabled = list['find']((options) => !map['has'](options['id']))?.['id'] || '';
+    return (
+      map['add'](enabled),
+      { ...response, refSlot: enabled, url: String(response['url'] || '')['trim']() }
+    );
+  });
+}
+const TRANSFORMS = Object['freeze']({
+  audioSlot: (target, { context: context, spec: spec }) => context['audioBySlot'][spec['slot']],
+  first: (source) => source?.[0x0],
+  lines: (next) =>
+    String(next || '')
+      ['split'](/\r?\n/)
+      ['map']((current) => current['trim']())
+      ['filter'](Boolean),
+  secondsToMilliseconds: (entry) => Math['round'](Number(entry) * 0x3e8),
+  parenthesisFilter: (record) => (record ? 0x64 : 0x0),
+});
+export async function buildRunningHubCatalogRequest(args2, enabled2, payload, handle = {}) {
+  const { modelManifest: modelManifest, executionManifest: executionManifest } = payload,
+    enabled3 = executionManifest['extensions']?.['audioModelApi'];
+  if (
+    !enabled3 ||
+    modelManifest['provider'] !== 'runninghub' ||
+    executionManifest['adapterType'] !== 'modelApi'
+  )
+    throw new Error('RunningHub 音频执行配置缺失');
+  throwIfAborted(args2['signal']);
+  const runningHubModelApiProfileId = resolveRunningHubModelApiProfileId(
+      modelManifest['modelId'],
+      getRunningHubProviderProfileId(args2),
+    ),
+    state = handle['getProviderConfig']?.(runningHubModelApiProfileId) || {},
+    enabled4 = String(state['modelApiKey'] || args2['apiKey'] || state['apiKey'] || '')['trim']();
+  if (!enabled4) throw new Error('RunningHub API Key 未配置，请在设置中配置');
+  const refs = normalizeRefs(args2, modelManifest, 'audio'),
+    refs2 = normalizeRefs(args2, modelManifest, 'image'),
+    config = args2['generationParams'] || {};
+  validateRunningHubAudioParameters(modelManifest, enabled3, enabled2, config, refs, refs2);
+  const sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(modelManifest['modelId'], config, {
+      includeDefaults: !![],
+    }),
+    scope = {
+      getProviderConfig: handle['getProviderConfig'],
+      processInputAudios: handle['processInputAudios'] || processInputAudiosPreserveOrder,
+      processInputImages: handle['processInputImages'] || processInputImagesPreserveOrder,
+    },
+    input = {
+      apiKey: enabled4,
+      providerProfileId: runningHubModelApiProfileId,
+      apiUrl: resolveRunningHubModelApiBaseUrl(runningHubModelApiProfileId),
+      strictUpload: !![],
+      uploadOptions: { signal: args2['signal'] },
+    },
+    output = refs['length']
+      ? await uploadModelApiMediaInputs(
+          'audio',
+          refs['map']((value2) => value2['url']),
+          scope,
+          input,
+        )
+      : [];
+  throwIfAborted(args2['signal']);
+  const value3 = refs2['length']
+    ? await uploadModelApiMediaInputs(
+        'image',
+        refs2['map']((value4) => value4['url']),
+        scope,
+        input,
+      )
+    : [];
+  throwIfAborted(args2['signal']);
+  if (
+    output['length'] !== refs['length'] ||
+    output['some']((enabled5) => !enabled5) ||
+    value3['length'] !== refs2['length']
+  )
+    throw new Error('参考素材上传不完整');
+  const value5 = Object['fromEntries'](refs['map']((value6, value7) => [value6['refSlot'], output[value7]])),
+    args3 = await buildBodyFromMapping({
+      bodyMapping: executionManifest['bodyMapping'],
+      context: {
+        payload: { ...args2, generationParams: sanitizeModelUiSchemaParams2 },
+        finalPrompt: enabled2,
+        inputAudios: output,
+        inputImages: value3,
+        audioBySlot: value5,
+      },
+      transforms: TRANSFORMS,
+    }),
+    enabled6 = enabled3['rules']?.['voiceOverride'];
+  if (
+    enabled6 &&
+    (!enabled6['mode'] || config[enabled6['mode']] === 'custom') &&
+    String(sanitizeModelUiSchemaParams2[enabled6['custom']] || '')['trim']()
+  )
+    args3[enabled6['target']] = String(sanitizeModelUiSchemaParams2[enabled6['custom']])['trim']();
+  if (enabled3['rules']?.['controlMode'] === 'murekaBgm' && !enabled2) delete args3['prompt'];
+  const value8 = [];
+  for (const args4 of enabled3['preparations'] || []) {
+    if (args4['toggle'] && sanitizeModelUiSchemaParams2[args4['toggle']] !== !![]) continue;
+    if (args3[args4['targetField']]) continue;
+    const enabled7 = value5[args4['slot']];
+    if (!enabled7) continue;
+    const executionManifest2 = getExecutionManifest(args4['executionId']);
+    if (
+      !executionManifest2?.['extensions']?.['audioPreparation'] ||
+      executionManifest2['provider'] !== 'runninghub'
+    )
+      throw new Error('RunningHub 音频前处理配置缺失');
+    value8['push']({
+      ...args4,
+      apiUrl: buildRunningHubModelApiUrl(runningHubModelApiProfileId, executionManifest2['endpoint']),
+      body: { [args4['inputField']]: enabled7, ...(args4['purpose'] ? { purpose: args4['purpose'] } : {}) },
+    });
+  }
+  const args5 = String(args2['installId'] || '')['trim']();
+  return {
+    url: '/api/v2/proxy/image',
+    headers: { 'Content-Type': 'application/json', ...(args5 ? { 'X-AIC-Install-Id': args5 } : {}) },
+    body: {
+      apiUrl: buildRunningHubModelApiUrl(runningHubModelApiProfileId, executionManifest['endpoint']),
+      apiKey: enabled4,
+      ...args3,
+    },
+    responseMapping: executionManifest['responseMapping'],
+    isProxy: !![],
+    adapterTrace: {
+      source: 'manifest',
+      modelId: modelManifest['modelId'],
+      executionId: executionManifest['id'],
+    },
+    meta: {
+      provider: 'runninghub',
+      adapterType: 'modelApi',
+      model: modelManifest['modelId'],
+      executionId: executionManifest['id'],
+      providerProfileId: runningHubModelApiProfileId,
+      rhProviderProfileId: runningHubModelApiProfileId,
+      apiUrl: resolveRunningHubModelApiBaseUrl(runningHubModelApiProfileId),
+      isRunningHubAudioModelApi: !![],
+      audioWorkflowKey: modelManifest['modelId'],
+      audioWorkflowLabel: modelManifest['displayName'],
+      nodeId: String(args2['nodeId'] || ''),
+      installId: args5,
+      prompt: enabled2,
+      preparations: value8,
+    },
+  };
+}
+function extractPreparationValue(value9, value10) {
+  const value11 = Array['isArray'](value9?.['results']) ? value9['results'] : [],
+    list3 = value11['filter'](
+      (response2) => response2?.['outputType'] === 'text' && typeof response2['text'] === 'string',
+    )
+      ['map']((response3) => response3['text']['trim']())
+      ['filter'](Boolean);
+  if (value10 === 'id') {
+    if (list3['length'] !== 0x1 || !/^[A-Za-z0-9_-]{1,64}$/['test'](list3[0x0]))
+      throw new Error('Mureka\x20前处理未返回有效素材\x20ID');
+    return { id: list3[0x0] };
+  }
+  for (const value12 of list3) {
+    let value13;
+    try {
+      value13 = JSON['parse'](value12);
+    } catch {
+      continue;
+    }
+    if (
+      value13 &&
+      typeof value13 === 'object' &&
+      typeof value13['coverFeatureId'] === 'string' &&
+      value13['coverFeatureId']['trim']()
+    )
+      return value13;
+  }
+  throw new Error('翻唱前处理未返回\x20coverFeatureId；请核对厂商返回格式，或关闭先提取原曲特征使用直接翻唱');
+}
+export async function prepareRunningHubCatalogRequest(
+  dom,
+  { submitAndPoll: submitAndPoll, signal: signal } = {},
+) {
+  const list4 = dom['meta']?.['preparations'] || [];
+  if (!list4['length']) return dom;
+  const enabled8 = { ...dom['body'] };
+  for (const args6 of list4) {
+    throwIfAborted(signal);
+    const value14 = await submitAndPoll({
+      ...dom,
+      body: { apiUrl: args6['apiUrl'], apiKey: enabled8['apiKey'], ...args6['body'] },
+      meta: { ...dom['meta'], preparations: [] },
+    });
+    throwIfAborted(signal);
+    const extractPreparationValue2 = extractPreparationValue(value14, args6['resultType']);
+    enabled8[args6['targetField']] =
+      args6['resultType'] === 'id'
+        ? extractPreparationValue2['id']
+        : extractPreparationValue2['coverFeatureId']['trim']();
+    if (args6['resultType'] === 'coverFeatures' && !enabled8['lyrics'])
+      enabled8['lyrics'] = String(extractPreparationValue2['lyrics'] || '')['trim']();
+    if (
+      args6['resultType'] === 'coverFeatures' &&
+      (enabled8['lyrics']['length'] < 0xa || enabled8['lyrics']['length'] > 0x3e8)
+    )
+      throw new Error('翻唱前处理后的歌词必须为\x2010–1000\x20字符');
+  }
+  return { ...dom, body: enabled8, meta: { ...dom['meta'], preparations: [] } };
+}

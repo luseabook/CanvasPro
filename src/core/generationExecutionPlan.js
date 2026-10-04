@@ -11,25 +11,25 @@ const ADAPTER_TYPE_ALIASES = Object['freeze']({
   local_runtime: 'localRuntime',
   'local-runtime': 'localRuntime',
 });
-function compactIdPart(_0x280638, _0x248e10 = '') {
-  return String(_0x280638 || _0x248e10)
+function compactIdPart(value, item = '') {
+  return String(value || item)
     ['trim']()
     ['replace'](/\s+/g, '-');
 }
-function firstTrimmed(..._0x4c4822) {
-  for (const _0x4fdf76 of _0x4c4822) {
-    const _0x253746 = String(_0x4fdf76 || '')['trim']();
-    if (_0x253746) return _0x253746;
+function firstTrimmed(...args) {
+  for (const key of args) {
+    const index = String(key || '')['trim']();
+    if (index) return index;
   }
   return '';
 }
-export function normalizeGenerationAdapterType(_0x2ee406, _0x138845 = 'modelApi') {
-  const _0x1af26d = String(_0x2ee406 || _0x138845)
+export function normalizeGenerationAdapterType(result, data = 'modelApi') {
+  const options = String(result || data)
     ['trim']()
     ['toLowerCase']();
-  return ADAPTER_TYPE_ALIASES[_0x1af26d] || _0x138845;
+  return ADAPTER_TYPE_ALIASES[options] || data;
 }
-export function resolveGenerationTaskIdentity(_0x44393b = {}) {
+export function resolveGenerationTaskIdentity(options2 = {}) {
   const {
       kind: kind = 'generation',
       node: node = {},
@@ -41,67 +41,66 @@ export function resolveGenerationTaskIdentity(_0x44393b = {}) {
       executionId: executionId = '',
       taskId: taskId = '',
       startedAt: startedAt = 0x0,
-    } = _0x44393b || {},
-    _0x19fe12 = inferGenerationTaskProtocol({
+    } = options2 || {},
+    protocol = inferGenerationTaskProtocol({
       taskProtocol: taskProtocol,
       adapterType: adapterType,
       provider: provider,
       node: node,
       async: taskProtocol === 'asyncModelApi',
     }),
-    _0x129eb2 = getGenerationTaskProtocolAdapter(_0x19fe12),
-    _0x135f2c = normalizeGenerationAdapterType(
-      adapterType || node['taskAdapterType'] || node['adapterType'] || _0x129eb2?.['adapterType'],
+    taskId2 = getGenerationTaskProtocolAdapter(protocol),
+    adapterType2 = normalizeGenerationAdapterType(
+      adapterType || node['taskAdapterType'] || node['adapterType'] || taskId2?.['adapterType'],
     ),
-    _0x42b8a8 = firstTrimmed(
+    provider2 = firstTrimmed(
       provider,
       node['taskProvider'],
       payload?.['provider'],
-      _0x19fe12 === 'asyncModelApi' ? node['asyncTaskProvider'] : '',
+      protocol === 'asyncModelApi' ? node['asyncTaskProvider'] : '',
       node['provider'],
-      _0x19fe12 === 'workflow' ? 'runninghubwf' : '',
-      _0x19fe12 === 'dreamina' ? 'dreamina' : '',
-      _0x135f2c,
+      protocol === 'workflow' ? 'runninghubwf' : '',
+      protocol === 'dreamina' ? 'dreamina' : '',
+      adapterType2,
     ),
-    _0x323a5a = firstTrimmed(modelId, node['taskModelId'], payload?.['model'], node['model']),
-    _0x42555a = firstTrimmed(
+    modelId2 = firstTrimmed(modelId, node['taskModelId'], payload?.['model'], node['model']),
+    executionId2 = firstTrimmed(
       executionId,
       node['taskExecutionId'],
       buildGenerationExecutionId({
         kind: kind,
-        provider: _0x42b8a8,
-        adapterType: _0x135f2c,
-        modelId: _0x323a5a,
+        provider: provider2,
+        adapterType: adapterType2,
+        modelId: modelId2,
       }),
     );
   return {
-    protocol: _0x19fe12,
-    provider: _0x42b8a8,
-    adapterType: _0x135f2c,
-    modelId: _0x323a5a,
-    executionId: _0x42555a,
+    protocol: protocol,
+    provider: provider2,
+    adapterType: adapterType2,
+    modelId: modelId2,
+    executionId: executionId2,
     taskId:
-      _0x129eb2?.['readTaskId'](node, taskId) ||
+      taskId2?.['readTaskId'](node, taskId) ||
       firstTrimmed(taskId, node['rhTaskId'], node['asyncTaskId'], node['dreaminaSubmitId'], node['taskId']),
     startedAt:
-      _0x129eb2?.['readStartedAt'](node, startedAt) ||
-      Number(startedAt || node['generationStartTime'] || 0x0),
-    async: _0x129eb2?.['async'] === !![],
+      taskId2?.['readStartedAt'](node, startedAt) || Number(startedAt || node['generationStartTime'] || 0x0),
+    async: taskId2?.['async'] === !![],
   };
 }
 export function buildGenerationExecutionId({
-  kind: _0x2e205b,
-  provider: _0x2ded01,
-  adapterType: _0x1e3f9b,
-  modelId: _0x3da94a,
+  kind: kind2,
+  provider: provider3,
+  adapterType: adapterType3,
+  modelId: modelId3,
   fallbackModel: fallbackModel = 'default',
 } = {}) {
-  const _0x174563 = compactIdPart(_0x2e205b, 'generation'),
-    _0x56636d = compactIdPart(_0x2ded01, normalizeGenerationAdapterType(_0x1e3f9b, 'modelApi')),
-    _0xb963af = compactIdPart(_0x3da94a, fallbackModel);
-  return _0x174563 + '.' + _0x56636d + '.' + _0xb963af;
+  const compactIdPart2 = compactIdPart(kind2, 'generation'),
+    compactIdPart3 = compactIdPart(provider3, normalizeGenerationAdapterType(adapterType3, 'modelApi')),
+    compactIdPart4 = compactIdPart(modelId3, fallbackModel);
+  return compactIdPart2 + '.' + compactIdPart3 + '.' + compactIdPart4;
 }
-export function createGenerationExecutionPlan(_0x512413 = {}) {
+export function createGenerationExecutionPlan(options3 = {}) {
   const {
       kind: kind = 'generation',
       sourceNodeId: sourceNodeId = '',
@@ -112,69 +111,69 @@ export function createGenerationExecutionPlan(_0x512413 = {}) {
       adapterType: adapterType = 'modelApi',
       modelId: modelId = '',
       executionId: executionId = '',
-      payload: _0x4d7bfd,
-      cancellable: _0xc795de,
-      resumable: _0x3568ba,
-      protocol: _0x12c288 = '',
+      payload: payload2,
+      cancellable: cancellable,
+      resumable: resumable,
+      protocol: protocol2 = '',
       taskProtocol: taskProtocol = '',
-      async: _0xaef874,
-      ..._0x3dbb84
-    } = _0x512413 || {},
-    _0x1fa4b1 = normalizeGenerationAdapterType(adapterType),
-    _0x3fa9b7 = _0x1fa4b1 === 'workflow',
-    _0x5270c8 = _0xaef874 === !![] && _0x1fa4b1 === 'modelApi',
-    _0x5ba9c0 = compactIdPart(provider || _0x4d7bfd?.['provider'], _0x1fa4b1),
-    _0x4a1667 =
+      async: async,
+      ...args2
+    } = options3 || {},
+    adapterType4 = normalizeGenerationAdapterType(adapterType),
+    target = adapterType4 === 'workflow',
+    async2 = async === !![] && adapterType4 === 'modelApi',
+    provider4 = compactIdPart(provider || payload2?.['provider'], adapterType4),
+    protocol3 =
       inferGenerationTaskProtocol({
-        taskProtocol: taskProtocol || _0x12c288,
-        adapterType: _0x1fa4b1,
-        provider: _0x5ba9c0,
-        async: _0x5270c8,
-      }) || _0x1fa4b1,
-    _0x1da55a = String(modelId || _0x4d7bfd?.['model'] || '')['trim']();
+        taskProtocol: taskProtocol || protocol2,
+        adapterType: adapterType4,
+        provider: provider4,
+        async: async2,
+      }) || adapterType4,
+    modelId4 = String(modelId || payload2?.['model'] || '')['trim']();
   return {
-    ..._0x3dbb84,
+    ...args2,
     sourceNodeId: sourceNodeId,
     targetNodeId: targetNodeId,
     trigger: trigger,
     taskType: String(taskType || kind + '-generation')['trim'](),
-    provider: _0x5ba9c0,
-    adapterType: _0x1fa4b1,
-    protocol: _0x4a1667,
-    modelId: _0x1da55a,
+    provider: provider4,
+    adapterType: adapterType4,
+    protocol: protocol3,
+    modelId: modelId4,
     executionId:
       String(executionId || '')['trim']() ||
       buildGenerationExecutionId({
         kind: kind,
-        provider: _0x5ba9c0,
-        adapterType: _0x1fa4b1,
-        modelId: _0x1da55a,
+        provider: provider4,
+        adapterType: adapterType4,
+        modelId: modelId4,
       }),
-    payload: _0x4d7bfd,
-    cancellable: _0xc795de === undefined ? _0x3fa9b7 : _0xc795de === !![],
-    resumable: _0x3568ba === undefined ? _0x3fa9b7 || _0x5270c8 : _0x3568ba === !![],
-    async: _0x5270c8,
+    payload: payload2,
+    cancellable: cancellable === undefined ? target : cancellable === !![],
+    resumable: resumable === undefined ? target || async2 : resumable === !![],
+    async: async2,
     capabilities: {
-      async: _0x5270c8,
-      cancellable: _0xc795de === undefined ? _0x3fa9b7 : _0xc795de === !![],
-      resumable: _0x3568ba === undefined ? _0x3fa9b7 || _0x5270c8 : _0x3568ba === !![],
+      async: async2,
+      cancellable: cancellable === undefined ? target : cancellable === !![],
+      resumable: resumable === undefined ? target || async2 : resumable === !![],
     },
   };
 }
-function createGenerationLifecyclePlan(_0x4fd4bc, _0x3afbf9 = {}) {
-  const _0x247ded = createGenerationExecutionPlan(_0x3afbf9);
-  return { ..._0x247ded, lifecycle: String(_0x4fd4bc || 'submit') };
+function createGenerationLifecyclePlan(source, next = {}) {
+  const args3 = createGenerationExecutionPlan(next);
+  return { ...args3, lifecycle: String(source || 'submit') };
 }
-export function createGenerationSubmitPlan(_0x4b51d4 = {}) {
-  return createGenerationLifecyclePlan('submit', _0x4b51d4);
+export function createGenerationSubmitPlan(options4 = {}) {
+  return createGenerationLifecyclePlan('submit', options4);
 }
-export function createGenerationResumePlan(_0xa11f91 = {}) {
-  return createGenerationLifecyclePlan('resume', { resumable: !![], ..._0xa11f91 });
+export function createGenerationResumePlan(args4 = {}) {
+  return createGenerationLifecyclePlan('resume', { resumable: !![], ...args4 });
 }
-export function createGenerationCancelPlan(_0x3d8f0c = {}) {
-  return createGenerationLifecyclePlan('cancel', { cancellable: !![], ..._0x3d8f0c });
+export function createGenerationCancelPlan(args5 = {}) {
+  return createGenerationLifecyclePlan('cancel', { cancellable: !![], ...args5 });
 }
-function createGenerationPlanFromNode(_0x553059, _0x1105fa = {}) {
+function createGenerationPlanFromNode(current, entry = {}) {
   const {
       node: node = {},
       payload: payload = {},
@@ -185,10 +184,10 @@ function createGenerationPlanFromNode(_0x553059, _0x1105fa = {}) {
       executionId: executionId = '',
       taskId: taskId = '',
       startedAt: startedAt = 0x0,
-      ..._0x114cb1
-    } = _0x1105fa || {},
-    _0x500cc9 = resolveGenerationTaskIdentity({
-      kind: _0x114cb1['kind'],
+      ...kind3
+    } = entry || {},
+    provider5 = resolveGenerationTaskIdentity({
+      kind: kind3['kind'],
       node: node,
       payload: payload,
       taskProtocol: taskProtocol,
@@ -199,28 +198,28 @@ function createGenerationPlanFromNode(_0x553059, _0x1105fa = {}) {
       taskId: taskId,
       startedAt: startedAt,
     }),
-    _0x1be8fa = {
-      ..._0x114cb1,
-      provider: _0x500cc9['provider'],
-      adapterType: _0x500cc9['adapterType'],
-      modelId: _0x500cc9['modelId'],
-      executionId: _0x500cc9['executionId'],
+    record = {
+      ...kind3,
+      provider: provider5['provider'],
+      adapterType: provider5['adapterType'],
+      modelId: provider5['modelId'],
+      executionId: provider5['executionId'],
       payload: payload,
-      taskId: _0x500cc9['taskId'],
-      startedAt: _0x500cc9['startedAt'],
-      taskProtocol: _0x500cc9['protocol'],
-      async: _0x500cc9['async'],
+      taskId: provider5['taskId'],
+      startedAt: provider5['startedAt'],
+      taskProtocol: provider5['protocol'],
+      async: provider5['async'],
     };
-  if (_0x553059 === 'resume') return createGenerationResumePlan(_0x1be8fa);
-  if (_0x553059 === 'cancel') return createGenerationCancelPlan(_0x1be8fa);
-  return createGenerationSubmitPlan(_0x1be8fa);
+  if (current === 'resume') return createGenerationResumePlan(record);
+  if (current === 'cancel') return createGenerationCancelPlan(record);
+  return createGenerationSubmitPlan(record);
 }
-export function createGenerationSubmitPlanFromNode(_0x48929d = {}) {
-  return createGenerationPlanFromNode('submit', _0x48929d);
+export function createGenerationSubmitPlanFromNode(options5 = {}) {
+  return createGenerationPlanFromNode('submit', options5);
 }
-export function createGenerationResumePlanFromNode(_0x566390 = {}) {
-  return createGenerationPlanFromNode('resume', _0x566390);
+export function createGenerationResumePlanFromNode(options6 = {}) {
+  return createGenerationPlanFromNode('resume', options6);
 }
-export function createGenerationCancelPlanFromNode(_0x3feebb = {}) {
-  return createGenerationPlanFromNode('cancel', _0x3feebb);
+export function createGenerationCancelPlanFromNode(options7 = {}) {
+  return createGenerationPlanFromNode('cancel', options7);
 }

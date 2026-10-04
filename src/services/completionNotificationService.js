@@ -7,229 +7,229 @@ const IMAGE_FILE_EXTENSION_RE = /\.(?:png|jpe?g|webp|gif|bmp|avif)$/i,
   clickSubscribers = new Set();
 let unsubscribeDesktopClicks = null,
   notificationSequence = 0x0;
-function createNotificationReceipt(_0x35dda9) {
-  const _0x5cc154 = _0x35dda9 ? 'renderer-' + Date['now']() + '-' + ++notificationSequence : '';
-  let _0x16aa97,
-    _0x3e26fe = ![];
-  function _0x1724a0() {
-    _0x3e26fe = !![];
-    if (!_0x5cc154 || !_0x16aa97) return;
-    void Promise['resolve'](_0x16aa97)
-      ['then'](() => getNotificationApi()?.['acknowledge']?.({ notificationId: _0x5cc154 }))
+function createNotificationReceipt(value) {
+  const notificationId = value ? 'renderer-' + Date['now']() + '-' + ++notificationSequence : '';
+  let enabled,
+    item = ![];
+  function acknowledge() {
+    item = !![];
+    if (!notificationId || !enabled) return;
+    void Promise['resolve'](enabled)
+      ['then'](() => getNotificationApi()?.['acknowledge']?.({ notificationId: notificationId }))
       ['catch'](() => {});
   }
   return {
-    notificationId: _0x5cc154,
-    setDelivery(_0x831ff7) {
-      _0x16aa97 = _0x831ff7;
-      if (_0x3e26fe) _0x1724a0();
+    notificationId: notificationId,
+    setDelivery(key) {
+      enabled = key;
+      if (item) acknowledge();
     },
-    acknowledge: _0x1724a0,
+    acknowledge: acknowledge,
   };
 }
-export function dispatchCompletionClick(_0x54646c) {
-  for (const _0x15bde4 of clickSubscribers) {
+export function dispatchCompletionClick(index) {
+  for (const run of clickSubscribers) {
     try {
-      _0x15bde4(_0x54646c);
-    } catch (_0x2ea79a) {
-      console['warn']('[completionNotification] navigation failed:', _0x2ea79a);
+      run(index);
+    } catch (result) {
+      console['warn']('[completionNotification] navigation failed:', result);
     }
   }
 }
-function showCompletionToast(_0x3e3544, _0x25b176) {
-  const _0x42cc21 = _0x3e3544?.['navigation'];
-  if (!['canvas', 'replacement-studio']['includes'](_0x42cc21?.['source'])) return;
-  const _0x18c483 = normalizeText(
-      _0x3e3544['nodeName'] || _0x3e3544['node']?.['name'] || _0x3e3544['node']?.['title'],
-    ),
-    _0x203465 =
-      normalizeText(_0x3e3544['body']) ||
-      (_0x18c483
-        ? t('coreServices.completion.notificationNodeBody', { name: _0x18c483 })
+function showCompletionToast(dom, data) {
+  const args = dom?.['navigation'];
+  if (!['canvas', 'replacement-studio']['includes'](args?.['source'])) return;
+  const name = normalizeText(dom['nodeName'] || dom['node']?.['name'] || dom['node']?.['title']),
+    ariaLabel =
+      normalizeText(dom['body']) ||
+      (name
+        ? t('coreServices.completion.notificationNodeBody', { name: name })
         : t('coreServices.completion.notificationBody')),
-    _0x345389 = { ..._0x42cc21 };
-  globalThis['window']?.['showToast']?.(_0x203465, 'success', 0x2710, {
-    ariaLabel: _0x203465 + '，点击查看结果',
+    options = { ...args };
+  globalThis['window']?.['showToast']?.(ariaLabel, 'success', 0x2710, {
+    ariaLabel: ariaLabel + '，点击查看结果',
     onClick: () => {
-      (_0x25b176['acknowledge'](), dispatchCompletionClick(_0x345389));
+      (data['acknowledge'](), dispatchCompletionClick(options));
     },
   });
 }
 function getNotificationApi() {
   return desktopBridge['notification'];
 }
-function normalizeText(_0x256d98) {
-  return String(_0x256d98 || '')
+function normalizeText(target) {
+  return String(target || '')
     ['replace'](/\s+/g, '\x20')
     ['trim']();
 }
-function normalizeMediaKind(_0x45d602) {
-  const _0x38ae14 = normalizeText(_0x45d602)['toLowerCase']();
-  if (_0x38ae14 === 'video' || _0x38ae14['includes']('video')) return 'video';
-  if (_0x38ae14 === 'image' || _0x38ae14['includes']('image')) return 'image';
+function normalizeMediaKind(source) {
+  const list = normalizeText(source)['toLowerCase']();
+  if (list === 'video' || list['includes']('video')) return 'video';
+  if (list === 'image' || list['includes']('image')) return 'image';
   return '';
 }
-function getPrimaryMediaItem(_0x9334c9 = {}, _0x163e50 = '') {
-  const _0xf5bc32 = _0x163e50 === 'video' ? 'videos' : 'images',
-    _0x45e037 = _0x163e50 === 'video' ? 'mainVideoIndex' : 'mainImageIndex',
-    _0xac422 = Array['isArray'](_0x9334c9?.[_0xf5bc32]) ? _0x9334c9[_0xf5bc32] : [];
-  if (_0xac422['length'] === 0x0) return _0x9334c9;
-  const _0x4d2c46 = Math['max'](0x0, Math['trunc'](Number(_0x9334c9?.[_0x45e037]) || 0x0)),
-    _0x40904e = _0xac422[_0x4d2c46] || _0xac422['find']((_0x43ac56) => _0x43ac56 && !_0x43ac56['error']);
-  return _0x40904e && typeof _0x40904e === 'object' ? { ..._0x9334c9, ..._0x40904e } : _0x9334c9;
+function getPrimaryMediaItem(args2 = {}, next = '') {
+  const current = next === 'video' ? 'videos' : 'images',
+    entry = next === 'video' ? 'mainVideoIndex' : 'mainImageIndex',
+    list2 = Array['isArray'](args2?.[current]) ? args2[current] : [];
+  if (list2['length'] === 0x0) return args2;
+  const record = Math['max'](0x0, Math['trunc'](Number(args2?.[entry]) || 0x0)),
+    args3 = list2[record] || list2['find']((enabled2) => enabled2 && !enabled2['error']);
+  return args3 && typeof args3 === 'object' ? { ...args2, ...args3 } : args2;
 }
-function resolveMediaKind(_0x43be96 = {}, _0xd23553 = {}) {
-  const _0x5c1579 = [
-    _0x43be96?.['mediaKind'],
-    _0xd23553?.['outputType'],
-    _0xd23553?.['taskType'],
-    _0xd23553?.['type'],
-  ];
-  for (const _0x22cd99 of _0x5c1579) {
-    const _0x1c5aa2 = normalizeMediaKind(_0x22cd99);
-    if (_0x1c5aa2) return _0x1c5aa2;
+function resolveMediaKind(options2 = {}, payload = {}) {
+  const handle = [options2?.['mediaKind'], payload?.['outputType'], payload?.['taskType'], payload?.['type']];
+  for (const state of handle) {
+    const mediaKind = normalizeMediaKind(state);
+    if (mediaKind) return mediaKind;
   }
   if (
-    Array['isArray'](_0xd23553?.['videos']) ||
-    normalizeText(_0xd23553?.['videoUrl'] || _0xd23553?.['outputVideoUrl'])
+    Array['isArray'](payload?.['videos']) ||
+    normalizeText(payload?.['videoUrl'] || payload?.['outputVideoUrl'])
   )
     return 'video';
-  if (
-    Array['isArray'](_0xd23553?.['images']) ||
-    normalizeText(_0xd23553?.['imageUrl'] || _0xd23553?.['outputUrl'])
-  )
+  if (Array['isArray'](payload?.['images']) || normalizeText(payload?.['imageUrl'] || payload?.['outputUrl']))
     return 'image';
   return '';
 }
-function resolveImageThumbnailLocalPath(_0x578f34 = {}) {
-  const _0x4b83f5 = [
-    _0x578f34?.['thumbLocalPath'],
-    _0x578f34?.['thumbnailLocalPath'],
-    _0x578f34?.['posterLocalPath'],
-    _0x578f34?.['displayLocalPath'],
-    _0x578f34?.['localPath'],
-    _0x578f34?.['originalLocalPath'],
-    _0x578f34?.['thumbUrl'],
-    _0x578f34?.['thumbnailUrl'],
-    _0x578f34?.['posterUrl'],
-    _0x578f34?.['imageUrl'],
-    _0x578f34?.['sourceUrl'],
-    _0x578f34?.['outputUrl'],
+function resolveImageThumbnailLocalPath(options3 = {}) {
+  const config = [
+    options3?.['thumbLocalPath'],
+    options3?.['thumbnailLocalPath'],
+    options3?.['posterLocalPath'],
+    options3?.['displayLocalPath'],
+    options3?.['localPath'],
+    options3?.['originalLocalPath'],
+    options3?.['thumbUrl'],
+    options3?.['thumbnailUrl'],
+    options3?.['posterUrl'],
+    options3?.['imageUrl'],
+    options3?.['sourceUrl'],
+    options3?.['outputUrl'],
   ];
-  for (const _0x168ac6 of _0x4b83f5) {
-    const _0x5c1f6d = normalizeLocalPath(_0x168ac6);
-    if (_0x5c1f6d && IMAGE_FILE_EXTENSION_RE['test'](_0x5c1f6d)) return _0x5c1f6d;
+  for (const scope of config) {
+    const localPath = normalizeLocalPath(scope);
+    if (localPath && IMAGE_FILE_EXTENSION_RE['test'](localPath)) return localPath;
   }
   return '';
 }
 export async function buildGenerationCompleteNotificationRequest(
-  _0x2ec05c = {},
+  notificationId2 = {},
   { ensureVideoThumbnail: ensureVideoThumbnail = ensureVideoResultThumbnail } = {},
 ) {
-  const _0x1a53c5 =
-      _0x2ec05c?.['node'] && typeof _0x2ec05c['node'] === 'object' && !Array['isArray'](_0x2ec05c['node'])
-        ? _0x2ec05c['node']
+  const error =
+      notificationId2?.['node'] &&
+      typeof notificationId2['node'] === 'object' &&
+      !Array['isArray'](notificationId2['node'])
+        ? notificationId2['node']
         : {},
-    _0x579d1d = normalizeText(_0x2ec05c?.['nodeName'] || _0x1a53c5?.['name'] || _0x1a53c5?.['title']),
-    _0x950ce6 = resolveMediaKind(_0x2ec05c, _0x1a53c5);
-  let _0x385066 = getPrimaryMediaItem(_0x1a53c5, _0x950ce6);
-  if (_0x950ce6 === 'video' && typeof ensureVideoThumbnail === 'function')
+    name2 = normalizeText(notificationId2?.['nodeName'] || error?.['name'] || error?.['title']),
+    mediaKind2 = resolveMediaKind(notificationId2, error);
+  let primaryMediaItem = getPrimaryMediaItem(error, mediaKind2);
+  if (mediaKind2 === 'video' && typeof ensureVideoThumbnail === 'function')
     try {
-      _0x385066 = await ensureVideoThumbnail(_0x385066);
+      primaryMediaItem = await ensureVideoThumbnail(primaryMediaItem);
     } catch {}
-  const _0x511305 =
-      _0x950ce6 === 'image' || _0x950ce6 === 'video' ? resolveImageThumbnailLocalPath(_0x385066) : '',
-    _0x405e86 = _0x579d1d
-      ? t('coreServices.completion.notificationNodeBody', { name: _0x579d1d })
+  const thumbnailLocalPath =
+      mediaKind2 === 'image' || mediaKind2 === 'video'
+        ? resolveImageThumbnailLocalPath(primaryMediaItem)
+        : '',
+    input = name2
+      ? t('coreServices.completion.notificationNodeBody', { name: name2 })
       : t('coreServices.completion.notificationBody');
   return {
-    title: normalizeText(_0x2ec05c?.['title']) || normalizeText(globalThis.document?.title) || 'Canvas',
-    body: normalizeText(_0x2ec05c?.['body']) || _0x405e86,
-    ...(_0x511305 ? { thumbnailLocalPath: _0x511305 } : {}),
-    ...(_0x2ec05c?.['navigation'] && typeof _0x2ec05c['navigation'] === 'object'
-      ? { navigation: { ..._0x2ec05c['navigation'] } }
+    title: normalizeText(notificationId2?.['title']) || normalizeText(globalThis.document?.title) || 'Canvas',
+    body: normalizeText(notificationId2?.['body']) || input,
+    ...(thumbnailLocalPath ? { thumbnailLocalPath: thumbnailLocalPath } : {}),
+    ...(notificationId2?.['navigation'] && typeof notificationId2['navigation'] === 'object'
+      ? { navigation: { ...notificationId2['navigation'] } }
       : {}),
-    ...(_0x2ec05c['notificationId'] ? { notificationId: _0x2ec05c['notificationId'] } : {}),
+    ...(notificationId2['notificationId'] ? { notificationId: notificationId2['notificationId'] } : {}),
   };
 }
-export function subscribeGenerationCompleteNotificationClicks(_0x842973) {
-  if (typeof _0x842973 !== 'function') return () => {};
+export function subscribeGenerationCompleteNotificationClicks(output) {
+  if (typeof output !== 'function') return () => {};
   return (
-    clickSubscribers['add'](_0x842973),
+    clickSubscribers['add'](output),
     !unsubscribeDesktopClicks &&
       (unsubscribeDesktopClicks =
         getNotificationApi()?.['onGenerationCompleteClick']?.(dispatchCompletionClick) || (() => {})),
     () => {
-      clickSubscribers['delete'](_0x842973);
+      clickSubscribers['delete'](output);
       if (clickSubscribers['size']) return;
       (unsubscribeDesktopClicks?.(), (unsubscribeDesktopClicks = null));
     }
   );
 }
-export function showGenerationCompleteNotification(_0x50f4c3 = {}) {
-  const _0x50dacf = createNotificationReceipt(_0x50f4c3['navigation']);
-  showCompletionToast(_0x50f4c3, _0x50dacf);
-  const _0x142f49 = getNotificationApi(),
-    _0x330e9d = _0x142f49?.['showGenerationComplete'];
-  if (_0x142f49?.['isAvailable']?.() === ![] || typeof _0x330e9d !== 'function')
+export function showGenerationCompleteNotification(args4 = {}) {
+  const notificationId3 = createNotificationReceipt(args4['navigation']);
+  showCompletionToast(args4, notificationId3);
+  const notificationApi = getNotificationApi(),
+    handler = notificationApi?.['showGenerationComplete'];
+  if (notificationApi?.['isAvailable']?.() === ![] || typeof handler !== 'function')
     return Promise['resolve']({ success: !![], shown: ![], reason: 'unavailable' });
-  const _0x5539f5 = (async () => {
-    const _0x210bf1 = await loadCompletionSoundSettings();
-    if (_0x210bf1['notificationEnabled'] === ![]) return { success: !![], shown: ![], reason: 'disabled' };
-    const _0x2bc76c = await buildGenerationCompleteNotificationRequest({
-      ..._0x50f4c3,
-      notificationId: _0x50dacf['notificationId'],
+  const promise = (async () => {
+    const completionSoundSettings = await loadCompletionSoundSettings();
+    if (completionSoundSettings['notificationEnabled'] === ![])
+      return { success: !![], shown: ![], reason: 'disabled' };
+    const generationCompleteNotificationRequest = await buildGenerationCompleteNotificationRequest({
+      ...args4,
+      notificationId: notificationId3['notificationId'],
     });
-    return _0x330e9d(_0x2bc76c);
+    return handler(generationCompleteNotificationRequest);
   })();
   return (
-    _0x50dacf['setDelivery'](_0x5539f5),
-    _0x5539f5 &&
-      typeof _0x5539f5['catch'] === 'function' &&
-      _0x5539f5['catch']((_0x1bbd9a) => {
-        console['warn']('[completionNotification] show failed:', _0x1bbd9a);
+    notificationId3['setDelivery'](promise),
+    promise &&
+      typeof promise['catch'] === 'function' &&
+      promise['catch']((value2) => {
+        console['warn']('[completionNotification] show failed:', value2);
       }),
-    _0x5539f5
+    promise
   );
 }
 export async function showTaskStatusNotification({
-  body: _0x4c49ca,
+  body: body,
   type: type = 'error',
-  navigation: _0x1354b7,
+  navigation: navigation,
 } = {}) {
-  const _0x394f11 = _0x1354b7 ? { ..._0x1354b7 } : null,
-    _0x4365f8 = createNotificationReceipt(_0x394f11);
+  const navigation2 = navigation ? { ...navigation } : null,
+    notificationId4 = createNotificationReceipt(navigation2);
   globalThis['window']?.['showToast']?.(
-    _0x4c49ca,
+    body,
     type,
     0x2710,
-    _0x394f11
+    navigation2
       ? {
-          ariaLabel: _0x4c49ca + '，点击查看任务',
+          ariaLabel: body + '，点击查看任务',
           onClick: () => {
-            (_0x4365f8['acknowledge'](), dispatchCompletionClick(_0x394f11));
+            (notificationId4['acknowledge'](), dispatchCompletionClick(navigation2));
           },
         }
       : {},
   );
-  const _0x1997fe = await loadCompletionSoundSettings(),
-    _0x4c589f = [];
-  _0x1997fe['enabled'] !== ![] &&
-    _0x1997fe['volume'] > 0x0 &&
+  const completionSoundSettings2 = await loadCompletionSoundSettings(),
+    list3 = [];
+  completionSoundSettings2['enabled'] !== ![] &&
+    completionSoundSettings2['volume'] > 0x0 &&
     desktopBridge['notificationSound']['isAvailable']() &&
-    _0x4c589f['push'](
+    list3['push'](
       Promise['resolve']()['then'](() => desktopBridge['notificationSound']['play']({ system: !![] })),
     );
-  const _0x1f0ab8 = getNotificationApi();
-  if (_0x1997fe['notificationEnabled'] !== ![] && _0x1f0ab8?.['isAvailable']?.() !== ![]) {
-    const _0x197a81 = Promise['resolve']()['then'](() =>
-      _0x1f0ab8?.['showGenerationComplete']?.({
+  const notificationApi2 = getNotificationApi();
+  if (
+    completionSoundSettings2['notificationEnabled'] !== ![] &&
+    notificationApi2?.['isAvailable']?.() !== ![]
+  ) {
+    const value3 = Promise['resolve']()['then'](() =>
+      notificationApi2?.['showGenerationComplete']?.({
         title: normalizeText(globalThis.document?.title) || 'Canvas',
-        body: _0x4c49ca,
-        ...(_0x394f11 ? { navigation: _0x394f11, notificationId: _0x4365f8['notificationId'] } : {}),
+        body: body,
+        ...(navigation2
+          ? { navigation: navigation2, notificationId: notificationId4['notificationId'] }
+          : {}),
       }),
     );
-    (_0x4365f8['setDelivery'](_0x197a81), _0x4c589f['push'](_0x197a81));
+    (notificationId4['setDelivery'](value3), list3['push'](value3));
   }
-  return Promise['allSettled'](_0x4c589f);
+  return Promise['allSettled'](list3);
 }

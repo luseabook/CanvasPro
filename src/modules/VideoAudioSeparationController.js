@@ -15,195 +15,177 @@ import { buildVideoGenerationResultPatch } from '../components/video-node/videoG
 import { commit } from './history.js';
 import { getNodeSpawnPrefs } from './nodeSpawn.js';
 let _separateVideoAudioImpl = separateVideoAudio;
-function videoAudioSeparationText(_0x1ae152, _0x458b0d = {}) {
-  return t('mediaProcessing.videoAudioSeparation.' + _0x1ae152, _0x458b0d);
+function videoAudioSeparationText(value, item = {}) {
+  return t('mediaProcessing.videoAudioSeparation.' + value, item);
 }
 function _getState() {
   return typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
 }
-function _getNode(_0x2b7ba1) {
-  return _getState().nodes?.[_0x2b7ba1] || null;
+function _getNode(key) {
+  return _getState().nodes?.[key] || null;
 }
-function _isVideoNodeType(_0x29940d) {
-  const _0x405540 = String(_0x29940d || '')
+function _isVideoNodeType(index) {
+  const result = String(index || '')
     .trim()
     .toLowerCase();
-  return _0x405540 === 'source-video' || _0x405540 === 'ai-video' || _0x405540 === 'video';
+  return result === 'source-video' || result === 'ai-video' || result === 'video';
 }
-function _cleanLocalPath(_0x17105a) {
-  return normalizeLocalPath(_0x17105a);
+function _cleanLocalPath(data) {
+  return normalizeLocalPath(data);
 }
-function _resolveSourcePath(_0x163bd8) {
-  return _cleanLocalPath(resolveCanvasVideoLocalPath(_0x163bd8));
+function _resolveSourcePath(options) {
+  return _cleanLocalPath(resolveCanvasVideoLocalPath(options));
 }
-function _getResultLocalPath(_0x375b6d) {
-  return pickResultLocalPath(_0x375b6d);
+function _getResultLocalPath(target) {
+  return pickResultLocalPath(target);
 }
-function _fileNameFromPath(_0x3a29b9) {
-  const _0x3dc19e = _cleanLocalPath(_0x3a29b9);
-  if (!_0x3dc19e) return '';
-  const _0x483246 = _0x3dc19e.split('/');
-  return String(_0x483246[_0x483246.length - 1] || '').trim();
+function _fileNameFromPath(source) {
+  const _cleanLocalPath2 = _cleanLocalPath(source);
+  if (!_cleanLocalPath2) return '';
+  const list = _cleanLocalPath2.split('/');
+  return String(list[list.length - 1] || '').trim();
 }
-function _getSpawnLayout(_0x389fcf) {
-  const { spacing: _0x483416, direction: _0x595fd7, avoidOverlap: _0x4a4d7c } = getNodeSpawnPrefs(),
-    _0x35e831 = _0x595fd7 === 'down' ? 'down' : 'right',
-    _0x4ec38f = Math.max(24, Math.min(80, Math.round(Number(_0x483416 || 0) / 2))),
-    _0x4b0b66 = getAutoMediaSizeByShortSide(
-      Number(_0x389fcf?.width) || 0x200,
-      Number(_0x389fcf?.height) || 0x120,
-    ),
-    _0x197e89 = getNodeDefaultSize('source-audio'),
-    _0x3358de = Number(_0x389fcf?.x) || 0,
-    _0x2fb241 = Number(_0x389fcf?.y) || 0,
-    _0x57b7bd = Number(_0x389fcf?.width) || 0x200,
-    _0x3a462f = Number(_0x389fcf?.height) || 0x120;
-  let _0x531d73 =
-      _0x35e831 === 'right'
-        ? _0x3358de + _0x57b7bd + _0x483416
-        : _0x3358de + Math.round((_0x57b7bd - Math.max(_0x4b0b66.width, _0x197e89.width)) / 2),
-    _0x40b667 =
-      _0x35e831 === 'down'
-        ? _0x2fb241 + _0x3a462f + _0x483416
-        : _0x2fb241 + Math.round((_0x3a462f - Math.max(_0x4b0b66.height, _0x197e89.height)) / 2);
-  const _0x2b70ab =
-      _0x35e831 === 'right'
-        ? _0x4b0b66.width + _0x197e89.width + _0x4ec38f
-        : Math.max(_0x4b0b66.width, _0x197e89.width),
-    _0x56890b =
-      _0x35e831 === 'down'
-        ? _0x4b0b66.height + _0x197e89.height + _0x4ec38f
-        : Math.max(_0x4b0b66.height, _0x197e89.height);
-  if (_0x4a4d7c) {
-    const _0x4575e9 = findAvailablePosition(
-      _getState().nodes || {},
-      _0x531d73,
-      _0x40b667,
-      _0x2b70ab,
-      _0x56890b,
-      _0x483416,
-      _0x35e831,
-    );
-    ((_0x531d73 = _0x4575e9.x), (_0x40b667 = _0x4575e9.y));
+function _getSpawnLayout(box) {
+  const { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+    audio = direction === 'down' ? 'down' : 'right',
+    next = Math.max(24, Math.min(80, Math.round(Number(spacing || 0) / 2))),
+    width = getAutoMediaSizeByShortSide(Number(box?.width) || 0x200, Number(box?.height) || 0x120),
+    width2 = getNodeDefaultSize('source-audio'),
+    current = Number(box?.x) || 0,
+    entry = Number(box?.y) || 0,
+    record = Number(box?.width) || 0x200,
+    payload = Number(box?.height) || 0x120;
+  let x =
+      audio === 'right'
+        ? current + record + spacing
+        : current + Math.round((record - Math.max(width.width, width2.width)) / 2),
+    y =
+      audio === 'down'
+        ? entry + payload + spacing
+        : entry + Math.round((payload - Math.max(width.height, width2.height)) / 2);
+  const handle = audio === 'right' ? width.width + width2.width + next : Math.max(width.width, width2.width),
+    state = audio === 'down' ? width.height + width2.height + next : Math.max(width.height, width2.height);
+  if (avoidOverlap) {
+    const box2 = findAvailablePosition(_getState().nodes || {}, x, y, handle, state, spacing, audio);
+    ((x = box2.x), (y = box2.y));
   }
   return {
-    video: { x: _0x531d73, y: _0x40b667, width: _0x4b0b66.width, height: _0x4b0b66.height },
+    video: { x: x, y: y, width: width.width, height: width.height },
     audio:
-      _0x35e831 === 'right'
+      audio === 'right'
         ? {
-            x: _0x531d73 + _0x4b0b66.width + _0x4ec38f,
-            y: _0x40b667 + Math.round((_0x4b0b66.height - _0x197e89.height) / 2),
-            width: _0x197e89.width,
-            height: _0x197e89.height,
+            x: x + width.width + next,
+            y: y + Math.round((width.height - width2.height) / 2),
+            width: width2.width,
+            height: width2.height,
           }
         : {
-            x: _0x531d73 + Math.round((_0x4b0b66.width - _0x197e89.width) / 2),
-            y: _0x40b667 + _0x4b0b66.height + _0x4ec38f,
-            width: _0x197e89.width,
-            height: _0x197e89.height,
+            x: x + Math.round((width.width - width2.width) / 2),
+            y: y + width.height + next,
+            width: width2.width,
+            height: width2.height,
           },
   };
 }
-function _focusCreatedNodes(_0x286d6c, _0xff2be9) {
-  const _0xf481d = Array.isArray(_0xff2be9)
-    ? _0xff2be9.map((_0x2efe10) => String(_0x2efe10 || '').trim()).filter(Boolean)
-    : [];
-  if (!_0xf481d.length) return;
-  appStore.setSelectedNodes(_0xf481d);
-  if (typeof window.v2FocusOnNodes === 'function') window.v2FocusOnNodes([_0x286d6c, ..._0xf481d]);
-  else typeof window.v2FocusOnNode === 'function' && window.v2FocusOnNode(_0xf481d[0]);
+function _focusCreatedNodes(config, list2) {
+  const list3 = Array.isArray(list2) ? list2.map((item2) => String(item2 || '').trim()).filter(Boolean) : [];
+  if (!list3.length) return;
+  appStore.setSelectedNodes(list3);
+  if (typeof window.v2FocusOnNodes === 'function') window.v2FocusOnNodes([config, ...list3]);
+  else typeof window.v2FocusOnNode === 'function' && window.v2FocusOnNode(list3[0]);
 }
 function _persistLocalCache() {
   try {
     window._triggerLocalCacheSave?.();
   } catch {}
 }
-function _createResultNodes(_0x5a7779, _0x9f139d) {
-  const _0x108cdb = _getResultLocalPath(_0x9f139d?.video),
-    _0x7310ca = _getResultLocalPath(_0x9f139d?.audio);
-  if (!_0x108cdb || !_0x7310ca) throw new Error(videoAudioSeparationText('incompleteResult'));
-  const _0x2706cf = _getSpawnLayout(_0x5a7779),
-    _0x5b1e87 = String(_0x5a7779?.name || '').trim() || videoAudioSeparationText('videoFallback'),
-    _0x406f18 = generateId('source-video-separate-av'),
-    _0x348969 = generateId('source-audio-separate-av'),
-    _0x4f052 = _0x9f139d?.video?.filename || _fileNameFromPath(_0x108cdb),
-    _0x28221e = _0x9f139d?.audio?.filename || _fileNameFromPath(_0x7310ca),
-    _0x1433f6 =
+function _createResultNodes(error, videoUrl) {
+  const localPath = _getResultLocalPath(videoUrl?.video),
+    localPath2 = _getResultLocalPath(videoUrl?.audio);
+  if (!localPath || !localPath2) throw new Error(videoAudioSeparationText('incompleteResult'));
+  const x2 = _getSpawnLayout(error),
+    name = String(error?.name || '').trim() || videoAudioSeparationText('videoFallback'),
+    id = generateId('source-video-separate-av'),
+    id2 = generateId('source-audio-separate-av'),
+    fileName = videoUrl?.video?.filename || _fileNameFromPath(localPath),
+    fileName2 = videoUrl?.audio?.filename || _fileNameFromPath(localPath2),
+    args =
       buildVideoGenerationResultPatch({
-        localPath: _0x108cdb,
-        videoUrl: _0x9f139d?.video?.url,
-        fileName: _0x4f052,
+        localPath: localPath,
+        videoUrl: videoUrl?.video?.url,
+        fileName: fileName,
       }) || {},
-    _0x4cb0d4 =
+    args2 =
       buildLocalAudioGenerationResultPatch({
-        localPath: _0x7310ca,
-        audioUrl: _0x9f139d?.audio?.url,
-        fileName: _0x28221e,
+        localPath: localPath2,
+        audioUrl: videoUrl?.audio?.url,
+        fileName: fileName2,
       }) || {},
-    _0x43b06a = buildSourceMediaNodePayload({
-      id: _0x406f18,
+    sourceMediaNodePayload = buildSourceMediaNodePayload({
+      id: id,
       type: 'source-video',
-      x: _0x2706cf.video.x,
-      y: _0x2706cf.video.y,
-      width: _0x2706cf.video.width,
-      height: _0x2706cf.video.height,
-      name: videoAudioSeparationText('videoNodeName', { name: _0x5b1e87 }),
-      ..._0x1433f6,
-      src: localPathToUrl(_0x1433f6.localPath) || _0x1433f6.videoUrl || '',
-      fileName: _0x4f052,
+      x: x2.video.x,
+      y: x2.video.y,
+      width: x2.video.width,
+      height: x2.video.height,
+      name: videoAudioSeparationText('videoNodeName', { name: name }),
+      ...args,
+      src: localPathToUrl(args.localPath) || args.videoUrl || '',
+      fileName: fileName,
       needsAutoResize: false,
       fixedSize: true,
     }),
-    _0x749cfa = buildSourceAudioNodePayload({
-      id: _0x348969,
-      x: _0x2706cf.audio.x,
-      y: _0x2706cf.audio.y,
-      width: _0x2706cf.audio.width,
-      height: _0x2706cf.audio.height,
-      name: videoAudioSeparationText('audioNodeName', { name: _0x5b1e87 }),
-      ..._0x4cb0d4,
-      fileName: _0x28221e,
+    sourceAudioNodePayload = buildSourceAudioNodePayload({
+      id: id2,
+      x: x2.audio.x,
+      y: x2.audio.y,
+      width: x2.audio.width,
+      height: x2.audio.height,
+      name: videoAudioSeparationText('audioNodeName', { name: name }),
+      ...args2,
+      fileName: fileName2,
     });
   return (
     typeof appStore.batch === 'function'
       ? appStore.batch(() => {
-          (appStore.addNode(_0x43b06a), appStore.addNode(_0x749cfa));
+          (appStore.addNode(sourceMediaNodePayload), appStore.addNode(sourceAudioNodePayload));
         })
-      : (appStore.addNode(_0x43b06a), appStore.addNode(_0x749cfa)),
-    { videoId: _0x406f18, audioId: _0x348969 }
+      : (appStore.addNode(sourceMediaNodePayload), appStore.addNode(sourceAudioNodePayload)),
+    { videoId: id, audioId: id2 }
   );
 }
-export async function runVideoAudioSeparationFromNode(_0x372d89) {
-  const _0x39c70d = _getNode(_0x372d89);
-  if (!_0x39c70d || !_isVideoNodeType(_0x39c70d.type))
+export async function runVideoAudioSeparationFromNode(scope) {
+  const _getNode2 = _getNode(scope);
+  if (!_getNode2 || !_isVideoNodeType(_getNode2.type))
     return (window.showToast?.(videoAudioSeparationText('unsupportedNode'), 'warn'), null);
-  if (_0x39c70d.isGenerating) return (window.showToast?.(videoAudioSeparationText('busy'), 'info'), null);
-  const _0x34150d = _resolveSourcePath(_0x39c70d);
-  if (!_0x34150d) return (window.showToast?.(videoAudioSeparationText('notLocalFile'), 'warn'), null);
+  if (_getNode2.isGenerating) return (window.showToast?.(videoAudioSeparationText('busy'), 'info'), null);
+  const src = _resolveSourcePath(_getNode2);
+  if (!src) return (window.showToast?.(videoAudioSeparationText('notLocalFile'), 'warn'), null);
   window.showToast?.(videoAudioSeparationText('progress'), 'info');
   try {
-    const _0x7b3415 = await _separateVideoAudioImpl({ src: _0x34150d }),
-      { videoId: _0x321f6a, audioId: _0x26a535 } = _createResultNodes(_0x39c70d, _0x7b3415);
+    const _separateVideoAudioImpl2 = await _separateVideoAudioImpl({ src: src }),
+      { videoId: videoId, audioId: audioId } = _createResultNodes(_getNode2, _separateVideoAudioImpl2);
     return (
-      _focusCreatedNodes(_0x39c70d.id, [_0x321f6a, _0x26a535]),
+      _focusCreatedNodes(_getNode2.id, [videoId, audioId]),
       commit(),
       _persistLocalCache(),
       window.showToast?.(videoAudioSeparationText('success'), 'success'),
-      { videoId: _0x321f6a, audioId: _0x26a535 }
+      { videoId: videoId, audioId: audioId }
     );
-  } catch (_0x2d6659) {
-    const _0x1f064b =
-      _0x2d6659 instanceof Error
-        ? _0x2d6659.message
-        : String(_0x2d6659 || videoAudioSeparationText('fallback'));
+  } catch (error2) {
+    const message =
+      error2 instanceof Error ? error2.message : String(error2 || videoAudioSeparationText('fallback'));
     return (
-      window.showToast?.(videoAudioSeparationText('failedWithMessage', { message: _0x1f064b }), 'error'),
+      window.showToast?.(videoAudioSeparationText('failedWithMessage', { message: message }), 'error'),
       null
     );
   }
 }
-export function __setVideoAudioSeparationDepsForTest({ separateVideoAudioImpl: _0x3f08e8 } = {}) {
-  _separateVideoAudioImpl = typeof _0x3f08e8 === 'function' ? _0x3f08e8 : separateVideoAudio;
+export function __setVideoAudioSeparationDepsForTest({
+  separateVideoAudioImpl: separateVideoAudioImpl,
+} = {}) {
+  _separateVideoAudioImpl =
+    typeof separateVideoAudioImpl === 'function' ? separateVideoAudioImpl : separateVideoAudio;
 }
 export function __resetVideoAudioSeparationDepsForTest() {
   _separateVideoAudioImpl = separateVideoAudio;

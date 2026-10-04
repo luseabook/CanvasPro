@@ -1,52 +1,52 @@
-function isPlainObject(_0x1abad1) {
-  return _0x1abad1 && typeof _0x1abad1 === 'object' && !Array.isArray(_0x1abad1);
+function isPlainObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value);
 }
-export function isInlineImageDataUrl(_0x4e2558) {
-  return String(_0x4e2558 || '')
+export function isInlineImageDataUrl(item) {
+  return String(item || '')
     .trim()
     .startsWith('data:image/');
 }
-export function isBlobObjectUrl(_0x231bff) {
-  return String(_0x231bff || '')
+export function isBlobObjectUrl(key) {
+  return String(key || '')
     .trim()
     .startsWith('blob:');
 }
-export function isVolatileMediaUrl(_0x5c193b) {
-  return isBlobObjectUrl(_0x5c193b);
+export function isVolatileMediaUrl(index) {
+  return isBlobObjectUrl(index);
 }
-function hasMeaningfulValue(_0x433309) {
-  return String(_0x433309 || '').trim().length > 0;
+function hasMeaningfulValue(result) {
+  return String(result || '').trim().length > 0;
 }
-function isStableUrlFallbackValue(_0x4c894e) {
-  const _0x375856 = String(_0x4c894e || '').trim();
-  if (!_0x375856) return false;
-  if (isInlineImageDataUrl(_0x375856)) return false;
-  if (isBlobObjectUrl(_0x375856)) return false;
+function isStableUrlFallbackValue(data) {
+  const enabled = String(data || '').trim();
+  if (!enabled) return false;
+  if (isInlineImageDataUrl(enabled)) return false;
+  if (isBlobObjectUrl(enabled)) return false;
   return true;
 }
-function sanitizeCanvasVisualSnapshot(_0x5796a5) {
-  if (!isPlainObject(_0x5796a5)) return null;
-  const _0x4da2a3 = String(_0x5796a5.src || '').trim();
-  if (!isInlineImageDataUrl(_0x4da2a3)) return null;
+function sanitizeCanvasVisualSnapshot(box) {
+  if (!isPlainObject(box)) return null;
+  const src = String(box.src || '').trim();
+  if (!isInlineImageDataUrl(src)) return null;
   return {
-    schemaVersion: Number(_0x5796a5.schemaVersion) || 1,
-    src: _0x4da2a3,
-    width: Math.max(1, Math.round(Number(_0x5796a5.width) || 1)),
-    height: Math.max(1, Math.round(Number(_0x5796a5.height) || 1)),
-    viewport: isPlainObject(_0x5796a5.viewport)
+    schemaVersion: Number(box.schemaVersion) || 1,
+    src: src,
+    width: Math.max(1, Math.round(Number(box.width) || 1)),
+    height: Math.max(1, Math.round(Number(box.height) || 1)),
+    viewport: isPlainObject(box.viewport)
       ? {
-          x: Number.isFinite(Number(_0x5796a5.viewport.x)) ? Number(_0x5796a5.viewport.x) : 0,
-          y: Number.isFinite(Number(_0x5796a5.viewport.y)) ? Number(_0x5796a5.viewport.y) : 0,
+          x: Number.isFinite(Number(box.viewport.x)) ? Number(box.viewport.x) : 0,
+          y: Number.isFinite(Number(box.viewport.y)) ? Number(box.viewport.y) : 0,
           zoom:
-            Number.isFinite(Number(_0x5796a5.viewport.zoom)) && Number(_0x5796a5.viewport.zoom) > 0
-              ? Number(_0x5796a5.viewport.zoom)
+            Number.isFinite(Number(box.viewport.zoom)) && Number(box.viewport.zoom) > 0
+              ? Number(box.viewport.zoom)
               : 1,
         }
       : { x: 0, y: 0, zoom: 1 },
-    capturedAt: Number(_0x5796a5.capturedAt) || 0,
-    visibleNodeCount: Math.max(0, Math.round(Number(_0x5796a5.visibleNodeCount) || 0)),
-    mediaNodeCount: Math.max(0, Math.round(Number(_0x5796a5.mediaNodeCount) || 0)),
-    readyMediaNodeCount: Math.max(0, Math.round(Number(_0x5796a5.readyMediaNodeCount) || 0)),
+    capturedAt: Number(box.capturedAt) || 0,
+    visibleNodeCount: Math.max(0, Math.round(Number(box.visibleNodeCount) || 0)),
+    mediaNodeCount: Math.max(0, Math.round(Number(box.mediaNodeCount) || 0)),
+    readyMediaNodeCount: Math.max(0, Math.round(Number(box.readyMediaNodeCount) || 0)),
   };
 }
 const INLINE_THUMBNAIL_FIELDS = Object.freeze(['thumbUrl', 'thumbSrc', 'firstFrameThumbUrl']),
@@ -74,126 +74,125 @@ const INLINE_THUMBNAIL_FIELDS = Object.freeze(['thumbUrl', 'thumbSrc', 'firstFra
   ]),
   CAPTURE_PREVIEW_MEDIA_URL_FIELDS = Object.freeze(['src', 'imageUrl', 'url']),
   CAPTURE_TRANSIENT_FIELDS = Object.freeze(['capturePreviewUrl', 'captureSavePending', 'captureSaveError']);
-export function hasStableThumbnailFallback(_0x5e27cd) {
-  if (!_0x5e27cd || typeof _0x5e27cd !== 'object') return false;
-  return THUMBNAIL_FALLBACK_FIELDS.some((_0x157206) => {
-    const _0x5e644b = _0x5e27cd[_0x157206];
-    if (!hasMeaningfulValue(_0x5e644b)) return false;
+export function hasStableThumbnailFallback(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
+  return THUMBNAIL_FALLBACK_FIELDS.some((item2) => {
+    const options = enabled2[item2];
+    if (!hasMeaningfulValue(options)) return false;
     if (
-      (_0x157206 === 'thumbUrl' || _0x157206 === 'firstFrameThumbUrl') &&
-      (isInlineImageDataUrl(_0x5e644b) || isBlobObjectUrl(_0x5e644b))
+      (item2 === 'thumbUrl' || item2 === 'firstFrameThumbUrl') &&
+      (isInlineImageDataUrl(options) || isBlobObjectUrl(options))
     )
       return false;
     if (
-      _0x157206 === 'src' ||
-      _0x157206 === 'imageUrl' ||
-      _0x157206 === 'sourceUrl' ||
-      _0x157206 === 'videoUrl' ||
-      _0x157206 === 'audioUrl' ||
-      _0x157206 === 'firstFrameUrl'
+      item2 === 'src' ||
+      item2 === 'imageUrl' ||
+      item2 === 'sourceUrl' ||
+      item2 === 'videoUrl' ||
+      item2 === 'audioUrl' ||
+      item2 === 'firstFrameUrl'
     )
-      return isStableUrlFallbackValue(_0x5e644b);
+      return isStableUrlFallbackValue(options);
     return true;
   });
 }
-function sanitizeInlineThumbnailFieldsInPlace(_0x222096) {
-  if (!_0x222096 || typeof _0x222096 !== 'object') return;
-  if (!hasStableThumbnailFallback(_0x222096)) return;
-  for (const _0x47354b of INLINE_THUMBNAIL_FIELDS) {
-    isInlineImageDataUrl(_0x222096[_0x47354b]) && delete _0x222096[_0x47354b];
+function sanitizeInlineThumbnailFieldsInPlace(enabled3) {
+  if (!enabled3 || typeof enabled3 !== 'object') return;
+  if (!hasStableThumbnailFallback(enabled3)) return;
+  for (const target of INLINE_THUMBNAIL_FIELDS) {
+    isInlineImageDataUrl(enabled3[target]) && delete enabled3[target];
   }
 }
-function sanitizeVolatileMediaUrlFieldsInPlace(_0xecb565) {
-  if (!_0xecb565 || typeof _0xecb565 !== 'object') return;
-  if (!hasStableThumbnailFallback(_0xecb565)) return;
-  for (const _0x3080b0 of VOLATILE_MEDIA_URL_FIELDS) {
-    isVolatileMediaUrl(_0xecb565[_0x3080b0]) && delete _0xecb565[_0x3080b0];
+function sanitizeVolatileMediaUrlFieldsInPlace(enabled4) {
+  if (!enabled4 || typeof enabled4 !== 'object') return;
+  if (!hasStableThumbnailFallback(enabled4)) return;
+  for (const source of VOLATILE_MEDIA_URL_FIELDS) {
+    isVolatileMediaUrl(enabled4[source]) && delete enabled4[source];
   }
 }
-function sanitizeCapturePreviewMediaUrlFieldsInPlace(_0x29de72) {
-  if (!_0x29de72 || typeof _0x29de72 !== 'object') return;
-  if (!isInlineImageDataUrl(_0x29de72.capturePreviewUrl) && _0x29de72.captureSavePending !== true) return;
-  for (const _0x173ea9 of CAPTURE_PREVIEW_MEDIA_URL_FIELDS) {
-    isInlineImageDataUrl(_0x29de72[_0x173ea9]) && delete _0x29de72[_0x173ea9];
+function sanitizeCapturePreviewMediaUrlFieldsInPlace(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object') return;
+  if (!isInlineImageDataUrl(enabled5.capturePreviewUrl) && enabled5.captureSavePending !== true) return;
+  for (const next of CAPTURE_PREVIEW_MEDIA_URL_FIELDS) {
+    isInlineImageDataUrl(enabled5[next]) && delete enabled5[next];
   }
 }
-function sanitizeRecordForPersistence(_0x4bc3f5) {
-  if (Array.isArray(_0x4bc3f5)) return _0x4bc3f5.map((_0x3da7bf) => sanitizeRecordForPersistence(_0x3da7bf));
-  if (!isPlainObject(_0x4bc3f5)) return _0x4bc3f5;
-  const _0x1a610a = { ..._0x4bc3f5 };
-  (sanitizeInlineThumbnailFieldsInPlace(_0x1a610a), sanitizeVolatileMediaUrlFieldsInPlace(_0x1a610a));
-  Array.isArray(_0x1a610a.nodes) &&
-    (_0x1a610a.nodes = _0x1a610a.nodes.map((_0x6ae162) => sanitizeNodeForPersistence(_0x6ae162)));
-  Array.isArray(_0x1a610a.items) &&
-    (_0x1a610a.items = _0x1a610a.items.map((_0x12faf6) => sanitizeRecordForPersistence(_0x12faf6)));
-  Array.isArray(_0x1a610a.edges) &&
-    (_0x1a610a.edges = _0x1a610a.edges.map((_0x547031) =>
-      isPlainObject(_0x547031) ? { ..._0x547031 } : _0x547031,
-    ));
-  isPlainObject(_0x1a610a.nodeData) && (_0x1a610a.nodeData = sanitizeNodeForPersistence(_0x1a610a.nodeData));
-  for (const [_0x1bb0a0, _0x5c1e4d] of Object.entries(_0x1a610a)) {
-    if (_0x1bb0a0 === 'nodes' || _0x1bb0a0 === 'items' || _0x1bb0a0 === 'edges' || _0x1bb0a0 === 'nodeData')
-      continue;
-    if (Array.isArray(_0x5c1e4d)) {
-      _0x1a610a[_0x1bb0a0] = _0x5c1e4d.map((_0x2d7abb) => sanitizeRecordForPersistence(_0x2d7abb));
+function sanitizeRecordForPersistence(list) {
+  if (Array.isArray(list)) return list.map((item3) => sanitizeRecordForPersistence(item3));
+  if (!isPlainObject(list)) return list;
+  const current = { ...list };
+  (sanitizeInlineThumbnailFieldsInPlace(current), sanitizeVolatileMediaUrlFieldsInPlace(current));
+  Array.isArray(current.nodes) &&
+    (current.nodes = current.nodes.map((item4) => sanitizeNodeForPersistence(item4)));
+  Array.isArray(current.items) &&
+    (current.items = current.items.map((item5) => sanitizeRecordForPersistence(item5)));
+  Array.isArray(current.edges) &&
+    (current.edges = current.edges.map((args) => (isPlainObject(args) ? { ...args } : args)));
+  isPlainObject(current.nodeData) && (current.nodeData = sanitizeNodeForPersistence(current.nodeData));
+  for (const [entry, list2] of Object.entries(current)) {
+    if (entry === 'nodes' || entry === 'items' || entry === 'edges' || entry === 'nodeData') continue;
+    if (Array.isArray(list2)) {
+      current[entry] = list2.map((item6) => sanitizeRecordForPersistence(item6));
       continue;
     }
-    isPlainObject(_0x5c1e4d) && (_0x1a610a[_0x1bb0a0] = sanitizeRecordForPersistence(_0x5c1e4d));
+    isPlainObject(list2) && (current[entry] = sanitizeRecordForPersistence(list2));
   }
-  return _0x1a610a;
+  return current;
 }
-export function sanitizeNodeForPersistence(_0x13f443) {
-  if (!isPlainObject(_0x13f443)) return _0x13f443;
-  const _0x359248 = { ..._0x13f443 };
-  (sanitizeInlineThumbnailFieldsInPlace(_0x359248),
-    sanitizeVolatileMediaUrlFieldsInPlace(_0x359248),
-    sanitizeCapturePreviewMediaUrlFieldsInPlace(_0x359248),
-    delete _0x359248.dreaminaTaskLastRaw);
-  for (const _0x33b132 of CAPTURE_TRANSIENT_FIELDS) {
-    delete _0x359248[_0x33b132];
+export function sanitizeNodeForPersistence(args2) {
+  if (!isPlainObject(args2)) return args2;
+  const record = { ...args2 };
+  (sanitizeInlineThumbnailFieldsInPlace(record),
+    sanitizeVolatileMediaUrlFieldsInPlace(record),
+    sanitizeCapturePreviewMediaUrlFieldsInPlace(record),
+    delete record.dreaminaTaskLastRaw);
+  for (const payload of CAPTURE_TRANSIENT_FIELDS) {
+    delete record[payload];
   }
   return (
-    Array.isArray(_0x359248.images) &&
-      (_0x359248.images = _0x359248.images.map((_0xd2d3ef) => sanitizeRecordForPersistence(_0xd2d3ef))),
-    Array.isArray(_0x359248.videos) &&
-      (_0x359248.videos = _0x359248.videos.map((_0x1c6710) => sanitizeRecordForPersistence(_0x1c6710))),
-    Array.isArray(_0x359248.cells) &&
-      (_0x359248.cells = _0x359248.cells.map((_0x4513c7) => sanitizeRecordForPersistence(_0x4513c7))),
-    _0x359248
+    Array.isArray(record.images) &&
+      (record.images = record.images.map((item7) => sanitizeRecordForPersistence(item7))),
+    Array.isArray(record.videos) &&
+      (record.videos = record.videos.map((item8) => sanitizeRecordForPersistence(item8))),
+    Array.isArray(record.cells) &&
+      (record.cells = record.cells.map((item9) => sanitizeRecordForPersistence(item9))),
+    record
   );
 }
-export function sanitizeSerializedCanvasData(_0x2240c0) {
-  if (!isPlainObject(_0x2240c0)) return _0x2240c0;
-  const _0x4bd885 = { ..._0x2240c0 };
-  delete _0x4bd885._persistRevHint;
-  const _0x424d0c = sanitizeCanvasVisualSnapshot(_0x4bd885.visualSnapshot);
-  _0x424d0c ? (_0x4bd885.visualSnapshot = _0x424d0c) : delete _0x4bd885.visualSnapshot;
-  if (Array.isArray(_0x4bd885.nodes))
-    _0x4bd885.nodes = _0x4bd885.nodes.map((_0x2ca9bf) => sanitizeNodeForPersistence(_0x2ca9bf));
+export function sanitizeSerializedCanvasData(args3) {
+  if (!isPlainObject(args3)) return args3;
+  const handle = { ...args3 };
+  delete handle._persistRevHint;
+  const sanitizeCanvasVisualSnapshot2 = sanitizeCanvasVisualSnapshot(handle.visualSnapshot);
+  sanitizeCanvasVisualSnapshot2
+    ? (handle.visualSnapshot = sanitizeCanvasVisualSnapshot2)
+    : delete handle.visualSnapshot;
+  if (Array.isArray(handle.nodes))
+    handle.nodes = handle.nodes.map((item10) => sanitizeNodeForPersistence(item10));
   else {
-    if (isPlainObject(_0x4bd885.nodes)) {
-      const _0x1711f3 = {};
-      for (const [_0x16aa7c, _0x1fcd43] of Object.entries(_0x4bd885.nodes)) {
-        _0x1711f3[_0x16aa7c] = sanitizeNodeForPersistence(_0x1fcd43);
+    if (isPlainObject(handle.nodes)) {
+      const state = {};
+      for (const [config, scope] of Object.entries(handle.nodes)) {
+        state[config] = sanitizeNodeForPersistence(scope);
       }
-      _0x4bd885.nodes = _0x1711f3;
+      handle.nodes = state;
     }
   }
   return (
-    Array.isArray(_0x4bd885.assets) &&
-      (_0x4bd885.assets = _0x4bd885.assets.map((_0x50554b) => sanitizeRecordForPersistence(_0x50554b))),
-    _0x4bd885
+    Array.isArray(handle.assets) &&
+      (handle.assets = handle.assets.map((item11) => sanitizeRecordForPersistence(item11))),
+    handle
   );
 }
-export function sanitizeMultiCanvasDataForPersistence(_0x45d8c4) {
-  if (!isPlainObject(_0x45d8c4)) return _0x45d8c4;
-  const _0x300240 = { ..._0x45d8c4 };
-  if (!Array.isArray(_0x300240.canvases)) return _0x300240;
+export function sanitizeMultiCanvasDataForPersistence(args4) {
+  if (!isPlainObject(args4)) return args4;
+  const input = { ...args4 };
+  if (!Array.isArray(input.canvases)) return input;
   return (
-    (_0x300240.canvases = _0x300240.canvases.map((_0x3572df) => {
-      if (!isPlainObject(_0x3572df)) return _0x3572df;
-      return sanitizeSerializedCanvasData(_0x3572df);
+    (input.canvases = input.canvases.map((item12) => {
+      if (!isPlainObject(item12)) return item12;
+      return sanitizeSerializedCanvasData(item12);
     })),
-    _0x300240
+    input
   );
 }

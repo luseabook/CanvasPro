@@ -3,219 +3,213 @@ import { ApiError } from './errors/ApiError.js';
 import { parseError, parseNetworkError } from './errors/ErrorParser.js';
 import { logDiagnosticEvent } from '../src/services/diagnosticsService.js';
 const DEFAULT_TIMEOUT = 0x7530;
-function isAbsoluteUrl(_0x8d81d8) {
-  return /^https?:\/\//i.test(_0x8d81d8);
+function isAbsoluteUrl(value) {
+  return /^https?:\/\//i.test(value);
 }
 function getRuntimeDeviceId() {
   return String(globalThis.window?.__aicDeviceId || globalThis.__aicDeviceId || '').trim();
 }
-function shouldAttachDeviceIdHeader(_0x455917, _0x2cacd0, _0x32f8c8) {
+function shouldAttachDeviceIdHeader(item, key, index) {
   if (
-    String(_0x2cacd0 || '')
+    String(key || '')
       .trim()
       .toLowerCase() === 'local'
   )
     return true;
-  if (_0x32f8c8 === false) return false;
-  return !isAbsoluteUrl(String(_0x455917 || ''));
+  if (index === false) return false;
+  return !isAbsoluteUrl(String(item || ''));
 }
-function withDeviceIdHeader(_0x3ec476, _0x5e4797, _0x595208, _0x62f0bf) {
-  const _0x4a2001 = getRuntimeDeviceId();
-  if (!_0x4a2001 || !shouldAttachDeviceIdHeader(_0x5e4797, _0x595208, _0x62f0bf)) return _0x3ec476 || {};
-  const _0x3f20e1 = 'X-AIC-Device-Id';
-  if (typeof Headers !== 'undefined' && _0x3ec476 instanceof Headers) {
-    const _0x19e5de = new Headers(_0x3ec476);
-    if (!_0x19e5de.has(_0x3f20e1)) _0x19e5de.set(_0x3f20e1, _0x4a2001);
-    return _0x19e5de;
+function withDeviceIdHeader(result, data, options, target) {
+  const runtimeDeviceId = getRuntimeDeviceId();
+  if (!runtimeDeviceId || !shouldAttachDeviceIdHeader(data, options, target)) return result || {};
+  const source = 'X-AIC-Device-Id';
+  if (typeof Headers !== 'undefined' && result instanceof Headers) {
+    const map = new Headers(result);
+    if (!map.has(source)) map.set(source, runtimeDeviceId);
+    return map;
   }
-  const _0x3e278d = { ...(_0x3ec476 || {}) },
-    _0x59fd1c = Object.keys(_0x3e278d).some(
-      (_0x252036) => String(_0x252036 || '').toLowerCase() === _0x3f20e1.toLowerCase(),
-    );
-  if (!_0x59fd1c) _0x3e278d[_0x3f20e1] = _0x4a2001;
-  return _0x3e278d;
+  const next = { ...(result || {}) },
+    enabled = Object.keys(next).some((item2) => String(item2 || '').toLowerCase() === source.toLowerCase());
+  if (!enabled) next[source] = runtimeDeviceId;
+  return next;
 }
-function sleep(_0x4d0302) {
-  return new Promise((_0x5d1f31) => setTimeout(_0x5d1f31, _0x4d0302));
+function sleep(current) {
+  return new Promise((entry) => setTimeout(entry, current));
 }
-function fetchWithTimeout(_0x3753e0, _0x1500e4 = {}, _0x349b32 = DEFAULT_TIMEOUT) {
-  const _0x224624 = new AbortController(),
-    _0x2e5a72 = setTimeout(() => _0x224624.abort(), _0x349b32);
-  return fetch(_0x3753e0, { ..._0x1500e4, signal: _0x224624.signal }).finally(() => clearTimeout(_0x2e5a72));
+function fetchWithTimeout(record, args = {}, payload = DEFAULT_TIMEOUT) {
+  const signal = new AbortController(),
+    setTimeout2 = setTimeout(() => signal.abort(), payload);
+  return fetch(record, { ...args, signal: signal.signal }).finally(() => clearTimeout(setTimeout2));
 }
-function fetchWithTimeoutWithSignal(_0x2e1fb2, _0x2b1d19 = {}, _0x14b89b = DEFAULT_TIMEOUT, _0xbadb17) {
-  const _0x2d8d7b = new AbortController(),
-    _0x4c91b2 = setTimeout(() => _0x2d8d7b.abort(), _0x14b89b);
-  let _0x5651f6 = null;
-  if (_0xbadb17) {
-    if (_0xbadb17.aborted) _0x2d8d7b.abort();
-    else
-      ((_0x5651f6 = () => _0x2d8d7b.abort()), _0xbadb17.addEventListener('abort', _0x5651f6, { once: true }));
+function fetchWithTimeoutWithSignal(handle, args2 = {}, state = DEFAULT_TIMEOUT, el) {
+  const signal2 = new AbortController(),
+    setTimeout3 = setTimeout(() => signal2.abort(), state);
+  let config = null;
+  if (el) {
+    if (el.aborted) signal2.abort();
+    else ((config = () => signal2.abort()), el.addEventListener('abort', config, { once: true }));
   }
-  return fetch(_0x2e1fb2, { ..._0x2b1d19, signal: _0x2d8d7b.signal }).finally(() => {
-    clearTimeout(_0x4c91b2);
-    if (_0xbadb17 && _0x5651f6) _0xbadb17.removeEventListener('abort', _0x5651f6);
+  return fetch(handle, { ...args2, signal: signal2.signal }).finally(() => {
+    clearTimeout(setTimeout3);
+    if (el && config) el.removeEventListener('abort', config);
   });
 }
-function shouldRetryError(_0x242896, _0x56a74b, _0x50f872, _0xc72844) {
-  if (_0xc72844?.aborted) return false;
-  return !!_0x242896?.retryable && _0x56a74b < _0x50f872;
+function shouldRetryError(enabled2, scope, input, output) {
+  if (output?.aborted) return false;
+  return !!enabled2?.retryable && scope < input;
 }
-function safeUrlForDiagnostics(_0x49b10d) {
-  const _0x18d179 = String(_0x49b10d || '');
+function safeUrlForDiagnostics(value2) {
+  const value3 = String(value2 || '');
   try {
-    const _0x6be294 = new URL(_0x18d179, 'http://local.invalid');
-    if (_0x18d179.startsWith('/') || _0x18d179.startsWith('http://local.invalid')) return _0x6be294.pathname;
-    return '' + _0x6be294.origin + _0x6be294.pathname;
+    const uRL = new URL(value3, 'http://local.invalid');
+    if (value3.startsWith('/') || value3.startsWith('http://local.invalid')) return uRL.pathname;
+    return '' + uRL.origin + uRL.pathname;
   } catch {
-    return _0x18d179.split(/[?#]/, 1)[0] || '';
+    return value3.split(/[?#]/, 1)[0] || '';
   }
 }
 function reportRequestFailure({
-  fullUrl: _0x57082a,
-  method: _0x581ff2,
-  provider: _0x1014ff,
-  apiErr: _0x2e80f0,
-  attempt: _0x2dd9a1,
-  retries: _0x3f9d42,
+  fullUrl: fullUrl,
+  method: method2,
+  provider: provider2,
+  apiErr: apiErr,
+  attempt: attempt,
+  retries: retries2,
 }) {
   void logDiagnosticEvent({
     type: 'api.request_failed',
     level: 'warn',
     source: 'renderer',
-    message: _0x2e80f0?.message || 'API request failed',
+    message: apiErr?.message || 'API request failed',
     context: {
-      method: _0x581ff2,
-      url: safeUrlForDiagnostics(_0x57082a),
-      provider: _0x1014ff,
-      status: _0x2e80f0?.status || _0x2e80f0?.statusCode || 0,
-      errorType: _0x2e80f0?.type || _0x2e80f0?.name || '',
-      retryable: Boolean(_0x2e80f0?.retryable),
-      attempts: _0x2dd9a1 + 1,
-      retries: _0x3f9d42,
+      method: method2,
+      url: safeUrlForDiagnostics(fullUrl),
+      provider: provider2,
+      status: apiErr?.status || apiErr?.statusCode || 0,
+      errorType: apiErr?.type || apiErr?.name || '',
+      retryable: Boolean(apiErr?.retryable),
+      attempts: attempt + 1,
+      retries: retries2,
     },
-    stack: _0x2e80f0?.stack || '',
+    stack: apiErr?.stack || '',
   });
 }
-async function parseResponseBody(_0x5ce0e0, _0x549b43) {
-  if (_0x549b43 === 'blob') return await _0x5ce0e0.blob();
-  if (_0x549b43 === 'text') return await _0x5ce0e0.text();
-  if (_0x549b43 === 'auto') {
-    const _0x65fb7e = _0x5ce0e0.headers.get('content-type') || '';
-    if (_0x65fb7e.includes('application/json')) return await _0x5ce0e0.json();
-    const _0x13ed31 = await _0x5ce0e0.text();
+async function parseResponseBody(response, value4) {
+  if (value4 === 'blob') return await response.blob();
+  if (value4 === 'text') return await response.text();
+  if (value4 === 'auto') {
+    const list = response.headers.get('content-type') || '';
+    if (list.includes('application/json')) return await response.json();
+    const value5 = await response.text();
     try {
-      return JSON.parse(_0x13ed31);
+      return JSON.parse(value5);
     } catch {
-      return _0x13ed31;
+      return value5;
     }
   }
-  return await _0x5ce0e0.json();
+  return await response.json();
 }
-async function parseErrorBody(_0x1bbe7c) {
+async function parseErrorBody(response2) {
   try {
-    const _0x833a12 = await _0x1bbe7c.text();
+    const error = await response2.text();
     try {
-      const _0x5cda45 = JSON.parse(_0x833a12);
-      return _0x5cda45;
+      const value6 = JSON.parse(error);
+      return value6;
     } catch {
-      return { error: _0x833a12 || 'HTTP ' + _0x1bbe7c.status };
+      return { error: error || 'HTTP ' + response2.status };
     }
   } catch {
-    return { error: 'HTTP ' + _0x1bbe7c.status };
+    return { error: 'HTTP ' + response2.status };
   }
 }
-export async function requester(_0x37fa02) {
+export async function requester(value7) {
   const {
-    url: _0x195e1f,
+    url: url,
     method: method = 'GET',
     headers: headers = {},
-    body: _0x5184ee,
+    body: body,
     timeout: timeout = DEFAULT_TIMEOUT,
-    signal: _0x302d07,
+    signal: signal3,
     retries: retries = 0,
     retryDelay: retryDelay = 0x258,
     responseType: responseType = 'auto',
     allow404Null: allow404Null = false,
     provider: provider = 'unknown',
-    errorParser: _0x125cef,
+    errorParser: errorParser,
     buildUrl: buildUrl = true,
     returnMeta: returnMeta = false,
-  } = _0x37fa02 || {};
-  let _0x30fe76 = _0x195e1f || '';
-  buildUrl && !isAbsoluteUrl(_0x30fe76) && (_0x30fe76 = buildApiUrl(_0x30fe76));
-  const _0x33d6f5 = withDeviceIdHeader(headers, _0x195e1f, provider, buildUrl),
-    _0x45dd6c = _0x302d07 ? fetchWithTimeoutWithSignal : fetchWithTimeout;
-  let _0x457649 = 0;
+  } = value7 || {};
+  let fullUrl2 = url || '';
+  buildUrl && !isAbsoluteUrl(fullUrl2) && (fullUrl2 = buildApiUrl(fullUrl2));
+  const headers2 = withDeviceIdHeader(headers, url, provider, buildUrl),
+    handler = signal3 ? fetchWithTimeoutWithSignal : fetchWithTimeout;
+  let attempt2 = 0;
   while (true) {
     try {
-      const _0x12c3da = await _0x45dd6c(
-        _0x30fe76,
-        { method: method, headers: _0x33d6f5, body: _0x5184ee },
+      const headers3 = await handler(
+        fullUrl2,
+        { method: method, headers: headers2, body: body },
         timeout,
-        _0x302d07,
+        signal3,
       );
-      if (_0x12c3da.status === 0x194 && allow404Null)
-        return returnMeta ? { data: null, status: 0x194, headers: _0x12c3da.headers } : null;
-      if (!_0x12c3da.ok) {
-        const _0x2c611c = await parseErrorBody(_0x12c3da),
-          _0x480138 =
-            typeof _0x125cef === 'function'
-              ? _0x125cef(provider, _0x2c611c, _0x12c3da.status)
-              : parseError(provider, _0x2c611c, _0x12c3da.status);
-        if (_0x480138 && shouldRetryError(_0x480138, _0x457649, retries, _0x302d07)) {
-          (_0x457649++, await sleep(retryDelay * _0x457649));
+      if (headers3.status === 0x194 && allow404Null)
+        return returnMeta ? { data: null, status: 0x194, headers: headers3.headers } : null;
+      if (!headers3.ok) {
+        const errorBody = await parseErrorBody(headers3),
+          apiErr2 =
+            typeof errorParser === 'function'
+              ? errorParser(provider, errorBody, headers3.status)
+              : parseError(provider, errorBody, headers3.status);
+        if (apiErr2 && shouldRetryError(apiErr2, attempt2, retries, signal3)) {
+          (attempt2++, await sleep(retryDelay * attempt2));
           continue;
         }
         reportRequestFailure({
-          fullUrl: _0x30fe76,
+          fullUrl: fullUrl2,
           method: method,
           provider: provider,
-          apiErr: _0x480138,
-          attempt: _0x457649,
+          apiErr: apiErr2,
+          attempt: attempt2,
           retries: retries,
         });
-        throw _0x480138 || ApiError.fromHttpStatus(_0x12c3da.status, provider);
+        throw apiErr2 || ApiError.fromHttpStatus(headers3.status, provider);
       }
-      const _0x302f7f = await parseResponseBody(_0x12c3da, responseType);
-      return returnMeta
-        ? { data: _0x302f7f, status: _0x12c3da.status, headers: _0x12c3da.headers }
-        : _0x302f7f;
-    } catch (_0x3da932) {
-      const _0x251f71 =
-        _0x3da932 instanceof ApiError ? _0x3da932 : parseNetworkError(provider, _0x3da932, timeout);
-      if (shouldRetryError(_0x251f71, _0x457649, retries, _0x302d07)) {
-        (_0x457649++, await sleep(retryDelay * _0x457649));
+      const data2 = await parseResponseBody(headers3, responseType);
+      return returnMeta ? { data: data2, status: headers3.status, headers: headers3.headers } : data2;
+    } catch (value8) {
+      const apiErr3 = value8 instanceof ApiError ? value8 : parseNetworkError(provider, value8, timeout);
+      if (shouldRetryError(apiErr3, attempt2, retries, signal3)) {
+        (attempt2++, await sleep(retryDelay * attempt2));
         continue;
       }
       reportRequestFailure({
-        fullUrl: _0x30fe76,
+        fullUrl: fullUrl2,
         method: method,
         provider: provider,
-        apiErr: _0x251f71,
-        attempt: _0x457649,
+        apiErr: apiErr3,
+        attempt: attempt2,
         retries: retries,
       });
-      throw _0x251f71;
+      throw apiErr3;
     }
   }
 }
-export function get(_0x13d340, _0x11d908 = {}) {
-  return requester({ url: _0x13d340, method: 'GET', ..._0x11d908 });
+export function get(url2, args3 = {}) {
+  return requester({ url: url2, method: 'GET', ...args3 });
 }
-export function del(_0x20ba45, _0x1dfbab = {}) {
-  return requester({ url: _0x20ba45, method: 'DELETE', ..._0x1dfbab });
+export function del(url3, args4 = {}) {
+  return requester({ url: url3, method: 'DELETE', ...args4 });
 }
-export function post(_0x5c1a4f, _0x402bbb, _0x3260ef = {}) {
-  const _0x5064c5 = { ...(_0x3260ef.headers || {}) };
-  let _0x42a29c = _0x402bbb;
+export function post(url4, value9, response3 = {}) {
+  const headers4 = { ...(response3.headers || {}) };
+  let body2 = value9;
   return (
-    _0x402bbb !== undefined &&
-      !(_0x402bbb instanceof FormData) &&
-      !(_0x402bbb instanceof Blob) &&
-      !(_0x402bbb instanceof ArrayBuffer) &&
-      ((_0x5064c5['Content-Type'] = _0x5064c5['Content-Type'] || 'application/json'),
-      (_0x42a29c = typeof _0x402bbb === 'string' ? _0x402bbb : JSON.stringify(_0x402bbb))),
-    requester({ url: _0x5c1a4f, method: 'POST', headers: _0x5064c5, body: _0x42a29c, ..._0x3260ef })
+    value9 !== undefined &&
+      !(value9 instanceof FormData) &&
+      !(value9 instanceof Blob) &&
+      !(value9 instanceof ArrayBuffer) &&
+      ((headers4['Content-Type'] = headers4['Content-Type'] || 'application/json'),
+      (body2 = typeof value9 === 'string' ? value9 : JSON.stringify(value9))),
+    requester({ url: url4, method: 'POST', headers: headers4, body: body2, ...response3 })
   );
 }

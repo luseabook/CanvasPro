@@ -57,128 +57,123 @@ const VIDEO_NODE_LAYOUT_SIG_IGNORED_KEYS = new Set([
     'asyncTaskError',
     'asyncTaskRecovering',
   ]);
-function stringifyVideoNodeUpdateSig(_0x3cafed) {
+function stringifyVideoNodeUpdateSig(value) {
   try {
-    return JSON['stringify'](_0x3cafed);
+    return JSON['stringify'](value);
   } catch {
     return '';
   }
 }
-function isVideoNodeUpdateSigPrimitive(_0xa30e81) {
-  return (
-    _0xa30e81 == null ||
-    typeof _0xa30e81 === 'string' ||
-    typeof _0xa30e81 === 'number' ||
-    typeof _0xa30e81 === 'boolean'
-  );
+function isVideoNodeUpdateSigPrimitive(item) {
+  return item == null || typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean';
 }
-function getGenerationParamsForSig(_0x2f38d4) {
-  return _0x2f38d4['generationParams'] &&
-    typeof _0x2f38d4['generationParams'] === 'object' &&
-    !Array['isArray'](_0x2f38d4['generationParams'])
-    ? _0x2f38d4['generationParams']
+function getGenerationParamsForSig(key) {
+  return key['generationParams'] &&
+    typeof key['generationParams'] === 'object' &&
+    !Array['isArray'](key['generationParams'])
+    ? key['generationParams']
     : null;
 }
 function buildVideoNodePrimitiveDataSig(
-  _0x4569b4 = {},
+  options = {},
   { ignoredKeys: ignoredKeys = VIDEO_NODE_LAYOUT_SIG_IGNORED_KEYS } = {},
 ) {
-  const _0x118c52 = _0x4569b4 && typeof _0x4569b4 === 'object' ? _0x4569b4 : {},
-    _0x10d7cf = {};
+  const index = options && typeof options === 'object' ? options : {},
+    primitive = {};
   return (
-    Object['keys'](_0x118c52)
+    Object['keys'](index)
       ['sort']()
-      ['forEach']((_0x3deeca) => {
-        if (ignoredKeys['has'](_0x3deeca)) return;
-        const _0x5c7dbc = _0x118c52[_0x3deeca];
-        isVideoNodeUpdateSigPrimitive(_0x5c7dbc) && (_0x10d7cf[_0x3deeca] = _0x5c7dbc ?? null);
+      ['forEach']((result) => {
+        if (ignoredKeys['has'](result)) return;
+        const data = index[result];
+        isVideoNodeUpdateSigPrimitive(data) && (primitive[result] = data ?? null);
       }),
     stringifyVideoNodeUpdateSig({
-      primitive: _0x10d7cf,
-      generationParams: getGenerationParamsForSig(_0x118c52),
+      primitive: primitive,
+      generationParams: getGenerationParamsForSig(index),
     })
   );
 }
-export function buildVideoNodePromptUiSig(_0x344117 = {}) {
-  const _0x4c90cf = _0x344117 && typeof _0x344117 === 'object' ? _0x344117 : {};
+export function buildVideoNodePromptUiSig(options2 = {}) {
+  const target = options2 && typeof options2 === 'object' ? options2 : {};
   return stringifyVideoNodeUpdateSig({
-    model: String(_0x4c90cf['model'] || ''),
-    provider: String(_0x4c90cf['provider'] || ''),
+    model: String(target['model'] || ''),
+    provider: String(target['provider'] || ''),
   });
 }
-export function buildVideoNodePromptBoxSizeSig(_0x4d5cc7 = {}) {
-  const _0x1101bb = _0x4d5cc7 && typeof _0x4d5cc7 === 'object' ? _0x4d5cc7 : {};
-  return String(Number(_0x1101bb['promptBoxHeight'] || 0x0) || 0x0);
+export function buildVideoNodePromptBoxSizeSig(options3 = {}) {
+  const source = options3 && typeof options3 === 'object' ? options3 : {};
+  return String(Number(source['promptBoxHeight'] || 0x0) || 0x0);
 }
-export function buildVideoNodeVideoViewSig(_0x476a93 = {}) {
-  const _0x4f03de = _0x476a93 && typeof _0x476a93 === 'object' ? _0x476a93 : {},
-    _0x4da373 = Array['isArray'](_0x4f03de['videos']) ? _0x4f03de['videos'] : [];
+export function buildVideoNodeVideoViewSig(options4 = {}) {
+  const isGenerating = options4 && typeof options4 === 'object' ? options4 : {},
+    videos = Array['isArray'](isGenerating['videos']) ? isGenerating['videos'] : [];
   return stringifyVideoNodeUpdateSig({
-    videos: _0x4da373['map']((_0x34bc8c) => ({
-      videoUrl: String(_0x34bc8c?.['videoUrl'] || ''),
-      resultUrl: String(_0x34bc8c?.['resultUrl'] || ''),
-      sourceUrl: String(_0x34bc8c?.['sourceUrl'] || ''),
-      localPath: String(_0x34bc8c?.['localPath'] || ''),
-      displayLocalPath: String(_0x34bc8c?.['displayLocalPath'] || ''),
-      originalLocalPath: String(_0x34bc8c?.['originalLocalPath'] || ''),
-      thumbId: String(_0x34bc8c?.['thumbId'] || ''),
-      thumbUrl: String(_0x34bc8c?.['thumbUrl'] || ''),
-      thumbLocalPath: String(_0x34bc8c?.['thumbLocalPath'] || ''),
-      posterUrl: String(_0x34bc8c?.['posterUrl'] || ''),
-      posterLocalPath: String(_0x34bc8c?.['posterLocalPath'] || ''),
-      error: String(_0x34bc8c?.['error'] || ''),
-      mediaUnavailable: _0x34bc8c?.['mediaUnavailable'] === !![],
-      mediaUnavailableSource: String(_0x34bc8c?.['mediaUnavailableSource'] || ''),
+    videos: videos['map']((mediaUnavailable) => ({
+      videoUrl: String(mediaUnavailable?.['videoUrl'] || ''),
+      resultUrl: String(mediaUnavailable?.['resultUrl'] || ''),
+      sourceUrl: String(mediaUnavailable?.['sourceUrl'] || ''),
+      localPath: String(mediaUnavailable?.['localPath'] || ''),
+      displayLocalPath: String(mediaUnavailable?.['displayLocalPath'] || ''),
+      originalLocalPath: String(mediaUnavailable?.['originalLocalPath'] || ''),
+      thumbId: String(mediaUnavailable?.['thumbId'] || ''),
+      thumbUrl: String(mediaUnavailable?.['thumbUrl'] || ''),
+      thumbLocalPath: String(mediaUnavailable?.['thumbLocalPath'] || ''),
+      posterUrl: String(mediaUnavailable?.['posterUrl'] || ''),
+      posterLocalPath: String(mediaUnavailable?.['posterLocalPath'] || ''),
+      error: String(mediaUnavailable?.['error'] || ''),
+      mediaUnavailable: mediaUnavailable?.['mediaUnavailable'] === !![],
+      mediaUnavailableSource: String(mediaUnavailable?.['mediaUnavailableSource'] || ''),
     })),
-    videoUrl: String(_0x4f03de['videoUrl'] || ''),
-    resultUrl: String(_0x4f03de['resultUrl'] || ''),
-    sourceUrl: String(_0x4f03de['sourceUrl'] || ''),
-    localPath: String(_0x4f03de['localPath'] || ''),
-    displayLocalPath: String(_0x4f03de['displayLocalPath'] || ''),
-    originalLocalPath: String(_0x4f03de['originalLocalPath'] || ''),
-    thumbId: String(_0x4f03de['thumbId'] || ''),
-    thumbUrl: String(_0x4f03de['thumbUrl'] || ''),
-    thumbLocalPath: String(_0x4f03de['thumbLocalPath'] || ''),
-    posterUrl: String(_0x4f03de['posterUrl'] || ''),
-    posterLocalPath: String(_0x4f03de['posterLocalPath'] || ''),
-    mainVideoIndex: Number(_0x4f03de['mainVideoIndex'] || 0x0),
-    isVideosExpanded: !!_0x4f03de['isVideosExpanded'],
-    isGenerating: _0x4f03de['isGenerating'] === !![],
-    jobStatus: String(_0x4f03de['jobStatus'] || ''),
-    jobError: String(_0x4f03de['jobError'] || ''),
-    error: String(_0x4f03de['error'] || ''),
-    statusMessage: String(_0x4f03de['statusMessage'] || ''),
-    rhStatus: String(_0x4f03de['rhStatus'] || ''),
-    rhStatusMessage: String(_0x4f03de['rhStatusMessage'] || ''),
-    rhStatusCode: String(_0x4f03de['rhStatusCode'] || ''),
-    rhTaskId: String(_0x4f03de['rhTaskId'] || ''),
-    rhTaskStatus: String(_0x4f03de['rhTaskStatus'] || ''),
-    rhTaskStartedAt: Number(_0x4f03de['rhTaskStartedAt'] || 0x0),
-    rhTaskRecovering: !!_0x4f03de['rhTaskRecovering'],
-    rhTaskUseOpenapiQuery: !!_0x4f03de['rhTaskUseOpenapiQuery'],
-    dreaminaSubmitId: String(_0x4f03de['dreaminaSubmitId'] || ''),
-    dreaminaTaskStatus: String(_0x4f03de['dreaminaTaskStatus'] || ''),
-    dreaminaTaskPhase: String(_0x4f03de['dreaminaTaskPhase'] || ''),
-    dreaminaTaskLabel: String(_0x4f03de['dreaminaTaskLabel'] || ''),
-    dreaminaTaskStartedAt: Number(_0x4f03de['dreaminaTaskStartedAt'] || 0x0),
-    dreaminaTaskLastCheckedAt: Number(_0x4f03de['dreaminaTaskLastCheckedAt'] || 0x0),
-    dreaminaTaskRecovering: !!_0x4f03de['dreaminaTaskRecovering'],
-    asyncTaskId: String(_0x4f03de['asyncTaskId'] || ''),
-    asyncTaskStatus: String(_0x4f03de['asyncTaskStatus'] || ''),
-    asyncTaskError: String(_0x4f03de['asyncTaskError'] || ''),
-    asyncTaskRecovering: !!_0x4f03de['asyncTaskRecovering'],
+    videoUrl: String(isGenerating['videoUrl'] || ''),
+    resultUrl: String(isGenerating['resultUrl'] || ''),
+    sourceUrl: String(isGenerating['sourceUrl'] || ''),
+    localPath: String(isGenerating['localPath'] || ''),
+    displayLocalPath: String(isGenerating['displayLocalPath'] || ''),
+    originalLocalPath: String(isGenerating['originalLocalPath'] || ''),
+    thumbId: String(isGenerating['thumbId'] || ''),
+    thumbUrl: String(isGenerating['thumbUrl'] || ''),
+    thumbLocalPath: String(isGenerating['thumbLocalPath'] || ''),
+    posterUrl: String(isGenerating['posterUrl'] || ''),
+    posterLocalPath: String(isGenerating['posterLocalPath'] || ''),
+    mainVideoIndex: Number(isGenerating['mainVideoIndex'] || 0x0),
+    isVideosExpanded: !!isGenerating['isVideosExpanded'],
+    isGenerating: isGenerating['isGenerating'] === !![],
+    jobStatus: String(isGenerating['jobStatus'] || ''),
+    jobError: String(isGenerating['jobError'] || ''),
+    error: String(isGenerating['error'] || ''),
+    statusMessage: String(isGenerating['statusMessage'] || ''),
+    rhStatus: String(isGenerating['rhStatus'] || ''),
+    rhStatusMessage: String(isGenerating['rhStatusMessage'] || ''),
+    rhStatusCode: String(isGenerating['rhStatusCode'] || ''),
+    rhTaskId: String(isGenerating['rhTaskId'] || ''),
+    rhTaskStatus: String(isGenerating['rhTaskStatus'] || ''),
+    rhTaskStartedAt: Number(isGenerating['rhTaskStartedAt'] || 0x0),
+    rhTaskRecovering: !!isGenerating['rhTaskRecovering'],
+    rhTaskUseOpenapiQuery: !!isGenerating['rhTaskUseOpenapiQuery'],
+    dreaminaSubmitId: String(isGenerating['dreaminaSubmitId'] || ''),
+    dreaminaTaskStatus: String(isGenerating['dreaminaTaskStatus'] || ''),
+    dreaminaTaskPhase: String(isGenerating['dreaminaTaskPhase'] || ''),
+    dreaminaTaskLabel: String(isGenerating['dreaminaTaskLabel'] || ''),
+    dreaminaTaskStartedAt: Number(isGenerating['dreaminaTaskStartedAt'] || 0x0),
+    dreaminaTaskLastCheckedAt: Number(isGenerating['dreaminaTaskLastCheckedAt'] || 0x0),
+    dreaminaTaskRecovering: !!isGenerating['dreaminaTaskRecovering'],
+    asyncTaskId: String(isGenerating['asyncTaskId'] || ''),
+    asyncTaskStatus: String(isGenerating['asyncTaskStatus'] || ''),
+    asyncTaskError: String(isGenerating['asyncTaskError'] || ''),
+    asyncTaskRecovering: !!isGenerating['asyncTaskRecovering'],
   });
 }
-export function buildVideoNodeFooterControlSig(_0x19e4cb = {}, _0x383641 = '') {
+export function buildVideoNodeFooterControlSig(options5 = {}, next = '') {
   return [
-    _0x383641,
-    buildVideoNodePrimitiveDataSig(_0x19e4cb, { ignoredKeys: VIDEO_NODE_FOOTER_CONTROL_SIG_IGNORED_KEYS }),
+    next,
+    buildVideoNodePrimitiveDataSig(options5, { ignoredKeys: VIDEO_NODE_FOOTER_CONTROL_SIG_IGNORED_KEYS }),
   ]['join']('\x0a');
 }
-export function buildVideoNodeSubmitButtonSig(_0x330b66 = {}, _0x12df8e = '', _0x1e823c = {}) {
+export function buildVideoNodeSubmitButtonSig(options6 = {}, current = '', entry = {}) {
   return [
-    _0x12df8e,
-    _0x1e823c['rhCancelInFlight'] === !![] ? 'cancel:1' : 'cancel:0',
-    buildVideoNodePrimitiveDataSig(_0x330b66),
+    current,
+    entry['rhCancelInFlight'] === !![] ? 'cancel:1' : 'cancel:0',
+    buildVideoNodePrimitiveDataSig(options6),
   ]['join']('\x0a');
 }

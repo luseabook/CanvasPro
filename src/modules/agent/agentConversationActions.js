@@ -2,212 +2,201 @@ import { getAgentEditableTurn, AGENT_REPLY_VERSION_LIMIT } from './agentReplyVer
 import { agentConversationActionText } from './agentConversationActionText.js';
 import { agentIconSvg } from './agentPanelElements.js';
 export function createAgentConversationActions({
-  messagesEl: _0x50b3bf,
-  runtime: _0x405285,
-  getBusy: _0x24ad09,
-  setBusy: _0x35ed28,
-  getPresentation: _0x21c6de,
-  onResult: _0xc35622,
-  setNotice: _0x3e9af4,
+  messagesEl: messagesEl,
+  runtime: runtime,
+  getBusy: getBusy,
+  setBusy: setBusy2,
+  getPresentation: getPresentation,
+  onResult: onResult,
+  setNotice: setNotice,
   replyActions: replyActions = [],
 }) {
-  let _0x286c3a = null,
-    _0x3a8da2 = '';
-  const _0x44d302 = (_0x42025c, _0x569062, _0x1fade8) => {
-    const _0x2d152d = document['createElement']('button');
+  let el = null,
+    value = '';
+  const run = (item, handler, key) => {
+    const el2 = document['createElement']('button');
     return (
-      (_0x2d152d['type'] = 'button'),
-      (_0x2d152d['className'] = ('agent-message-action ' + (_0x1fade8 || ''))['trim']()),
-      (_0x2d152d['textContent'] = _0x42025c),
-      _0x2d152d['addEventListener']('click', (_0x115310) => {
-        _0x115310['stopPropagation']();
-        if (!_0x24ad09()) _0x569062();
+      (el2['type'] = 'button'),
+      (el2['className'] = ('agent-message-action ' + (key || ''))['trim']()),
+      (el2['textContent'] = item),
+      el2['addEventListener']('click', (event) => {
+        event['stopPropagation']();
+        if (!getBusy()) handler();
       }),
-      _0x2d152d
+      el2
     );
   };
-  function _0x1dc792() {
-    (_0x286c3a?.['remove'](), (_0x286c3a = null));
+  function destroy() {
+    (el?.['remove'](), (el = null));
   }
-  async function _0x3c99ba(_0x499e00, _0x39a379) {
-    if (_0x24ad09()) return;
-    (_0x1dc792(), _0x3e9af4(''), _0x35ed28(!![], { stoppable: !![] }));
-    const _0x3cac7e = _0x21c6de()['appendWaiting']();
+  async function run2(itemId, message) {
+    if (getBusy()) return;
+    (destroy(), setNotice(''), setBusy2(!![], { stoppable: !![] }));
+    const el3 = getPresentation()['appendWaiting']();
     try {
-      const _0x5d3f86 = await _0x405285['reviseAssistantTurn']({
-        itemId: _0x499e00,
-        ...(_0x39a379 === undefined ? {} : { message: _0x39a379 }),
+      const response = await runtime['reviseAssistantTurn']({
+        itemId: itemId,
+        ...(message === undefined ? {} : { message: message }),
       });
-      _0xc35622(_0x5d3f86);
-      if (_0x5d3f86?.['ok'] === ![] && !_0x5d3f86['stale']) _0x3e9af4(_0x5d3f86['reply']);
-    } catch (_0x1bde25) {
-      _0x3e9af4(_0x1bde25['message']);
+      onResult(response);
+      if (response?.['ok'] === ![] && !response['stale']) setNotice(response['reply']);
+    } catch (error) {
+      setNotice(error['message']);
     } finally {
-      const _0x3b6e88 = Boolean(_0x3cac7e['parentNode']);
-      _0x21c6de()['removeWaiting'](_0x3cac7e);
-      if (_0x3b6e88) _0x35ed28(![]);
+      const index = Boolean(el3['parentNode']);
+      getPresentation()['removeWaiting'](el3);
+      if (index) setBusy2(![]);
     }
   }
-  function _0xe36320(_0xfdf66d, _0x5d118f) {
-    (_0x1dc792(),
-      (_0x286c3a = document['createElement']('div')),
-      (_0x286c3a['className'] = 'agent-message-editor'));
-    const _0x507637 = document['createElement']('textarea');
-    ((_0x507637['className'] = 'agent-message-edit-input'),
-      _0x507637['setAttribute']('aria-label', agentConversationActionText('edit')),
-      (_0x507637['rows'] = 0x4),
-      (_0x507637['value'] = _0xfdf66d['user']['content']));
-    const _0x40c888 = _0x44d302(
+  function run3(result, data) {
+    (destroy(), (el = document['createElement']('div')), (el['className'] = 'agent-message-editor'));
+    const el4 = document['createElement']('textarea');
+    ((el4['className'] = 'agent-message-edit-input'),
+      el4['setAttribute']('aria-label', agentConversationActionText('edit')),
+      (el4['rows'] = 0x4),
+      (el4['value'] = result['user']['content']));
+    const el5 = run(
       agentConversationActionText('save'),
       () => {
-        if (_0x507637['value']['trim']()) void _0x3c99ba(_0xfdf66d['itemId'], _0x507637['value']['trim']());
+        if (el4['value']['trim']()) void run2(result['itemId'], el4['value']['trim']());
       },
       'agent-message-edit-save',
     );
-    (_0x507637['addEventListener']('input', () => {
-      _0x40c888['disabled'] = !_0x507637['value']['trim']();
+    (el4['addEventListener']('input', () => {
+      el5['disabled'] = !el4['value']['trim']();
     }),
-      _0x507637['addEventListener']('keydown', (_0x2cf9d2) => {
-        _0x2cf9d2['stopPropagation']();
-        if (_0x2cf9d2['key'] === 'Escape') _0x1dc792();
-        if (
-          (_0x2cf9d2['ctrlKey'] || _0x2cf9d2['metaKey']) &&
-          _0x2cf9d2['key'] === 'Enter' &&
-          !_0x2cf9d2['isComposing']
-        )
-          _0x40c888['click']();
+      el4['addEventListener']('keydown', (event2) => {
+        event2['stopPropagation']();
+        if (event2['key'] === 'Escape') destroy();
+        if ((event2['ctrlKey'] || event2['metaKey']) && event2['key'] === 'Enter' && !event2['isComposing'])
+          el5['click']();
       }),
-      _0x286c3a['append'](_0x507637, _0x44d302(agentConversationActionText('cancel'), _0x1dc792), _0x40c888),
-      _0x5d118f['append'](_0x286c3a),
-      _0x507637['focus']());
+      el['append'](el4, run(agentConversationActionText('cancel'), destroy), el5),
+      data['append'](el),
+      el4['focus']());
   }
-  function _0x151e9f() {
-    if (typeof _0x405285['reviseAssistantTurn'] !== 'function') return;
-    const _0x152357 = getAgentEditableTurn(_0x405285['sessionStore']['getHistory']()),
-      _0x5c9217 = [..._0x50b3bf['querySelectorAll']('.agent-message:not(.agent-message--typing)')],
-      _0x283979 = _0x152357?.['assistant']['replyVersions'],
-      _0x3de3a5 = _0x152357
-        ? _0x152357['itemId'] +
+  function render() {
+    if (typeof runtime['reviseAssistantTurn'] !== 'function') return;
+    const itemId2 = getAgentEditableTurn(runtime['sessionStore']['getHistory']()),
+      list = [...messagesEl['querySelectorAll']('.agent-message:not(.agent-message--typing)')],
+      index2 = itemId2?.['assistant']['replyVersions'],
+      options = itemId2
+        ? itemId2['itemId'] +
           ':' +
-          (_0x283979?.['activeIndex'] || 0x0) +
+          (index2?.['activeIndex'] || 0x0) +
           ':' +
-          (_0x283979?.['versions']['length'] || 0x1) +
+          (index2?.['versions']['length'] || 0x1) +
           ':' +
           agentConversationActionText('retry')
         : '',
-      _0x4f6b7f = _0x50b3bf['querySelector']('.agent-message-actions');
+      target = messagesEl['querySelector']('.agent-message-actions');
     if (
-      _0x3de3a5 === _0x3a8da2 &&
-      _0x4f6b7f &&
-      (!_0x152357 || _0x5c9217['length'] === _0x405285['sessionStore']['getHistory']()['length'])
+      options === value &&
+      target &&
+      (!itemId2 || list['length'] === runtime['sessionStore']['getHistory']()['length'])
     ) {
-      _0x1e7fe0();
+      run4();
       return;
     }
-    if (_0x24ad09() && _0x4f6b7f) {
-      _0x1e7fe0();
+    if (getBusy() && target) {
+      run4();
       return;
     }
-    (_0x1dc792(),
-      _0x50b3bf['querySelectorAll']('.agent-message-actions')['forEach']((_0x4892bb) =>
-        _0x4892bb['remove'](),
-      ),
-      (_0x3a8da2 = _0x3de3a5));
-    if (!_0x152357 || _0x5c9217['length'] !== _0x405285['sessionStore']['getHistory']()['length']) return;
-    const _0x39332c = _0x5c9217['at'](-0x2),
-      _0x155c4d = _0x5c9217['at'](-0x1),
-      _0x21216f = document['createElement']('div');
-    _0x21216f['className'] = 'agent-message-actions';
-    const _0x878883 = _0x44d302(
-      agentConversationActionText('edit'),
-      () => _0xe36320(_0x152357, _0x39332c),
-      'agent-message-edit',
-    );
-    ((_0x878883['title'] = agentConversationActionText('edit')),
-      _0x878883['setAttribute']('aria-label', agentConversationActionText('edit')),
-      (_0x878883['innerHTML'] = agentIconSvg('edit')),
-      _0x21216f['append'](_0x878883));
-    const _0x3c12d8 = document['createElement']('div');
-    ((_0x3c12d8['className'] = 'agent-message-actions'),
-      _0x3c12d8['append'](
-        _0x44d302(
+    (destroy(),
+      messagesEl['querySelectorAll']('.agent-message-actions')['forEach']((el6) => el6['remove']()),
+      (value = options));
+    if (!itemId2 || list['length'] !== runtime['sessionStore']['getHistory']()['length']) return;
+    const el7 = list['at'](-0x2),
+      source = list['at'](-0x1),
+      next = document['createElement']('div');
+    next['className'] = 'agent-message-actions';
+    const el8 = run(agentConversationActionText('edit'), () => run3(itemId2, el7), 'agent-message-edit');
+    ((el8['title'] = agentConversationActionText('edit')),
+      el8['setAttribute']('aria-label', agentConversationActionText('edit')),
+      (el8['innerHTML'] = agentIconSvg('edit')),
+      next['append'](el8));
+    const current = document['createElement']('div');
+    ((current['className'] = 'agent-message-actions'),
+      current['append'](
+        run(
           agentConversationActionText('retry'),
-          () => void _0x3c99ba(_0x152357['itemId']),
+          () => void run2(itemId2['itemId']),
           'agent-message-regenerate',
         ),
       ));
-    if (_0x152357['assistant']['status'] === 'chat')
-      replyActions['forEach']((_0xe9f45a) => {
-        _0x3c12d8['append'](
-          _0x44d302(
-            _0xe9f45a['label'],
+    if (itemId2['assistant']['status'] === 'chat')
+      replyActions['forEach']((entry) => {
+        current['append'](
+          run(
+            entry['label'],
             () => {
               try {
-                _0xe9f45a['apply'](_0x152357['assistant']['content']);
-              } catch (_0x2b9f2e) {
-                _0x3e9af4(_0x2b9f2e['message']);
+                entry['apply'](itemId2['assistant']['content']);
+              } catch (error2) {
+                setNotice(error2['message']);
               }
             },
-            _0xe9f45a['className'],
+            entry['className'],
           ),
         );
       });
-    if (_0x283979?.['versions']['length'] > 0x1) {
-      const _0x1353ee = _0x44d302(
+    if (index2?.['versions']['length'] > 0x1) {
+      const el9 = run(
           '‹',
           () =>
-            _0xc35622(
-              _0x405285['selectAssistantVersion']({
-                itemId: _0x152357['itemId'],
-                index: _0x283979['activeIndex'] - 0x1,
+            onResult(
+              runtime['selectAssistantVersion']({
+                itemId: itemId2['itemId'],
+                index: index2['activeIndex'] - 0x1,
               }),
             ),
           'agent-message-version-prev',
         ),
-        _0xf78665 = _0x44d302(
+        el10 = run(
           '›',
           () =>
-            _0xc35622(
-              _0x405285['selectAssistantVersion']({
-                itemId: _0x152357['itemId'],
-                index: _0x283979['activeIndex'] + 0x1,
+            onResult(
+              runtime['selectAssistantVersion']({
+                itemId: itemId2['itemId'],
+                index: index2['activeIndex'] + 0x1,
               }),
             ),
           'agent-message-version-next',
         );
-      (_0x1353ee['setAttribute']('aria-label', agentConversationActionText('previous')),
-        _0xf78665['setAttribute']('aria-label', agentConversationActionText('next')));
-      const _0x37107c = document['createElement']('span');
-      ((_0x37107c['className'] = 'agent-message-version-count'),
-        _0x37107c['setAttribute']('aria-label', agentConversationActionText('version')),
-        (_0x37107c['textContent'] = _0x283979['activeIndex'] + 0x1 + ' / ' + _0x283979['versions']['length']),
-        _0x3c12d8['append'](_0x1353ee, _0x37107c, _0xf78665));
+      (el9['setAttribute']('aria-label', agentConversationActionText('previous')),
+        el10['setAttribute']('aria-label', agentConversationActionText('next')));
+      const el11 = document['createElement']('span');
+      ((el11['className'] = 'agent-message-version-count'),
+        el11['setAttribute']('aria-label', agentConversationActionText('version')),
+        (el11['textContent'] = index2['activeIndex'] + 0x1 + ' / ' + index2['versions']['length']),
+        current['append'](el9, el11, el10));
     }
-    ((_0x39332c['querySelector']('.agent-message-footer') || _0x39332c)['append'](_0x21216f),
-      _0x155c4d['append'](_0x3c12d8),
-      _0x1e7fe0());
+    ((el7['querySelector']('.agent-message-footer') || el7)['append'](next),
+      source['append'](current),
+      run4());
   }
-  function _0x1e7fe0() {
-    const _0x33631a = getAgentEditableTurn(_0x405285['sessionStore']['getHistory']())?.['assistant'][
+  function run4() {
+    const agentEditableTurn = getAgentEditableTurn(runtime['sessionStore']['getHistory']())?.['assistant'][
       'replyVersions'
     ];
-    _0x50b3bf['querySelectorAll']('.agent-message-action')['forEach']((_0x43695c) => {
-      _0x43695c['disabled'] =
-        _0x24ad09() ||
-        (_0x43695c['classList']['contains']('agent-message-version-prev') && !_0x33631a?.['activeIndex']) ||
-        (_0x43695c['classList']['contains']('agent-message-version-next') &&
-          _0x33631a?.['activeIndex'] === _0x33631a?.['versions']['length'] - 0x1) ||
-        ((_0x43695c['classList']['contains']('agent-message-regenerate') ||
-          _0x43695c['classList']['contains']('agent-message-edit')) &&
-          _0x33631a?.['versions']['length'] >= AGENT_REPLY_VERSION_LIMIT);
+    messagesEl['querySelectorAll']('.agent-message-action')['forEach']((el12) => {
+      el12['disabled'] =
+        getBusy() ||
+        (el12['classList']['contains']('agent-message-version-prev') &&
+          !agentEditableTurn?.['activeIndex']) ||
+        (el12['classList']['contains']('agent-message-version-next') &&
+          agentEditableTurn?.['activeIndex'] === agentEditableTurn?.['versions']['length'] - 0x1) ||
+        ((el12['classList']['contains']('agent-message-regenerate') ||
+          el12['classList']['contains']('agent-message-edit')) &&
+          agentEditableTurn?.['versions']['length'] >= AGENT_REPLY_VERSION_LIMIT);
     });
   }
   return {
-    render: _0x151e9f,
+    render: render,
     setBusy() {
-      if (_0x24ad09()) _0x1dc792();
-      _0x151e9f();
+      if (getBusy()) destroy();
+      render();
     },
-    destroy: _0x1dc792,
+    destroy: destroy,
   };
 }

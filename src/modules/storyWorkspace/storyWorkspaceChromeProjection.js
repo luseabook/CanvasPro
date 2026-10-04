@@ -4,120 +4,107 @@ import {
   getStoryVideoEpisodes,
   isStoryWorkspaceStepNavigationDisabled,
 } from './storyWorkspaceNavigationTransaction.js';
-function normalizeText(_0x4e622d) {
-  return String(_0x4e622d ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function freezeSnapshot(_0x9f503) {
-  if (Array['isArray'](_0x9f503))
-    return Object['freeze'](_0x9f503['map']((_0x192d37) => freezeSnapshot(_0x192d37)));
-  if (_0x9f503 && typeof _0x9f503 === 'object')
+function freezeSnapshot(list) {
+  if (Array['isArray'](list)) return Object['freeze'](list['map']((item) => freezeSnapshot(item)));
+  if (list && typeof list === 'object')
     return Object['freeze'](
-      Object['fromEntries'](
-        Object['entries'](_0x9f503)['map'](([_0x540dc3, _0x5d9f3f]) => [
-          _0x540dc3,
-          freezeSnapshot(_0x5d9f3f),
-        ]),
-      ),
+      Object['fromEntries'](Object['entries'](list)['map'](([key, index]) => [key, freezeSnapshot(index)])),
     );
-  return _0x9f503;
+  return list;
 }
-export function getStoryEpisodeToolbarOptions(_0x1a9f0b = [], _0x5c7a58 = '') {
-  const _0x16e773 = normalizeText(_0x5c7a58);
-  return getStoryVideoEpisodes(_0x1a9f0b)['filter'](
-    (_0x3de3d5) =>
-      normalizeText(_0x3de3d5?.['id']) !== _0x16e773 &&
-      Array['isArray'](_0x3de3d5?.['clips']) &&
-      _0x3de3d5['clips']['length'] > 0x0,
+export function getStoryEpisodeToolbarOptions(list2 = [], result = '') {
+  const text = normalizeText(result);
+  return getStoryVideoEpisodes(list2)['filter'](
+    (data) =>
+      normalizeText(data?.['id']) !== text &&
+      Array['isArray'](data?.['clips']) &&
+      data['clips']['length'] > 0x0,
   );
 }
-export function getStoryProjectCanvasEpisodes(_0x5bc6c5 = [], _0x45a125 = '') {
-  const _0x55585b = getStoryVideoEpisodes(_0x5bc6c5),
-    _0x38bd6b = normalizeText(_0x45a125),
-    _0x51d982 =
-      _0x55585b['find']((_0x598c84) => normalizeText(_0x598c84?.['id']) === _0x38bd6b) || _0x55585b[0x0];
-  return _0x51d982 ? [_0x51d982] : [];
+export function getStoryProjectCanvasEpisodes(list3 = [], options = '') {
+  const list4 = getStoryVideoEpisodes(list3),
+    text2 = normalizeText(options),
+    target = list4['find']((source) => normalizeText(source?.['id']) === text2) || list4[0x0];
+  return target ? [target] : [];
 }
-function projectEpisodeSwitcher(_0x1f02d3, _0x4451a3, _0x1fb53a) {
+function projectEpisodeSwitcher(next, current, isCurrentPage) {
   return {
-    currentEpisodeId: normalizeText(_0x4451a3?.['id']),
-    currentEpisodeName: buildStoryEpisodeCanvasName(_0x4451a3) || '分集详情',
-    isCurrentPage: _0x1fb53a,
-    options: getStoryEpisodeToolbarOptions(_0x1f02d3['data']?.['episodes'], _0x4451a3?.['id'])['map'](
-      (_0x263ef1) => ({
-        id: _0x263ef1['id'],
-        name: buildStoryEpisodeCanvasName(_0x263ef1) || '分集详情',
-        clipCount: _0x263ef1['clips']['length'],
-      }),
-    ),
+    currentEpisodeId: normalizeText(current?.['id']),
+    currentEpisodeName: buildStoryEpisodeCanvasName(current) || '分集详情',
+    isCurrentPage: isCurrentPage,
+    options: getStoryEpisodeToolbarOptions(next['data']?.['episodes'], current?.['id'])['map']((id) => ({
+      id: id['id'],
+      name: buildStoryEpisodeCanvasName(id) || '分集详情',
+      clipCount: id['clips']['length'],
+    })),
   };
 }
 export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {}) {
-  function _0x3e1853(_0x15cef0, _0x309f11 = _0x15cef0['step']) {
-    const _0x5dfd5e = _0x15cef0['data']?.['project']?.['sourceMode'],
-      _0x5e20e2 =
-        _0x5dfd5e === 'upload-original'
-          ? steps['map']((_0x44eb7f) =>
-              _0x44eb7f['id'] === 0x1 ? { ..._0x44eb7f, label: '原始剧本' } : _0x44eb7f,
-            )
-          : _0x5dfd5e === 'video-replication'
-            ? steps['map']((_0x1bc02a) => ({
-                ..._0x1bc02a,
-                label:
-                  { 0x1: '原片分析', 0x2: '素材设定', 0x3: '视频列表' }[_0x1bc02a['id']] ||
-                  _0x1bc02a['label'],
+  function steps2(entry, activeStep = entry['step']) {
+    const record = entry['data']?.['project']?.['sourceMode'],
+      args =
+        record === 'upload-original'
+          ? steps['map']((args2) => (args2['id'] === 0x1 ? { ...args2, label: '原始剧本' } : args2))
+          : record === 'video-replication'
+            ? steps['map']((args3) => ({
+                ...args3,
+                label: { 0x1: '原片分析', 0x2: '素材设定', 0x3: '视频列表' }[args3['id']] || args3['label'],
               }))
             : steps;
     return {
-      activeStep: _0x309f11,
-      items: (isStoryCollaborationProject(_0x15cef0['data'])
-        ? [{ id: 0x0, label: '故事构思' }, ..._0x5e20e2]
-        : _0x5e20e2)['map']((_0x1028d9, _0x24ad4b) => ({
-        id: _0x1028d9['id'],
-        number: _0x24ad4b + 0x1,
-        label: _0x1028d9['label'],
-        active: _0x309f11 === _0x1028d9['id'],
+      activeStep: activeStep,
+      items: (isStoryCollaborationProject(entry['data']) ? [{ id: 0x0, label: '故事构思' }, ...args] : args)[
+        'map'
+      ]((id2, number) => ({
+        id: id2['id'],
+        number: number + 0x1,
+        label: id2['label'],
+        active: activeStep === id2['id'],
         disabled:
-          (_0x1028d9['id'] === 0x0 && _0x15cef0['developerModeAvailable'] !== !![]) ||
-          isStoryWorkspaceStepNavigationDisabled(_0x15cef0['data'], _0x1028d9['id']),
+          (id2['id'] === 0x0 && entry['developerModeAvailable'] !== !![]) ||
+          isStoryWorkspaceStepNavigationDisabled(entry['data'], id2['id']),
       })),
     };
   }
-  function _0x391769(_0x595bd4 = {}) {
-    if (_0x595bd4['view'] === 'episode') {
-      const _0x4061af = _0x595bd4['data']?.['episodes']?.['find'](
-        (_0x52d1dd) => _0x52d1dd['id'] === _0x595bd4['selectedEpisodeId'],
+  function run(projectLabel = {}) {
+    if (projectLabel['view'] === 'episode') {
+      const payload = projectLabel['data']?.['episodes']?.['find'](
+        (handle) => handle['id'] === projectLabel['selectedEpisodeId'],
       );
       return {
         kind: 'episode',
-        projectLabel: _0x595bd4['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目',
-        steps: _0x3e1853(_0x595bd4, 'episode'),
-        episodeSwitcher: projectEpisodeSwitcher(_0x595bd4, _0x4061af, !![]),
-        canvasSyncPending: _0x595bd4['canvasSyncPending'] === !![],
+        projectLabel: projectLabel['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目',
+        steps: steps2(projectLabel, 'episode'),
+        episodeSwitcher: projectEpisodeSwitcher(projectLabel, payload, !![]),
+        canvasSyncPending: projectLabel['canvasSyncPending'] === !![],
       };
     }
-    const _0x2fe6fc = getStoryEpisodeToolbarOptions(_0x595bd4['data']?.['episodes']),
-      _0x5e3906 =
-        _0x2fe6fc['find'](
-          (_0x50fd30) => normalizeText(_0x50fd30?.['id']) === normalizeText(_0x595bd4['selectedEpisodeId']),
+    const list5 = getStoryEpisodeToolbarOptions(projectLabel['data']?.['episodes']),
+      episodeSwitcher =
+        list5['find'](
+          (state) => normalizeText(state?.['id']) === normalizeText(projectLabel['selectedEpisodeId']),
         ) ||
-        _0x2fe6fc[0x0] ||
+        list5[0x0] ||
         null;
     return {
       kind: 'project',
       collaborationAvailable:
-        _0x595bd4['developerModeAvailable'] === !![] &&
-        _0x595bd4['workspaceSurface'] !== 'replication' &&
-        isStoryCollaborationProject(_0x595bd4['data']),
-      projectLabel: _0x595bd4['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目',
-      steps: _0x3e1853(_0x595bd4),
-      episodeSwitcher: _0x5e3906 ? projectEpisodeSwitcher(_0x595bd4, _0x5e3906, ![]) : null,
+        projectLabel['developerModeAvailable'] === !![] &&
+        projectLabel['workspaceSurface'] !== 'replication' &&
+        isStoryCollaborationProject(projectLabel['data']),
+      projectLabel: projectLabel['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目',
+      steps: steps2(projectLabel),
+      episodeSwitcher: episodeSwitcher ? projectEpisodeSwitcher(projectLabel, episodeSwitcher, ![]) : null,
     };
   }
-  function _0x291648(
-    _0x2f0a06 = {},
+  function run2(
+    showPrevious = {},
     {
-      nextLabel: _0x36d60e,
-      nextAction: _0x38abfe = '',
+      nextLabel: nextLabel,
+      nextAction: nextAction = '',
       isLast: isLast = ![],
       title: title = '',
       hint: hint = '',
@@ -126,55 +113,53 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
       useDefaultCopy: useDefaultCopy = !![],
     } = {},
   ) {
-    const _0x3d00d0 =
-        _0x38abfe ||
+    const nextAction2 =
+        nextAction ||
         (isLast
           ? 'finish-story-workbench'
-          : _0x2f0a06['step'] === 0x1
+          : showPrevious['step'] === 0x1
             ? 'extract-assets'
             : 'open-episode-stage'),
-      _0x2c35d3 =
-        _0x2f0a06['data']?.['project']?.['sourceMode'] === 'video-replication' &&
-        _0x2f0a06['splittingEpisodeIds']?.['length'] > 0x0,
-      _0x2b195c = Boolean(_0x2f0a06['storyPlanningOperation'] || _0x2c35d3),
-      _0x716cbc = _0x2c35d3
-        ? '正在生成分段提示词'
-        : _0x2f0a06['storyPlanningStatus'] || _0x36d60e || '处理中',
-      _0x4dbec9 =
+      config =
+        showPrevious['data']?.['project']?.['sourceMode'] === 'video-replication' &&
+        showPrevious['splittingEpisodeIds']?.['length'] > 0x0,
+      nextLabel2 = Boolean(showPrevious['storyPlanningOperation'] || config),
+      scope = config ? '正在生成分段提示词' : showPrevious['storyPlanningStatus'] || nextLabel || '处理中',
+      input =
         title ||
-        (_0x38abfe === 'plan-episode-outlines'
+        (nextAction === 'plan-episode-outlines'
           ? '剧本摘要已完成'
-          : _0x38abfe === 'extract-assets'
+          : nextAction === 'extract-assets'
             ? '完整分集剧本已全部完成'
-            : _0x2f0a06['step'] === 0x2
+            : showPrevious['step'] === 0x2
               ? '角色、场景和道具设定已应用'
               : '分集结构已建立'),
-      _0x55c110 =
+      output =
         hint ||
-        (_0x38abfe === 'plan-episode-outlines'
+        (nextAction === 'plan-episode-outlines'
           ? '下一步将按已设置集数生成分集大纲'
-          : _0x38abfe === 'extract-assets'
+          : nextAction === 'extract-assets'
             ? '下一步沿用现有素材、分镜和视频流程'
             : isLast
               ? '进入分集后可编辑片段并选择视频模型'
               : '可以继续下一步，也可以返回修改');
     return {
-      title: useDefaultCopy ? _0x4dbec9 : title,
-      hint: useDefaultCopy ? _0x55c110 : hint,
+      title: useDefaultCopy ? input : title,
+      hint: useDefaultCopy ? output : hint,
       actionsMarkup: actionsMarkup,
       leadingActionsMarkup: leadingActionsMarkup,
       showPrevious:
-        _0x2f0a06['step'] >
-        (_0x2f0a06['developerModeAvailable'] === !![] && isStoryCollaborationProject(_0x2f0a06['data'])
+        showPrevious['step'] >
+        (showPrevious['developerModeAvailable'] === !![] && isStoryCollaborationProject(showPrevious['data'])
           ? 0x0
           : 0x1),
-      nextAction: _0x3d00d0,
-      nextLabel: _0x2b195c ? _0x716cbc : _0x36d60e || '下一步',
-      busy: _0x2b195c,
+      nextAction: nextAction2,
+      nextLabel: nextLabel2 ? scope : nextLabel || '下一步',
+      busy: nextLabel2,
     };
   }
   return Object['freeze']({
-    projectFooter: (..._0x2dc8b2) => freezeSnapshot(_0x291648(..._0x2dc8b2)),
-    projectToolbar: (..._0x2080f2) => freezeSnapshot(_0x391769(..._0x2080f2)),
+    projectFooter: (...args4) => freezeSnapshot(run2(...args4)),
+    projectToolbar: (...args5) => freezeSnapshot(run(...args5)),
   });
 }

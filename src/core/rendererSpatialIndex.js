@@ -3,191 +3,192 @@ const DEFAULT_CELL_SIZE = 0x400,
   DEFAULT_NODE_HEIGHT = 120;
 let cachedSpatialIndexSignature = '',
   cachedSpatialIndex = null;
-function finiteNumber(_0x29a3ba, _0x2de07b = 0) {
-  const _0x14dab9 = Number(_0x29a3ba);
-  return Number.isFinite(_0x14dab9) ? _0x14dab9 : _0x2de07b;
+function finiteNumber(value, item = 0) {
+  const key = Number(value);
+  return Number.isFinite(key) ? key : item;
 }
-function normalizeNodeBounds(_0x2eee9b) {
-  const _0x317479 = finiteNumber(_0x2eee9b?.x, 0),
-    _0x5427e4 = finiteNumber(_0x2eee9b?.y, 0),
-    _0x5bebee = Math.max(1, finiteNumber(_0x2eee9b?.width, DEFAULT_NODE_WIDTH)),
-    _0x5aaca4 = Math.max(1, finiteNumber(_0x2eee9b?.height, DEFAULT_NODE_HEIGHT));
-  return { minX: _0x317479, minY: _0x5427e4, maxX: _0x317479 + _0x5bebee, maxY: _0x5427e4 + _0x5aaca4 };
+function normalizeNodeBounds(box) {
+  const minX = finiteNumber(box?.x, 0),
+    minY = finiteNumber(box?.y, 0),
+    index = Math.max(1, finiteNumber(box?.width, DEFAULT_NODE_WIDTH)),
+    result = Math.max(1, finiteNumber(box?.height, DEFAULT_NODE_HEIGHT));
+  return { minX: minX, minY: minY, maxX: minX + index, maxY: minY + result };
 }
-function cellRangeForBounds(_0x146d56, _0x52217a) {
+function cellRangeForBounds(data, options) {
   return {
-    minCellX: Math.floor(_0x146d56.minX / _0x52217a),
-    maxCellX: Math.floor(_0x146d56.maxX / _0x52217a),
-    minCellY: Math.floor(_0x146d56.minY / _0x52217a),
-    maxCellY: Math.floor(_0x146d56.maxY / _0x52217a),
+    minCellX: Math.floor(data.minX / options),
+    maxCellX: Math.floor(data.maxX / options),
+    minCellY: Math.floor(data.minY / options),
+    maxCellY: Math.floor(data.maxY / options),
   };
 }
-function cellKey(_0x2bf2b8, _0x24bd13) {
-  return _0x2bf2b8 + ':' + _0x24bd13;
+function cellKey(target, source) {
+  return target + ':' + source;
 }
-function intersectsBounds(_0x5068ae, _0xe656f9) {
+function intersectsBounds(next, current) {
   return (
-    _0x5068ae.maxX > _0xe656f9.minX &&
-    _0x5068ae.minX < _0xe656f9.maxX &&
-    _0x5068ae.maxY > _0xe656f9.minY &&
-    _0x5068ae.minY < _0xe656f9.maxY
+    next.maxX > current.minX &&
+    next.minX < current.maxX &&
+    next.maxY > current.minY &&
+    next.minY < current.maxY
   );
 }
-function getViewportWorldCenter(_0x56001e, _0x5f2e07, _0x48c095) {
-  const _0x34ba96 = screenViewportToWorldBounds({
-    viewport: _0x56001e,
-    containerWidth: _0x5f2e07,
-    containerHeight: _0x48c095,
+function getViewportWorldCenter(viewport, containerWidth, containerHeight) {
+  const worldBounds = screenViewportToWorldBounds({
+    viewport: viewport,
+    containerWidth: containerWidth,
+    containerHeight: containerHeight,
     padding: 0,
   });
-  return { x: (_0x34ba96.minX + _0x34ba96.maxX) / 2, y: (_0x34ba96.minY + _0x34ba96.maxY) / 2 };
+  return { x: (worldBounds.minX + worldBounds.maxX) / 2, y: (worldBounds.minY + worldBounds.maxY) / 2 };
 }
-function getNodeDistanceSqToCenter(_0x39d690, _0x1c2112) {
-  if (!_0x39d690 || !_0x1c2112) return 0;
-  const _0x530c7a = normalizeNodeBounds(_0x39d690),
-    _0x43e69d = (_0x530c7a.minX + _0x530c7a.maxX) / 2,
-    _0x5c08dd = (_0x530c7a.minY + _0x530c7a.maxY) / 2,
-    _0x3e4d6f = _0x43e69d - _0x1c2112.x,
-    _0x2386f1 = _0x5c08dd - _0x1c2112.y;
-  return _0x3e4d6f * _0x3e4d6f + _0x2386f1 * _0x2386f1;
+function getNodeDistanceSqToCenter(enabled, box2) {
+  if (!enabled || !box2) return 0;
+  const nodeBounds = normalizeNodeBounds(enabled),
+    entry = (nodeBounds.minX + nodeBounds.maxX) / 2,
+    record = (nodeBounds.minY + nodeBounds.maxY) / 2,
+    payload = entry - box2.x,
+    handle = record - box2.y;
+  return payload * payload + handle * handle;
 }
 export function screenViewportToWorldBounds({
-  viewport: _0x5dbefa,
-  containerWidth: _0x49b713,
-  containerHeight: _0xb9c051,
+  viewport: viewport2,
+  containerWidth: containerWidth2,
+  containerHeight: containerHeight2,
   padding: padding = 0,
 } = {}) {
-  const _0x563822 = Math.max(0.0001, finiteNumber(_0x5dbefa?.zoom, 1)),
-    _0x59345f = finiteNumber(_0x5dbefa?.x, 0),
-    _0x25fc15 = finiteNumber(_0x5dbefa?.y, 0),
-    _0x8b48b1 = Math.max(1, finiteNumber(_0x49b713, 1)),
-    _0x188f08 = Math.max(1, finiteNumber(_0xb9c051, 1)),
-    _0xb848ed = Math.max(0, finiteNumber(padding, 0));
+  const state = Math.max(0.0001, finiteNumber(viewport2?.zoom, 1)),
+    finiteNumber2 = finiteNumber(viewport2?.x, 0),
+    finiteNumber3 = finiteNumber(viewport2?.y, 0),
+    config = Math.max(1, finiteNumber(containerWidth2, 1)),
+    scope = Math.max(1, finiteNumber(containerHeight2, 1)),
+    input = Math.max(0, finiteNumber(padding, 0));
   return {
-    minX: (-_0xb848ed - _0x59345f) / _0x563822,
-    minY: (-_0xb848ed - _0x25fc15) / _0x563822,
-    maxX: (_0x8b48b1 + _0xb848ed - _0x59345f) / _0x563822,
-    maxY: (_0x188f08 + _0xb848ed - _0x25fc15) / _0x563822,
+    minX: (-input - finiteNumber2) / state,
+    minY: (-input - finiteNumber3) / state,
+    maxX: (config + input - finiteNumber2) / state,
+    maxY: (scope + input - finiteNumber3) / state,
   };
 }
-export function createRendererSpatialIndex(_0x113bba, { cellSize: cellSize = DEFAULT_CELL_SIZE } = {}) {
-  const _0x23e84f = Object.values(_0x113bba || {}),
-    _0x2fa854 = new Map(),
-    _0x41722d = new Map(),
-    _0x18b5aa = new Set(),
-    _0x4847d4 = Math.max(128, finiteNumber(cellSize, DEFAULT_CELL_SIZE));
-  for (const _0x53d8ca of _0x23e84f) {
-    const _0x59daf1 = String(_0x53d8ca?.id || '').trim();
-    if (!_0x59daf1) continue;
-    const _0x907039 = normalizeNodeBounds(_0x53d8ca),
-      _0x326ee6 = cellRangeForBounds(_0x907039, _0x4847d4);
-    (_0x41722d.set(_0x59daf1, { node: _0x53d8ca, bounds: _0x907039 }), _0x18b5aa.add(_0x59daf1));
-    for (let _0x85381 = _0x326ee6.minCellX; _0x85381 <= _0x326ee6.maxCellX; _0x85381 += 1) {
-      for (let _0x24e281 = _0x326ee6.minCellY; _0x24e281 <= _0x326ee6.maxCellY; _0x24e281 += 1) {
-        const _0x3b7db8 = cellKey(_0x85381, _0x24e281);
-        let _0x48e978 = _0x2fa854.get(_0x3b7db8);
-        (!_0x48e978 && ((_0x48e978 = new Set()), _0x2fa854.set(_0x3b7db8, _0x48e978)),
-          _0x48e978.add(_0x59daf1));
+export function createRendererSpatialIndex(output, { cellSize: cellSize = DEFAULT_CELL_SIZE } = {}) {
+  const value2 = Object.values(output || {}),
+    cells = new Map(),
+    nodesById = new Map(),
+    nodeIds = new Set(),
+    cellSize2 = Math.max(128, finiteNumber(cellSize, DEFAULT_CELL_SIZE));
+  for (const node of value2) {
+    const enabled2 = String(node?.id || '').trim();
+    if (!enabled2) continue;
+    const bounds = normalizeNodeBounds(node),
+      cellRangeForBounds2 = cellRangeForBounds(bounds, cellSize2);
+    (nodesById.set(enabled2, { node: node, bounds: bounds }), nodeIds.add(enabled2));
+    for (let value3 = cellRangeForBounds2.minCellX; value3 <= cellRangeForBounds2.maxCellX; value3 += 1) {
+      for (let value4 = cellRangeForBounds2.minCellY; value4 <= cellRangeForBounds2.maxCellY; value4 += 1) {
+        const cellKey2 = cellKey(value3, value4);
+        let enabled3 = cells.get(cellKey2);
+        (!enabled3 && ((enabled3 = new Set()), cells.set(cellKey2, enabled3)), enabled3.add(enabled2));
       }
     }
   }
   return {
-    cellSize: _0x4847d4,
-    cells: _0x2fa854,
-    nodesById: _0x41722d,
-    nodeIds: _0x18b5aa,
-    nodeCount: _0x18b5aa.size,
+    cellSize: cellSize2,
+    cells: cells,
+    nodesById: nodesById,
+    nodeIds: nodeIds,
+    nodeCount: nodeIds.size,
   };
 }
-export function getRendererSpatialIndexNode(_0x454912, _0x309e6c) {
-  const _0x1960f9 = _0x454912?.nodeSource;
-  if (_0x1960f9 instanceof Map) return _0x1960f9.get(_0x309e6c);
-  if (_0x1960f9 && typeof _0x1960f9 === 'object' && !Array.isArray(_0x1960f9))
-    return _0x1960f9[_0x309e6c];
-  return _0x454912?.nodesById?.get?.(_0x309e6c)?.node;
+export function getRendererSpatialIndexNode(value5, value6) {
+  const map = value5?.nodeSource;
+  if (map instanceof Map) return map.get(value6);
+  if (map && typeof map === 'object' && !Array.isArray(map)) return map[value6];
+  return value5?.nodesById?.get?.(value6)?.node;
 }
-export function queryRendererSpatialIndex(_0x252b1f, _0x57b541) {
-  if (!_0x252b1f || !_0x57b541) return [];
-  const _0x2853c7 = cellRangeForBounds(_0x57b541, _0x252b1f.cellSize || DEFAULT_CELL_SIZE),
-    _0x4bb22c = new Set(),
-    _0x210b34 = [];
-  for (let _0x469576 = _0x2853c7.minCellX; _0x469576 <= _0x2853c7.maxCellX; _0x469576 += 1) {
-    for (let _0x5aab46 = _0x2853c7.minCellY; _0x5aab46 <= _0x2853c7.maxCellY; _0x5aab46 += 1) {
-      const _0x19d6a = _0x252b1f.cells?.get?.(cellKey(_0x469576, _0x5aab46));
-      if (!_0x19d6a) continue;
-      for (const _0x1bfbbe of _0x19d6a) {
-        if (_0x4bb22c.has(_0x1bfbbe)) continue;
-        _0x4bb22c.add(_0x1bfbbe);
-        const _0x511de8 = _0x252b1f.nodesById?.get?.(_0x1bfbbe);
-        if (!_0x511de8 || !intersectsBounds(_0x511de8.bounds, _0x57b541)) continue;
-        _0x210b34.push(_0x511de8.node);
+export function queryRendererSpatialIndex(enabled4, enabled5) {
+  if (!enabled4 || !enabled5) return [];
+  const cellRangeForBounds3 = cellRangeForBounds(enabled5, enabled4.cellSize || DEFAULT_CELL_SIZE),
+    map2 = new Set(),
+    list = [];
+  for (let value7 = cellRangeForBounds3.minCellX; value7 <= cellRangeForBounds3.maxCellX; value7 += 1) {
+    for (let value8 = cellRangeForBounds3.minCellY; value8 <= cellRangeForBounds3.maxCellY; value8 += 1) {
+      const enabled6 = enabled4.cells?.get?.(cellKey(value7, value8));
+      if (!enabled6) continue;
+      for (const value9 of enabled6) {
+        if (map2.has(value9)) continue;
+        map2.add(value9);
+        const enabled7 = enabled4.nodesById?.get?.(value9);
+        if (!enabled7 || !intersectsBounds(enabled7.bounds, enabled5)) continue;
+        list.push(enabled7.node);
       }
     }
   }
-  return _0x210b34;
+  return list;
 }
-export function queryRendererSpatialIndexIds(_0x514a0a, _0x529448) {
-  return new Set(queryRendererSpatialIndex(_0x514a0a, _0x529448).map((_0xd97164) => _0xd97164.id));
+export function queryRendererSpatialIndexIds(value10, value11) {
+  return new Set(queryRendererSpatialIndex(value10, value11).map((item2) => item2.id));
 }
 export function clearRendererSpatialIndexCache() {
   ((cachedSpatialIndexSignature = ''), (cachedSpatialIndex = null));
 }
 export function getCachedRendererSpatialIndex(
-  _0x4b3aba,
-  { snapshotRev: _0x1ab41e, nodeCount: _0x12a250, denseNodeCount: denseNodeCount = 80 } = {},
+  value12,
+  { snapshotRev: snapshotRev, nodeCount: nodeCount, denseNodeCount: denseNodeCount = 80 } = {},
 ) {
-  const _0x86a5aa = Number.isFinite(_0x12a250) ? _0x12a250 : Object.keys(_0x4b3aba || {}).length;
-  if (_0x86a5aa < denseNodeCount) return (clearRendererSpatialIndexCache(), null);
-  const _0x4cde70 = (Number.isFinite(_0x1ab41e) ? _0x1ab41e : 0) + '|' + _0x86a5aa;
-  if (cachedSpatialIndex && cachedSpatialIndexSignature === _0x4cde70) return cachedSpatialIndex;
+  const value13 = Number.isFinite(nodeCount) ? nodeCount : Object.keys(value12 || {}).length;
+  if (value13 < denseNodeCount) return (clearRendererSpatialIndexCache(), null);
+  const value14 = (Number.isFinite(snapshotRev) ? snapshotRev : 0) + '|' + value13;
+  if (cachedSpatialIndex && cachedSpatialIndexSignature === value14) return cachedSpatialIndex;
   return (
-    (cachedSpatialIndex = createRendererSpatialIndex(_0x4b3aba)),
-    (cachedSpatialIndexSignature = _0x4cde70),
+    (cachedSpatialIndex = createRendererSpatialIndex(value12)),
+    (cachedSpatialIndexSignature = value14),
     cachedSpatialIndex
   );
 }
 export function collectVirtualizedRenderNodes({
-  nodes: _0x27e76f,
-  virtualizationResult: _0x3b0eed,
-  spatialIndex: _0x2c2740,
-  mountedNodeIds: _0x27488f,
-  viewport: _0x2e254f,
-  containerWidth: _0x256b8d,
-  containerHeight: _0x4021c1,
+  nodes: nodes,
+  virtualizationResult: virtualizationResult,
+  spatialIndex: spatialIndex,
+  mountedNodeIds: mountedNodeIds,
+  viewport: viewport3,
+  containerWidth: containerWidth3,
+  containerHeight: containerHeight3,
 } = {}) {
-  const _0x3a4387 = Object.values(_0x27e76f || {});
-  if (!_0x2c2740) return _0x3a4387;
-  const _0x2d7e88 = new Set();
-  for (const _0x30e8cc of _0x3b0eed?.mountCandidateIds || []) {
-    _0x2d7e88.add(_0x30e8cc);
+  const list2 = Object.values(nodes || {});
+  if (!spatialIndex) return list2;
+  const value15 = new Set();
+  for (const value16 of virtualizationResult?.mountCandidateIds || []) {
+    value15.add(value16);
   }
-  const _0x2a17a2 = _0x27488f instanceof Set ? _0x27488f : Array.isArray(_0x27488f) ? _0x27488f : [];
-  for (const _0x4a044e of _0x2a17a2) {
-    _0x2d7e88.add(_0x4a044e);
+  const value17 =
+    mountedNodeIds instanceof Set ? mountedNodeIds : Array.isArray(mountedNodeIds) ? mountedNodeIds : [];
+  for (const value18 of value17) {
+    value15.add(value18);
   }
-  const _0x2a0e65 = [];
-  for (const _0x33c049 of _0x2d7e88) {
-    const _0x18aa25 = _0x27e76f?.[_0x33c049];
-    if (_0x18aa25?.id) _0x2a0e65.push(_0x18aa25);
+  const list3 = [];
+  for (const value19 of value15) {
+    const value20 = nodes?.[value19];
+    if (value20?.id) list3.push(value20);
   }
-  const _0x17816b = _0x2e254f && Number.isFinite(Number(_0x256b8d)) && Number.isFinite(Number(_0x4021c1));
-  if (!_0x17816b || _0x2a0e65.length < 2) return _0x2a0e65;
-  const _0xc393ba = getViewportWorldCenter(_0x2e254f, _0x256b8d, _0x4021c1),
-    _0x5ee612 = _0x3b0eed?.mountCandidateIds || new Set(),
-    _0x258855 = _0x3b0eed?.keepAliveNodeIds || new Set(),
-    _0x291187 = new Map(_0x3a4387.map((_0x294cf3, _0x21ebf6) => [String(_0x294cf3?.id || ''), _0x21ebf6]));
-  return _0x2a0e65.sort((_0x2ef8f9, _0x4c37ca) => {
-    const _0x1aa652 = String(_0x2ef8f9?.id || ''),
-      _0x3fee6e = String(_0x4c37ca?.id || ''),
-      _0x562e0b = _0x5ee612.has(_0x1aa652),
-      _0x5b461c = _0x5ee612.has(_0x3fee6e);
-    if (_0x562e0b !== _0x5b461c) return _0x562e0b ? -1 : 1;
-    const _0x42cfc0 = _0x258855.has(_0x1aa652),
-      _0x44b8ff = _0x258855.has(_0x3fee6e);
-    if (_0x42cfc0 !== _0x44b8ff) return _0x42cfc0 ? -1 : 1;
-    const _0x43cd5f =
-      getNodeDistanceSqToCenter(_0x2ef8f9, _0xc393ba) - getNodeDistanceSqToCenter(_0x4c37ca, _0xc393ba);
-    if (_0x43cd5f !== 0) return _0x43cd5f;
-    return (_0x291187.get(_0x1aa652) ?? 0) - (_0x291187.get(_0x3fee6e) ?? 0);
+  const enabled8 =
+    viewport3 && Number.isFinite(Number(containerWidth3)) && Number.isFinite(Number(containerHeight3));
+  if (!enabled8 || list3.length < 2) return list3;
+  const viewportWorldCenter = getViewportWorldCenter(viewport3, containerWidth3, containerHeight3),
+    map3 = virtualizationResult?.mountCandidateIds || new Set(),
+    map4 = virtualizationResult?.keepAliveNodeIds || new Set(),
+    map5 = new Map(list2.map((item3, value21) => [String(item3?.id || ''), value21]));
+  return list3.sort((item4, value22) => {
+    const value23 = String(item4?.id || ''),
+      value24 = String(value22?.id || ''),
+      value25 = map3.has(value23),
+      value26 = map3.has(value24);
+    if (value25 !== value26) return value25 ? -1 : 1;
+    const value27 = map4.has(value23),
+      value28 = map4.has(value24);
+    if (value27 !== value28) return value27 ? -1 : 1;
+    const center =
+      getNodeDistanceSqToCenter(item4, viewportWorldCenter) -
+      getNodeDistanceSqToCenter(value22, viewportWorldCenter);
+    if (center !== 0) return center;
+    return (map5.get(value23) ?? 0) - (map5.get(value24) ?? 0);
   });
 }

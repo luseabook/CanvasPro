@@ -3,192 +3,199 @@ import {
   normalizePersonReplacementCompositeSidebarWidth,
   normalizePersonReplacementLayout,
 } from './personReplacementProjectSession.js';
-function normalizeText(_0x182798) {
-  return String(_0x182798 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-export function renderPersonReplacementLayoutSplitter(_0x25490c, _0x32c2d6, _0x1f3f59 = {}) {
-  const _0x5e2f2b = _0x25490c === 'asset-detail',
-    _0x27d40f = _0x25490c === 'center' || _0x5e2f2b,
-    _0x7b43ac = _0x5e2f2b
-      ? normalizePersonReplacementAssetDetailSplitRatio(_0x32c2d6['assetDetailSplitRatio'])
-      : _0x25490c === 'center'
-        ? _0x32c2d6['centerTop']
-        : _0x32c2d6[_0x25490c],
-    _0x4c80a0 = _0x5e2f2b ? 0x20 : _0x25490c === 'center' ? 0x26 : _0x25490c === 'left' ? 0x12 : 0x18,
-    _0x51d385 = _0x5e2f2b ? 0x44 : _0x25490c === 'center' ? 0x52 : _0x25490c === 'left' ? 0x26 : 0x2a,
-    _0x5b2139 =
-      _0x1f3f59['label'] ||
-      (_0x5e2f2b
+export function renderPersonReplacementLayoutSplitter(item, key, index = {}) {
+  const result = item === 'asset-detail',
+    data = item === 'center' || result,
+    options = result
+      ? normalizePersonReplacementAssetDetailSplitRatio(key['assetDetailSplitRatio'])
+      : item === 'center'
+        ? key['centerTop']
+        : key[item],
+    target = result ? 0x20 : item === 'center' ? 0x26 : item === 'left' ? 0x12 : 0x18,
+    source = result ? 0x44 : item === 'center' ? 0x52 : item === 'left' ? 0x26 : 0x2a,
+    next =
+      index['label'] ||
+      (result
         ? '调整形象预览与提示词区域高度'
-        : _0x25490c === 'center'
+        : item === 'center'
           ? '调整中间上下区域高度'
-          : _0x25490c === 'left'
+          : item === 'left'
             ? '调整左侧素材栏宽度'
             : '调整右侧生成栏宽度'),
-    _0x29a2b5 = _0x5e2f2b ? ' data-person-replacement-asset-detail-splitter' : '';
+    current = result ? ' data-person-replacement-asset-detail-splitter' : '';
   return (
     '<div class="person-replacement-layout-splitter panel-resize-handle panel-resize-handle--transient ' +
-    (_0x27d40f ? 'panel-resize-handle--horizontal is-horizontal' : 'is-vertical') +
+    (data ? 'panel-resize-handle--horizontal is-horizontal' : 'is-vertical') +
     ' is-' +
-    _0x25490c +
+    item +
     '" data-person-replacement-layout-splitter="' +
-    _0x25490c +
+    item +
     '\x22' +
-    _0x29a2b5 +
+    current +
     ' role="separator" aria-orientation="' +
-    (_0x27d40f ? 'horizontal' : 'vertical') +
+    (data ? 'horizontal' : 'vertical') +
     '" aria-label="' +
-    _0x5b2139 +
+    next +
     '\x22\x20aria-valuemin=\x22' +
-    _0x4c80a0 +
+    target +
     '" aria-valuemax="' +
-    _0x51d385 +
+    source +
     '" aria-valuenow="' +
-    Math['round'](_0x7b43ac) +
+    Math['round'](options) +
     '\x22\x20tabindex=\x220\x22></div>'
   );
 }
-export function applyPersonReplacementCompositeSidebarWidthToLayout(_0x4b10ac, _0x19e005, _0x32f336) {
-  const _0xbb420e = normalizePersonReplacementCompositeSidebarWidth(_0x32f336);
+export function applyPersonReplacementCompositeSidebarWidthToLayout(el, el2, entry) {
+  const personReplacementCompositeSidebarWidth = normalizePersonReplacementCompositeSidebarWidth(entry);
   return (
-    _0x4b10ac?.['style']?.['setProperty']?.('--person-replacement-composite-sidebar-width', _0xbb420e + 'px'),
-    _0x19e005?.['setAttribute']?.('aria-valuenow', String(Math['round'](_0xbb420e))),
-    _0xbb420e
+    el?.['style']?.['setProperty']?.(
+      '--person-replacement-composite-sidebar-width',
+      personReplacementCompositeSidebarWidth + 'px',
+    ),
+    el2?.['setAttribute']?.('aria-valuenow', String(Math['round'](personReplacementCompositeSidebarWidth))),
+    personReplacementCompositeSidebarWidth
   );
 }
 export function createPersonReplacementLayoutResizeController({
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'] || globalThis,
-  getProject: _0x4f87aa,
-  commitLayoutChange: _0x2f59c8,
+  getProject: getProject,
+  commitLayoutChange: commitLayoutChange,
 } = {}) {
-  if (typeof _0x4f87aa !== 'function' || typeof _0x2f59c8 !== 'function')
+  if (typeof getProject !== 'function' || typeof commitLayoutChange !== 'function')
     throw new TypeError('Person replacement layout resize requires project and commit adapters.');
-  let _0xb7beb2 = null;
-  const _0x4863e6 = () => {
-      (_0xb7beb2?.(), (_0xb7beb2 = null));
+  let value2 = null;
+  const destroy = () => {
+      (value2?.(), (value2 = null));
     },
-    _0x5613ee = (_0x82760b, _0x204c95) => {
-      if (!_0x82760b || !_0x204c95) return ![];
-      if (
-        _0x82760b['isPrimary'] === ![] ||
-        (Number['isFinite'](_0x82760b['button']) && _0x82760b['button'] !== 0x0)
-      )
+    begin = (event, el3) => {
+      if (!event || !el3) return ![];
+      if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0x0))
         return ![];
-      const _0x387e3b = normalizeText(_0x204c95['dataset']?.['personReplacementLayoutSplitter']);
-      if (!['left', 'center', 'right', 'asset-detail']['includes'](_0x387e3b)) return ![];
-      const _0xb3a36e = _0x387e3b === 'asset-detail',
-        _0x4b04c5 = _0x387e3b === 'center',
-        _0xed5bd3 = _0x4b04c5 || _0xb3a36e,
-        _0x402091 = _0xb3a36e
-          ? _0x204c95['closest']?.('[data-person-replacement-asset-detail-layout]')
-          : _0x4b04c5
-            ? _0x204c95['closest']?.('.person-replacement-middle-layout') ||
-              _0x204c95['closest']?.('.person-replacement-generation-panel')
-            : _0x204c95['closest']?.('[data-person-replacement-layout]'),
-        _0x10ef26 = _0x204c95['closest']?.('[data-person-replacement-layout]'),
-        _0x57d5a0 = _0x402091?.['getBoundingClientRect']?.(),
-        _0x31fd3d = _0xed5bd3 ? Number(_0x57d5a0?.['height']) : Number(_0x57d5a0?.['width']);
-      if (!(_0x31fd3d > 0x0)) return ![];
-      (_0x82760b['preventDefault']?.(), _0x82760b['stopPropagation']?.(), _0x4863e6());
-      const _0x578dd5 = _0x82760b['pointerId'];
+      const text = normalizeText(el3['dataset']?.['personReplacementLayoutSplitter']);
+      if (!['left', 'center', 'right', 'asset-detail']['includes'](text)) return ![];
+      const record = text === 'asset-detail',
+        payload = text === 'center',
+        handle = payload || record,
+        el4 = record
+          ? el3['closest']?.('[data-person-replacement-asset-detail-layout]')
+          : payload
+            ? el3['closest']?.('.person-replacement-middle-layout') ||
+              el3['closest']?.('.person-replacement-generation-panel')
+            : el3['closest']?.('[data-person-replacement-layout]'),
+        el5 = el3['closest']?.('[data-person-replacement-layout]'),
+        box = el4?.['getBoundingClientRect']?.(),
+        count = handle ? Number(box?.['height']) : Number(box?.['width']);
+      if (!(count > 0x0)) return ![];
+      (event['preventDefault']?.(), event['stopPropagation']?.(), destroy());
+      const state = event['pointerId'];
       try {
-        _0x204c95['setPointerCapture']?.(_0x578dd5);
+        el3['setPointerCapture']?.(state);
       } catch {}
-      (_0x204c95['classList']?.['add']?.('is-active'),
+      (el3['classList']?.['add']?.('is-active'),
         documentObject?.['body']?.['classList']?.['add']?.('person-replacement-layout-resizing'));
-      const _0x293df7 = (_0x4eaed2) =>
-        !Number['isFinite'](Number(_0x578dd5)) ||
-        !Number['isFinite'](Number(_0x4eaed2?.['pointerId'])) ||
-        Number(_0x4eaed2['pointerId']) === Number(_0x578dd5);
-      let _0x2560ab = null,
-        _0x481fd6 = 0x0;
-      const _0x51a512 = (_0x140cba) => {
-          if (!_0x140cba) return;
-          const _0x13cafd = _0xed5bd3 ? _0x140cba['clientY'] : _0x140cba['clientX'],
-            _0x49a344 = _0xed5bd3 ? _0x57d5a0['top'] : _0x57d5a0['left'],
-            _0x2a6324 = ((Number(_0x13cafd) - Number(_0x49a344 || 0x0)) / _0x31fd3d) * 0x64,
-            _0x25afc9 = Math['round']((_0x387e3b === 'right' ? 0x64 - _0x2a6324 : _0x2a6324) * 0x64) / 0x64,
-            _0x2a6783 = _0x4f87aa();
-          if (_0xb3a36e) {
-            const _0xe3ec08 = normalizePersonReplacementAssetDetailSplitRatio(_0x25afc9);
-            ((_0x2a6783['workspace']['assetDetailSplitRatio'] = _0xe3ec08),
-              _0x402091['style']?.['setProperty']?.('--person-replacement-asset-detail-top', _0xe3ec08 + '%'),
-              _0x204c95['setAttribute']?.('aria-valuenow', String(Math['round'](_0xe3ec08))));
+      const run = (event2) =>
+        !Number['isFinite'](Number(state)) ||
+        !Number['isFinite'](Number(event2?.['pointerId'])) ||
+        Number(event2['pointerId']) === Number(state);
+      let value3 = null,
+        config = 0x0;
+      const run2 = (event3) => {
+          if (!event3) return;
+          const scope = handle ? event3['clientY'] : event3['clientX'],
+            input = handle ? box['top'] : box['left'],
+            output = ((Number(scope) - Number(input || 0x0)) / count) * 0x64,
+            centerTop = Math['round']((text === 'right' ? 0x64 - output : output) * 0x64) / 0x64,
+            value4 = getProject();
+          if (record) {
+            const personReplacementAssetDetailSplitRatio =
+              normalizePersonReplacementAssetDetailSplitRatio(centerTop);
+            ((value4['workspace']['assetDetailSplitRatio'] = personReplacementAssetDetailSplitRatio),
+              el4['style']?.['setProperty']?.(
+                '--person-replacement-asset-detail-top',
+                personReplacementAssetDetailSplitRatio + '%',
+              ),
+              el3['setAttribute']?.(
+                'aria-valuenow',
+                String(Math['round'](personReplacementAssetDetailSplitRatio)),
+              ));
             return;
           }
-          const _0x2d4097 = _0x2a6783['workspace']['replacementLayout'],
-            _0x1722cc = normalizePersonReplacementLayout({
-              ..._0x2d4097,
-              ...(_0x387e3b === 'center' ? { centerTop: _0x25afc9 } : { [_0x387e3b]: _0x25afc9 }),
+          const args = value4['workspace']['replacementLayout'],
+            personReplacementLayout = normalizePersonReplacementLayout({
+              ...args,
+              ...(text === 'center' ? { centerTop: centerTop } : { [text]: centerTop }),
             });
-          ((_0x2a6783['workspace']['replacementLayout'] = _0x1722cc),
-            _0x387e3b === 'center'
-              ? _0x10ef26?.['style']?.['setProperty']?.(
+          ((value4['workspace']['replacementLayout'] = personReplacementLayout),
+            text === 'center'
+              ? el5?.['style']?.['setProperty']?.(
                   '--person-replacement-center-top',
-                  _0x1722cc['centerTop'] + '%',
+                  personReplacementLayout['centerTop'] + '%',
                 )
-              : _0x402091['style']?.['setProperty']?.(
-                  '--person-replacement-' + _0x387e3b + '-width',
-                  _0x1722cc[_0x387e3b] + '%',
+              : el4['style']?.['setProperty']?.(
+                  '--person-replacement-' + text + '-width',
+                  personReplacementLayout[text] + '%',
                 ),
-            _0x204c95['setAttribute']?.(
+            el3['setAttribute']?.(
               'aria-valuenow',
-              String(Math['round'](_0x1722cc[_0x387e3b === 'center' ? 'centerTop' : _0x387e3b])),
+              String(Math['round'](personReplacementLayout[text === 'center' ? 'centerTop' : text])),
             ));
         },
-        _0x55f161 = () => {
-          _0x481fd6 = 0x0;
-          const _0x58f19c = _0x2560ab;
-          ((_0x2560ab = null), _0x51a512(_0x58f19c));
+        handler = () => {
+          config = 0x0;
+          const value5 = value3;
+          ((value3 = null), run2(value5));
         },
-        _0xed58ab = (_0x51849c) => {
-          if (!_0x293df7(_0x51849c)) return;
-          _0x2560ab = { clientX: _0x51849c?.['clientX'], clientY: _0x51849c?.['clientY'] };
-          if (_0x481fd6) return;
-          const _0x53ca69 = windowObject?.['requestAnimationFrame'];
-          if (typeof _0x53ca69 === 'function') {
-            _0x481fd6 = _0x53ca69['call'](windowObject, _0x55f161);
+        handler2 = (clientX) => {
+          if (!run(clientX)) return;
+          value3 = { clientX: clientX?.['clientX'], clientY: clientX?.['clientY'] };
+          if (config) return;
+          const value6 = windowObject?.['requestAnimationFrame'];
+          if (typeof value6 === 'function') {
+            config = value6['call'](windowObject, handler);
             return;
           }
-          _0x55f161();
+          handler();
         },
-        _0x589054 = (_0x3360a5) => {
-          if (!_0x293df7(_0x3360a5)) return;
-          const _0x18dff9 = _0xed5bd3 ? Number(_0x3360a5?.['clientY']) : Number(_0x3360a5?.['clientX']);
-          (Number['isFinite'](_0x18dff9) &&
-            (_0x2560ab = { clientX: _0x3360a5?.['clientX'], clientY: _0x3360a5?.['clientY'] }),
-            _0x481fd6 &&
+        value7 = (clientX2) => {
+          if (!run(clientX2)) return;
+          const value8 = handle ? Number(clientX2?.['clientY']) : Number(clientX2?.['clientX']);
+          (Number['isFinite'](value8) &&
+            (value3 = { clientX: clientX2?.['clientX'], clientY: clientX2?.['clientY'] }),
+            config &&
               typeof windowObject?.['cancelAnimationFrame'] === 'function' &&
-              windowObject['cancelAnimationFrame'](_0x481fd6),
-            _0x55f161(),
-            _0x4863e6(),
-            _0x2f59c8(_0x387e3b));
+              windowObject['cancelAnimationFrame'](config),
+            handler(),
+            destroy(),
+            commitLayoutChange(text));
         },
-        _0x13a338 = () => {
-          _0x481fd6 &&
+        value9 = () => {
+          config &&
             typeof windowObject?.['cancelAnimationFrame'] === 'function' &&
-            windowObject['cancelAnimationFrame'](_0x481fd6);
-          ((_0x481fd6 = 0x0),
-            (_0x2560ab = null),
-            _0x204c95['classList']?.['remove']?.('is-active'),
+            windowObject['cancelAnimationFrame'](config);
+          ((config = 0x0),
+            (value3 = null),
+            el3['classList']?.['remove']?.('is-active'),
             documentObject?.['body']?.['classList']?.['remove']?.('person-replacement-layout-resizing'));
           try {
-            _0x204c95['releasePointerCapture']?.(_0x578dd5);
+            el3['releasePointerCapture']?.(state);
           } catch {}
-          (windowObject?.['removeEventListener']?.('pointermove', _0xed58ab, !![]),
-            windowObject?.['removeEventListener']?.('pointerup', _0x589054, !![]),
-            windowObject?.['removeEventListener']?.('pointercancel', _0x589054, !![]));
-          if (_0xb7beb2 === _0x13a338) _0xb7beb2 = null;
+          (windowObject?.['removeEventListener']?.('pointermove', handler2, !![]),
+            windowObject?.['removeEventListener']?.('pointerup', value7, !![]),
+            windowObject?.['removeEventListener']?.('pointercancel', value7, !![]));
+          if (value2 === value9) value2 = null;
         };
       return (
-        (_0xb7beb2 = _0x13a338),
-        windowObject?.['addEventListener']?.('pointermove', _0xed58ab, !![]),
-        windowObject?.['addEventListener']?.('pointerup', _0x589054, !![]),
-        windowObject?.['addEventListener']?.('pointercancel', _0x589054, !![]),
-        _0xed58ab(_0x82760b),
+        (value2 = value9),
+        windowObject?.['addEventListener']?.('pointermove', handler2, !![]),
+        windowObject?.['addEventListener']?.('pointerup', value7, !![]),
+        windowObject?.['addEventListener']?.('pointercancel', value7, !![]),
+        handler2(event),
         !![]
       );
     };
-  return Object['freeze']({ begin: _0x5613ee, destroy: _0x4863e6, stop: _0x4863e6 });
+  return Object['freeze']({ begin: begin, destroy: destroy, stop: destroy });
 }

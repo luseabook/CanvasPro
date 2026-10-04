@@ -10,159 +10,157 @@ import {
 import { convertImageBlobToDataUrl } from '../services/imagePngConversionService.js';
 import { localPathToUrl } from '../utils/localMediaPath.js';
 const IMAGE_DATA_URL_RE = /^data:image\//i;
-function normalizeText(_0x189f30) {
-  return String(_0x189f30 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function firstNonEmptyString(..._0x5eea6e) {
-  for (const _0x2d9087 of _0x5eea6e) {
-    const _0x4ee8bd = normalizeText(_0x2d9087);
-    if (_0x4ee8bd) return _0x4ee8bd;
+function firstNonEmptyString(...args) {
+  for (const item of args) {
+    const text = normalizeText(item);
+    if (text) return text;
   }
   return '';
 }
-function isPlainObject(_0x545faa) {
-  return !!_0x545faa && typeof _0x545faa === 'object' && !Array['isArray'](_0x545faa);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array['isArray'](enabled);
 }
-function hasError(_0x21b34c) {
-  return !!normalizeText(_0x21b34c?.['error']);
+function hasError(key) {
+  return !!normalizeText(key?.['error']);
 }
-function normalizeIndex(_0x241b93, _0x200e5b) {
-  const _0x56458a = Number(_0x241b93);
-  if (!Number['isFinite'](_0x56458a)) return 0x0;
-  return Math['max'](0x0, Math['min'](Math['trunc'](_0x56458a), Math['max'](0x0, _0x200e5b - 0x1)));
+function normalizeIndex(index, result) {
+  const data = Number(index);
+  if (!Number['isFinite'](data)) return 0x0;
+  return Math['max'](0x0, Math['min'](Math['trunc'](data), Math['max'](0x0, result - 0x1)));
 }
-function pickSuccessfulItem(_0x2f0e62, _0x146afd, _0x2e30b2) {
-  const _0x286b86 = Array['isArray'](_0x2f0e62)
-    ? _0x2f0e62['filter']((_0x810c38) => isPlainObject(_0x810c38))
-    : [];
-  if (_0x286b86['length'] === 0x0) return null;
-  const _0x309fff = normalizeIndex(_0x146afd, _0x286b86['length']),
-    _0x352db1 = _0x286b86[_0x309fff];
-  if (_0x352db1 && !hasError(_0x352db1) && _0x2e30b2(_0x352db1)) return _0x352db1;
-  return _0x286b86['find']((_0x5feb3a) => !hasError(_0x5feb3a) && !!_0x2e30b2(_0x5feb3a)) || null;
+function pickSuccessfulItem(list, options, handler) {
+  const list2 = Array['isArray'](list) ? list['filter']((target) => isPlainObject(target)) : [];
+  if (list2['length'] === 0x0) return null;
+  const index2 = normalizeIndex(options, list2['length']),
+    source = list2[index2];
+  if (source && !hasError(source) && handler(source)) return source;
+  return list2['find']((next) => !hasError(next) && !!handler(next)) || null;
 }
-function resolveImageCoverUrl(_0x51ab89 = {}) {
-  if (!isPlainObject(_0x51ab89) || hasError(_0x51ab89)) return '';
+function resolveImageCoverUrl(response = {}) {
+  if (!isPlainObject(response) || hasError(response)) return '';
   return firstNonEmptyString(
-    resolveCanvasImageThumbUrl(_0x51ab89),
-    resolveCanvasImageDisplayUrl(_0x51ab89),
-    resolveCanvasImageSourceUrl(_0x51ab89),
-    _0x51ab89['thumbUrl'],
-    _0x51ab89['imageUrl'],
-    _0x51ab89['sourceUrl'],
-    _0x51ab89['url'],
-    _0x51ab89['resultUrl'],
-    localPathToUrl(_0x51ab89['thumbLocalPath']),
-    localPathToUrl(_0x51ab89['displayLocalPath']),
-    localPathToUrl(_0x51ab89['localPath']),
+    resolveCanvasImageThumbUrl(response),
+    resolveCanvasImageDisplayUrl(response),
+    resolveCanvasImageSourceUrl(response),
+    response['thumbUrl'],
+    response['imageUrl'],
+    response['sourceUrl'],
+    response['url'],
+    response['resultUrl'],
+    localPathToUrl(response['thumbLocalPath']),
+    localPathToUrl(response['displayLocalPath']),
+    localPathToUrl(response['localPath']),
   );
 }
-function resolveVideoCoverUrl(_0x560b66 = {}) {
-  if (!isPlainObject(_0x560b66) || hasError(_0x560b66)) return '';
+function resolveVideoCoverUrl(options2 = {}) {
+  if (!isPlainObject(options2) || hasError(options2)) return '';
   return firstNonEmptyString(
-    resolveCanvasVideoPosterUrl(_0x560b66),
-    localPathToUrl(_0x560b66['posterLocalPath']),
-    localPathToUrl(_0x560b66['previewLocalPath']),
-    localPathToUrl(_0x560b66['thumbLocalPath']),
-    localPathToUrl(_0x560b66['thumbnailLocalPath']),
-    _0x560b66['posterUrl'],
-    _0x560b66['previewUrl'],
-    _0x560b66['thumbUrl'],
-    _0x560b66['thumbnailUrl'],
-    _0x560b66['coverUrl'],
+    resolveCanvasVideoPosterUrl(options2),
+    localPathToUrl(options2['posterLocalPath']),
+    localPathToUrl(options2['previewLocalPath']),
+    localPathToUrl(options2['thumbLocalPath']),
+    localPathToUrl(options2['thumbnailLocalPath']),
+    options2['posterUrl'],
+    options2['previewUrl'],
+    options2['thumbUrl'],
+    options2['thumbnailUrl'],
+    options2['coverUrl'],
   );
 }
-function resolveVideoResultUrl(_0x1b9839 = {}) {
-  if (!isPlainObject(_0x1b9839) || hasError(_0x1b9839)) return '';
+function resolveVideoResultUrl(response2 = {}) {
+  if (!isPlainObject(response2) || hasError(response2)) return '';
   return firstNonEmptyString(
-    resolveCanvasVideoUrl(_0x1b9839),
-    localPathToUrl(_0x1b9839['displayLocalPath']),
-    localPathToUrl(_0x1b9839['localPath']),
-    _0x1b9839['videoUrl'],
-    _0x1b9839['resultUrl'],
-    _0x1b9839['src'],
-    _0x1b9839['url'],
+    resolveCanvasVideoUrl(response2),
+    localPathToUrl(response2['displayLocalPath']),
+    localPathToUrl(response2['localPath']),
+    response2['videoUrl'],
+    response2['resultUrl'],
+    response2['src'],
+    response2['url'],
   );
 }
-function resolveVideoThumbResultUrl(_0x33e9b2 = {}) {
-  if (!isPlainObject(_0x33e9b2)) return '';
+function resolveVideoThumbResultUrl(response3 = {}) {
+  if (!isPlainObject(response3)) return '';
   return firstNonEmptyString(
-    _0x33e9b2['url'],
-    _0x33e9b2['thumbUrl'],
-    _0x33e9b2['posterUrl'],
-    localPathToUrl(_0x33e9b2['thumbLocalPath']),
-    localPathToUrl(_0x33e9b2['posterLocalPath']),
-    localPathToUrl(_0x33e9b2['localPath']),
+    response3['url'],
+    response3['thumbUrl'],
+    response3['posterUrl'],
+    localPathToUrl(response3['thumbLocalPath']),
+    localPathToUrl(response3['posterLocalPath']),
+    localPathToUrl(response3['localPath']),
   );
 }
-export function resolvePresetDefaultCoverCandidate(_0x342284 = {}) {
-  if (!isPlainObject(_0x342284)) return { coverUrl: '', videoUrl: '' };
-  const _0x427d61 = normalizeText(_0x342284['type']);
-  if (_0x427d61 === 'ai-image') {
-    const _0x26cb52 = Array['isArray'](_0x342284['images']) ? _0x342284['images'] : [];
-    if (_0x26cb52['length'] > 0x0) {
-      const _0x351638 = pickSuccessfulItem(_0x26cb52, _0x342284['mainImageIndex'], resolveImageCoverUrl);
-      return { coverUrl: resolveImageCoverUrl(_0x351638), videoUrl: '' };
+export function resolvePresetDefaultCoverCandidate(options3 = {}) {
+  if (!isPlainObject(options3)) return { coverUrl: '', videoUrl: '' };
+  const text2 = normalizeText(options3['type']);
+  if (text2 === 'ai-image') {
+    const list3 = Array['isArray'](options3['images']) ? options3['images'] : [];
+    if (list3['length'] > 0x0) {
+      const successfulItem = pickSuccessfulItem(list3, options3['mainImageIndex'], resolveImageCoverUrl);
+      return { coverUrl: resolveImageCoverUrl(successfulItem), videoUrl: '' };
     }
-    return { coverUrl: resolveImageCoverUrl(_0x342284), videoUrl: '' };
+    return { coverUrl: resolveImageCoverUrl(options3), videoUrl: '' };
   }
-  if (_0x427d61 === 'ai-video') {
-    const _0x232c30 = Array['isArray'](_0x342284['videos']) ? _0x342284['videos'] : [];
-    if (_0x232c30['length'] > 0x0) {
-      const _0x5409cc = pickSuccessfulItem(
-          _0x232c30,
-          _0x342284['mainVideoIndex'],
-          (_0x5f1d38) => resolveVideoCoverUrl(_0x5f1d38) || resolveVideoResultUrl(_0x5f1d38),
+  if (text2 === 'ai-video') {
+    const list4 = Array['isArray'](options3['videos']) ? options3['videos'] : [];
+    if (list4['length'] > 0x0) {
+      const successfulItem2 = pickSuccessfulItem(
+          list4,
+          options3['mainVideoIndex'],
+          (current) => resolveVideoCoverUrl(current) || resolveVideoResultUrl(current),
         ),
-        _0x198d0e = resolveVideoCoverUrl(_0x5409cc);
-      return { coverUrl: _0x198d0e, videoUrl: _0x198d0e ? '' : resolveVideoResultUrl(_0x5409cc) };
+        coverUrl = resolveVideoCoverUrl(successfulItem2);
+      return { coverUrl: coverUrl, videoUrl: coverUrl ? '' : resolveVideoResultUrl(successfulItem2) };
     }
-    const _0x2c8cc7 = resolveVideoCoverUrl(_0x342284);
-    return { coverUrl: _0x2c8cc7, videoUrl: _0x2c8cc7 ? '' : resolveVideoResultUrl(_0x342284) };
+    const coverUrl2 = resolveVideoCoverUrl(options3);
+    return { coverUrl: coverUrl2, videoUrl: coverUrl2 ? '' : resolveVideoResultUrl(options3) };
   }
   return { coverUrl: '', videoUrl: '' };
 }
-export async function imageUrlToDataUrl(_0x27c2c3, _0x2e98ab = {}) {
-  const _0x2e2a58 = normalizeText(_0x27c2c3);
-  if (!_0x2e2a58) return '';
-  if (IMAGE_DATA_URL_RE['test'](_0x2e2a58)) return _0x2e2a58;
-  const _0x21ad23 =
-      typeof _0x2e98ab['getBlob'] === 'function'
-        ? _0x2e98ab['getBlob']
-        : (_0x55fc4c) => get(_0x55fc4c, { responseType: 'blob', provider: 'local', timeout: 0x7530 }),
-    _0x435c1a =
-      typeof _0x2e98ab['blobToDataUrl'] === 'function'
-        ? _0x2e98ab['blobToDataUrl']
-        : convertImageBlobToDataUrl;
+export async function imageUrlToDataUrl(entry, record = {}) {
+  const text3 = normalizeText(entry);
+  if (!text3) return '';
+  if (IMAGE_DATA_URL_RE['test'](text3)) return text3;
+  const run =
+      typeof record['getBlob'] === 'function'
+        ? record['getBlob']
+        : (payload) => get(payload, { responseType: 'blob', provider: 'local', timeout: 0x7530 }),
+    handler2 =
+      typeof record['blobToDataUrl'] === 'function' ? record['blobToDataUrl'] : convertImageBlobToDataUrl;
   try {
-    const _0x308986 = await _0x21ad23(_0x2e2a58),
-      _0x151be8 = await _0x435c1a(_0x308986, _0x2e2a58);
-    return IMAGE_DATA_URL_RE['test'](_0x151be8) ? _0x151be8 : '';
+    const handle = await run(text3),
+      state = await handler2(handle, text3);
+    return IMAGE_DATA_URL_RE['test'](state) ? state : '';
   } catch {
     return '';
   }
 }
-export async function resolvePresetDefaultCoverDataUrl(_0x51fabf = {}, _0x481cd1 = {}) {
-  const _0xdbb4e1 =
-      typeof _0x481cd1['loadImageDataUrl'] === 'function'
-        ? _0x481cd1['loadImageDataUrl']
-        : (_0x2be052) => imageUrlToDataUrl(_0x2be052, _0x481cd1),
-    _0x330958 =
-      typeof _0x481cd1['fetchVideoFirstFrameThumb'] === 'function'
-        ? _0x481cd1['fetchVideoFirstFrameThumb']
+export async function resolvePresetDefaultCoverDataUrl(options4 = {}, config = {}) {
+  const run2 =
+      typeof config['loadImageDataUrl'] === 'function'
+        ? config['loadImageDataUrl']
+        : (scope) => imageUrlToDataUrl(scope, config),
+    handler3 =
+      typeof config['fetchVideoFirstFrameThumb'] === 'function'
+        ? config['fetchVideoFirstFrameThumb']
         : fetchVideoFirstFrameThumbFromServer;
   try {
-    const _0x5bf467 = resolvePresetDefaultCoverCandidate(_0x51fabf);
-    if (_0x5bf467['coverUrl']) {
-      const _0x181563 = await _0xdbb4e1(_0x5bf467['coverUrl']);
-      return IMAGE_DATA_URL_RE['test'](_0x181563) ? _0x181563 : '';
+    const presetDefaultCoverCandidate = resolvePresetDefaultCoverCandidate(options4);
+    if (presetDefaultCoverCandidate['coverUrl']) {
+      const input = await run2(presetDefaultCoverCandidate['coverUrl']);
+      return IMAGE_DATA_URL_RE['test'](input) ? input : '';
     }
-    if (!_0x5bf467['videoUrl']) return '';
-    const _0x5e55d1 = await _0x330958(_0x5bf467['videoUrl'], { nodeId: normalizeText(_0x51fabf?.['id']) }),
-      _0x3aad4d = resolveVideoThumbResultUrl(_0x5e55d1);
-    if (!_0x3aad4d) return '';
-    const _0x42b74b = await _0xdbb4e1(_0x3aad4d);
-    return IMAGE_DATA_URL_RE['test'](_0x42b74b) ? _0x42b74b : '';
+    if (!presetDefaultCoverCandidate['videoUrl']) return '';
+    const output = await handler3(presetDefaultCoverCandidate['videoUrl'], {
+        nodeId: normalizeText(options4?.['id']),
+      }),
+      videoThumbResultUrl = resolveVideoThumbResultUrl(output);
+    if (!videoThumbResultUrl) return '';
+    const value2 = await run2(videoThumbResultUrl);
+    return IMAGE_DATA_URL_RE['test'](value2) ? value2 : '';
   } catch {
     return '';
   }

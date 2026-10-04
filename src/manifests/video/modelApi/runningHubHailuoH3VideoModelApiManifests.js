@@ -19,20 +19,20 @@ const RUNNINGHUB_HAILUO_H3_MODE_FIELD = Object['freeze']({
   ]),
 });
 function createHailuoH3FixedSlot({
-  id: _0x1c1594,
-  kind: _0x3abce2,
-  label: _0x4b5827,
-  mode: _0x1a1bf1,
-  description: _0x5c0691,
-  displayOrder: _0x3921c3,
+  id: id,
+  kind: kind,
+  label: label,
+  mode: mode,
+  description: description,
+  displayOrder: displayOrder,
 }) {
   return Object['freeze']({
-    id: _0x1c1594,
-    kind: _0x3abce2,
-    label: _0x4b5827,
-    description: _0x5c0691,
-    displayOrder: _0x3921c3,
-    showWhen: Object['freeze']({ field: 'rh_hailuo_h3_mode', value: _0x1a1bf1 }),
+    id: id,
+    kind: kind,
+    label: label,
+    description: description,
+    displayOrder: displayOrder,
+    showWhen: Object['freeze']({ field: 'rh_hailuo_h3_mode', value: mode }),
   });
 }
 const RUNNINGHUB_HAILUO_H3_FIXED_INPUT_SLOTS = Object['freeze']([

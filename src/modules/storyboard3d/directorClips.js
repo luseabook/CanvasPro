@@ -1,195 +1,173 @@
 import { collectDirectorKeys } from './directorTimelineOperations.js';
-const finite = (_0x33b00f, _0x2da2c2) =>
-  Number['isFinite'](Number(_0x33b00f)) ? Number(_0x33b00f) : _0x2da2c2;
-export function normalizeDirectorClips(_0x1ea59b, _0x121207) {
-  const _0xcbbea5 = collectDirectorKeys(_0x121207),
-    _0x328b0b = new Set(_0xcbbea5['map'](({ key: _0x55e2c9 }) => _0x55e2c9['id'])),
-    _0x18f4f0 = new Set();
-  return (Array['isArray'](_0x1ea59b) ? _0x1ea59b : [])
+const finite = (value, item) => (Number['isFinite'](Number(value)) ? Number(value) : item);
+export function normalizeDirectorClips(key, index) {
+  const list = collectDirectorKeys(index),
+    map = new Set(list['map'](({ key: key2 }) => key2['id'])),
+    map2 = new Set();
+  return (Array['isArray'](key) ? key : [])
     ['slice'](0x0, 0x12c)
-    ['map']((_0x565b59, _0x1c4410) => {
-      const _0x3f5365 = [
-        ...new Set(Array['isArray'](_0x565b59?.['keyframeIds']) ? _0x565b59['keyframeIds'] : []),
-      ]['filter']((_0xf49de2) => _0x328b0b['has'](_0xf49de2) && !_0x18f4f0['has'](_0xf49de2));
-      if (!_0x3f5365['length']) return null;
-      _0x3f5365['forEach']((_0x3451f2) => _0x18f4f0['add'](_0x3451f2));
-      const _0x42da68 = _0xcbbea5['filter'](({ key: _0x368708 }) => _0x3f5365['includes'](_0x368708['id'])),
-        _0x274bdd = Math['max'](
+    ['map']((error, result) => {
+      const keyframeIds = [...new Set(Array['isArray'](error?.['keyframeIds']) ? error['keyframeIds'] : [])][
+        'filter'
+      ]((data) => map['has'](data) && !map2['has'](data));
+      if (!keyframeIds['length']) return null;
+      keyframeIds['forEach']((options) => map2['add'](options));
+      const list2 = list['filter'](({ key: key3 }) => keyframeIds['includes'](key3['id'])),
+        start = Math['max'](
           0x0,
           Math['min'](
             3599.9,
-            finite(
-              _0x565b59['start'],
-              Math['min'](..._0x42da68['map'](({ key: _0x28fc41 }) => _0x28fc41['time'])),
-            ),
+            finite(error['start'], Math['min'](...list2['map'](({ key: key4 }) => key4['time']))),
           ),
         );
       return {
-        id: String(_0x565b59['id'] || 'motion-clip-' + _0x1c4410),
-        name: String(_0x565b59['name'] || '运动片段')['slice'](0x0, 0x78),
-        keyframeIds: _0x3f5365,
-        start: _0x274bdd,
+        id: String(error['id'] || 'motion-clip-' + result),
+        name: String(error['name'] || '运动片段')['slice'](0x0, 0x78),
+        keyframeIds: keyframeIds,
+        start: start,
         end: Math['max'](
-          _0x274bdd + 0.1,
+          start + 0.1,
           Math['min'](
             0xe10,
-            finite(
-              _0x565b59['end'],
-              Math['max'](..._0x42da68['map'](({ key: _0x3cf1b9 }) => _0x3cf1b9['time'])),
-            ),
+            finite(error['end'], Math['max'](...list2['map'](({ key: key5 }) => key5['time']))),
           ),
         ),
       };
     })
     ['filter'](Boolean)
     ['sort'](
-      (_0x4d68e3, _0x1b3723) =>
-        _0x4d68e3['start'] - _0x1b3723['start'] || _0x4d68e3['id']['localeCompare'](_0x1b3723['id']),
+      (target, source) => target['start'] - source['start'] || target['id']['localeCompare'](source['id']),
     );
 }
-export function resolveDirectorClipSample(_0x38abfb, _0x3e05f0, _0x54874f) {
-  const _0x5d5454 = new Set(_0x3e05f0['map']((_0x36d9e0) => _0x36d9e0['id'])),
-    _0x296883 = (_0x38abfb || [])['filter']((_0x207355) =>
-      _0x207355['keyframeIds']['some']((_0x192d80) => _0x5d5454['has'](_0x192d80)),
-    );
-  if (!_0x296883['length']) return { keys: _0x3e05f0, time: _0x54874f };
-  const _0x330df8 = new Set(_0x296883['flatMap']((_0xa2d649) => _0xa2d649['keyframeIds'])),
-    _0x4a48b6 = _0x296883['filter']((_0x38333d) => _0x38333d['start'] <= _0x54874f)['at'](-0x1);
-  if (!_0x4a48b6)
-    return { keys: _0x3e05f0['filter']((_0x54d236) => !_0x330df8['has'](_0x54d236['id'])), time: _0x54874f };
-  const _0xc69d2a = _0x3e05f0['filter'](
-    (_0x2a3700) => !_0x330df8['has'](_0x2a3700['id']) && _0x2a3700['time'] > _0x4a48b6['end'],
-  );
-  if (_0x54874f >= _0x4a48b6['end'] && _0xc69d2a['length'] && _0x54874f >= _0xc69d2a[0x0]['time'])
-    return { keys: _0xc69d2a, time: _0x54874f };
-  const _0x25a38e = new Set(_0x4a48b6['keyframeIds']);
+export function resolveDirectorClipSample(next, keys, time) {
+  const map3 = new Set(keys['map']((current) => current['id'])),
+    list3 = (next || [])['filter']((entry) => entry['keyframeIds']['some']((record) => map3['has'](record)));
+  if (!list3['length']) return { keys: keys, time: time };
+  const map4 = new Set(list3['flatMap']((payload) => payload['keyframeIds'])),
+    enabled = list3['filter']((handle) => handle['start'] <= time)['at'](-0x1);
+  if (!enabled) return { keys: keys['filter']((state) => !map4['has'](state['id'])), time: time };
+  const keys2 = keys['filter']((config) => !map4['has'](config['id']) && config['time'] > enabled['end']);
+  if (time >= enabled['end'] && keys2['length'] && time >= keys2[0x0]['time'])
+    return { keys: keys2, time: time };
+  const map5 = new Set(enabled['keyframeIds']);
   return {
-    keys: _0x3e05f0['filter']((_0x25b651) => _0x25a38e['has'](_0x25b651['id'])),
-    time: Math['min'](_0x54874f, _0x4a48b6['end']),
+    keys: keys['filter']((scope) => map5['has'](scope['id'])),
+    time: Math['min'](time, enabled['end']),
   };
 }
-export function createDirectorClip(_0x55294e, _0x14fc43, _0x47788d = '运动片段') {
-  const _0x2af37c = new Set(_0x14fc43),
-    _0x444d51 = collectDirectorKeys(_0x55294e)['filter'](({ key: _0x34e33c }) =>
-      _0x2af37c['has'](_0x34e33c['id']),
-    );
-  if (!_0x444d51['length']) throw new Error('请先选择关键帧或创建轨迹。');
+export function createDirectorClip(input, output, name = '运动片段') {
+  const map6 = new Set(output),
+    list4 = collectDirectorKeys(input)['filter'](({ key: key6 }) => map6['has'](key6['id']));
+  if (!list4['length']) throw new Error('请先选择关键帧或创建轨迹。');
   if (
-    (_0x55294e['motionClips'] || [])['some']((_0x50bc5c) =>
-      _0x50bc5c['keyframeIds']['some']((_0x48e044) => _0x2af37c['has'](_0x48e044)),
+    (input['motionClips'] || [])['some']((value2) =>
+      value2['keyframeIds']['some']((value3) => map6['has'](value3)),
     )
   )
     throw new Error('选中关键帧已属于运动片段，请编辑或复制原片段。');
-  const _0x5a9709 = structuredClone(_0x55294e),
-    _0x53d6ab = Math['min'](..._0x444d51['map'](({ key: _0x2d176d }) => _0x2d176d['time'])),
-    _0x5aaa07 = Math['max'](..._0x444d51['map'](({ key: _0x13bc87 }) => _0x13bc87['time']));
+  const structuredClone2 = structuredClone(input),
+    start2 = Math['min'](...list4['map'](({ key: key7 }) => key7['time'])),
+    value4 = Math['max'](...list4['map'](({ key: key8 }) => key8['time']));
   return (
-    (_0x5a9709['motionClips'] = [
-      ...(_0x5a9709['motionClips'] || []),
+    (structuredClone2['motionClips'] = [
+      ...(structuredClone2['motionClips'] || []),
       {
         id: 'motion-' + globalThis['crypto']['randomUUID'](),
-        name: _0x47788d,
-        keyframeIds: [..._0x2af37c],
-        start: _0x53d6ab,
-        end: Math['max'](_0x53d6ab + 0.1, _0x5aaa07),
+        name: name,
+        keyframeIds: [...map6],
+        start: start2,
+        end: Math['max'](start2 + 0.1, value4),
       },
     ]),
-    _0x5a9709
+    structuredClone2
   );
 }
-export function editDirectorClip(
-  _0x32f2cd,
-  { kind: _0x561880, id: _0x1d6876, start: _0x5ede74, end: _0x3f46d6, move: move = ![] },
-) {
-  const _0x14503b = structuredClone(_0x32f2cd),
-    _0x237910 = (_0x561880 === 'action' ? _0x14503b['actionClips'] : _0x14503b['motionClips'])?.['find'](
-      (_0x4489f9) => _0x4489f9['id'] === _0x1d6876,
-    );
-  if (!_0x237910) return _0x14503b;
-  const _0x38ea76 = Math['round'](Number(_0x5ede74) * _0x14503b['fps']) / _0x14503b['fps'],
-    _0x2c2c67 = Math['round'](Number(_0x3f46d6) * _0x14503b['fps']) / _0x14503b['fps'];
+export function editDirectorClip(value5, { kind: kind, id: id, start: start3, end: end, move: move = ![] }) {
+  const structuredClone3 = structuredClone(value5),
+    enabled2 = (kind === 'action' ? structuredClone3['actionClips'] : structuredClone3['motionClips'])?.[
+      'find'
+    ]((value6) => value6['id'] === id);
+  if (!enabled2) return structuredClone3;
+  const count = Math['round'](Number(start3) * structuredClone3['fps']) / structuredClone3['fps'],
+    count2 = Math['round'](Number(end) * structuredClone3['fps']) / structuredClone3['fps'];
   if (
-    !Number['isFinite'](_0x38ea76) ||
-    !Number['isFinite'](_0x2c2c67) ||
-    _0x38ea76 < 0x0 ||
-    _0x2c2c67 > 0xe10 ||
-    _0x2c2c67 - _0x38ea76 < 0x1 / _0x14503b['fps']
+    !Number['isFinite'](count) ||
+    !Number['isFinite'](count2) ||
+    count < 0x0 ||
+    count2 > 0xe10 ||
+    count2 - count < 0x1 / structuredClone3['fps']
   )
     throw new Error('片段范围必须在 0–3600 秒内且至少一帧。');
-  if (_0x561880 === 'action' && !move) {
-    const _0x1c281c = _0x237910['offset'] + (_0x38ea76 - _0x237910['start']) * _0x237910['speed'];
-    if (_0x1c281c < 0x0) throw new Error('无法向前扩展到动作源起点之前。');
-    _0x237910['offset'] = _0x1c281c;
+  if (kind === 'action' && !move) {
+    const count3 = enabled2['offset'] + (count - enabled2['start']) * enabled2['speed'];
+    if (count3 < 0x0) throw new Error('无法向前扩展到动作源起点之前。');
+    enabled2['offset'] = count3;
   }
-  if (_0x561880 === 'motion' && move) {
-    const _0x397d99 = _0x38ea76 - _0x237910['start'],
-      _0x2faadf = new Set(_0x237910['keyframeIds']),
-      _0x338135 = collectDirectorKeys(_0x14503b)['filter'](({ key: _0x58d7a0 }) =>
-        _0x2faadf['has'](_0x58d7a0['id']),
-      );
-    if (
-      _0x338135['some'](
-        ({ key: _0x56aacd }) => _0x56aacd['time'] + _0x397d99 < 0x0 || _0x56aacd['time'] + _0x397d99 > 0xe10,
-      )
-    )
+  if (kind === 'motion' && move) {
+    const count4 = count - enabled2['start'],
+      map7 = new Set(enabled2['keyframeIds']),
+      list5 = collectDirectorKeys(structuredClone3)['filter'](({ key: key9 }) => map7['has'](key9['id']));
+    if (list5['some'](({ key: key10 }) => key10['time'] + count4 < 0x0 || key10['time'] + count4 > 0xe10))
       throw new Error('移动后源关键帧超出范围。');
-    _0x338135['forEach'](({ key: _0x3a6b6a }) => {
-      _0x3a6b6a['time'] += _0x397d99;
+    list5['forEach'](({ key: key11 }) => {
+      key11['time'] += count4;
     });
   }
-  return ((_0x237910['start'] = _0x38ea76), (_0x237910['end'] = _0x2c2c67), _0x14503b);
+  return ((enabled2['start'] = count), (enabled2['end'] = count2), structuredClone3);
 }
-export function duplicateDirectorClip(_0x28c4db, _0x2057be, _0x472d41, _0x4ffad2) {
-  return pasteDirectorClip(_0x28c4db, copyDirectorClip(_0x28c4db, _0x2057be, _0x472d41), _0x4ffad2);
+export function duplicateDirectorClip(value7, value8, value9, value10) {
+  return pasteDirectorClip(value7, copyDirectorClip(value7, value8, value9), value10);
 }
-export function copyDirectorClip(_0x4cb34e, _0x520e25, _0xe69ac8) {
-  const _0x2bdd06 = (_0x520e25 === 'action' ? _0x4cb34e['actionClips'] : _0x4cb34e['motionClips'])?.['find'](
-    (_0x33e05b) => _0x33e05b['id'] === _0xe69ac8,
+export function copyDirectorClip(value11, kind2, value12) {
+  const clip = (kind2 === 'action' ? value11['actionClips'] : value11['motionClips'])?.['find'](
+    (value13) => value13['id'] === value12,
   );
-  if (!_0x2bdd06) throw new Error('片段已不存在。');
+  if (!clip) throw new Error('片段已不存在。');
   return structuredClone({
-    kind: _0x520e25,
-    clip: _0x2bdd06,
+    kind: kind2,
+    clip: clip,
     entries:
-      _0x520e25 === 'motion'
-        ? collectDirectorKeys(_0x4cb34e)['filter'](({ key: _0x150330 }) =>
-            _0x2bdd06['keyframeIds']['includes'](_0x150330['id']),
+      kind2 === 'motion'
+        ? collectDirectorKeys(value11)['filter'](({ key: key12 }) =>
+            clip['keyframeIds']['includes'](key12['id']),
           )
         : [],
   });
 }
-export function pasteDirectorClip(_0x596f58, _0x506d39, _0x5603b9) {
-  const _0x329c82 = structuredClone(_0x596f58),
-    { kind: _0x3acc01, clip: _0x2b4e24, entries: _0x1e49a8 } = _0x506d39;
-  if (!_0x2b4e24) throw new Error('片段已不存在。');
-  const _0x4c1ed8 = structuredClone(_0x2b4e24),
-    _0x1cb089 = _0x5603b9 - _0x4c1ed8['start'];
-  if (_0x5603b9 < 0x0 || _0x4c1ed8['end'] + _0x1cb089 > 0xe10) throw new Error('复制片段超出镜头时长范围。');
-  ((_0x4c1ed8['id'] = 'clip-' + globalThis['crypto']['randomUUID']()),
-    (_0x4c1ed8['start'] += _0x1cb089),
-    (_0x4c1ed8['end'] += _0x1cb089));
-  if (_0x3acc01 === 'motion') {
-    const _0x417b73 = new Map();
-    for (const _0x4dde14 of _0x1e49a8) {
-      const _0x5a8003 = {
-        ...structuredClone(_0x4dde14['key']),
+export function pasteDirectorClip(value14, value15, count5) {
+  const structuredClone4 = structuredClone(value14),
+    { kind: kind3, clip: clip2, entries: entries } = value15;
+  if (!clip2) throw new Error('片段已不存在。');
+  const structuredClone5 = structuredClone(clip2),
+    count6 = count5 - structuredClone5['start'];
+  if (count5 < 0x0 || structuredClone5['end'] + count6 > 0xe10) throw new Error('复制片段超出镜头时长范围。');
+  ((structuredClone5['id'] = 'clip-' + globalThis['crypto']['randomUUID']()),
+    (structuredClone5['start'] += count6),
+    (structuredClone5['end'] += count6));
+  if (kind3 === 'motion') {
+    const map8 = new Map();
+    for (const time2 of entries) {
+      const value16 = {
+        ...structuredClone(time2['key']),
         id: 'key-' + globalThis['crypto']['randomUUID'](),
-        time: _0x4dde14['key']['time'] + _0x1cb089,
+        time: time2['key']['time'] + count6,
       };
-      if (_0x5a8003['time'] < 0x0 || _0x5a8003['time'] > 0xe10) throw new Error('源关键帧超出复制范围。');
-      _0x417b73['set'](_0x4dde14['key']['id'], _0x5a8003['id']);
-      const _0x10e48b = _0x329c82['objectTracks']['find'](
-        (_0xf18c51) => _0xf18c51['objectId'] === _0x4dde14['objectId'],
+      if (value16['time'] < 0x0 || value16['time'] > 0xe10) throw new Error('源关键帧超出复制范围。');
+      map8['set'](time2['key']['id'], value16['id']);
+      const enabled3 = structuredClone4['objectTracks']['find'](
+        (value17) => value17['objectId'] === time2['objectId'],
       );
-      if (_0x4dde14['type'] !== 'camera' && !_0x10e48b) throw new Error('片段对应物体轨道已不存在。');
-      const _0x22e0ec =
-        _0x4dde14['type'] === 'camera'
-          ? _0x329c82['cameraKeyframes']
-          : _0x10e48b[_0x4dde14['property'] + 'Keyframes'];
-      _0x22e0ec['push'](_0x5a8003);
+      if (time2['type'] !== 'camera' && !enabled3) throw new Error('片段对应物体轨道已不存在。');
+      const list6 =
+        time2['type'] === 'camera'
+          ? structuredClone4['cameraKeyframes']
+          : enabled3[time2['property'] + 'Keyframes'];
+      list6['push'](value16);
     }
-    ((_0x4c1ed8['keyframeIds'] = _0x4c1ed8['keyframeIds']['map']((_0x3bfc5b) => _0x417b73['get'](_0x3bfc5b))),
-      (_0x329c82['motionClips'] ||= [])['push'](_0x4c1ed8));
-  } else _0x329c82['actionClips']['push'](_0x4c1ed8);
-  return _0x329c82;
+    ((structuredClone5['keyframeIds'] = structuredClone5['keyframeIds']['map']((value18) =>
+      map8['get'](value18),
+    )),
+      (structuredClone4['motionClips'] ||= [])['push'](structuredClone5));
+  } else structuredClone4['actionClips']['push'](structuredClone5);
+  return structuredClone4;
 }

@@ -1,190 +1,261 @@
 import appStore from '../core/stores/appStore.js';
 import { t } from '../i18n/index.js';
 const EXECUTABLE_NODE_TYPES = new Set(['ai-text', 'ai-image', 'ai-video', 'ai-audio']);
-function groupExecutionText(_0x5a2124, _0x1c034a = {}) {
-  return t('groupExecution.' + _0x5a2124, _0x1c034a);
+function groupExecutionText(value, item = {}) {
+  return t('groupExecution.' + value, item);
 }
-function toNodeList(_0x2db5bf) {
-  if (!_0x2db5bf || typeof _0x2db5bf !== 'object') return [];
-  return Object.values(_0x2db5bf).filter((_0x109adf) => _0x109adf && typeof _0x109adf === 'object');
+function toNodeList(enabled) {
+  if (!enabled || typeof enabled !== 'object') return [];
+  return Object.values(enabled).filter((item2) => item2 && typeof item2 === 'object');
 }
-function isExecutableNode(_0x56b3ce) {
-  return EXECUTABLE_NODE_TYPES.has(String(_0x56b3ce?.type || ''));
+function isExecutableNode(key) {
+  return EXECUTABLE_NODE_TYPES.has(String(key?.type || ''));
 }
-function compareCanvasOrder(_0x2ec58c, _0x634fce) {
-  const _0x1b00a4 = Number(_0x2ec58c?.y) || 0,
-    _0x4d85d5 = Number(_0x634fce?.y) || 0;
-  if (_0x1b00a4 !== _0x4d85d5) return _0x1b00a4 - _0x4d85d5;
-  const _0x26f7d6 = Number(_0x2ec58c?.x) || 0,
-    _0x5b5e5a = Number(_0x634fce?.x) || 0;
-  if (_0x26f7d6 !== _0x5b5e5a) return _0x26f7d6 - _0x5b5e5a;
-  return String(_0x2ec58c?.id || '').localeCompare(String(_0x634fce?.id || ''));
+function compareCanvasOrder(box, box2) {
+  const index = Number(box?.y) || 0,
+    result = Number(box2?.y) || 0;
+  if (index !== result) return index - result;
+  const data = Number(box?.x) || 0,
+    options = Number(box2?.x) || 0;
+  if (data !== options) return data - options;
+  return String(box?.id || '').localeCompare(String(box2?.id || ''));
 }
-export function collectGroupExecutableNodeIds(_0x23adc4, _0x5a4c19) {
-  const _0x44e1ea = String(_0x5a4c19 || '').trim();
-  if (!_0x44e1ea) return [];
-  const _0x147a0a = toNodeList(_0x23adc4),
-    _0x7f1cf5 = new Map();
-  for (const _0xe4c081 of _0x147a0a) {
-    const _0xd51c3f = String(_0xe4c081.parentId || '').trim();
-    if (!_0xd51c3f) continue;
-    if (!_0x7f1cf5.has(_0xd51c3f)) _0x7f1cf5.set(_0xd51c3f, []);
-    _0x7f1cf5.get(_0xd51c3f).push(_0xe4c081);
+export function collectGroupExecutableNodeIds(target, source) {
+  const enabled2 = String(source || '').trim();
+  if (!enabled2) return [];
+  const toNodeList2 = toNodeList(target),
+    map = new Map();
+  for (const next of toNodeList2) {
+    const enabled3 = String(next.parentId || '').trim();
+    if (!enabled3) continue;
+    if (!map.has(enabled3)) map.set(enabled3, []);
+    map.get(enabled3).push(next);
   }
-  for (const _0x238622 of _0x7f1cf5.values()) {
-    _0x238622.sort(compareCanvasOrder);
+  for (const list of map.values()) {
+    list.sort(compareCanvasOrder);
   }
-  const _0x1f5b4d = [],
-    _0x270b48 = new Set(),
-    _0x48003a = (_0x1453a3) => {
-      const _0x2afb6f = _0x7f1cf5.get(_0x1453a3) || [];
-      for (const _0x59aef3 of _0x2afb6f) {
-        const _0x3b65a7 = String(_0x59aef3?.id || '').trim();
-        if (!_0x3b65a7 || _0x270b48.has(_0x3b65a7)) continue;
-        _0x270b48.add(_0x3b65a7);
-        if (isExecutableNode(_0x59aef3)) _0x1f5b4d.push(_0x3b65a7);
-        if (String(_0x59aef3?.type || '') === 'group') _0x48003a(_0x3b65a7);
+  const list2 = [],
+    map2 = new Set(),
+    handler = (current) => {
+      const entry = map.get(current) || [];
+      for (const record of entry) {
+        const enabled4 = String(record?.id || '').trim();
+        if (!enabled4 || map2.has(enabled4)) continue;
+        map2.add(enabled4);
+        if (isExecutableNode(record)) list2.push(enabled4);
+        if (String(record?.type || '') === 'group') handler(enabled4);
       }
     };
-  return (_0x48003a(_0x44e1ea), _0x1f5b4d);
+  return (handler(enabled2), list2);
 }
-export function collectSelectedExecutableNodeIds(_0x5a3091, _0x349cd3 = []) {
-  const _0x303886 = new Set(
-    (Array.isArray(_0x349cd3) ? _0x349cd3 : [])
-      .map((_0x4112fc) => String(_0x4112fc || '').trim())
-      .filter(Boolean),
+export function collectSelectedExecutableNodeIds(payload, handle = []) {
+  const map3 = new Set(
+    (Array.isArray(handle) ? handle : []).map((item3) => String(item3 || '').trim()).filter(Boolean),
   );
-  if (_0x303886.size === 0) return [];
-  return toNodeList(_0x5a3091)
-    .filter((_0x25d978) => _0x303886.has(String(_0x25d978?.id || '').trim()) && isExecutableNode(_0x25d978))
+  if (map3.size === 0) return [];
+  return toNodeList(payload)
+    .filter((item4) => map3.has(String(item4?.id || '').trim()) && isExecutableNode(item4))
     .sort(compareCanvasOrder)
-    .map((_0x1ce8ba) => String(_0x1ce8ba?.id || '').trim())
+    .map((item5) => String(item5?.id || '').trim())
     .filter(Boolean);
 }
-export function findGenerateButtonForNode(_0x2fef2d, _0x4ebb42) {
-  const _0xc065a0 = _0x2fef2d || globalThis.document;
-  if (!_0xc065a0 || typeof _0xc065a0.getElementById !== 'function') return null;
-  const _0x212311 = _0xc065a0.getElementById(String(_0x4ebb42 || ''));
-  if (!_0x212311 || typeof _0x212311.querySelector !== 'function') return null;
-  return _0x212311.querySelector('.prompt-submit.img-gen-btn:not(.debug-wrench-btn)');
+export function findGenerateButtonForNode(config, scope) {
+  const enabled5 = config || globalThis.document;
+  if (!enabled5 || typeof enabled5.getElementById !== 'function') return null;
+  const el = enabled5.getElementById(String(scope || ''));
+  if (!el || typeof el.querySelector !== 'function') return null;
+  return el.querySelector('.prompt-submit.img-gen-btn:not(.debug-wrench-btn)');
 }
 export function executeGroupGenerateButtons({
-  groupId: _0x23fcf9,
+  groupId: groupId,
   state: state = appStore.getState(),
   root: root = globalThis.document,
   showToast: showToast = globalThis.window?.showToast,
 } = {}) {
-  const _0x1cc927 = state?.nodes || {},
-    _0x535220 = _0x1cc927?.[_0x23fcf9];
-  if (!_0x535220 || String(_0x535220.type || '') !== 'group')
+  const input = state?.nodes || {},
+    enabled6 = input?.[groupId];
+  if (!enabled6 || String(enabled6.type || '') !== 'group')
     return (
       showToast?.(groupExecutionText('groupNotFound'), 'warn'),
       { clicked: 0, total: 0, missing: 0, skippedDisabled: 0, skippedGenerating: 0 }
     );
-  const _0x2cefb8 = collectGroupExecutableNodeIds(_0x1cc927, _0x23fcf9);
-  if (_0x2cefb8.length === 0)
+  const total = collectGroupExecutableNodeIds(input, groupId);
+  if (total.length === 0)
     return (
       showToast?.(groupExecutionText('groupNoExecutable'), 'warn'),
       { clicked: 0, total: 0, missing: 0, skippedDisabled: 0, skippedGenerating: 0 }
     );
-  let _0xabfc42 = 0,
-    _0x47ee69 = 0,
-    _0xb06e3d = 0,
-    _0x99c40c = 0;
-  for (const _0x2d10ae of _0x2cefb8) {
-    const _0x4f6abf = _0x1cc927[_0x2d10ae];
-    if (_0x4f6abf?.isGenerating === true) {
-      _0x99c40c += 1;
+  let count = 0,
+    missing = 0,
+    skippedDisabled = 0,
+    skippedGenerating = 0;
+  for (const output of total) {
+    const value2 = input[output];
+    if (value2?.isGenerating === true) {
+      skippedGenerating += 1;
       continue;
     }
-    const _0x281fe8 = findGenerateButtonForNode(root, _0x2d10ae);
-    if (!_0x281fe8) {
-      _0x47ee69 += 1;
+    const el2 = findGenerateButtonForNode(root, output);
+    if (!el2) {
+      missing += 1;
       continue;
     }
-    if (_0x281fe8.disabled) {
-      _0xb06e3d += 1;
+    if (el2.disabled) {
+      skippedDisabled += 1;
       continue;
     }
-    (_0x281fe8.click(), (_0xabfc42 += 1));
+    (el2.click(), (count += 1));
   }
-  if (_0xabfc42 > 0) showToast?.(groupExecutionText('groupTriggered', { count: _0xabfc42 }), 'success');
+  if (count > 0) showToast?.(groupExecutionText('groupTriggered', { count: count }), 'success');
   else
-    _0x99c40c > 0
+    skippedGenerating > 0
       ? showToast?.(groupExecutionText('groupRunning'), 'warn')
       : showToast?.(groupExecutionText('groupNoTriggerable'), 'warn');
   return {
-    clicked: _0xabfc42,
-    total: _0x2cefb8.length,
-    missing: _0x47ee69,
-    skippedDisabled: _0xb06e3d,
-    skippedGenerating: _0x99c40c,
+    clicked: count,
+    total: total.length,
+    missing: missing,
+    skippedDisabled: skippedDisabled,
+    skippedGenerating: skippedGenerating,
   };
 }
 export function executeSelectedGenerateButtons({
-  selectedIds: _0x23f830,
+  selectedIds: selectedIds2,
   state: state = appStore.getState(),
   root: root = globalThis.document,
   showToast: showToast = globalThis.window?.showToast,
 } = {}) {
-  const _0x5b3256 = state?.nodes || {},
-    _0x377d2b = collectSelectedExecutableNodeIds(_0x5b3256, _0x23f830 || state?.selectedNodeIds || []);
-  if (_0x377d2b.length === 0)
+  const value3 = state?.nodes || {},
+    total2 = collectSelectedExecutableNodeIds(value3, selectedIds2 || state?.selectedNodeIds || []);
+  if (total2.length === 0)
     return (
       showToast?.(groupExecutionText('selectedNoExecutable'), 'warn'),
       { clicked: 0, total: 0, missing: 0, skippedDisabled: 0, skippedGenerating: 0 }
     );
-  let _0x1987ba = 0,
-    _0x52c1cd = 0,
-    _0xa55b67 = 0,
-    _0xe2f2b1 = 0;
-  for (const _0x4b3575 of _0x377d2b) {
-    const _0x1a299b = _0x5b3256[_0x4b3575];
-    if (_0x1a299b?.isGenerating === true) {
-      _0xe2f2b1 += 1;
+  let count2 = 0,
+    missing2 = 0,
+    skippedDisabled2 = 0,
+    skippedGenerating2 = 0;
+  for (const value4 of total2) {
+    const value5 = value3[value4];
+    if (value5?.isGenerating === true) {
+      skippedGenerating2 += 1;
       continue;
     }
-    const _0x49254c = findGenerateButtonForNode(root, _0x4b3575);
-    if (!_0x49254c) {
-      _0x52c1cd += 1;
+    const el3 = findGenerateButtonForNode(root, value4);
+    if (!el3) {
+      missing2 += 1;
       continue;
     }
-    if (_0x49254c.disabled) {
-      _0xa55b67 += 1;
+    if (el3.disabled) {
+      skippedDisabled2 += 1;
       continue;
     }
-    (_0x49254c.click(), (_0x1987ba += 1));
+    (el3.click(), (count2 += 1));
   }
-  if (_0x1987ba > 0) showToast?.(groupExecutionText('selectedTriggered', { count: _0x1987ba }), 'success');
+  if (count2 > 0) showToast?.(groupExecutionText('selectedTriggered', { count: count2 }), 'success');
   else
-    _0xe2f2b1 > 0
+    skippedGenerating2 > 0
       ? showToast?.(groupExecutionText('selectedRunning'), 'warn')
       : showToast?.(groupExecutionText('selectedNoTriggerable'), 'warn');
   return {
-    clicked: _0x1987ba,
-    total: _0x377d2b.length,
-    missing: _0x52c1cd,
-    skippedDisabled: _0xa55b67,
-    skippedGenerating: _0xe2f2b1,
+    clicked: count2,
+    total: total2.length,
+    missing: missing2,
+    skippedDisabled: skippedDisabled2,
+    skippedGenerating: skippedGenerating2,
   };
 }
 
 const DEFAULT_SELECTED_GENERATE_STAGGER_MS = 0x12c;
 
-let activeSelectedGenerateBatch=null;
+let activeSelectedGenerateBatch = null;
 
-export function hasRunningGroupGenerateNodes(_0x40b22d,_0x40bb92){return collectGroupExecutableNodeIds(_0x40b22d,_0x40bb92)['some'](_0x405e9d=>_0x40b22d?.[_0x405e9d]?.["isGenerating"]===!![]);}
+export function hasRunningGroupGenerateNodes(value6, value7) {
+  return collectGroupExecutableNodeIds(value6, value7)['some'](
+    (value8) => value6?.[value8]?.['isGenerating'] === !![],
+  );
+}
 
-export function hasRunningSelectedGenerateNodes(_0x46eb8c,_0x25b9db=[]){return collectSelectedExecutableNodeIds(_0x46eb8c,_0x25b9db)['some'](_0x17b036=>_0x46eb8c?.[_0x17b036]?.["isGenerating"]===!![]);}
+export function hasRunningSelectedGenerateNodes(value9, value10 = []) {
+  return collectSelectedExecutableNodeIds(value9, value10)['some'](
+    (value11) => value9?.[value11]?.['isGenerating'] === !![],
+  );
+}
 
-export function cancelGroupGenerateButtons({groupId:_0x2accde,state:state=appStore["getState"](),root:root=globalThis['document'],showToast:showToast=globalThis["window"]?.['showToast']}={}){const _0x11a03d=state?.["nodes"]||{},_0x41dec7=collectGroupExecutableNodeIds(_0x11a03d,_0x2accde)["filter"](_0x5affc5=>_0x11a03d?.[_0x5affc5]?.["isGenerating"]===!![]);let _0x2a6c7b=0x0;for(const _0x13263e of _0x41dec7){const _0x100f37=findGenerateButtonForNode(root,_0x13263e);if(!_0x100f37||_0x100f37["disabled"])continue;_0x100f37['click'](),_0x2a6c7b+=0x1;}return _0x2a6c7b>0x0&&showToast?.(groupExecutionText("groupCancelTriggered",{'count':_0x2a6c7b}),"info"),{'clicked':_0x2a6c7b,'total':_0x41dec7["length"]};}
+export function cancelGroupGenerateButtons({
+  groupId: groupId2,
+  state: state = appStore['getState'](),
+  root: root = globalThis['document'],
+  showToast: showToast = globalThis['window']?.['showToast'],
+} = {}) {
+  const value12 = state?.['nodes'] || {},
+    groupExecutableNodeIds = collectGroupExecutableNodeIds(value12, groupId2)['filter'](
+      (value13) => value12?.[value13]?.['isGenerating'] === !![],
+    );
+  let count3 = 0x0;
+  for (const value14 of groupExecutableNodeIds) {
+    const el4 = findGenerateButtonForNode(root, value14);
+    if (!el4 || el4['disabled']) continue;
+    (el4['click'](), (count3 += 0x1));
+  }
+  return (
+    count3 > 0x0 && showToast?.(groupExecutionText('groupCancelTriggered', { count: count3 }), 'info'),
+    { clicked: count3, total: groupExecutableNodeIds['length'] }
+  );
+}
 
-function normalizeStaggerMs(_0x33622f,_0x15a972=DEFAULT_SELECTED_GENERATE_STAGGER_MS){const _0x415119=Number(_0x33622f);if(!Number["isFinite"](_0x415119)||_0x415119<0x0)return _0x15a972;return Math["floor"](_0x415119);}
+function normalizeStaggerMs(value15, value16 = DEFAULT_SELECTED_GENERATE_STAGGER_MS) {
+  const count4 = Number(value15);
+  if (!Number['isFinite'](count4) || count4 < 0x0) return value16;
+  return Math['floor'](count4);
+}
 
-function scheduleGenerateButtonClick(_0x5f512d,_0x56f8e6,_0x316d14,_0xc326a8=()=>{}){const _0x73d244=()=>{if(!_0x5f512d["disabled"])_0x5f512d["click"]();_0xc326a8();};if(_0x56f8e6>0x0&&typeof _0x316d14==="function")return _0x316d14(_0x73d244,_0x56f8e6);return _0x73d244(),null;}
+function scheduleGenerateButtonClick(enabled7, count5, handler2, handler3 = () => {}) {
+  const run = () => {
+    if (!enabled7['disabled']) enabled7['click']();
+    handler3();
+  };
+  if (count5 > 0x0 && typeof handler2 === 'function') return handler2(run, count5);
+  return (run(), null);
+}
 
-export function hasActiveSelectedGenerateBatch(){return Boolean(activeSelectedGenerateBatch);}
+export function hasActiveSelectedGenerateBatch() {
+  return Boolean(activeSelectedGenerateBatch);
+}
 
-function cancelActiveSelectedGenerateQueue(){const _0x1d52b2=activeSelectedGenerateBatch;if(!_0x1d52b2)return![];return activeSelectedGenerateBatch=null,_0x1d52b2["cancelled"]=!![],_0x1d52b2["timeoutIds"]["forEach"](_0xf78e1e=>_0x1d52b2["clearScheduledTimeout"]?.(_0xf78e1e)),_0x1d52b2['timeoutIds']["clear"](),_0x1d52b2["onStateChange"]?.(![]),!![];}
+function cancelActiveSelectedGenerateQueue() {
+  const enabled8 = activeSelectedGenerateBatch;
+  if (!enabled8) return ![];
+  return (
+    (activeSelectedGenerateBatch = null),
+    (enabled8['cancelled'] = !![]),
+    enabled8['timeoutIds']['forEach']((value17) => enabled8['clearScheduledTimeout']?.(value17)),
+    enabled8['timeoutIds']['clear'](),
+    enabled8['onStateChange']?.(![]),
+    !![]
+  );
+}
 
-export function cancelSelectedGenerateButtons({selectedIds:selectedIds=[],state:state=appStore["getState"](),root:root=globalThis['document'],showToast:showToast=globalThis["window"]?.["showToast"]}={}){const _0xe1d3bb=cancelActiveSelectedGenerateQueue(),_0x1263a5=state?.['nodes']||{},_0x359bb4=collectSelectedExecutableNodeIds(_0x1263a5,selectedIds)['filter'](_0x461514=>_0x1263a5?.[_0x461514]?.['isGenerating']===!![]);let _0x23383d=0x0;for(const _0x2e70f6 of _0x359bb4){const _0x479965=findGenerateButtonForNode(root,_0x2e70f6);if(!_0x479965||_0x479965["disabled"])continue;_0x479965["click"](),_0x23383d+=0x1;}return _0x23383d>0x0&&showToast?.(groupExecutionText("selectedCancelTriggered",{'count':_0x23383d}),'info'),_0xe1d3bb||_0x23383d>0x0;}
+export function cancelSelectedGenerateButtons({
+  selectedIds: selectedIds = [],
+  state: state = appStore['getState'](),
+  root: root = globalThis['document'],
+  showToast: showToast = globalThis['window']?.['showToast'],
+} = {}) {
+  const cancelActiveSelectedGenerateQueue2 = cancelActiveSelectedGenerateQueue(),
+    value18 = state?.['nodes'] || {},
+    selectedExecutableNodeIds = collectSelectedExecutableNodeIds(value18, selectedIds)['filter'](
+      (value19) => value18?.[value19]?.['isGenerating'] === !![],
+    );
+  let count6 = 0x0;
+  for (const value20 of selectedExecutableNodeIds) {
+    const generateButtonForNode = findGenerateButtonForNode(root, value20);
+    if (!generateButtonForNode || generateButtonForNode['disabled']) continue;
+    (generateButtonForNode['click'](), (count6 += 0x1));
+  }
+  return (
+    count6 > 0x0 && showToast?.(groupExecutionText('selectedCancelTriggered', { count: count6 }), 'info'),
+    cancelActiveSelectedGenerateQueue2 || count6 > 0x0
+  );
+}

@@ -1,7 +1,7 @@
 import { createToolbarIconButton } from './buttonFactory.js';
 import { t } from '../../i18n/index.js';
-function toolbarText(_0x49d73e) {
-  return t('nodeToolbar.' + _0x49d73e);
+function toolbarText(value) {
+  return t('nodeToolbar.' + value);
 }
 const MORE_ICON_SVG =
     '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',

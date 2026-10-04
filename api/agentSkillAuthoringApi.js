@@ -42,14 +42,12 @@ const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object['freeze']({
     },
   }),
 });
-function truncateText(_0x2f33cd, _0x47034a = AUTHORING_TEXT_LIMIT) {
-  const _0x12395d = String(_0x2f33cd || '');
-  return _0x12395d['length'] <= _0x47034a
-    ? _0x12395d
-    : _0x12395d['slice'](0x0, Math['max'](0x0, _0x47034a - 0x3)) + '...';
+function truncateText(value, item = AUTHORING_TEXT_LIMIT) {
+  const list = String(value || '');
+  return list['length'] <= item ? list : list['slice'](0x0, Math['max'](0x0, item - 0x3)) + '...';
 }
-function normalizeLocale(_0x5e5050 = '') {
-  return String(_0x5e5050 || '')
+function normalizeLocale(key = '') {
+  return String(key || '')
     ['toLowerCase']()
     ['startsWith']('en')
     ? 'en-US'
@@ -67,7 +65,7 @@ function buildPrompt({
   operation: operation = 'create',
   targetSkill: targetSkill = null,
 } = {}) {
-  const _0x22e568 = {
+  const index = {
     languagePolicy:
       normalizeLocale(locale) === 'en-US'
         ? 'Write title, description, triggers, instructions, reply, and question in English.'
@@ -76,18 +74,18 @@ function buildPrompt({
     userMessage: truncateText(message),
     clarificationAnswer: truncateText(clarificationAnswer),
     history: (Array['isArray'](history) ? history : [])
-      ['map']((_0x52ed53 = {}) => ({
-        role: String(_0x52ed53['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
-        content: truncateText(_0x52ed53['content'] || _0x52ed53['reply'] || _0x52ed53['message'] || ''),
+      ['map']((error = {}) => ({
+        role: String(error['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
+        content: truncateText(error['content'] || error['reply'] || error['message'] || ''),
       }))
-      ['filter']((_0x4c539d) => _0x4c539d['content'])
+      ['filter']((result) => result['content'])
       ['slice'](-AUTHORING_HISTORY_LIMIT),
     existingSkills: (Array['isArray'](existingSkills) ? existingSkills : [])
-      ['map']((_0x448d7f = {}) => ({
-        id: truncateText(_0x448d7f['id'], 0x40),
-        title: truncateText(_0x448d7f['title'] || _0x448d7f['id'], 0x78),
+      ['map']((options = {}) => ({
+        id: truncateText(options['id'], 0x40),
+        title: truncateText(options['title'] || options['id'], 0x78),
       }))
-      ['filter']((_0x1dc57a) => _0x1dc57a['id'])
+      ['filter']((data) => data['id'])
       ['slice'](0x0, 0x64),
     operation: ['create', 'update', 'clone']['includes'](String(operation)) ? String(operation) : 'create',
     targetSkill:
@@ -98,7 +96,7 @@ function buildPrompt({
             description: truncateText(targetSkill['description'], 0x258),
             triggers: (Array['isArray'](targetSkill['triggers']) ? targetSkill['triggers'] : [])
               ['slice'](0x0, 0x18)
-              ['map']((_0x4f751a) => truncateText(_0x4f751a, 0xa0)),
+              ['map']((target) => truncateText(target, 0xa0)),
             instructions: truncateText(targetSkill['instructions'], 0x2ee0),
           }
         : null,
@@ -124,31 +122,31 @@ function buildPrompt({
         }
       : {}),
   };
-  return JSON['stringify'](_0x22e568)['slice'](0x0, AUTHORING_PROMPT_LIMIT);
+  return JSON['stringify'](index)['slice'](0x0, AUTHORING_PROMPT_LIMIT);
 }
-function getResultText(_0x42d877) {
-  return typeof _0x42d877 === 'string'
-    ? _0x42d877
-    : _0x42d877?.['text'] || _0x42d877?.['outputText'] || _0x42d877?.['content'] || '';
+function getResultText(response) {
+  return typeof response === 'string'
+    ? response
+    : response?.['text'] || response?.['outputText'] || response?.['content'] || '';
 }
-function parseResult(_0x85a190) {
+function parseResult(source) {
   if (
-    _0x85a190 &&
-    typeof _0x85a190 === 'object' &&
-    !Array['isArray'](_0x85a190) &&
-    (Object['prototype']['hasOwnProperty']['call'](_0x85a190, 'status') || _0x85a190['definition'])
+    source &&
+    typeof source === 'object' &&
+    !Array['isArray'](source) &&
+    (Object['prototype']['hasOwnProperty']['call'](source, 'status') || source['definition'])
   )
-    return _0x85a190;
-  const _0x4e8139 = String(getResultText(_0x85a190) || '')['trim']();
-  if (!_0x4e8139) throw new Error('Agent Skill author returned empty text.');
+    return source;
+  const enabled = String(getResultText(source) || '')['trim']();
+  if (!enabled) throw new Error('Agent Skill author returned empty text.');
   try {
-    return JSON['parse'](_0x4e8139);
+    return JSON['parse'](enabled);
   } catch {
     throw new Error('Agent\x20Skill\x20author\x20returned\x20invalid\x20JSON.');
   }
 }
 export async function requestAgentSkillDraft({
-  message: _0x170d9f,
+  message: message2,
   originalMessage: originalMessage = '',
   clarificationAnswer: clarificationAnswer = '',
   history: history = [],
@@ -161,23 +159,23 @@ export async function requestAgentSkillDraft({
   targetSkill: targetSkill = null,
   repairReason: repairReason = '',
 } = {}) {
-  const _0x2fdd91 = String(settings['model'] || '')['trim'](),
-    _0xd56b1e = String(settings['provider'] || '')['trim'](),
-    _0x39b53f = String(settings['providerProfileId'] || '')['trim']();
-  if (!_0x2fdd91 || !_0xd56b1e) throw new Error('Agent model is not configured.');
+  const model = String(settings['model'] || '')['trim'](),
+    provider = String(settings['provider'] || '')['trim'](),
+    providerProfileId = String(settings['providerProfileId'] || '')['trim']();
+  if (!model || !provider) throw new Error('Agent model is not configured.');
   onTrace?.({
     type: 'agent_skill_authoring_model_selected',
     channel: 'skill.authoring',
-    provider: _0xd56b1e,
-    model: _0x2fdd91,
+    provider: provider,
+    model: model,
   });
-  const _0x39722f = {
-      model: _0x2fdd91,
-      provider: _0xd56b1e,
+  const args = {
+      model: model,
+      provider: provider,
       ...buildAgentModelRequestParams(settings),
-      ...(_0x39b53f ? { providerProfileId: _0x39b53f } : {}),
+      ...(providerProfileId ? { providerProfileId: providerProfileId } : {}),
       prompt: buildPrompt({
-        message: _0x170d9f,
+        message: message2,
         originalMessage: originalMessage,
         clarificationAnswer: clarificationAnswer,
         history: history,
@@ -192,15 +190,15 @@ export async function requestAgentSkillDraft({
       temperature: 0.2,
       ...(signal ? { signal: signal } : {}),
     },
-    _0x4cbb8b = await request(_0x39722f);
+    request2 = await request(args);
   try {
-    return parseResult(_0x4cbb8b);
-  } catch (_0x57c080) {
-    onTrace?.({ type: 'agent_skill_authoring_json_retry', reason: _0x57c080?.['message'] || 'invalid JSON' });
-    const _0x5deffb = await request({
-      ..._0x39722f,
+    return parseResult(request2);
+  } catch (reason) {
+    onTrace?.({ type: 'agent_skill_authoring_json_retry', reason: reason?.['message'] || 'invalid JSON' });
+    const request3 = await request({
+      ...args,
       prompt: buildPrompt({
-        message: _0x170d9f,
+        message: message2,
         originalMessage: originalMessage,
         clarificationAnswer: clarificationAnswer,
         history: history,
@@ -208,9 +206,9 @@ export async function requestAgentSkillDraft({
         locale: settings['locale'],
         operation: operation,
         targetSkill: targetSkill,
-        retryReason: _0x57c080?.['message'],
+        retryReason: reason?.['message'],
       }),
     });
-    return parseResult(_0x5deffb);
+    return parseResult(request3);
   }
 }

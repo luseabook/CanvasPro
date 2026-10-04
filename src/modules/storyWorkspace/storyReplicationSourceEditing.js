@@ -8,169 +8,164 @@ import {
   REPLICATION_SUBJECT_TYPES,
 } from '../../domain/storyGeneration/videoReplicationCharacters.js';
 import { REPLICATION_VOICEOVER_KINDS } from '../../domain/storyGeneration/videoReplicationSpeech.js';
-function canEdit(_0x1e2ac9) {
+function canEdit(enabled) {
   return (
-    _0x1e2ac9?.['replication']?.['sourceAnalysis'] &&
-    !_0x1e2ac9['clips']?.['length'] &&
-    !['queued', 'uploading', 'analyzing']['includes'](_0x1e2ac9['replication']['status'])
+    enabled?.['replication']?.['sourceAnalysis'] &&
+    !enabled['clips']?.['length'] &&
+    !['queued', 'uploading', 'analyzing']['includes'](enabled['replication']['status'])
   );
 }
-function commitSourceEdit(_0x3740a4, _0xf50691) {
-  ((_0xf50691['replication']['sourceAnalysis']['revision'] =
-    (_0xf50691['replication']['sourceAnalysis']['revision'] || 0x0) + 0x1),
-    applyStoryVideoReplicationAnalysis(_0xf50691, {
-      sourceAnalysis: _0xf50691['replication']['sourceAnalysis'],
+function commitSourceEdit(value, sourceAnalysis) {
+  ((sourceAnalysis['replication']['sourceAnalysis']['revision'] =
+    (sourceAnalysis['replication']['sourceAnalysis']['revision'] || 0x0) + 0x1),
+    applyStoryVideoReplicationAnalysis(sourceAnalysis, {
+      sourceAnalysis: sourceAnalysis['replication']['sourceAnalysis'],
     }),
-    syncStoryVideoReplicationProject(_0x3740a4),
-    invalidateStoryVideoReplicationAssetLocalization(_0x3740a4));
+    syncStoryVideoReplicationProject(value),
+    invalidateStoryVideoReplicationAssetLocalization(value));
 }
 export function editStoryReplicationSource(
-  _0x2c9cc8,
-  _0x25a782,
-  { kind: _0x377d96, id: _0xc1a9ef, index: _0x4f3975, field: _0x39dc82, value: _0x5ccd74 } = {},
+  item,
+  key,
+  { kind: kind, id: id, index: index, field: field, value: value2 } = {},
 ) {
-  const _0x45ff04 = _0x25a782?.['replication']?.['sourceAnalysis'];
-  if (!canEdit(_0x25a782)) return ![];
-  const _0x181d1a = _0x45ff04['events']['find']((_0xbb7410) => _0xbb7410['id'] === _0xc1a9ef);
-  let _0x41d723;
-  if (_0x377d96 === 'story' && _0x39dc82 === 'synopsis') _0x41d723 = _0x45ff04;
+  const enabled2 = key?.['replication']?.['sourceAnalysis'];
+  if (!canEdit(key)) return ![];
+  const result = enabled2['events']['find']((data) => data['id'] === id);
+  let enabled3;
+  if (kind === 'story' && field === 'synopsis') enabled3 = enabled2;
   if (
-    _0x377d96 === 'character' &&
-    ['name', 'description', 'identityNotes', 'role', 'roleEvidence', 'subjectType']['includes'](_0x39dc82)
+    kind === 'character' &&
+    ['name', 'description', 'identityNotes', 'role', 'roleEvidence', 'subjectType']['includes'](field)
   ) {
-    if (_0x39dc82 === 'role' && !Object['hasOwn'](REPLICATION_CHARACTER_ROLES, _0x5ccd74)) return ![];
-    if (_0x39dc82 === 'subjectType' && !Object['hasOwn'](REPLICATION_SUBJECT_TYPES, _0x5ccd74)) return ![];
-    _0x41d723 = _0x45ff04['characters']['find']((_0x35b228) => _0x35b228['id'] === _0xc1a9ef);
+    if (field === 'role' && !Object['hasOwn'](REPLICATION_CHARACTER_ROLES, value2)) return ![];
+    if (field === 'subjectType' && !Object['hasOwn'](REPLICATION_SUBJECT_TYPES, value2)) return ![];
+    enabled3 = enabled2['characters']['find']((options) => options['id'] === id);
   }
-  if (_0x377d96 === 'event' && _0x39dc82 === 'visual') _0x41d723 = _0x181d1a;
-  if (_0x377d96 === 'dialogue' && ['speakerId', 'text', 'uncertain']['includes'](_0x39dc82)) {
-    _0x41d723 = _0x181d1a?.['dialogue']?.[Number(_0x4f3975)];
+  if (kind === 'event' && field === 'visual') enabled3 = result;
+  if (kind === 'dialogue' && ['speakerId', 'text', 'uncertain']['includes'](field)) {
+    enabled3 = result?.['dialogue']?.[Number(index)];
     if (
-      _0x39dc82 === 'speakerId' &&
-      _0x5ccd74 &&
-      !_0x45ff04['characters']['some']((_0x2d92da) => _0x2d92da['id'] === _0x5ccd74)
+      field === 'speakerId' &&
+      value2 &&
+      !enabled2['characters']['some']((target) => target['id'] === value2)
     )
       return ![];
   }
-  if (_0x377d96 === 'voiceover' && ['speakerId', 'text', 'uncertain', 'kind']['includes'](_0x39dc82)) {
-    _0x41d723 = _0x181d1a?.['voiceover']?.[Number(_0x4f3975)];
-    if (_0x39dc82 === 'kind' && !Object['hasOwn'](REPLICATION_VOICEOVER_KINDS, _0x5ccd74)) return ![];
+  if (kind === 'voiceover' && ['speakerId', 'text', 'uncertain', 'kind']['includes'](field)) {
+    enabled3 = result?.['voiceover']?.[Number(index)];
+    if (field === 'kind' && !Object['hasOwn'](REPLICATION_VOICEOVER_KINDS, value2)) return ![];
     if (
-      _0x39dc82 === 'speakerId' &&
-      _0x5ccd74 &&
-      !_0x45ff04['characters']['some']((_0x5a69d8) => _0x5a69d8['id'] === _0x5ccd74)
+      field === 'speakerId' &&
+      value2 &&
+      !enabled2['characters']['some']((source) => source['id'] === value2)
     )
       return ![];
   }
-  if (!_0x41d723) return ![];
-  const _0x17704f = _0x39dc82 === 'uncertain' ? _0x5ccd74 === !![] : String(_0x5ccd74 ?? '')['trim']();
-  if (_0x41d723[_0x39dc82] === _0x17704f) return ![];
-  if (_0x39dc82 === 'name' && !_0x17704f) return ![];
-  _0x41d723[_0x39dc82] = _0x17704f;
+  if (!enabled3) return ![];
+  const enabled4 = field === 'uncertain' ? value2 === !![] : String(value2 ?? '')['trim']();
+  if (enabled3[field] === enabled4) return ![];
+  if (field === 'name' && !enabled4) return ![];
+  enabled3[field] = enabled4;
   if (
-    _0x377d96 === 'voiceover' &&
-    ['kind', 'speakerId']['includes'](_0x39dc82) &&
-    (_0x41d723['kind'] === 'uncertain' ||
-      (_0x41d723['kind'] === 'inner_monologue' && !_0x41d723['speakerId']))
+    kind === 'voiceover' &&
+    ['kind', 'speakerId']['includes'](field) &&
+    (enabled3['kind'] === 'uncertain' || (enabled3['kind'] === 'inner_monologue' && !enabled3['speakerId']))
   )
-    _0x41d723['uncertain'] = !![];
-  return (commitSourceEdit(_0x2c9cc8, _0x25a782), !![]);
+    enabled3['uncertain'] = !![];
+  return (commitSourceEdit(item, key), !![]);
 }
-export function mergeStoryReplicationCharacters(_0xd9664a, _0x2e1a59, _0xd18863, _0x22c970) {
-  const _0x39e0bd = _0x2e1a59?.['replication']?.['sourceAnalysis'];
-  if (!canEdit(_0x2e1a59) || _0xd18863 === _0x22c970) return ![];
-  const _0x197793 = _0x39e0bd['characters']['find']((_0x22c3f5) => _0x22c3f5['id'] === _0xd18863),
-    _0x50e6fb = _0x39e0bd['characters']['find']((_0x578f53) => _0x578f53['id'] === _0x22c970);
-  if (!_0x197793 || !_0x50e6fb) return ![];
-  for (const _0x411ae2 of _0x39e0bd['events']) {
-    ((_0x411ae2['characterIds'] = [
-      ...new Set(
-        _0x411ae2['characterIds']['map']((_0x49080e) => (_0x49080e === _0xd18863 ? _0x22c970 : _0x49080e)),
-      ),
+export function mergeStoryReplicationCharacters(next, current, entry, record) {
+  const payload = current?.['replication']?.['sourceAnalysis'];
+  if (!canEdit(current) || entry === record) return ![];
+  const enabled5 = payload['characters']['find']((handle) => handle['id'] === entry),
+    enabled6 = payload['characters']['find']((state) => state['id'] === record);
+  if (!enabled5 || !enabled6) return ![];
+  for (const args of payload['events']) {
+    ((args['characterIds'] = [
+      ...new Set(args['characterIds']['map']((config) => (config === entry ? record : config))),
     ]),
-      [..._0x411ae2['dialogue'], ...(_0x411ae2['voiceover'] || [])]['forEach']((_0x88d4a7) => {
-        if (_0x88d4a7['speakerId'] === _0xd18863) _0x88d4a7['speakerId'] = _0x22c970;
+      [...args['dialogue'], ...(args['voiceover'] || [])]['forEach']((scope) => {
+        if (scope['speakerId'] === entry) scope['speakerId'] = record;
       }));
   }
-  ((_0x50e6fb['identityNotes'] = [_0x50e6fb['identityNotes'], _0x197793['identityNotes']]
+  ((enabled6['identityNotes'] = [enabled6['identityNotes'], enabled5['identityNotes']]
     ['filter'](Boolean)
     ['join']('\x0a')),
-    (_0x39e0bd['characters'] = _0x39e0bd['characters']['filter']((_0x5525e9) => _0x5525e9 !== _0x197793)));
-  if (_0xd9664a['project']['replication']?.['characterBindings'])
-    delete _0xd9664a['project']['replication']['characterBindings'][_0x2e1a59['id'] + ':' + _0xd18863];
-  return (commitSourceEdit(_0xd9664a, _0x2e1a59), !![]);
+    (payload['characters'] = payload['characters']['filter']((input) => input !== enabled5)));
+  if (next['project']['replication']?.['characterBindings'])
+    delete next['project']['replication']['characterBindings'][current['id'] + ':' + entry];
+  return (commitSourceEdit(next, current), !![]);
 }
 export function addStoryReplicationCharacter(
-  _0x4167d2,
-  _0x3dd032,
-  { timeSec: _0x1fc747, name: name = '新人物' } = {},
+  output,
+  value3,
+  { timeSec: timeSec, name: name = '新人物' } = {},
 ) {
-  if (!canEdit(_0x3dd032)) return null;
-  const _0x4a6891 = _0x3dd032['replication']['sourceAnalysis'],
-    _0x14a1e1 = _0x4a6891['events']['find'](
-      (_0x3f26d0) => Number(_0x1fc747) >= _0x3f26d0['startSec'] && Number(_0x1fc747) < _0x3f26d0['endSec'],
+  if (!canEdit(value3)) return null;
+  const value4 = value3['replication']['sourceAnalysis'],
+    enabled7 = value4['events']['find'](
+      (value5) => Number(timeSec) >= value5['startSec'] && Number(timeSec) < value5['endSec'],
     );
-  if (!_0x14a1e1) return null;
-  let _0x579624 = 0x1;
-  while (_0x4a6891['characters']['some']((_0x16c527) => _0x16c527['id'] === 'person-' + _0x579624))
-    _0x579624 += 0x1;
-  const _0x1ac095 = {
-    id: 'person-' + _0x579624,
+  if (!enabled7) return null;
+  let value6 = 0x1;
+  while (value4['characters']['some']((value7) => value7['id'] === 'person-' + value6)) value6 += 0x1;
+  const value8 = {
+    id: 'person-' + value6,
     name: String(name)['trim']() || '新人物',
     description: '',
     role: 'uncertain',
     subjectType: 'person',
     roleEvidence: '',
     identityNotes: '用户补录，请核对外观与出场片段',
-    representativeTimeSec: Number(_0x1fc747),
+    representativeTimeSec: Number(timeSec),
   };
   return (
-    _0x4a6891['characters']['push'](_0x1ac095),
-    _0x14a1e1['characterIds']['push'](_0x1ac095['id']),
-    commitSourceEdit(_0x4167d2, _0x3dd032),
-    _0x1ac095
+    value4['characters']['push'](value8),
+    enabled7['characterIds']['push'](value8['id']),
+    commitSourceEdit(output, value3),
+    value8
   );
 }
-export function removeStoryReplicationCharacter(_0x2a09db, _0x13faeb, _0x2ac43d) {
-  if (!canEdit(_0x13faeb)) return ![];
-  const _0x4ad451 = _0x13faeb['replication']['sourceAnalysis'];
-  if (!_0x4ad451['characters']['some']((_0x4474dd) => _0x4474dd['id'] === _0x2ac43d)) return ![];
-  _0x4ad451['characters'] = _0x4ad451['characters']['filter']((_0x36197b) => _0x36197b['id'] !== _0x2ac43d);
-  for (const _0x17c4e7 of _0x4ad451['events']) {
-    _0x17c4e7['characterIds'] = _0x17c4e7['characterIds']['filter']((_0x225746) => _0x225746 !== _0x2ac43d);
-    for (const _0x1bce25 of [..._0x17c4e7['dialogue'], ...(_0x17c4e7['voiceover'] || [])])
-      _0x1bce25['speakerId'] === _0x2ac43d &&
-        ((_0x1bce25['speakerId'] = ''), (_0x1bce25['uncertain'] = !![]));
+export function removeStoryReplicationCharacter(value9, value10, value11) {
+  if (!canEdit(value10)) return ![];
+  const enabled8 = value10['replication']['sourceAnalysis'];
+  if (!enabled8['characters']['some']((value12) => value12['id'] === value11)) return ![];
+  enabled8['characters'] = enabled8['characters']['filter']((value13) => value13['id'] !== value11);
+  for (const args2 of enabled8['events']) {
+    args2['characterIds'] = args2['characterIds']['filter']((value14) => value14 !== value11);
+    for (const value15 of [...args2['dialogue'], ...(args2['voiceover'] || [])])
+      value15['speakerId'] === value11 && ((value15['speakerId'] = ''), (value15['uncertain'] = !![]));
   }
-  if (_0x2a09db['project']['replication']?.['characterBindings'])
-    delete _0x2a09db['project']['replication']['characterBindings'][_0x13faeb['id'] + ':' + _0x2ac43d];
-  return (commitSourceEdit(_0x2a09db, _0x13faeb), !![]);
+  if (value9['project']['replication']?.['characterBindings'])
+    delete value9['project']['replication']['characterBindings'][value10['id'] + ':' + value11];
+  return (commitSourceEdit(value9, value10), !![]);
 }
 export function setStoryReplicationCharacterPresence(
-  _0x50b801,
-  _0x48442d,
-  { characterId: _0x3277ab, eventId: _0x129f04, present: _0x3637af } = {},
+  value16,
+  value17,
+  { characterId: characterId, eventId: eventId, present: present } = {},
 ) {
-  if (!canEdit(_0x48442d)) return ![];
-  const _0x3b9ca3 = _0x48442d['replication']['sourceAnalysis'],
-    _0x1fec11 = _0x3b9ca3['characters']['find']((_0x471862) => _0x471862['id'] === _0x3277ab),
-    _0x1d9adf = _0x3b9ca3['events']['find']((_0x4e3b9b) => _0x4e3b9b['id'] === _0x129f04);
-  if (!_0x1fec11 || !_0x1d9adf || _0x1d9adf['characterIds']['includes'](_0x3277ab) === _0x3637af) return ![];
-  const _0xe5a85f = _0x3b9ca3['events']['filter'](
-    (_0x368f64) => _0x368f64 !== _0x1d9adf && _0x368f64['characterIds']['includes'](_0x3277ab),
+  if (!canEdit(value17)) return ![];
+  const value18 = value17['replication']['sourceAnalysis'],
+    enabled9 = value18['characters']['find']((value19) => value19['id'] === characterId),
+    args3 = value18['events']['find']((value20) => value20['id'] === eventId);
+  if (!enabled9 || !args3 || args3['characterIds']['includes'](characterId) === present) return ![];
+  const list = value18['events']['filter'](
+    (value21) => value21 !== args3 && value21['characterIds']['includes'](characterId),
   );
-  if (!_0x3637af && !_0xe5a85f['length']) return ![];
+  if (!present && !list['length']) return ![];
   return (
-    (_0x1d9adf['characterIds'] = _0x3637af
-      ? [..._0x1d9adf['characterIds'], _0x3277ab]
-      : _0x1d9adf['characterIds']['filter']((_0x2399f9) => _0x2399f9 !== _0x3277ab)),
-    !_0x3637af &&
-      _0x1fec11['representativeTimeSec'] >= _0x1d9adf['startSec'] &&
-      _0x1fec11['representativeTimeSec'] < _0x1d9adf['endSec'] &&
-      ((_0x1fec11['representativeTimeSec'] = _0xe5a85f[0x0]['startSec']),
-      delete _0x1fec11['frame'],
-      delete _0x1fec11['portrait']),
-    commitSourceEdit(_0x50b801, _0x48442d),
+    (args3['characterIds'] = present
+      ? [...args3['characterIds'], characterId]
+      : args3['characterIds']['filter']((value22) => value22 !== characterId)),
+    !present &&
+      enabled9['representativeTimeSec'] >= args3['startSec'] &&
+      enabled9['representativeTimeSec'] < args3['endSec'] &&
+      ((enabled9['representativeTimeSec'] = list[0x0]['startSec']),
+      delete enabled9['frame'],
+      delete enabled9['portrait']),
+    commitSourceEdit(value16, value17),
     !![]
   );
 }

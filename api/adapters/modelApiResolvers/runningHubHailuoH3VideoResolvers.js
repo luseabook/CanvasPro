@@ -6,77 +6,74 @@ const RUNNINGHUB_HAILUO_H3_ENDPOINTS = Object['freeze']({
     reference: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-h3/multimodal-to-video',
   }),
   RUNNINGHUB_HAILUO_H3_RATIOS = new Set(['adaptive', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16']);
-function normalizeHailuoH3Mode(_0x4f56cc) {
-  const _0x5c91d6 = String(_0x4f56cc || '')
+function normalizeHailuoH3Mode(value) {
+  const item = String(value || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x5c91d6 === 'reference' || _0x5c91d6 === 'multimodal' ? 'reference' : 'frames';
+  return item === 'reference' || item === 'multimodal' ? 'reference' : 'frames';
 }
-function getHailuoH3Mode(_0x1311d8 = {}, _0x4c77d6 = {}) {
+function getHailuoH3Mode(options = {}, key = {}) {
   return normalizeHailuoH3Mode(
-    _0x4c77d6['rh_hailuo_h3_mode'] ||
-      _0x1311d8?.['generationParams']?.['rh_hailuo_h3_mode'] ||
-      _0x1311d8?.['rh_hailuo_h3_mode'],
+    key['rh_hailuo_h3_mode'] ||
+      options?.['generationParams']?.['rh_hailuo_h3_mode'] ||
+      options?.['rh_hailuo_h3_mode'],
   );
 }
-function normalizeHailuoH3Duration(_0x6442d4) {
-  const _0x41f2ac = Math['trunc'](Number(_0x6442d4));
-  return Number['isFinite'](_0x41f2ac) && _0x41f2ac >= 0x5 && _0x41f2ac <= 0xf ? String(_0x41f2ac) : '5';
+function normalizeHailuoH3Duration(index) {
+  const count = Math['trunc'](Number(index));
+  return Number['isFinite'](count) && count >= 0x5 && count <= 0xf ? String(count) : '5';
 }
-function normalizeHailuoH3Ratio(_0x32346, { allowAdaptive: _0x2e254b }) {
-  const _0x165c25 = String(_0x32346 || '')['trim'](),
-    _0x62f96f =
-      _0x165c25 === '自适应' || _0x165c25['toLowerCase']() === 'auto'
-        ? 'adaptive'
-        : _0x165c25['toLowerCase']();
-  if (!RUNNINGHUB_HAILUO_H3_RATIOS['has'](_0x62f96f)) return '16:9';
-  return _0x62f96f === 'adaptive' && !_0x2e254b ? '16:9' : _0x62f96f;
+function normalizeHailuoH3Ratio(result, { allowAdaptive: allowAdaptive }) {
+  const data = String(result || '')['trim'](),
+    target = data === '自适应' || data['toLowerCase']() === 'auto' ? 'adaptive' : data['toLowerCase']();
+  if (!RUNNINGHUB_HAILUO_H3_RATIOS['has'](target)) return '16:9';
+  return target === 'adaptive' && !allowAdaptive ? '16:9' : target;
 }
 function collectImagesWithSlotPriority({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
   slotIds: slotIds = [],
 }) {
-  const _0x4fd77e = [],
-    _0x5cc78e = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    _0x2c5a5a = new Set(normalizeInputList(slotIds['map']((_0x45122d) => _0x5cc78e[_0x45122d])));
+  const images = [],
+    slotUrls = normalizeInputUrlsBySlot(finalUrlsBySlot),
+    map = new Set(normalizeInputList(slotIds['map']((source) => slotUrls[source])));
   return (
-    slotIds['forEach']((_0x5a8733) => appendUniqueUrl(_0x4fd77e, _0x5cc78e[_0x5a8733])),
-    normalizeInputList(inputImages)['forEach']((_0x14ef6b) => {
-      if (!_0x2c5a5a['has'](_0x14ef6b)) appendUniqueUrl(_0x4fd77e, _0x14ef6b);
+    slotIds['forEach']((next) => appendUniqueUrl(images, slotUrls[next])),
+    normalizeInputList(inputImages)['forEach']((current) => {
+      if (!map['has'](current)) appendUniqueUrl(images, current);
     }),
-    { images: _0x4fd77e, slotUrls: _0x5cc78e }
+    { images: images, slotUrls: slotUrls }
   );
 }
 function resolveHailuoH3FrameInputs({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const { images: _0x43cdbb, slotUrls: _0x3fb97c } = collectImagesWithSlotPriority({
+  const { images: images2, slotUrls: slotUrls2 } = collectImagesWithSlotPriority({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
       slotIds: ['firstFrame', 'lastFrame'],
     }),
-    _0x58a0a8 = new Set(normalizeInputList([_0x3fb97c['firstFrame'], _0x3fb97c['lastFrame']])),
-    _0x5d456c = normalizeInputList(inputImages)['filter']((_0x1a056d) => !_0x58a0a8['has'](_0x1a056d));
-  let _0x1a62dd = String(_0x3fb97c['firstFrame'] || '')['trim'](),
-    _0x25729f = String(_0x3fb97c['lastFrame'] || '')['trim']();
+    map2 = new Set(normalizeInputList([slotUrls2['firstFrame'], slotUrls2['lastFrame']])),
+    list = normalizeInputList(inputImages)['filter']((entry) => !map2['has'](entry));
+  let firstFrameUrl = String(slotUrls2['firstFrame'] || '')['trim'](),
+    lastFrameUrl = String(slotUrls2['lastFrame'] || '')['trim']();
   return (
-    !_0x1a62dd && _0x5d456c['length'] > 0x0 && (_0x1a62dd = _0x5d456c['shift']()),
-    !_0x25729f && _0x5d456c['length'] > 0x0 && (_0x25729f = _0x5d456c['shift']()),
-    { count: _0x43cdbb['length'], firstFrameUrl: _0x1a62dd, lastFrameUrl: _0x25729f }
+    !firstFrameUrl && list['length'] > 0x0 && (firstFrameUrl = list['shift']()),
+    !lastFrameUrl && list['length'] > 0x0 && (lastFrameUrl = list['shift']()),
+    { count: images2['length'], firstFrameUrl: firstFrameUrl, lastFrameUrl: lastFrameUrl }
   );
 }
-function removeHailuoH3TransientFields(_0x2203ce) {
-  (delete _0x2203ce['rh_hailuo_h3_mode'],
-    delete _0x2203ce['firstFrameUrl'],
-    delete _0x2203ce['lastFrameUrl'],
-    delete _0x2203ce['imageUrls'],
-    delete _0x2203ce['videoUrls'],
-    delete _0x2203ce['audioUrls']);
+function removeHailuoH3TransientFields(record) {
+  (delete record['rh_hailuo_h3_mode'],
+    delete record['firstFrameUrl'],
+    delete record['lastFrameUrl'],
+    delete record['imageUrls'],
+    delete record['videoUrls'],
+    delete record['audioUrls']);
 }
 export function runninghubHailuoH3Video({
-  currentBody: _0x552009,
+  currentBody: currentBody,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
@@ -84,71 +81,66 @@ export function runninghubHailuoH3Video({
   finalPrompt: finalPrompt = '',
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x331f12 = { ..._0x552009 },
-    _0x8dce34 = translateMinimaxH3EditorAssetMentions(
-      _0x331f12['prompt'] || finalPrompt || payload?.['prompt'] || '',
+  const handle = { ...currentBody },
+    translateMinimaxH3EditorAssetMentions2 = translateMinimaxH3EditorAssetMentions(
+      handle['prompt'] || finalPrompt || payload?.['prompt'] || '',
     )['trim']();
-  if (!_0x8dce34) throw new Error('RunningHub\x20MiniMax-H3\x20prompt\x20is\x20required');
-  const _0x4a567d = getHailuoH3Mode(payload, _0x331f12),
-    _0x38f83d = normalizeInputList(inputVideos),
-    _0x3d1531 = normalizeInputList(inputAudios);
-  ((_0x331f12['prompt'] = _0x8dce34),
-    (_0x331f12['resolution'] = '2K'),
-    (_0x331f12['duration'] = normalizeHailuoH3Duration(_0x331f12['duration'])),
-    removeHailuoH3TransientFields(_0x331f12));
-  if (_0x4a567d === 'reference') {
-    const { images: _0x3032ae } = collectImagesWithSlotPriority({
+  if (!translateMinimaxH3EditorAssetMentions2)
+    throw new Error('RunningHub\x20MiniMax-H3\x20prompt\x20is\x20required');
+  const hailuoH3Mode = getHailuoH3Mode(payload, handle),
+    list2 = normalizeInputList(inputVideos),
+    list3 = normalizeInputList(inputAudios);
+  ((handle['prompt'] = translateMinimaxH3EditorAssetMentions2),
+    (handle['resolution'] = '2K'),
+    (handle['duration'] = normalizeHailuoH3Duration(handle['duration'])),
+    removeHailuoH3TransientFields(handle));
+  if (hailuoH3Mode === 'reference') {
+    const { images: images3 } = collectImagesWithSlotPriority({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
       slotIds: ['referenceImage'],
     });
-    if (_0x3032ae['length'] === 0x0 && _0x38f83d['length'] === 0x0 && _0x3d1531['length'] === 0x0)
+    if (images3['length'] === 0x0 && list2['length'] === 0x0 && list3['length'] === 0x0)
       throw new Error('MiniMax-H3\x20多参考模式至少需要一张图片、一个视频或一段音频');
-    if (_0x3032ae['length'] > 0x9)
+    if (images3['length'] > 0x9)
       throw new Error('RunningHub MiniMax-H3 reference mode supports at most 9 image inputs');
-    if (_0x38f83d['length'] > 0x3)
+    if (list2['length'] > 0x3)
       throw new Error(
         'RunningHub\x20MiniMax-H3\x20reference\x20mode\x20supports\x20at\x20most\x203\x20video\x20inputs',
       );
-    if (_0x3d1531['length'] > 0x3)
+    if (list3['length'] > 0x3)
       throw new Error('RunningHub MiniMax-H3 reference mode supports at most 3 audio inputs');
-    if (_0x3032ae['length'] > 0x0) _0x331f12['imageUrls'] = _0x3032ae;
-    if (_0x38f83d['length'] > 0x0) _0x331f12['videoUrls'] = _0x38f83d;
-    if (_0x3d1531['length'] > 0x0) _0x331f12['audioUrls'] = _0x3d1531;
-    return (
-      (_0x331f12['ratio'] = normalizeHailuoH3Ratio(_0x331f12['ratio'], { allowAdaptive: !![] })),
-      _0x331f12
-    );
+    if (images3['length'] > 0x0) handle['imageUrls'] = images3;
+    if (list2['length'] > 0x0) handle['videoUrls'] = list2;
+    if (list3['length'] > 0x0) handle['audioUrls'] = list3;
+    return ((handle['ratio'] = normalizeHailuoH3Ratio(handle['ratio'], { allowAdaptive: !![] })), handle);
   }
-  if (_0x38f83d['length'] > 0x0 || _0x3d1531['length'] > 0x0)
+  if (list2['length'] > 0x0 || list3['length'] > 0x0)
     throw new Error(
       'RunningHub\x20MiniMax-H3\x20first-last-frame\x20mode\x20accepts\x20images\x20only;\x20use\x20reference\x20mode\x20for\x20video\x20or\x20audio\x20inputs',
     );
-  const _0x63679b = resolveHailuoH3FrameInputs({
+  const hailuoH3FrameInputs = resolveHailuoH3FrameInputs({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x63679b['count'] > 0x2)
+  if (hailuoH3FrameInputs['count'] > 0x2)
     throw new Error(
       'RunningHub\x20MiniMax-H3\x20first-last-frame\x20mode\x20supports\x20at\x20most\x202\x20image\x20inputs',
     );
-  if (_0x63679b['count'] === 0x0)
-    return (
-      (_0x331f12['ratio'] = normalizeHailuoH3Ratio(_0x331f12['ratio'], { allowAdaptive: ![] })),
-      _0x331f12
-    );
+  if (hailuoH3FrameInputs['count'] === 0x0)
+    return ((handle['ratio'] = normalizeHailuoH3Ratio(handle['ratio'], { allowAdaptive: ![] })), handle);
   return (
-    _0x63679b['firstFrameUrl'] && (_0x331f12['firstFrameUrl'] = _0x63679b['firstFrameUrl']),
-    _0x63679b['lastFrameUrl'] && (_0x331f12['lastFrameUrl'] = _0x63679b['lastFrameUrl']),
-    delete _0x331f12['ratio'],
-    _0x331f12
+    hailuoH3FrameInputs['firstFrameUrl'] && (handle['firstFrameUrl'] = hailuoH3FrameInputs['firstFrameUrl']),
+    hailuoH3FrameInputs['lastFrameUrl'] && (handle['lastFrameUrl'] = hailuoH3FrameInputs['lastFrameUrl']),
+    delete handle['ratio'],
+    handle
   );
 }
-export function runninghubHailuoH3VideoEndpoint(_0x392b6f = {}) {
-  const _0x28fba4 = getHailuoH3Mode(_0x392b6f['payload'], _0x392b6f['currentBody']);
-  if (_0x28fba4 === 'reference') return RUNNINGHUB_HAILUO_H3_ENDPOINTS['reference'];
-  const _0x237274 = resolveHailuoH3FrameInputs(_0x392b6f);
-  return _0x237274['count'] > 0x0
+export function runninghubHailuoH3VideoEndpoint(options2 = {}) {
+  const hailuoH3Mode2 = getHailuoH3Mode(options2['payload'], options2['currentBody']);
+  if (hailuoH3Mode2 === 'reference') return RUNNINGHUB_HAILUO_H3_ENDPOINTS['reference'];
+  const hailuoH3FrameInputs2 = resolveHailuoH3FrameInputs(options2);
+  return hailuoH3FrameInputs2['count'] > 0x0
     ? RUNNINGHUB_HAILUO_H3_ENDPOINTS['image']
     : RUNNINGHUB_HAILUO_H3_ENDPOINTS['text'];
 }

@@ -2,193 +2,173 @@ import { ApiError, ErrorType } from '../ApiError.js';
 const PROVIDER = 'comfyui',
   MAX_NODE_ERRORS = 0x4,
   MAX_ERROR_TEXT = 0x208;
-function isPlainObject(_0xb6eb09) {
-  return !!_0xb6eb09 && typeof _0xb6eb09 === 'object' && !Array['isArray'](_0xb6eb09);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array['isArray'](enabled);
 }
-function normalizeText(_0x183c3f) {
-  if (_0x183c3f === undefined || _0x183c3f === null) return '';
-  if (typeof _0x183c3f === 'string') return _0x183c3f['trim']();
-  if (typeof _0x183c3f === 'number' || typeof _0x183c3f === 'boolean') return String(_0x183c3f);
-  if (isPlainObject(_0x183c3f)) {
-    const _0x5e8d04 =
-      _0x183c3f['message'] ||
-      _0x183c3f['details'] ||
-      _0x183c3f['detail'] ||
-      _0x183c3f['errorMessage'] ||
-      _0x183c3f['error_message'] ||
-      _0x183c3f['reason'] ||
-      _0x183c3f['type'];
-    if (_0x5e8d04 !== undefined && _0x5e8d04 !== null && _0x5e8d04 !== _0x183c3f) {
-      const _0x342feb = normalizeText(_0x5e8d04);
-      if (_0x342feb) return _0x342feb;
+function normalizeText(error) {
+  if (error === undefined || error === null) return '';
+  if (typeof error === 'string') return error['trim']();
+  if (typeof error === 'number' || typeof error === 'boolean') return String(error);
+  if (isPlainObject(error)) {
+    const value =
+      error['message'] ||
+      error['details'] ||
+      error['detail'] ||
+      error['errorMessage'] ||
+      error['error_message'] ||
+      error['reason'] ||
+      error['type'];
+    if (value !== undefined && value !== null && value !== error) {
+      const text = normalizeText(value);
+      if (text) return text;
     }
     try {
-      return JSON['stringify'](_0x183c3f);
+      return JSON['stringify'](error);
     } catch {
       return '';
     }
   }
-  return String(_0x183c3f || '')['trim']();
+  return String(error || '')['trim']();
 }
-function firstText(..._0x4c379b) {
-  for (const _0x588c17 of _0x4c379b) {
-    const _0x565eb9 = normalizeText(_0x588c17);
-    if (_0x565eb9) return _0x565eb9;
+function firstText(...args) {
+  for (const item of args) {
+    const text2 = normalizeText(item);
+    if (text2) return text2;
   }
   return '';
 }
-function truncateText(_0x4e88db, _0x4f0839 = MAX_ERROR_TEXT) {
-  const _0x11b0a9 = String(_0x4e88db || '')
+function truncateText(key, index = MAX_ERROR_TEXT) {
+  const list = String(key || '')
     ['replace'](/\s+/g, '\x20')
     ['trim']();
-  if (_0x11b0a9['length'] <= _0x4f0839) return _0x11b0a9;
-  return _0x11b0a9['slice'](0x0, Math['max'](0x0, _0x4f0839 - 0x1))['trim']() + '...';
+  if (list['length'] <= index) return list;
+  return list['slice'](0x0, Math['max'](0x0, index - 0x1))['trim']() + '...';
 }
-function simplifyComfyUiDetail(_0x4ef24d) {
-  const _0x229cf7 = truncateText(_0x4ef24d);
-  return _0x229cf7['replace'](/\s+not in\s+\[[\s\S]*$/i, ' not in current ComfyUI list');
+function simplifyComfyUiDetail(result) {
+  const truncateText2 = truncateText(result);
+  return truncateText2['replace'](/\s+not in\s+\[[\s\S]*$/i, ' not in current ComfyUI list');
 }
-function getNodeErrors(_0x1f6ab0) {
-  if (isPlainObject(_0x1f6ab0?.['node_errors']) && Object['keys'](_0x1f6ab0['node_errors'])['length'] > 0x0)
-    return _0x1f6ab0['node_errors'];
-  if (isPlainObject(_0x1f6ab0?.['nodeErrors']) && Object['keys'](_0x1f6ab0['nodeErrors'])['length'] > 0x0)
-    return _0x1f6ab0['nodeErrors'];
+function getNodeErrors(data) {
+  if (isPlainObject(data?.['node_errors']) && Object['keys'](data['node_errors'])['length'] > 0x0)
+    return data['node_errors'];
+  if (isPlainObject(data?.['nodeErrors']) && Object['keys'](data['nodeErrors'])['length'] > 0x0)
+    return data['nodeErrors'];
   if (
-    isPlainObject(_0x1f6ab0?.['error']?.['node_errors']) &&
-    Object['keys'](_0x1f6ab0['error']['node_errors'])['length'] > 0x0
+    isPlainObject(data?.['error']?.['node_errors']) &&
+    Object['keys'](data['error']['node_errors'])['length'] > 0x0
   )
-    return _0x1f6ab0['error']['node_errors'];
+    return data['error']['node_errors'];
   if (
-    isPlainObject(_0x1f6ab0?.['error']?.['nodeErrors']) &&
-    Object['keys'](_0x1f6ab0['error']['nodeErrors'])['length'] > 0x0
+    isPlainObject(data?.['error']?.['nodeErrors']) &&
+    Object['keys'](data['error']['nodeErrors'])['length'] > 0x0
   )
-    return _0x1f6ab0['error']['nodeErrors'];
+    return data['error']['nodeErrors'];
   return null;
 }
-function formatNodeError(_0x41c520, _0x149d09) {
-  const _0x52ae84 = isPlainObject(_0x149d09) ? _0x149d09 : {},
-    _0x307b59 = firstText(
-      _0x52ae84['class_type'],
-      _0x52ae84['classType'],
-      _0x52ae84['type'],
-      _0x52ae84['title'],
-      _0x52ae84['name'],
+function formatNodeError(options, target) {
+  const error2 = isPlainObject(target) ? target : {},
+    text3 = firstText(
+      error2['class_type'],
+      error2['classType'],
+      error2['type'],
+      error2['title'],
+      error2['name'],
     ),
-    _0x13029b = [_0x307b59 || 'node', _0x41c520]['filter'](Boolean)['join']('\x20'),
-    _0x23469f = Array['isArray'](_0x52ae84['errors']) ? _0x52ae84['errors'] : [],
-    _0x23243a = _0x23469f['slice'](0x0, 0x2)
-      ['map']((_0x4927a4) => {
-        const _0x204075 = firstText(
-          _0x4927a4?.['extra_info']?.['input_name'],
-          _0x4927a4?.['extraInfo']?.['inputName'],
-          _0x4927a4?.['input_name'],
-          _0x4927a4?.['inputName'],
+    source = [text3 || 'node', options]['filter'](Boolean)['join']('\x20'),
+    list2 = Array['isArray'](error2['errors']) ? error2['errors'] : [],
+    list3 = list2['slice'](0x0, 0x2)
+      ['map']((error3) => {
+        const text4 = firstText(
+          error3?.['extra_info']?.['input_name'],
+          error3?.['extraInfo']?.['inputName'],
+          error3?.['input_name'],
+          error3?.['inputName'],
         );
-        let _0x1d1507 = simplifyComfyUiDetail(
-          firstText(
-            _0x4927a4?.['details'],
-            _0x4927a4?.['detail'],
-            _0x4927a4?.['message'],
-            _0x4927a4?.['type'],
-          ),
+        let list4 = simplifyComfyUiDetail(
+          firstText(error3?.['details'], error3?.['detail'], error3?.['message'], error3?.['type']),
         );
-        return (
-          _0x204075 &&
-            _0x1d1507 &&
-            !_0x1d1507['includes'](_0x204075) &&
-            (_0x1d1507 = _0x204075 + ':\x20' + _0x1d1507),
-          _0x1d1507
-        );
+        return (text4 && list4 && !list4['includes'](text4) && (list4 = text4 + ':\x20' + list4), list4);
       })
       ['filter'](Boolean),
-    _0x4e535f = simplifyComfyUiDetail(
-      firstText(
-        _0x52ae84['message'],
-        _0x52ae84['error'],
-        _0x52ae84['details'],
-        _0x52ae84['detail'],
-        _0x52ae84,
-      ),
+    simplifyComfyUiDetail2 = simplifyComfyUiDetail(
+      firstText(error2['message'], error2['error'], error2['details'], error2['detail'], error2),
     ),
-    _0x5a604a = _0x23243a['length'] ? _0x23243a['join']('；') : _0x4e535f;
-  return _0x5a604a ? _0x13029b + ':\x20' + _0x5a604a : '';
+    next = list3['length'] ? list3['join']('；') : simplifyComfyUiDetail2;
+  return next ? source + ':\x20' + next : '';
 }
-function formatNodeErrors(_0x2ffe5b) {
-  const _0x4474da = getNodeErrors(_0x2ffe5b);
-  if (!_0x4474da) return '';
-  const _0x4d0625 = Object['entries'](_0x4474da)
+function formatNodeErrors(current) {
+  const nodeErrors = getNodeErrors(current);
+  if (!nodeErrors) return '';
+  const list5 = Object['entries'](nodeErrors)
       ['slice'](0x0, MAX_NODE_ERRORS)
-      ['map'](([_0x1ba92a, _0x5803a3]) => formatNodeError(_0x1ba92a, _0x5803a3))
+      ['map'](([entry, record]) => formatNodeError(entry, record))
       ['filter'](Boolean),
-    _0x558f70 = Math['max'](0x0, Object['keys'](_0x4474da)['length'] - _0x4d0625['length']);
-  return (
-    _0x558f70 > 0x0 && _0x4d0625['push']('另有 ' + _0x558f70 + '\x20个节点错误'),
-    _0x4d0625['join']('；')
-  );
+    count = Math['max'](0x0, Object['keys'](nodeErrors)['length'] - list5['length']);
+  return (count > 0x0 && list5['push']('另有 ' + count + '\x20个节点错误'), list5['join']('；'));
 }
-function hasComfyUiErrorShape(_0x3b8d65) {
-  if (!_0x3b8d65 || typeof _0x3b8d65 !== 'object') return ![];
+function hasComfyUiErrorShape(error4) {
+  if (!error4 || typeof error4 !== 'object') return ![];
   return Boolean(
-    _0x3b8d65['error'] ||
-    _0x3b8d65['message'] ||
-    _0x3b8d65['errorMessage'] ||
-    _0x3b8d65['error_message'] ||
-    getNodeErrors(_0x3b8d65),
+    error4['error'] ||
+    error4['message'] ||
+    error4['errorMessage'] ||
+    error4['error_message'] ||
+    getNodeErrors(error4),
   );
 }
-function resolveErrorType(_0xed1363, _0x2b8995, _0x209636) {
-  const _0x2024e6 = String(_0xed1363?.['error']?.['type'] || _0xed1363?.['type'] || '')['toLowerCase'](),
-    _0x25f156 = String(_0x209636 || '')['toLowerCase']();
+function resolveErrorType(payload, count2, handle) {
+  const list6 = String(payload?.['error']?.['type'] || payload?.['type'] || '')['toLowerCase'](),
+    list7 = String(handle || '')['toLowerCase']();
   if (
-    _0x2b8995 === 0x190 ||
-    _0x2024e6['includes']('validation') ||
-    _0x2024e6['includes']('invalid') ||
-    _0x25f156['includes']('failed validation') ||
-    _0x25f156['includes']('value not in list') ||
-    _0x25f156['includes']('not in current comfyui list')
+    count2 === 0x190 ||
+    list6['includes']('validation') ||
+    list6['includes']('invalid') ||
+    list7['includes']('failed validation') ||
+    list7['includes']('value not in list') ||
+    list7['includes']('not in current comfyui list')
   )
     return ErrorType['INVALID_PARAMS'];
-  if (_0x2b8995 >= 0x1f4) return ErrorType['SERVER_ERROR'];
+  if (count2 >= 0x1f4) return ErrorType['SERVER_ERROR'];
   return ErrorType['TASK_FAILED'];
 }
-function buildComfyUiErrorMessage(_0x104159, _0x19d426 = 'ComfyUI 工作流执行失败') {
-  const _0x227822 = firstText(
-      _0x104159?.['error']?.['message'],
-      _0x104159?.['message'],
-      _0x104159?.['errorMessage'],
-      _0x104159?.['error_message'],
-      _0x104159?.['error']?.['type'],
+function buildComfyUiErrorMessage(error5, state = 'ComfyUI 工作流执行失败') {
+  const text5 = firstText(
+      error5?.['error']?.['message'],
+      error5?.['message'],
+      error5?.['errorMessage'],
+      error5?.['error_message'],
+      error5?.['error']?.['type'],
     ),
-    _0x7aac04 = firstText(_0x104159?.['error']?.['details'], _0x104159?.['details'], _0x104159?.['detail']),
-    _0xd94e3e = formatNodeErrors(_0x104159),
-    _0x399ecb = [];
-  if (_0x227822) _0x399ecb['push'](truncateText(_0x227822));
-  if (_0x7aac04 && _0x7aac04 !== _0x227822) _0x399ecb['push'](simplifyComfyUiDetail(_0x7aac04));
-  if (_0xd94e3e) _0x399ecb['push'](_0xd94e3e);
-  const _0x3815c2 = _0x399ecb['join']('；') || normalizeText(_0x104159) || _0x19d426;
-  return _0x3815c2['startsWith']('ComfyUI') ? _0x3815c2 : 'ComfyUI 工作流报错：' + _0x3815c2;
+    text6 = firstText(error5?.['error']?.['details'], error5?.['details'], error5?.['detail']),
+    formatNodeErrors2 = formatNodeErrors(error5),
+    list8 = [];
+  if (text5) list8['push'](truncateText(text5));
+  if (text6 && text6 !== text5) list8['push'](simplifyComfyUiDetail(text6));
+  if (formatNodeErrors2) list8['push'](formatNodeErrors2);
+  const config = list8['join']('；') || normalizeText(error5) || state;
+  return config['startsWith']('ComfyUI') ? config : 'ComfyUI 工作流报错：' + config;
 }
-export function parseError(_0x26dd44, _0x49ff79 = 0x0) {
-  if (!hasComfyUiErrorShape(_0x26dd44) && Number(_0x49ff79) < 0x190) return null;
-  const _0x445f2b = buildComfyUiErrorMessage(_0x26dd44, 'ComfyUI 请求失败');
+export function parseError(raw, status = 0x0) {
+  if (!hasComfyUiErrorShape(raw) && Number(status) < 0x190) return null;
+  const message = buildComfyUiErrorMessage(raw, 'ComfyUI 请求失败');
   return new ApiError({
-    type: resolveErrorType(_0x26dd44, Number(_0x49ff79) || 0x0, _0x445f2b),
+    type: resolveErrorType(raw, Number(status) || 0x0, message),
     provider: PROVIDER,
-    status: _0x49ff79,
-    message: _0x445f2b,
-    raw: _0x26dd44,
-    retryable: Number(_0x49ff79) >= 0x1f4,
+    status: status,
+    message: message,
+    raw: raw,
+    retryable: Number(status) >= 0x1f4,
   });
 }
-export function parseTaskError(_0x565c38) {
-  if (!hasComfyUiErrorShape(_0x565c38)) return null;
-  const _0x20aa78 = String(_0x565c38?.['status'] || _0x565c38?.['state'] || '')['toLowerCase']();
-  if (_0x20aa78 && !['failed', 'fail', 'error', 'cancelled', 'canceled']['includes'](_0x20aa78)) return null;
+export function parseTaskError(raw2) {
+  if (!hasComfyUiErrorShape(raw2)) return null;
+  const scope = String(raw2?.['status'] || raw2?.['state'] || '')['toLowerCase']();
+  if (scope && !['failed', 'fail', 'error', 'cancelled', 'canceled']['includes'](scope)) return null;
   return new ApiError({
     type: ErrorType['TASK_FAILED'],
     provider: PROVIDER,
-    message: buildComfyUiErrorMessage(_0x565c38),
-    raw: _0x565c38,
+    message: buildComfyUiErrorMessage(raw2),
+    raw: raw2,
     retryable: ![],
   });
 }

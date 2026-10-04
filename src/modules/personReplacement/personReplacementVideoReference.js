@@ -6,163 +6,169 @@ import {
   resolvePersonReplacementImageResultRef,
   resolvePersonReplacementVideoImageInput,
 } from './personReplacementProject.js';
-function normalizeText(_0x278a53) {
-  return String(_0x278a53 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function getShot(_0x7ccf3c, _0x5f5123) {
-  const _0x24f186 = normalizeText(_0x5f5123);
+function getShot(item, key) {
+  const text = normalizeText(key);
   return (
-    (Array['isArray'](_0x7ccf3c?.['shots']) ? _0x7ccf3c['shots'] : [])['find'](
-      (_0x2706f3) => normalizeText(_0x2706f3?.['id']) === _0x24f186,
+    (Array['isArray'](item?.['shots']) ? item['shots'] : [])['find'](
+      (index) => normalizeText(index?.['id']) === text,
     ) || null
   );
 }
-function updateSourceImageResult(_0x42124b, _0x5c4dee, _0x4be8a4) {
-  const _0x5c9694 = _0x5c4dee[_0x4be8a4],
-    _0x3d01b2 = resolvePersonReplacementImageResultRef(_0x5c9694);
-  if (!_0x42124b || !_0x3d01b2) return null;
-  const _0xf30d8a = Object['prototype']['hasOwnProperty']['call'](_0x5c9694, 'userPrompt');
+function updateSourceImageResult(args, results, activeIndex) {
+  const result = results[activeIndex],
+    replacementImageRef = resolvePersonReplacementImageResultRef(result);
+  if (!args || !replacementImageRef) return null;
+  const data = Object['prototype']['hasOwnProperty']['call'](result, 'userPrompt');
   return {
-    ..._0x42124b,
+    ...args,
     replacementImage: {
-      ...(_0x42124b['replacementImage'] || {}),
-      results: _0x5c4dee,
-      activeIndex: _0x4be8a4,
+      ...(args['replacementImage'] || {}),
+      results: results,
+      activeIndex: activeIndex,
     },
-    replacementImageRef: _0x3d01b2,
-    ...(_0xf30d8a ? { imagePrompt: normalizeText(_0x5c9694?.['userPrompt']) } : {}),
+    replacementImageRef: replacementImageRef,
+    ...(data ? { imagePrompt: normalizeText(result?.['userPrompt']) } : {}),
   };
 }
 export function selectPersonReplacementVideoReference(
-  _0x3b8b08 = {},
+  project = {},
   {
-    targetShotId: _0x77ad80,
-    sourceShotId: _0x10babf,
-    resultIndex: _0x1d02ec,
-    referencePersonId: _0x2aa6b5,
+    targetShotId: targetShotId,
+    sourceShotId: sourceShotId,
+    resultIndex: resultIndex,
+    referencePersonId: referencePersonId,
     referenceKind: referenceKind = PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE,
   } = {},
 ) {
-  const _0x46591e = normalizeText(_0x77ad80),
-    _0x5e5c67 = normalizeText(_0x10babf),
-    _0xde36a9 = getShot(_0x3b8b08, _0x46591e);
-  if (!_0xde36a9) return { changed: ![], project: _0x3b8b08 };
+  const text2 = normalizeText(targetShotId),
+    sourceShotId2 = normalizeText(sourceShotId),
+    shot = getShot(project, text2);
+  if (!shot) return { changed: ![], project: project };
   if (referenceKind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE) {
-    const _0x343395 =
-        resolvePersonReplacementVideoImageInput(_0x3b8b08, _0xde36a9, 'character-reference')[
-          'referenceOptions'
-        ]?.['filter'](
-          (_0x1b0a8c) => _0x1b0a8c?.['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
-        ) || [],
-      _0x43d55b = normalizeText(_0x2aa6b5),
-      _0xc3dcd6 =
-        _0x343395['find'](
-          (_0x3a2a12) => normalizeText(_0x3a2a12?.['reference']?.['personId']) === _0x43d55b,
-        ) || (!_0x43d55b ? _0x343395[0x0] : null),
-      _0x19bc88 = normalizeText(_0xc3dcd6?.['reference']?.['personId']);
-    if (!_0xc3dcd6 || !_0x19bc88) return { changed: ![], project: _0x3b8b08 };
+    const list =
+        resolvePersonReplacementVideoImageInput(project, shot, 'character-reference')['referenceOptions']?.[
+          'filter'
+        ]((options) => options?.['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE) || [],
+      text3 = normalizeText(referencePersonId),
+      enabled =
+        list['find']((target) => normalizeText(target?.['reference']?.['personId']) === text3) ||
+        (!text3 ? list[0x0] : null),
+      replacementVideoReferencePersonId = normalizeText(enabled?.['reference']?.['personId']);
+    if (!enabled || !replacementVideoReferencePersonId) return { changed: ![], project: project };
     if (
-      _0xde36a9['replacementVideoReferenceKind'] ===
-        PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
-      normalizeText(_0xde36a9['replacementVideoReferencePersonId']) === _0x19bc88
+      shot['replacementVideoReferenceKind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
+      normalizeText(shot['replacementVideoReferencePersonId']) === replacementVideoReferencePersonId
     )
-      return { changed: ![], project: _0x3b8b08 };
+      return { changed: ![], project: project };
     return {
       changed: !![],
       project: {
-        ..._0x3b8b08,
-        shots: _0x3b8b08['shots']['map']((_0x465d69) =>
-          normalizeText(_0x465d69?.['id']) === _0x46591e
+        ...project,
+        shots: project['shots']['map']((args2) =>
+          normalizeText(args2?.['id']) === text2
             ? {
-                ..._0x465d69,
+                ...args2,
                 replacementVideoReferenceKind: PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
-                replacementVideoReferencePersonId: _0x19bc88,
+                replacementVideoReferencePersonId: replacementVideoReferencePersonId,
               }
-            : _0x465d69,
+            : args2,
         ),
       },
     };
   }
-  const _0xdede4c = getShot(_0x3b8b08, _0x5e5c67),
-    _0x11df38 = getPersonReplacementImageResults(_0xdede4c),
-    _0x31f59c = Math['trunc'](Number(_0x1d02ec));
-  if (!_0xdede4c || !Number['isInteger'](_0x31f59c) || _0x31f59c < 0x0 || _0x31f59c >= _0x11df38['length'])
-    return { changed: ![], project: _0x3b8b08 };
-  const _0x12885a = updateSourceImageResult(_0xdede4c, _0x11df38, _0x31f59c),
-    _0x475008 = normalizeText(_0x12885a?.['replacementImageRef']);
-  if (!_0x12885a || !_0x475008) return { changed: ![], project: _0x3b8b08 };
-  const _0x16ffd0 =
-    _0xde36a9['replacementVideoReferenceKind'] ===
-      PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE &&
-    normalizeText(_0xde36a9['replacementVideoReferenceSourceShotId']) === _0x5e5c67 &&
-    normalizeText(_0xde36a9['replacementVideoReferenceImageRef']) === _0x475008 &&
-    getPersonReplacementActiveImageResultIndex(_0xdede4c, _0x11df38) === _0x31f59c;
-  if (_0x16ffd0) return { changed: ![], project: _0x3b8b08 };
+  const shot2 = getShot(project, sourceShotId2),
+    list2 = getPersonReplacementImageResults(shot2),
+    resultIndex2 = Math['trunc'](Number(resultIndex));
+  if (!shot2 || !Number['isInteger'](resultIndex2) || resultIndex2 < 0x0 || resultIndex2 >= list2['length'])
+    return { changed: ![], project: project };
+  const updateSourceImageResult2 = updateSourceImageResult(shot2, list2, resultIndex2),
+    imageRef = normalizeText(updateSourceImageResult2?.['replacementImageRef']);
+  if (!updateSourceImageResult2 || !imageRef) return { changed: ![], project: project };
+  const source =
+    shot['replacementVideoReferenceKind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE &&
+    normalizeText(shot['replacementVideoReferenceSourceShotId']) === sourceShotId2 &&
+    normalizeText(shot['replacementVideoReferenceImageRef']) === imageRef &&
+    getPersonReplacementActiveImageResultIndex(shot2, list2) === resultIndex2;
+  if (source) return { changed: ![], project: project };
   return {
     changed: !![],
-    sourceShotId: _0x5e5c67,
-    resultIndex: _0x31f59c,
-    imageRef: _0x475008,
+    sourceShotId: sourceShotId2,
+    resultIndex: resultIndex2,
+    imageRef: imageRef,
     project: {
-      ..._0x3b8b08,
-      shots: _0x3b8b08['shots']['map']((_0x32bce4) => {
-        const _0x3b1ef1 = normalizeText(_0x32bce4?.['id']);
-        let _0x5d4cf5 = _0x3b1ef1 === _0x5e5c67 ? _0x12885a : _0x32bce4;
-        if (_0x3b1ef1 === _0x46591e) {
-          const { replacementVideoReferencePersonId: _0x164ab0, ..._0x56e543 } = _0x5d4cf5;
-          _0x5d4cf5 = {
-            ..._0x56e543,
+      ...project,
+      shots: project['shots']['map']((next) => {
+        const text4 = normalizeText(next?.['id']);
+        let current = text4 === sourceShotId2 ? updateSourceImageResult2 : next;
+        if (text4 === text2) {
+          const { replacementVideoReferencePersonId: replacementVideoReferencePersonId2, ...args3 } = current;
+          current = {
+            ...args3,
             replacementVideoReferenceKind: PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE,
-            replacementVideoReferenceSourceShotId: _0x5e5c67,
-            replacementVideoReferenceImageRef: _0x475008,
+            replacementVideoReferenceSourceShotId: sourceShotId2,
+            replacementVideoReferenceImageRef: imageRef,
           };
         }
-        return _0x5d4cf5;
+        return current;
       }),
     },
   };
 }
 export function switchPersonReplacementVideoReferenceResult(
-  _0x2697f0 = {},
-  { targetShotId: _0x582ad2, sourceShotId: _0x18c3aa, currentResultIndex: _0x33f891, delta: _0x1322bb } = {},
+  project2 = {},
+  {
+    targetShotId: targetShotId2,
+    sourceShotId: sourceShotId3,
+    currentResultIndex: currentResultIndex,
+    delta: delta,
+  } = {},
 ) {
-  const _0x2f53bf = normalizeText(_0x582ad2),
-    _0x3bb60f = normalizeText(_0x18c3aa),
-    _0x378bd1 = getShot(_0x2697f0, _0x2f53bf),
-    _0x4ce06d = getShot(_0x2697f0, _0x3bb60f),
-    _0x33d6d8 = getPersonReplacementImageResults(_0x4ce06d);
-  if (!_0x378bd1 || !_0x4ce06d || _0x33d6d8['length'] < 0x2) return { changed: ![], project: _0x2697f0 };
-  const _0x4b0b20 = Math['trunc'](Number(_0x33f891)),
-    _0x49b8ca =
-      Number['isInteger'](_0x4b0b20) && _0x4b0b20 >= 0x0 && _0x4b0b20 < _0x33d6d8['length']
-        ? _0x4b0b20
-        : getPersonReplacementActiveImageResultIndex(_0x4ce06d, _0x33d6d8),
-    _0x4d6609 = Math['sign'](Number(_0x1322bb) || 0x0);
-  if (!_0x4d6609) return { changed: ![], project: _0x2697f0 };
-  const _0xec5dff = (_0x49b8ca + _0x4d6609 + _0x33d6d8['length']) % _0x33d6d8['length'],
-    _0x434a65 = resolvePersonReplacementVideoImageInput(_0x2697f0, _0x378bd1, 'first-frame'),
-    _0x198f83 = _0x434a65['referenceOptions']?.[_0x434a65['activeReferenceIndex']],
-    _0x2dc4b0 =
-      _0x378bd1['replacementVideoReferenceKind'] !==
-        PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
-      normalizeText(_0x198f83?.['sourceShotId']) === _0x3bb60f;
-  if (_0x2dc4b0)
-    return selectPersonReplacementVideoReference(_0x2697f0, {
-      targetShotId: _0x2f53bf,
-      sourceShotId: _0x3bb60f,
-      resultIndex: _0xec5dff,
+  const targetShotId3 = normalizeText(targetShotId2),
+    sourceShotId4 = normalizeText(sourceShotId3),
+    shot3 = getShot(project2, targetShotId3),
+    shot4 = getShot(project2, sourceShotId4),
+    list3 = getPersonReplacementImageResults(shot4);
+  if (!shot3 || !shot4 || list3['length'] < 0x2) return { changed: ![], project: project2 };
+  const count = Math['trunc'](Number(currentResultIndex)),
+    entry =
+      Number['isInteger'](count) && count >= 0x0 && count < list3['length']
+        ? count
+        : getPersonReplacementActiveImageResultIndex(shot4, list3),
+    enabled2 = Math['sign'](Number(delta) || 0x0);
+  if (!enabled2) return { changed: ![], project: project2 };
+  const resultIndex3 = (entry + enabled2 + list3['length']) % list3['length'],
+    personReplacementVideoImageInput = resolvePersonReplacementVideoImageInput(
+      project2,
+      shot3,
+      'first-frame',
+    ),
+    record =
+      personReplacementVideoImageInput['referenceOptions']?.[
+        personReplacementVideoImageInput['activeReferenceIndex']
+      ],
+    payload =
+      shot3['replacementVideoReferenceKind'] !== PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
+      normalizeText(record?.['sourceShotId']) === sourceShotId4;
+  if (payload)
+    return selectPersonReplacementVideoReference(project2, {
+      targetShotId: targetShotId3,
+      sourceShotId: sourceShotId4,
+      resultIndex: resultIndex3,
     });
-  const _0x1b1342 = updateSourceImageResult(_0x4ce06d, _0x33d6d8, _0xec5dff);
-  if (!_0x1b1342) return { changed: ![], project: _0x2697f0 };
+  const imageRef2 = updateSourceImageResult(shot4, list3, resultIndex3);
+  if (!imageRef2) return { changed: ![], project: project2 };
   return {
     changed: !![],
-    sourceShotId: _0x3bb60f,
-    resultIndex: _0xec5dff,
-    imageRef: _0x1b1342['replacementImageRef'],
+    sourceShotId: sourceShotId4,
+    resultIndex: resultIndex3,
+    imageRef: imageRef2['replacementImageRef'],
     project: {
-      ..._0x2697f0,
-      shots: _0x2697f0['shots']['map']((_0x3139b5) =>
-        normalizeText(_0x3139b5?.['id']) === _0x3bb60f ? _0x1b1342 : _0x3139b5,
+      ...project2,
+      shots: project2['shots']['map']((handle) =>
+        normalizeText(handle?.['id']) === sourceShotId4 ? imageRef2 : handle,
       ),
     },
   };

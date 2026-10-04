@@ -115,8 +115,8 @@ const VOLCENGINE_IMAGE_RESPONSE_MAPPING = Object.freeze({
       omitWhenEmpty: true,
     }),
   ]);
-function createImageMenuExtension(_0x1168fb) {
-  return Object.freeze({ imageMenu: Object.freeze(_0x1168fb) });
+function createImageMenuExtension(value) {
+  return Object.freeze({ imageMenu: Object.freeze(value) });
 }
 export const volcengineImageModelApiModelManifests = Object.freeze([
   createImageModelApiManifest({

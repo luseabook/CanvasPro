@@ -1,65 +1,65 @@
-function freezeField(_0x12b83d) {
-  return Object['freeze'](_0x12b83d);
+function freezeField(value) {
+  return Object['freeze'](value);
 }
 export function createAudioModelApiManifest({
-  modelId: _0x3eef2a,
-  executionId: _0x4f82a3,
-  provider: _0x4a3834,
-  displayName: _0xb47046,
-  aliases: _0x1f483e,
-  icon: _0x4d3d82,
-  description: _0x3405af,
-  fields: _0x3338c6,
-  extensions: _0x40351c,
-  inputSlots: _0x4771c4,
-  help: _0x2d7baa,
-  prompt: _0x2b8415,
+  modelId: modelId,
+  executionId: executionId,
+  provider: provider,
+  displayName: displayName,
+  aliases: aliases,
+  icon: icon,
+  description: description,
+  fields: fields,
+  extensions: extensions,
+  inputSlots: inputSlots,
+  help: help,
+  prompt: prompt,
   vip: vip = ![],
   async: async = ![],
   cancellable: cancellable = ![],
   modelType: modelType = '',
 }) {
-  const _0x35ae3f = {};
-  _0x40351c && Object['assign'](_0x35ae3f, _0x40351c);
-  modelType && (_0x35ae3f['modelType'] = String(modelType));
-  const _0xde9a8b = Object['keys'](_0x35ae3f)['length'] > 0x0;
+  const item = {};
+  extensions && Object['assign'](item, extensions);
+  modelType && (item['modelType'] = String(modelType));
+  const key = Object['keys'](item)['length'] > 0x0;
   return Object['freeze']({
     schemaVersion: '1.0',
-    modelId: _0x3eef2a,
-    provider: _0x4a3834,
+    modelId: modelId,
+    provider: provider,
     kind: 'audio',
     adapterType: 'modelApi',
-    executionId: _0x4f82a3,
-    displayName: _0xb47046,
-    ...(_0x1f483e ? { aliases: Object['freeze']([...(_0x1f483e || [])]) } : {}),
-    icon: _0x4d3d82 || 'images/volcengine.svg',
-    description: _0x3405af,
-    ...(_0x2d7baa ? { help: Object['freeze'](_0x2d7baa) } : {}),
-    ...(_0x2b8415 ? { prompt: Object['freeze'](_0x2b8415) } : {}),
-    ...(_0xde9a8b ? { extensions: Object['freeze'](_0x35ae3f) } : {}),
+    executionId: executionId,
+    displayName: displayName,
+    ...(aliases ? { aliases: Object['freeze']([...(aliases || [])]) } : {}),
+    icon: icon || 'images/volcengine.svg',
+    description: description,
+    ...(help ? { help: Object['freeze'](help) } : {}),
+    ...(prompt ? { prompt: Object['freeze'](prompt) } : {}),
+    ...(key ? { extensions: Object['freeze'](item) } : {}),
     vip: vip,
     uiPlacement: Object['freeze'](['modelMenu']),
     capabilities: Object['freeze']({
-      inputKinds: Object['freeze']((_0x4771c4 && _0x4771c4['allowedKinds']) || ['text', 'audio']),
+      inputKinds: Object['freeze']((inputSlots && inputSlots['allowedKinds']) || ['text', 'audio']),
       outputType: 'audio',
       fixedAssetSlots: Object['freeze'](
-        ((_0x4771c4 && _0x4771c4['fixedSlots']) || [])['map']((_0xeaaa7b) => _0xeaaa7b['id']),
+        ((inputSlots && inputSlots['fixedSlots']) || [])['map']((index) => index['id']),
       ),
     }),
-    inputSlots: _0x4771c4
+    inputSlots: inputSlots
       ? Object['freeze']({
-          allowedKinds: Object['freeze']([...(_0x4771c4['allowedKinds'] || [])]),
-          minByKind: Object['freeze']({ ...(_0x4771c4['minByKind'] || { text: 0x1 }) }),
+          allowedKinds: Object['freeze']([...(inputSlots['allowedKinds'] || [])]),
+          minByKind: Object['freeze']({ ...(inputSlots['minByKind'] || { text: 0x1 }) }),
           maxByKind: Object['freeze']({
             image: 0x0,
             video: 0x0,
             audio: 0x1,
-            ...(_0x4771c4['maxByKind'] || {}),
+            ...(inputSlots['maxByKind'] || {}),
           }),
-          ...(_0x4771c4['fixedSlots']
+          ...(inputSlots['fixedSlots']
             ? {
                 fixedSlots: Object['freeze'](
-                  _0x4771c4['fixedSlots']['map']((_0x523bea) => Object['freeze']({ ...(_0x523bea || {}) })),
+                  inputSlots['fixedSlots']['map']((result) => Object['freeze']({ ...(result || {}) })),
                 ),
               }
             : {}),
@@ -69,42 +69,42 @@ export function createAudioModelApiManifest({
           minByKind: Object['freeze']({ text: 0x1 }),
           maxByKind: Object['freeze']({ image: 0x0, video: 0x0, audio: 0x0 }),
         }),
-    uiSchema: Object['freeze']({ fields: Object['freeze'](_0x3338c6 || []) }),
+    uiSchema: Object['freeze']({ fields: Object['freeze'](fields || []) }),
     async: async,
     cancellable: cancellable,
     outputType: 'audio',
   });
 }
 export function createAudioModelApiExecutionManifest({
-  id: _0x2816df,
-  provider: _0x5eaaed,
-  model: _0x3c594c,
-  endpoint: _0x1e9905,
+  id: id,
+  provider: provider2,
+  model: model,
+  endpoint: endpoint,
   method: method = 'POST',
-  headers: _0x8be54,
-  bodyMapping: _0x3d7c02,
-  responseMapping: _0xc13db,
-  extensions: _0x3cc241,
+  headers: headers,
+  bodyMapping: bodyMapping,
+  responseMapping: responseMapping,
+  extensions: extensions2,
 }) {
   return Object['freeze']({
     schemaVersion: '1.0',
-    id: _0x2816df,
-    provider: _0x5eaaed,
+    id: id,
+    provider: provider2,
     kind: 'audio',
     adapterType: 'modelApi',
-    endpoint: _0x1e9905,
+    endpoint: endpoint,
     method: method,
-    model: _0x3c594c,
-    ...(_0x3cc241 ? { extensions: Object['freeze']({ ..._0x3cc241 }) } : {}),
-    headers: Object['freeze']({ 'Content-Type': 'application/json', ...(_0x8be54 || {}) }),
-    bodyMapping: Object['freeze'](_0x3d7c02 || []),
+    model: model,
+    ...(extensions2 ? { extensions: Object['freeze']({ ...extensions2 }) } : {}),
+    headers: Object['freeze']({ 'Content-Type': 'application/json', ...(headers || {}) }),
+    bodyMapping: Object['freeze'](bodyMapping || []),
     responseMapping: Object['freeze']({
       taskIdPath: '',
       statusPath: 'code',
       statusSuccessValue: 0x0,
       errorPath: Object['freeze'](['message', 'msg', 'error']),
       base64AudioField: 'data',
-      ...(_0xc13db || {}),
+      ...(responseMapping || {}),
     }),
     result: Object['freeze']({ taskIdPath: '', audioPaths: Object['freeze'](['data']) }),
   });

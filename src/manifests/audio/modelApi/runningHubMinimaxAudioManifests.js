@@ -33,15 +33,14 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     ['2.6-turbo', 0x1ab6bbe6],
     ['02-hd', 0x1ab6bbeb],
     ['02-turbo', 0x1ab6bbec],
-  ]['map'](([_0x3783fa, _0x396c4d], _0x457190) =>
+  ]['map'](([value, docId], item) =>
     createRunningHubAudioCatalogEntry({
-      id: 'minimax/speech-' + _0x3783fa,
+      id: 'minimax/speech-' + value,
       name:
-        'MiniMax 语音 ' +
-        _0x3783fa['replace']('-', '\x20')['replace']('hd', 'HD')['replace']('turbo', 'Turbo'),
-      endpoint: '/openapi/v2/rhart-audio/text-to-audio/speech-' + _0x3783fa,
-      docId: _0x396c4d,
-      order: 0xdc + _0x457190,
+        'MiniMax 语音 ' + value['replace']('-', '\x20')['replace']('hd', 'HD')['replace']('turbo', 'Turbo'),
+      endpoint: '/openapi/v2/rhart-audio/text-to-audio/speech-' + value,
+      docId: docId,
+      order: 0xdc + item,
       fields: [
         MINIMAX_VOICE_ID_FIELD,
         CUSTOM_VOICE,
@@ -53,7 +52,7 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
         audioToggle('englishNormalization', '英语文本规范化'),
       ],
       mapping: ['voice_id', 'speed', 'volume', 'pitch', 'emotion']
-        ['map']((_0x3a7e43) => paramMapping(_0x3a7e43))
+        ['map']((key) => paramMapping(key))
         ['concat']([
           paramMapping('pronunciation_dict', 'pronunciationDict', { transform: 'lines' }),
           paramMapping('english_normalization', 'englishNormalization'),

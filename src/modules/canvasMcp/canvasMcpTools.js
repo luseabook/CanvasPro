@@ -2,69 +2,65 @@ const CANVAS_WRITES = new Set(['nodes', 'edges', 'selection', 'viewport', 'histo
   PRIVATE_NAMESPACES = new Set(['agent', 'clipboard', 'video', 'audio', 'image']),
   SENSITIVE_KEY =
     /api.?key|secret|token|authorization|cookie|credential|headers|manifestBundle|executionManifest|providerConfig/i;
-function toolSchema(_0x3f91ed) {
-  if (Array['isArray'](_0x3f91ed)) return _0x3f91ed['map'](toolSchema);
-  if (!_0x3f91ed || typeof _0x3f91ed !== 'object') return _0x3f91ed;
-  const _0x1535df = Object['fromEntries'](
-    Object['entries'](_0x3f91ed)['map'](([_0x4e28aa, _0x396d20]) => [_0x4e28aa, toolSchema(_0x396d20)]),
+function toolSchema(list) {
+  if (Array['isArray'](list)) return list['map'](toolSchema);
+  if (!list || typeof list !== 'object') return list;
+  const enabled = Object['fromEntries'](
+    Object['entries'](list)['map'](([value, item]) => [value, toolSchema(item)]),
   );
-  if (_0x1535df['type'] === 'array' && !_0x1535df['items']) _0x1535df['items'] = {};
-  return _0x1535df;
+  if (enabled['type'] === 'array' && !enabled['items']) enabled['items'] = {};
+  return enabled;
 }
-export function sanitizeMcpResult(_0x12c741, _0x5402a8 = 0x0) {
-  if (_0x5402a8 > 0x12) return '[depth limit]';
-  if (typeof _0x12c741 === 'string') {
-    if (/^data:|^blob:/i['test'](_0x12c741)) return '[inline media omitted]';
-    return _0x12c741['length'] > 0x5dc0 ? _0x12c741['slice'](0x0, 0x5dc0) + '…[truncated]' : _0x12c741;
+export function sanitizeMcpResult(list2, count = 0x0) {
+  if (count > 0x12) return '[depth limit]';
+  if (typeof list2 === 'string') {
+    if (/^data:|^blob:/i['test'](list2)) return '[inline media omitted]';
+    return list2['length'] > 0x5dc0 ? list2['slice'](0x0, 0x5dc0) + '…[truncated]' : list2;
   }
-  if (Array['isArray'](_0x12c741)) {
-    if (_0x12c741['length'] > 0x7d0)
+  if (Array['isArray'](list2)) {
+    if (list2['length'] > 0x7d0)
       throw new Error(
         'Result has too many entries; request a smaller selection. Do not resubmit a mutation.',
       );
-    return _0x12c741['map']((_0x7e0110) => sanitizeMcpResult(_0x7e0110, _0x5402a8 + 0x1));
+    return list2['map']((key) => sanitizeMcpResult(key, count + 0x1));
   }
-  if (_0x12c741 && typeof _0x12c741 === 'object')
+  if (list2 && typeof list2 === 'object')
     return Object['fromEntries'](
-      Object['entries'](_0x12c741)
-        ['filter'](
-          ([_0x183cad, _0x39b07f]) => !SENSITIVE_KEY['test'](_0x183cad) && typeof _0x39b07f !== 'function',
-        )
-        ['map'](([_0x283215, _0x2e891d]) => [_0x283215, sanitizeMcpResult(_0x2e891d, _0x5402a8 + 0x1)]),
+      Object['entries'](list2)
+        ['filter'](([index, result]) => !SENSITIVE_KEY['test'](index) && typeof result !== 'function')
+        ['map'](([data, options]) => [data, sanitizeMcpResult(options, count + 0x1)]),
     );
-  return _0x12c741;
+  return list2;
 }
-export function canExposeCanvasCommand(_0x5bb542, { allowGeneration: allowGeneration = ![] } = {}) {
-  const _0x23b27b = _0x5bb542['capabilitySchema'] || {};
-  if (!Array['isArray'](_0x23b27b['writes']) || _0x23b27b['requiresSystemAccess']) return ![];
-  if (!['safe', 'confirm']['includes'](_0x5bb542['riskLevel'])) return ![];
-  if (PRIVATE_NAMESPACES['has'](_0x5bb542['id']['split']('.')[0x0])) return ![];
-  if (_0x23b27b['writes']['some']((_0x19f25f) => !CANVAS_WRITES['has'](_0x19f25f))) return ![];
+export function canExposeCanvasCommand(target, { allowGeneration: allowGeneration = ![] } = {}) {
+  const source = target['capabilitySchema'] || {};
+  if (!Array['isArray'](source['writes']) || source['requiresSystemAccess']) return ![];
+  if (!['safe', 'confirm']['includes'](target['riskLevel'])) return ![];
+  if (PRIVATE_NAMESPACES['has'](target['id']['split']('.')[0x0])) return ![];
+  if (source['writes']['some']((next) => !CANVAS_WRITES['has'](next))) return ![];
   if (
-    _0x23b27b['writes']['includes']('generationTasks') &&
-    _0x5bb542['id'] !== 'generation.cancel' &&
+    source['writes']['includes']('generationTasks') &&
+    target['id'] !== 'generation.cancel' &&
     !allowGeneration
   )
     return ![];
   return !![];
 }
-export function buildCanvasMcpTools(_0x3336f3, _0x5d534f = {}) {
-  const _0x12be1c = _0x3336f3['list']()['filter']((_0xc8fbce) =>
-      canExposeCanvasCommand(_0xc8fbce, _0x5d534f),
-    ),
-    _0x795631 = _0x12be1c['map']((_0x36430f) => ({
-      name: 'canvas_' + _0x36430f['id']['replaceAll']('.', '_'),
+export function buildCanvasMcpTools(current, entry = {}) {
+  const list3 = current['list']()['filter']((record) => canExposeCanvasCommand(record, entry)),
+    tools = list3['map']((description) => ({
+      name: 'canvas_' + description['id']['replaceAll']('.', '_'),
       description:
-        _0x36430f['description'] +
+        description['description'] +
         ' Uses the connected canvas. ' +
-        (_0x36430f['capabilitySchema']['writes']['includes']('generationTasks')
+        (description['capabilitySchema']['writes']['includes']('generationTasks')
           ? 'Generation\x20may\x20consume\x20provider\x20credits;\x20follow\x20the\x20user\x27s\x20authorized\x20scope.\x20'
           : '') +
         'Reuse\x20requestKey\x20when\x20retrying\x20an\x20uncertain\x20submission.',
       inputSchema: {
         type: 'object',
         properties: {
-          ...toolSchema(_0x36430f['argsSchema']['properties']),
+          ...toolSchema(description['argsSchema']['properties']),
           requestKey: {
             type: 'string',
             minLength: 0x8,
@@ -73,19 +69,19 @@ export function buildCanvasMcpTools(_0x3336f3, _0x5d534f = {}) {
               'Unique\x20operation\x20ID;\x20reuse\x20only\x20when\x20retrying\x20exactly\x20the\x20same\x20call.',
           },
         },
-        required: [..._0x36430f['argsSchema']['required'], 'requestKey'],
+        required: [...description['argsSchema']['required'], 'requestKey'],
         additionalProperties: ![],
       },
       annotations: {
-        readOnlyHint: _0x36430f['capabilitySchema']['writes']['length'] === 0x0,
+        readOnlyHint: description['capabilitySchema']['writes']['length'] === 0x0,
         destructiveHint: ![],
-        openWorldHint: _0x36430f['capabilitySchema']['writes']['includes']('generationTasks'),
+        openWorldHint: description['capabilitySchema']['writes']['includes']('generationTasks'),
       },
     }));
-  if (new Set(_0x795631['map']((_0x235a31) => _0x235a31['name']))['size'] !== _0x795631['length'])
+  if (new Set(tools['map']((error) => error['name']))['size'] !== tools['length'])
     throw new Error('Canvas MCP tool name collision');
   return (
-    _0x795631['push']({
+    tools['push']({
       name: 'canvas_models',
       description:
         'Discover current model manifests. Search by query/kind, then pass modelId to retrieve editable fields and input slots. Does not expose provider credentials or execution payloads.',
@@ -104,45 +100,39 @@ export function buildCanvasMcpTools(_0x3336f3, _0x5d534f = {}) {
       annotations: { readOnlyHint: !![], destructiveHint: ![], openWorldHint: ![] },
     }),
     {
-      tools: _0x795631,
-      commandIds: new Map(
-        _0x12be1c['map']((_0x32e8d4, _0x232370) => [_0x795631[_0x232370]['name'], _0x32e8d4['id']]),
-      ),
+      tools: tools,
+      commandIds: new Map(list3['map']((payload, handle) => [tools[handle]['name'], payload['id']])),
     }
   );
 }
-export function describeCanvasMcpModels(_0x2aeccf, _0x225b51 = {}) {
-  const _0x1dfb9d = String(_0x225b51['query'] || '')['toLowerCase'](),
-    _0x294ba0 = _0x2aeccf['filter'](
-      (_0x180be2) =>
-        (!_0x225b51['kind'] || _0x180be2['kind'] === _0x225b51['kind']) &&
-        (!_0x225b51['modelId'] || _0x180be2['modelId'] === _0x225b51['modelId']) &&
-        (!_0x1dfb9d ||
-          [
-            _0x180be2['modelId'],
-            _0x180be2['displayName'],
-            _0x180be2['name'],
-            _0x180be2['label'],
-            _0x180be2['provider'],
-          ]['some']((_0x223ee4) =>
-            String(_0x223ee4 || '')
+export function describeCanvasMcpModels(list4, enabled2 = {}) {
+  const enabled3 = String(enabled2['query'] || '')['toLowerCase'](),
+    total = list4['filter'](
+      (error2) =>
+        (!enabled2['kind'] || error2['kind'] === enabled2['kind']) &&
+        (!enabled2['modelId'] || error2['modelId'] === enabled2['modelId']) &&
+        (!enabled3 ||
+          [error2['modelId'], error2['displayName'], error2['name'], error2['label'], error2['provider']][
+            'some'
+          ]((state) =>
+            String(state || '')
               ['toLowerCase']()
-              ['includes'](_0x1dfb9d),
+              ['includes'](enabled3),
           )),
     ),
-    _0x4fb8be = Number['isInteger'](_0x225b51['offset']) ? Math['max'](0x0, _0x225b51['offset']) : 0x0;
+    nextOffset = Number['isInteger'](enabled2['offset']) ? Math['max'](0x0, enabled2['offset']) : 0x0;
   return sanitizeMcpResult({
-    total: _0x294ba0['length'],
-    nextOffset: _0x4fb8be + 0x14 < _0x294ba0['length'] ? _0x4fb8be + 0x14 : null,
-    models: _0x294ba0['slice'](_0x4fb8be, _0x4fb8be + 0x14)['map']((_0x77c398) => ({
-      modelId: _0x77c398['modelId'],
-      name: _0x77c398['displayName'] || _0x77c398['name'] || _0x77c398['label'],
-      kind: _0x77c398['kind'],
-      provider: _0x77c398['provider'],
-      ...(_0x225b51['modelId']
+    total: total['length'],
+    nextOffset: nextOffset + 0x14 < total['length'] ? nextOffset + 0x14 : null,
+    models: total['slice'](nextOffset, nextOffset + 0x14)['map']((modelId) => ({
+      modelId: modelId['modelId'],
+      name: modelId['displayName'] || modelId['name'] || modelId['label'],
+      kind: modelId['kind'],
+      provider: modelId['provider'],
+      ...(enabled2['modelId']
         ? {
-            fields: _0x77c398['uiSchema']?.['fields'] || [],
-            inputSlots: _0x77c398['inputSlots'] || _0x77c398['uiSchema']?.['inputSlots'] || {},
+            fields: modelId['uiSchema']?.['fields'] || [],
+            inputSlots: modelId['inputSlots'] || modelId['uiSchema']?.['inputSlots'] || {},
           }
         : {}),
     })),

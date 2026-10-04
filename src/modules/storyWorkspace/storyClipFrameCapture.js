@@ -3,174 +3,170 @@ import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../../u
 const STORY_CLIP_VIDEO_LOCALIZE_MAX_BYTES = 0x200 * 0x400 * 0x400,
   STORY_CLIP_FRAME_READY_TIMEOUT_MS = 0x2710,
   STORY_CLIP_FRAME_SEEK_TIMEOUT_MS = 0x1f40;
-function normalizeText(_0x284be7) {
-  return String(_0x284be7 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function seekVideoToTime(_0x4c92f5, _0x46c717, _0x3354f8 = STORY_CLIP_FRAME_SEEK_TIMEOUT_MS) {
-  return new Promise((_0x9b7970) => {
-    let _0x3dbee0 = ![],
-      _0x250803 = null;
-    const _0x121657 = (_0x425fc5) => {
-        if (_0x3dbee0) return;
-        _0x3dbee0 = !![];
-        if (_0x250803) clearTimeout(_0x250803);
-        (_0x4c92f5['removeEventListener']?.('seeked', _0x2e8073),
-          _0x4c92f5['removeEventListener']?.('error', _0x26b33e),
-          _0x4c92f5['removeEventListener']?.('abort', _0x26b33e),
-          _0x9b7970(_0x425fc5 === !![]));
+function seekVideoToTime(el, item, key = STORY_CLIP_FRAME_SEEK_TIMEOUT_MS) {
+  return new Promise((handler) => {
+    let index = ![],
+      setTimeout2 = null;
+    const run = (result) => {
+        if (index) return;
+        index = !![];
+        if (setTimeout2) clearTimeout(setTimeout2);
+        (el['removeEventListener']?.('seeked', data),
+          el['removeEventListener']?.('error', options),
+          el['removeEventListener']?.('abort', options),
+          handler(result === !![]));
       },
-      _0x2e8073 = () => _0x121657(!![]),
-      _0x26b33e = () => _0x121657(![]);
-    (_0x4c92f5['addEventListener']?.('seeked', _0x2e8073, { once: !![] }),
-      _0x4c92f5['addEventListener']?.('error', _0x26b33e, { once: !![] }),
-      _0x4c92f5['addEventListener']?.('abort', _0x26b33e, { once: !![] }),
-      (_0x250803 = setTimeout(
-        () =>
-          _0x121657(
-            !_0x4c92f5['seeking'] &&
-              Math['abs'](Number(_0x4c92f5['currentTime']) - Number(_0x46c717)) <= 0.05,
-          ),
-        _0x3354f8,
+      data = () => run(!![]),
+      options = () => run(![]);
+    (el['addEventListener']?.('seeked', data, { once: !![] }),
+      el['addEventListener']?.('error', options, { once: !![] }),
+      el['addEventListener']?.('abort', options, { once: !![] }),
+      (setTimeout2 = setTimeout(
+        () => run(!el['seeking'] && Math['abs'](Number(el['currentTime']) - Number(item)) <= 0.05),
+        key,
       )));
     try {
-      _0x4c92f5['currentTime'] = _0x46c717;
+      el['currentTime'] = item;
     } catch {
-      _0x121657(![]);
+      run(![]);
       return;
     }
-    !_0x4c92f5['seeking'] &&
-      Math['abs'](Number(_0x4c92f5['currentTime']) - Number(_0x46c717)) <= 0.01 &&
-      queueMicrotask(() => _0x121657(!![]));
+    !el['seeking'] &&
+      Math['abs'](Number(el['currentTime']) - Number(item)) <= 0.01 &&
+      queueMicrotask(() => run(!![]));
   });
 }
-function resolveCaptureTime(_0x5490d6, _0x324f32) {
-  const _0x1656c5 = Math['max'](0x0, Number(_0x324f32) || 0x0),
-    _0x197b18 = Number(_0x5490d6?.['duration']);
-  if (!Number['isFinite'](_0x197b18) || _0x197b18 <= 0x0) return _0x1656c5;
-  return Math['min'](_0x1656c5, Math['max'](0x0, _0x197b18 - 0.001));
+function resolveCaptureTime(target, source) {
+  const next = Math['max'](0x0, Number(source) || 0x0),
+    count = Number(target?.['duration']);
+  if (!Number['isFinite'](count) || count <= 0x0) return next;
+  return Math['min'](next, Math['max'](0x0, count - 0.001));
 }
-function inferVideoExtension(_0x4f4334, _0x12f9d6 = {}) {
-  const _0x38ac68 = normalizeText(_0x12f9d6['mimeType'] || _0x12f9d6['contentType'])['toLowerCase']();
-  if (_0x38ac68['includes']('webm')) return 'webm';
-  if (_0x38ac68['includes']('quicktime')) return 'mov';
-  if (_0x38ac68['includes']('mp4')) return 'mp4';
+function inferVideoExtension(current, entry = {}) {
+  const list = normalizeText(entry['mimeType'] || entry['contentType'])['toLowerCase']();
+  if (list['includes']('webm')) return 'webm';
+  if (list['includes']('quicktime')) return 'mov';
+  if (list['includes']('mp4')) return 'mp4';
   try {
-    const _0x3cc4fb = new URL(_0x4f4334, globalThis['location']?.['href'] || 'http://localhost/')['pathname'],
-      _0x4f0d94 = normalizeText(_0x3cc4fb['match'](/\.([a-z0-9]{2,5})$/i)?.[0x1])['toLowerCase']();
-    if (['mp4', 'm4v', 'mov', 'webm']['includes'](_0x4f0d94)) return _0x4f0d94;
+    const uRL = new URL(current, globalThis['location']?.['href'] || 'http://localhost/')['pathname'],
+      text = normalizeText(uRL['match'](/\.([a-z0-9]{2,5})$/i)?.[0x1])['toLowerCase']();
+    if (['mp4', 'm4v', 'mov', 'webm']['includes'](text)) return text;
   } catch {}
   return 'mp4';
 }
-function resolveRemoteVideoUrl(_0x45644d = {}, _0x3cbdac = '') {
+function resolveRemoteVideoUrl(response = {}, record = '') {
   return (
-    [_0x45644d['videoUrl'], _0x45644d['url'], _0x45644d['displayUrl'], _0x3cbdac]
+    [response['videoUrl'], response['url'], response['displayUrl'], record]
       ['map'](normalizeText)
-      ['find']((_0x3bdedc) => /^https?:\/\//i['test'](_0x3bdedc)) || ''
+      ['find']((payload) => /^https?:\/\//i['test'](payload)) || ''
   );
 }
-function normalizeLocalizedVideoResult(_0x2847a3 = {}) {
-  const _0xea2299 = pickResultLocalPath(_0x2847a3),
-    _0x2bdaa5 = localPathToUrl(_0xea2299) || normalizeText(_0x2847a3['url']);
-  if (!_0xea2299 || !_0x2bdaa5) return null;
+function normalizeLocalizedVideoResult(response2 = {}) {
+  const localPath = pickResultLocalPath(response2),
+    url = localPathToUrl(localPath) || normalizeText(response2['url']);
+  if (!localPath || !url) return null;
   return {
-    url: _0x2bdaa5,
-    localPath: _0xea2299,
-    originalLocalPath: normalizeLocalPath(_0x2847a3['originalLocalPath'] || _0xea2299),
-    displayLocalPath: normalizeLocalPath(_0x2847a3['displayLocalPath']),
+    url: url,
+    localPath: localPath,
+    originalLocalPath: normalizeLocalPath(response2['originalLocalPath'] || localPath),
+    displayLocalPath: normalizeLocalPath(response2['displayLocalPath']),
   };
 }
-export function isStoryClipFrameCanvasSecurityError(_0x5ca085) {
-  const _0x4ebb35 = normalizeText(_0x5ca085?.['name'])['toLowerCase'](),
-    _0x1ae719 = normalizeText(_0x5ca085?.['message'])['toLowerCase']();
+export function isStoryClipFrameCanvasSecurityError(error) {
+  const text2 = normalizeText(error?.['name'])['toLowerCase'](),
+    list2 = normalizeText(error?.['message'])['toLowerCase']();
   return (
-    _0x4ebb35 === 'securityerror' ||
-    _0x1ae719['includes']('tainted canvas') ||
-    _0x1ae719['includes']('tainted canvases') ||
-    _0x1ae719['includes']('insecure')
+    text2 === 'securityerror' ||
+    list2['includes']('tainted canvas') ||
+    list2['includes']('tainted canvases') ||
+    list2['includes']('insecure')
   );
 }
 export async function captureStoryClipFrameFromSource({
-  sourceUrl: _0xafd283,
+  sourceUrl: sourceUrl2,
   currentTimeSec: currentTimeSec = 0x0,
   documentObject: documentObject = globalThis['document'],
   fileNamePrefix: fileNamePrefix = 'story_clip_frame',
-  crop: _0x59528a,
+  crop: crop,
 } = {}) {
-  const _0x3a0b91 = normalizeText(_0xafd283);
-  if (!_0x3a0b91 || !documentObject?.['createElement']) throw new Error('片段视频本地源不可用');
-  const _0x39424d = documentObject['createElement']('video');
-  ((_0x39424d['muted'] = !![]),
-    (_0x39424d['playsInline'] = !![]),
-    (_0x39424d['preload'] = 'auto'),
-    (_0x39424d['style']['position'] = 'fixed'),
-    (_0x39424d['style']['left'] = '-10000px'),
-    (_0x39424d['style']['top'] = '-10000px'),
-    (_0x39424d['style']['width'] = '1px'),
-    (_0x39424d['style']['height'] = '1px'),
-    (_0x39424d['style']['opacity'] = '0'),
-    documentObject['body']?.['appendChild'](_0x39424d));
+  const text3 = normalizeText(sourceUrl2);
+  if (!text3 || !documentObject?.['createElement']) throw new Error('片段视频本地源不可用');
+  const el2 = documentObject['createElement']('video');
+  ((el2['muted'] = !![]),
+    (el2['playsInline'] = !![]),
+    (el2['preload'] = 'auto'),
+    (el2['style']['position'] = 'fixed'),
+    (el2['style']['left'] = '-10000px'),
+    (el2['style']['top'] = '-10000px'),
+    (el2['style']['width'] = '1px'),
+    (el2['style']['height'] = '1px'),
+    (el2['style']['opacity'] = '0'),
+    documentObject['body']?.['appendChild'](el2));
   try {
-    ((_0x39424d['src'] = _0x3a0b91), _0x39424d['load']?.());
-    const _0x492707 = await waitForVideoFrame(_0x39424d, { timeoutMs: STORY_CLIP_FRAME_READY_TIMEOUT_MS });
-    if (!_0x492707) throw new Error('片段视频本地画面加载失败');
-    const _0x4701ed = resolveCaptureTime(_0x39424d, currentTimeSec);
-    if (_0x4701ed > 0.001 && Math['abs'](Number(_0x39424d['currentTime']) - _0x4701ed) > 0.01) {
-      if (!(await seekVideoToTime(_0x39424d, _0x4701ed))) throw new Error('片段视频定位当前时间失败');
-      if (!(await waitForVideoFrame(_0x39424d, { timeoutMs: STORY_CLIP_FRAME_READY_TIMEOUT_MS })))
+    ((el2['src'] = text3), el2['load']?.());
+    const waitForVideoFrame2 = await waitForVideoFrame(el2, { timeoutMs: STORY_CLIP_FRAME_READY_TIMEOUT_MS });
+    if (!waitForVideoFrame2) throw new Error('片段视频本地画面加载失败');
+    const captureTime = resolveCaptureTime(el2, currentTimeSec);
+    if (captureTime > 0.001 && Math['abs'](Number(el2['currentTime']) - captureTime) > 0.01) {
+      if (!(await seekVideoToTime(el2, captureTime))) throw new Error('片段视频定位当前时间失败');
+      if (!(await waitForVideoFrame(el2, { timeoutMs: STORY_CLIP_FRAME_READY_TIMEOUT_MS })))
         throw new Error('片段视频当前画面加载失败');
     }
-    return captureVideoFrameSnapshot(_0x39424d, {
+    return captureVideoFrameSnapshot(el2, {
       type: 'image/png',
       fileNamePrefix: fileNamePrefix,
-      crop: _0x59528a,
+      crop: crop,
     });
   } finally {
     try {
-      (_0x39424d['pause']?.(), _0x39424d['removeAttribute']?.('src'), _0x39424d['load']?.());
+      (el2['pause']?.(), el2['removeAttribute']?.('src'), el2['load']?.());
     } catch {}
-    _0x39424d['remove']?.();
+    el2['remove']?.();
   }
 }
 export async function captureStoryClipFrameSnapshot({
-  videoEl: _0x321188,
+  videoEl: videoEl,
   sourceResult: sourceResult = {},
   sourceUrl: sourceUrl = '',
   currentTimeSec: currentTimeSec = 0x0,
-  saveOutputFromUrl: _0x2894a5,
+  saveOutputFromUrl: saveOutputFromUrl,
   documentObject: documentObject = globalThis['document'],
   fileNamePrefix: fileNamePrefix = 'story_clip_frame',
 } = {}) {
-  if (!_0x321188) throw new Error('当前片段视频不可用');
-  if (!(await waitForVideoFrame(_0x321188, { timeoutMs: STORY_CLIP_FRAME_READY_TIMEOUT_MS })))
+  if (!videoEl) throw new Error('当前片段视频不可用');
+  if (!(await waitForVideoFrame(videoEl, { timeoutMs: STORY_CLIP_FRAME_READY_TIMEOUT_MS })))
     throw new Error('视频画面尚未加载完成，请稍后重试');
   try {
     return {
-      snapshot: await captureVideoFrameSnapshot(_0x321188, {
+      snapshot: await captureVideoFrameSnapshot(videoEl, {
         type: 'image/png',
         fileNamePrefix: fileNamePrefix,
       }),
       localizedVideo: null,
     };
-  } catch (_0x4a395a) {
-    if (!isStoryClipFrameCanvasSecurityError(_0x4a395a)) throw _0x4a395a;
-    const _0x12e992 = resolveRemoteVideoUrl(sourceResult, sourceUrl);
-    if (!_0x12e992 || typeof _0x2894a5 !== 'function') throw _0x4a395a;
-    const _0x56c6ec = normalizeLocalizedVideoResult(
-      await _0x2894a5(_0x12e992, {
-        ext: inferVideoExtension(_0x12e992, sourceResult),
+  } catch (handle) {
+    if (!isStoryClipFrameCanvasSecurityError(handle)) throw handle;
+    const remoteVideoUrl = resolveRemoteVideoUrl(sourceResult, sourceUrl);
+    if (!remoteVideoUrl || typeof saveOutputFromUrl !== 'function') throw handle;
+    const sourceUrl3 = normalizeLocalizedVideoResult(
+      await saveOutputFromUrl(remoteVideoUrl, {
+        ext: inferVideoExtension(remoteVideoUrl, sourceResult),
         maxBytes: STORY_CLIP_VIDEO_LOCALIZE_MAX_BYTES,
-        dedupeKey: 'story-clip-video:' + _0x12e992,
+        dedupeKey: 'story-clip-video:' + remoteVideoUrl,
       }),
     );
-    if (!_0x56c6ec) throw new Error('片段视频本地保存失败');
+    if (!sourceUrl3) throw new Error('片段视频本地保存失败');
     return {
       snapshot: await captureStoryClipFrameFromSource({
-        sourceUrl: _0x56c6ec['url'],
+        sourceUrl: sourceUrl3['url'],
         currentTimeSec: currentTimeSec,
         documentObject: documentObject,
         fileNamePrefix: fileNamePrefix,
       }),
-      localizedVideo: _0x56c6ec,
+      localizedVideo: sourceUrl3,
     };
   }
 }

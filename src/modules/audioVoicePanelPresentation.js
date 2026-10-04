@@ -1,1 +1,131 @@
-import{positionAnchoredSubmenu}from'../utils/submenuPosition.js';export function positionAudioVoiceModelSubmenu(_0x549c9f,_0x3ec177,{windowObject:windowObject=globalThis["window"],gap:gap=0x0,container:container=_0x549c9f}={}){const _0x145043=_0x549c9f?.["getBoundingClientRect"]?.();if(!_0x145043)return null;const _0x487f25=container?.["getBoundingClientRect"]?.()||_0x145043;return positionAnchoredSubmenu({'submenu':_0x3ec177,'anchorRect':_0x145043,'containerRect':_0x487f25,'preferredSide':'left','position':'absolute','gap':gap,'viewportWidth':windowObject?.["innerWidth"],'viewportHeight':windowObject?.['innerHeight']});}export function bindAudioVoiceModelSubmenuPosition(_0x16fa15,_0x45ab5d,_0xc0fcab,_0x34010a){let _0x39af55=null;const _0x5a6411=()=>{if(_0x39af55===null)return;_0xc0fcab?.["clearTimeout"]?.(_0x39af55),_0x39af55=null;},_0x1d9a9b=()=>{_0x5a6411(),_0x16fa15?.["classList"]?.["add"]('is-model-submenu-open'),_0x45ab5d?.["classList"]?.["add"]('is-model-submenu-open'),positionAudioVoiceModelSubmenu(_0x16fa15,_0x45ab5d,{'windowObject':_0xc0fcab,..._0x34010a});},_0x49d6cc=_0x32cff4=>{if(_0x16fa15?.['contains']?.(_0x32cff4?.["relatedTarget"])||_0x45ab5d?.["contains"]?.(_0x32cff4?.["relatedTarget"]))return;_0x5a6411(),_0x39af55=_0xc0fcab?.["setTimeout"]?.(()=>{_0x39af55=null;const _0x3a9784=_0x16fa15?.["ownerDocument"]?.["activeElement"];if(_0x16fa15?.["matches"]?.(":hover")||_0x45ab5d?.["matches"]?.(':hover')||_0x16fa15?.['contains']?.(_0x3a9784)||_0x45ab5d?.['contains']?.(_0x3a9784))return;_0x16fa15?.["classList"]?.["remove"]('is-model-submenu-open'),_0x45ab5d?.['classList']?.["remove"]("is-model-submenu-open");},0x50);};_0x16fa15?.["addEventListener"]?.("mouseenter",_0x1d9a9b),_0x16fa15?.["addEventListener"]?.('mouseleave',_0x49d6cc),_0x16fa15?.['addEventListener']?.("focusin",_0x1d9a9b),_0x16fa15?.["addEventListener"]?.("focusout",_0x49d6cc),_0x45ab5d?.["addEventListener"]?.("mouseenter",_0x1d9a9b),_0x45ab5d?.["addEventListener"]?.("mouseleave",_0x49d6cc),_0x45ab5d?.["addEventListener"]?.('focusin',_0x1d9a9b),_0x45ab5d?.['addEventListener']?.("focusout",_0x49d6cc);}export function createEl(_0x304101,_0x3cd892='',_0x5ddadb=''){const _0x1bf9f6=document["createElement"](_0x304101);if(_0x3cd892)_0x1bf9f6['className']=_0x3cd892;if(_0x5ddadb)_0x1bf9f6['textContent']=_0x5ddadb;return _0x1bf9f6;}export function createButton(_0x3bc6c7,_0x39878c,_0x51a5bc,_0x7147b1=''){const _0x259b85=createEl("button",_0x3bc6c7),_0x463d1f=String(_0x39878c||'')['trim'](),_0x3eeb7f=String(_0x7147b1||'')["trim"](),_0x210c46=_0x463d1f||_0x3eeb7f;_0x259b85["type"]="button";_0x463d1f&&_0x463d1f!==_0x3eeb7f&&(_0x259b85["title"]=_0x463d1f);if(_0x210c46)_0x259b85["setAttribute"]("aria-label",_0x210c46);return _0x259b85['innerHTML']=iconSvg(_0x51a5bc),_0x3eeb7f&&_0x259b85["appendChild"](createEl("span",'audio-voice-btn-label',_0x7147b1)),_0x259b85;}export function createAudioVoiceModelIcon(_0x46040b={},_0x3bd6d2=''){const _0x3566df=String(_0x46040b?.["icon"]||'')['trim'](),_0x49d091=String(_0x46040b?.["iconName"]||'')["trim"](),_0x2f1dc6=String(_0x46040b?.["iconAlt"]||_0x46040b?.['label']||'model')["trim"](),_0x572e90=createEl("span",_0x3bd6d2||"audio-voice-global-model-provider");if(_0x49d091)return _0x572e90['classList']["add"]('has-svg-icon'),_0x572e90["innerHTML"]=iconSvg(_0x49d091),_0x572e90;if(!_0x3566df)return _0x572e90['textContent']=String(_0x46040b?.["badgeText"]||'RH')['trim']()||'RH',_0x572e90;const _0x196df5=createEl("img",'audio-voice-global-model-icon-img');return _0x196df5['src']=_0x3566df,_0x196df5["alt"]=_0x2f1dc6,_0x196df5["draggable"]=![],_0x572e90["appendChild"](_0x196df5),_0x572e90;}export function iconSvg(_0x596e03){const _0x5ed853="viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"",_0x566401={'align':'<path\x20d=\x22M4\x206h16\x22></path><path\x20d=\x22M4\x2012h10\x22></path><path\x20d=\x22M4\x2018h16\x22></path>','audio':"<path d=\"M9 18V5l12-2v13\"></path><circle cx=\"6\" cy=\"18\" r=\"3\"></circle><circle cx=\"18\" cy=\"16\" r=\"3\"></circle>",'check':'<path\x20d=\x22m5\x2012\x204\x204L19\x206\x22></path>','close':"<path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path>",'device':"<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><rect x=\"9\" y=\"9\" width=\"6\" height=\"6\"></rect><path d=\"M9 1v3\"></path><path d=\"M15 1v3\"></path><path d=\"M9 20v3\"></path><path d=\"M15 20v3\"></path><path d=\"M20 9h3\"></path><path d=\"M20 15h3\"></path><path d=\"M1 9h3\"></path><path d=\"M1 15h3\"></path>",'edit':"<path d=\"M12 20h9\"></path><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z\"></path>",'generate':"<path d=\"M13 2 3 14h8l-1 8 11-14h-8l0-6Z\"></path>",'generateAction':"<line x1=\"12\" y1=\"19\" x2=\"12\" y2=\"5\"></line><polyline points=\"5 12 12 5 19 12\"></polyline>",'grid':"<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"></rect><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"></rect><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"></rect><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"></rect>",'history':"<path d=\"M21 12a9 9 0 1 1-3-6.7\"></path><path d=\"M21 3v6h-6\"></path><path d=\"M12 7v5l3 2\"></path>",'insert':"<path d=\"M12 5v14\"></path><path d=\"M5 12h14\"></path>",'loading':'<path\x20d=\x22M21\x2012a9\x209\x200\x201\x201-2.64-6.36\x22></path>','merge':"<path d=\"M12 3v7\"></path><path d=\"m8 7 4 4 4-4\"></path><path d=\"M12 21v-7\"></path><path d=\"m16 17-4-4-4 4\"></path>",'more':"<path d=\"M12 12h.01\"></path><path d=\"M19 12h.01\"></path><path d=\"M5 12h.01\"></path>",'play':"<path d=\"m8 5 11 7-11 7V5Z\"></path>",'plus':"<path d=\"M12 5v14\"></path><path d=\"M5 12h14\"></path>",'settings':'<path\x20d=\x22M12\x2015.5a3.5\x203.5\x200\x201\x200\x200-7\x203.5\x203.5\x200\x200\x200\x200\x207Z\x22></path><path\x20d=\x22M19.4\x2015a1.7\x201.7\x200\x200\x200\x20.3\x201.9l.1.1a2\x202\x200\x201\x201-2.8\x202.8l-.1-.1a1.7\x201.7\x200\x200\x200-1.9-.3\x201.7\x201.7\x200\x200\x200-1\x201.6V21a2\x202\x200\x201\x201-4\x200v-.1a1.7\x201.7\x200\x200\x200-1-1.6\x201.7\x201.7\x200\x200\x200-1.9.3l-.1.1a2\x202\x200\x201\x201-2.8-2.8l.1-.1a1.7\x201.7\x200\x200\x200\x20.3-1.9\x201.7\x201.7\x200\x200\x200-1.6-1H3a2\x202\x200\x201\x201\x200-4h.1a1.7\x201.7\x200\x200\x200\x201.6-1\x201.7\x201.7\x200\x200\x200-.3-1.9l-.1-.1a2\x202\x200\x201\x201\x202.8-2.8l.1.1a1.7\x201.7\x200\x200\x200\x201.9.3h.1a1.7\x201.7\x200\x200\x200\x20.9-1.5V3a2\x202\x200\x201\x201\x204\x200v.1a1.7\x201.7\x200\x200\x200\x201\x201.6\x201.7\x201.7\x200\x200\x200\x201.9-.3l.1-.1a2\x202\x200\x201\x201\x202.8\x202.8l-.1.1a1.7\x201.7\x200\x200\x200-.3\x201.9v.1a1.7\x201.7\x200\x200\x200\x201.5.9H21a2\x202\x200\x201\x201\x200\x204h-.1a1.7\x201.7\x200\x200\x200-1.5.9Z\x22></path>','speaker':"<path d=\"M11 5 6 9H3v6h3l5 4V5Z\"></path><path d=\"M15 9.5a4 4 0 0 1 0 5\"></path>",'translate':"<path d=\"m5 8 6 6\"></path><path d=\"m4 14 6-7 2-3\"></path><path d=\"M2 4h12\"></path><path d=\"M7 2h1\"></path><path d=\"m12 20 4-9 4 9\"></path><path d=\"m13.5 17h5\"></path>",'video':"<rect x=\"3\" y=\"5\" width=\"14\" height=\"14\" rx=\"2\"></rect><path d=\"m17 9 4-2v10l-4-2\"></path>"};return "<svg width=\"18\" height=\"18\" "+_0x5ed853+'>'+(_0x566401[_0x596e03]||'')+'</svg>';}
+import { positionAnchoredSubmenu } from '../utils/submenuPosition.js';
+export function positionAudioVoiceModelSubmenu(
+  value,
+  item,
+  { windowObject: windowObject = globalThis['window'], gap: gap = 0x0, container: container = value } = {},
+) {
+  const enabled = value?.['getBoundingClientRect']?.();
+  if (!enabled) return null;
+  const key = container?.['getBoundingClientRect']?.() || enabled;
+  return positionAnchoredSubmenu({
+    submenu: item,
+    anchorRect: enabled,
+    containerRect: key,
+    preferredSide: 'left',
+    position: 'absolute',
+    gap: gap,
+    viewportWidth: windowObject?.['innerWidth'],
+    viewportHeight: windowObject?.['innerHeight'],
+  });
+}
+export function bindAudioVoiceModelSubmenuPosition(el, el2, index, args) {
+  let result = null;
+  const run = () => {
+      if (result === null) return;
+      (index?.['clearTimeout']?.(result), (result = null));
+    },
+    data = () => {
+      (run(),
+        el?.['classList']?.['add']('is-model-submenu-open'),
+        el2?.['classList']?.['add']('is-model-submenu-open'),
+        positionAudioVoiceModelSubmenu(el, el2, { windowObject: index, ...args }));
+    },
+    options = (target) => {
+      if (el?.['contains']?.(target?.['relatedTarget']) || el2?.['contains']?.(target?.['relatedTarget']))
+        return;
+      (run(),
+        (result = index?.['setTimeout']?.(() => {
+          result = null;
+          const source = el?.['ownerDocument']?.['activeElement'];
+          if (
+            el?.['matches']?.(':hover') ||
+            el2?.['matches']?.(':hover') ||
+            el?.['contains']?.(source) ||
+            el2?.['contains']?.(source)
+          )
+            return;
+          (el?.['classList']?.['remove']('is-model-submenu-open'),
+            el2?.['classList']?.['remove']('is-model-submenu-open'));
+        }, 0x50)));
+    };
+  (el?.['addEventListener']?.('mouseenter', data),
+    el?.['addEventListener']?.('mouseleave', options),
+    el?.['addEventListener']?.('focusin', data),
+    el?.['addEventListener']?.('focusout', options),
+    el2?.['addEventListener']?.('mouseenter', data),
+    el2?.['addEventListener']?.('mouseleave', options),
+    el2?.['addEventListener']?.('focusin', data),
+    el2?.['addEventListener']?.('focusout', options));
+}
+export function createEl(next, current = '', entry = '') {
+  const el3 = document['createElement'](next);
+  if (current) el3['className'] = current;
+  if (entry) el3['textContent'] = entry;
+  return el3;
+}
+export function createButton(record, payload, handle, state = '') {
+  const el4 = createEl('button', record),
+    config = String(payload || '')['trim'](),
+    scope = String(state || '')['trim'](),
+    input = config || scope;
+  el4['type'] = 'button';
+  config && config !== scope && (el4['title'] = config);
+  if (input) el4['setAttribute']('aria-label', input);
+  return (
+    (el4['innerHTML'] = iconSvg(handle)),
+    scope && el4['appendChild'](createEl('span', 'audio-voice-btn-label', state)),
+    el4
+  );
+}
+export function createAudioVoiceModelIcon(options2 = {}, output = '') {
+  const enabled2 = String(options2?.['icon'] || '')['trim'](),
+    value2 = String(options2?.['iconName'] || '')['trim'](),
+    value3 = String(options2?.['iconAlt'] || options2?.['label'] || 'model')['trim'](),
+    el5 = createEl('span', output || 'audio-voice-global-model-provider');
+  if (value2) return (el5['classList']['add']('has-svg-icon'), (el5['innerHTML'] = iconSvg(value2)), el5);
+  if (!enabled2)
+    return ((el5['textContent'] = String(options2?.['badgeText'] || 'RH')['trim']() || 'RH'), el5);
+  const el6 = createEl('img', 'audio-voice-global-model-icon-img');
+  return (
+    (el6['src'] = enabled2),
+    (el6['alt'] = value3),
+    (el6['draggable'] = ![]),
+    el5['appendChild'](el6),
+    el5
+  );
+}
+export function iconSvg(value4) {
+  const value5 =
+      'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"',
+    value6 = {
+      align:
+        '<path\x20d=\x22M4\x206h16\x22></path><path\x20d=\x22M4\x2012h10\x22></path><path\x20d=\x22M4\x2018h16\x22></path>',
+      audio:
+        '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>',
+      check: '<path\x20d=\x22m5\x2012\x204\x204L19\x206\x22></path>',
+      close: '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>',
+      device:
+        '<rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><path d="M9 1v3"></path><path d="M15 1v3"></path><path d="M9 20v3"></path><path d="M15 20v3"></path><path d="M20 9h3"></path><path d="M20 15h3"></path><path d="M1 9h3"></path><path d="M1 15h3"></path>',
+      edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path>',
+      generate: '<path d="M13 2 3 14h8l-1 8 11-14h-8l0-6Z"></path>',
+      generateAction:
+        '<line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>',
+      grid: '<rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>',
+      history:
+        '<path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path><path d="M12 7v5l3 2"></path>',
+      insert: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
+      loading: '<path\x20d=\x22M21\x2012a9\x209\x200\x201\x201-2.64-6.36\x22></path>',
+      merge:
+        '<path d="M12 3v7"></path><path d="m8 7 4 4 4-4"></path><path d="M12 21v-7"></path><path d="m16 17-4-4-4 4"></path>',
+      more: '<path d="M12 12h.01"></path><path d="M19 12h.01"></path><path d="M5 12h.01"></path>',
+      play: '<path d="m8 5 11 7-11 7V5Z"></path>',
+      plus: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
+      settings:
+        '<path\x20d=\x22M12\x2015.5a3.5\x203.5\x200\x201\x200\x200-7\x203.5\x203.5\x200\x200\x200\x200\x207Z\x22></path><path\x20d=\x22M19.4\x2015a1.7\x201.7\x200\x200\x200\x20.3\x201.9l.1.1a2\x202\x200\x201\x201-2.8\x202.8l-.1-.1a1.7\x201.7\x200\x200\x200-1.9-.3\x201.7\x201.7\x200\x200\x200-1\x201.6V21a2\x202\x200\x201\x201-4\x200v-.1a1.7\x201.7\x200\x200\x200-1-1.6\x201.7\x201.7\x200\x200\x200-1.9.3l-.1.1a2\x202\x200\x201\x201-2.8-2.8l.1-.1a1.7\x201.7\x200\x200\x200\x20.3-1.9\x201.7\x201.7\x200\x200\x200-1.6-1H3a2\x202\x200\x201\x201\x200-4h.1a1.7\x201.7\x200\x200\x200\x201.6-1\x201.7\x201.7\x200\x200\x200-.3-1.9l-.1-.1a2\x202\x200\x201\x201\x202.8-2.8l.1.1a1.7\x201.7\x200\x200\x200\x201.9.3h.1a1.7\x201.7\x200\x200\x200\x20.9-1.5V3a2\x202\x200\x201\x201\x204\x200v.1a1.7\x201.7\x200\x200\x200\x201\x201.6\x201.7\x201.7\x200\x200\x200\x201.9-.3l.1-.1a2\x202\x200\x201\x201\x202.8\x202.8l-.1.1a1.7\x201.7\x200\x200\x200-.3\x201.9v.1a1.7\x201.7\x200\x200\x200\x201.5.9H21a2\x202\x200\x201\x201\x200\x204h-.1a1.7\x201.7\x200\x200\x200-1.5.9Z\x22></path>',
+      speaker: '<path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9.5a4 4 0 0 1 0 5"></path>',
+      translate:
+        '<path d="m5 8 6 6"></path><path d="m4 14 6-7 2-3"></path><path d="M2 4h12"></path><path d="M7 2h1"></path><path d="m12 20 4-9 4 9"></path><path d="m13.5 17h5"></path>',
+      video: '<rect x="3" y="5" width="14" height="14" rx="2"></rect><path d="m17 9 4-2v10l-4-2"></path>',
+    };
+  return '<svg width="18" height="18" ' + value5 + '>' + (value6[value4] || '') + '</svg>';
+}

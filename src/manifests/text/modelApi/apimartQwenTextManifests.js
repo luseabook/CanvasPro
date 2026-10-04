@@ -5,7 +5,7 @@ const QWEN_MODELS = Object['freeze']([
     ['qwen3.8-27b', 'Qwen 3.8 27B'],
     ['qwen3.8-2.4t-a95b', 'Qwen 3.8 2.4T A95B'],
   ]),
-  executionId = (_0x4d7ad3) => 'apimart.model-api.text.' + _0x4d7ad3['replaceAll']('.', '-') + '.v1',
+  executionId = (value) => 'apimart.model-api.text.' + value['replaceAll']('.', '-') + '.v1',
   CHAT_RESPONSE_MAPPING = Object['freeze']({ resultPaths: Object['freeze'](['choices[].message.content']) }),
   CHAT_EXTENSIONS = Object['freeze']({
     chatCompletionInputPolicy: 'image-video',
@@ -13,17 +13,17 @@ const QWEN_MODELS = Object['freeze']([
     structuredOutputMode: 'json_object',
   });
 export const apimartQwenTextModelManifests = Object['freeze'](
-  QWEN_MODELS['map'](([_0x5ab025, _0x391b1a, _0x5ef678]) =>
+  QWEN_MODELS['map'](([item, displayName, description]) =>
     Object['freeze']({
       schemaVersion: '1.0',
-      modelId: 'apimart/' + _0x5ab025,
-      executionId: executionId(_0x5ab025),
+      modelId: 'apimart/' + item,
+      executionId: executionId(item),
       provider: 'apimart',
       kind: 'text',
       adapterType: 'modelApi',
-      displayName: _0x391b1a,
+      displayName: displayName,
       icon: 'images/qwen.svg',
-      description: _0x5ef678
+      description: description
         ? '支持图文理解、联网搜索和网页读取；推理始终开启'
         : 'APIMart chat completion model API',
       inputSlots: Object['freeze']({
@@ -31,7 +31,7 @@ export const apimartQwenTextModelManifests = Object['freeze'](
         minByKind: Object['freeze']({ text: 0x0, image: 0x0 }),
         maxByKind: Object['freeze']({ image: 0x8, video: 0x1, audio: 0x0 }),
       }),
-      uiSchema: _0x5ef678
+      uiSchema: description
         ? Object['freeze']({
             fields: Object['freeze']([
               Object['freeze']({
@@ -76,11 +76,11 @@ export const apimartQwenTextModelManifests = Object['freeze'](
                 defaultValue: 0x2000,
                 menuDescription: '上限包含思考与正文；本模型的思考不可关闭。',
                 options: Object['freeze'](
-                  [0x1000, 0x2000, 0x4000, 0x8000, 0x10000, 0x20000]['map']((_0x304946) =>
+                  [0x1000, 0x2000, 0x4000, 0x8000, 0x10000, 0x20000]['map']((value2) =>
                     Object['freeze']({
-                      value: _0x304946,
-                      label: _0x304946['toLocaleString']('en-US') + ' tokens',
-                      selectedLabel: '上限：' + _0x304946 / 0x400 + 'K',
+                      value: value2,
+                      label: value2['toLocaleString']('en-US') + ' tokens',
+                      selectedLabel: '上限：' + value2 / 0x400 + 'K',
                     }),
                   ),
                 ),
@@ -91,8 +91,8 @@ export const apimartQwenTextModelManifests = Object['freeze'](
       extensions: Object['freeze']({
         textMenu: Object['freeze']({
           group: 'apimart',
-          title: _0x391b1a,
-          subtitle: _0x5ef678 ? '图文理解 · 可选联网搜索 / 网页读取' : 'APIMart chat completion model API',
+          title: displayName,
+          subtitle: description ? '图文理解 · 可选联网搜索 / 网页读取' : 'APIMart chat completion model API',
           icon: 'qwen',
         }),
       }),
@@ -103,24 +103,24 @@ export const apimartQwenTextModelManifests = Object['freeze'](
   ),
 );
 export const apimartQwenTextExecutionManifests = Object['freeze'](
-  QWEN_MODELS['map'](([_0x1234fb, , _0x4b6984, _0x56006b]) =>
+  QWEN_MODELS['map'](([model, , endpoint, thinkingControlMode]) =>
     Object['freeze']({
       schemaVersion: '1.0',
-      id: executionId(_0x1234fb),
+      id: executionId(model),
       provider: 'apimart',
       kind: 'text',
       adapterType: 'modelApi',
-      endpoint: _0x4b6984 ? '/v1/responses' : '/v1/chat/completions',
-      endpointMode: _0x4b6984 ? 'responses' : 'chat-completion',
+      endpoint: endpoint ? '/v1/responses' : '/v1/chat/completions',
+      endpointMode: endpoint ? 'responses' : 'chat-completion',
       method: 'POST',
-      model: _0x1234fb,
+      model: model,
       headers: Object['freeze']({ 'Content-Type': 'application/json' }),
       bodyMapping: Object['freeze'](
-        _0x4b6984
+        endpoint
           ? { modelField: 'model', promptField: 'input' }
           : { modelField: 'model', messagesField: 'messages' },
       ),
-      responseMapping: _0x4b6984
+      responseMapping: endpoint
         ? Object['freeze']({
             resultPaths: Object['freeze'](['output_text', 'output[].content[].text']),
             includeSources: !![],
@@ -128,11 +128,11 @@ export const apimartQwenTextExecutionManifests = Object['freeze'](
           })
         : CHAT_RESPONSE_MAPPING,
       result: Object['freeze']({
-        textFields: _0x4b6984
+        textFields: endpoint
           ? Object['freeze'](['output_text', 'output[].content[].text'])
           : CHAT_RESPONSE_MAPPING['resultPaths'],
       }),
-      extensions: _0x4b6984
+      extensions: endpoint
         ? Object['freeze']({
             chatCompletionInputPolicy: 'image-video',
             strictUpload: !![],
@@ -154,8 +154,8 @@ export const apimartQwenTextExecutionManifests = Object['freeze'](
             imageSearchInstructions:
               'When presenting image search results, use only actual image URLs returned by the search tool. Format each image as [![short description](<image URL>)](<source page URL>), or ![short description](<image URL>) if no source page is provided. Do not invent URLs. If the tool returns no usable image URLs, explain that no images were found. Return at most 24 images.',
           })
-        : _0x56006b
-          ? Object['freeze']({ ...CHAT_EXTENSIONS, thinkingControlMode: _0x56006b })
+        : thinkingControlMode
+          ? Object['freeze']({ ...CHAT_EXTENSIONS, thinkingControlMode: thinkingControlMode })
           : CHAT_EXTENSIONS,
     }),
   ),

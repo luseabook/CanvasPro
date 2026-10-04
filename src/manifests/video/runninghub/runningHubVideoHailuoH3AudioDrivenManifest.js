@@ -144,9 +144,7 @@ export const rhVideoHailuoH3AudioDrivenExecutionManifest = createRunningHubVideo
     defaultAspectRatio: '自适应',
     dimensionMultiple: 0x20,
     imageLoaderNodes: Object['freeze'](
-      ['60', '72', '128', '129']['map']((_0x5050d3) =>
-        Object['freeze']({ nodeId: _0x5050d3, fieldName: 'image' }),
-      ),
+      ['60', '72', '128', '129']['map']((nodeId) => Object['freeze']({ nodeId: nodeId, fieldName: 'image' })),
     ),
     videoLoaderNodes: Object['freeze']([Object['freeze']({ nodeId: '68', fieldName: 'video' })]),
     audioLoaderNodes: Object['freeze']([Object['freeze']({ nodeId: '336', fieldName: 'audio' })]),

@@ -1,1 +1,250 @@
-import{sliceFlowSpeech}from'./videoReplicationFlowSpeech.js';import{isStoryContinuousTimelinePromptMode}from'./promptModes.js';import{getReplicationEventSpeech}from'./videoReplicationSpeechOrder.js';import{REPLICATION_SHOT_GUIDANCE as REPLICATION_SHOT_GUIDANCE_2,inspectReplicationSourceShotCoverage,hasReplicationInternalCut}from'./videoReplicationShotEvidence.js';import{REPLICATION_SPEECH_INTEGRITY_GUIDANCE}from'./videoReplicationSpeechIntegrity.js';import{REPLICATION_TIMELINE_RULE}from'./videoReplicationPromptPolicy.js';import{connectReplicationClipStates}from'./videoReplicationVisualState.js';import{resolveReplicationContentType}from'./videoReplicationContentRouting.js';const REPLICATION_SHOT_GUIDANCE=REPLICATION_SHOT_GUIDANCE_2+REPLICATION_SPEECH_INTEGRITY_GUIDANCE,round=_0x85dac0=>Number(_0x85dac0['toFixed'](0x3));export function buildReplicationSegmentPlan(_0x22166b,{durationSec:_0x517f30,maxSeconds:_0x1badd9,promptMode:_0xa61573}={}){const _0xa49bc5=Number(_0x517f30),_0x1fb241=isStoryContinuousTimelinePromptMode(_0xa61573)?Math["floor"](Number(_0x1badd9)):Number(_0x1badd9);if(!(_0xa49bc5>0x0&&_0x1fb241>0x0)||!_0x22166b?.["events"]?.["length"])throw new Error('原片缺少可分段的时间证据。');const _0x2a6779=[...new Set(_0x22166b["events"]["map"](_0x422966=>Number(_0x422966["endSec"])))]['sort']((_0x164a36,_0x354496)=>_0x164a36-_0x354496),_0x110865=[];let _0x1756cf=0x0;while(_0x1756cf<_0xa49bc5-0.001){const _0x4bb76e=Math["min"](_0xa49bc5,_0x1756cf+_0x1fb241),_0x3cbeaf=_0x2a6779['filter'](_0x5833b9=>_0x5833b9>_0x1756cf&&_0x5833b9<=_0x4bb76e+0.001),_0x202db3=_0x3cbeaf['at'](-0x1),_0x5cfe77=_0x4bb76e===_0xa49bc5?_0xa49bc5:_0x202db3??_0x4bb76e,_0x1dfd70=_0x22166b["events"]["filter"](_0x306923=>_0x306923["endSec"]>_0x1756cf&&_0x306923["startSec"]<_0x5cfe77)['map'](_0x4771a8=>{const _0x1f30df={..._0x4771a8,'startSec':Math["max"](_0x1756cf,_0x4771a8["startSec"]),'endSec':Math["min"](_0x5cfe77,_0x4771a8["endSec"])},_0x1c69d8=getReplicationEventSpeech(_0x4771a8),_0x5f339a=new Map();if(_0x1c69d8){const _0x43bbbf=_0x4771a8["shots"]?.["length"]?_0x1c69d8["flatMap"](_0x561f45=>{const _0x41006c=_0x4771a8["shots"]["filter"](_0x12834b=>_0x12834b["speechRefs"]["includes"](_0x561f45["key"])),_0x2a3202=_0x561f45["timingSource"]==="asr"?_0x561f45["startSec"]:_0x41006c['length']?Math["min"](..._0x41006c['map'](_0x379470=>_0x379470["startSec"])):_0x4771a8["startSec"],_0x153900=_0x561f45["timingSource"]==='asr'?_0x561f45['endSec']:_0x41006c["length"]?Math["max"](..._0x41006c['map'](_0x20edf1=>_0x20edf1["endSec"])):_0x4771a8["endSec"];return sliceFlowSpeech({..._0x4771a8,'startSec':_0x2a3202,'endSec':_0x153900,'parts':[_0x561f45]},_0x1756cf,_0x5cfe77)['parts'];}):sliceFlowSpeech({..._0x4771a8,'parts':_0x1c69d8},_0x1756cf,_0x5cfe77)['parts'];_0x1f30df["dialogue"]=[],_0x1f30df['voiceover']=[],_0x1f30df["speechOrder"]=_0x43bbbf['map'](({key:_0x572baf,kind:_0x1da85b,..._0x325b3e})=>{const _0x15cd1b=_0x1f30df[_0x1da85b]['length'],_0x443183=(_0x4771a8[_0x1da85b]||[])[Number(_0x572baf?.["split"](':')[0x1])];return _0x1f30df[_0x1da85b]['push']({..._0x325b3e,..._0x1da85b==="voiceover"?{'kind':_0x443183?.["kind"]||"narration"}:{}}),_0x5f339a["set"](_0x572baf,[..._0x5f339a["get"](_0x572baf)||[],_0x1da85b+':'+_0x15cd1b]),_0x1da85b+':'+_0x15cd1b;});}else for(const _0x488492 of["dialogue","voiceover"]){_0x1f30df[_0x488492]=sliceFlowSpeech({..._0x4771a8,'parts':(_0x4771a8[_0x488492]||[])['map']((_0x3e9168,_0x5396f1)=>({..._0x3e9168,'key':_0x488492+':'+_0x5396f1}))},_0x1756cf,_0x5cfe77)["parts"]["map"](({key:_0x363c7d,..._0x2636d7},_0x5db8b0)=>{return _0x5f339a['set'](_0x363c7d,[_0x488492+':'+_0x5db8b0]),_0x2636d7;});}if(_0x4771a8["shots"])_0x1f30df["shots"]=_0x4771a8["shots"]['filter'](_0xb7121c=>_0xb7121c["endSec"]>_0x1756cf&&_0xb7121c['startSec']<_0x5cfe77)["map"](_0x314134=>({..._0x314134,'startSec':Math["max"](_0x1756cf,_0x314134['startSec']),'endSec':Math["min"](_0x5cfe77,_0x314134["endSec"]),..._0x314134['startSec']<_0x1756cf?{'spatialStart':[]}:{},..._0x314134["endSec"]>_0x5cfe77?{'spatialEnd':[]}:{},'speechRefs':[...new Set(_0x314134["speechRefs"]["flatMap"](_0x488cb2=>_0x5f339a["get"](_0x488cb2)||[]))]}));return _0x1f30df["timingEstimated"]=_0x4771a8["startSec"]<_0x1756cf||_0x4771a8["endSec"]>_0x5cfe77,_0x1f30df;}),_0x2a1a49=round(_0x5cfe77-_0x1756cf);_0x110865["push"]({'ref':'clip-'+(_0x110865["length"]+0x1),'sourceStartSec':round(_0x1756cf),'sourceEndSec':round(_0x5cfe77),'durationSec':isStoryContinuousTimelinePromptMode(_0xa61573)?Math['ceil'](_0x2a1a49):_0x2a1a49,'events':_0x1dfd70}),_0x1756cf=_0x5cfe77;}return _0x110865;}export function getReplicationSegmentPlanGuidance(_0x37750b={}){const _0x57dfd9=_0x37750b["replication"]?.["segmentPlan"];if(!_0x57dfd9?.["length"])return'';const _0x1ff876=REPLICATION_SHOT_GUIDANCE+'\x0a每个\x20shot.assetUsages\x20必须关联实际出现的场景和关键道具，不能只列人物；对白里只是提及的位置不算实际场景。使用素材清单已有\x20ref\x20和\x20appearanceRef，多形象选当前镜头实际状态，不凭空造素材。画外音可以延迟开始、跨镜持续；在开始发声镜头的\x20audio\x20写完整覆盖时间，正文保留整句一次，后续镜头无需延续标记；时间不得超出片段。人物对白写入对应镜头\x20dialogue，visual/camera\x20明确说话人的画面动作和景别；画外音写\x20voiceover，不附加口型同步或不驱动口型说明，不用‘对白同步发生’代替具体发言。';return _0x1ff876+"\n程序已确定 "+_0x57dfd9["length"]+" 个片段。"+REPLICATION_TIMELINE_RULE+'\x20每段只返回一个同\x20ref\x20的\x20clip，shots\x20合计严格等于计划\x20durationSec。原片绝对时间转为片段局部时间，不能重新估时。events.shots\x20记录实际镜头；按\x20speechRefs\x20放回人声，speechOrder\x20保留穿插顺序。timingEstimated\x20表示跨段人声近似定位，不能据此重复或猜写原话。';}export function inspectReplicationShotGranularity({clips:clips=[]}={},_0x2ea8b2={}){return[...inspectReplicationSourceShotCoverage({'clips':clips},_0x2ea8b2),...clips["flatMap"](_0x540842=>(_0x540842['shots']||[])["flatMap"]((_0x5217a2,_0x5c67f8)=>{const _0x51a34c=String(_0x5217a2["dialogue"]||'')["split"]('\x0a')["filter"](_0x24e915=>/^[^：:]+[：:]/u["test"](_0x24e915)),_0x2c4d01=/正反打|切换|切至|切到|切镜/u["test"]((_0x5217a2["camera"]||'')+'\x20'+(_0x5217a2["visual"]||''));if(!(Number(_0x5217a2["durationSec"])>=0xf&&_0x51a34c["length"]>=0x3&&_0x2c4d01)&&hasReplicationInternalCut(_0x5217a2))return[{'clipRef':_0x540842["ref"],'shotIndex':_0x5c67f8,'code':'replication_shot_internal_cut','message':"单个 shot 内仍包含实际切镜或多个机位，须按原片边界分成独立区间，不能改写为连续运镜。"}];return Number(_0x5217a2["durationSec"])>=0xf&&_0x51a34c["length"]>=0x3&&_0x2c4d01?[{'clipRef':_0x540842['ref'],'shotIndex':_0x5c67f8,'code':"replication_shot_collapsed",'message':"单镜头混入多轮问答和切镜，缺少动作与人声对应的镜头时间区间。"}]:[];}))];}export function applyReplicationSegmentPlan(_0x48b916,_0x4e6e05){const _0x179ada=_0x4e6e05["replication"]?.["segmentPlan"];if(!_0x179ada?.["length"])return _0x48b916;if(_0x48b916["clips"]?.["length"]!==_0x179ada["length"])throw new Error("原片已规划 "+_0x179ada["length"]+" 段，模型返回 "+(_0x48b916["clips"]?.["length"]||0x0)+" 段，未采用偏离计划的分段。");return{..._0x48b916,'clips':connectReplicationClipStates(_0x48b916["clips"]["map"]((_0x1eee36,_0x53f8b4)=>{const _0x1811bd=_0x179ada[_0x53f8b4],_0x2d3855=(_0x1eee36["shots"]||[])['reduce']((_0x3a55e0,_0x59db57)=>_0x3a55e0+Number(_0x59db57['durationSec']||0x0),0x0);return{..._0x1eee36,'ref':_0x1811bd['ref'],'durationSec':_0x2d3855,'replicationContentType':resolveReplicationContentType(_0x4e6e05["replication"]["sourceAnalysis"]?.['contentType'],_0x1eee36['replicationContentType']),'replicationSpeechEvents':_0x1811bd['events'],'replicationCharacters':_0x4e6e05["replication"]["sourceAnalysis"]?.["characters"]||_0x1eee36["replicationCharacters"]||[],'sourceStartSec':_0x1811bd["sourceStartSec"],'sourceEndSec':_0x1811bd["sourceEndSec"]};}))};}export function inspectReplicationSegmentTiming({clips:clips=[]}={},_0x850bb1={},_0x4692df=0x0){const _0x356ffe=_0x850bb1["replication"]?.['segmentPlan']||[];return clips['flatMap'](_0x5e8bb6=>{const _0x8036a3=_0x356ffe["find"](_0x4f1b79=>_0x4f1b79["ref"]===_0x5e8bb6['ref']);if(!_0x8036a3)return[];const _0x4740ae=(_0x5e8bb6["shots"]||[])["reduce"]((_0x25fd1e,_0x5a379c)=>_0x25fd1e+Number(_0x5a379c['durationSec']||0x0),0x0),_0x3e8b8d=Number(_0x8036a3["durationSec"]),_0x1f343f=!Number["isFinite"](_0x4740ae)||_0x4740ae<=0x0,_0x4ebfeb=Math["abs"](_0x4740ae-_0x3e8b8d)>0.001,_0x50d5ca=_0x4692df>0x0&&_0x4740ae>_0x4692df+0.11;return _0x1f343f||_0x4ebfeb||_0x50d5ca?[{'clipRef':_0x5e8bb6['ref'],'code':"replication_duration_extreme",'message':"片段时间已锁定为 "+_0x3e8b8d+'\x20秒，镜头合计\x20'+_0x4740ae+'\x20秒'+(_0x4692df>0x0?"，模型上限 "+_0x4692df+'\x20秒':'')+"；必须恢复既定时间范围，不能重新分配片段时长。"}]:[];});}
+import { sliceFlowSpeech } from './videoReplicationFlowSpeech.js';
+import { isStoryContinuousTimelinePromptMode } from './promptModes.js';
+import { getReplicationEventSpeech } from './videoReplicationSpeechOrder.js';
+import {
+  REPLICATION_SHOT_GUIDANCE as REPLICATION_SHOT_GUIDANCE_2,
+  inspectReplicationSourceShotCoverage,
+  hasReplicationInternalCut,
+} from './videoReplicationShotEvidence.js';
+import { REPLICATION_SPEECH_INTEGRITY_GUIDANCE } from './videoReplicationSpeechIntegrity.js';
+import { REPLICATION_TIMELINE_RULE } from './videoReplicationPromptPolicy.js';
+import { connectReplicationClipStates } from './videoReplicationVisualState.js';
+import { resolveReplicationContentType } from './videoReplicationContentRouting.js';
+const REPLICATION_SHOT_GUIDANCE = REPLICATION_SHOT_GUIDANCE_2 + REPLICATION_SPEECH_INTEGRITY_GUIDANCE,
+  round = (value) => Number(value['toFixed'](0x3));
+export function buildReplicationSegmentPlan(
+  enabled,
+  { durationSec: durationSec, maxSeconds: maxSeconds, promptMode: promptMode } = {},
+) {
+  const count = Number(durationSec),
+    isStoryContinuousTimelinePromptMode2 = isStoryContinuousTimelinePromptMode(promptMode)
+      ? Math['floor'](Number(maxSeconds))
+      : Number(maxSeconds);
+  if (!(count > 0x0 && isStoryContinuousTimelinePromptMode2 > 0x0) || !enabled?.['events']?.['length'])
+    throw new Error('原片缺少可分段的时间证据。');
+  const list = [...new Set(enabled['events']['map']((item) => Number(item['endSec'])))]['sort'](
+      (key, index) => key - index,
+    ),
+    result = [];
+  let data = 0x0;
+  while (data < count - 0.001) {
+    const options = Math['min'](count, data + isStoryContinuousTimelinePromptMode2),
+      target = list['filter']((source) => source > data && source <= options + 0.001),
+      next = target['at'](-0x1),
+      current = options === count ? count : (next ?? options),
+      entry = enabled['events']
+        ['filter']((record) => record['endSec'] > data && record['startSec'] < current)
+        ['map']((args) => {
+          const payload = {
+              ...args,
+              startSec: Math['max'](data, args['startSec']),
+              endSec: Math['min'](current, args['endSec']),
+            },
+            replicationEventSpeech = getReplicationEventSpeech(args),
+            map = new Map();
+          if (replicationEventSpeech) {
+            const list2 = args['shots']?.['length']
+              ? replicationEventSpeech['flatMap']((handle) => {
+                  const list3 = args['shots']['filter']((state) =>
+                      state['speechRefs']['includes'](handle['key']),
+                    ),
+                    config =
+                      handle['timingSource'] === 'asr'
+                        ? handle['startSec']
+                        : list3['length']
+                          ? Math['min'](...list3['map']((scope) => scope['startSec']))
+                          : args['startSec'],
+                    input =
+                      handle['timingSource'] === 'asr'
+                        ? handle['endSec']
+                        : list3['length']
+                          ? Math['max'](...list3['map']((output) => output['endSec']))
+                          : args['endSec'];
+                  return sliceFlowSpeech(
+                    { ...args, startSec: config, endSec: input, parts: [handle] },
+                    data,
+                    current,
+                  )['parts'];
+                })
+              : sliceFlowSpeech({ ...args, parts: replicationEventSpeech }, data, current)['parts'];
+            ((payload['dialogue'] = []),
+              (payload['voiceover'] = []),
+              (payload['speechOrder'] = list2['map'](({ key: key2, kind: kind, ...args2 }) => {
+                const value2 = payload[kind]['length'],
+                  value3 = (args[kind] || [])[Number(key2?.['split'](':')[0x1])];
+                return (
+                  payload[kind]['push']({
+                    ...args2,
+                    ...(kind === 'voiceover' ? { kind: value3?.['kind'] || 'narration' } : {}),
+                  }),
+                  map['set'](key2, [...(map['get'](key2) || []), kind + ':' + value2]),
+                  kind + ':' + value2
+                );
+              })));
+          } else
+            for (const value4 of ['dialogue', 'voiceover']) {
+              payload[value4] = sliceFlowSpeech(
+                {
+                  ...args,
+                  parts: (args[value4] || [])['map']((args3, value5) => ({
+                    ...args3,
+                    key: value4 + ':' + value5,
+                  })),
+                },
+                data,
+                current,
+              )['parts']['map'](({ key: key3, ...args4 }, value6) => {
+                return (map['set'](key3, [value4 + ':' + value6]), args4);
+              });
+            }
+          if (args['shots'])
+            payload['shots'] = args['shots']
+              ['filter']((value7) => value7['endSec'] > data && value7['startSec'] < current)
+              ['map']((args5) => ({
+                ...args5,
+                startSec: Math['max'](data, args5['startSec']),
+                endSec: Math['min'](current, args5['endSec']),
+                ...(args5['startSec'] < data ? { spatialStart: [] } : {}),
+                ...(args5['endSec'] > current ? { spatialEnd: [] } : {}),
+                speechRefs: [
+                  ...new Set(args5['speechRefs']['flatMap']((value8) => map['get'](value8) || [])),
+                ],
+              }));
+          return (
+            (payload['timingEstimated'] = args['startSec'] < data || args['endSec'] > current),
+            payload
+          );
+        }),
+      round2 = round(current - data);
+    (result['push']({
+      ref: 'clip-' + (result['length'] + 0x1),
+      sourceStartSec: round(data),
+      sourceEndSec: round(current),
+      durationSec: isStoryContinuousTimelinePromptMode(promptMode) ? Math['ceil'](round2) : round2,
+      events: entry,
+    }),
+      (data = current));
+  }
+  return result;
+}
+export function getReplicationSegmentPlanGuidance(options2 = {}) {
+  const enabled2 = options2['replication']?.['segmentPlan'];
+  if (!enabled2?.['length']) return '';
+  const value9 =
+    REPLICATION_SHOT_GUIDANCE +
+    '\x0a每个\x20shot.assetUsages\x20必须关联实际出现的场景和关键道具，不能只列人物；对白里只是提及的位置不算实际场景。使用素材清单已有\x20ref\x20和\x20appearanceRef，多形象选当前镜头实际状态，不凭空造素材。画外音可以延迟开始、跨镜持续；在开始发声镜头的\x20audio\x20写完整覆盖时间，正文保留整句一次，后续镜头无需延续标记；时间不得超出片段。人物对白写入对应镜头\x20dialogue，visual/camera\x20明确说话人的画面动作和景别；画外音写\x20voiceover，不附加口型同步或不驱动口型说明，不用‘对白同步发生’代替具体发言。';
+  return (
+    value9 +
+    '\n程序已确定 ' +
+    enabled2['length'] +
+    ' 个片段。' +
+    REPLICATION_TIMELINE_RULE +
+    '\x20每段只返回一个同\x20ref\x20的\x20clip，shots\x20合计严格等于计划\x20durationSec。原片绝对时间转为片段局部时间，不能重新估时。events.shots\x20记录实际镜头；按\x20speechRefs\x20放回人声，speechOrder\x20保留穿插顺序。timingEstimated\x20表示跨段人声近似定位，不能据此重复或猜写原话。'
+  );
+}
+export function inspectReplicationShotGranularity({ clips: clips = [] } = {}, value10 = {}) {
+  return [
+    ...inspectReplicationSourceShotCoverage({ clips: clips }, value10),
+    ...clips['flatMap']((value11) =>
+      (value11['shots'] || [])['flatMap']((value12, value13) => {
+        const value14 = String(value12['dialogue'] || '')
+            ['split']('\x0a')
+            ['filter']((value15) => /^[^：:]+[：:]/u['test'](value15)),
+          value16 = /正反打|切换|切至|切到|切镜/u['test'](
+            (value12['camera'] || '') + '\x20' + (value12['visual'] || ''),
+          );
+        if (
+          !(Number(value12['durationSec']) >= 0xf && value14['length'] >= 0x3 && value16) &&
+          hasReplicationInternalCut(value12)
+        )
+          return [
+            {
+              clipRef: value11['ref'],
+              shotIndex: value13,
+              code: 'replication_shot_internal_cut',
+              message: '单个 shot 内仍包含实际切镜或多个机位，须按原片边界分成独立区间，不能改写为连续运镜。',
+            },
+          ];
+        return Number(value12['durationSec']) >= 0xf && value14['length'] >= 0x3 && value16
+          ? [
+              {
+                clipRef: value11['ref'],
+                shotIndex: value13,
+                code: 'replication_shot_collapsed',
+                message: '单镜头混入多轮问答和切镜，缺少动作与人声对应的镜头时间区间。',
+              },
+            ]
+          : [];
+      }),
+    ),
+  ];
+}
+export function applyReplicationSegmentPlan(args6, value17) {
+  const enabled3 = value17['replication']?.['segmentPlan'];
+  if (!enabled3?.['length']) return args6;
+  if (args6['clips']?.['length'] !== enabled3['length'])
+    throw new Error(
+      '原片已规划 ' +
+        enabled3['length'] +
+        ' 段，模型返回 ' +
+        (args6['clips']?.['length'] || 0x0) +
+        ' 段，未采用偏离计划的分段。',
+    );
+  return {
+    ...args6,
+    clips: connectReplicationClipStates(
+      args6['clips']['map']((args7, value18) => {
+        const value19 = enabled3[value18],
+          value20 = (args7['shots'] || [])['reduce'](
+            (value21, value22) => value21 + Number(value22['durationSec'] || 0x0),
+            0x0,
+          );
+        return {
+          ...args7,
+          ref: value19['ref'],
+          durationSec: value20,
+          replicationContentType: resolveReplicationContentType(
+            value17['replication']['sourceAnalysis']?.['contentType'],
+            args7['replicationContentType'],
+          ),
+          replicationSpeechEvents: value19['events'],
+          replicationCharacters:
+            value17['replication']['sourceAnalysis']?.['characters'] || args7['replicationCharacters'] || [],
+          sourceStartSec: value19['sourceStartSec'],
+          sourceEndSec: value19['sourceEndSec'],
+        };
+      }),
+    ),
+  };
+}
+export function inspectReplicationSegmentTiming({ clips: clips = [] } = {}, value23 = {}, count2 = 0x0) {
+  const value24 = value23['replication']?.['segmentPlan'] || [];
+  return clips['flatMap']((value25) => {
+    const enabled4 = value24['find']((value26) => value26['ref'] === value25['ref']);
+    if (!enabled4) return [];
+    const count3 = (value25['shots'] || [])['reduce'](
+        (value27, value28) => value27 + Number(value28['durationSec'] || 0x0),
+        0x0,
+      ),
+      value29 = Number(enabled4['durationSec']),
+      value30 = !Number['isFinite'](count3) || count3 <= 0x0,
+      value31 = Math['abs'](count3 - value29) > 0.001,
+      value32 = count2 > 0x0 && count3 > count2 + 0.11;
+    return value30 || value31 || value32
+      ? [
+          {
+            clipRef: value25['ref'],
+            code: 'replication_duration_extreme',
+            message:
+              '片段时间已锁定为 ' +
+              value29 +
+              '\x20秒，镜头合计\x20' +
+              count3 +
+              '\x20秒' +
+              (count2 > 0x0 ? '，模型上限 ' + count2 + '\x20秒' : '') +
+              '；必须恢复既定时间范围，不能重新分配片段时长。',
+          },
+        ]
+      : [];
+  });
+}

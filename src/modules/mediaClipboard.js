@@ -8,210 +8,193 @@ import {
 } from '../services/imagePngConversionService.js';
 import { localPathToUrl, normalizeLocalPath } from '../utils/localMediaPath.js';
 const IMAGE_NODE_TYPES = new Set(['source-image', 'ai-image', 'storyboard']);
-function pickMainItem(_0x3139f0, _0x5c7cd3) {
-  if (!Array.isArray(_0x3139f0) || _0x3139f0.length === 0) return null;
-  const _0x525720 = Number(_0x5c7cd3),
-    _0x1ff7e5 = Number.isFinite(_0x525720) ? Math.max(0, Math.trunc(_0x525720)) : 0;
-  return _0x3139f0[_0x1ff7e5] || _0x3139f0[0] || null;
+function pickMainItem(list, value) {
+  if (!Array.isArray(list) || list.length === 0) return null;
+  const item = Number(value),
+    key = Number.isFinite(item) ? Math.max(0, Math.trunc(item)) : 0;
+  return list[key] || list[0] || null;
 }
-function normalizeMediaUrl(_0x110174) {
-  const _0xd05879 = String(_0x110174 || '').trim();
-  if (!_0xd05879) return '';
-  if (/^(https?:|blob:|data:)/i.test(_0xd05879)) return _0xd05879;
-  const _0x50d632 = localPathToUrl(_0xd05879);
-  if (_0x50d632) return _0x50d632;
-  const _0x2b74f7 = _0xd05879.replace(/\\/g, '/');
-  if (
-    /^(?:file:|javascript:)/i.test(_0x2b74f7) ||
-    /^[a-zA-Z]:\//.test(_0x2b74f7) ||
-    _0x2b74f7.startsWith('//')
-  )
+function normalizeMediaUrl(index) {
+  const enabled = String(index || '').trim();
+  if (!enabled) return '';
+  if (/^(https?:|blob:|data:)/i.test(enabled)) return enabled;
+  const url = localPathToUrl(enabled);
+  if (url) return url;
+  const result = enabled.replace(/\\/g, '/');
+  if (/^(?:file:|javascript:)/i.test(result) || /^[a-zA-Z]:\//.test(result) || result.startsWith('//'))
     return '';
-  const _0x4c8709 = _0x2b74f7.split(/[?#]/, 1)[0].replace(/^\/+/, ''),
-    _0x36ebe6 = _0x4c8709.split('/').filter(Boolean);
-  if (!_0x36ebe6.length || _0x36ebe6.some((_0x32728a) => _0x32728a === '.' || _0x32728a === '..')) return '';
-  return '/' + _0x36ebe6.join('/');
+  const data = result.split(/[?#]/, 1)[0].replace(/^\/+/, ''),
+    list2 = data.split('/').filter(Boolean);
+  if (!list2.length || list2.some((item2) => item2 === '.' || item2 === '..')) return '';
+  return '/' + list2.join('/');
 }
-function normalizeLocalMediaPath(_0x4f3057) {
-  return normalizeLocalPath(_0x4f3057);
+function normalizeLocalMediaPath(options) {
+  return normalizeLocalPath(options);
 }
-function pickMediaUrl(..._0x197518) {
-  for (const _0x36915c of _0x197518) {
-    const _0x2017f0 = normalizeMediaUrl(_0x36915c);
-    if (_0x2017f0) return _0x2017f0;
+function pickMediaUrl(...args) {
+  for (const target of args) {
+    const mediaUrl = normalizeMediaUrl(target);
+    if (mediaUrl) return mediaUrl;
   }
   return '';
 }
-function pickLocalMediaPath(..._0x33c722) {
-  for (const _0x259a68 of _0x33c722) {
-    const _0x1f408b = normalizeLocalMediaPath(_0x259a68);
-    if (_0x1f408b) return _0x1f408b;
+function pickLocalMediaPath(...args2) {
+  for (const source of args2) {
+    const localMediaPath = normalizeLocalMediaPath(source);
+    if (localMediaPath) return localMediaPath;
   }
   return '';
 }
-function resolveNodeMedia(_0x3a2964) {
-  const _0xcea1d3 = String(_0x3a2964?.type || '').trim();
-  if (!IMAGE_NODE_TYPES.has(_0xcea1d3)) return { kind: '', url: '', localPath: '' };
-  if (_0xcea1d3 === 'storyboard') {
-    const _0x124692 = Array.isArray(_0x3a2964?.cells) ? _0x3a2964.cells[0] : null;
+function resolveNodeMedia(next) {
+  const current = String(next?.type || '').trim();
+  if (!IMAGE_NODE_TYPES.has(current)) return { kind: '', url: '', localPath: '' };
+  if (current === 'storyboard') {
+    const response = Array.isArray(next?.cells) ? next.cells[0] : null;
     return {
       kind: 'image',
-      url: pickMediaUrl(
-        _0x124692?.url,
-        _0x3a2964?.sourceUrl,
-        _0x3a2964?.imageUrl,
-        _0x3a2964?.src,
-        _0x3a2964?.localPath,
-      ),
+      url: pickMediaUrl(response?.url, next?.sourceUrl, next?.imageUrl, next?.src, next?.localPath),
       localPath: pickLocalMediaPath(
-        _0x124692?.localPath,
-        _0x124692?.url,
-        _0x3a2964?.localPath,
-        _0x3a2964?.sourceUrl,
-        _0x3a2964?.imageUrl,
-        _0x3a2964?.src,
+        response?.localPath,
+        response?.url,
+        next?.localPath,
+        next?.sourceUrl,
+        next?.imageUrl,
+        next?.src,
       ),
     };
   }
-  if (_0xcea1d3 === 'source-image')
+  if (current === 'source-image')
     return {
       kind: 'image',
-      url: pickMediaUrl(
-        _0x3a2964?.localPath,
-        _0x3a2964?.sourceUrl,
-        _0x3a2964?.imageUrl,
-        _0x3a2964?.src,
-        _0x3a2964?.thumbUrl,
-      ),
+      url: pickMediaUrl(next?.localPath, next?.sourceUrl, next?.imageUrl, next?.src, next?.thumbUrl),
       localPath: pickLocalMediaPath(
-        _0x3a2964?.displayLocalPath,
-        _0x3a2964?.localPath,
-        _0x3a2964?.originalLocalPath,
-        _0x3a2964?.sourceUrl,
-        _0x3a2964?.imageUrl,
-        _0x3a2964?.src,
-        _0x3a2964?.thumbUrl,
+        next?.displayLocalPath,
+        next?.localPath,
+        next?.originalLocalPath,
+        next?.sourceUrl,
+        next?.imageUrl,
+        next?.src,
+        next?.thumbUrl,
       ),
     };
-  const _0x4c1de1 = pickMainItem(_0x3a2964?.images, _0x3a2964?.mainImageIndex);
+  const response2 = pickMainItem(next?.images, next?.mainImageIndex);
   return {
     kind: 'image',
     url: pickMediaUrl(
-      _0x4c1de1?.localPath,
-      _0x4c1de1?.sourceUrl,
-      _0x4c1de1?.imageUrl,
-      _0x4c1de1?.url,
-      _0x4c1de1?.thumbUrl,
-      _0x3a2964?.localPath,
-      _0x3a2964?.sourceUrl,
-      _0x3a2964?.imageUrl,
-      _0x3a2964?.src,
-      _0x3a2964?.thumbUrl,
+      response2?.localPath,
+      response2?.sourceUrl,
+      response2?.imageUrl,
+      response2?.url,
+      response2?.thumbUrl,
+      next?.localPath,
+      next?.sourceUrl,
+      next?.imageUrl,
+      next?.src,
+      next?.thumbUrl,
     ),
     localPath: pickLocalMediaPath(
-      _0x4c1de1?.displayLocalPath,
-      _0x4c1de1?.localPath,
-      _0x4c1de1?.originalLocalPath,
-      _0x4c1de1?.sourceUrl,
-      _0x4c1de1?.imageUrl,
-      _0x4c1de1?.url,
-      _0x4c1de1?.thumbUrl,
-      _0x3a2964?.displayLocalPath,
-      _0x3a2964?.localPath,
-      _0x3a2964?.originalLocalPath,
-      _0x3a2964?.sourceUrl,
-      _0x3a2964?.imageUrl,
-      _0x3a2964?.src,
-      _0x3a2964?.thumbUrl,
+      response2?.displayLocalPath,
+      response2?.localPath,
+      response2?.originalLocalPath,
+      response2?.sourceUrl,
+      response2?.imageUrl,
+      response2?.url,
+      response2?.thumbUrl,
+      next?.displayLocalPath,
+      next?.localPath,
+      next?.originalLocalPath,
+      next?.sourceUrl,
+      next?.imageUrl,
+      next?.src,
+      next?.thumbUrl,
     ),
   };
 }
 function getElectronClipboardApi() {
-  const _0x2bb8ce = globalThis?.window?.electronAPI?.clipboard;
-  return _0x2bb8ce && typeof _0x2bb8ce.writeImage === 'function' ? _0x2bb8ce : null;
+  const entry = globalThis?.window?.electronAPI?.clipboard;
+  return entry && typeof entry.writeImage === 'function' ? entry : null;
 }
-async function copyNodeMediaToElectronClipboard({ url: _0x151334, localPath: _0xef0e69 } = {}) {
-  const _0x542952 = getElectronClipboardApi();
-  if (!_0x542952) return null;
-  const _0x4b0f69 = _0xef0e69 || normalizeLocalMediaPath(_0x151334);
-  if (!_0x4b0f69) return { ok: false, reason: 'no-local-path' };
+async function copyNodeMediaToElectronClipboard({ url: url2, localPath: localPath } = {}) {
+  const electronClipboardApi = getElectronClipboardApi();
+  if (!electronClipboardApi) return null;
+  const localPath2 = localPath || normalizeLocalMediaPath(url2);
+  if (!localPath2) return { ok: false, reason: 'no-local-path' };
   try {
-    const _0x57fd98 = await _0x542952.writeImage({
-      localPath: _0x4b0f69,
-      text: String(_0x151334 || _0x4b0f69 || ''),
+    const mimeType = await electronClipboardApi.writeImage({
+      localPath: localPath2,
+      text: String(url2 || localPath2 || ''),
     });
-    if (_0x57fd98?.ok)
+    if (mimeType?.ok)
       return {
         ok: true,
         kind: 'image',
-        mimeType: _0x57fd98.mimeType || 'image/png',
-        sourceUrl: _0x151334,
-        localPath: _0x4b0f69,
+        mimeType: mimeType.mimeType || 'image/png',
+        sourceUrl: url2,
+        localPath: localPath2,
         copyPath: 'electron',
       };
-    return { ok: false, reason: _0x57fd98?.reason || 'copy-failed', error: _0x57fd98?.error };
-  } catch (_0x4222bd) {
-    return { ok: false, reason: 'copy-failed', error: _0x4222bd };
+    return { ok: false, reason: mimeType?.reason || 'copy-failed', error: mimeType?.error };
+  } catch (error) {
+    return { ok: false, reason: 'copy-failed', error: error };
   }
 }
 async function writeImageBlobToClipboard({
-  clipboard: _0x2e23bc,
-  write: _0x4191d8,
-  ClipboardItemCtor: _0xed542b,
-  blob: _0x2ef4e0,
-  mimeType: _0x12999b,
+  clipboard: clipboard,
+  write: write,
+  ClipboardItemCtor: ClipboardItemCtor,
+  blob: blob,
+  mimeType: mimeType2,
 } = {}) {
-  const _0x13bc3b = normalizeImageMimeType(_0x12999b) || 'image/png',
-    _0x41c4fd = new _0xed542b({ [_0x13bc3b]: _0x2ef4e0 });
-  return (await _0x4191d8.call(_0x2e23bc, [_0x41c4fd]), _0x13bc3b);
+  const imageMimeType = normalizeImageMimeType(mimeType2) || 'image/png',
+    record = new ClipboardItemCtor({ [imageMimeType]: blob });
+  return (await write.call(clipboard, [record]), imageMimeType);
 }
-export async function copyNodeMediaToSystemClipboard(_0x66afbd) {
-  const { kind: _0x1a2b5a, url: _0x8a8b3f, localPath: _0x512224 } = resolveNodeMedia(_0x66afbd);
-  if (_0x1a2b5a !== 'image' || !_0x8a8b3f) return { ok: false, reason: 'no-media' };
-  const _0x433b15 = await copyNodeMediaToElectronClipboard({ url: _0x8a8b3f, localPath: _0x512224 });
-  if (_0x433b15?.ok) return _0x433b15;
-  const _0x77174 = globalThis?.navigator?.clipboard,
-    _0x11057b = _0x77174?.write,
-    _0x2ff2d0 = globalThis?.ClipboardItem;
-  if (typeof _0x11057b !== 'function' || typeof _0x2ff2d0 !== 'function')
+export async function copyNodeMediaToSystemClipboard(payload) {
+  const { kind: kind, url: url3, localPath: localPath3 } = resolveNodeMedia(payload);
+  if (kind !== 'image' || !url3) return { ok: false, reason: 'no-media' };
+  const response3 = await copyNodeMediaToElectronClipboard({ url: url3, localPath: localPath3 });
+  if (response3?.ok) return response3;
+  const clipboard2 = globalThis?.navigator?.clipboard,
+    write2 = clipboard2?.write,
+    ClipboardItemCtor2 = globalThis?.ClipboardItem;
+  if (typeof write2 !== 'function' || typeof ClipboardItemCtor2 !== 'function')
     return { ok: false, reason: 'not-supported' };
-  let _0x424ff1 = null,
-    _0x386936 = null;
+  let blob2 = null,
+    error2 = null;
   try {
-    ((_0x424ff1 = await fetchRemoteBlob(_0x8a8b3f, { timeout: 0x3a98 })),
-      !isBlobLike(_0x424ff1) && (_0x424ff1 = null));
-  } catch (_0x3ae6c9) {
-    _0x386936 = _0x3ae6c9;
+    ((blob2 = await fetchRemoteBlob(url3, { timeout: 0x3a98 })), !isBlobLike(blob2) && (blob2 = null));
+  } catch (handle) {
+    error2 = handle;
   }
-  if (_0x424ff1) {
-    const _0x3df42d = resolveImageMimeType(_0x424ff1, _0x8a8b3f) || 'image/png';
+  if (blob2) {
+    const mimeType3 = resolveImageMimeType(blob2, url3) || 'image/png';
     try {
-      const _0x56dfa3 = await writeImageBlobToClipboard({
-        clipboard: _0x77174,
-        write: _0x11057b,
-        ClipboardItemCtor: _0x2ff2d0,
-        blob: _0x424ff1,
-        mimeType: _0x3df42d,
+      const mimeType4 = await writeImageBlobToClipboard({
+        clipboard: clipboard2,
+        write: write2,
+        ClipboardItemCtor: ClipboardItemCtor2,
+        blob: blob2,
+        mimeType: mimeType3,
       });
-      return { ok: true, kind: 'image', mimeType: _0x56dfa3, sourceUrl: _0x8a8b3f, copyPath: 'direct' };
-    } catch (_0x5a90dc) {
-      _0x386936 = _0x5a90dc;
+      return { ok: true, kind: 'image', mimeType: mimeType4, sourceUrl: url3, copyPath: 'direct' };
+    } catch (state) {
+      error2 = state;
     }
   }
   try {
-    let _0x36d22b = null;
-    _0x424ff1 && (_0x36d22b = await convertImageBlobToPngBlob(_0x424ff1));
-    !isBlobLike(_0x36d22b) && (_0x36d22b = await convertImageUrlToPngBlob(_0x8a8b3f));
-    if (!isBlobLike(_0x36d22b)) return { ok: false, reason: 'copy-failed', error: _0x386936 };
-    const _0x3b19a3 = await writeImageBlobToClipboard({
-      clipboard: _0x77174,
-      write: _0x11057b,
-      ClipboardItemCtor: _0x2ff2d0,
-      blob: _0x36d22b,
+    let blob3 = null;
+    blob2 && (blob3 = await convertImageBlobToPngBlob(blob2));
+    !isBlobLike(blob3) && (blob3 = await convertImageUrlToPngBlob(url3));
+    if (!isBlobLike(blob3)) return { ok: false, reason: 'copy-failed', error: error2 };
+    const mimeType5 = await writeImageBlobToClipboard({
+      clipboard: clipboard2,
+      write: write2,
+      ClipboardItemCtor: ClipboardItemCtor2,
+      blob: blob3,
       mimeType: 'image/png',
     });
-    return { ok: true, kind: 'image', mimeType: _0x3b19a3, sourceUrl: _0x8a8b3f, copyPath: 'png-fallback' };
-  } catch (_0x49c070) {
-    return { ok: false, reason: 'copy-failed', error: _0x49c070 || _0x386936 };
+    return { ok: true, kind: 'image', mimeType: mimeType5, sourceUrl: url3, copyPath: 'png-fallback' };
+  } catch (error3) {
+    return { ok: false, reason: 'copy-failed', error: error3 || error2 };
   }
 }

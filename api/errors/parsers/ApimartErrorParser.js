@@ -39,164 +39,159 @@ const APIMART_HTTP_STATUS_MAP = {
     TASK_FAILED: { type: ErrorType.TASK_FAILED, message: '任务执行失败' },
     INVALID_ARGUMENT: { type: ErrorType.INVALID_PARAMS, message: '无效的请求参数' },
   };
-function extractErrorCode(_0x1fdbd6, _0x22b44f) {
-  if (APIMART_HTTP_STATUS_MAP[_0x22b44f]) return _0x22b44f;
-  const _0x1850f6 =
-    _0x1fdbd6?.error?.code ??
-    _0x1fdbd6?.code ??
-    _0x1fdbd6?.errorCode ??
-    _0x1fdbd6?.error_code ??
-    _0x1fdbd6?.errCode ??
-    _0x22b44f;
-  return _0x1850f6;
+function extractErrorCode(value, item) {
+  if (APIMART_HTTP_STATUS_MAP[item]) return item;
+  const key =
+    value?.error?.code ?? value?.code ?? value?.errorCode ?? value?.error_code ?? value?.errCode ?? item;
+  return key;
 }
-function extractErrorMessage(_0x50c22c) {
-  if (_0x50c22c?.error?.message) return _0x50c22c.error.message;
+function extractErrorMessage(error) {
+  if (error?.error?.message) return error.error.message;
   return (
-    _0x50c22c?.errorMessage ||
-    _0x50c22c?.error_message ||
-    _0x50c22c?.message ||
-    _0x50c22c?.msg ||
-    (typeof _0x50c22c?.error === 'string' ? _0x50c22c.error : '') ||
+    error?.errorMessage ||
+    error?.error_message ||
+    error?.message ||
+    error?.msg ||
+    (typeof error?.error === 'string' ? error.error : '') ||
     ''
   );
 }
-function stringifyErrorValue(_0x4010f9) {
-  if (_0x4010f9 == null) return '';
-  if (typeof _0x4010f9 === 'string') return _0x4010f9.trim();
-  if (typeof _0x4010f9 === 'number' || typeof _0x4010f9 === 'boolean') return String(_0x4010f9);
-  if (typeof _0x4010f9 === 'object') {
-    const _0x2463ad =
-      _0x4010f9.message ||
-      _0x4010f9.errorMessage ||
-      _0x4010f9.error_message ||
-      _0x4010f9.detail ||
-      _0x4010f9.reason ||
-      _0x4010f9.type ||
-      _0x4010f9.status ||
-      _0x4010f9.code;
-    if (_0x2463ad) return stringifyErrorValue(_0x2463ad);
+function stringifyErrorValue(error2) {
+  if (error2 == null) return '';
+  if (typeof error2 === 'string') return error2.trim();
+  if (typeof error2 === 'number' || typeof error2 === 'boolean') return String(error2);
+  if (typeof error2 === 'object') {
+    const index =
+      error2.message ||
+      error2.errorMessage ||
+      error2.error_message ||
+      error2.detail ||
+      error2.reason ||
+      error2.type ||
+      error2.status ||
+      error2.code;
+    if (index) return stringifyErrorValue(index);
     try {
-      return JSON.stringify(_0x4010f9);
+      return JSON.stringify(error2);
     } catch {
-      return String(_0x4010f9 || '').trim();
+      return String(error2 || '').trim();
     }
   }
-  return String(_0x4010f9 || '').trim();
+  return String(error2 || '').trim();
 }
-function extractTaskStatus(_0x28c21c) {
+function extractTaskStatus(response) {
   return String(
-    _0x28c21c?.status ||
-      _0x28c21c?.taskStatus ||
-      _0x28c21c?.task_status ||
-      _0x28c21c?.state ||
-      _0x28c21c?.phase ||
-      _0x28c21c?.data?.status ||
-      _0x28c21c?.data?.taskStatus ||
-      _0x28c21c?.data?.task_status ||
+    response?.status ||
+      response?.taskStatus ||
+      response?.task_status ||
+      response?.state ||
+      response?.phase ||
+      response?.data?.status ||
+      response?.data?.taskStatus ||
+      response?.data?.task_status ||
       '',
   )
     .trim()
     .toLowerCase();
 }
-function extractTaskFailureReason(_0x11943f) {
-  const _0x3e0146 = [
-    _0x11943f?.error?.message,
-    _0x11943f?.error?.error?.message,
-    _0x11943f?.errorMessage,
-    _0x11943f?.error_message,
-    _0x11943f?.message,
-    _0x11943f?.failedReason,
-    _0x11943f?.failReason,
-    _0x11943f?.failure_reason,
-    _0x11943f?.data?.error?.message,
-    _0x11943f?.data?.error?.error?.message,
-    _0x11943f?.data?.errorMessage,
-    _0x11943f?.data?.error_message,
-    _0x11943f?.data?.message,
-    _0x11943f?.data?.failedReason,
-    _0x11943f?.data?.failReason,
-    _0x11943f?.data?.failure_reason,
-    _0x11943f?.result?.error?.message,
-    _0x11943f?.result?.errorMessage,
-    _0x11943f?.result?.message,
+function extractTaskFailureReason(error3) {
+  const result = [
+    error3?.error?.message,
+    error3?.error?.error?.message,
+    error3?.errorMessage,
+    error3?.error_message,
+    error3?.message,
+    error3?.failedReason,
+    error3?.failReason,
+    error3?.failure_reason,
+    error3?.data?.error?.message,
+    error3?.data?.error?.error?.message,
+    error3?.data?.errorMessage,
+    error3?.data?.error_message,
+    error3?.data?.message,
+    error3?.data?.failedReason,
+    error3?.data?.failReason,
+    error3?.data?.failure_reason,
+    error3?.result?.error?.message,
+    error3?.result?.errorMessage,
+    error3?.result?.message,
   ];
-  for (const _0xe43475 of _0x3e0146) {
-    const _0x4a4eca = stringifyErrorValue(_0xe43475);
-    if (_0x4a4eca) return _0x4a4eca;
+  for (const data of result) {
+    const stringifyErrorValue2 = stringifyErrorValue(data);
+    if (stringifyErrorValue2) return stringifyErrorValue2;
   }
   return (
-    stringifyErrorValue(_0x11943f?.error) ||
-    stringifyErrorValue(_0x11943f?.data?.error) ||
-    stringifyErrorValue(_0x11943f?.result?.error) ||
+    stringifyErrorValue(error3?.error) ||
+    stringifyErrorValue(error3?.data?.error) ||
+    stringifyErrorValue(error3?.result?.error) ||
     ''
   );
 }
-export function parseError(_0x27c8e3, _0x4c6218) {
-  if (!_0x27c8e3) return null;
-  const _0x4fd2fe = extractErrorCode(_0x27c8e3, _0x4c6218),
-    _0xecd0fd = extractErrorMessage(_0x27c8e3),
-    _0x1fcb27 = String(_0xecd0fd).toUpperCase();
-  if (APIMART_HTTP_STATUS_MAP[_0x4fd2fe]) {
-    const _0x4cef4e = APIMART_HTTP_STATUS_MAP[_0x4fd2fe];
+export function parseError(enabled, status) {
+  if (!enabled) return null;
+  const code = extractErrorCode(enabled, status),
+    message = extractErrorMessage(enabled),
+    list = String(message).toUpperCase();
+  if (APIMART_HTTP_STATUS_MAP[code]) {
+    const type = APIMART_HTTP_STATUS_MAP[code];
     return new ApiError({
-      type: _0x4cef4e.type,
+      type: type.type,
       provider: 'apimart',
-      code: _0x4fd2fe,
-      message: _0xecd0fd || _0x4cef4e.message,
-      status: _0x4c6218,
-      retryable: _0x4cef4e.retryable,
+      code: code,
+      message: message || type.message,
+      status: status,
+      retryable: type.retryable,
     });
   }
-  if (APIMART_BUSINESS_CODES[_0x4fd2fe]) {
-    const _0x423ad9 = APIMART_BUSINESS_CODES[_0x4fd2fe];
+  if (APIMART_BUSINESS_CODES[code]) {
+    const type2 = APIMART_BUSINESS_CODES[code];
     return new ApiError({
-      type: _0x423ad9.type,
+      type: type2.type,
       provider: 'apimart',
-      code: _0x4fd2fe,
-      message: _0xecd0fd || _0x423ad9.message,
-      status: _0x4c6218,
-      retryable: _0x423ad9.retryable,
+      code: code,
+      message: message || type2.message,
+      status: status,
+      retryable: type2.retryable,
     });
   }
-  for (const [_0x540b59, _0x27ec10] of Object.entries(APIMART_ERROR_KEYWORDS)) {
-    if (_0x1fcb27.includes(_0x540b59))
+  for (const [options, type3] of Object.entries(APIMART_ERROR_KEYWORDS)) {
+    if (list.includes(options))
       return new ApiError({
-        type: _0x27ec10.type,
+        type: type3.type,
         provider: 'apimart',
-        code: _0x4fd2fe,
-        message: _0xecd0fd || _0x27ec10.message,
-        status: _0x4c6218,
+        code: code,
+        message: message || type3.message,
+        status: status,
         retryable: false,
       });
   }
-  if (_0x4c6218 >= 0x190) return ApiError.fromHttpStatus(_0x4c6218, 'apimart', _0xecd0fd);
+  if (status >= 0x190) return ApiError.fromHttpStatus(status, 'apimart', message);
   return null;
 }
-export function parseTaskError(_0x367a56) {
-  if (!_0x367a56) return null;
-  const _0x412f5b = extractTaskStatus(_0x367a56);
+export function parseTaskError(enabled2) {
+  if (!enabled2) return null;
+  const extractTaskStatus2 = extractTaskStatus(enabled2);
   if (
-    _0x412f5b === 'failed' ||
-    _0x412f5b === 'fail' ||
-    _0x412f5b === 'error' ||
-    _0x412f5b === 'cancelled' ||
-    _0x412f5b === 'canceled'
+    extractTaskStatus2 === 'failed' ||
+    extractTaskStatus2 === 'fail' ||
+    extractTaskStatus2 === 'error' ||
+    extractTaskStatus2 === 'cancelled' ||
+    extractTaskStatus2 === 'canceled'
   ) {
-    const _0xa5bbcf =
-        extractTaskFailureReason(_0x367a56) ||
-        (_0x412f5b === 'cancelled' || _0x412f5b === 'canceled' ? '任务已取消' : '未知错误'),
-      _0x46cd00 = String(_0xa5bbcf).toUpperCase();
-    for (const [_0x4ebdb1, _0x403b7b] of Object.entries(APIMART_ERROR_KEYWORDS)) {
-      if (_0x46cd00.includes(_0x4ebdb1))
+    const extractTaskFailureReason2 =
+        extractTaskFailureReason(enabled2) ||
+        (extractTaskStatus2 === 'cancelled' || extractTaskStatus2 === 'canceled' ? '任务已取消' : '未知错误'),
+      list2 = String(extractTaskFailureReason2).toUpperCase();
+    for (const [target, type4] of Object.entries(APIMART_ERROR_KEYWORDS)) {
+      if (list2.includes(target))
         return new ApiError({
-          type: _0x403b7b.type,
+          type: type4.type,
           provider: 'apimart',
-          message: _0x403b7b.message + ': ' + _0xa5bbcf,
+          message: type4.message + ': ' + extractTaskFailureReason2,
           retryable: false,
         });
     }
-    return ApiError.taskFailed('apimart', _0xa5bbcf);
+    return ApiError.taskFailed('apimart', extractTaskFailureReason2);
   }
   return null;
 }

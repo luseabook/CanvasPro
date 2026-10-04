@@ -1,1 +1,224 @@
-import{requireFlow}from'./videoReplicationFlowContract.js';import{STORY_PROMPT_MODE_SEEDANCE_2_0,STORY_PROMPT_MODE_SEEDANCE_2_5}from'./promptModes.js';import{formatStoryPromptShotHeading}from'./promptShotFormat.js';import{sliceFlowSpeech}from'./videoReplicationFlowSpeech.js';import{findReplicationSpeechBlock,groupContinuousReplicationVoiceover}from'./videoReplicationSpeechLayout.js';import{formatReplicationSpatial}from'./videoReplicationVisualContract.js';const limits=Object['freeze']({[STORY_PROMPT_MODE_SEEDANCE_2_0]:0xf,[STORY_PROMPT_MODE_SEEDANCE_2_5]:0x1e}),tick=_0x3352f4=>Math["round"]((_0x3352f4+Number["EPSILON"])*0xa),seconds=_0x4bea43=>(tick(_0x4bea43)/0xa)["toFixed"](0x1);export function resolveReplicationFlowOptions({promptMode:promptMode=STORY_PROMPT_MODE_SEEDANCE_2_0,maxSeconds:_0x354ca5}={}){return requireFlow(Object['hasOwn'](limits,promptMode),'当前复刻草稿编译仅支持\x20Seedance\x202.0\x20/\x202.5'),_0x354ca5??=limits[promptMode],requireFlow(Number["isFinite"](_0x354ca5)&&_0x354ca5>=0.1,"片段时长上限无效"),{'promptMode':promptMode,'maxSeconds':Math["min"](_0x354ca5,limits[promptMode])};}export function stripFlowSubtitleOverlays(_0x1dfcf1=''){const _0x2fb163=[],_0x50a419=[],_0x56500b={'“':'”','‘':'’','（':'）','(':')','「':'」'};let _0x24dc07='';for(const _0x1a6ef0 of _0x1dfcf1){_0x24dc07+=_0x1a6ef0;if(_0x1a6ef0==='\x22'){if(_0x50a419['at'](-0x1)===_0x1a6ef0)_0x50a419["pop"]();else _0x50a419["push"](_0x1a6ef0);}else{if(_0x56500b[_0x1a6ef0])_0x50a419["push"](_0x56500b[_0x1a6ef0]);else{if(_0x1a6ef0===_0x50a419['at'](-0x1))_0x50a419["pop"]();}}!_0x50a419["length"]&&/[，,。；;\n]/u["test"](_0x1a6ef0)&&(_0x2fb163["push"](_0x24dc07),_0x24dc07='');}if(_0x24dc07)_0x2fb163["push"](_0x24dc07);const _0x3175b6=/^(?:(?:同时|此时)[，,\s]*)?(?:(?:屏幕|画面)(?:(?:的)?(?:左上角|右上角|左下角|右下角|左侧|右侧|左边|右边|下方|上方|底部|顶部|中央|中间)|上)?(?:字幕|(?:出现|显示|叠加|浮现)(?=[、：:\s“"「]|字幕|文字|$))|(?:屏幕|画面)[。\s]*$|(?:旁白|对话|解说)?字幕|(?:旁边|一旁|画面旁边)?(?:配有|出现|叠加)(?:身份|人物)介绍文字)/u,_0x7ea57a=/^(?:(?:屏幕|画面)(?:的)?)?(?:左上角|右上角|左下角|右下角|左侧|右侧|下方|上方|底部|顶部)(?:有|出现|显示|叠加)(?:竖排|横排|人物介绍|身份介绍|姓名|介绍|白色|黑色|红色|金色|的)*(?:文字|字幕|字样|标题|文案)/u;return _0x2fb163["filter"](_0x59ba4d=>!_0x3175b6["test"](_0x59ba4d["trim"]())&&!_0x7ea57a["test"](_0x59ba4d['trim']()))["join"]('')["trim"]()['replace'](/[，,；;]\s*$/u,'。');}function promptBlocks(_0x9e7c1e,_0x592021,_0x2038be,_0x48b72b=tick){const _0x5bf2ab=[];let _0x4ac05a=[];for(const _0x3266a0 of _0x9e7c1e){const _0x1e18ea=Math["max"](_0x592021,_0x3266a0['startSec']),_0x5f0c27=Math["min"](_0x2038be,_0x3266a0["endSec"]);if(_0x48b72b(_0x5f0c27-_0x592021)===_0x48b72b(_0x1e18ea-_0x592021)){if(_0x5bf2ab["length"])_0x5bf2ab['at'](-0x1)['endSec']=_0x5f0c27,_0x5bf2ab['at'](-0x1)["shots"]['push'](_0x3266a0);else _0x4ac05a["push"](_0x3266a0);}else _0x5bf2ab["push"]({'startSec':_0x4ac05a["length"]?_0x592021:_0x1e18ea,'endSec':_0x5f0c27,'shots':[..._0x4ac05a,_0x3266a0]}),_0x4ac05a=[];}if(_0x4ac05a["length"])_0x5bf2ab["push"]({'startSec':_0x592021,'endSec':_0x2038be,'shots':_0x4ac05a});return _0x5bf2ab;}export function buildReplicationFlowPrompt(_0x12818b,{start:_0x224711,end:_0x173b14,shots:_0x4a2e50,used:_0x4340b6,promptMode:_0x1c0722,referenceHeader:_0x5226a1,continuityLines:_0x4df887,integerTime:integerTime=![],shotSpeech:shotSpeech=![],stagingHandoff:stagingHandoff=![]}){const _0x495604=integerTime?_0xfcfbd=>String(Math['round'](_0xfcfbd)):seconds,_0x537119=new Map(_0x12818b['characters']["map"](_0x50932e=>[_0x50932e['id'],_0x50932e["name"]])),_0x151912=_0x12818b["speech"]['filter'](_0x472a59=>_0x472a59['endSec']>_0x224711&&_0x472a59["startSec"]<_0x173b14)["map"](_0x1ba4a0=>sliceFlowSpeech(_0x1ba4a0,_0x224711,_0x173b14))["filter"](_0x2e11fa=>_0x2e11fa["parts"]["length"]),_0x37fb3f=_0x747354=>_0x747354["speakerLabel"]||_0x537119["get"](_0x747354["speakerId"])||'',_0x2c59c8=[..._0x537119['keys']()]["filter"](Boolean)["sort"]((_0x5da1a6,_0x54369f)=>_0x54369f['length']-_0x5da1a6['length'])["map"](_0x54ad21=>_0x54ad21["replace"](/[.*+?^${}()|[\]\\]/gu,"\\$&")),_0xc0a99=_0x2c59c8["length"]?new RegExp('(?<![A-Za-z0-9_-])(?:'+_0x2c59c8['join']('|')+")(?![A-Za-z0-9_-])",'gu'):null,_0x4688ef=_0x27c640=>String(_0x27c640||'')['replace'](/\s*[（(]([^（）()]+)[）)]/gu,(_0x35c5fc,_0x343147)=>_0x537119["has"](_0x343147)?'':_0x35c5fc)["replace"](_0xc0a99||/(?!)/u,_0x2a8c72=>_0x537119['get'](_0x2a8c72)||_0x2a8c72),_0x21ebc2=integerTime?Math['round']:tick,_0x384c51=promptBlocks(_0x4a2e50,_0x224711,_0x173b14,_0x21ebc2),_0x26d0b4=_0xa87d45=>findReplicationSpeechBlock(_0x384c51,_0xa87d45["startSec"],_0x21ebc2,_0x224711,_0xa87d45["endSec"]),_0x522046=_0x384c51["map"]((_0x11eb9c,_0x4c8026)=>{const _0x4ce4c4=tick(_0x11eb9c["startSec"]-_0x224711),_0x491889=tick(_0x11eb9c["endSec"]-_0x224711),_0x121e0d=_0x151912["filter"](_0x2fc9fa=>_0x26d0b4(_0x2fc9fa)===_0x4c8026),_0x5e682f=_0x151912["filter"](_0x525fab=>_0x26d0b4(_0x525fab)<_0x4c8026&&_0x525fab['endSec']>_0x11eb9c["startSec"]),_0x51e172=_0x11eb9c["shots"]['map'](_0x5a20fc=>{const _0x2d8bbd=_0x4688ef(_0x5a20fc["visual"]),_0x19dee9=_0x4688ef(_0x5a20fc["camera"]),_0x22c5ad=stripFlowSubtitleOverlays(_0x5a20fc["sound"])["replace"](/(?:画外音|对白)时间[：:]\s*\d+(?:\.\d+)?\s*[-–]\s*\d+(?:\.\d+)?秒?[，。；;]?/gu,'')["split"](/[，,；;、]/u)["filter"](_0x599f2d=>_0x599f2d["trim"]()&&!/^(?:画外音|旁白|对白|对话|人声)(?:解说|声|开始|继续|结束|响起)*[。\s]*$/u['test'](_0x599f2d["trim"]()))["join"]('，'),_0x574ad5=_0x4a2e50["indexOf"](_0x5a20fc),_0x2beb96=_0x574ad5===0x0||_0x5a20fc['sceneKey']&&_0x5a20fc["sceneKey"]!==_0x4a2e50[_0x574ad5-0x1]?.['sceneKey'],_0x460d12=stagingHandoff&&_0x574ad5===_0x4a2e50['length']-0x1,_0x12350b=_0x2beb96?formatReplicationSpatial(_0x5a20fc["spatialStart"]):'',_0x2f94ac=_0x460d12?formatReplicationSpatial(_0x5a20fc["spatialEnd"]):'';return[_0x12350b?'站位设定：'+_0x4688ef(_0x12350b):'',_0x2d8bbd?"画面："+_0x2d8bbd:'',_0x19dee9?'镜头：'+_0x19dee9['replace'](/[。]+$/u,'')+'。':'',_0x2f94ac?"片段结束站位："+_0x4688ef(_0x2f94ac):'',_0x22c5ad&&_0x22c5ad!=='无'?"环境音："+_0x22c5ad["replace"](/[。]+$/u,'')+'。':'']["filter"](Boolean)['join']('\x0a');})["join"]('\x0a'),_0x2553bc=formatStoryPromptShotHeading({'promptMode':_0x1c0722,'index':_0x4c8026,'durationSec':(_0x491889-_0x4ce4c4)/0xa,'timeRange':_0x495604(_0x11eb9c["startSec"]-_0x224711)+'-'+_0x495604(_0x11eb9c["endSec"]-_0x224711)+'秒'}),_0x2f3e70=shotSpeech?groupContinuousReplicationVoiceover(_0x121e0d,_0x151912,_0x58ed48=>_0x21ebc2(_0x58ed48-_0x224711),_0x37fb3f):_0x121e0d,_0x53f306=_0x2f3e70["map"](_0x25c2cd=>{const _0x2dce68=_0x25c2cd["startSec"]-_0x224711,_0x59a037=_0x25c2cd["endSec"]-_0x224711,_0x23cefc=_0x495604(_0x2dce68)===_0x495604(_0x59a037)&&_0x59a037>_0x2dce68?_0x41e37f=>String(Number(_0x41e37f['toFixed'](0x3))):_0x495604,_0xa802cb=_0x23cefc(_0x2dce68)+'-'+_0x23cefc(_0x59a037)+'秒',_0x4de1fe=_0x25c2cd["parts"]["map"](_0x40cca5=>_0x40cca5['kind']==='voiceover'?''+(shotSpeech?"（本片段"+_0xa802cb+'）':'')+_0x37fb3f(_0x40cca5)+"画外音：“"+_0x40cca5['text']+'”':(_0x37fb3f(_0x40cca5)||"说话人")+"说：“"+_0x40cca5["text"]+'”');if(shotSpeech)return _0x4de1fe['join']("\n随后，");return "同期人声（本片段"+_0xa802cb+(_0x25c2cd["endSec"]>_0x11eb9c["endSec"]?"，跨镜连续":'')+"）：\n"+_0x4de1fe["join"]("\n随后，");});return{'startSec':_0x11eb9c['startSec']-_0x224711,'endSec':_0x11eb9c["endSec"]-_0x224711,'sourceShotIds':_0x11eb9c["shots"]["map"](_0x1f4903=>_0x1f4903['id']),'speechFragments':_0x121e0d,'continuedSpeechIds':_0x5e682f["map"](_0x5f5d48=>_0x5f5d48['sourceId']),'prompt':[_0x2553bc+'：\x0a'+_0x51e172,..._0x53f306]['join']('\x0a')};});return{'promptShots':_0x522046,'prompt':['生成'+_0x495604(_0x173b14-_0x224711)+'秒视频。',_0x5226a1??(_0x4340b6["length"]?"人物："+_0x4340b6['map'](_0x3a1c93=>_0x3a1c93["name"]+'（'+_0x3a1c93["appearance"]+'）')["join"]('；'):''),..._0x4df887??[],..._0x522046['map'](_0xd6b22e=>_0xd6b22e["prompt"])]["filter"](Boolean)["join"]('\x0a\x0a')};}
+import { requireFlow } from './videoReplicationFlowContract.js';
+import { STORY_PROMPT_MODE_SEEDANCE_2_0, STORY_PROMPT_MODE_SEEDANCE_2_5 } from './promptModes.js';
+import { formatStoryPromptShotHeading } from './promptShotFormat.js';
+import { sliceFlowSpeech } from './videoReplicationFlowSpeech.js';
+import {
+  findReplicationSpeechBlock,
+  groupContinuousReplicationVoiceover,
+} from './videoReplicationSpeechLayout.js';
+import { formatReplicationSpatial } from './videoReplicationVisualContract.js';
+const limits = Object['freeze']({
+    [STORY_PROMPT_MODE_SEEDANCE_2_0]: 0xf,
+    [STORY_PROMPT_MODE_SEEDANCE_2_5]: 0x1e,
+  }),
+  tick = (value) => Math['round']((value + Number['EPSILON']) * 0xa),
+  seconds = (item) => (tick(item) / 0xa)['toFixed'](0x1);
+export function resolveReplicationFlowOptions({
+  promptMode: promptMode = STORY_PROMPT_MODE_SEEDANCE_2_0,
+  maxSeconds: maxSeconds,
+} = {}) {
+  return (
+    requireFlow(
+      Object['hasOwn'](limits, promptMode),
+      '当前复刻草稿编译仅支持\x20Seedance\x202.0\x20/\x202.5',
+    ),
+    (maxSeconds ??= limits[promptMode]),
+    requireFlow(Number['isFinite'](maxSeconds) && maxSeconds >= 0.1, '片段时长上限无效'),
+    { promptMode: promptMode, maxSeconds: Math['min'](maxSeconds, limits[promptMode]) }
+  );
+}
+export function stripFlowSubtitleOverlays(key = '') {
+  const index = [],
+    enabled = [],
+    result = { '“': '”', '‘': '’', '（': '）', '(': ')', '「': '」' };
+  let data = '';
+  for (const options of key) {
+    data += options;
+    if (options === '\x22') {
+      if (enabled['at'](-0x1) === options) enabled['pop']();
+      else enabled['push'](options);
+    } else {
+      if (result[options]) enabled['push'](result[options]);
+      else {
+        if (options === enabled['at'](-0x1)) enabled['pop']();
+      }
+    }
+    !enabled['length'] && /[，,。；;\n]/u['test'](options) && (index['push'](data), (data = ''));
+  }
+  if (data) index['push'](data);
+  const enabled2 =
+      /^(?:(?:同时|此时)[，,\s]*)?(?:(?:屏幕|画面)(?:(?:的)?(?:左上角|右上角|左下角|右下角|左侧|右侧|左边|右边|下方|上方|底部|顶部|中央|中间)|上)?(?:字幕|(?:出现|显示|叠加|浮现)(?=[、：:\s“"「]|字幕|文字|$))|(?:屏幕|画面)[。\s]*$|(?:旁白|对话|解说)?字幕|(?:旁边|一旁|画面旁边)?(?:配有|出现|叠加)(?:身份|人物)介绍文字)/u,
+    enabled3 =
+      /^(?:(?:屏幕|画面)(?:的)?)?(?:左上角|右上角|左下角|右下角|左侧|右侧|下方|上方|底部|顶部)(?:有|出现|显示|叠加)(?:竖排|横排|人物介绍|身份介绍|姓名|介绍|白色|黑色|红色|金色|的)*(?:文字|字幕|字样|标题|文案)/u;
+  return index['filter'](
+    (target) => !enabled2['test'](target['trim']()) && !enabled3['test'](target['trim']()),
+  )
+    ['join']('')
+    ['trim']()
+    ['replace'](/[，,；;]\s*$/u, '。');
+}
+function promptBlocks(source, next, current, handler = tick) {
+  const entry = [];
+  let args = [];
+  for (const record of source) {
+    const payload = Math['max'](next, record['startSec']),
+      handle = Math['min'](current, record['endSec']);
+    if (handler(handle - next) === handler(payload - next)) {
+      if (entry['length'])
+        ((entry['at'](-0x1)['endSec'] = handle), entry['at'](-0x1)['shots']['push'](record));
+      else args['push'](record);
+    } else
+      (entry['push']({ startSec: args['length'] ? next : payload, endSec: handle, shots: [...args, record] }),
+        (args = []));
+  }
+  if (args['length']) entry['push']({ startSec: next, endSec: current, shots: args });
+  return entry;
+}
+export function buildReplicationFlowPrompt(
+  state,
+  {
+    start: start,
+    end: end,
+    shots: shots,
+    used: used,
+    promptMode: promptMode2,
+    referenceHeader: referenceHeader,
+    continuityLines: continuityLines,
+    integerTime: integerTime = ![],
+    shotSpeech: shotSpeech = ![],
+    stagingHandoff: stagingHandoff = ![],
+  },
+) {
+  const run = integerTime ? (config) => String(Math['round'](config)) : seconds,
+    map = new Map(state['characters']['map']((scope) => [scope['id'], scope['name']])),
+    input = state['speech']
+      ['filter']((output) => output['endSec'] > start && output['startSec'] < end)
+      ['map']((value2) => sliceFlowSpeech(value2, start, end))
+      ['filter']((value3) => value3['parts']['length']),
+    handler2 = (value4) => value4['speakerLabel'] || map['get'](value4['speakerId']) || '',
+    list = [...map['keys']()]
+      ['filter'](Boolean)
+      ['sort']((list2, list3) => list3['length'] - list2['length'])
+      ['map']((value5) => value5['replace'](/[.*+?^${}()|[\]\\]/gu, '\\$&')),
+    value6 = list['length']
+      ? new RegExp('(?<![A-Za-z0-9_-])(?:' + list['join']('|') + ')(?![A-Za-z0-9_-])', 'gu')
+      : null,
+    handler3 = (value7) =>
+      String(value7 || '')
+        ['replace'](/\s*[（(]([^（）()]+)[）)]/gu, (value8, value9) => (map['has'](value9) ? '' : value8))
+        ['replace'](value6 || /(?!)/u, (value10) => map['get'](value10) || value10),
+    handler4 = integerTime ? Math['round'] : tick,
+    promptBlocks2 = promptBlocks(shots, start, end, handler4),
+    handler5 = (value11) =>
+      findReplicationSpeechBlock(promptBlocks2, value11['startSec'], handler4, start, value11['endSec']),
+    list4 = promptBlocks2['map']((value12, value13) => {
+      const tick2 = tick(value12['startSec'] - start),
+        tick3 = tick(value12['endSec'] - start),
+        value14 = input['filter']((value15) => handler5(value15) === value13),
+        value16 = input['filter'](
+          (value17) => handler5(value17) < value13 && value17['endSec'] > value12['startSec'],
+        ),
+        value18 = value12['shots']
+          ['map']((value19) => {
+            const value20 = handler3(value19['visual']),
+              value21 = handler3(value19['camera']),
+              stripFlowSubtitleOverlays2 = stripFlowSubtitleOverlays(value19['sound'])
+                ['replace'](
+                  /(?:画外音|对白)时间[：:]\s*\d+(?:\.\d+)?\s*[-–]\s*\d+(?:\.\d+)?秒?[，。；;]?/gu,
+                  '',
+                )
+                ['split'](/[，,；;、]/u)
+                ['filter'](
+                  (value22) =>
+                    value22['trim']() &&
+                    !/^(?:画外音|旁白|对白|对话|人声)(?:解说|声|开始|继续|结束|响起)*[。\s]*$/u['test'](
+                      value22['trim'](),
+                    ),
+                )
+                ['join']('，'),
+              count = shots['indexOf'](value19),
+              value23 =
+                count === 0x0 ||
+                (value19['sceneKey'] && value19['sceneKey'] !== shots[count - 0x1]?.['sceneKey']),
+              value24 = stagingHandoff && count === shots['length'] - 0x1,
+              value25 = value23 ? formatReplicationSpatial(value19['spatialStart']) : '',
+              value26 = value24 ? formatReplicationSpatial(value19['spatialEnd']) : '';
+            return [
+              value25 ? '站位设定：' + handler3(value25) : '',
+              value20 ? '画面：' + value20 : '',
+              value21 ? '镜头：' + value21['replace'](/[。]+$/u, '') + '。' : '',
+              value26 ? '片段结束站位：' + handler3(value26) : '',
+              stripFlowSubtitleOverlays2 && stripFlowSubtitleOverlays2 !== '无'
+                ? '环境音：' + stripFlowSubtitleOverlays2['replace'](/[。]+$/u, '') + '。'
+                : '',
+            ]
+              ['filter'](Boolean)
+              ['join']('\x0a');
+          })
+          ['join']('\x0a'),
+        formatStoryPromptShotHeading2 = formatStoryPromptShotHeading({
+          promptMode: promptMode2,
+          index: value13,
+          durationSec: (tick3 - tick2) / 0xa,
+          timeRange: run(value12['startSec'] - start) + '-' + run(value12['endSec'] - start) + '秒',
+        }),
+        value27 = shotSpeech
+          ? groupContinuousReplicationVoiceover(
+              value14,
+              input,
+              (value28) => handler4(value28 - start),
+              handler2,
+            )
+          : value14,
+        args2 = value27['map']((value29) => {
+          const value30 = value29['startSec'] - start,
+            value31 = value29['endSec'] - start,
+            handler6 =
+              run(value30) === run(value31) && value31 > value30
+                ? (value32) => String(Number(value32['toFixed'](0x3)))
+                : run,
+            value33 = handler6(value30) + '-' + handler6(value31) + '秒',
+            list5 = value29['parts']['map']((response) =>
+              response['kind'] === 'voiceover'
+                ? '' +
+                  (shotSpeech ? '（本片段' + value33 + '）' : '') +
+                  handler2(response) +
+                  '画外音：“' +
+                  response['text'] +
+                  '”'
+                : (handler2(response) || '说话人') + '说：“' + response['text'] + '”',
+            );
+          if (shotSpeech) return list5['join']('\n随后，');
+          return (
+            '同期人声（本片段' +
+            value33 +
+            (value29['endSec'] > value12['endSec'] ? '，跨镜连续' : '') +
+            '）：\n' +
+            list5['join']('\n随后，')
+          );
+        });
+      return {
+        startSec: value12['startSec'] - start,
+        endSec: value12['endSec'] - start,
+        sourceShotIds: value12['shots']['map']((value34) => value34['id']),
+        speechFragments: value14,
+        continuedSpeechIds: value16['map']((value35) => value35['sourceId']),
+        prompt: [formatStoryPromptShotHeading2 + '：\x0a' + value18, ...args2]['join']('\x0a'),
+      };
+    });
+  return {
+    promptShots: list4,
+    prompt: [
+      '生成' + run(end - start) + '秒视频。',
+      referenceHeader ??
+        (used['length']
+          ? '人物：' +
+            used['map']((value36) => value36['name'] + '（' + value36['appearance'] + '）')['join']('；')
+          : ''),
+      ...(continuityLines ?? []),
+      ...list4['map']((value37) => value37['prompt']),
+    ]
+      ['filter'](Boolean)
+      ['join']('\x0a\x0a'),
+  };
+}

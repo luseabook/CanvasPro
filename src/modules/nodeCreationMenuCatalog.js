@@ -178,31 +178,34 @@ export const NODE_CREATION_UPLOAD_ITEM = Object.freeze({
     return t('nodeCreation.upload.subtitle');
   },
 });
-export function getNodeCreationMenuItem(_0x5b5e1c) {
-  const _0x141cc6 = NODE_CREATION_ITEMS[String(_0x5b5e1c || '')] || null;
-  if (!_0x141cc6) return null;
-  const _0x49824a = NODE_CREATION_ITEM_I18N_KEYS[_0x141cc6.type];
-  if (!_0x49824a) return _0x141cc6;
+export function getNodeCreationMenuItem(value) {
+  const args = NODE_CREATION_ITEMS[String(value || '')] || null;
+  if (!args) return null;
+  const enabled = NODE_CREATION_ITEM_I18N_KEYS[args.type];
+  if (!enabled) return args;
   return {
-    ..._0x141cc6,
-    label: t('nodeCreation.items.' + _0x49824a + '.label'),
-    defaultName: t('nodeCreation.items.' + _0x49824a + '.defaultName'),
-    subtitle: t('nodeCreation.items.' + _0x49824a + '.subtitle'),
+    ...args,
+    label: t('nodeCreation.items.' + enabled + '.label'),
+    defaultName: t('nodeCreation.items.' + enabled + '.defaultName'),
+    subtitle: t('nodeCreation.items.' + enabled + '.subtitle'),
   };
 }
-export function getNodeCreationMenuSections(_0x19e09f, { includeDevOnly: includeDevOnly = false } = {}) {
-  return (Array.isArray(_0x19e09f) ? _0x19e09f : [])
-    .map((_0x92b3a9) => {
-      const _0x40f350 = NODE_CREATION_SECTIONS[_0x92b3a9];
-      if (!_0x40f350) return null;
-      const _0x464f22 = _0x40f350.itemTypes
-        .map((_0x48b6f0) => getNodeCreationMenuItem(_0x48b6f0))
-        .filter((_0x17f09e) => _0x17f09e && (includeDevOnly || _0x17f09e.devOnly !== true));
-      if (_0x464f22.length === 0) return null;
-      const _0x41fd3b = NODE_CREATION_SECTION_I18N_KEYS[_0x40f350.id];
-      return { id: _0x40f350.id, label: _0x41fd3b ? t(_0x41fd3b) : _0x40f350.label, items: _0x464f22 };
+export function getNodeCreationMenuSections(item, { includeDevOnly: includeDevOnly = false } = {}) {
+  return (Array.isArray(item) ? item : [])
+    .map((item2) => {
+      const id = NODE_CREATION_SECTIONS[item2];
+      if (!id) return null;
+      const items = id.itemTypes
+        .map((item3) => getNodeCreationMenuItem(item3))
+        .filter((item4) => item4 && (includeDevOnly || item4.devOnly !== true));
+      if (items.length === 0) return null;
+      const label2 = NODE_CREATION_SECTION_I18N_KEYS[id.id];
+      return { id: id.id, label: label2 ? t(label2) : id.label, items: items };
     })
     .filter(Boolean);
 }
 
-export function isNodeCreationTypeEnabled(_0x245f43){const _0x13386a=NODE_CREATION_ITEMS[String(_0x245f43||'')];return _0x13386a?.["creationDisabled"]!==!![];}
+export function isNodeCreationTypeEnabled(key) {
+  const index = NODE_CREATION_ITEMS[String(key || '')];
+  return index?.['creationDisabled'] !== !![];
+}

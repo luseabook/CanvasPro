@@ -17,130 +17,124 @@ const URL_PATTERN = /https?:\/\/[^\s<>"'，。；！？、）】》」』]+/giu,
   ],
   SHORT_READ_INTENT_PATTERN =
     /^(?:(?:请)?(?:帮我)?(?:看看|看一下|看下|读一下|读下|阅读|总结|分析|打开|检查)|(?:please\s+)?(?:read|open|check|summari[sz]e|analy[sz]e)(?:\s+this)?)?$/i;
-function stripUrlPunctuation(_0x53b1ce = '') {
-  return String(_0x53b1ce || '')['replace'](/[),.;!?，。；！？、）】》」』]+$/u, '');
+function stripUrlPunctuation(value = '') {
+  return String(value || '')['replace'](/[),.;!?，。；！？、）】》」』]+$/u, '');
 }
-function truncateText(_0x34c98e, _0x327918) {
-  const _0x34fa9a = String(_0x34c98e || '')
+function truncateText(item, key) {
+  const list = String(item || '')
     ['replace'](/\u0000/g, '')
     ['trim']();
-  return _0x34fa9a['length'] <= _0x327918
-    ? _0x34fa9a
-    : _0x34fa9a['slice'](0x0, Math['max'](0x0, _0x327918 - 0x3)) + '...';
+  return list['length'] <= key ? list : list['slice'](0x0, Math['max'](0x0, key - 0x3)) + '...';
 }
-function normalizeCount(_0x5aeb99, _0x23b080 = 0x0) {
-  const _0x4d5c90 = Number(_0x5aeb99);
-  return Number['isFinite'](_0x4d5c90) ? Math['max'](0x0, _0x4d5c90) : _0x23b080;
+function normalizeCount(index, result = 0x0) {
+  const data = Number(index);
+  return Number['isFinite'](data) ? Math['max'](0x0, data) : result;
 }
-export function extractAgentExternalUrls(_0x478e7e = '') {
-  const _0xb49cd6 = String(_0x478e7e || '')['match'](URL_PATTERN) || [];
-  return [...new Set(_0xb49cd6['map'](stripUrlPunctuation)['filter'](Boolean))]['slice'](
+export function extractAgentExternalUrls(options = '') {
+  const list2 = String(options || '')['match'](URL_PATTERN) || [];
+  return [...new Set(list2['map'](stripUrlPunctuation)['filter'](Boolean))]['slice'](
     0x0,
     AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT,
   );
 }
-export function detectAgentExternalInformationIntent(_0xc4fe09 = '') {
-  const _0x194c87 = String(_0xc4fe09 || '')['trim'](),
-    _0x191dd9 = extractAgentExternalUrls(_0x194c87);
-  if (
-    _0x191dd9['length'] === 0x0 ||
-    NEGATED_READ_PATTERNS['some']((_0x5dc713) => _0x5dc713['test'](_0x194c87))
-  )
+export function detectAgentExternalInformationIntent(target = '') {
+  const source = String(target || '')['trim'](),
+    requests = extractAgentExternalUrls(source);
+  if (requests['length'] === 0x0 || NEGATED_READ_PATTERNS['some']((next) => next['test'](source)))
     return null;
-  const _0xe324dc = _0x194c87['replace'](URL_PATTERN, '')
+  const current = source['replace'](URL_PATTERN, '')
       ['replace'](/[:：,，。.!！?？]/g, '\x20')
       ['trim'](),
-    _0x5d6c87 = READ_INTENT_PATTERNS['some']((_0x2742f9) => _0x2742f9['test'](_0x194c87));
-  if (!_0x5d6c87 && !SHORT_READ_INTENT_PATTERN['test'](_0xe324dc)) return null;
+    reason = READ_INTENT_PATTERNS['some']((entry) => entry['test'](source));
+  if (!reason && !SHORT_READ_INTENT_PATTERN['test'](current)) return null;
   return {
     toolId: AGENT_EXTERNAL_INFORMATION_TOOL_ID,
-    requests: _0x191dd9['map']((_0x4e98da) => ({ url: _0x4e98da })),
-    reason: _0x5d6c87 ? 'explicit-url-reading' : 'url-only-message',
+    requests: requests['map']((url) => ({ url: url })),
+    reason: reason ? 'explicit-url-reading' : 'url-only-message',
   };
 }
 export function createAgentExternalInformationRequests({
   message: message = '',
   documentFiles: documentFiles = [],
 } = {}) {
-  const _0x429614 = (Array['isArray'](documentFiles) ? documentFiles : [])
-      ['filter']((_0x185583) => _0x185583 && String(_0x185583['name'] || '')['trim']())
+  const list3 = (Array['isArray'](documentFiles) ? documentFiles : [])
+      ['filter']((error) => error && String(error['name'] || '')['trim']())
       ['slice'](0x0, AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT)
-      ['map']((_0x4485c7) => ({
+      ['map']((file) => ({
         toolId: AGENT_EXTERNAL_DOCUMENT_TOOL_ID,
-        args: { file: _0x4485c7 },
+        args: { file: file },
         sourceKind: 'document',
       })),
-    _0x5637da = detectAgentExternalInformationIntent(message);
-  _0x5637da &&
-    _0x429614['push'](
-      ..._0x5637da['requests']['map']((_0x1b001b) => ({
-        toolId: _0x5637da['toolId'],
-        args: _0x1b001b,
+    toolId = detectAgentExternalInformationIntent(message);
+  toolId &&
+    list3['push'](
+      ...toolId['requests']['map']((args) => ({
+        toolId: toolId['toolId'],
+        args: args,
         sourceKind: 'url',
       })),
     );
-  const _0x3c4b03 = _0x429614['slice'](0x0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT);
-  if (_0x3c4b03['length'] === 0x0) return null;
+  const requests2 = list3['slice'](0x0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT);
+  if (requests2['length'] === 0x0) return null;
   return {
     reason: [
-      _0x3c4b03['some']((_0x3f0060) => _0x3f0060['sourceKind'] === 'document') ? 'attached-document' : '',
-      _0x3c4b03['some']((_0x371ca0) => _0x371ca0['sourceKind'] === 'url') ? _0x5637da?.['reason'] || '' : '',
+      requests2['some']((record) => record['sourceKind'] === 'document') ? 'attached-document' : '',
+      requests2['some']((payload) => payload['sourceKind'] === 'url') ? toolId?.['reason'] || '' : '',
     ]
       ['filter'](Boolean)
       ['join']('+'),
-    requests: _0x3c4b03,
+    requests: requests2,
   };
 }
 export function compactAgentExternalInformationForPrompt(
-  _0x43df28 = null,
+  value2 = null,
   { maxContentChars: maxContentChars = AGENT_EXTERNAL_INFORMATION_CONTENT_LIMIT } = {},
 ) {
-  const _0x49ff9f = Array['isArray'](_0x43df28?.['sources']) ? _0x43df28['sources'] : [],
-    _0x86bb28 = _0x49ff9f['slice'](0x0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT),
-    _0xd29a2f = Math['max'](0x3e8, Math['floor'](maxContentChars / Math['max'](0x1, _0x86bb28['length'])));
-  return _0x86bb28['map']((_0x35478 = {}, _0x3b6070) => {
-    const _0x50b7e3 = _0x35478['sourceKind'] === 'document' ? 'document' : 'url',
-      _0x2423a0 = String(_0x35478['content'] || '')
+  const list4 = Array['isArray'](value2?.['sources']) ? value2['sources'] : [],
+    list5 = list4['slice'](0x0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT),
+    handle = Math['max'](0x3e8, Math['floor'](maxContentChars / Math['max'](0x1, list5['length'])));
+  return list5['map']((truncated = {}, state) => {
+    const sourceKind = truncated['sourceKind'] === 'document' ? 'document' : 'url',
+      list6 = String(truncated['content'] || '')
         ['replace'](/\u0000/g, '')
         ['trim'](),
-      _0x46d3a1 = truncateText(_0x35478['displayName'] || _0x35478['fileName'], 0xff)['replace'](
+      displayName = truncateText(truncated['displayName'] || truncated['fileName'], 0xff)['replace'](
         /\s+/g,
         '\x20',
       ),
-      _0x24b692 = truncateText(_0x35478['finalUrl'] || _0x35478['url'], 0x7d0);
+      finalUrl = truncateText(truncated['finalUrl'] || truncated['url'], 0x7d0);
     return {
-      sourceId: String(_0x35478['sourceId'] || 'external-source-' + (_0x3b6070 + 0x1))['slice'](0x0, 0x50),
+      sourceId: String(truncated['sourceId'] || 'external-source-' + (state + 0x1))['slice'](0x0, 0x50),
       toolId: String(
-        _0x35478['toolId'] ||
-          (_0x50b7e3 === 'document' ? AGENT_EXTERNAL_DOCUMENT_TOOL_ID : AGENT_EXTERNAL_INFORMATION_TOOL_ID),
+        truncated['toolId'] ||
+          (sourceKind === 'document' ? AGENT_EXTERNAL_DOCUMENT_TOOL_ID : AGENT_EXTERNAL_INFORMATION_TOOL_ID),
       )['slice'](0x0, 0x50),
-      sourceKind: _0x50b7e3,
-      ...(_0x50b7e3 === 'url'
+      sourceKind: sourceKind,
+      ...(sourceKind === 'url'
         ? {
-            requestedUrl: truncateText(_0x35478['requestedUrl'] || _0x35478['url'], 0x7d0),
-            finalUrl: _0x24b692,
+            requestedUrl: truncateText(truncated['requestedUrl'] || truncated['url'], 0x7d0),
+            finalUrl: finalUrl,
           }
         : {
-            displayName: _0x46d3a1,
-            extension: truncateText(_0x35478['extension'], 0xc),
-            characterCount: normalizeCount(_0x35478['characterCount'], _0x2423a0['length']),
-            ...(Number['isFinite'](Number(_0x35478['pageCount']))
-              ? { pageCount: normalizeCount(_0x35478['pageCount']) }
+            displayName: displayName,
+            extension: truncateText(truncated['extension'], 0xc),
+            characterCount: normalizeCount(truncated['characterCount'], list6['length']),
+            ...(Number['isFinite'](Number(truncated['pageCount']))
+              ? { pageCount: normalizeCount(truncated['pageCount']) }
               : {}),
-            warnings: (Array['isArray'](_0x35478['warnings']) ? _0x35478['warnings'] : [])
-              ['map']((_0x2936d3) => truncateText(_0x2936d3, 0x12c))
+            warnings: (Array['isArray'](truncated['warnings']) ? truncated['warnings'] : [])
+              ['map']((config) => truncateText(config, 0x12c))
               ['filter'](Boolean)
               ['slice'](0x0, 0x8),
           }),
-      title: truncateText(_0x35478['title'] || _0x46d3a1, 0x12c),
-      contentType: truncateText(_0x35478['contentType'], 0xa0),
-      content: truncateText(_0x2423a0, _0xd29a2f),
-      truncated: _0x35478['truncated'] === !![] || _0x2423a0['length'] > _0xd29a2f,
+      title: truncateText(truncated['title'] || displayName, 0x12c),
+      contentType: truncateText(truncated['contentType'], 0xa0),
+      content: truncateText(list6, handle),
+      truncated: truncated['truncated'] === !![] || list6['length'] > handle,
       trust: 'untrusted_external',
     };
   })['filter'](
-    (_0x21dd1c) =>
-      _0x21dd1c['content'] &&
-      (_0x21dd1c['sourceKind'] === 'document' ? _0x21dd1c['displayName'] : _0x21dd1c['finalUrl']),
+    (scope) =>
+      scope['content'] && (scope['sourceKind'] === 'document' ? scope['displayName'] : scope['finalUrl']),
   );
 }

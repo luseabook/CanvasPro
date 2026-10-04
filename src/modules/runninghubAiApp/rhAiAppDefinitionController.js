@@ -4,187 +4,183 @@ import { parseRunningHubAiAppInput } from './rhAiAppImport.js';
 import { createRunningHubWorkflowComponentDrafts } from './rhWorkflowImport.js';
 import { resolveRunningHubModelApiBaseUrl } from '../runningHubProviderProfiles.js';
 export function createRhAiAppDefinitionController(
-  _0x275114,
+  sourceType,
   { fetchDefinition: fetchDefinition = fetchRunningHubDefinition } = {},
 ) {
-  let _0x2a513e = null,
-    _0x2d86c8 = null,
-    _0x561058 = null,
-    _0x363360 = null,
-    _0x2c6eb1 = null;
-  const _0x34a3b6 = (_0x11b1b7) => {
-      const _0x5d6c3a = _0x275114['workflowInputFieldEl']?.['querySelector'](
-        '[data-role="workflow-input-shell"]',
-      );
-      (_0x5d6c3a?.['setAttribute']('aria-busy', String(_0x11b1b7)),
-        _0x5d6c3a?.['classList']['toggle']('is-loading', _0x11b1b7));
+  let value = null,
+    value2 = null,
+    el = null,
+    reference = null,
+    el2 = null;
+  const run = (item) => {
+      const el3 = sourceType['workflowInputFieldEl']?.['querySelector']('[data-role="workflow-input-shell"]');
+      (el3?.['setAttribute']('aria-busy', String(item)), el3?.['classList']['toggle']('is-loading', item));
     },
-    _0x10efe0 = (_0x2e8ddd) => {
-      if (!_0x2c6eb1) return;
-      ((_0x2c6eb1['disabled'] = _0x2e8ddd),
-        _0x2c6eb1['setAttribute']('aria-busy', String(_0x2e8ddd)),
-        _0x2c6eb1['classList']['toggle']('is-loading', _0x2e8ddd),
-        (_0x2c6eb1['querySelector']('span')['textContent'] = _0x2e8ddd ? '正在解析…' : '解析连接'));
+    handler = (key) => {
+      if (!el2) return;
+      ((el2['disabled'] = key),
+        el2['setAttribute']('aria-busy', String(key)),
+        el2['classList']['toggle']('is-loading', key),
+        (el2['querySelector']('span')['textContent'] = key ? '正在解析…' : '解析连接'));
     },
-    _0x118ceb = {
+    index = {
       syncInputSource() {
-        if (!isRunningHubSource(_0x275114['sourceType'])) return;
-        const _0x5a816a = _0x275114['_getInputText']();
-        let _0x2a79fd;
+        if (!isRunningHubSource(sourceType['sourceType'])) return;
+        const result = sourceType['_getInputText']();
+        let data;
         try {
-          _0x2a79fd = JSON['parse'](_0x5a816a);
+          data = JSON['parse'](result);
         } catch {}
-        let _0x118796,
-          _0x212c23,
-          _0x4a6c76 = _0x275114['runningHubProfileId'];
-        if (_0x2a79fd?.['workflow'])
-          ((_0x212c23 = createRunningHubWorkflowComponentDrafts(_0x5a816a)['parsed']['workflowId']),
-            (_0x118796 = SOURCE_TYPES['runninghubWorkflow']));
+        let sourceType2,
+          appId,
+          runningHubProfileId = sourceType['runningHubProfileId'];
+        if (data?.['workflow'])
+          ((appId = createRunningHubWorkflowComponentDrafts(result)['parsed']['workflowId']),
+            (sourceType2 = SOURCE_TYPES['runninghubWorkflow']));
         else {
-          const _0x6f944a = parseRunningHubAiAppInput(_0x5a816a);
-          if (!_0x6f944a['body']['appId'] && !_0x6f944a['body']['aiAppId'] && _0x6f944a['body']['workflowId'])
-            return;
-          ((_0x212c23 = _0x6f944a['appId']),
-            (_0x4a6c76 = _0x6f944a['providerProfileId'] || _0x4a6c76),
-            (_0x118796 = SOURCE_TYPES['runninghub']));
+          const dom = parseRunningHubAiAppInput(result);
+          if (!dom['body']['appId'] && !dom['body']['aiAppId'] && dom['body']['workflowId']) return;
+          ((appId = dom['appId']),
+            (runningHubProfileId = dom['providerProfileId'] || runningHubProfileId),
+            (sourceType2 = SOURCE_TYPES['runninghub']));
         }
-        (_0x275114['sourceType'] !== _0x118796 &&
-          ((_0x275114['savedAppId'] = ''),
-          (_0x275114['componentDrafts'] = []),
-          (_0x275114['componentCandidates'] = []),
-          (_0x275114['componentDraftKey'] = ''),
-          (_0x275114['promptHelpTooltip'] = ''),
-          (_0x275114['sourceType'] = _0x118796),
-          _0x275114['_syncSourceView']()),
-          (_0x275114['definitionReference'] = _0x118ceb['getSavedReference']({
-            sourceType: _0x118796,
-            runningHubProfileId: _0x4a6c76,
-            input: JSON['stringify']({ appId: _0x212c23 }),
+        (sourceType['sourceType'] !== sourceType2 &&
+          ((sourceType['savedAppId'] = ''),
+          (sourceType['componentDrafts'] = []),
+          (sourceType['componentCandidates'] = []),
+          (sourceType['componentDraftKey'] = ''),
+          (sourceType['promptHelpTooltip'] = ''),
+          (sourceType['sourceType'] = sourceType2),
+          sourceType['_syncSourceView']()),
+          (sourceType['definitionReference'] = index['getSavedReference']({
+            sourceType: sourceType2,
+            runningHubProfileId: runningHubProfileId,
+            input: JSON['stringify']({ appId: appId }),
           })),
-          _0x118ceb['sync']());
+          index['sync']());
       },
       beginFileRead() {
-        (_0x118ceb['cancel'](), window['clearTimeout'](_0x275114['parseTimer']));
-        const _0x3f3cd6 = {};
+        (index['cancel'](), window['clearTimeout'](sourceType['parseTimer']));
+        const options = {};
         return (
-          (_0x2d86c8 = _0x3f3cd6),
-          (_0x275114['workflowInputCollapsed'] = ![]),
-          _0x275114['_syncWorkflowInputCollapsed'](),
-          _0x34a3b6(!![]),
+          (value2 = options),
+          (sourceType['workflowInputCollapsed'] = ![]),
+          sourceType['_syncWorkflowInputCollapsed'](),
+          run(!![]),
           {
-            isCurrent: () => _0x2d86c8 === _0x3f3cd6,
+            isCurrent: () => value2 === options,
             finish() {
-              _0x2d86c8 === _0x3f3cd6 && ((_0x2d86c8 = null), _0x34a3b6(![]));
+              value2 === options && ((value2 = null), run(![]));
             },
           }
         );
       },
-      getSavedReference(_0x137702) {
-        if (!isRunningHubSource(_0x137702['sourceType'])) return '';
+      getSavedReference(target) {
+        if (!isRunningHubSource(target['sourceType'])) return '';
         try {
-          const _0x5f5790 = JSON['parse'](_0x137702['input']),
-            _0x4b8607 = _0x5f5790['workflowId'] || _0x5f5790['appId'];
-          if (!/^\d{1,30}$/['test'](String(_0x4b8607 || ''))) return '';
+          const source = JSON['parse'](target['input']),
+            next = source['workflowId'] || source['appId'];
+          if (!/^\d{1,30}$/['test'](String(next || ''))) return '';
           return (
-            resolveRunningHubModelApiBaseUrl(_0x137702['runningHubProfileId']) +
+            resolveRunningHubModelApiBaseUrl(target['runningHubProfileId']) +
             '/' +
-            (_0x137702['sourceType'] === 'runninghub-workflow' ? 'workflow' : 'ai-detail') +
+            (target['sourceType'] === 'runninghub-workflow' ? 'workflow' : 'ai-detail') +
             '/' +
-            _0x4b8607
+            next
           );
         } catch {
           return '';
         }
       },
       mount() {
-        ((_0x561058 = document['createElement']('div')),
-          (_0x561058['className'] = 'rh-ai-app-definition'),
-          (_0x561058['innerHTML'] =
+        ((el = document['createElement']('div')),
+          (el['className'] = 'rh-ai-app-definition'),
+          (el['innerHTML'] =
             '<div class="rh-ai-app-definition-head">\n          <label class="rh-ai-app-label rh-ai-app-input-title" for="rh-definition-reference">RunningHub 链接</label>\n          <div class="rh-ai-app-site-links">\n            <a href="https://www.runninghub.cn/ai-apps?inviteCode=rh-v1312" target="_blank" rel="noopener noreferrer">国内站 <span aria-hidden="true">↗</span></a>\n            <a href="https://www.runninghub.ai/ai-apps?inviteCode=rh-v1312" target="_blank" rel="noopener noreferrer">国际站 <span aria-hidden="true">↗</span></a>\n          </div>\n        </div>\n        <div class="rh-ai-app-definition-row">\n          <input id="rh-definition-reference" data-role="definition-reference" type="text" autocomplete="off" spellcheck="false" />\n          <button type="button" class="rh-ai-app-secondary" data-action="fetch-definition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12 0l2 5M4 12l2 5a7 7 0 0 0 12 0"/></svg><span>解析连接</span></button>\n        </div>'),
-          _0x275114['panel']['querySelector']('[data-role="workbench"]')['prepend'](_0x561058),
-          (_0x363360 = _0x561058['querySelector']('input')),
-          (_0x2c6eb1 = _0x561058['querySelector']('button')),
-          _0x363360['addEventListener']('input', () => {
-            (_0x118ceb['cancel'](),
-              (_0x275114['definitionReference'] = _0x363360['value']),
-              _0x275114['_saveKindState']());
+          sourceType['panel']['querySelector']('[data-role="workbench"]')['prepend'](el),
+          (reference = el['querySelector']('input')),
+          (el2 = el['querySelector']('button')),
+          reference['addEventListener']('input', () => {
+            (index['cancel'](),
+              (sourceType['definitionReference'] = reference['value']),
+              sourceType['_saveKindState']());
           }),
-          _0x363360['addEventListener']('keydown', (_0x22e192) => {
-            if (_0x22e192['key'] !== 'Enter' || _0x22e192['isComposing']) return;
-            (_0x22e192['preventDefault'](), void _0x118ceb['load']());
+          reference['addEventListener']('keydown', (event) => {
+            if (event['key'] !== 'Enter' || event['isComposing']) return;
+            (event['preventDefault'](), void index['load']());
           }),
-          _0x275114['textarea']['addEventListener']('input', _0x118ceb['cancel']),
-          _0x275114['panel']['addEventListener']('input', (_0x995ad3) => {
-            if (_0x995ad3['target'] !== _0x363360) _0x118ceb['cancel']();
+          sourceType['textarea']['addEventListener']('input', index['cancel']),
+          sourceType['panel']['addEventListener']('input', (event2) => {
+            if (event2['target'] !== reference) index['cancel']();
           }),
-          _0x275114['panel']['addEventListener'](
+          sourceType['panel']['addEventListener'](
             'click',
             () => {
-              if (_0x2d86c8) _0x118ceb['cancel']();
+              if (value2) index['cancel']();
             },
             !![],
           ),
-          _0x2c6eb1['addEventListener']('click', () => void _0x118ceb['load']()),
-          _0x118ceb['sync']());
+          el2['addEventListener']('click', () => void index['load']()),
+          index['sync']());
       },
       sync() {
-        if (!_0x561058) return;
-        ((_0x561058['hidden'] = !isRunningHubSource(_0x275114['sourceType'])),
-          (_0x363360['placeholder'] = '粘贴 AI 应用或工作流链接，自动识别类型'),
-          (_0x363360['value'] = _0x275114['definitionReference'] || ''));
+        if (!el) return;
+        ((el['hidden'] = !isRunningHubSource(sourceType['sourceType'])),
+          (reference['placeholder'] = '粘贴 AI 应用或工作流链接，自动识别类型'),
+          (reference['value'] = sourceType['definitionReference'] || ''));
       },
       cancel() {
-        ((_0x2d86c8 = null), _0x34a3b6(![]));
-        const _0x1f02df = _0x2a513e;
-        ((_0x2a513e = null), _0x1f02df?.['abort'](), _0x10efe0(![]));
+        ((value2 = null), run(![]));
+        const current = value;
+        ((value = null), current?.['abort'](), handler(![]));
       },
       async load() {
-        if (_0x2a513e || !isRunningHubSource(_0x275114['sourceType'])) return;
-        if (!_0x275114['_guardRunningHubAiAppAccess']()) return;
-        _0x118ceb['cancel']();
-        const _0x15254e = new AbortController();
-        _0x2a513e = _0x15254e;
-        const _0x105abf = {
-            sourceType: _0x275114['sourceType'],
-            kind: _0x275114['kind'],
-            profileId: _0x275114['runningHubProfileId'],
-            reference: _0x363360['value']['trim'](),
+        if (value || !isRunningHubSource(sourceType['sourceType'])) return;
+        if (!sourceType['_guardRunningHubAiAppAccess']()) return;
+        index['cancel']();
+        const signal = new AbortController();
+        value = signal;
+        const args = {
+            sourceType: sourceType['sourceType'],
+            kind: sourceType['kind'],
+            profileId: sourceType['runningHubProfileId'],
+            reference: reference['value']['trim'](),
           },
-          _0x466ff2 = _0x275114['_getInputText']();
-        (_0x10efe0(!![]), _0x275114['_setError'](''));
+          entry = sourceType['_getInputText']();
+        (handler(!![]), sourceType['_setError'](''));
         try {
-          const _0x327de2 = await fetchDefinition({
-            ..._0x105abf,
+          const error = await fetchDefinition({
+            ...args,
             sourceType: 'auto',
-            signal: _0x15254e['signal'],
+            signal: signal['signal'],
           });
           if (
-            _0x2a513e !== _0x15254e ||
-            _0x275114['sourceType'] !== _0x105abf['sourceType'] ||
-            _0x275114['kind'] !== _0x105abf['kind'] ||
-            _0x275114['_getInputText']() !== _0x466ff2
+            value !== signal ||
+            sourceType['sourceType'] !== args['sourceType'] ||
+            sourceType['kind'] !== args['kind'] ||
+            sourceType['_getInputText']() !== entry
           )
             return;
-          (window['clearTimeout'](_0x275114['parseTimer']),
-            _0x275114['_clearCurrentDraftIdentity'](),
-            (_0x275114['componentDrafts'] = []),
-            (_0x275114['componentCandidates'] = []),
-            (_0x275114['componentDraftKey'] = ''),
-            (_0x275114['sourceType'] = _0x327de2['sourceType']),
-            (_0x275114['runningHubProfileId'] = _0x327de2['providerProfileId']),
-            (_0x275114['definitionReference'] = _0x105abf['reference']),
-            (_0x275114['textarea']['value'] = _0x327de2['input']),
-            (_0x275114['appName'] = _0x327de2['name']),
-            _0x275114['_syncSourceView'](),
-            _0x275114['_parseNow']());
-        } catch (_0x12f9d9) {
-          if (_0x2a513e !== _0x15254e || _0x15254e['signal']['aborted']) return;
-          (_0x275114['_setError'](_0x12f9d9?.['message'] || '获取配置失败，请重试'),
-            _0x275114['_saveKindState']());
+          (window['clearTimeout'](sourceType['parseTimer']),
+            sourceType['_clearCurrentDraftIdentity'](),
+            (sourceType['componentDrafts'] = []),
+            (sourceType['componentCandidates'] = []),
+            (sourceType['componentDraftKey'] = ''),
+            (sourceType['sourceType'] = error['sourceType']),
+            (sourceType['runningHubProfileId'] = error['providerProfileId']),
+            (sourceType['definitionReference'] = args['reference']),
+            (sourceType['textarea']['value'] = error['input']),
+            (sourceType['appName'] = error['name']),
+            sourceType['_syncSourceView'](),
+            sourceType['_parseNow']());
+        } catch (error2) {
+          if (value !== signal || signal['signal']['aborted']) return;
+          (sourceType['_setError'](error2?.['message'] || '获取配置失败，请重试'),
+            sourceType['_saveKindState']());
         } finally {
-          _0x2a513e === _0x15254e && ((_0x2a513e = null), _0x10efe0(![]));
+          value === signal && ((value = null), handler(![]));
         }
       },
     };
-  return _0x118ceb;
+  return index;
 }

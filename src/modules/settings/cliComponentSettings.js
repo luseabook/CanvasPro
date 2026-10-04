@@ -13,138 +13,128 @@ export function initCliComponentSettings({
   documentObject: documentObject = document,
   host: host = window,
   showToast: showToast = window['showToast'],
-  onStatusChanged: _0x16b27a,
+  onStatusChanged: onStatusChanged,
 } = {}) {
-  let _0x39d622 = ![];
-  const _0xfe6ee0 = [],
-    _0x92d0e6 = new Map(),
-    _0xf843b0 = new Map();
-  let _0x45f608 = 0x0;
-  const _0xe60a8d = { codex: 'btnCodexCliLogin', dreamina: 'btnDreaminaAuth' },
-    _0xbd67a7 = (_0x2c1cc8) =>
-      _0x2c1cc8 === 'codex' ? fetchCliProviderStatuses() : fetchDreaminaCliStatusFromServer();
-  function _0x27be04(_0x312118) {
-    if (_0x39d622 || !_0x312118) return;
-    const _0x488f78 = _0x312118['provider'];
-    _0x92d0e6['set'](_0x488f78, _0x312118);
-    const _0x25a187 = documentObject['querySelector']('[data-cli-component="' + _0x488f78 + '\x22]');
-    if (!_0x25a187) return;
-    const _0x20a9fd = _0x312118['phase'] === 'downloading',
-      _0x5f3ee7 = _0xf843b0['get'](_0x488f78),
-      _0x4fe4fa = !!_0x5f3ee7;
-    (_0x25a187['setAttribute']('aria-busy', String(_0x4fe4fa || _0x20a9fd)),
-      (_0x25a187['dataset']['componentReady'] = String(!!_0x312118['installed'] && !_0x20a9fd)));
-    const _0x2f3a0a = _0x25a187['querySelector']('[data-component-version]');
-    ((_0x2f3a0a['textContent'] =
-      _0x312118['installed'] && _0x312118['version'] ? 'v' + _0x312118['version'] : ''),
-      (_0x2f3a0a['hidden'] = !_0x2f3a0a['textContent']));
-    const _0x40dfd6 = _0x25a187['querySelector']('[data-component-notice]');
-    ((_0x40dfd6['textContent'] =
-      _0x5f3ee7 === checkCliComponentUpdate ? '正在检查更新…' : _0x312118['updateMessage'] || ''),
-      (_0x40dfd6['hidden'] = !_0x40dfd6['textContent']));
-    const _0x248283 = _0x25a187['querySelector']('[data-component-status]'),
-      _0x341622 = _0x312118['downloadBytes']
-        ? '约\x20' + (_0x312118['downloadBytes'] / 0xf4240)['toFixed'](0x1) + ' MB'
+  let enabled = ![];
+  const list = [],
+    map = new Map(),
+    map2 = new Map();
+  let value = 0x0;
+  const item = { codex: 'btnCodexCliLogin', dreamina: 'btnDreaminaAuth' },
+    handler = (key) => (key === 'codex' ? fetchCliProviderStatuses() : fetchDreaminaCliStatusFromServer());
+  function run(enabled2) {
+    if (enabled || !enabled2) return;
+    const index = enabled2['provider'];
+    map['set'](index, enabled2);
+    const el = documentObject['querySelector']('[data-cli-component="' + index + '\x22]');
+    if (!el) return;
+    const enabled3 = enabled2['phase'] === 'downloading',
+      enabled4 = map2['get'](index),
+      enabled5 = !!enabled4;
+    (el['setAttribute']('aria-busy', String(enabled5 || enabled3)),
+      (el['dataset']['componentReady'] = String(!!enabled2['installed'] && !enabled3)));
+    const el2 = el['querySelector']('[data-component-version]');
+    ((el2['textContent'] = enabled2['installed'] && enabled2['version'] ? 'v' + enabled2['version'] : ''),
+      (el2['hidden'] = !el2['textContent']));
+    const el3 = el['querySelector']('[data-component-notice]');
+    ((el3['textContent'] =
+      enabled4 === checkCliComponentUpdate ? '正在检查更新…' : enabled2['updateMessage'] || ''),
+      (el3['hidden'] = !el3['textContent']));
+    const el4 = el['querySelector']('[data-component-status]'),
+      result = enabled2['downloadBytes']
+        ? '约\x20' + (enabled2['downloadBytes'] / 0xf4240)['toFixed'](0x1) + ' MB'
         : '';
-    ((_0x248283['textContent'] = _0x20a9fd
+    ((el4['textContent'] = enabled3
       ? '正在下载 ' +
-        (_0x312118['progress'] || 0x0) +
+        (enabled2['progress'] || 0x0) +
         '% · ' +
-        ((_0x312118['receivedBytes'] || 0x0) / 0xf4240)['toFixed'](0x1) +
+        ((enabled2['receivedBytes'] || 0x0) / 0xf4240)['toFixed'](0x1) +
         '\x20MB'
-      : [_0x312118['installed'] ? '' : _0x341622, _0x312118['error'] || _0x312118['busyReason']]
+      : [enabled2['installed'] ? '' : result, enabled2['error'] || enabled2['busyReason']]
           ['filter'](Boolean)
           ['join']('\x20·\x20')),
-      (_0x248283['hidden'] = !_0x248283['textContent']));
-    const _0x4f9071 = _0x25a187['querySelector']('progress');
-    _0x4f9071['hidden'] = !_0x20a9fd && !_0x4fe4fa;
-    if (_0x20a9fd && _0x312118['totalBytes'] > 0x0) _0x4f9071['value'] = _0x312118['progress'] || 0x0;
-    else _0x4f9071['removeAttribute']('value');
-    const _0xa262d4 = _0x25a187['querySelector']('[data-component-install]');
-    ((_0xa262d4['hidden'] = _0x312118['installed']),
-      (_0xa262d4['disabled'] = _0x312118['supported'] === ![] || _0x20a9fd || _0xf843b0['has'](_0x488f78)),
-      (_0xa262d4['textContent'] = _0x20a9fd
-        ? '下载中…'
-        : _0x312118['phase'] === 'failed'
-          ? '重试下载'
-          : '下载组件'),
-      (_0x25a187['querySelector']('[data-component-remove]')['hidden'] = !_0x312118['installed']),
-      (_0x25a187['querySelector']('[data-component-remove]')['disabled'] =
-        _0x20a9fd || _0x312118['busy'] || _0xf843b0['has'](_0x488f78)));
-    const _0x1330ee = _0x25a187['querySelector']('[data-component-update]');
-    ((_0x1330ee['hidden'] = !_0x312118['installed']),
-      (_0x1330ee['disabled'] = _0x20a9fd || _0x312118['busy'] || _0xf843b0['has'](_0x488f78)),
-      (_0x1330ee['textContent'] = _0x20a9fd ? '处理中…' : '修复组件'));
-    const _0x709bb9 = _0x25a187['querySelector']('[data-component-check]');
-    ((_0x709bb9['hidden'] = !_0x312118['installed']),
-      (_0x709bb9['disabled'] = _0x20a9fd || _0xf843b0['has'](_0x488f78)),
-      (_0x709bb9['textContent'] = _0x5f3ee7 === checkCliComponentUpdate ? '检查中…' : '检查更新'));
-    const _0x3b534d = _0x25a187['querySelector']('[data-component-upgrade]');
-    ((_0x3b534d['hidden'] = !_0x312118['installed'] || !_0x312118['updateAvailable']),
-      (_0x3b534d['disabled'] = _0x20a9fd || _0x312118['busy'] || _0xf843b0['has'](_0x488f78)),
-      (_0x3b534d['textContent'] = '更新到 ' + (_0x312118['latestVersion'] || '新版本')));
+      (el4['hidden'] = !el4['textContent']));
+    const el5 = el['querySelector']('progress');
+    el5['hidden'] = !enabled3 && !enabled5;
+    if (enabled3 && enabled2['totalBytes'] > 0x0) el5['value'] = enabled2['progress'] || 0x0;
+    else el5['removeAttribute']('value');
+    const el6 = el['querySelector']('[data-component-install]');
+    ((el6['hidden'] = enabled2['installed']),
+      (el6['disabled'] = enabled2['supported'] === ![] || enabled3 || map2['has'](index)),
+      (el6['textContent'] = enabled3 ? '下载中…' : enabled2['phase'] === 'failed' ? '重试下载' : '下载组件'),
+      (el['querySelector']('[data-component-remove]')['hidden'] = !enabled2['installed']),
+      (el['querySelector']('[data-component-remove]')['disabled'] =
+        enabled3 || enabled2['busy'] || map2['has'](index)));
+    const el7 = el['querySelector']('[data-component-update]');
+    ((el7['hidden'] = !enabled2['installed']),
+      (el7['disabled'] = enabled3 || enabled2['busy'] || map2['has'](index)),
+      (el7['textContent'] = enabled3 ? '处理中…' : '修复组件'));
+    const el8 = el['querySelector']('[data-component-check]');
+    ((el8['hidden'] = !enabled2['installed']),
+      (el8['disabled'] = enabled3 || map2['has'](index)),
+      (el8['textContent'] = enabled4 === checkCliComponentUpdate ? '检查中…' : '检查更新'));
+    const el9 = el['querySelector']('[data-component-upgrade]');
+    ((el9['hidden'] = !enabled2['installed'] || !enabled2['updateAvailable']),
+      (el9['disabled'] = enabled3 || enabled2['busy'] || map2['has'](index)),
+      (el9['textContent'] = '更新到 ' + (enabled2['latestVersion'] || '新版本')));
   }
-  async function _0x1a0f97(_0x23cf49, _0xecb19a) {
-    if (_0xf843b0['has'](_0x23cf49)) return;
-    ((_0x45f608 += 0x1), _0xf843b0['set'](_0x23cf49, _0xecb19a), _0x27be04(_0x92d0e6['get'](_0x23cf49)));
+  async function run2(data, handler2) {
+    if (map2['has'](data)) return;
+    ((value += 0x1), map2['set'](data, handler2), run(map['get'](data)));
     try {
-      await _0xecb19a(_0x23cf49);
-      if (!_0x39d622 && _0xecb19a !== checkCliComponentUpdate)
-        void _0xbd67a7(_0x23cf49)
-          ['then'](() => _0x16b27a?.())
+      await handler2(data);
+      if (!enabled && handler2 !== checkCliComponentUpdate)
+        void handler(data)
+          ['then'](() => onStatusChanged?.())
           ['catch'](() => {});
-    } catch (_0x541513) {
-      if (!_0x39d622) showToast?.(_0x541513['message'], 'error');
+    } catch (error2) {
+      if (!enabled) showToast?.(error2['message'], 'error');
     } finally {
-      (_0xf843b0['delete'](_0x23cf49), (_0x45f608 += 0x1), _0x27be04(_0x92d0e6['get'](_0x23cf49)));
+      (map2['delete'](data), (value += 0x1), run(map['get'](data)));
     }
   }
-  for (const _0x4290e6 of Object['keys'](_0xe60a8d)) {
-    const _0x3741d5 = documentObject['querySelector']('[data-cli-component="' + _0x4290e6 + '\x22]');
-    if (!_0x3741d5) continue;
-    const _0x56760c = _0x3741d5['querySelector']('[data-component-install]'),
-      _0x94779e = _0x3741d5['querySelector']('[data-component-remove]'),
-      _0x536021 = _0x3741d5['querySelector']('[data-component-update]'),
-      _0x26dcbc = _0x3741d5['querySelector']('[data-component-check]'),
-      _0x586457 = _0x3741d5['querySelector']('[data-component-upgrade]'),
-      _0x1b7386 = documentObject['getElementById'](_0xe60a8d[_0x4290e6]),
-      _0x58c22b = () => _0x1a0f97(_0x4290e6, ensureCliComponent),
-      _0x211829 = () => _0x1a0f97(_0x4290e6, removeCliComponent),
-      _0x2d9ee6 = () => _0x1a0f97(_0x4290e6, repairCliComponent),
-      _0x17c589 = () => _0x1a0f97(_0x4290e6, checkCliComponentUpdate),
-      _0x356326 = () => _0x1a0f97(_0x4290e6, updateCliComponent),
-      _0x52b739 = (_0x48a66b) => {
-        if (
-          _0x92d0e6['get'](_0x4290e6)?.['installed'] &&
-          _0x92d0e6['get'](_0x4290e6)?.['phase'] !== 'downloading'
-        )
-          return;
-        (_0x48a66b['preventDefault'](), _0x48a66b['stopImmediatePropagation']());
+  for (const options of Object['keys'](item)) {
+    const el10 = documentObject['querySelector']('[data-cli-component="' + options + '\x22]');
+    if (!el10) continue;
+    const el11 = el10['querySelector']('[data-component-install]'),
+      el12 = el10['querySelector']('[data-component-remove]'),
+      el13 = el10['querySelector']('[data-component-update]'),
+      el14 = el10['querySelector']('[data-component-check]'),
+      el15 = el10['querySelector']('[data-component-upgrade]'),
+      el16 = documentObject['getElementById'](item[options]),
+      target = () => run2(options, ensureCliComponent),
+      source = () => run2(options, removeCliComponent),
+      next = () => run2(options, repairCliComponent),
+      current = () => run2(options, checkCliComponentUpdate),
+      entry = () => run2(options, updateCliComponent),
+      record = (event) => {
+        if (map['get'](options)?.['installed'] && map['get'](options)?.['phase'] !== 'downloading') return;
+        (event['preventDefault'](), event['stopImmediatePropagation']());
       };
-    (_0x56760c['addEventListener']('click', _0x58c22b),
-      _0x94779e['addEventListener']('click', _0x211829),
-      _0x536021['addEventListener']('click', _0x2d9ee6),
-      _0x26dcbc['addEventListener']('click', _0x17c589),
-      _0x586457['addEventListener']('click', _0x356326),
-      _0x1b7386?.['addEventListener']('click', _0x52b739, !![]),
-      _0xfe6ee0['push'](() => {
-        (_0x56760c['removeEventListener']('click', _0x58c22b),
-          _0x94779e['removeEventListener']('click', _0x211829),
-          _0x536021['removeEventListener']('click', _0x2d9ee6),
-          _0x26dcbc['removeEventListener']('click', _0x17c589),
-          _0x586457['removeEventListener']('click', _0x356326),
-          _0x1b7386?.['removeEventListener']('click', _0x52b739, !![]));
+    (el11['addEventListener']('click', target),
+      el12['addEventListener']('click', source),
+      el13['addEventListener']('click', next),
+      el14['addEventListener']('click', current),
+      el15['addEventListener']('click', entry),
+      el16?.['addEventListener']('click', record, !![]),
+      list['push'](() => {
+        (el11['removeEventListener']('click', target),
+          el12['removeEventListener']('click', source),
+          el13['removeEventListener']('click', next),
+          el14['removeEventListener']('click', current),
+          el15['removeEventListener']('click', entry),
+          el16?.['removeEventListener']('click', record, !![]));
       }));
   }
-  const _0x59b501 = (_0x22116d) => {
-    ((_0x45f608 += 0x1), _0x27be04(_0x22116d['detail']));
+  const payload = (handle) => {
+    ((value += 0x1), run(handle['detail']));
   };
-  host['addEventListener'](CLI_COMPONENT_CHANGED, _0x59b501);
-  function _0x2e1250(_0x381265) {
-    for (const _0x12812a of Object['keys'](_0xe60a8d)) {
-      _0x27be04(
-        _0x381265[_0x12812a] || {
-          provider: _0x12812a,
+  host['addEventListener'](CLI_COMPONENT_CHANGED, payload);
+  function run3(state) {
+    for (const provider2 of Object['keys'](item)) {
+      run(
+        state[provider2] || {
+          provider: provider2,
           installed: ![],
           supported: ![],
           error: '当前平台暂不支持此组件',
@@ -152,46 +142,46 @@ export function initCliComponentSettings({
       );
     }
   }
-  let _0x53ee9a = ![];
-  const _0x473105 = host['setInterval'](async () => {
-      const _0x1d2945 = documentObject['getElementById']('pane-cli-login');
+  let config = ![];
+  const scope = host['setInterval'](async () => {
+      const el17 = documentObject['getElementById']('pane-cli-login');
       if (
-        _0x39d622 ||
-        _0x53ee9a ||
-        !_0x1d2945?.['classList']['contains']('active') ||
-        !_0x1d2945['getClientRects']()['length']
+        enabled ||
+        config ||
+        !el17?.['classList']['contains']('active') ||
+        !el17['getClientRects']()['length']
       )
         return;
-      _0x53ee9a = !![];
-      const _0x44a07a = _0x45f608;
+      config = !![];
+      const input = value;
       try {
-        const { components: _0x367326 } = await fetchCliComponents();
-        if (_0x44a07a === _0x45f608) _0x2e1250(_0x367326);
+        const { components: components } = await fetchCliComponents();
+        if (input === value) run3(components);
       } catch {
       } finally {
-        _0x53ee9a = ![];
+        config = ![];
       }
     }, 0xbb8),
-    _0x2c0c4e = _0x45f608;
+    output = value;
   return (
     fetchCliComponents()
-      ['then'](({ components: _0x343498 }) => {
-        if (_0x39d622) return;
-        if (_0x2c0c4e !== _0x45f608) return;
-        _0x2e1250(_0x343498);
-        for (const _0x8b5b32 of Object['values'](_0x343498)) {
-          if (_0x8b5b32['phase'] === 'downloading') _0x1a0f97(_0x8b5b32['provider'], ensureCliComponent);
+      ['then'](({ components: components2 }) => {
+        if (enabled) return;
+        if (output !== value) return;
+        run3(components2);
+        for (const value2 of Object['values'](components2)) {
+          if (value2['phase'] === 'downloading') run2(value2['provider'], ensureCliComponent);
         }
       })
-      ['catch']((_0x55f5ed) => {
-        if (!_0x39d622) showToast?.(_0x55f5ed['message'], 'error');
+      ['catch']((error3) => {
+        if (!enabled) showToast?.(error3['message'], 'error');
       }),
     {
       destroy() {
-        ((_0x39d622 = !![]),
-          host['removeEventListener'](CLI_COMPONENT_CHANGED, _0x59b501),
-          host['clearInterval'](_0x473105),
-          _0xfe6ee0['forEach']((_0x14e703) => _0x14e703()));
+        ((enabled = !![]),
+          host['removeEventListener'](CLI_COMPONENT_CHANGED, payload),
+          host['clearInterval'](scope),
+          list['forEach']((handler3) => handler3()));
       },
     }
   );

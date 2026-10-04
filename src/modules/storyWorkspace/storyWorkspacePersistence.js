@@ -1,179 +1,173 @@
 export const STORY_WORKSPACE_PERSISTENCE_VERSION = 0x1;
-function cloneJson(_0x2f66f2) {
-  if (!_0x2f66f2 || typeof _0x2f66f2 !== 'object') return _0x2f66f2;
-  return JSON['parse'](JSON['stringify'](_0x2f66f2));
+function cloneJson(enabled) {
+  if (!enabled || typeof enabled !== 'object') return enabled;
+  return JSON['parse'](JSON['stringify'](enabled));
 }
-function normalizeText(_0x16688a) {
-  return String(_0x16688a || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function normalizeEpisodeAssetRailTab(_0x56f7c2) {
-  const _0xe7ec92 = normalizeText(_0x56f7c2);
-  return ['assets', 'frames', 'library']['includes'](_0xe7ec92) ? _0xe7ec92 : 'assets';
+function normalizeEpisodeAssetRailTab(item) {
+  const text = normalizeText(item);
+  return ['assets', 'frames', 'library']['includes'](text) ? text : 'assets';
 }
-function clonePersistableStoryData(_0x1c6d5c) {
-  return filterPersistableStoryData(cloneJson(_0x1c6d5c));
+function clonePersistableStoryData(key) {
+  return filterPersistableStoryData(cloneJson(key));
 }
-function filterPersistableStoryData(_0x534e7d) {
-  if (!_0x534e7d || typeof _0x534e7d !== 'object') return _0x534e7d;
-  if (_0x534e7d['project']?.['sourceMode'] === 'video-replication') {
-    if (_0x534e7d['project']['replication']) delete _0x534e7d['project']['replication']['requirements'];
-    for (const _0x23735d of _0x534e7d['episodes'] || []) {
-      if (_0x23735d['replication']) delete _0x23735d['replication']['requirements'];
+function filterPersistableStoryData(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return enabled2;
+  if (enabled2['project']?.['sourceMode'] === 'video-replication') {
+    if (enabled2['project']['replication']) delete enabled2['project']['replication']['requirements'];
+    for (const index of enabled2['episodes'] || []) {
+      if (index['replication']) delete index['replication']['requirements'];
     }
   }
   return (
-    Array['isArray'](_0x534e7d['clipFrames']) &&
-      (_0x534e7d['clipFrames'] = _0x534e7d['clipFrames']['filter'](
-        (_0x1f75dd) =>
-          _0x1f75dd?.['captureSavePending'] !== !![] &&
-          _0x1f75dd?.['isTransient'] !== !![] &&
-          ![
-            _0x1f75dd?.['imageUrl'],
-            _0x1f75dd?.['videoUrl'],
-            _0x1f75dd?.['thumbUrl'],
-            _0x1f75dd?.['posterUrl'],
-          ]['some']((_0xa46e7f) => normalizeText(_0xa46e7f)['startsWith']('blob:')),
+    Array['isArray'](enabled2['clipFrames']) &&
+      (enabled2['clipFrames'] = enabled2['clipFrames']['filter'](
+        (result) =>
+          result?.['captureSavePending'] !== !![] &&
+          result?.['isTransient'] !== !![] &&
+          ![result?.['imageUrl'], result?.['videoUrl'], result?.['thumbUrl'], result?.['posterUrl']]['some'](
+            (data) => normalizeText(data)['startsWith']('blob:'),
+          ),
       )),
-    _0x534e7d
+    enabled2
   );
 }
-function clonePersistableProjects(_0x160133) {
-  return (Array['isArray'](_0x160133) ? _0x160133 : [])['map']((_0x5a5425) => {
-    const _0x57b036 = cloneJson(_0x5a5425);
-    if (_0x57b036?.['data']) _0x57b036['data'] = filterPersistableStoryData(_0x57b036['data']);
-    return _0x57b036;
+function clonePersistableProjects(options) {
+  return (Array['isArray'](options) ? options : [])['map']((target) => {
+    const cloneJson2 = cloneJson(target);
+    if (cloneJson2?.['data']) cloneJson2['data'] = filterPersistableStoryData(cloneJson2['data']);
+    return cloneJson2;
   });
 }
-export function createStoryWorkspaceSnapshot(_0x308fa9 = {}) {
-  const _0x53edb4 = Array['isArray'](_0x308fa9['projects']) ? _0x308fa9['projects'] : [];
+export function createStoryWorkspaceSnapshot(hasCreatedProject = {}) {
+  const source = Array['isArray'](hasCreatedProject['projects']) ? hasCreatedProject['projects'] : [];
   return {
     schemaVersion: STORY_WORKSPACE_PERSISTENCE_VERSION,
     savedAt: Date['now'](),
-    activeProjectId: normalizeText(_0x308fa9['data']?.['project']?.['id']),
-    hasCreatedProject: _0x308fa9['hasCreatedProject'] === !![],
-    projectTitleEdited: _0x308fa9['projectTitleEdited'] === !![],
-    projects: clonePersistableProjects(_0x53edb4),
-    currentData: clonePersistableStoryData(_0x308fa9['data']),
-    models: cloneJson(_0x308fa9['models'] || {}),
+    activeProjectId: normalizeText(hasCreatedProject['data']?.['project']?.['id']),
+    hasCreatedProject: hasCreatedProject['hasCreatedProject'] === !![],
+    projectTitleEdited: hasCreatedProject['projectTitleEdited'] === !![],
+    projects: clonePersistableProjects(source),
+    currentData: clonePersistableStoryData(hasCreatedProject['data']),
+    models: cloneJson(hasCreatedProject['models'] || {}),
     modelProviders: {
-      text: normalizeText(_0x308fa9['textProvider']),
-      image: normalizeText(_0x308fa9['imageProvider']),
-      video: normalizeText(_0x308fa9['videoProvider']),
+      text: normalizeText(hasCreatedProject['textProvider']),
+      image: normalizeText(hasCreatedProject['imageProvider']),
+      video: normalizeText(hasCreatedProject['videoProvider']),
     },
     modelProviderProfiles: {
-      text: normalizeText(_0x308fa9['textProviderProfileId']),
-      video: normalizeText(_0x308fa9['videoProviderProfileId']),
-      videoByModel: cloneJson(_0x308fa9['videoProviderProfileIdByModel'] || {}),
+      text: normalizeText(hasCreatedProject['textProviderProfileId']),
+      video: normalizeText(hasCreatedProject['videoProviderProfileId']),
+      videoByModel: cloneJson(hasCreatedProject['videoProviderProfileIdByModel'] || {}),
     },
     modelParams: {
-      image: cloneJson(_0x308fa9['imageGenerationParams'] || {}),
-      imageByModel: cloneJson(_0x308fa9['imageGenerationParamsByModel'] || {}),
-      video: cloneJson(_0x308fa9['videoGenerationParams'] || {}),
-      videoByModel: cloneJson(_0x308fa9['videoGenerationParamsByModel'] || {}),
+      image: cloneJson(hasCreatedProject['imageGenerationParams'] || {}),
+      imageByModel: cloneJson(hasCreatedProject['imageGenerationParamsByModel'] || {}),
+      video: cloneJson(hasCreatedProject['videoGenerationParams'] || {}),
+      videoByModel: cloneJson(hasCreatedProject['videoGenerationParamsByModel'] || {}),
     },
     ui: {
-      view: normalizeText(_0x308fa9['view']) || 'home',
-      step: _0x308fa9['step'] === 0x0 ? 0x0 : Number(_0x308fa9['step']) || 0x1,
-      homeTab: ['upload', 'generate', 'collaborate', 'replication']['includes'](_0x308fa9['homeTab'])
-        ? _0x308fa9['homeTab']
+      view: normalizeText(hasCreatedProject['view']) || 'home',
+      step: hasCreatedProject['step'] === 0x0 ? 0x0 : Number(hasCreatedProject['step']) || 0x1,
+      homeTab: ['upload', 'generate', 'collaborate', 'replication']['includes'](hasCreatedProject['homeTab'])
+        ? hasCreatedProject['homeTab']
         : 'upload',
-      replicationTargetLocale: normalizeText(_0x308fa9['replicationTargetLocale']) || 'zh-CN',
-      replicationAsrProvider: normalizeText(_0x308fa9['replicationAsrProvider']) || 'volcengine-speech',
-      scriptMode: _0x308fa9['scriptMode'] === 'narration' ? 'narration' : 'plot',
-      uploadInputMode: _0x308fa9['uploadInputMode'] === 'paste' ? 'paste' : 'file',
-      idea: String(_0x308fa9['idea'] || ''),
-      scriptFileName: String(_0x308fa9['scriptFileName'] || ''),
-      scriptText: String(_0x308fa9['scriptText'] || ''),
-      scriptCharacterCount: Number['isFinite'](_0x308fa9['scriptCharacterCount'])
-        ? _0x308fa9['scriptCharacterCount']
+      replicationTargetLocale: normalizeText(hasCreatedProject['replicationTargetLocale']) || 'zh-CN',
+      replicationAsrProvider:
+        normalizeText(hasCreatedProject['replicationAsrProvider']) || 'volcengine-speech',
+      scriptMode: hasCreatedProject['scriptMode'] === 'narration' ? 'narration' : 'plot',
+      uploadInputMode: hasCreatedProject['uploadInputMode'] === 'paste' ? 'paste' : 'file',
+      idea: String(hasCreatedProject['idea'] || ''),
+      scriptFileName: String(hasCreatedProject['scriptFileName'] || ''),
+      scriptText: String(hasCreatedProject['scriptText'] || ''),
+      scriptCharacterCount: Number['isFinite'](hasCreatedProject['scriptCharacterCount'])
+        ? hasCreatedProject['scriptCharacterCount']
         : null,
-      assetFilter: normalizeText(_0x308fa9['assetFilter']) || 'character',
-      assetSplitRatio: Number(_0x308fa9['assetSplitRatio']) || 0x32,
-      assetDetailSplitRatio: Number(_0x308fa9['assetDetailSplitRatio']) || 0x32,
-      episodeAssetPanelRatio: Number(_0x308fa9['episodeAssetPanelRatio']) || 0x16,
-      episodeEditorPanelRatio: Number(_0x308fa9['episodeEditorPanelRatio']) || 0x22,
-      episodeAssetRailTab: normalizeEpisodeAssetRailTab(_0x308fa9['episodeAssetRailTab']),
-      assetAppearanceIndexes: cloneJson(_0x308fa9['assetAppearanceIndexes'] || {}),
-      outlineSectionOpenState: cloneJson(_0x308fa9['outlineSectionOpenState'] || {}),
-      pageScrollPositions: cloneJson(_0x308fa9['pageScrollPositions'] || {}),
-      experimentalSplitMode: _0x308fa9['experimentalSplitMode'] === !![],
-      selectedAssetId: normalizeText(_0x308fa9['selectedAssetId']),
-      selectedEpisodeId: normalizeText(_0x308fa9['selectedEpisodeId']),
-      selectedClipId: normalizeText(_0x308fa9['selectedClipId']),
-      characterVoiceEditor: _0x308fa9['characterVoiceEditor']
-        ? { ...cloneJson(_0x308fa9['characterVoiceEditor']), isGenerating: ![] }
+      assetFilter: normalizeText(hasCreatedProject['assetFilter']) || 'character',
+      assetSplitRatio: Number(hasCreatedProject['assetSplitRatio']) || 0x32,
+      assetDetailSplitRatio: Number(hasCreatedProject['assetDetailSplitRatio']) || 0x32,
+      episodeAssetPanelRatio: Number(hasCreatedProject['episodeAssetPanelRatio']) || 0x16,
+      episodeEditorPanelRatio: Number(hasCreatedProject['episodeEditorPanelRatio']) || 0x22,
+      episodeAssetRailTab: normalizeEpisodeAssetRailTab(hasCreatedProject['episodeAssetRailTab']),
+      assetAppearanceIndexes: cloneJson(hasCreatedProject['assetAppearanceIndexes'] || {}),
+      outlineSectionOpenState: cloneJson(hasCreatedProject['outlineSectionOpenState'] || {}),
+      pageScrollPositions: cloneJson(hasCreatedProject['pageScrollPositions'] || {}),
+      experimentalSplitMode: hasCreatedProject['experimentalSplitMode'] === !![],
+      selectedAssetId: normalizeText(hasCreatedProject['selectedAssetId']),
+      selectedEpisodeId: normalizeText(hasCreatedProject['selectedEpisodeId']),
+      selectedClipId: normalizeText(hasCreatedProject['selectedClipId']),
+      characterVoiceEditor: hasCreatedProject['characterVoiceEditor']
+        ? { ...cloneJson(hasCreatedProject['characterVoiceEditor']), isGenerating: ![] }
         : null,
     },
   };
 }
-export function normalizeStoryWorkspaceSnapshot(_0x3fab69) {
-  if (!_0x3fab69 || typeof _0x3fab69 !== 'object' || Array['isArray'](_0x3fab69)) return null;
-  if (Number(_0x3fab69['schemaVersion']) !== STORY_WORKSPACE_PERSISTENCE_VERSION) return null;
-  if (!_0x3fab69['currentData']?.['project'] || !Array['isArray'](_0x3fab69['currentData']?.['episodes']))
+export function normalizeStoryWorkspaceSnapshot(models) {
+  if (!models || typeof models !== 'object' || Array['isArray'](models)) return null;
+  if (Number(models['schemaVersion']) !== STORY_WORKSPACE_PERSISTENCE_VERSION) return null;
+  if (!models['currentData']?.['project'] || !Array['isArray'](models['currentData']?.['episodes']))
     return null;
-  const _0x105da0 = _0x3fab69['ui'] && typeof _0x3fab69['ui'] === 'object' ? cloneJson(_0x3fab69['ui']) : {};
+  const ui = models['ui'] && typeof models['ui'] === 'object' ? cloneJson(models['ui']) : {};
   return (
-    delete _0x105da0['replicationRequirements'],
+    delete ui['replicationRequirements'],
     {
-      ..._0x3fab69,
-      projects: clonePersistableProjects(_0x3fab69['projects']),
-      currentData: clonePersistableStoryData(_0x3fab69['currentData']),
-      models:
-        _0x3fab69['models'] && typeof _0x3fab69['models'] === 'object' ? cloneJson(_0x3fab69['models']) : {},
+      ...models,
+      projects: clonePersistableProjects(models['projects']),
+      currentData: clonePersistableStoryData(models['currentData']),
+      models: models['models'] && typeof models['models'] === 'object' ? cloneJson(models['models']) : {},
       modelProviders:
-        _0x3fab69['modelProviders'] && typeof _0x3fab69['modelProviders'] === 'object'
-          ? cloneJson(_0x3fab69['modelProviders'])
+        models['modelProviders'] && typeof models['modelProviders'] === 'object'
+          ? cloneJson(models['modelProviders'])
           : {},
       modelProviderProfiles:
-        _0x3fab69['modelProviderProfiles'] && typeof _0x3fab69['modelProviderProfiles'] === 'object'
-          ? cloneJson(_0x3fab69['modelProviderProfiles'])
+        models['modelProviderProfiles'] && typeof models['modelProviderProfiles'] === 'object'
+          ? cloneJson(models['modelProviderProfiles'])
           : {},
       modelParams:
-        _0x3fab69['modelParams'] && typeof _0x3fab69['modelParams'] === 'object'
-          ? cloneJson(_0x3fab69['modelParams'])
+        models['modelParams'] && typeof models['modelParams'] === 'object'
+          ? cloneJson(models['modelParams'])
           : {},
-      ui: _0x105da0,
+      ui: ui,
     }
   );
 }
-export function isEmptyStoryWorkspaceSnapshotPayload(_0x3ae411) {
+export function isEmptyStoryWorkspaceSnapshotPayload(next) {
   return (
-    _0x3ae411 == null ||
-    (typeof _0x3ae411 === 'object' &&
-      !Array['isArray'](_0x3ae411) &&
-      Object['keys'](_0x3ae411)['length'] === 0x0)
+    next == null ||
+    (typeof next === 'object' && !Array['isArray'](next) && Object['keys'](next)['length'] === 0x0)
   );
 }
-export function parseStoryWorkspaceSnapshotPayload(_0xabbc89) {
-  const _0x4b86c6 = normalizeStoryWorkspaceSnapshot(_0xabbc89);
-  if (!_0x4b86c6 && !isEmptyStoryWorkspaceSnapshotPayload(_0xabbc89))
+export function parseStoryWorkspaceSnapshotPayload(current) {
+  const storyWorkspaceSnapshot = normalizeStoryWorkspaceSnapshot(current);
+  if (!storyWorkspaceSnapshot && !isEmptyStoryWorkspaceSnapshotPayload(current))
     throw new Error('剧本工作室存档格式无效');
-  return _0x4b86c6;
+  return storyWorkspaceSnapshot;
 }
-export function mergeStoryWorkspaceHydratedProjects(_0x13e823 = [], _0x4b1d79 = []) {
-  const _0x5a2bad = Array['isArray'](_0x13e823) ? [..._0x13e823] : [],
-    _0x40f568 = (_0x38c5bd) =>
-      String(_0x38c5bd?.['id'] || _0x38c5bd?.['data']?.['project']?.['id'] || '')['trim'](),
-    _0x325f5a = new Set(_0x5a2bad['map'](_0x40f568));
+export function mergeStoryWorkspaceHydratedProjects(args = [], entry = []) {
+  const list = Array['isArray'](args) ? [...args] : [],
+    handler = (record) => String(record?.['id'] || record?.['data']?.['project']?.['id'] || '')['trim'](),
+    map = new Set(list['map'](handler));
   return (
-    (Array['isArray'](_0x4b1d79) ? _0x4b1d79 : [])['forEach']((_0x590bad) => {
-      const _0x44f8d6 = _0x40f568(_0x590bad);
-      if (!_0x44f8d6 || _0x325f5a['has'](_0x44f8d6)) return;
-      (_0x5a2bad['push'](_0x590bad), _0x325f5a['add'](_0x44f8d6));
+    (Array['isArray'](entry) ? entry : [])['forEach']((payload) => {
+      const enabled3 = handler(payload);
+      if (!enabled3 || map['has'](enabled3)) return;
+      (list['push'](payload), map['add'](enabled3));
     }),
-    _0x5a2bad
+    list
   );
 }
-export function hasStoryWorkspaceSnapshotChanged(_0x526565, _0x5553ee) {
-  if (_0x526565 === _0x5553ee) return ![];
-  if (!_0x526565 || !_0x5553ee) return !![];
+export function hasStoryWorkspaceSnapshotChanged(enabled4, enabled5) {
+  if (enabled4 === enabled5) return ![];
+  if (!enabled4 || !enabled5) return !![];
   try {
-    const _0x15e60a = cloneJson(_0x526565),
-      _0xcccb94 = cloneJson(_0x5553ee);
+    const cloneJson3 = cloneJson(enabled4),
+      cloneJson4 = cloneJson(enabled5);
     return (
-      delete _0x15e60a['savedAt'],
-      delete _0xcccb94['savedAt'],
-      JSON['stringify'](_0x15e60a) !== JSON['stringify'](_0xcccb94)
+      delete cloneJson3['savedAt'],
+      delete cloneJson4['savedAt'],
+      JSON['stringify'](cloneJson3) !== JSON['stringify'](cloneJson4)
     );
   } catch {
     return !![];

@@ -1,8 +1,8 @@
-export function isActionableFileManagerMediaKind(_0x38e216) {
-  const _0x4f65f8 = String(_0x38e216 || '')
+export function isActionableFileManagerMediaKind(value) {
+  const item = String(value || '')
     .trim()
     .toLowerCase();
-  return _0x4f65f8 === 'image' || _0x4f65f8 === 'video' || _0x4f65f8 === 'audio';
+  return item === 'image' || item === 'video' || item === 'audio';
 }
 export function buildFileManagerHistoryRecordKey({
   projectId: projectId = '',
@@ -22,8 +22,8 @@ export function buildFileManagerHistoryMediaKey({
   localPath: localPath = '',
   resultFingerprint: resultFingerprint = '',
 } = {}) {
-  const _0x58f45e = String(localPath || '').trim();
-  if (_0x58f45e)
+  const key = String(localPath || '').trim();
+  if (key)
     return [
       'media',
       String(projectId || '').trim(),
@@ -31,7 +31,7 @@ export function buildFileManagerHistoryMediaKey({
       String(mediaKind || '')
         .trim()
         .toLowerCase(),
-      _0x58f45e,
+      key,
     ].join(':');
   if (!String(resultFingerprint || '').trim()) return '';
   return (
@@ -44,20 +44,19 @@ export function buildFileManagerHistoryMediaKey({
   );
 }
 export function isFileManagerHistoryRecordVisible({
-  record: _0xf8d22d,
+  record: record,
   source: source = 'history',
   projectId: projectId = '',
   canvasId: canvasId = '',
   activeFilter: activeFilter = 'all',
-  getMediaKind: getMediaKind = (_0x5991c1) => _0x5991c1?.mediaKind,
+  getMediaKind: getMediaKind = (index) => index?.mediaKind,
 } = {}) {
-  const _0x5cb90c = String(projectId || '').trim(),
-    _0x16a0e7 = String(canvasId || '').trim();
-  if (_0x5cb90c && String(_0xf8d22d?.projectId || '').trim() !== _0x5cb90c) return false;
-  if (source === 'current-canvas' && _0x16a0e7 && String(_0xf8d22d?.canvasId || '').trim() !== _0x16a0e7)
-    return false;
-  const _0x5b92de = String(activeFilter || 'all').trim();
-  return _0x5b92de === 'all' || String(getMediaKind(_0xf8d22d) || '').trim() === _0x5b92de;
+  const result = String(projectId || '').trim(),
+    data = String(canvasId || '').trim();
+  if (result && String(record?.projectId || '').trim() !== result) return false;
+  if (source === 'current-canvas' && data && String(record?.canvasId || '').trim() !== data) return false;
+  const options = String(activeFilter || 'all').trim();
+  return options === 'all' || String(getMediaKind(record) || '').trim() === options;
 }
 export function getFileManagerSelectionAfterClick({
   current: current = [],
@@ -65,46 +64,196 @@ export function getFileManagerSelectionAfterClick({
   shiftKey: shiftKey = false,
   actionable: actionable = true,
 } = {}) {
-  const _0x198335 = String(recordId || ''),
-    _0x59ca7f = new Set((Array.isArray(current) ? current : []).map((_0x1cc017) => String(_0x1cc017 || '')));
-  if (!_0x198335 || !actionable) return Array.from(_0x59ca7f);
+  const enabled = String(recordId || ''),
+    map = new Set((Array.isArray(current) ? current : []).map((item2) => String(item2 || '')));
+  if (!enabled || !actionable) return Array.from(map);
   if (shiftKey) {
-    if (_0x59ca7f.has(_0x198335)) _0x59ca7f.delete(_0x198335);
-    else _0x59ca7f.add(_0x198335);
-    return Array.from(_0x59ca7f);
+    if (map.has(enabled)) map.delete(enabled);
+    else map.add(enabled);
+    return Array.from(map);
   }
-  return [_0x198335];
+  return [enabled];
 }
 export function getFileManagerMenuActions({
   records: records = [],
   canRevealInFolder: canRevealInFolder = false,
-  getMediaKind: getMediaKind = (_0x40a560) => _0x40a560?.mediaKind,
-  isActionableRecord: isActionableRecord = (_0x5a52e1) =>
-    isActionableFileManagerMediaKind(getMediaKind(_0x5a52e1)),
+  getMediaKind: getMediaKind = (target) => target?.mediaKind,
+  isActionableRecord: isActionableRecord = (next) => isActionableFileManagerMediaKind(getMediaKind(next)),
 } = {}) {
-  const _0xfbdc80 = (Array.isArray(records) ? records : []).filter(isActionableRecord);
-  if (_0xfbdc80.length === 0) return [];
-  const _0x4ff086 = ['add-to-canvas'];
-  if (_0xfbdc80.length === 1) {
-    const _0x3be240 = String(getMediaKind(_0xfbdc80[0]) || '')
+  const list = (Array.isArray(records) ? records : []).filter(isActionableRecord);
+  if (list.length === 0) return [];
+  const list2 = ['add-to-canvas'];
+  if (list.length === 1) {
+    const entry = String(getMediaKind(list[0]) || '')
       .trim()
       .toLowerCase();
-    if (_0x3be240 === 'image' || _0x3be240 === 'video') _0x4ff086.push('fullscreen');
-    if (canRevealInFolder) _0x4ff086.push('reveal');
+    if (entry === 'image' || entry === 'video') list2.push('fullscreen');
+    if (canRevealInFolder) list2.push('reveal');
   }
-  return (_0x4ff086.push('delete'), _0x4ff086);
+  return (list2.push('delete'), list2);
 }
 
-export function buildFileManagerHistoryEntryKey({projectId:projectId='',canvasId:canvasId='',generationRunId:generationRunId='',mediaKind:mediaKind='',sourceIndex:sourceIndex=0x0,localPath:localPath='',resultFingerprint:resultFingerprint=''}={}){const _0x3255e5=String(generationRunId||'')["trim"]();if(_0x3255e5)return["generation",String(projectId||'')["trim"](),String(canvasId||'')["trim"](),_0x3255e5,String(mediaKind||'')["trim"]()["toLowerCase"](),Math["max"](0x0,Math["trunc"](Number(sourceIndex)||0x0))]["join"](':');return buildFileManagerHistoryMediaKey({'projectId':projectId,'canvasId':canvasId,'mediaKind':mediaKind,'localPath':localPath,'resultFingerprint':resultFingerprint});}
+export function buildFileManagerHistoryEntryKey({
+  projectId: projectId = '',
+  canvasId: canvasId = '',
+  generationRunId: generationRunId = '',
+  mediaKind: mediaKind = '',
+  sourceIndex: sourceIndex = 0x0,
+  localPath: localPath = '',
+  resultFingerprint: resultFingerprint = '',
+} = {}) {
+  const payload = String(generationRunId || '')['trim']();
+  if (payload)
+    return [
+      'generation',
+      String(projectId || '')['trim'](),
+      String(canvasId || '')['trim'](),
+      payload,
+      String(mediaKind || '')
+        ['trim']()
+        ['toLowerCase'](),
+      Math['max'](0x0, Math['trunc'](Number(sourceIndex) || 0x0)),
+    ]['join'](':');
+  return buildFileManagerHistoryMediaKey({
+    projectId: projectId,
+    canvasId: canvasId,
+    mediaKind: mediaKind,
+    localPath: localPath,
+    resultFingerprint: resultFingerprint,
+  });
+}
 
-function defaultHistoryLocalPath(_0x478a6c){const _0xee02c8=Array['isArray'](_0x478a6c?.["nodes"])?_0x478a6c['nodes'][0x0]:null;return String(_0x478a6c?.["localPath"]||_0xee02c8?.["originalLocalPath"]||_0xee02c8?.["localPath"]||_0xee02c8?.["displayLocalPath"]||_0xee02c8?.["imageUrl"]||_0xee02c8?.["videoUrl"]||_0xee02c8?.["audioUrl"]||_0xee02c8?.["src"]||'')['trim']();}
+function defaultHistoryLocalPath(state) {
+  const handle = Array['isArray'](state?.['nodes']) ? state['nodes'][0x0] : null;
+  return String(
+    state?.['localPath'] ||
+      handle?.['originalLocalPath'] ||
+      handle?.['localPath'] ||
+      handle?.['displayLocalPath'] ||
+      handle?.['imageUrl'] ||
+      handle?.['videoUrl'] ||
+      handle?.['audioUrl'] ||
+      handle?.['src'] ||
+      '',
+  )['trim']();
+}
 
-export function isFileManagerHistoryBackfillRecord(_0x4a6135){const _0x1eefbc=String(_0x4a6135?.["historyCaptureSource"]||'')["trim"]();if(_0x1eefbc)return _0x1eefbc==="backfill";if(!String(_0x4a6135?.["generationRunId"]||'')['trim']())return![];const _0x451137=Number(_0x4a6135?.["generationStartedAt"]||0x0),_0x13326f=Number(_0x4a6135?.["createdAt"]||0x0),_0x1d438e=Math["max"](0x0,Math["trunc"](Number(_0x4a6135?.['sourceIndex'])||0x0));return Number["isFinite"](_0x451137)&&_0x451137>0x0&&Number["isFinite"](_0x13326f)&&_0x13326f===_0x451137+_0x1d438e;}
+export function isFileManagerHistoryBackfillRecord(config) {
+  const scope = String(config?.['historyCaptureSource'] || '')['trim']();
+  if (scope) return scope === 'backfill';
+  if (!String(config?.['generationRunId'] || '')['trim']()) return ![];
+  const count = Number(config?.['generationStartedAt'] || 0x0),
+    input = Number(config?.['createdAt'] || 0x0),
+    output = Math['max'](0x0, Math['trunc'](Number(config?.['sourceIndex']) || 0x0));
+  return Number['isFinite'](count) && count > 0x0 && Number['isFinite'](input) && input === count + output;
+}
 
-function buildFileManagerBackfillMatchKey(_0x20adc9,{getMediaKind:getMediaKind=_0x34247e=>_0x34247e?.["mediaKind"],getLocalPath:getLocalPath=defaultHistoryLocalPath}={}){const _0x28dd97=String(_0x20adc9?.["sourceNodeId"]||'')["trim"]();if(!_0x28dd97)return'';const _0x10737a=buildFileManagerHistoryMediaKey({'projectId':_0x20adc9?.["projectId"],'canvasId':_0x20adc9?.["canvasId"],'mediaKind':getMediaKind(_0x20adc9),'localPath':getLocalPath(_0x20adc9),'resultFingerprint':_0x20adc9?.["resultFingerprint"]});if(!_0x10737a)return'';return[_0x28dd97,Math["max"](0x0,Math["trunc"](Number(_0x20adc9?.["sourceIndex"])||0x0)),_0x10737a]["join"](':');}
+function buildFileManagerBackfillMatchKey(
+  value2,
+  {
+    getMediaKind: getMediaKind = (value3) => value3?.['mediaKind'],
+    getLocalPath: getLocalPath = defaultHistoryLocalPath,
+  } = {},
+) {
+  const enabled2 = String(value2?.['sourceNodeId'] || '')['trim']();
+  if (!enabled2) return '';
+  const fileManagerHistoryMediaKey = buildFileManagerHistoryMediaKey({
+    projectId: value2?.['projectId'],
+    canvasId: value2?.['canvasId'],
+    mediaKind: getMediaKind(value2),
+    localPath: getLocalPath(value2),
+    resultFingerprint: value2?.['resultFingerprint'],
+  });
+  if (!fileManagerHistoryMediaKey) return '';
+  return [
+    enabled2,
+    Math['max'](0x0, Math['trunc'](Number(value2?.['sourceIndex']) || 0x0)),
+    fileManagerHistoryMediaKey,
+  ]['join'](':');
+}
 
-export function isFileManagerBackfillDuplicate(_0x4c6e8d,_0x5bd2c6,{getMediaKind:getMediaKind=_0xc0b6bd=>_0xc0b6bd?.['mediaKind'],getLocalPath:getLocalPath=defaultHistoryLocalPath}={}){if(!isFileManagerHistoryBackfillRecord(_0x5bd2c6))return![];const _0x40e989=buildFileManagerBackfillMatchKey(_0x5bd2c6,{'getMediaKind':getMediaKind,'getLocalPath':getLocalPath});return Boolean(_0x40e989&&_0x40e989===buildFileManagerBackfillMatchKey(_0x4c6e8d,{'getMediaKind':getMediaKind,'getLocalPath':getLocalPath}));}
+export function isFileManagerBackfillDuplicate(
+  value4,
+  value5,
+  {
+    getMediaKind: getMediaKind = (value6) => value6?.['mediaKind'],
+    getLocalPath: getLocalPath = defaultHistoryLocalPath,
+  } = {},
+) {
+  if (!isFileManagerHistoryBackfillRecord(value5)) return ![];
+  const fileManagerBackfillMatchKey = buildFileManagerBackfillMatchKey(value5, {
+    getMediaKind: getMediaKind,
+    getLocalPath: getLocalPath,
+  });
+  return Boolean(
+    fileManagerBackfillMatchKey &&
+    fileManagerBackfillMatchKey ===
+      buildFileManagerBackfillMatchKey(value4, { getMediaKind: getMediaKind, getLocalPath: getLocalPath }),
+  );
+}
 
-export function resolveFileManagerBackfillStartedAt(_0x2d4e06){for(const _0x46693 of[_0x2d4e06?.["generationStartTime"],_0x2d4e06?.["rhTaskStartedAt"],_0x2d4e06?.["dreaminaTaskStartedAt"],_0x2d4e06?.["asyncTaskStartedAt"],_0x2d4e06?.["createdAt"]]){const _0x5cfc02=Number(_0x46693);if(Number['isFinite'](_0x5cfc02)&&_0x5cfc02>0x0)return Math["trunc"](_0x5cfc02);}const _0x4571d9=String(_0x2d4e06?.['id']||'')["match"](/\d{13}/g)||[],_0x5d5247=Number(_0x4571d9[_0x4571d9["length"]-0x1]||0x0);return Number["isFinite"](_0x5d5247)&&_0x5d5247>0x0?Math['trunc'](_0x5d5247):0x1;}
+export function resolveFileManagerBackfillStartedAt(value7) {
+  for (const value8 of [
+    value7?.['generationStartTime'],
+    value7?.['rhTaskStartedAt'],
+    value7?.['dreaminaTaskStartedAt'],
+    value7?.['asyncTaskStartedAt'],
+    value7?.['createdAt'],
+  ]) {
+    const count2 = Number(value8);
+    if (Number['isFinite'](count2) && count2 > 0x0) return Math['trunc'](count2);
+  }
+  const value9 = String(value7?.['id'] || '')['match'](/\d{13}/g) || [],
+    count3 = Number(value9[value9['length'] - 0x1] || 0x0);
+  return Number['isFinite'](count3) && count3 > 0x0 ? Math['trunc'](count3) : 0x1;
+}
 
-export function dedupeFileManagerHistoryRecords(_0x3479dc,{getMediaKind:getMediaKind=_0x2eb535=>_0x2eb535?.["mediaKind"],getLocalPath:getLocalPath=defaultHistoryLocalPath}={}){const _0x596efd=[...Array["isArray"](_0x3479dc)?_0x3479dc:[]]["sort"]((_0x1d4620,_0x4e9693)=>{const _0x8234bf=Number(_0x1d4620?.["updatedAt"]||_0x1d4620?.["createdAt"]||0x0),_0x150cc8=Number(_0x4e9693?.["updatedAt"]||_0x4e9693?.['createdAt']||0x0);return _0x150cc8-_0x8234bf;}),_0x330dd2=_0x596efd["filter"](_0x45e036=>!isFileManagerHistoryBackfillRecord(_0x45e036)),_0x53729f=new Set(),_0x1da2f9=new Set(),_0x2950cf=[];for(const _0x4749fb of _0x596efd){if(isFileManagerHistoryBackfillRecord(_0x4749fb)){if(_0x330dd2["some"](_0x20674e=>isFileManagerBackfillDuplicate(_0x20674e,_0x4749fb,{'getMediaKind':getMediaKind,'getLocalPath':getLocalPath})))continue;const _0x38f8e4=buildFileManagerBackfillMatchKey(_0x4749fb,{'getMediaKind':getMediaKind,'getLocalPath':getLocalPath});if(_0x38f8e4&&_0x53729f["has"](_0x38f8e4))continue;if(_0x38f8e4)_0x53729f["add"](_0x38f8e4);}const _0x51a25a=buildFileManagerHistoryEntryKey({'projectId':_0x4749fb?.['projectId'],'canvasId':_0x4749fb?.['canvasId'],'generationRunId':_0x4749fb?.["generationRunId"],'mediaKind':getMediaKind(_0x4749fb),'sourceIndex':_0x4749fb?.["sourceIndex"],'localPath':getLocalPath(_0x4749fb),'resultFingerprint':_0x4749fb?.["resultFingerprint"]});if(_0x51a25a&&_0x1da2f9['has'](_0x51a25a))continue;if(_0x51a25a)_0x1da2f9["add"](_0x51a25a);_0x2950cf["push"](_0x4749fb);}return _0x2950cf;}
+export function dedupeFileManagerHistoryRecords(
+  value10,
+  {
+    getMediaKind: getMediaKind = (value11) => value11?.['mediaKind'],
+    getLocalPath: getLocalPath = defaultHistoryLocalPath,
+  } = {},
+) {
+  const value12 = [...(Array['isArray'](value10) ? value10 : [])]['sort']((value13, value14) => {
+      const value15 = Number(value13?.['updatedAt'] || value13?.['createdAt'] || 0x0),
+        value16 = Number(value14?.['updatedAt'] || value14?.['createdAt'] || 0x0);
+      return value16 - value15;
+    }),
+    value17 = value12['filter']((value18) => !isFileManagerHistoryBackfillRecord(value18)),
+    value19 = new Set(),
+    map2 = new Set(),
+    value20 = [];
+  for (const value21 of value12) {
+    if (isFileManagerHistoryBackfillRecord(value21)) {
+      if (
+        value17['some']((value22) =>
+          isFileManagerBackfillDuplicate(value22, value21, {
+            getMediaKind: getMediaKind,
+            getLocalPath: getLocalPath,
+          }),
+        )
+      )
+        continue;
+      const fileManagerBackfillMatchKey2 = buildFileManagerBackfillMatchKey(value21, {
+        getMediaKind: getMediaKind,
+        getLocalPath: getLocalPath,
+      });
+      if (fileManagerBackfillMatchKey2 && value19['has'](fileManagerBackfillMatchKey2)) continue;
+      if (fileManagerBackfillMatchKey2) value19['add'](fileManagerBackfillMatchKey2);
+    }
+    const fileManagerHistoryEntryKey = buildFileManagerHistoryEntryKey({
+      projectId: value21?.['projectId'],
+      canvasId: value21?.['canvasId'],
+      generationRunId: value21?.['generationRunId'],
+      mediaKind: getMediaKind(value21),
+      sourceIndex: value21?.['sourceIndex'],
+      localPath: getLocalPath(value21),
+      resultFingerprint: value21?.['resultFingerprint'],
+    });
+    if (fileManagerHistoryEntryKey && map2['has'](fileManagerHistoryEntryKey)) continue;
+    if (fileManagerHistoryEntryKey) map2['add'](fileManagerHistoryEntryKey);
+    value20['push'](value21);
+  }
+  return value20;
+}

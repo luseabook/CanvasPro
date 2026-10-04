@@ -1,1 +1,316 @@
-import{GENERATION_TASK_PROTOCOLS,buildGenerationTaskProtocolPatch,inferGenerationTaskProtocol}from'./generationTaskProtocolAdapters.js';function normalizeStatus(_0x5d97dc,_0x3ecce1="pending"){return String(_0x5d97dc||_0x3ecce1)["trim"]()||_0x3ecce1;}function normalizeNumber(_0x9944d5,_0x4c1dd4=0x0){const _0x4fbdd9=Number(_0x9944d5);return Number['isFinite'](_0x4fbdd9)?_0x4fbdd9:_0x4c1dd4;}const DEFAULT_IMAGE_DREAMINA_TASK_LABEL='生成中';function isWorkflowProtocolSpec(_0x5b5a7d={},_0x345ecf={}){return inferGenerationTaskProtocol({'taskProtocol':_0x5b5a7d["protocol"],'adapterType':_0x5b5a7d['adapterType']||_0x345ecf["adapterType"],'provider':_0x5b5a7d["provider"]||_0x345ecf['provider'],'async':_0x5b5a7d['async'],'node':_0x345ecf})===GENERATION_TASK_PROTOCOLS['WORKFLOW'];}function isAsyncModelApiProtocolSpec(_0x18dec4={},_0x39cbf6={}){return inferGenerationTaskProtocol({'taskProtocol':_0x18dec4["protocol"],'adapterType':_0x18dec4['adapterType']||_0x39cbf6["adapterType"],'provider':_0x18dec4["provider"]||_0x39cbf6["provider"],'async':_0x18dec4["async"],'node':_0x39cbf6})===GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];}function buildTaskMetaPatch(_0x100006={}){const _0x19ab5b=String(_0x100006["providerProfileId"]||_0x100006['payload']?.["providerProfileId"]||_0x100006["payload"]?.["rhProviderProfileId"]||'')["trim"]();return{'taskTrigger':String(_0x100006['trigger']||''),'taskType':String(_0x100006['taskType']||''),'taskProvider':String(_0x100006["provider"]||''),..._0x19ab5b?{'taskProviderProfileId':_0x19ab5b}:{},'taskAdapterType':String(_0x100006["adapterType"]||''),'taskModelId':String(_0x100006["modelId"]||''),'taskExecutionId':String(_0x100006["executionId"]||''),'taskCancellable':_0x100006["cancellable"]===!![],'taskResumable':_0x100006["resumable"]===!![]};}export function buildRunningHubTaskPatch({taskId:taskId='',status:status="pending",startedAt:startedAt=0x0,recovering:recovering=![],useOpenapiQuery:useOpenapiQuery=![]}={}){return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS["WORKFLOW"],{'taskId':taskId,'status':status,'startedAt':startedAt,'recovering':recovering,'useOpenapiQuery':useOpenapiQuery});}export function buildAsyncTaskPatch({provider:provider='',kind:kind="generation",taskId:taskId='',status:status="pending",startedAt:startedAt=0x0,recovering:recovering=![]}={}){return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'],{'provider':provider,'kind':kind,'taskId':taskId,'status':status,'startedAt':startedAt,'recovering':recovering});}export function buildDreaminaTaskPatch({submitId:submitId='',status:status='pending',phase:phase="generating",label:label='',startedAt:startedAt=0x0,lastCheckedAt:lastCheckedAt=Date["now"](),recovering:recovering=![],raw:raw={},defaultLabel:defaultLabel=''}={}){return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS["DREAMINA"],{'submitId':submitId,'status':status,'phase':phase,'label':label,'startedAt':startedAt,'lastCheckedAt':lastCheckedAt,'recovering':recovering,'raw':raw,'defaultLabel':defaultLabel});}export function buildImageGenerationRunningHubTaskPatch(_0xea73b6={}){return buildRunningHubTaskPatch(_0xea73b6);}export function buildImageGenerationDreaminaTaskPatch({submitId:submitId='',status:status="pending",phase:phase="generating",label:label=DEFAULT_IMAGE_DREAMINA_TASK_LABEL,startedAt:startedAt=0x0,lastCheckedAt:lastCheckedAt=Date["now"](),recovering:recovering=![],raw:raw={}}={}){return buildDreaminaTaskPatch({'submitId':submitId,'status':status,'phase':phase,'label':label,'startedAt':startedAt,'lastCheckedAt':lastCheckedAt,'recovering':recovering,'raw':raw,'defaultLabel':DEFAULT_IMAGE_DREAMINA_TASK_LABEL});}export function buildImageGenerationAsyncTaskPatch({provider:provider='',kind:kind="image",taskId:taskId='',status:status="pending",startedAt:startedAt=0x0,recovering:recovering=![]}={}){return buildAsyncTaskPatch({'provider':provider,'kind':kind,'taskId':taskId,'status':status,'startedAt':startedAt,'recovering':recovering});}export function buildRunningHubOpenapiTaskPatch({taskId:taskId='',status:status='pending',startedAt:startedAt=0x0,recovering:recovering=![],useOpenapiQuery:useOpenapiQuery=!![]}={}){return buildRunningHubTaskPatch({'taskId':taskId,'status':status,'startedAt':startedAt,'recovering':recovering,'useOpenapiQuery':useOpenapiQuery});}export function buildIdleGenerationProtocolPatch({kind:kind="generation"}={}){return{'generationQueueStatus':"idle",'generationQueueIndex':-0x1,'generationQueueLength':0x0,...buildRunningHubTaskPatch({'taskId':'','status':"idle",'startedAt':0x0,'recovering':![],'useOpenapiQuery':![]}),...buildDreaminaTaskPatch({'submitId':'','status':"idle",'phase':"idle",'label':'','startedAt':0x0,'lastCheckedAt':0x0,'recovering':![],'raw':{}}),...buildAsyncTaskPatch({'provider':'','kind':kind,'taskId':'','status':'idle','startedAt':0x0,'recovering':![]})};}export function buildGenerationProtocolResetPatch(_0x14a181={}){return buildIdleGenerationProtocolPatch(_0x14a181);}export function buildGenerationProtocolStartPatch(_0x2c16ea={},_0x56f280=0x0){const _0x140b62=buildTaskMetaPatch(_0x2c16ea),_0x29f67e={'generationQueueStatus':'submitting','generationQueueIndex':-0x1,'generationQueueLength':0x0};if(isWorkflowProtocolSpec(_0x2c16ea))return{..._0x140b62,..._0x29f67e,...buildRunningHubTaskPatch({'taskId':'','status':'pending','startedAt':_0x56f280,'recovering':![],'useOpenapiQuery':![]}),'rhSourceNodeId':String(_0x2c16ea["sourceNodeId"]||''),'rhToolbarTaskType':String(_0x2c16ea["taskType"]||'')};if(isAsyncModelApiProtocolSpec(_0x2c16ea))return{..._0x140b62,..._0x29f67e,'asyncTaskId':'','asyncTaskStatus':"pending",'asyncTaskStartedAt':normalizeNumber(_0x56f280),'asyncTaskRecovering':![]};return{..._0x140b62,..._0x29f67e};}export function buildGenerationProtocolTaskIdPatch(_0x3b9807={},_0x3ec892='',_0x4537b1=0x0){const _0x98b3cd=String(_0x3ec892||'')["trim"]();if(!_0x98b3cd)return{};if(isWorkflowProtocolSpec(_0x3b9807))return buildRunningHubTaskPatch({'taskId':_0x98b3cd,'status':"running",'startedAt':_0x4537b1,'recovering':![],'useOpenapiQuery':![]});if(isAsyncModelApiProtocolSpec(_0x3b9807))return{'asyncTaskId':_0x98b3cd,'asyncTaskStatus':"running",'asyncTaskStartedAt':normalizeNumber(_0x4537b1),'asyncTaskRecovering':![]};return{};}export function buildGenerationProtocolTerminalPatch(_0x23148f={},_0x36df62="idle"){const _0x70f2b7=normalizeStatus(_0x36df62,"idle");if(isWorkflowProtocolSpec(_0x23148f))return{'generationQueueStatus':'idle','generationQueueIndex':-0x1,'generationQueueLength':0x0,'rhTaskStatus':_0x70f2b7,'rhTaskRecovering':![]};if(isAsyncModelApiProtocolSpec(_0x23148f))return{'generationQueueStatus':"idle",'generationQueueIndex':-0x1,'generationQueueLength':0x0,'asyncTaskStatus':_0x70f2b7,'asyncTaskRecovering':![]};return{'generationQueueStatus':"idle",'generationQueueIndex':-0x1,'generationQueueLength':0x0};}export function buildGenerationProtocolPendingPatch(_0x58c3fe={},_0x12f54d={},_0x362a6a=''){const _0x3c5b7c=String(_0x12f54d?.['taskId']||'')["trim"](),_0x24ac28=String(_0x362a6a||'')["trim"](),_0x9166f3={'isGenerating':!![],'jobStatus':"running",'jobError':null,'generationDuration':null,..._0x24ac28?{'statusMessage':_0x24ac28}:{}};if(isWorkflowProtocolSpec(_0x58c3fe))return{..._0x9166f3,..._0x3c5b7c?buildGenerationProtocolTaskIdPatch(_0x58c3fe,_0x3c5b7c,_0x12f54d["startedAt"]):{'rhTaskStatus':'pending'},'rhTaskRecovering':![],..._0x24ac28?{'rhStatusMessage':_0x24ac28}:{}};if(isAsyncModelApiProtocolSpec(_0x58c3fe))return{..._0x9166f3,..._0x3c5b7c?buildGenerationProtocolTaskIdPatch(_0x58c3fe,_0x3c5b7c,_0x12f54d["startedAt"]):{'asyncTaskStatus':"pending"},'asyncTaskRecovering':![]};return _0x9166f3;}export function buildGenerationProtocolTransitionPatch({type:type='',spec:spec={},context:context={},startedAt:startedAt=0x0,taskId:taskId='',status:status='',message:message='',kind:kind="generation"}={}){const _0x578121=String(type||'')["trim"]();if(_0x578121==="start")return buildGenerationProtocolStartPatch(spec,startedAt);if(_0x578121==='taskId')return buildGenerationProtocolTaskIdPatch(spec,taskId,startedAt);if(_0x578121==="pending")return buildGenerationProtocolPendingPatch(spec,context,message);if(_0x578121==="terminal")return buildGenerationProtocolTerminalPatch(spec,status);if(_0x578121==="reset")return buildGenerationProtocolResetPatch({'kind':kind});return{};}
+import {
+  GENERATION_TASK_PROTOCOLS,
+  buildGenerationTaskProtocolPatch,
+  inferGenerationTaskProtocol,
+} from './generationTaskProtocolAdapters.js';
+function normalizeStatus(value, item = 'pending') {
+  return String(value || item)['trim']() || item;
+}
+function normalizeNumber(key, index = 0x0) {
+  const result = Number(key);
+  return Number['isFinite'](result) ? result : index;
+}
+const DEFAULT_IMAGE_DREAMINA_TASK_LABEL = '生成中';
+function isWorkflowProtocolSpec(options = {}, data = {}) {
+  return (
+    inferGenerationTaskProtocol({
+      taskProtocol: options['protocol'],
+      adapterType: options['adapterType'] || data['adapterType'],
+      provider: options['provider'] || data['provider'],
+      async: options['async'],
+      node: data,
+    }) === GENERATION_TASK_PROTOCOLS['WORKFLOW']
+  );
+}
+function isAsyncModelApiProtocolSpec(options2 = {}, target = {}) {
+  return (
+    inferGenerationTaskProtocol({
+      taskProtocol: options2['protocol'],
+      adapterType: options2['adapterType'] || target['adapterType'],
+      provider: options2['provider'] || target['provider'],
+      async: options2['async'],
+      node: target,
+    }) === GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API']
+  );
+}
+function buildTaskMetaPatch(options3 = {}) {
+  const args = String(
+    options3['providerProfileId'] ||
+      options3['payload']?.['providerProfileId'] ||
+      options3['payload']?.['rhProviderProfileId'] ||
+      '',
+  )['trim']();
+  return {
+    taskTrigger: String(options3['trigger'] || ''),
+    taskType: String(options3['taskType'] || ''),
+    taskProvider: String(options3['provider'] || ''),
+    ...(args ? { taskProviderProfileId: args } : {}),
+    taskAdapterType: String(options3['adapterType'] || ''),
+    taskModelId: String(options3['modelId'] || ''),
+    taskExecutionId: String(options3['executionId'] || ''),
+    taskCancellable: options3['cancellable'] === !![],
+    taskResumable: options3['resumable'] === !![],
+  };
+}
+export function buildRunningHubTaskPatch({
+  taskId: taskId = '',
+  status: status = 'pending',
+  startedAt: startedAt = 0x0,
+  recovering: recovering = ![],
+  useOpenapiQuery: useOpenapiQuery = ![],
+} = {}) {
+  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['WORKFLOW'], {
+    taskId: taskId,
+    status: status,
+    startedAt: startedAt,
+    recovering: recovering,
+    useOpenapiQuery: useOpenapiQuery,
+  });
+}
+export function buildAsyncTaskPatch({
+  provider: provider = '',
+  kind: kind = 'generation',
+  taskId: taskId = '',
+  status: status = 'pending',
+  startedAt: startedAt = 0x0,
+  recovering: recovering = ![],
+} = {}) {
+  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'], {
+    provider: provider,
+    kind: kind,
+    taskId: taskId,
+    status: status,
+    startedAt: startedAt,
+    recovering: recovering,
+  });
+}
+export function buildDreaminaTaskPatch({
+  submitId: submitId = '',
+  status: status = 'pending',
+  phase: phase = 'generating',
+  label: label = '',
+  startedAt: startedAt = 0x0,
+  lastCheckedAt: lastCheckedAt = Date['now'](),
+  recovering: recovering = ![],
+  raw: raw = {},
+  defaultLabel: defaultLabel = '',
+} = {}) {
+  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['DREAMINA'], {
+    submitId: submitId,
+    status: status,
+    phase: phase,
+    label: label,
+    startedAt: startedAt,
+    lastCheckedAt: lastCheckedAt,
+    recovering: recovering,
+    raw: raw,
+    defaultLabel: defaultLabel,
+  });
+}
+export function buildImageGenerationRunningHubTaskPatch(options4 = {}) {
+  return buildRunningHubTaskPatch(options4);
+}
+export function buildImageGenerationDreaminaTaskPatch({
+  submitId: submitId = '',
+  status: status = 'pending',
+  phase: phase = 'generating',
+  label: label = DEFAULT_IMAGE_DREAMINA_TASK_LABEL,
+  startedAt: startedAt = 0x0,
+  lastCheckedAt: lastCheckedAt = Date['now'](),
+  recovering: recovering = ![],
+  raw: raw = {},
+} = {}) {
+  return buildDreaminaTaskPatch({
+    submitId: submitId,
+    status: status,
+    phase: phase,
+    label: label,
+    startedAt: startedAt,
+    lastCheckedAt: lastCheckedAt,
+    recovering: recovering,
+    raw: raw,
+    defaultLabel: DEFAULT_IMAGE_DREAMINA_TASK_LABEL,
+  });
+}
+export function buildImageGenerationAsyncTaskPatch({
+  provider: provider = '',
+  kind: kind = 'image',
+  taskId: taskId = '',
+  status: status = 'pending',
+  startedAt: startedAt = 0x0,
+  recovering: recovering = ![],
+} = {}) {
+  return buildAsyncTaskPatch({
+    provider: provider,
+    kind: kind,
+    taskId: taskId,
+    status: status,
+    startedAt: startedAt,
+    recovering: recovering,
+  });
+}
+export function buildRunningHubOpenapiTaskPatch({
+  taskId: taskId = '',
+  status: status = 'pending',
+  startedAt: startedAt = 0x0,
+  recovering: recovering = ![],
+  useOpenapiQuery: useOpenapiQuery = !![],
+} = {}) {
+  return buildRunningHubTaskPatch({
+    taskId: taskId,
+    status: status,
+    startedAt: startedAt,
+    recovering: recovering,
+    useOpenapiQuery: useOpenapiQuery,
+  });
+}
+export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } = {}) {
+  return {
+    generationQueueStatus: 'idle',
+    generationQueueIndex: -0x1,
+    generationQueueLength: 0x0,
+    ...buildRunningHubTaskPatch({
+      taskId: '',
+      status: 'idle',
+      startedAt: 0x0,
+      recovering: ![],
+      useOpenapiQuery: ![],
+    }),
+    ...buildDreaminaTaskPatch({
+      submitId: '',
+      status: 'idle',
+      phase: 'idle',
+      label: '',
+      startedAt: 0x0,
+      lastCheckedAt: 0x0,
+      recovering: ![],
+      raw: {},
+    }),
+    ...buildAsyncTaskPatch({
+      provider: '',
+      kind: kind,
+      taskId: '',
+      status: 'idle',
+      startedAt: 0x0,
+      recovering: ![],
+    }),
+  };
+}
+export function buildGenerationProtocolResetPatch(options5 = {}) {
+  return buildIdleGenerationProtocolPatch(options5);
+}
+export function buildGenerationProtocolStartPatch(options6 = {}, source = 0x0) {
+  const args2 = buildTaskMetaPatch(options6),
+    args3 = { generationQueueStatus: 'submitting', generationQueueIndex: -0x1, generationQueueLength: 0x0 };
+  if (isWorkflowProtocolSpec(options6))
+    return {
+      ...args2,
+      ...args3,
+      ...buildRunningHubTaskPatch({
+        taskId: '',
+        status: 'pending',
+        startedAt: source,
+        recovering: ![],
+        useOpenapiQuery: ![],
+      }),
+      rhSourceNodeId: String(options6['sourceNodeId'] || ''),
+      rhToolbarTaskType: String(options6['taskType'] || ''),
+    };
+  if (isAsyncModelApiProtocolSpec(options6))
+    return {
+      ...args2,
+      ...args3,
+      asyncTaskId: '',
+      asyncTaskStatus: 'pending',
+      asyncTaskStartedAt: normalizeNumber(source),
+      asyncTaskRecovering: ![],
+    };
+  return { ...args2, ...args3 };
+}
+export function buildGenerationProtocolTaskIdPatch(options7 = {}, next = '', current = 0x0) {
+  const enabled = String(next || '')['trim']();
+  if (!enabled) return {};
+  if (isWorkflowProtocolSpec(options7))
+    return buildRunningHubTaskPatch({
+      taskId: enabled,
+      status: 'running',
+      startedAt: current,
+      recovering: ![],
+      useOpenapiQuery: ![],
+    });
+  if (isAsyncModelApiProtocolSpec(options7))
+    return {
+      asyncTaskId: enabled,
+      asyncTaskStatus: 'running',
+      asyncTaskStartedAt: normalizeNumber(current),
+      asyncTaskRecovering: ![],
+    };
+  return {};
+}
+export function buildGenerationProtocolTerminalPatch(options8 = {}, entry = 'idle') {
+  const status2 = normalizeStatus(entry, 'idle');
+  if (isWorkflowProtocolSpec(options8))
+    return {
+      generationQueueStatus: 'idle',
+      generationQueueIndex: -0x1,
+      generationQueueLength: 0x0,
+      rhTaskStatus: status2,
+      rhTaskRecovering: ![],
+    };
+  if (isAsyncModelApiProtocolSpec(options8))
+    return {
+      generationQueueStatus: 'idle',
+      generationQueueIndex: -0x1,
+      generationQueueLength: 0x0,
+      asyncTaskStatus: status2,
+      asyncTaskRecovering: ![],
+    };
+  return { generationQueueStatus: 'idle', generationQueueIndex: -0x1, generationQueueLength: 0x0 };
+}
+export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, payload = '') {
+  const args4 = String(record?.['taskId'] || '')['trim'](),
+    args5 = String(payload || '')['trim'](),
+    args6 = {
+      isGenerating: !![],
+      jobStatus: 'running',
+      jobError: null,
+      generationDuration: null,
+      ...(args5 ? { statusMessage: args5 } : {}),
+    };
+  if (isWorkflowProtocolSpec(options9))
+    return {
+      ...args6,
+      ...(args4
+        ? buildGenerationProtocolTaskIdPatch(options9, args4, record['startedAt'])
+        : { rhTaskStatus: 'pending' }),
+      rhTaskRecovering: ![],
+      ...(args5 ? { rhStatusMessage: args5 } : {}),
+    };
+  if (isAsyncModelApiProtocolSpec(options9))
+    return {
+      ...args6,
+      ...(args4
+        ? buildGenerationProtocolTaskIdPatch(options9, args4, record['startedAt'])
+        : { asyncTaskStatus: 'pending' }),
+      asyncTaskRecovering: ![],
+    };
+  return args6;
+}
+export function buildGenerationProtocolTransitionPatch({
+  type: type = '',
+  spec: spec = {},
+  context: context = {},
+  startedAt: startedAt = 0x0,
+  taskId: taskId = '',
+  status: status = '',
+  message: message = '',
+  kind: kind = 'generation',
+} = {}) {
+  const handle = String(type || '')['trim']();
+  if (handle === 'start') return buildGenerationProtocolStartPatch(spec, startedAt);
+  if (handle === 'taskId') return buildGenerationProtocolTaskIdPatch(spec, taskId, startedAt);
+  if (handle === 'pending') return buildGenerationProtocolPendingPatch(spec, context, message);
+  if (handle === 'terminal') return buildGenerationProtocolTerminalPatch(spec, status);
+  if (handle === 'reset') return buildGenerationProtocolResetPatch({ kind: kind });
+  return {};
+}

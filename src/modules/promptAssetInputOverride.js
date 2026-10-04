@@ -20,67 +20,67 @@ import { getModelManifest } from '../manifests/index.js';
 const RH_PERSON_REPLACE_ASSET_SLOT_ORDER = Object.freeze({
   image: Object.freeze(['replaceTarget', 'replacedImage']),
 });
-function getAudioWorkflowKey(_0x33ee8e = {}) {
-  const _0x135658 = String(_0x33ee8e?.audioWorkflowKey || '').trim();
-  if (_0x135658) return _0x135658;
-  const _0x1875c9 = String(_0x33ee8e?.model || '').trim();
-  return _0x1875c9;
+function getAudioWorkflowKey(options = {}) {
+  const value = String(options?.audioWorkflowKey || '').trim();
+  if (value) return value;
+  const item = String(options?.model || '').trim();
+  return item;
 }
-function getSlotsFromOrder(_0x168a7f = {}) {
+function getSlotsFromOrder(options2 = {}) {
   return Array.from(
     new Set(
-      Object.values(_0x168a7f)
+      Object.values(options2)
         .flat()
-        .map((_0x48f65f) => String(_0x48f65f || ''))
+        .map((item2) => String(item2 || ''))
         .filter(Boolean),
     ),
   );
 }
-function getFixedAssetSlotConfig(_0x8faf86 = {}) {
-  const _0x3663c2 = String(_0x8faf86?.type || '').trim(),
-    _0x21923e = String(_0x8faf86?.model || '').trim();
-  if (_0x3663c2 === 'ai-video' || _0x3663c2 === 'ai-image') {
-    const _0xf1aa9d = getFixedInputSlotConfigFromManifest(_0x8faf86);
-    if (_0xf1aa9d)
+function getFixedAssetSlotConfig(args = {}) {
+  const key = String(args?.type || '').trim(),
+    index = String(args?.model || '').trim();
+  if (key === 'ai-video' || key === 'ai-image') {
+    const slotOrderByType2 = getFixedInputSlotConfigFromManifest(args);
+    if (slotOrderByType2)
       return {
-        slotOrderByType: _0xf1aa9d.slotOrderByType,
-        visibleSlots: _0xf1aa9d.visibleSlots,
-        slotKindById: _0xf1aa9d.slotKindById,
-        exclusiveGroups: _0xf1aa9d.exclusiveGroups,
+        slotOrderByType: slotOrderByType2.slotOrderByType,
+        visibleSlots: slotOrderByType2.visibleSlots,
+        slotKindById: slotOrderByType2.slotKindById,
+        exclusiveGroups: slotOrderByType2.exclusiveGroups,
       };
   }
-  if (_0x3663c2 === 'ai-image' && isRhPersonReplaceWorkflowModel(_0x21923e))
+  if (key === 'ai-image' && isRhPersonReplaceWorkflowModel(index))
     return {
       slotOrderByType: RH_PERSON_REPLACE_ASSET_SLOT_ORDER,
       visibleSlots: ['replaceTarget', 'replacedImage'],
     };
-  if (_0x3663c2 === 'ai-audio') {
-    const _0x26111f = getAudioWorkflowKey(_0x8faf86),
-      _0x55671b = getFixedInputSlotConfigFromManifest({
-        ..._0x8faf86,
-        audioWorkflowKey: _0x26111f,
-        model: _0x26111f,
+  if (key === 'ai-audio') {
+    const audioWorkflowKey = getAudioWorkflowKey(args),
+      slotOrderByType3 = getFixedInputSlotConfigFromManifest({
+        ...args,
+        audioWorkflowKey: audioWorkflowKey,
+        model: audioWorkflowKey,
       });
-    if (_0x55671b)
+    if (slotOrderByType3)
       return {
-        slotOrderByType: _0x55671b.slotOrderByType,
-        visibleSlots: _0x55671b.visibleSlots,
-        slotKindById: _0x55671b.slotKindById,
-        exclusiveGroups: _0x55671b.exclusiveGroups,
+        slotOrderByType: slotOrderByType3.slotOrderByType,
+        visibleSlots: slotOrderByType3.visibleSlots,
+        slotKindById: slotOrderByType3.slotKindById,
+        exclusiveGroups: slotOrderByType3.exclusiveGroups,
       };
-    const _0xa01182 = getModelManifest(_0x26111f)?.inputSlots?.fixedSlots,
-      _0x27f6fa =
-        Array.isArray(_0xa01182) && _0xa01182.length
-          ? _0xa01182.map((_0x1ef0fd) => String(_0x1ef0fd?.id || '').trim()).filter(Boolean)
+    const list = getModelManifest(audioWorkflowKey)?.inputSlots?.fixedSlots,
+      audio =
+        Array.isArray(list) && list.length
+          ? list.map((item3) => String(item3?.id || '').trim()).filter(Boolean)
           : ['audioRef'];
-    return { slotOrderByType: { audio: _0x27f6fa }, visibleSlots: _0x27f6fa };
+    return { slotOrderByType: { audio: audio }, visibleSlots: audio };
   }
   return null;
 }
-function getIncomingEdges(_0xd6f481 = '', _0x1b3a31 = null) {
-  if (Array.isArray(_0x1b3a31)) return _0x1b3a31;
-  if (!_0xd6f481) return [];
-  return appStore.getIncomingEdges?.(_0xd6f481) || [];
+function getIncomingEdges(enabled = '', result = null) {
+  if (Array.isArray(result)) return result;
+  if (!enabled) return [];
+  return appStore.getIncomingEdges?.(enabled) || [];
 }
 function assignOccupiedFixedSlots({
   incomingEdges: incomingEdges = [],
@@ -91,59 +91,59 @@ function assignOccupiedFixedSlots({
   exclusiveGroups: exclusiveGroups = [],
   slotById: slotById = {},
 } = {}) {
-  const _0x546b32 = new Set(
+  const data = new Set(
       Array.isArray(visibleSlots) && visibleSlots.length
         ? visibleSlots.map(String)
         : getSlotsFromOrder(slotOrderByType),
     ),
-    _0x2c8188 = {};
+    occupiedSlots = {};
   return (
-    (Array.isArray(incomingEdges) ? incomingEdges : []).forEach((_0x2224ef) => {
-      const _0x30baa4 = resolveEffectiveInputKind(nodes?.[_0x2224ef?.sourceId], _0x2224ef),
-        { slot: _0x54545c } = resolveFixedInputSlotForRef({
+    (Array.isArray(incomingEdges) ? incomingEdges : []).forEach((refSlot2) => {
+      const kind = resolveEffectiveInputKind(nodes?.[refSlot2?.sourceId], refSlot2),
+        { slot: slot } = resolveFixedInputSlotForRef({
           fixedInputConfig: {
             slotOrderByType: slotOrderByType,
-            visibleSlots: Array.from(_0x546b32),
+            visibleSlots: Array.from(data),
             slotKindById: slotKindById,
             exclusiveGroups: exclusiveGroups,
             slotById: slotById,
           },
-          refSlot: _0x2224ef?.refSlot,
-          kind: _0x30baa4,
-          occupiedSlots: _0x2c8188,
-          sourceNode: nodes?.[_0x2224ef?.sourceId],
+          refSlot: refSlot2?.refSlot,
+          kind: kind,
+          occupiedSlots: occupiedSlots,
+          sourceNode: nodes?.[refSlot2?.sourceId],
         });
-      if (_0x54545c) _0x2c8188[_0x54545c] = _0x2224ef;
+      if (slot) occupiedSlots[slot] = refSlot2;
     }),
-    new Set(Object.keys(_0x2c8188))
+    new Set(Object.keys(occupiedSlots))
   );
 }
 function removeGenericOverflowAssetRefs({
-  targetId: _0x1c5e5f,
-  targetNode: _0x205c48,
-  sourceKind: _0x438390,
-  incomingEdges: _0x537f65,
-  nodes: _0x396bc1,
+  targetId: targetId2,
+  targetNode: targetNode2,
+  sourceKind: sourceKind2,
+  incomingEdges: incomingEdges2,
+  nodes: nodes2,
 } = {}) {
-  const _0x4b5872 = getTargetInputPolicy(_0x205c48),
-    _0x3c038c = Number(_0x4b5872?.maxByKind?.[_0x438390]);
-  if (!Number.isFinite(_0x3c038c) || _0x3c038c <= 0) return false;
-  const _0x57f884 = (Array.isArray(_0x537f65) ? _0x537f65 : []).filter(
-    (_0x2d9708) => resolveEffectiveInputKind(_0x396bc1?.[_0x2d9708?.sourceId], _0x2d9708) === _0x438390,
+  const targetInputPolicy = getTargetInputPolicy(targetNode2),
+    count = Number(targetInputPolicy?.maxByKind?.[sourceKind2]);
+  if (!Number.isFinite(count) || count <= 0) return false;
+  const target = (Array.isArray(incomingEdges2) ? incomingEdges2 : []).filter(
+    (item4) => resolveEffectiveInputKind(nodes2?.[item4?.sourceId], item4) === sourceKind2,
   ).length;
-  let _0x162668 =
-      _0x57f884 +
-      getAssetInputRefsFromNodeData(_0x205c48, { allowedTypes: [_0x438390] }).length +
-      1 -
-      _0x3c038c,
-    _0x129c88 = false;
-  while (_0x162668 > 0) {
-    const _0x17e442 = appStore.getState?.()?.nodes?.[_0x1c5e5f] || _0x205c48,
-      _0x3fa018 = getAssetInputRefsFromNodeData(_0x17e442, { allowedTypes: [_0x438390] })[0];
-    if (!_0x3fa018) break;
-    ((_0x129c88 = removeAssetInputRefFromNodeData(_0x1c5e5f, _0x3fa018) || _0x129c88), (_0x162668 -= 1));
+  let count2 =
+      target + getAssetInputRefsFromNodeData(targetNode2, { allowedTypes: [sourceKind2] }).length + 1 - count,
+    removeAssetInputRefFromNodeData2 = false;
+  while (count2 > 0) {
+    const source = appStore.getState?.()?.nodes?.[targetId2] || targetNode2,
+      assetInputRefsFromNodeData = getAssetInputRefsFromNodeData(source, { allowedTypes: [sourceKind2] })[0];
+    if (!assetInputRefsFromNodeData) break;
+    ((removeAssetInputRefFromNodeData2 =
+      removeAssetInputRefFromNodeData(targetId2, assetInputRefsFromNodeData) ||
+      removeAssetInputRefFromNodeData2),
+      (count2 -= 1));
   }
-  return _0x129c88;
+  return removeAssetInputRefFromNodeData2;
 }
 export function removeCoveredAssetInputRefForConnection({
   targetId: targetId = '',
@@ -154,53 +154,52 @@ export function removeCoveredAssetInputRefForConnection({
   incomingEdges: incomingEdges = null,
   nodes: nodes = null,
 } = {}) {
-  const _0xc738c3 = String(targetId || targetNode?.id || '').trim();
-  if (!_0xc738c3) return false;
-  const _0x5bee63 = appStore.getState?.() || {},
-    _0x3b0a29 = nodes || _0x5bee63.nodes || {},
-    _0x16b16c = _0x5bee63.nodes?.[_0xc738c3] || targetNode || {},
-    _0x51cb6c = getFixedAssetSlotConfig(_0x16b16c);
-  if (!isRunningHubWorkflowNode(_0x16b16c) && !_0x51cb6c) return false;
-  const _0xe4fea9 = resolveEffectiveInputKind(sourceNode) || normalizeInputKind(sourceKind || '');
-  if (_0xe4fea9 !== 'image' && _0xe4fea9 !== 'video' && _0xe4fea9 !== 'audio') return false;
-  const _0x4629d7 = getIncomingEdges(_0xc738c3, incomingEdges),
-    _0x25d43f = String(refSlot || '').trim();
-  if (_0x51cb6c && _0x25d43f) {
-    const _0x119aa1 = _0x51cb6c.slotOrderByType?.[_0xe4fea9];
-    if (Array.isArray(_0x119aa1) && _0x119aa1.includes(_0x25d43f)) {
-      const _0x52ecfe = assignOccupiedFixedSlots({
-          incomingEdges: _0x4629d7,
-          nodes: _0x3b0a29,
-          slotOrderByType: _0x51cb6c.slotOrderByType,
-          visibleSlots: _0x51cb6c.visibleSlots,
-          slotKindById: _0x51cb6c.slotKindById,
-          exclusiveGroups: _0x51cb6c.exclusiveGroups,
-          slotById: _0x51cb6c.slotById,
+  const targetId3 = String(targetId || targetNode?.id || '').trim();
+  if (!targetId3) return false;
+  const next = appStore.getState?.() || {},
+    nodes3 = nodes || next.nodes || {},
+    targetNode3 = next.nodes?.[targetId3] || targetNode || {},
+    slotOrderByType4 = getFixedAssetSlotConfig(targetNode3);
+  if (!isRunningHubWorkflowNode(targetNode3) && !slotOrderByType4) return false;
+  const sourceKind3 = resolveEffectiveInputKind(sourceNode) || normalizeInputKind(sourceKind || '');
+  if (sourceKind3 !== 'image' && sourceKind3 !== 'video' && sourceKind3 !== 'audio') return false;
+  const incomingEdges3 = getIncomingEdges(targetId3, incomingEdges),
+    current = String(refSlot || '').trim();
+  if (slotOrderByType4 && current) {
+    const list2 = slotOrderByType4.slotOrderByType?.[sourceKind3];
+    if (Array.isArray(list2) && list2.includes(current)) {
+      const occupiedSlots2 = assignOccupiedFixedSlots({
+          incomingEdges: incomingEdges3,
+          nodes: nodes3,
+          slotOrderByType: slotOrderByType4.slotOrderByType,
+          visibleSlots: slotOrderByType4.visibleSlots,
+          slotKindById: slotOrderByType4.slotKindById,
+          exclusiveGroups: slotOrderByType4.exclusiveGroups,
+          slotById: slotOrderByType4.slotById,
         }),
-        _0x20abb4 = getAssetInputRefsFromNodeData(_0x16b16c, {
-          allowedTypes: Object.keys(_0x51cb6c.slotOrderByType || {}),
+        assetInputRefsFromNodeData2 = getAssetInputRefsFromNodeData(targetNode3, {
+          allowedTypes: Object.keys(slotOrderByType4.slotOrderByType || {}),
         }),
-        _0x5beed2 = buildFixedInputAssetSlotMapFromRefs(_0x20abb4, {
-          slotOrderByType: _0x51cb6c.slotOrderByType,
-          visibleSlots: _0x51cb6c.visibleSlots,
-          exclusiveGroups: _0x51cb6c.exclusiveGroups,
-          slotById: _0x51cb6c.slotById,
-          occupiedSlots: _0x52ecfe,
+        fixedInputAssetSlotMapFromRefs = buildFixedInputAssetSlotMapFromRefs(assetInputRefsFromNodeData2, {
+          slotOrderByType: slotOrderByType4.slotOrderByType,
+          visibleSlots: slotOrderByType4.visibleSlots,
+          exclusiveGroups: slotOrderByType4.exclusiveGroups,
+          slotById: slotOrderByType4.slotById,
+          occupiedSlots: occupiedSlots2,
         }),
-        _0x208bb6 = getExclusiveSlotsForFixedSlot(_0x51cb6c.exclusiveGroups, _0x25d43f);
-      for (const _0x5c0511 of _0x208bb6) {
-        const _0x274a92 = _0x5beed2[_0x5c0511],
-          _0x496ecb = _0x51cb6c.slotKindById?.[_0x5c0511] || _0x274a92?.type || '';
-        if (_0x274a92 && _0x274a92.type === _0x496ecb)
-          return removeAssetInputRefFromNodeData(_0xc738c3, _0x274a92);
+        exclusiveSlotsForFixedSlot = getExclusiveSlotsForFixedSlot(slotOrderByType4.exclusiveGroups, current);
+      for (const entry of exclusiveSlotsForFixedSlot) {
+        const record = fixedInputAssetSlotMapFromRefs[entry],
+          payload = slotOrderByType4.slotKindById?.[entry] || record?.type || '';
+        if (record && record.type === payload) return removeAssetInputRefFromNodeData(targetId3, record);
       }
     }
   }
   return removeGenericOverflowAssetRefs({
-    targetId: _0xc738c3,
-    targetNode: _0x16b16c,
-    sourceKind: _0xe4fea9,
-    incomingEdges: _0x4629d7,
-    nodes: _0x3b0a29,
+    targetId: targetId3,
+    targetNode: targetNode3,
+    sourceKind: sourceKind3,
+    incomingEdges: incomingEdges3,
+    nodes: nodes3,
   });
 }

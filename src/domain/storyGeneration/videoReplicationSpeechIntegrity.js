@@ -1,1 +1,171 @@
-import{getReplicationEventSpeech,orderReplicationShotSpeech}from'./videoReplicationSpeechOrder.js';import{hasReplicationInternalCut}from'./videoReplicationShotEvidence.js';import{getReplicationVisualGaps}from'./videoReplicationTimingContract.js';import{REPLICATION_SPEECH_OUTPUT_RULE}from'./videoReplicationPromptPolicy.js';const channels=["voiceover","dialogue"],canonical=_0x209a67=>String(_0x209a67||'')["replace"](/[\p{P}\p{Z}\s]/gu,'');export const REPLICATION_SPEECH_INTEGRITY_GUIDANCE=REPLICATION_SPEECH_OUTPUT_RULE+'对照\x20speechOrder\x20与\x20speechRefs\x20逐句检查遗漏、重复、类型和先后。人物说话不能塞进画外音，也不能把对白前后的旁白合成一条。每个\x20shot\x20只记录一个实际镜头；camera\x20不得串写切镜或用连续调整构图掩盖切镜。';export function replicationSpeechParts(_0x4f1f38,_0x526884){return String(_0x4f1f38||'')["split"](/\n/u)["map"](_0xb9c1e0=>_0xb9c1e0["trim"]())['filter'](Boolean)['map'](_0x4e45be=>{const _0x23394e=_0x4e45be['match'](/^[^：:]*[：:]([\s\S]*)$/u);return{'kind':_0x526884,'text':(_0x23394e?.[0x1]||_0x4e45be)["replace"](/^“|”$/gu,'')["trim"]()};});}const occurrences=(_0x4ebb71,_0x46ec5c)=>_0x46ec5c?_0x4ebb71["split"](_0x46ec5c)["length"]-0x1:0x0;export function getReplicationSourceSpeechReviewReasons(_0x46d4be,{durationSec:durationSec=0x0}={}){const _0x2367d7=getReplicationVisualGaps(_0x46d4be?.['events'],0x0,durationSec)["map"](_0x3fee19=>"原片 "+_0x3fee19["startSec"]+'-'+_0x3fee19['endSec']+"秒缺少逐镜画面记录；回看该区间，包括无人声时段，记录实际画面与切点，不用黑屏、过渡或无动作代替未识别内容。");return[..._0x2367d7,...(_0x46d4be?.["events"]||[])["flatMap"](_0x205023=>{const _0x33eb30=[];return!_0x205023["shots"]?.["length"]&&_0x33eb30["push"](_0x205023['id']+'（'+_0x205023["startSec"]+'-'+_0x205023["endSec"]+"秒）缺少逐镜 shots 和人声引用；请回看原视频记录实际切点，不把剧情摘要当作一个镜头，也不要均分时间。"),!(_0x205023["dialogue"]||[])["length"]&&(_0x205023['voiceover']||[])["length"]&&/打电话|通话|开口|问道|说道|问话|回答/u["test"]([_0x205023["visual"],...(_0x205023['shots']||[])["map"](_0xf39643=>_0xf39643["visual"])]['join']('\x20'))&&_0x33eb30['push'](_0x205023['id']+'（'+_0x205023['startSec']+'-'+_0x205023['endSec']+"秒）画面描述包含发言行为，但人声全部被归为画外音；需回听声音并观察实际表演，确认是否吞掉了人物对白。"),(_0x205023['shots']||[])['some'](hasReplicationInternalCut)&&_0x33eb30["push"](_0x205023['id']+" 的单个 shot 内描述多个机位切换，请回看真实切点并分开记录。"),_0x33eb30;})];}export function inspectReplicationSpeechIntegrity({clips:clips=[]}={},_0x4be409={},{compareSource:compareSource=!![]}={}){return clips['flatMap'](_0x357671=>{const _0x956865=_0x4be409["replication"]?.["segmentPlan"]?.["find"](_0x43cc7f=>_0x43cc7f['ref']===_0x357671["ref"]),_0x1223fd=_0x956865?.['events']||_0x357671["replicationSpeechEvents"]||[],_0x1f4edd=_0x1223fd["map"](getReplicationEventSpeech),_0x55d30e=_0x1f4edd['every'](Boolean)?_0x1f4edd["flat"]():null,_0xb2fe02=(_0x357671["shots"]||[])["flatMap"]((_0x12ba8b,_0x50b046)=>{const _0x284d03=channels['flatMap'](_0x3d62fd=>replicationSpeechParts(_0x12ba8b[_0x3d62fd],_0x3d62fd));return(orderReplicationShotSpeech(_0x284d03,_0x1223fd)||_0x284d03)['map'](_0x1480fd=>({..._0x1480fd,'shotIndex':_0x50b046}));}),_0x46ebb0=[],_0x281733=(_0x4c0ef0,_0x241274,_0xb5c7cd)=>_0x46ebb0["push"]({'clipRef':_0x357671["ref"],'code':_0x4c0ef0,'message':_0x241274,..._0xb5c7cd==null?{}:{'shotIndex':_0xb5c7cd}});for(const _0x1fe8ea of channels){const _0x418d0b=_0xb2fe02['filter'](_0x3ff454=>_0x3ff454["kind"]===_0x1fe8ea),_0x35549f=(_0x55d30e||[])["filter"](_0x73934c=>_0x73934c["kind"]===_0x1fe8ea),_0x2676d0=_0x35549f["map"](_0xffebe8=>canonical(_0xffebe8["text"]))["join"](''),_0x30d84c=new Set();for(const _0x291054 of _0x418d0b){const _0x3c299a=canonical(_0x291054["text"]);if(_0x3c299a["length"]<0x4||_0x30d84c["has"](_0x3c299a))continue;_0x30d84c["add"](_0x3c299a);const _0x729056=_0x418d0b["filter"](_0x449501=>canonical(_0x449501['text'])===_0x3c299a)["length"];if(!_0x2676d0||!_0x55d30e)continue;const _0x51579d=Math['max'](0x1,occurrences(_0x2676d0,_0x3c299a));if(_0x729056>_0x51579d)_0x281733("replication_speech_duplicate","同一句"+(_0x1fe8ea==="voiceover"?'画外音':'对白')+'在\x20'+_0x729056+" 个镜头重复转写，原片本段仅支持 "+_0x51579d+" 次；跨镜应在起始镜头保留整句一次及声音时间。",_0x291054['shotIndex']);}if(compareSource&&_0x35549f['length']&&_0x35549f["some"](_0x3615cf=>_0x3615cf["uncertain"])){const _0x120b78=_0x418d0b["map"](_0x38a3a9=>canonical(_0x38a3a9["text"]))["join"]('');let _0x12ef8b=0x0;for(const _0x33df45 of _0x35549f){const _0x218f00=String(_0x33df45["text"]||'')["split"](/\[听不清\]|【听不清】|\[无法听清\]/gu)["map"](canonical)['filter'](Boolean);for(const _0x3cca7d of _0x218f00){const _0x2320d7=_0x120b78["indexOf"](_0x3cca7d,_0x12ef8b);if(_0x2320d7<0x0)_0x281733("replication_speech_mismatch","原片已识别的"+(_0x1fe8ea==="voiceover"?"画外音":'对白')+"文字缺失或发生改写，存疑部分不能使其他已识别文字跳过核对。");else _0x12ef8b=_0x2320d7+_0x3cca7d['length'];}}}compareSource&&_0x55d30e?.["length"]&&_0x1223fd['every'](_0x334f53=>_0x334f53["shots"]?.["length"])&&!_0x35549f["some"](_0x12c491=>_0x12c491["uncertain"])&&_0x2676d0!==_0x418d0b['map'](_0x1eaf00=>canonical(_0x1eaf00["text"]))["join"]('')&&_0x281733("replication_speech_mismatch",(_0x1fe8ea==="voiceover"?"画外音":'对白')+"与本段原片逐句证据不符（重复、遗漏、改写或类型错误）；按原话与声音类型逐句修复，不从另一通道补写。");}if(compareSource&&_0x55d30e?.["length"]&&_0x1223fd['every'](_0x232f9b=>_0x232f9b["shots"]?.["length"])&&!_0x55d30e["some"](_0xc07497=>_0xc07497["uncertain"])){const _0x40649e=_0x55d30e['flatMap'](_0x24d2dc=>[...canonical(_0x24d2dc["text"])]['map'](_0x377fce=>_0x24d2dc["kind"]+':'+_0x377fce)),_0x559cf9=_0xb2fe02["flatMap"](_0x3e2f30=>[...canonical(_0x3e2f30["text"])]['map'](_0x5beba6=>_0x3e2f30["kind"]+':'+_0x5beba6));_0x40649e["join"]('|')!==_0x559cf9["join"]('|')&&!_0x46ebb0["some"](_0x259ce0=>_0x259ce0["code"]==='replication_speech_mismatch')&&_0x281733("replication_speech_order",'对白与画外音穿插顺序和原片\x20speechOrder\x20不符，不能按通道重新排序。');}return _0x46ebb0;});}
+import { getReplicationEventSpeech, orderReplicationShotSpeech } from './videoReplicationSpeechOrder.js';
+import { hasReplicationInternalCut } from './videoReplicationShotEvidence.js';
+import { getReplicationVisualGaps } from './videoReplicationTimingContract.js';
+import { REPLICATION_SPEECH_OUTPUT_RULE } from './videoReplicationPromptPolicy.js';
+const channels = ['voiceover', 'dialogue'],
+  canonical = (value) => String(value || '')['replace'](/[\p{P}\p{Z}\s]/gu, '');
+export const REPLICATION_SPEECH_INTEGRITY_GUIDANCE =
+  REPLICATION_SPEECH_OUTPUT_RULE +
+  '对照\x20speechOrder\x20与\x20speechRefs\x20逐句检查遗漏、重复、类型和先后。人物说话不能塞进画外音，也不能把对白前后的旁白合成一条。每个\x20shot\x20只记录一个实际镜头；camera\x20不得串写切镜或用连续调整构图掩盖切镜。';
+export function replicationSpeechParts(item, key) {
+  return String(item || '')
+    ['split'](/\n/u)
+    ['map']((index) => index['trim']())
+    ['filter'](Boolean)
+    ['map']((result) => {
+      const data = result['match'](/^[^：:]*[：:]([\s\S]*)$/u);
+      return { kind: key, text: (data?.[0x1] || result)['replace'](/^“|”$/gu, '')['trim']() };
+    });
+}
+const occurrences = (options, target) => (target ? options['split'](target)['length'] - 0x1 : 0x0);
+export function getReplicationSourceSpeechReviewReasons(source, { durationSec: durationSec = 0x0 } = {}) {
+  const args = getReplicationVisualGaps(source?.['events'], 0x0, durationSec)['map'](
+    (next) =>
+      '原片 ' +
+      next['startSec'] +
+      '-' +
+      next['endSec'] +
+      '秒缺少逐镜画面记录；回看该区间，包括无人声时段，记录实际画面与切点，不用黑屏、过渡或无动作代替未识别内容。',
+  );
+  return [
+    ...args,
+    ...(source?.['events'] || [])['flatMap']((enabled) => {
+      const list = [];
+      return (
+        !enabled['shots']?.['length'] &&
+          list['push'](
+            enabled['id'] +
+              '（' +
+              enabled['startSec'] +
+              '-' +
+              enabled['endSec'] +
+              '秒）缺少逐镜 shots 和人声引用；请回看原视频记录实际切点，不把剧情摘要当作一个镜头，也不要均分时间。',
+          ),
+        !(enabled['dialogue'] || [])['length'] &&
+          (enabled['voiceover'] || [])['length'] &&
+          /打电话|通话|开口|问道|说道|问话|回答/u['test'](
+            [enabled['visual'], ...(enabled['shots'] || [])['map']((current) => current['visual'])]['join'](
+              '\x20',
+            ),
+          ) &&
+          list['push'](
+            enabled['id'] +
+              '（' +
+              enabled['startSec'] +
+              '-' +
+              enabled['endSec'] +
+              '秒）画面描述包含发言行为，但人声全部被归为画外音；需回听声音并观察实际表演，确认是否吞掉了人物对白。',
+          ),
+        (enabled['shots'] || [])['some'](hasReplicationInternalCut) &&
+          list['push'](enabled['id'] + ' 的单个 shot 内描述多个机位切换，请回看真实切点并分开记录。'),
+        list
+      );
+    }),
+  ];
+}
+export function inspectReplicationSpeechIntegrity(
+  { clips: clips = [] } = {},
+  entry = {},
+  { compareSource: compareSource = !![] } = {},
+) {
+  return clips['flatMap']((record) => {
+    const payload = entry['replication']?.['segmentPlan']?.['find'](
+        (handle) => handle['ref'] === record['ref'],
+      ),
+      list2 = payload?.['events'] || record['replicationSpeechEvents'] || [],
+      list3 = list2['map'](getReplicationEventSpeech),
+      list4 = list3['every'](Boolean) ? list3['flat']() : null,
+      list5 = (record['shots'] || [])['flatMap']((state, config) => {
+        const scope = channels['flatMap']((input) => replicationSpeechParts(state[input], input));
+        return (orderReplicationShotSpeech(scope, list2) || scope)['map']((args2) => ({
+          ...args2,
+          shotIndex: config,
+        }));
+      }),
+      enabled2 = [],
+      handler = (output, value2, args3) =>
+        enabled2['push']({
+          clipRef: record['ref'],
+          code: output,
+          message: value2,
+          ...(args3 == null ? {} : { shotIndex: args3 }),
+        });
+    for (const value3 of channels) {
+      const list6 = list5['filter']((value4) => value4['kind'] === value3),
+        list7 = (list4 || [])['filter']((value5) => value5['kind'] === value3),
+        enabled3 = list7['map']((value6) => canonical(value6['text']))['join'](''),
+        value7 = new Set();
+      for (const value8 of list6) {
+        const canonical2 = canonical(value8['text']);
+        if (canonical2['length'] < 0x4 || value7['has'](canonical2)) continue;
+        value7['add'](canonical2);
+        const value9 = list6['filter']((response) => canonical(response['text']) === canonical2)['length'];
+        if (!enabled3 || !list4) continue;
+        const value10 = Math['max'](0x1, occurrences(enabled3, canonical2));
+        if (value9 > value10)
+          handler(
+            'replication_speech_duplicate',
+            '同一句' +
+              (value3 === 'voiceover' ? '画外音' : '对白') +
+              '在\x20' +
+              value9 +
+              ' 个镜头重复转写，原片本段仅支持 ' +
+              value10 +
+              ' 次；跨镜应在起始镜头保留整句一次及声音时间。',
+            value8['shotIndex'],
+          );
+      }
+      if (compareSource && list7['length'] && list7['some']((value11) => value11['uncertain'])) {
+        const value12 = list6['map']((value13) => canonical(value13['text']))['join']('');
+        let value14 = 0x0;
+        for (const value15 of list7) {
+          const value16 = String(value15['text'] || '')
+            ['split'](/\[听不清\]|【听不清】|\[无法听清\]/gu)
+            ['map'](canonical)
+            ['filter'](Boolean);
+          for (const list8 of value16) {
+            const count = value12['indexOf'](list8, value14);
+            if (count < 0x0)
+              handler(
+                'replication_speech_mismatch',
+                '原片已识别的' +
+                  (value3 === 'voiceover' ? '画外音' : '对白') +
+                  '文字缺失或发生改写，存疑部分不能使其他已识别文字跳过核对。',
+              );
+            else value14 = count + list8['length'];
+          }
+        }
+      }
+      compareSource &&
+        list4?.['length'] &&
+        list2['every']((value17) => value17['shots']?.['length']) &&
+        !list7['some']((value18) => value18['uncertain']) &&
+        enabled3 !== list6['map']((value19) => canonical(value19['text']))['join']('') &&
+        handler(
+          'replication_speech_mismatch',
+          (value3 === 'voiceover' ? '画外音' : '对白') +
+            '与本段原片逐句证据不符（重复、遗漏、改写或类型错误）；按原话与声音类型逐句修复，不从另一通道补写。',
+        );
+    }
+    if (
+      compareSource &&
+      list4?.['length'] &&
+      list2['every']((value20) => value20['shots']?.['length']) &&
+      !list4['some']((value21) => value21['uncertain'])
+    ) {
+      const value22 = list4['flatMap']((value23) =>
+          [...canonical(value23['text'])]['map']((value24) => value23['kind'] + ':' + value24),
+        ),
+        value25 = list5['flatMap']((value26) =>
+          [...canonical(value26['text'])]['map']((value27) => value26['kind'] + ':' + value27),
+        );
+      value22['join']('|') !== value25['join']('|') &&
+        !enabled2['some']((value28) => value28['code'] === 'replication_speech_mismatch') &&
+        handler(
+          'replication_speech_order',
+          '对白与画外音穿插顺序和原片\x20speechOrder\x20不符，不能按通道重新排序。',
+        );
+    }
+    return enabled2;
+  });
+}

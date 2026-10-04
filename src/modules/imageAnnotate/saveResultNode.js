@@ -1,7 +1,14 @@
 import { buildGenerationStartPatch } from '../../core/generationTaskLifecycle.js';
-import { addToolbarPendingResultNodes, persistToolbarResultNodes, updateToolbarResultNode } from '../toolbarPendingResultNodes.js';
+import {
+  addToolbarPendingResultNodes,
+  persistToolbarResultNodes,
+  updateToolbarResultNode,
+} from '../toolbarPendingResultNodes.js';
 import { buildCanvasLocalImageFields } from '../../services/canvasMediaLocalService.js';
-import { buildImageGenerationFailurePatch, buildImageGenerationResultPatch } from '../../components/aigenImage/imageGenerationResultRenderer.js';
+import {
+  buildImageGenerationFailurePatch,
+  buildImageGenerationResultPatch,
+} from '../../components/aigenImage/imageGenerationResultRenderer.js';
 import appStore from '../../core/stores/appStore.js';
 import { generateId } from '../../core/math.js';
 import { commit } from '../history.js';
@@ -10,75 +17,180 @@ import { saveOutputBlob } from '../project.js';
 import { buildSourceMediaNodePayload } from '../../services/fileService.js';
 import { localPathToUrl, pickResultLocalPath } from '../../utils/localMediaPath.js';
 import { t } from '../../i18n/index.js';
-function imageAnnotateOutputText(_0x20565b, _0x220fed = {}) {
-  return t('imageAnnotate.output.' + _0x20565b, _0x220fed);
+function imageAnnotateOutputText(value, item = {}) {
+  return t('imageAnnotate.output.' + value, item);
 }
-export const getSavedAnnotateNodeName = (_0x504754, _0x1527be) => {
-  const _0x2d78cb = _0x1527be || imageAnnotateOutputText('baseImage');
-  if (_0x504754 === 'repaint') return imageAnnotateOutputText('repaintName', { baseName: _0x2d78cb });
-  if (_0x504754 === 'erase') return imageAnnotateOutputText('eraseName', { baseName: _0x2d78cb });
-  return imageAnnotateOutputText('annotateName', { baseName: _0x2d78cb });
+export const getSavedAnnotateNodeName = (key, index) => {
+  const baseName = index || imageAnnotateOutputText('baseImage');
+  if (key === 'repaint') return imageAnnotateOutputText('repaintName', { baseName: baseName });
+  if (key === 'erase') return imageAnnotateOutputText('eraseName', { baseName: baseName });
+  return imageAnnotateOutputText('annotateName', { baseName: baseName });
 };
-export const getSavedAnnotateSuccessLabel = (_0x4b57f2) => {
-  if (_0x4b57f2 === 'repaint') return imageAnnotateOutputText('repaintCreated');
-  if (_0x4b57f2 === 'erase') return imageAnnotateOutputText('eraseCreated');
+export const getSavedAnnotateSuccessLabel = (result) => {
+  if (result === 'repaint') return imageAnnotateOutputText('repaintCreated');
+  if (result === 'erase') return imageAnnotateOutputText('eraseCreated');
   return imageAnnotateOutputText('annotateCreated');
 };
 export const saveAnnotateExportResult = async ({
-  blob: _0x5577d9,
-  exportType: _0x1011ee,
-  scene: _0x2764fe,
-  sourceNodeId: _0xb0c9af,
-  baseNode: _0x425ee4,
-  notify: notify = (_0x246bc0, _0x289cc8) => window.showToast?.(_0x246bc0, _0x289cc8),
+  blob: blob,
+  exportType: exportType,
+  scene: scene,
+  sourceNodeId: sourceNodeId,
+  baseNode: baseNode,
+  notify: notify = (data, options) => window.showToast?.(data, options),
   triggerLocalCacheSave: triggerLocalCacheSave = () => window._triggerLocalCacheSave?.(),
 } = {}) => {
-  const _0x21cd2c = _0x1011ee === 'image/png' ? 'png' : 'jpg',
-    _0x404d39 = generateId('annotate'),
-    _0x58608d = new File([_0x5577d9], 'annotate_' + _0x404d39 + '.' + _0x21cd2c, { type: _0x1011ee }),
-    _0x31bc0a = await saveOutputBlob(_0x58608d, { ext: _0x21cd2c }),
-    _0x2c25a7 = pickResultLocalPath(_0x31bc0a),
-    _0x253e9b = localPathToUrl(_0x2c25a7) || String(_0x31bc0a.url || '').trim(),
-    _0x24292d = appStore.getState().nodes?.[_0xb0c9af],
-    _0x53b539 = _0x24292d || _0x425ee4 || {},
-    _0x4c5e01 = _0x53b539.width || 0x104,
-    _0x477755 = _0x53b539.height || 0x104,
-    _0x22fe84 = calcSafeSpawnPosNearNode(appStore.getState().nodes, _0x53b539, _0x4c5e01, _0x477755),
-    _0x57b021 = generateId('source-image');
+  const ext = exportType === 'image/png' ? 'png' : 'jpg',
+    generateId2 = generateId('annotate'),
+    error = new File([blob], 'annotate_' + generateId2 + '.' + ext, { type: exportType }),
+    fileName = await saveOutputBlob(error, { ext: ext }),
+    localPath = pickResultLocalPath(fileName),
+    src = localPathToUrl(localPath) || String(fileName.url || '').trim(),
+    target = appStore.getState().nodes?.[sourceNodeId],
+    box = target || baseNode || {},
+    width = box.width || 0x104,
+    height = box.height || 0x104,
+    x = calcSafeSpawnPosNearNode(appStore.getState().nodes, box, width, height),
+    id = generateId('source-image');
   return (
     appStore.addNode(
       buildSourceMediaNodePayload({
-        id: _0x57b021,
+        id: id,
         type: 'source-image',
-        x: _0x22fe84.x,
-        y: _0x22fe84.y,
-        width: _0x4c5e01,
-        height: _0x477755,
-        name: getSavedAnnotateNodeName(_0x2764fe, _0x53b539.name),
-        src: _0x253e9b,
-        localPath: _0x2c25a7,
-        fileName: _0x31bc0a.filename || _0x58608d.name,
+        x: x.x,
+        y: x.y,
+        width: width,
+        height: height,
+        name: getSavedAnnotateNodeName(scene, box.name),
+        src: src,
+        localPath: localPath,
+        fileName: fileName.filename || error.name,
         fixedSize: true,
         needsAutoResize: false,
       }),
     ),
-    appStore.setSelectedNodes([_0x57b021]),
+    appStore.setSelectedNodes([id]),
     commit(),
-    window.v2FocusOnNodes && window.v2FocusOnNodes([_0xb0c9af, _0x57b021]),
+    window.v2FocusOnNodes && window.v2FocusOnNodes([sourceNodeId, id]),
     triggerLocalCacheSave(),
-    notify(getSavedAnnotateSuccessLabel(_0x2764fe), 'success'),
-    { newNodeId: _0x57b021, localPath: _0x2c25a7, srcUrl: _0x253e9b, response: _0x31bc0a }
+    notify(getSavedAnnotateSuccessLabel(scene), 'success'),
+    { newNodeId: id, localPath: localPath, srcUrl: src, response: fileName }
   );
 };
 
-function imageAnnotateActionText(_0xe110e2,_0x1522b3={}){return t("imageAnnotate.actions."+_0xe110e2,_0x1522b3);}
+function imageAnnotateActionText(source, next = {}) {
+  return t('imageAnnotate.actions.' + source, next);
+}
 
-function resolveAnnotateResultBaseNode(_0x56d44d,_0x4f5f46){return appStore["getState"]()["nodes"]?.[_0x56d44d]||_0x4f5f46||{};}
+function resolveAnnotateResultBaseNode(current, entry) {
+  return appStore['getState']()['nodes']?.[current] || entry || {};
+}
 
-function resolveAnnotateResultLayout(_0x359eb0,_0x1ecdda,_0x14a648){const _0x1a4699=resolveAnnotateResultBaseNode(_0x359eb0,_0x1ecdda),_0x31f4ee=_0x14a648?.["width"]||_0x1a4699["width"]||0x104,_0x36d4e2=_0x14a648?.["height"]||_0x1a4699["height"]||0x104,_0x4f58c8=calcSafeSpawnPosNearNode(appStore['getState']()["nodes"],_0x1a4699,_0x31f4ee,_0x36d4e2);return{'baseNode':_0x1a4699,'width':_0x31f4ee,'height':_0x36d4e2,'x':_0x4f58c8['x'],'y':_0x4f58c8['y']};}
+function resolveAnnotateResultLayout(record, payload, handle) {
+  const annotateResultBaseNode = resolveAnnotateResultBaseNode(record, payload),
+    state = handle?.['width'] || annotateResultBaseNode['width'] || 0x104,
+    config = handle?.['height'] || annotateResultBaseNode['height'] || 0x104,
+    box2 = calcSafeSpawnPosNearNode(appStore['getState']()['nodes'], annotateResultBaseNode, state, config);
+  return { baseNode: annotateResultBaseNode, width: state, height: config, x: box2['x'], y: box2['y'] };
+}
 
-export const createPendingAnnotateExportNode=({scene:_0x1b53ae,sourceNodeId:_0x42cfdc,baseNode:_0x16cb44,startedAt:startedAt=Date["now"](),outputSize:_0x87448d}={})=>{const _0x46d7ca=resolveAnnotateResultLayout(_0x42cfdc,_0x16cb44,_0x87448d),_0x1bfe6e=generateId("source-image"),_0x1b01fd=buildSourceMediaNodePayload({'id':_0x1bfe6e,'type':"source-image",'x':_0x46d7ca['x'],'y':_0x46d7ca['y'],'width':_0x46d7ca["width"],'height':_0x46d7ca["height"],'name':getSavedAnnotateNodeName(_0x1b53ae,_0x46d7ca["baseNode"]["name"]),'src':'','outputText':imageAnnotateActionText("saving"),...buildGenerationStartPatch({'startedAt':startedAt}),'fixedSize':!![],'needsAutoResize':![]});return addToolbarPendingResultNodes({'nodes':[_0x1b01fd]}),{'newNodeId':_0x1bfe6e,'baseNode':_0x46d7ca["baseNode"],'startedAt':startedAt};};
+export const createPendingAnnotateExportNode = ({
+  scene: scene2,
+  sourceNodeId: sourceNodeId2,
+  baseNode: baseNode2,
+  startedAt: startedAt = Date['now'](),
+  outputSize: outputSize,
+} = {}) => {
+  const box3 = resolveAnnotateResultLayout(sourceNodeId2, baseNode2, outputSize),
+    generateId3 = generateId('source-image'),
+    sourceMediaNodePayload = buildSourceMediaNodePayload({
+      id: generateId3,
+      type: 'source-image',
+      x: box3['x'],
+      y: box3['y'],
+      width: box3['width'],
+      height: box3['height'],
+      name: getSavedAnnotateNodeName(scene2, box3['baseNode']['name']),
+      src: '',
+      outputText: imageAnnotateActionText('saving'),
+      ...buildGenerationStartPatch({ startedAt: startedAt }),
+      fixedSize: !![],
+      needsAutoResize: ![],
+    });
+  return (
+    addToolbarPendingResultNodes({ nodes: [sourceMediaNodePayload] }),
+    { newNodeId: generateId3, baseNode: box3['baseNode'], startedAt: startedAt }
+  );
+};
 
-function buildSavedAnnotateResultPatch({scene:_0x140db4,baseNode:_0x258534,saveResult:_0x386ddc,fileName:_0xc5fff3,startedAt:startedAt=0x0}){const _0x1a6545=pickResultLocalPath(_0x386ddc),_0x381459=buildCanvasLocalImageFields({..._0x386ddc,'localPath':_0x1a6545,'imageUrl':_0x386ddc?.["displayUrl"]||_0x386ddc?.['thumbUrl']||localPathToUrl(_0x1a6545)||String(_0x386ddc?.['url']||'')["trim"](),'sourceUrl':_0x386ddc?.["originalUrl"]||_0x386ddc?.["url"]||localPathToUrl(_0x1a6545),'thumbUrl':_0x386ddc?.['thumbUrl'],'fileName':_0xc5fff3},{'includeSrc':!![]}),_0x1b321a=_0x381459["src"]||_0x381459['imageUrl']||localPathToUrl(_0x1a6545)||String(_0x386ddc?.["url"]||'')["trim"](),_0x8ba22f=buildImageGenerationResultPatch({..._0x386ddc,..._0x381459,'imageUrl':_0x381459["imageUrl"]||_0x1b321a,'sourceUrl':_0x381459["sourceUrl"]||_0x1b321a,'thumbUrl':_0x381459["thumbUrl"]||_0x1b321a,'localPath':_0x381459['localPath']||_0x1a6545,'fileName':_0xc5fff3},{'startedAt':startedAt})||{};return{'name':getSavedAnnotateNodeName(_0x140db4,_0x258534?.['name']),..._0x8ba22f,..._0x381459,'src':_0x1b321a,'localPath':_0x381459["localPath"]||_0x1a6545,'fileName':_0xc5fff3,'outputText':'','fixedSize':!![],'needsAutoResize':![]};}
+function buildSavedAnnotateResultPatch({
+  scene: scene3,
+  baseNode: baseNode3,
+  saveResult: saveResult,
+  fileName: fileName2,
+  startedAt: startedAt = 0x0,
+}) {
+  const resultLocalPath = pickResultLocalPath(saveResult),
+    args = buildCanvasLocalImageFields(
+      {
+        ...saveResult,
+        localPath: resultLocalPath,
+        imageUrl:
+          saveResult?.['displayUrl'] ||
+          saveResult?.['thumbUrl'] ||
+          localPathToUrl(resultLocalPath) ||
+          String(saveResult?.['url'] || '')['trim'](),
+        sourceUrl: saveResult?.['originalUrl'] || saveResult?.['url'] || localPathToUrl(resultLocalPath),
+        thumbUrl: saveResult?.['thumbUrl'],
+        fileName: fileName2,
+      },
+      { includeSrc: !![] },
+    ),
+    scope =
+      args['src'] ||
+      args['imageUrl'] ||
+      localPathToUrl(resultLocalPath) ||
+      String(saveResult?.['url'] || '')['trim'](),
+    args2 =
+      buildImageGenerationResultPatch(
+        {
+          ...saveResult,
+          ...args,
+          imageUrl: args['imageUrl'] || scope,
+          sourceUrl: args['sourceUrl'] || scope,
+          thumbUrl: args['thumbUrl'] || scope,
+          localPath: args['localPath'] || resultLocalPath,
+          fileName: fileName2,
+        },
+        { startedAt: startedAt },
+      ) || {};
+  return {
+    name: getSavedAnnotateNodeName(scene3, baseNode3?.['name']),
+    ...args2,
+    ...args,
+    src: scope,
+    localPath: args['localPath'] || resultLocalPath,
+    fileName: fileName2,
+    outputText: '',
+    fixedSize: !![],
+    needsAutoResize: ![],
+  };
+}
 
-export const markAnnotateExportNodeFailed=({targetNodeId:_0x1eb113,error:_0x22568e,startedAt:startedAt=0x0}={})=>{const _0x566e85=String(_0x1eb113||'')["trim"]();if(!_0x566e85)return![];const _0x1593af=updateToolbarResultNode(_0x566e85,buildImageGenerationFailurePatch({'error':_0x22568e instanceof Error?_0x22568e['message']:String(_0x22568e||''),'startedAt':startedAt})||{});if(_0x1593af)persistToolbarResultNodes();return _0x1593af;};
+export const markAnnotateExportNodeFailed = ({
+  targetNodeId: targetNodeId,
+  error: error2,
+  startedAt: startedAt = 0x0,
+} = {}) => {
+  const enabled = String(targetNodeId || '')['trim']();
+  if (!enabled) return ![];
+  const updateToolbarResultNode2 = updateToolbarResultNode(
+    enabled,
+    buildImageGenerationFailurePatch({
+      error: error2 instanceof Error ? error2['message'] : String(error2 || ''),
+      startedAt: startedAt,
+    }) || {},
+  );
+  if (updateToolbarResultNode2) persistToolbarResultNodes();
+  return updateToolbarResultNode2;
+};

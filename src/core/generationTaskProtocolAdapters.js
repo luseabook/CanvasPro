@@ -11,35 +11,35 @@ const PROTOCOL_ALIASES = Object['freeze']({
   'model-api': 'asyncModelApi',
   dreamina: 'dreamina',
 });
-function normalizeText(_0x90a079) {
-  return String(_0x90a079 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function normalizeAdapterType(_0x5085d7) {
-  return normalizeText(_0x5085d7)['toLowerCase']()['replaceAll'](/[_-]/gu, '');
+function normalizeAdapterType(item) {
+  return normalizeText(item)['toLowerCase']()['replaceAll'](/[_-]/gu, '');
 }
-function firstText(..._0x3878df) {
-  for (const _0x4e0399 of _0x3878df) {
-    const _0x1d4a60 = normalizeText(_0x4e0399);
-    if (_0x1d4a60) return _0x1d4a60;
+function firstText(...args) {
+  for (const key of args) {
+    const text = normalizeText(key);
+    if (text) return text;
   }
   return '';
 }
-function positiveTime(..._0x249849) {
-  for (const _0x37a675 of _0x249849) {
-    const _0x191b1c = Number(_0x37a675);
-    if (Number['isFinite'](_0x191b1c) && _0x191b1c > 0x0) return _0x191b1c;
+function positiveTime(...args2) {
+  for (const index of args2) {
+    const count = Number(index);
+    if (Number['isFinite'](count) && count > 0x0) return count;
   }
   return 0x0;
 }
-function normalizeStatus(_0x18986f, _0x321229 = 'pending') {
-  return normalizeText(_0x18986f || _0x321229) || _0x321229;
+function normalizeStatus(result, data = 'pending') {
+  return normalizeText(result || data) || data;
 }
-function normalizeNumber(_0x3ea5dc, _0x33e097 = 0x0) {
-  const _0x397b3c = Number(_0x3ea5dc);
-  return Number['isFinite'](_0x397b3c) ? _0x397b3c : _0x33e097;
+function normalizeNumber(options, target = 0x0) {
+  const source = Number(options);
+  return Number['isFinite'](source) ? source : target;
 }
-function normalizeRecord(_0xab86a5) {
-  return _0xab86a5 && typeof _0xab86a5 === 'object' && !Array['isArray'](_0xab86a5) ? _0xab86a5 : {};
+function normalizeRecord(next) {
+  return next && typeof next === 'object' && !Array['isArray'](next) ? next : {};
 }
 const PROTOCOL_ADAPTERS = Object['freeze']({
   workflow: Object['freeze']({
@@ -50,9 +50,9 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     statusField: 'rhTaskStatus',
     startedAtField: 'rhTaskStartedAt',
     recoveringField: 'rhTaskRecovering',
-    readTaskId: (_0x13c27c = {}, _0x2a15f3 = '') => firstText(_0x2a15f3, _0x13c27c['rhTaskId']),
-    readStartedAt: (_0x7d3117 = {}, _0x44eff0 = 0x0) =>
-      positiveTime(_0x44eff0, _0x7d3117['rhTaskStartedAt'], _0x7d3117['generationStartTime']),
+    readTaskId: (options2 = {}, current = '') => firstText(current, options2['rhTaskId']),
+    readStartedAt: (options3 = {}, entry = 0x0) =>
+      positiveTime(entry, options3['rhTaskStartedAt'], options3['generationStartTime']),
     buildPatch: ({
       taskId: taskId = '',
       status: status = 'pending',
@@ -75,9 +75,9 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     statusField: 'dreaminaTaskStatus',
     startedAtField: 'dreaminaTaskStartedAt',
     recoveringField: 'dreaminaTaskRecovering',
-    readTaskId: (_0x4a2db5 = {}, _0xabe9b6 = '') => firstText(_0xabe9b6, _0x4a2db5['dreaminaSubmitId']),
-    readStartedAt: (_0x1b89a2 = {}, _0x34aba1 = 0x0) =>
-      positiveTime(_0x34aba1, _0x1b89a2['dreaminaTaskStartedAt'], _0x1b89a2['generationStartTime']),
+    readTaskId: (options4 = {}, record = '') => firstText(record, options4['dreaminaSubmitId']),
+    readStartedAt: (options5 = {}, payload = 0x0) =>
+      positiveTime(payload, options5['dreaminaTaskStartedAt'], options5['generationStartTime']),
     buildPatch: ({
       taskId: taskId = '',
       submitId: submitId = taskId,
@@ -90,12 +90,12 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
       raw: raw = {},
       defaultLabel: defaultLabel = '',
     } = {}) => {
-      const _0x1a2558 = normalizeText(defaultLabel);
+      const text2 = normalizeText(defaultLabel);
       return {
         dreaminaSubmitId: normalizeText(submitId),
         dreaminaTaskStatus: normalizeStatus(status),
         dreaminaTaskPhase: normalizeStatus(phase, 'generating'),
-        dreaminaTaskLabel: normalizeText(label || _0x1a2558),
+        dreaminaTaskLabel: normalizeText(label || text2),
         dreaminaTaskStartedAt: normalizeNumber(startedAt),
         dreaminaTaskLastCheckedAt: normalizeNumber(lastCheckedAt, Date['now']()),
         dreaminaTaskRecovering: recovering === !![],
@@ -111,9 +111,9 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     statusField: 'asyncTaskStatus',
     startedAtField: 'asyncTaskStartedAt',
     recoveringField: 'asyncTaskRecovering',
-    readTaskId: (_0x20581e = {}, _0x214475 = '') => firstText(_0x214475, _0x20581e['asyncTaskId']),
-    readStartedAt: (_0x4e2c62 = {}, _0x8ca1c2 = 0x0) =>
-      positiveTime(_0x8ca1c2, _0x4e2c62['asyncTaskStartedAt'], _0x4e2c62['generationStartTime']),
+    readTaskId: (options6 = {}, handle = '') => firstText(handle, options6['asyncTaskId']),
+    readStartedAt: (options7 = {}, state = 0x0) =>
+      positiveTime(state, options7['asyncTaskStartedAt'], options7['generationStartTime']),
     buildPatch: ({
       provider: provider = '',
       kind: kind = 'generation',
@@ -136,46 +136,45 @@ export const GENERATION_TASK_PROTOCOLS = Object['freeze']({
   DREAMINA: 'dreamina',
   ASYNC_MODEL_API: 'asyncModelApi',
 });
-export function normalizeGenerationTaskProtocol(_0x39ca1c) {
-  const _0x349a9f = normalizeText(_0x39ca1c)['toLowerCase']();
-  return PROTOCOL_ALIASES[_0x349a9f] || '';
+export function normalizeGenerationTaskProtocol(config) {
+  const text3 = normalizeText(config)['toLowerCase']();
+  return PROTOCOL_ALIASES[text3] || '';
 }
-export function getGenerationTaskProtocolAdapter(_0x571929) {
-  const _0x10df53 = normalizeGenerationTaskProtocol(_0x571929);
-  return PROTOCOL_ADAPTERS[_0x10df53] || null;
+export function getGenerationTaskProtocolAdapter(scope) {
+  const generationTaskProtocol = normalizeGenerationTaskProtocol(scope);
+  return PROTOCOL_ADAPTERS[generationTaskProtocol] || null;
 }
 export function inferGenerationTaskProtocol({
   taskProtocol: taskProtocol = '',
   adapterType: adapterType = '',
   provider: provider = '',
-  async: _0x3f37c3 = ![],
+  async: async = ![],
   node: node = {},
 } = {}) {
-  const _0x11c96f = normalizeText(taskProtocol),
-    _0x403216 =
-      _0x11c96f === 'modelApi' && _0x3f37c3 !== !![] ? '' : normalizeGenerationTaskProtocol(_0x11c96f);
-  if (_0x403216) return _0x403216;
-  const _0x310ca9 = normalizeAdapterType(adapterType || node['taskAdapterType'] || node['adapterType']);
-  if (_0x310ca9 === 'workflow') return GENERATION_TASK_PROTOCOLS['WORKFLOW'];
+  const text4 = normalizeText(taskProtocol),
+    input = text4 === 'modelApi' && async !== !![] ? '' : normalizeGenerationTaskProtocol(text4);
+  if (input) return input;
+  const adapterType2 = normalizeAdapterType(adapterType || node['taskAdapterType'] || node['adapterType']);
+  if (adapterType2 === 'workflow') return GENERATION_TASK_PROTOCOLS['WORKFLOW'];
   if (firstText(node['asyncTaskId'])) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
   if (firstText(node['dreaminaSubmitId'])) return GENERATION_TASK_PROTOCOLS['DREAMINA'];
-  if (_0x310ca9 === 'modelapi' && _0x3f37c3 === !![]) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
+  if (adapterType2 === 'modelapi' && async === !![]) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
   if (
-    _0x310ca9 === 'localruntime' &&
+    adapterType2 === 'localruntime' &&
     normalizeText(provider || node['provider'])['toLowerCase']() === 'dreamina'
   )
     return GENERATION_TASK_PROTOCOLS['DREAMINA'];
   return '';
 }
-export function resolveGenerationTaskProtocolAdapter(_0x53a977 = {}) {
-  return getGenerationTaskProtocolAdapter(inferGenerationTaskProtocol(_0x53a977));
+export function resolveGenerationTaskProtocolAdapter(options8 = {}) {
+  return getGenerationTaskProtocolAdapter(inferGenerationTaskProtocol(options8));
 }
 export function listGenerationTaskProtocolAdapters() {
   return Object['values'](PROTOCOL_ADAPTERS);
 }
-export function buildGenerationTaskProtocolPatch(_0x45b9aa, _0xa33b87 = {}) {
-  const _0x290508 = getGenerationTaskProtocolAdapter(_0x45b9aa);
-  if (!_0x290508)
-    throw new Error('Unknown\x20generation\x20task\x20protocol:\x20' + normalizeText(_0x45b9aa));
-  return _0x290508['buildPatch'](_0xa33b87);
+export function buildGenerationTaskProtocolPatch(output, value2 = {}) {
+  const generationTaskProtocolAdapter = getGenerationTaskProtocolAdapter(output);
+  if (!generationTaskProtocolAdapter)
+    throw new Error('Unknown\x20generation\x20task\x20protocol:\x20' + normalizeText(output));
+  return generationTaskProtocolAdapter['buildPatch'](value2);
 }

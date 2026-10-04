@@ -10,110 +10,108 @@ const MODEL_NODE_KINDS = Object.freeze({
   'ai-audio': 'audio',
   'storyboard-script': 'text',
 });
-function getState(_0x1c564c) {
-  return _0x1c564c.store?.getStateRaw?.() || _0x1c564c.store?.getState?.() || {};
+function getState(value) {
+  return value.store?.getStateRaw?.() || value.store?.getState?.() || {};
 }
-function getNode(_0x3f6a0f, _0x47d8c2) {
-  const _0x19c1ec = String(_0x47d8c2 || '').trim();
-  return _0x19c1ec ? getState(_0x3f6a0f).nodes?.[_0x19c1ec] || null : null;
+function getNode(item, key) {
+  const index = String(key || '').trim();
+  return index ? getState(item).nodes?.[index] || null : null;
 }
-function getPlainObject(_0x1fdcbe) {
-  return _0x1fdcbe && typeof _0x1fdcbe === 'object' && !Array.isArray(_0x1fdcbe) ? _0x1fdcbe : {};
+function getPlainObject(result) {
+  return result && typeof result === 'object' && !Array.isArray(result) ? result : {};
 }
-function getDeclaredParamIds(_0x431f04) {
+function getDeclaredParamIds(data) {
   return new Set(
-    (Array.isArray(_0x431f04?.uiSchema?.fields) ? _0x431f04.uiSchema.fields : [])
-      .map((_0x1b24b1) => String(_0x1b24b1?.id || '').trim())
+    (Array.isArray(data?.uiSchema?.fields) ? data.uiSchema.fields : [])
+      .map((item2) => String(item2?.id || '').trim())
       .filter(Boolean),
   );
 }
-function normalizeParamsArgs(_0x1f9595 = {}) {
-  if (_0x1f9595.params && typeof _0x1f9595.params === 'object' && !Array.isArray(_0x1f9595.params))
-    return { ..._0x1f9595.params };
-  const _0x41b872 = String(_0x1f9595.field || _0x1f9595.param || '').trim();
-  if (_0x41b872) return { [_0x41b872]: _0x1f9595.value };
+function normalizeParamsArgs(el = {}) {
+  if (el.params && typeof el.params === 'object' && !Array.isArray(el.params)) return { ...el.params };
+  const options = String(el.field || el.param || '').trim();
+  if (options) return { [options]: el.value };
   return {};
 }
-function normalizeModelArgs(_0x2b5079 = {}) {
+function normalizeModelArgs(preserveParams = {}) {
   return {
-    modelId: String(_0x2b5079.model || _0x2b5079.modelId || '').trim(),
-    providerHint: String(_0x2b5079.provider || '').trim(),
-    preserveParams: _0x2b5079.resetParams === true ? false : _0x2b5079.preserveParams !== false,
-    params: getPlainObject(_0x2b5079.params),
+    modelId: String(preserveParams.model || preserveParams.modelId || '').trim(),
+    providerHint: String(preserveParams.provider || '').trim(),
+    preserveParams: preserveParams.resetParams === true ? false : preserveParams.preserveParams !== false,
+    params: getPlainObject(preserveParams.params),
   };
 }
-function validateModelPatchArgs(_0x580fc5, _0x26d428 = {}, _0x2bec18 = {}) {
-  const _0x5bf746 = String(_0x26d428.nodeId || '').trim();
-  if (!_0x5bf746)
-    return { ok: false, errorCode: 'MISSING_NODE_ID', message: _0x580fc5 + ' requires nodeId.' };
-  const _0x46a2e0 = getNode(_0x2bec18, _0x5bf746);
-  if (!_0x46a2e0)
-    return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + _0x5bf746 };
-  const _0x1bb38d = normalizeModelArgs(_0x26d428);
-  if (!_0x1bb38d.modelId)
-    return { ok: false, errorCode: 'MISSING_MODEL_ID', message: _0x580fc5 + ' requires model or modelId.' };
-  const _0x1e978c = resolveModelExecution(_0x1bb38d.modelId, { providerHint: _0x1bb38d.providerHint }),
-    _0x1d3f79 = _0x1e978c?.modelManifest || null;
-  if (!_0x1d3f79)
+function validateModelPatchArgs(message, target = {}, source = {}) {
+  const nodeId = String(target.nodeId || '').trim();
+  if (!nodeId) return { ok: false, errorCode: 'MISSING_NODE_ID', message: message + ' requires nodeId.' };
+  const node = getNode(source, nodeId);
+  if (!node) return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId };
+  const providerHint = normalizeModelArgs(target);
+  if (!providerHint.modelId)
+    return { ok: false, errorCode: 'MISSING_MODEL_ID', message: message + ' requires model or modelId.' };
+  const modelExecution = resolveModelExecution(providerHint.modelId, {
+      providerHint: providerHint.providerHint,
+    }),
+    modelId = modelExecution?.modelManifest || null;
+  if (!modelId)
     return {
       ok: false,
       errorCode: 'MODEL_MANIFEST_NOT_FOUND',
-      message: 'Model manifest not found: ' + _0x1bb38d.modelId,
+      message: 'Model manifest not found: ' + providerHint.modelId,
     };
-  const _0x557ed6 = MODEL_NODE_KINDS[String(_0x46a2e0.type || '').trim()] || '';
-  if (!_0x557ed6)
+  const enabled = MODEL_NODE_KINDS[String(node.type || '').trim()] || '';
+  if (!enabled)
     return {
       ok: false,
       errorCode: 'MODEL_UNSUPPORTED_NODE',
-      message: 'Canvas node does not support model selection: ' + _0x5bf746,
+      message: 'Canvas node does not support model selection: ' + nodeId,
     };
-  if (String(_0x1d3f79.kind || '') !== _0x557ed6)
+  if (String(modelId.kind || '') !== enabled)
     return {
       ok: false,
       errorCode: 'MODEL_KIND_MISMATCH',
-      message:
-        'Model ' + _0x1d3f79.modelId + ' is ' + (_0x1d3f79.kind || '(unknown)') + ', not ' + _0x557ed6 + '.',
+      message: 'Model ' + modelId.modelId + ' is ' + (modelId.kind || '(unknown)') + ', not ' + enabled + '.',
     };
-  const _0x1ab86e = _0x1bb38d.preserveParams ? getPlainObject(_0x46a2e0.generationParams) : {},
-    _0x3ef0e4 = sanitizeModelUiSchemaParams(
-      _0x1d3f79.modelId,
-      { ..._0x1ab86e, ..._0x1bb38d.params },
+  const args = providerHint.preserveParams ? getPlainObject(node.generationParams) : {},
+    params = sanitizeModelUiSchemaParams(
+      modelId.modelId,
+      { ...args, ...providerHint.params },
       { includeDefaults: true },
     );
   return {
     args: {
-      nodeId: _0x5bf746,
-      modelId: _0x1d3f79.modelId,
-      provider: _0x1d3f79.provider || _0x1bb38d.providerHint,
-      params: _0x3ef0e4,
-      preserveParams: _0x1bb38d.preserveParams,
-      changedParamIds: Object.keys(_0x1bb38d.params),
+      nodeId: nodeId,
+      modelId: modelId.modelId,
+      provider: modelId.provider || providerHint.providerHint,
+      params: params,
+      preserveParams: providerHint.preserveParams,
+      changedParamIds: Object.keys(providerHint.params),
     },
   };
 }
-function executeModelPatch(_0x29eec0, _0x159a56) {
+function executeModelPatch(model, store) {
   return (
-    _0x159a56.store?.updateNodeData?.(_0x29eec0.nodeId, {
-      model: _0x29eec0.modelId,
-      provider: _0x29eec0.provider,
-      generationParams: _0x29eec0.params,
+    store.store?.updateNodeData?.(model.nodeId, {
+      model: model.modelId,
+      provider: model.provider,
+      generationParams: model.params,
     }),
-    _0x159a56.commit?.(),
+    store.commit?.(),
     {
-      nodeId: _0x29eec0.nodeId,
-      modelId: _0x29eec0.modelId,
-      model: _0x29eec0.modelId,
-      provider: _0x29eec0.provider,
-      params: _0x29eec0.params,
-      changedParamIds: _0x29eec0.changedParamIds,
+      nodeId: model.nodeId,
+      modelId: model.modelId,
+      model: model.modelId,
+      provider: model.provider,
+      params: model.params,
+      changedParamIds: model.changedParamIds,
     }
   );
 }
-export function registerModelParamCommands(_0x35e6cd) {
-  function _0x4df775(_0xcb6160, _0x405d8a) {
-    _0x35e6cd.register({
-      id: _0xcb6160,
-      description: _0x405d8a,
+export function registerModelParamCommands(next) {
+  function run(id, description) {
+    next.register({
+      id: id,
+      description: description,
       riskLevel: 'safe',
       argsSchema: {
         required: ['nodeId', 'model'],
@@ -130,15 +128,15 @@ export function registerModelParamCommands(_0x35e6cd) {
       },
       capabilitySchema: { reads: ['nodes', 'modelRegistry'], writes: ['nodes'] },
       returnSchema: { aliasFields: ['nodeId', 'modelId', 'model', 'provider', 'params'] },
-      validate(_0xe0d8cf = {}, _0x1b5e54 = {}) {
-        return validateModelPatchArgs(_0xcb6160, _0xe0d8cf, _0x1b5e54);
+      validate(options2 = {}, current = {}) {
+        return validateModelPatchArgs(id, options2, current);
       },
       execute: executeModelPatch,
     });
   }
-  (_0x4df775('node.setModel', 'Set a manifest-backed model on a generation node.'),
-    _0x4df775('node.changeModel', 'Change a generation node to another manifest-backed model.'),
-    _0x35e6cd.register({
+  (run('node.setModel', 'Set a manifest-backed model on a generation node.'),
+    run('node.changeModel', 'Change a generation node to another manifest-backed model.'),
+    next.register({
       id: 'node.setParams',
       description: 'Set manifest-backed node generation parameters.',
       riskLevel: 'safe',
@@ -155,66 +153,68 @@ export function registerModelParamCommands(_0x35e6cd) {
       },
       capabilitySchema: { reads: ['nodes', 'modelRegistry'], writes: ['nodes'] },
       returnSchema: { aliasFields: ['nodeId', 'modelId', 'params', 'changedParamIds'] },
-      validate(_0x167eee = {}, _0xc7244 = {}) {
-        const _0x1cfb9b = String(_0x167eee.nodeId || '').trim();
-        if (!_0x1cfb9b)
+      validate(options3 = {}, entry = {}) {
+        const nodeId2 = String(options3.nodeId || '').trim();
+        if (!nodeId2)
           return { ok: false, errorCode: 'MISSING_NODE_ID', message: 'node.setParams requires nodeId.' };
-        const _0x4b07ed = getNode(_0xc7244, _0x1cfb9b);
-        if (!_0x4b07ed)
-          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + _0x1cfb9b };
-        const _0x167751 = String(_0x167eee.modelId || _0x4b07ed.model || '').trim();
-        if (!_0x167751)
+        const node2 = getNode(entry, nodeId2);
+        if (!node2)
+          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId2 };
+        const modelId2 = String(options3.modelId || node2.model || '').trim();
+        if (!modelId2)
           return {
             ok: false,
             errorCode: 'MISSING_MODEL_ID',
             message: 'node.setParams requires a node model backed by a manifest.',
           };
-        const _0x1e4690 = getModelManifest(_0x167751);
-        if (!_0x1e4690)
+        const modelManifest = getModelManifest(modelId2);
+        if (!modelManifest)
           return {
             ok: false,
             errorCode: 'MODEL_MANIFEST_NOT_FOUND',
-            message: 'Model manifest not found: ' + _0x167751,
+            message: 'Model manifest not found: ' + modelId2,
           };
-        const _0x32851d = getDeclaredParamIds(_0x1e4690);
-        if (_0x32851d.size === 0)
+        const map = getDeclaredParamIds(modelManifest);
+        if (map.size === 0)
           return {
             ok: false,
             errorCode: 'MODEL_PARAMS_UNSUPPORTED',
-            message: 'Model has no uiSchema params: ' + _0x167751,
+            message: 'Model has no uiSchema params: ' + modelId2,
           };
-        const _0xf92954 = normalizeParamsArgs(_0x167eee),
-          _0x122fcf = Object.keys(_0xf92954);
-        if (_0x122fcf.length === 0)
+        const args2 = normalizeParamsArgs(options3),
+          changedParamIds = Object.keys(args2);
+        if (changedParamIds.length === 0)
           return {
             ok: false,
             errorCode: 'MISSING_PARAMS',
             message: 'node.setParams requires params or field/value.',
           };
-        const _0x57b625 = _0x122fcf.filter((_0x5ea5b3) => !_0x32851d.has(_0x5ea5b3));
-        if (_0x57b625.length > 0)
+        const unknown = changedParamIds.filter((item3) => !map.has(item3));
+        if (unknown.length > 0)
           return {
             ok: false,
             errorCode: 'UNSUPPORTED_MODEL_PARAM',
-            message: 'Unsupported model param(s): ' + _0x57b625.join(', '),
-            details: { modelId: _0x167751, unknown: _0x57b625 },
+            message: 'Unsupported model param(s): ' + unknown.join(', '),
+            details: { modelId: modelId2, unknown: unknown },
           };
-        const _0x5c8a22 = getPlainObject(_0x4b07ed.generationParams),
-          _0x83cfd8 = { ..._0x5c8a22, ..._0xf92954 },
-          _0x39e808 = sanitizeModelUiSchemaParams(_0x167751, _0x83cfd8, { includeDefaults: false });
+        const args3 = getPlainObject(node2.generationParams),
+          record = { ...args3, ...args2 },
+          params2 = sanitizeModelUiSchemaParams(modelId2, record, { includeDefaults: false });
         return {
-          args: { nodeId: _0x1cfb9b, modelId: _0x167751, params: _0x39e808, changedParamIds: _0x122fcf },
+          args: { nodeId: nodeId2, modelId: modelId2, params: params2, changedParamIds: changedParamIds },
         };
       },
-      execute(_0x16e1cd, _0x5ef073) {
+      execute(generationParams, store2) {
         return (
-          _0x5ef073.store?.updateNodeData?.(_0x16e1cd.nodeId, { generationParams: _0x16e1cd.params }),
-          _0x5ef073.commit?.(),
+          store2.store?.updateNodeData?.(generationParams.nodeId, {
+            generationParams: generationParams.params,
+          }),
+          store2.commit?.(),
           {
-            nodeId: _0x16e1cd.nodeId,
-            modelId: _0x16e1cd.modelId,
-            params: _0x16e1cd.params,
-            changedParamIds: _0x16e1cd.changedParamIds,
+            nodeId: generationParams.nodeId,
+            modelId: generationParams.modelId,
+            params: generationParams.params,
+            changedParamIds: generationParams.changedParamIds,
           }
         );
       },

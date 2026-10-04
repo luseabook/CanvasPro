@@ -1,1 +1,166 @@
-import{renderModelUiSchemaControls}from'../aigenImage/uiSchemaRenderer.js';import{getModelManifest}from'../../manifests/index.js';import{isRunningHubAiAppManifest,resolveCustomAiAppNodeManifest}from'../shared/rhAiAppNodeBehavior.js';import{buildAudioModelMenuHtml,buildAudioModelTriggerHtml}from'./audioModelMenuHelpers.js';import{ADVANCED_SETTINGS_TUNE_ICON_MARKUP}from'../sharedIconMarkup.js';export function isRunningHubAudioWorkflowItem(_0x21e098={}){const _0x31665e=String(_0x21e098?.["provider"]||'')["trim"]()["toLowerCase"](),_0x5709d8=String(_0x21e098?.["adapterType"]||'')["trim"]()["toLowerCase"]();return _0x31665e==="runninghubwf"&&_0x5709d8==='workflow';}function getAudioWorkflowManifest(_0x494199={},_0x1d5ef7={}){const _0x52204e=String(_0x494199?.['key']||_0x494199?.["modelId"]||'')["trim"]();return resolveCustomAiAppNodeManifest({..._0x1d5ef7,'model':_0x52204e,'provider':_0x494199?.["provider"]||_0x1d5ef7?.["provider"]})||getModelManifest(_0x52204e);}function renderAudioWorkflowSchemaControl(_0x9e97c7,_0x5c7cd3,_0x547a0d={}){const _0x4293a0=String(_0x9e97c7?.["key"]||_0x9e97c7?.['modelId']||'')["trim"]();if(!_0x4293a0)return'';return renderModelUiSchemaControls(_0x4293a0,_0x5c7cd3,_0x547a0d);}export function isRhAiAppAudioWorkflow(_0x5285a2={},_0x53f38f={}){return isRunningHubAiAppManifest(getAudioWorkflowManifest(_0x5285a2,_0x53f38f));}export function renderAudioWorkflowFooterSchemaControls(_0x77729d,_0x37927b={}){return{'batch':renderAudioWorkflowSchemaControl(_0x77729d,_0x37927b,{'placement':'batch'}),'mode':renderAudioWorkflowSchemaControl(_0x77729d,_0x37927b,{'placement':'mode'}),'advanced':renderAudioWorkflowSchemaControl(_0x77729d,_0x37927b,{'placement':'advanced'}),'instance':isRunningHubAudioWorkflowItem(_0x77729d)?renderAudioWorkflowSchemaControl(_0x77729d,_0x37927b,{'placement':"instance",'variant':"instanceToggle"}):''};}export function buildAudioWorkflowFooterHtml({workflow:_0x335fdd,nodeData:nodeData={},workflowItems:workflowItems=[],labels:labels={},debugIconHtml:debugIconHtml=''}={}){const {mode:_0x4d32b3,advanced:_0x488862,instance:_0x518580,batch:_0x214ef7}=renderAudioWorkflowFooterSchemaControls(_0x335fdd,nodeData),_0x54a005=String(labels["advanced"]||"高级设置")["replace"](/&/g,"&amp;")["replace"](/"/g,"&quot;")["replace"](/</g,"&lt;")["replace"](/>/g,'&gt;'),_0x3147b4=buildAudioModelMenuHtml({'activeModel':_0x335fdd?.['key'],'workflowItems':workflowItems});return "\n          <div class=\"img-model-pills\">\n            <div class=\"img-model-wrap\" style=\"position:relative;\">\n              "+buildAudioModelTriggerHtml({'label':_0x335fdd?.["label"],'activeProvider':_0x335fdd?.["provider"]||'','icon':_0x335fdd?.['icon']||'','iconAlt':_0x335fdd?.["iconAlt"]||'','iconHtml':_0x335fdd?.['iconHtml']||''})+"\n              "+_0x3147b4+"\n            </div>\n            <div class=\"ui-schema-placement ui-schema-mode-slot\" style=\""+(_0x4d32b3?'':'display:none;')+"\">\n              "+_0x4d32b3+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22prompt-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20ui-schema-batch-slot\x22\x20style=\x22'+(_0x214ef7?'':"display:none;")+'\x22>'+_0x214ef7+"</div>\n            <div class=\"rh-adv-wrap\" style=\"position:relative;"+(_0x488862?'':"display:none;")+"\">\n              <button type=\"button\" class=\"img-pill-btn rh-adv-btn advanced-settings-icon-button\" data-tooltip=\""+_0x54a005+'\x22\x20aria-label=\x22'+_0x54a005+"\" aria-expanded=\"false\">"+ADVANCED_SETTINGS_TUNE_ICON_MARKUP+"</button>\n            </div>\n            <button type=\"button\" class=\"prompt-submit debug-wrench-btn\" title=\""+(labels["debugTitle"]||'')+"\">\n              "+debugIconHtml+"\n            </button>\n            <div class=\"ui-schema-placement ui-schema-instance-slot\" style=\""+(_0x518580?'':"display:none;")+"\">\n              "+_0x518580+"\n            </div>\n            <button type=\"button\" class=\"prompt-submit img-gen-btn\" title=\""+(labels["generateTitle"]||'')+"\">\n              <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><line x1=\"12\" y1=\"19\" x2=\"12\" y2=\"5\"/><polyline points=\"5 12 12 5 19 12\"/></svg>\n            </button>\n          </div>\n          <div class=\"rh-adv-panel\">\n            "+_0x488862+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>';}function updateHtmlSlot(_0x3e4898,_0x2b4fb7){if(!_0x3e4898)return;_0x3e4898["innerHTML"]=_0x2b4fb7||'',_0x3e4898["style"]["display"]=_0x2b4fb7?'':"none";}export function applyAudioWorkflowFooterSchemaControls({workflow:_0x44c294,nodeData:nodeData={},modeSlot:_0x3277a7,advancedPanel:_0x557ced,advancedWrap:_0x38d964,advancedButton:_0x16ffa5,instanceSlot:_0x27a9a7,batchSlot:_0x9b43b3}={}){const _0x1c04c4=renderAudioWorkflowFooterSchemaControls(_0x44c294,nodeData);updateHtmlSlot(_0x3277a7,_0x1c04c4["mode"]),updateHtmlSlot(_0x27a9a7,_0x1c04c4['instance']),updateHtmlSlot(_0x9b43b3,_0x1c04c4["batch"]);if(_0x557ced)_0x557ced["innerHTML"]=_0x1c04c4["advanced"]||'';if(_0x38d964)_0x38d964["style"]['display']=_0x1c04c4['advanced']?'':'none';return!_0x1c04c4["advanced"]&&(_0x557ced?.['classList']?.["remove"]?.("show"),_0x16ffa5?.["classList"]?.['remove']?.("active")),_0x16ffa5?.["setAttribute"]?.("aria-expanded",String(_0x557ced?.["classList"]?.['contains']?.("show")===!![])),_0x1c04c4;}export function updateAudioModelTriggerIcon(_0x2f014e,_0x198d60={}){const _0xaaa11a=String(_0x198d60?.['iconHtml']||'')["trim"]();if(_0xaaa11a&&_0x2f014e&&typeof document!=="undefined"){const _0x4c4889=_0x2f014e?.['querySelector']?.(".img-model-label")||null,_0xb830a9=_0x2f014e?.["querySelector"]?.(".node-menu-icon, .node-menu-icon-small, img"),_0x496e01=document["createElement"]('template');_0x496e01["innerHTML"]=_0xaaa11a;const _0x4f1634=_0x496e01['content']["firstElementChild"];_0x4f1634&&_0x4c4889&&(_0xb830a9?.["remove"]?.(),_0x2f014e['insertBefore'](_0x4f1634,_0x4c4889));return;}const _0x42c53e=_0x2f014e?.["querySelector"]?.("img");if(!_0x42c53e)return;const _0x24f66c=String(_0x198d60?.["provider"]||'')["trim"](),_0x32c8ee=String(_0x198d60?.["icon"]||'')["trim"]()||(_0x24f66c==="volcengine-speech"?'images/volcengine.svg':"images/RH.png"),_0x5632b9=String(_0x198d60?.['iconAlt']||'')['trim']()||(_0x24f66c==="volcengine-speech"?"volcengine-speech":"runninghub");_0x42c53e["setAttribute"]?.("src",_0x32c8ee),_0x42c53e["setAttribute"]?.("alt",_0x5632b9),_0x42c53e['src']=_0x32c8ee,_0x42c53e['alt']=_0x5632b9;}
+import { renderModelUiSchemaControls } from '../aigenImage/uiSchemaRenderer.js';
+import { getModelManifest } from '../../manifests/index.js';
+import { isRunningHubAiAppManifest, resolveCustomAiAppNodeManifest } from '../shared/rhAiAppNodeBehavior.js';
+import { buildAudioModelMenuHtml, buildAudioModelTriggerHtml } from './audioModelMenuHelpers.js';
+import { ADVANCED_SETTINGS_TUNE_ICON_MARKUP } from '../sharedIconMarkup.js';
+export function isRunningHubAudioWorkflowItem(options = {}) {
+  const value = String(options?.['provider'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+    item = String(options?.['adapterType'] || '')
+      ['trim']()
+      ['toLowerCase']();
+  return value === 'runninghubwf' && item === 'workflow';
+}
+function getAudioWorkflowManifest(event = {}, args = {}) {
+  const key = String(event?.['key'] || event?.['modelId'] || '')['trim']();
+  return (
+    resolveCustomAiAppNodeManifest({
+      ...args,
+      model: key,
+      provider: event?.['provider'] || args?.['provider'],
+    }) || getModelManifest(key)
+  );
+}
+function renderAudioWorkflowSchemaControl(index, result, data = {}) {
+  const enabled = String(index?.['key'] || index?.['modelId'] || '')['trim']();
+  if (!enabled) return '';
+  return renderModelUiSchemaControls(enabled, result, data);
+}
+export function isRhAiAppAudioWorkflow(options2 = {}, target = {}) {
+  return isRunningHubAiAppManifest(getAudioWorkflowManifest(options2, target));
+}
+export function renderAudioWorkflowFooterSchemaControls(source, next = {}) {
+  return {
+    batch: renderAudioWorkflowSchemaControl(source, next, { placement: 'batch' }),
+    mode: renderAudioWorkflowSchemaControl(source, next, { placement: 'mode' }),
+    advanced: renderAudioWorkflowSchemaControl(source, next, { placement: 'advanced' }),
+    instance: isRunningHubAudioWorkflowItem(source)
+      ? renderAudioWorkflowSchemaControl(source, next, { placement: 'instance', variant: 'instanceToggle' })
+      : '',
+  };
+}
+export function buildAudioWorkflowFooterHtml({
+  workflow: workflow,
+  nodeData: nodeData = {},
+  workflowItems: workflowItems = [],
+  labels: labels = {},
+  debugIconHtml: debugIconHtml = '',
+} = {}) {
+  const {
+      mode: mode,
+      advanced: advanced,
+      instance: instance,
+      batch: batch,
+    } = renderAudioWorkflowFooterSchemaControls(workflow, nodeData),
+    current = String(labels['advanced'] || '高级设置')
+      ['replace'](/&/g, '&amp;')
+      ['replace'](/"/g, '&quot;')
+      ['replace'](/</g, '&lt;')
+      ['replace'](/>/g, '&gt;'),
+    audioModelMenuHtml = buildAudioModelMenuHtml({
+      activeModel: workflow?.['key'],
+      workflowItems: workflowItems,
+    });
+  return (
+    '\n          <div class="img-model-pills">\n            <div class="img-model-wrap" style="position:relative;">\n              ' +
+    buildAudioModelTriggerHtml({
+      label: workflow?.['label'],
+      activeProvider: workflow?.['provider'] || '',
+      icon: workflow?.['icon'] || '',
+      iconAlt: workflow?.['iconAlt'] || '',
+      iconHtml: workflow?.['iconHtml'] || '',
+    }) +
+    '\n              ' +
+    audioModelMenuHtml +
+    '\n            </div>\n            <div class="ui-schema-placement ui-schema-mode-slot" style="' +
+    (mode ? '' : 'display:none;') +
+    '">\n              ' +
+    mode +
+    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22prompt-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20ui-schema-batch-slot\x22\x20style=\x22' +
+    (batch ? '' : 'display:none;') +
+    '\x22>' +
+    batch +
+    '</div>\n            <div class="rh-adv-wrap" style="position:relative;' +
+    (advanced ? '' : 'display:none;') +
+    '">\n              <button type="button" class="img-pill-btn rh-adv-btn advanced-settings-icon-button" data-tooltip="' +
+    current +
+    '\x22\x20aria-label=\x22' +
+    current +
+    '" aria-expanded="false">' +
+    ADVANCED_SETTINGS_TUNE_ICON_MARKUP +
+    '</button>\n            </div>\n            <button type="button" class="prompt-submit debug-wrench-btn" title="' +
+    (labels['debugTitle'] || '') +
+    '">\n              ' +
+    debugIconHtml +
+    '\n            </button>\n            <div class="ui-schema-placement ui-schema-instance-slot" style="' +
+    (instance ? '' : 'display:none;') +
+    '">\n              ' +
+    instance +
+    '\n            </div>\n            <button type="button" class="prompt-submit img-gen-btn" title="' +
+    (labels['generateTitle'] || '') +
+    '">\n              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>\n            </button>\n          </div>\n          <div class="rh-adv-panel">\n            ' +
+    advanced +
+    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>'
+  );
+}
+function updateHtmlSlot(enabled2, entry) {
+  if (!enabled2) return;
+  ((enabled2['innerHTML'] = entry || ''), (enabled2['style']['display'] = entry ? '' : 'none'));
+}
+export function applyAudioWorkflowFooterSchemaControls({
+  workflow: workflow2,
+  nodeData: nodeData = {},
+  modeSlot: modeSlot,
+  advancedPanel: advancedPanel,
+  advancedWrap: advancedWrap,
+  advancedButton: advancedButton,
+  instanceSlot: instanceSlot,
+  batchSlot: batchSlot,
+} = {}) {
+  const renderAudioWorkflowFooterSchemaControls2 = renderAudioWorkflowFooterSchemaControls(
+    workflow2,
+    nodeData,
+  );
+  (updateHtmlSlot(modeSlot, renderAudioWorkflowFooterSchemaControls2['mode']),
+    updateHtmlSlot(instanceSlot, renderAudioWorkflowFooterSchemaControls2['instance']),
+    updateHtmlSlot(batchSlot, renderAudioWorkflowFooterSchemaControls2['batch']));
+  if (advancedPanel) advancedPanel['innerHTML'] = renderAudioWorkflowFooterSchemaControls2['advanced'] || '';
+  if (advancedWrap)
+    advancedWrap['style']['display'] = renderAudioWorkflowFooterSchemaControls2['advanced'] ? '' : 'none';
+  return (
+    !renderAudioWorkflowFooterSchemaControls2['advanced'] &&
+      (advancedPanel?.['classList']?.['remove']?.('show'),
+      advancedButton?.['classList']?.['remove']?.('active')),
+    advancedButton?.['setAttribute']?.(
+      'aria-expanded',
+      String(advancedPanel?.['classList']?.['contains']?.('show') === !![]),
+    ),
+    renderAudioWorkflowFooterSchemaControls2
+  );
+}
+export function updateAudioModelTriggerIcon(el, record = {}) {
+  const payload = String(record?.['iconHtml'] || '')['trim']();
+  if (payload && el && typeof document !== 'undefined') {
+    const handle = el?.['querySelector']?.('.img-model-label') || null,
+      state = el?.['querySelector']?.('.node-menu-icon, .node-menu-icon-small, img'),
+      config = document['createElement']('template');
+    config['innerHTML'] = payload;
+    const scope = config['content']['firstElementChild'];
+    scope && handle && (state?.['remove']?.(), el['insertBefore'](scope, handle));
+    return;
+  }
+  const enabled3 = el?.['querySelector']?.('img');
+  if (!enabled3) return;
+  const input = String(record?.['provider'] || '')['trim'](),
+    output =
+      String(record?.['icon'] || '')['trim']() ||
+      (input === 'volcengine-speech' ? 'images/volcengine.svg' : 'images/RH.png'),
+    value2 =
+      String(record?.['iconAlt'] || '')['trim']() ||
+      (input === 'volcengine-speech' ? 'volcengine-speech' : 'runninghub');
+  (enabled3['setAttribute']?.('src', output),
+    enabled3['setAttribute']?.('alt', value2),
+    (enabled3['src'] = output),
+    (enabled3['alt'] = value2));
+}

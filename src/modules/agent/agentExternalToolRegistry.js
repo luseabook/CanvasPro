@@ -4,107 +4,106 @@ import {
   validateAgentDocumentFile,
 } from './agentDocumentInput.js';
 const TOOL_ID_PATTERN = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)+$/;
-function normalizeToolDefinition(_0x5068eb = {}) {
-  const _0x445a77 = String(_0x5068eb['id'] || '')
+function normalizeToolDefinition(inputSchema = {}) {
+  const id = String(inputSchema['id'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (!TOOL_ID_PATTERN['test'](_0x445a77))
-    throw new TypeError('Invalid Agent external tool id: ' + (_0x445a77 || '<empty>'));
-  if (typeof _0x5068eb['execute'] !== 'function')
-    throw new TypeError('Agent\x20external\x20tool\x20' + _0x445a77 + '\x20must\x20provide\x20execute()');
+  if (!TOOL_ID_PATTERN['test'](id))
+    throw new TypeError('Invalid Agent external tool id: ' + (id || '<empty>'));
+  if (typeof inputSchema['execute'] !== 'function')
+    throw new TypeError('Agent\x20external\x20tool\x20' + id + '\x20must\x20provide\x20execute()');
   return Object['freeze']({
-    id: _0x445a77,
-    title: String(_0x5068eb['title'] || _0x445a77)
+    id: id,
+    title: String(inputSchema['title'] || id)
       ['trim']()
       ['slice'](0x0, 0x78),
-    description: String(_0x5068eb['description'] || '')
+    description: String(inputSchema['description'] || '')
       ['trim']()
       ['slice'](0x0, 0x1f4),
     inputSchema:
-      _0x5068eb['inputSchema'] && typeof _0x5068eb['inputSchema'] === 'object'
-        ? structuredClone(_0x5068eb['inputSchema'])
+      inputSchema['inputSchema'] && typeof inputSchema['inputSchema'] === 'object'
+        ? structuredClone(inputSchema['inputSchema'])
         : { type: 'object', properties: {}, additionalProperties: ![] },
     riskLevel: 'read_only',
-    trust: String(_0x5068eb['trust'] || 'untrusted_external')['trim'](),
-    execute: _0x5068eb['execute'],
-    validate: typeof _0x5068eb['validate'] === 'function' ? _0x5068eb['validate'] : null,
+    trust: String(inputSchema['trust'] || 'untrusted_external')['trim'](),
+    execute: inputSchema['execute'],
+    validate: typeof inputSchema['validate'] === 'function' ? inputSchema['validate'] : null,
   });
 }
-function normalizeToolError(_0x15bf9c, _0x4edbda = 'EXTERNAL_TOOL_FAILED') {
+function normalizeToolError(error, value = 'EXTERNAL_TOOL_FAILED') {
   return {
-    errorCode: String(_0x15bf9c?.['code'] || _0x15bf9c?.['errorCode'] || _0x4edbda)['trim'](),
-    message: String(_0x15bf9c?.['message'] || 'External tool failed.')['trim'](),
+    errorCode: String(error?.['code'] || error?.['errorCode'] || value)['trim'](),
+    message: String(error?.['message'] || 'External tool failed.')['trim'](),
   };
 }
-function executeWithSignal(_0x1ca903, _0x4ecae2, _0x13bc67) {
-  if (!_0x13bc67?.['addEventListener'])
-    return Promise['resolve'](_0x1ca903(_0x4ecae2, { signal: _0x13bc67 }));
-  return new Promise((_0x25bf83, _0x4a4e45) => {
-    const _0x1964f5 = () => {
-      const _0x210600 = new Error('External tool request was cancelled.');
-      ((_0x210600['code'] = 'EXTERNAL_TOOL_ABORTED'), _0x4a4e45(_0x210600));
+function executeWithSignal(handler, item, signal2) {
+  if (!signal2?.['addEventListener']) return Promise['resolve'](handler(item, { signal: signal2 }));
+  return new Promise((handler2, handler3) => {
+    const key = () => {
+      const error2 = new Error('External tool request was cancelled.');
+      ((error2['code'] = 'EXTERNAL_TOOL_ABORTED'), handler3(error2));
     };
-    (_0x13bc67['addEventListener']('abort', _0x1964f5, { once: !![] }),
+    (signal2['addEventListener']('abort', key, { once: !![] }),
       Promise['resolve']()
-        ['then'](() => _0x1ca903(_0x4ecae2, { signal: _0x13bc67 }))
+        ['then'](() => handler(item, { signal: signal2 }))
         ['then'](
-          (_0x38c821) => {
-            (_0x13bc67['removeEventListener']('abort', _0x1964f5), _0x25bf83(_0x38c821));
+          (index) => {
+            (signal2['removeEventListener']('abort', key), handler2(index));
           },
-          (_0x18c442) => {
-            (_0x13bc67['removeEventListener']('abort', _0x1964f5), _0x4a4e45(_0x18c442));
+          (result) => {
+            (signal2['removeEventListener']('abort', key), handler3(result));
           },
         ));
   });
 }
 export function createAgentExternalToolRegistry({ tools: tools = [] } = {}) {
-  const _0x4c80c2 = new Map();
-  function _0x5d21c3(_0x4661cf) {
-    const _0x5b319e = normalizeToolDefinition(_0x4661cf);
-    if (_0x4c80c2['has'](_0x5b319e['id']))
-      throw new Error('Agent external tool already registered: ' + _0x5b319e['id']);
-    return (_0x4c80c2['set'](_0x5b319e['id'], _0x5b319e), _0x5b319e['id']);
+  const map = new Map();
+  function register(data) {
+    const toolDefinition = normalizeToolDefinition(data);
+    if (map['has'](toolDefinition['id']))
+      throw new Error('Agent external tool already registered: ' + toolDefinition['id']);
+    return (map['set'](toolDefinition['id'], toolDefinition), toolDefinition['id']);
   }
-  for (const _0xbd77b1 of Array['isArray'](tools) ? tools : []) _0x5d21c3(_0xbd77b1);
+  for (const options of Array['isArray'](tools) ? tools : []) register(options);
   return {
-    register: _0x5d21c3,
-    has(_0x48b96d) {
-      return _0x4c80c2['has'](
-        String(_0x48b96d || '')
+    register: register,
+    has(target) {
+      return map['has'](
+        String(target || '')
           ['trim']()
           ['toLowerCase'](),
       );
     },
-    get(_0x1e372a) {
+    get(source) {
       return (
-        _0x4c80c2['get'](
-          String(_0x1e372a || '')
+        map['get'](
+          String(source || '')
             ['trim']()
             ['toLowerCase'](),
         ) || null
       );
     },
     list() {
-      return [..._0x4c80c2['values']()]['map']((_0x4235d2) => ({
-        id: _0x4235d2['id'],
-        title: _0x4235d2['title'],
-        description: _0x4235d2['description'],
-        inputSchema: structuredClone(_0x4235d2['inputSchema']),
-        riskLevel: _0x4235d2['riskLevel'],
-        trust: _0x4235d2['trust'],
+      return [...map['values']()]['map']((id2) => ({
+        id: id2['id'],
+        title: id2['title'],
+        description: id2['description'],
+        inputSchema: structuredClone(id2['inputSchema']),
+        riskLevel: id2['riskLevel'],
+        trust: id2['trust'],
       }));
     },
-    async execute({ toolId: _0xe35e98, args: args = {}, signal: signal = null } = {}) {
-      const _0x347124 = _0x4c80c2['get'](
-        String(_0xe35e98 || '')
+    async execute({ toolId: toolId, args: args = {}, signal: signal = null } = {}) {
+      const toolId2 = map['get'](
+        String(toolId || '')
           ['trim']()
           ['toLowerCase'](),
       );
-      if (!_0x347124)
+      if (!toolId2)
         return {
           ok: ![],
           status: 'failed',
-          toolId: String(_0xe35e98 || ''),
+          toolId: String(toolId || ''),
           errorCode: 'EXTERNAL_TOOL_NOT_FOUND',
           message: 'External tool is not registered.',
         };
@@ -112,48 +111,45 @@ export function createAgentExternalToolRegistry({ tools: tools = [] } = {}) {
         return {
           ok: ![],
           status: 'cancelled',
-          toolId: _0x347124['id'],
+          toolId: toolId2['id'],
           errorCode: 'EXTERNAL_TOOL_ABORTED',
           message: 'External\x20tool\x20request\x20was\x20cancelled.',
         };
       try {
-        const _0x1b8e20 = _0x347124['validate']?.(args);
-        if (_0x1b8e20 === ![] || _0x1b8e20?.['ok'] === ![])
+        const error3 = toolId2['validate']?.(args);
+        if (error3 === ![] || error3?.['ok'] === ![])
           return {
             ok: ![],
             status: 'failed',
-            toolId: _0x347124['id'],
-            errorCode: String(_0x1b8e20?.['errorCode'] || 'INVALID_EXTERNAL_TOOL_INPUT'),
-            message: String(_0x1b8e20?.['message'] || 'External\x20tool\x20input\x20is\x20invalid.'),
+            toolId: toolId2['id'],
+            errorCode: String(error3?.['errorCode'] || 'INVALID_EXTERNAL_TOOL_INPUT'),
+            message: String(error3?.['message'] || 'External\x20tool\x20input\x20is\x20invalid.'),
           };
-        const _0x3683b9 = await executeWithSignal(_0x347124['execute'], args, signal);
-        if (_0x3683b9?.['success'] === ![] || _0x3683b9?.['ok'] === ![])
+        const result2 = await executeWithSignal(toolId2['execute'], args, signal);
+        if (result2?.['success'] === ![] || result2?.['ok'] === ![])
           return {
             ok: ![],
             status: 'failed',
-            toolId: _0x347124['id'],
-            errorCode: String(_0x3683b9['errorCode'] || 'EXTERNAL_TOOL_FAILED'),
-            message: String(_0x3683b9['message'] || _0x3683b9['error'] || 'External tool failed.'),
+            toolId: toolId2['id'],
+            errorCode: String(result2['errorCode'] || 'EXTERNAL_TOOL_FAILED'),
+            message: String(result2['message'] || result2['error'] || 'External tool failed.'),
           };
-        return { ok: !![], status: 'success', toolId: _0x347124['id'], result: _0x3683b9 };
-      } catch (_0x1cfaec) {
+        return { ok: !![], status: 'success', toolId: toolId2['id'], result: result2 };
+      } catch (next) {
         return {
           ok: ![],
           status: signal?.['aborted'] ? 'cancelled' : 'failed',
-          toolId: _0x347124['id'],
-          ...normalizeToolError(
-            _0x1cfaec,
-            signal?.['aborted'] ? 'EXTERNAL_TOOL_ABORTED' : 'EXTERNAL_TOOL_FAILED',
-          ),
+          toolId: toolId2['id'],
+          ...normalizeToolError(next, signal?.['aborted'] ? 'EXTERNAL_TOOL_ABORTED' : 'EXTERNAL_TOOL_FAILED'),
         };
       }
     },
   };
 }
 export function createDefaultAgentExternalToolRegistry({
-  readUrl: _0x2f2f5a,
-  readDocument: _0x49cac2,
-  validateDocument: _0x189cfe,
+  readUrl: readUrl,
+  readDocument: readDocument,
+  validateDocument: validateDocument,
 } = {}) {
   return createAgentExternalToolRegistry({
     tools: [
@@ -168,19 +164,19 @@ export function createDefaultAgentExternalToolRegistry({
           required: ['url'],
           additionalProperties: ![],
         },
-        validate(_0x137ec7 = {}) {
-          return String(_0x137ec7['url'] || '')['trim']()
+        validate(response = {}) {
+          return String(response['url'] || '')['trim']()
             ? !![]
             : { ok: ![], errorCode: 'URL_REQUIRED', message: 'URL is required.' };
         },
-        execute(_0x16d441) {
-          if (typeof _0x2f2f5a !== 'function')
+        execute(url) {
+          if (typeof readUrl !== 'function')
             return {
               success: ![],
               errorCode: 'URL_READER_UNAVAILABLE',
               message: 'URL reading is unavailable in this runtime.',
             };
-          return _0x2f2f5a({ url: _0x16d441['url'] });
+          return readUrl({ url: url['url'] });
         },
       },
       {
@@ -195,21 +191,21 @@ export function createDefaultAgentExternalToolRegistry({
           required: ['file'],
           additionalProperties: ![],
         },
-        validate(_0x5cfa8a = {}) {
-          const _0x24f319 = validateAgentDocumentFile(_0x5cfa8a['file'], _0x189cfe);
-          return _0x24f319['ok']
+        validate(options2 = {}) {
+          const message = validateAgentDocumentFile(options2['file'], validateDocument);
+          return message['ok']
             ? !![]
-            : { ok: ![], errorCode: 'DOCUMENT_FILE_INVALID', message: _0x24f319['error'] };
+            : { ok: ![], errorCode: 'DOCUMENT_FILE_INVALID', message: message['error'] };
         },
-        async execute(_0x1762a2, { signal: _0x3b32d8 } = {}) {
-          if (typeof _0x49cac2 !== 'function')
+        async execute(current, { signal: signal3 } = {}) {
+          if (typeof readDocument !== 'function')
             return {
               success: ![],
               errorCode: 'DOCUMENT_READER_UNAVAILABLE',
               message: '文档读取在当前运行环境中不可用。',
             };
-          const _0x163b2a = await _0x49cac2(_0x1762a2['file'], { signal: _0x3b32d8 });
-          return { success: !![], source: createAgentDocumentSource(_0x163b2a, _0x1762a2['file']) };
+          const entry = await readDocument(current['file'], { signal: signal3 });
+          return { success: !![], source: createAgentDocumentSource(entry, current['file']) };
         },
       },
     ],

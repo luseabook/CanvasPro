@@ -1,163 +1,154 @@
-function normalizeText(_0x3c01bd) {
-  return String(_0x3c01bd ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
 export function createStoryAssetHoverPreviewController({
-  previewElement: _0x251ff4,
-  getState: _0x2cc04f,
-  getSelectedAppearance: _0x52f2b3,
-  buildContent: _0x3a6585,
-  isStoryAssetHoverLandscape: _0x188fd8,
+  previewElement: previewElement,
+  getState: getState,
+  getSelectedAppearance: getSelectedAppearance,
+  buildContent: buildContent,
+  isStoryAssetHoverLandscape: isStoryAssetHoverLandscape,
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'] || globalThis,
 } = {}) {
   if (
-    typeof _0x2cc04f !== 'function' ||
-    typeof _0x52f2b3 !== 'function' ||
-    typeof _0x3a6585 !== 'function' ||
-    typeof _0x188fd8 !== 'function'
+    typeof getState !== 'function' ||
+    typeof getSelectedAppearance !== 'function' ||
+    typeof buildContent !== 'function' ||
+    typeof isStoryAssetHoverLandscape !== 'function'
   )
     throw new Error('story asset hover preview requires presentation adapters');
-  let _0x508a3c = 0x0,
-    _0x2f8146 = 0x0,
-    _0x5a33c2 = 0x0,
-    _0x3213c9 = null,
-    _0x41e3ff = '',
-    _0x4ab60b = ![];
-  const _0x382f51 = () => {
-      _0x508a3c = 0x0;
-      if (!_0x251ff4?.['classList']['contains']('is-visible')) return;
-      const _0x2fb296 = _0x251ff4['getBoundingClientRect'](),
-        _0x1585ce = windowObject['innerWidth'] || documentObject['documentElement']?.['clientWidth'] || 0x400,
-        _0x3247b3 =
-          windowObject['innerHeight'] || documentObject['documentElement']?.['clientHeight'] || 0x300,
-        _0x567d99 = 0xe,
-        _0x44cd20 = 0xa,
-        _0x542d7d = Math['max'](_0x44cd20, _0x1585ce - _0x2fb296['width'] - _0x44cd20),
-        _0x57dfa9 = Math['max'](_0x44cd20, _0x3247b3 - _0x2fb296['height'] - _0x44cd20),
-        _0x4bac5c = _0x3213c9?.['getBoundingClientRect']?.();
-      let _0x3380f5 = Math['min'](Math['max'](_0x44cd20, _0x2f8146 + _0x567d99), _0x542d7d),
-        _0x1efc1e = Math['min'](Math['max'](_0x44cd20, _0x5a33c2 + _0x567d99), _0x57dfa9);
-      if (_0x4bac5c) {
-        const _0x19911c = _0x4bac5c['right'] + _0x567d99,
-          _0x9cf3f2 = _0x4bac5c['left'] - _0x2fb296['width'] - _0x567d99;
-        if (_0x19911c <= _0x542d7d) _0x3380f5 = _0x19911c;
+  let item = 0x0,
+    key = 0x0,
+    index = 0x0,
+    el = null,
+    result = '',
+    data = ![];
+  const run = () => {
+      item = 0x0;
+      if (!previewElement?.['classList']['contains']('is-visible')) return;
+      const box = previewElement['getBoundingClientRect'](),
+        options = windowObject['innerWidth'] || documentObject['documentElement']?.['clientWidth'] || 0x400,
+        target = windowObject['innerHeight'] || documentObject['documentElement']?.['clientHeight'] || 0x300,
+        source = 0xe,
+        next = 0xa,
+        current = Math['max'](next, options - box['width'] - next),
+        entry = Math['max'](next, target - box['height'] - next),
+        box2 = el?.['getBoundingClientRect']?.();
+      let record = Math['min'](Math['max'](next, key + source), current),
+        payload = Math['min'](Math['max'](next, index + source), entry);
+      if (box2) {
+        const handle = box2['right'] + source,
+          state = box2['left'] - box['width'] - source;
+        if (handle <= current) record = handle;
         else {
-          if (_0x9cf3f2 >= _0x44cd20) _0x3380f5 = _0x9cf3f2;
+          if (state >= next) record = state;
           else {
-            const _0x4aab0b = _0x4bac5c['bottom'] + _0x567d99,
-              _0x167070 = _0x4bac5c['top'] - _0x2fb296['height'] - _0x567d99;
-            _0x3380f5 = Math['min'](Math['max'](_0x44cd20, _0x2f8146 - _0x2fb296['width'] / 0x2), _0x542d7d);
-            if (_0x4aab0b <= _0x57dfa9) _0x1efc1e = _0x4aab0b;
+            const config = box2['bottom'] + source,
+              scope = box2['top'] - box['height'] - source;
+            record = Math['min'](Math['max'](next, key - box['width'] / 0x2), current);
+            if (config <= entry) payload = config;
             else {
-              if (_0x167070 >= _0x44cd20) _0x1efc1e = _0x167070;
+              if (scope >= next) payload = scope;
             }
           }
         }
-        (_0x3380f5 === _0x19911c || _0x3380f5 === _0x9cf3f2) &&
-          (_0x1efc1e = Math['min'](Math['max'](_0x44cd20, _0x5a33c2 - 0x12), _0x57dfa9));
+        (record === handle || record === state) &&
+          (payload = Math['min'](Math['max'](next, index - 0x12), entry));
       }
-      ((_0x251ff4['style']['left'] = Math['round'](_0x3380f5) + 'px'),
-        (_0x251ff4['style']['top'] = Math['round'](_0x1efc1e) + 'px'));
+      ((previewElement['style']['left'] = Math['round'](record) + 'px'),
+        (previewElement['style']['top'] = Math['round'](payload) + 'px'));
     },
-    _0x319375 = (_0x541046) => {
-      ((_0x2f8146 = Number(_0x541046?.['clientX'] || 0x0)),
-        (_0x5a33c2 = Number(_0x541046?.['clientY'] || 0x0)));
-      if (_0x508a3c) return;
+    handler = (event) => {
+      ((key = Number(event?.['clientX'] || 0x0)), (index = Number(event?.['clientY'] || 0x0)));
+      if (item) return;
       if (typeof windowObject['requestAnimationFrame'] === 'function') {
-        _0x508a3c = windowObject['requestAnimationFrame'](_0x382f51);
+        item = windowObject['requestAnimationFrame'](run);
         return;
       }
-      _0x382f51();
+      run();
     },
-    _0xe365ee = (_0x50ea00) => {
-      if (!_0x50ea00) return;
-      const _0x7570b1 = _0x188fd8(_0x50ea00['naturalWidth'], _0x50ea00['naturalHeight']);
-      (_0x50ea00['closest']('.story-asset-hover-preview-item')?.['classList']['toggle'](
-        'is-landscape',
-        _0x7570b1,
-      ),
-        _0x50ea00['closest']('.story-asset-hover-preview-cell')?.['classList']['toggle'](
-          'is-landscape',
-          _0x7570b1,
-        ));
-      if (_0x251ff4?.['classList']['contains']('is-visible')) _0x382f51();
+    handler2 = (el2) => {
+      if (!el2) return;
+      const input = isStoryAssetHoverLandscape(el2['naturalWidth'], el2['naturalHeight']);
+      (el2['closest']('.story-asset-hover-preview-item')?.['classList']['toggle']('is-landscape', input),
+        el2['closest']('.story-asset-hover-preview-cell')?.['classList']['toggle']('is-landscape', input));
+      if (previewElement?.['classList']['contains']('is-visible')) run();
     },
-    _0x2c22d4 = () => {
-      _0x251ff4?.['querySelectorAll']('[data-story-asset-hover-image]')['forEach']((_0x5e8139) => {
-        if (_0x5e8139['complete'] && Number(_0x5e8139['naturalWidth']) > 0x0) {
-          _0xe365ee(_0x5e8139);
+    handler3 = () => {
+      previewElement?.['querySelectorAll']('[data-story-asset-hover-image]')['forEach']((el3) => {
+        if (el3['complete'] && Number(el3['naturalWidth']) > 0x0) {
+          handler2(el3);
           return;
         }
-        _0x5e8139['addEventListener']('load', () => _0xe365ee(_0x5e8139), { once: !![] });
+        el3['addEventListener']('load', () => handler2(el3), { once: !![] });
       });
     },
-    _0x40d934 = (_0x474e92, _0x2a6073 = '') => {
-      if (!_0x251ff4 || !_0x474e92 || _0x474e92['mediaKind'] === 'audio') return ![];
-      const _0x5c3c8d = _0x2cc04f(),
-        _0x5a7062 = _0x52f2b3(_0x5c3c8d, _0x474e92),
-        _0x5abb5f = _0x3a6585(_0x474e92, {
-          appearanceId: _0x2a6073,
-          selectedAssetId: _0x5c3c8d['selectedAssetId'],
-          selectedAppearanceId: _0x5a7062?.['id'],
+    handler4 = (enabled, appearanceId = '') => {
+      if (!previewElement || !enabled || enabled['mediaKind'] === 'audio') return ![];
+      const selectedAssetId = getState(),
+        selectedAppearanceId = getSelectedAppearance(selectedAssetId, enabled),
+        enabled2 = buildContent(enabled, {
+          appearanceId: appearanceId,
+          selectedAssetId: selectedAssetId['selectedAssetId'],
+          selectedAppearanceId: selectedAppearanceId?.['id'],
         });
-      if (!_0x5abb5f)
+      if (!enabled2)
         return (
-          (_0x251ff4['innerHTML'] = ''),
-          (_0x251ff4['dataset']['assetId'] = ''),
-          (_0x251ff4['dataset']['signature'] = ''),
+          (previewElement['innerHTML'] = ''),
+          (previewElement['dataset']['assetId'] = ''),
+          (previewElement['dataset']['signature'] = ''),
           ![]
         );
-      const _0x59158d = [
-        normalizeText(_0x2a6073) + ':' + (_0x5a7062?.['id'] || ''),
-        (_0x474e92['baseAppearanceId'] || '') + ':' + _0x5abb5f['hasVoice'],
-        _0x5abb5f['appearances']
-          ['map']((_0x2048be) => (_0x2048be?.['id'] || '') + ':' + normalizeText(_0x2048be?.['imageUrl']))
+      const output = [
+        normalizeText(appearanceId) + ':' + (selectedAppearanceId?.['id'] || ''),
+        (enabled['baseAppearanceId'] || '') + ':' + enabled2['hasVoice'],
+        enabled2['appearances']
+          ['map']((value2) => (value2?.['id'] || '') + ':' + normalizeText(value2?.['imageUrl']))
           ['join']('|'),
       ]['join'](':');
       if (
-        _0x251ff4['dataset']['assetId'] === String(_0x474e92['id']) &&
-        _0x251ff4['dataset']['signature'] === _0x59158d
+        previewElement['dataset']['assetId'] === String(enabled['id']) &&
+        previewElement['dataset']['signature'] === output
       )
         return !![];
       return (
-        (_0x251ff4['dataset']['assetId'] = String(_0x474e92['id'])),
-        (_0x251ff4['dataset']['signature'] = _0x59158d),
-        _0x251ff4['style']['setProperty']('--story-asset-hover-columns', String(_0x5abb5f['columns'])),
-        (_0x251ff4['innerHTML'] = _0x5abb5f['html']),
-        _0x2c22d4(),
+        (previewElement['dataset']['assetId'] = String(enabled['id'])),
+        (previewElement['dataset']['signature'] = output),
+        previewElement['style']['setProperty']('--story-asset-hover-columns', String(enabled2['columns'])),
+        (previewElement['innerHTML'] = enabled2['html']),
+        handler3(),
         !![]
       );
     },
-    _0x5baf74 = () => {
-      ((_0x41e3ff = ''),
-        (_0x3213c9 = null),
-        _0x251ff4?.['classList']['remove']('is-visible'),
-        _0x251ff4?.['setAttribute']('aria-hidden', 'true'));
+    hide = () => {
+      ((result = ''),
+        (el = null),
+        previewElement?.['classList']['remove']('is-visible'),
+        previewElement?.['setAttribute']('aria-hidden', 'true'));
     };
   return Object['freeze']({
-    show(_0x4d1061, _0x29b309, _0x357d1f, _0x1762e0 = '') {
-      if (_0x4ab60b || !_0x251ff4 || _0x29b309?.['pointerType'] === 'touch') return ![];
-      if (!_0x357d1f) return (_0x5baf74(), ![]);
-      ((_0x3213c9 = _0x4d1061?.['closest']?.('.at-mention-menu') || null),
-        (_0x41e3ff = String(_0x357d1f['id'])));
-      if (!_0x40d934(_0x357d1f, _0x1762e0)) return (_0x5baf74(), ![]);
+    show(el4, value3, enabled3, value4 = '') {
+      if (data || !previewElement || value3?.['pointerType'] === 'touch') return ![];
+      if (!enabled3) return (hide(), ![]);
+      ((el = el4?.['closest']?.('.at-mention-menu') || null), (result = String(enabled3['id'])));
+      if (!handler4(enabled3, value4)) return (hide(), ![]);
       return (
-        _0x251ff4['classList']['add']('is-visible'),
-        _0x251ff4['setAttribute']('aria-hidden', 'false'),
-        _0x319375(_0x29b309),
+        previewElement['classList']['add']('is-visible'),
+        previewElement['setAttribute']('aria-hidden', 'false'),
+        handler(value3),
         !![]
       );
     },
-    hide: _0x5baf74,
-    getHoveredAssetId: () => _0x41e3ff,
+    hide: hide,
+    getHoveredAssetId: () => result,
     destroy() {
-      if (_0x4ab60b) return;
-      (_0x5baf74(),
-        _0x508a3c &&
+      if (data) return;
+      (hide(),
+        item &&
           typeof windowObject['cancelAnimationFrame'] === 'function' &&
-          windowObject['cancelAnimationFrame'](_0x508a3c),
-        (_0x508a3c = 0x0),
-        (_0x4ab60b = !![]));
+          windowObject['cancelAnimationFrame'](item),
+        (item = 0x0),
+        (data = !![]));
     },
   });
 }

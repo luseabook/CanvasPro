@@ -1,92 +1,97 @@
 import { getModelManifest, getModelsByKind } from '../../manifests/index.js';
 export const SEGMENT_RETAKE_PHASE_EDITING = 'editing';
 export const SEGMENT_RETAKE_PHASE_SUBMITTED = 'submitted';
-function getSegmentRetakeCapability(_0x2c7d2a) {
-  const _0x400407 = _0x2c7d2a?.['extensions']?.['segmentRetake'];
-  return _0x400407 && typeof _0x400407 === 'object' ? _0x400407 : null;
+function getSegmentRetakeCapability(value) {
+  const item = value?.['extensions']?.['segmentRetake'];
+  return item && typeof item === 'object' ? item : null;
 }
-function getPlainObject(_0x56d130) {
-  return _0x56d130 && typeof _0x56d130 === 'object' && !Array['isArray'](_0x56d130) ? _0x56d130 : {};
+function getPlainObject(key) {
+  return key && typeof key === 'object' && !Array['isArray'](key) ? key : {};
 }
-export function getSegmentRetakeParameterPolicy(_0x2dfc9c = {}) {
-  if (!_0x2dfc9c?.['segmentRetake']) return null;
-  const _0x504c0e = getModelManifest(String(_0x2dfc9c?.['model'] || '')['trim']()),
-    _0x434bde = getSegmentRetakeCapability(_0x504c0e),
-    _0xc95da4 = _0x434bde?.['parameterPolicy'];
-  return _0x434bde?.['supported'] === !![] && _0xc95da4 && typeof _0xc95da4 === 'object' ? _0xc95da4 : null;
+export function getSegmentRetakeParameterPolicy(enabled = {}) {
+  if (!enabled?.['segmentRetake']) return null;
+  const modelManifest = getModelManifest(String(enabled?.['model'] || '')['trim']()),
+    segmentRetakeCapability = getSegmentRetakeCapability(modelManifest),
+    index = segmentRetakeCapability?.['parameterPolicy'];
+  return segmentRetakeCapability?.['supported'] === !![] && index && typeof index === 'object' ? index : null;
 }
-function buildForcedParameterPatch(_0xf4e64) {
-  const _0x3569b5 = {};
-  for (const _0x36a54e of Object['values'](getPlainObject(_0xf4e64))) {
-    const _0x2e1050 = String(_0x36a54e?.['fieldId'] || '')['trim']();
-    if (!_0x2e1050 || !Object['prototype']['hasOwnProperty']['call'](_0x36a54e || {}, 'value')) continue;
-    _0x3569b5[_0x2e1050] = _0x36a54e['value'];
+function buildForcedParameterPatch(result) {
+  const data = {};
+  for (const el of Object['values'](getPlainObject(result))) {
+    const enabled2 = String(el?.['fieldId'] || '')['trim']();
+    if (!enabled2 || !Object['prototype']['hasOwnProperty']['call'](el || {}, 'value')) continue;
+    data[enabled2] = el['value'];
   }
-  return _0x3569b5;
+  return data;
 }
-function releaseSegmentRetakeParameterLocks(_0x2b59ad, _0x3129a4) {
-  const _0x1c2217 = getPlainObject(_0x2b59ad?.['uiSchemaFieldState']),
-    _0x5c9e64 = { ..._0x1c2217 };
-  let _0x2db1ce = ![];
-  for (const [_0x157e41, _0x35cec3] of Object['entries'](_0x3129a4)) {
-    const _0x55feb0 = getPlainObject(_0x1c2217[_0x157e41]),
-      _0x3c9e3a =
-        _0x55feb0['segmentRetakeLocked'] === !![] ||
-        (_0x55feb0['disabled'] === !![] &&
-          Object['prototype']['hasOwnProperty']['call'](_0x55feb0, 'lockedValue') &&
-          String(_0x55feb0['lockedValue']) === String(_0x35cec3));
-    if (!_0x3c9e3a) continue;
-    const _0x26d3ef = { ..._0x55feb0 };
-    (delete _0x26d3ef['disabled'], delete _0x26d3ef['lockedValue'], delete _0x26d3ef['segmentRetakeLocked']);
-    if (Object['keys'](_0x26d3ef)['length'] > 0x0) _0x5c9e64[_0x157e41] = _0x26d3ef;
-    else delete _0x5c9e64[_0x157e41];
-    _0x2db1ce = !![];
+function releaseSegmentRetakeParameterLocks(args, options) {
+  const args2 = getPlainObject(args?.['uiSchemaFieldState']),
+    uiSchemaFieldState = { ...args2 };
+  let target = ![];
+  for (const [source, next] of Object['entries'](options)) {
+    const el2 = getPlainObject(args2[source]),
+      enabled3 =
+        el2['segmentRetakeLocked'] === !![] ||
+        (el2['disabled'] === !![] &&
+          Object['prototype']['hasOwnProperty']['call'](el2, 'lockedValue') &&
+          String(el2['lockedValue']) === String(next));
+    if (!enabled3) continue;
+    const el3 = { ...el2 };
+    (delete el3['disabled'], delete el3['lockedValue'], delete el3['segmentRetakeLocked']);
+    if (Object['keys'](el3)['length'] > 0x0) uiSchemaFieldState[source] = el3;
+    else delete uiSchemaFieldState[source];
+    target = !![];
   }
-  return _0x2db1ce ? { ..._0x2b59ad, uiSchemaFieldState: _0x5c9e64 } : _0x2b59ad;
+  return target ? { ...args, uiSchemaFieldState: uiSchemaFieldState } : args;
 }
-export function decorateSegmentRetakeParameterNodeData(_0x28bbfe = {}) {
-  const _0x2a13e2 = getSegmentRetakeParameterPolicy(_0x28bbfe);
-  if (!_0x2a13e2) return _0x28bbfe;
-  const _0x4d07bd = buildForcedParameterPatch(_0x2a13e2);
-  if (!isSegmentRetakeEditing(_0x28bbfe)) return releaseSegmentRetakeParameterLocks(_0x28bbfe, _0x4d07bd);
-  const _0x3cdf92 = getPlainObject(_0x28bbfe?.['uiSchemaFieldState']),
-    _0x5240b4 = { ..._0x3cdf92 };
-  for (const _0x2c64c8 of Object['keys'](_0x4d07bd)) {
-    _0x5240b4[_0x2c64c8] = {
-      ...getPlainObject(_0x3cdf92[_0x2c64c8]),
+export function decorateSegmentRetakeParameterNodeData(args3 = {}) {
+  const segmentRetakeParameterPolicy = getSegmentRetakeParameterPolicy(args3);
+  if (!segmentRetakeParameterPolicy) return args3;
+  const lockedValue = buildForcedParameterPatch(segmentRetakeParameterPolicy);
+  if (!isSegmentRetakeEditing(args3)) return releaseSegmentRetakeParameterLocks(args3, lockedValue);
+  const args4 = getPlainObject(args3?.['uiSchemaFieldState']),
+    uiSchemaFieldState2 = { ...args4 };
+  for (const current of Object['keys'](lockedValue)) {
+    uiSchemaFieldState2[current] = {
+      ...getPlainObject(args4[current]),
       disabled: !![],
-      lockedValue: _0x4d07bd[_0x2c64c8],
+      lockedValue: lockedValue[current],
       segmentRetakeLocked: !![],
     };
   }
   return {
-    ..._0x28bbfe,
-    ..._0x4d07bd,
-    generationParams: { ...getPlainObject(_0x28bbfe?.['generationParams']), ..._0x4d07bd },
-    uiSchemaFieldState: _0x5240b4,
+    ...args3,
+    ...lockedValue,
+    generationParams: { ...getPlainObject(args3?.['generationParams']), ...lockedValue },
+    uiSchemaFieldState: uiSchemaFieldState2,
   };
 }
-export function decorateSegmentRetakeParameterSchemaFields(_0x4d63e7 = {}, _0x281c68 = {}) {
-  const _0x209329 = getSegmentRetakeParameterPolicy(_0x4d63e7);
-  if (!_0x209329 || !isSegmentRetakeEditing(_0x4d63e7)) return _0x281c68;
-  const _0x148b92 = new Map(
-    Object['values'](_0x209329)['map']((_0x464e45) => [_0x464e45['fieldId'], _0x464e45]),
+export function decorateSegmentRetakeParameterSchemaFields(options2 = {}, entry = {}) {
+  const segmentRetakeParameterPolicy2 = getSegmentRetakeParameterPolicy(options2);
+  if (!segmentRetakeParameterPolicy2 || !isSegmentRetakeEditing(options2)) return entry;
+  const map = new Map(
+    Object['values'](segmentRetakeParameterPolicy2)['map']((record) => [record['fieldId'], record]),
   );
   return Object['fromEntries'](
-    Object['entries'](_0x281c68)['map'](([_0xaa1a4a, _0x2c6c9a]) => {
-      const _0x336b1f = _0x148b92['get'](_0x2c6c9a?.['id']);
-      if (!_0x336b1f) return [_0xaa1a4a, _0x2c6c9a];
-      const _0x41ac47 = _0x336b1f['value'] === -0x1 || _0x336b1f['value'] === 'auto';
+    Object['entries'](entry)['map'](([payload, args5]) => {
+      const defaultValue = map['get'](args5?.['id']);
+      if (!defaultValue) return [payload, args5];
+      const handle = defaultValue['value'] === -0x1 || defaultValue['value'] === 'auto';
       return [
-        _0xaa1a4a,
+        payload,
         {
-          ..._0x2c6c9a,
+          ...args5,
           disabled: !![],
-          defaultValue: _0x336b1f['value'],
-          ...(_0x41ac47
+          defaultValue: defaultValue['value'],
+          ...(handle
             ? {
                 options: [
-                  { value: _0x336b1f['value'], label: 'Auto', selectedLabel: 'Auto', displayLabel: 'Auto' },
+                  {
+                    value: defaultValue['value'],
+                    label: 'Auto',
+                    selectedLabel: 'Auto',
+                    displayLabel: 'Auto',
+                  },
                 ],
               }
             : {}),
@@ -95,50 +100,54 @@ export function decorateSegmentRetakeParameterSchemaFields(_0x4d63e7 = {}, _0x28
     }),
   );
 }
-export function applySegmentRetakeSubmitParameterPolicy(_0x2f23e0 = {}, _0x3eee3d = {}) {
-  const _0x2c8022 = getSegmentRetakeParameterPolicy(_0x2f23e0);
-  if (!_0x2c8022) return _0x3eee3d;
-  const _0xcf7716 = buildForcedParameterPatch(_0x2c8022);
+export function applySegmentRetakeSubmitParameterPolicy(options3 = {}, state = {}) {
+  const segmentRetakeParameterPolicy3 = getSegmentRetakeParameterPolicy(options3);
+  if (!segmentRetakeParameterPolicy3) return state;
+  const args6 = buildForcedParameterPatch(segmentRetakeParameterPolicy3);
   return (
-    Object['assign'](_0x3eee3d, _0xcf7716, {
-      generationParams: { ...getPlainObject(_0x3eee3d?.['generationParams']), ..._0xcf7716 },
+    Object['assign'](state, args6, {
+      generationParams: { ...getPlainObject(state?.['generationParams']), ...args6 },
     }),
-    Object['prototype']['hasOwnProperty']['call'](_0xcf7716, 'resolution') &&
-      ((_0x3eee3d['videoResolution'] = _0xcf7716['resolution']),
-      (_0x3eee3d['videoSize'] = _0xcf7716['resolution'])),
-    _0x3eee3d
+    Object['prototype']['hasOwnProperty']['call'](args6, 'resolution') &&
+      ((state['videoResolution'] = args6['resolution']), (state['videoSize'] = args6['resolution'])),
+    state
   );
 }
-export function isSegmentRetakeModelSupported(_0x1a98f6) {
-  const _0x46b80a = getModelManifest(String(_0x1a98f6 || '')['trim']());
-  return getSegmentRetakeCapability(_0x46b80a)?.['supported'] === !![];
+export function isSegmentRetakeModelSupported(config) {
+  const modelManifest2 = getModelManifest(String(config || '')['trim']());
+  return getSegmentRetakeCapability(modelManifest2)?.['supported'] === !![];
 }
 export function getSegmentRetakeAllowedModelIds() {
   return getModelsByKind('video')
-    ['filter']((_0x37fe4f) => getSegmentRetakeCapability(_0x37fe4f)?.['supported'] === !![])
-    ['map']((_0x5c6915) => _0x5c6915['modelId']);
+    ['filter']((scope) => getSegmentRetakeCapability(scope)?.['supported'] === !![])
+    ['map']((input) => input['modelId']);
 }
-export function getSegmentRetakeAllowedModelIdsForNode(_0x987fcd = {}) {
-  return _0x987fcd?.['segmentRetake'] ? getSegmentRetakeAllowedModelIds() : [];
+export function getSegmentRetakeAllowedModelIdsForNode(options4 = {}) {
+  return options4?.['segmentRetake'] ? getSegmentRetakeAllowedModelIds() : [];
 }
-export function isSegmentRetakeEditing(_0x1323b2 = {}) {
-  return _0x1323b2?.['segmentRetake']?.['phase'] === SEGMENT_RETAKE_PHASE_EDITING;
+export function isSegmentRetakeEditing(options5 = {}) {
+  return options5?.['segmentRetake']?.['phase'] === SEGMENT_RETAKE_PHASE_EDITING;
 }
-export function buildSegmentRetakePhasePatch(_0x48945f = {}, _0x35ba44) {
-  const _0x78cc27 = _0x48945f?.['segmentRetake'];
-  if (!_0x78cc27) return null;
-  const _0x4d8ff5 = { ..._0x78cc27, phase: _0x35ba44 },
-    _0x482f08 = decorateSegmentRetakeParameterNodeData({ ..._0x48945f, segmentRetake: _0x4d8ff5 }),
-    _0x3e03dd = { uiSchemaFieldState: _0x482f08['uiSchemaFieldState'], segmentRetake: { ..._0x4d8ff5 } };
-  if (_0x35ba44 === SEGMENT_RETAKE_PHASE_EDITING) {
-    const _0x315a72 = getSegmentRetakeParameterPolicy(_0x482f08),
-      _0x5cbb38 = buildForcedParameterPatch(_0x315a72);
-    Object['assign'](_0x3e03dd, _0x5cbb38, { generationParams: _0x482f08['generationParams'] });
+export function buildSegmentRetakePhasePatch(args7 = {}, phase) {
+  const args8 = args7?.['segmentRetake'];
+  if (!args8) return null;
+  const segmentRetake = { ...args8, phase: phase },
+    uiSchemaFieldState3 = decorateSegmentRetakeParameterNodeData({ ...args7, segmentRetake: segmentRetake }),
+    output = {
+      uiSchemaFieldState: uiSchemaFieldState3['uiSchemaFieldState'],
+      segmentRetake: { ...segmentRetake },
+    };
+  if (phase === SEGMENT_RETAKE_PHASE_EDITING) {
+    const segmentRetakeParameterPolicy4 = getSegmentRetakeParameterPolicy(uiSchemaFieldState3),
+      forcedParameterPatch = buildForcedParameterPatch(segmentRetakeParameterPolicy4);
+    Object['assign'](output, forcedParameterPatch, {
+      generationParams: uiSchemaFieldState3['generationParams'],
+    });
   }
-  return _0x3e03dd;
+  return output;
 }
-export function buildSegmentRetakeSessionClearPatch(_0x427fe1 = {}) {
-  if (!_0x427fe1?.['segmentRetake']) return { segmentRetake: null };
-  const _0x4d3c03 = buildSegmentRetakePhasePatch(_0x427fe1, SEGMENT_RETAKE_PHASE_SUBMITTED);
-  return { ...(_0x4d3c03 || {}), segmentRetake: null };
+export function buildSegmentRetakeSessionClearPatch(enabled4 = {}) {
+  if (!enabled4?.['segmentRetake']) return { segmentRetake: null };
+  const segmentRetakePhasePatch = buildSegmentRetakePhasePatch(enabled4, SEGMENT_RETAKE_PHASE_SUBMITTED);
+  return { ...(segmentRetakePhasePatch || {}), segmentRetake: null };
 }

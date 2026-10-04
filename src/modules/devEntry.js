@@ -8,64 +8,62 @@ const DEV_ENTRY_WRAP_ID = 'devEntryWrap',
 let syncBound = false,
   perfPanelController = null,
   localeUnsubscribe = null;
-function devEntryText(_0x2e1fb0, _0x2bb636 = {}) {
-  return t('devEntry.' + _0x2e1fb0, _0x2bb636);
+function devEntryText(value, item = {}) {
+  return t('devEntry.' + value, item);
 }
-function setToggleButtonState(_0x6c1268, _0x478fd3, _0x30a1e8) {
-  if (!_0x6c1268) return;
-  (_0x6c1268.classList.toggle('is-active', _0x478fd3 === true),
-    _0x6c1268.setAttribute('aria-pressed', _0x478fd3 === true ? 'true' : 'false'),
-    (_0x6c1268.title = _0x478fd3 === true ? _0x30a1e8.on : _0x30a1e8.off));
+function setToggleButtonState(el, key, index) {
+  if (!el) return;
+  (el.classList.toggle('is-active', key === true),
+    el.setAttribute('aria-pressed', key === true ? 'true' : 'false'),
+    (el.title = key === true ? index.on : index.off));
 }
-function setDevButtonState(_0x17d947, _0x5d2558) {
-  setToggleButtonState(_0x17d947, _0x5d2558, {
+function setDevButtonState(result, data) {
+  setToggleButtonState(result, data, {
     on: devEntryText('titles.devOn'),
     off: devEntryText('titles.devOff'),
   });
 }
-function setPreviewButtonState(_0x38e20a, _0x10be02) {
-  setToggleButtonState(_0x38e20a, _0x10be02, {
+function setPreviewButtonState(options, target) {
+  setToggleButtonState(options, target, {
     on: devEntryText('titles.previewOn'),
     off: devEntryText('titles.previewOff'),
   });
 }
-function broadcastDevMode(_0x5a83ec) {
+function broadcastDevMode(enabled) {
   try {
-    window.dispatchEvent(new CustomEvent('dev-mode-changed', { detail: { enabled: _0x5a83ec === true } }));
+    window.dispatchEvent(new CustomEvent('dev-mode-changed', { detail: { enabled: enabled === true } }));
   } catch {}
 }
-function setDevMode(_0x12f8d9, _0x4a0a53) {
-  const _0x14b130 = _0x12f8d9 === true;
-  ((window.DEV_MODE = _0x14b130),
-    document.body?.classList?.toggle('dev-mode', _0x14b130),
-    setDevButtonState(_0x4a0a53, _0x14b130),
-    broadcastDevMode(_0x14b130));
+function setDevMode(source, next) {
+  const current = source === true;
+  ((window.DEV_MODE = current),
+    document.body?.classList?.toggle('dev-mode', current),
+    setDevButtonState(next, current),
+    broadcastDevMode(current));
 }
-function createEntryButton({ id: _0x3f0a41, label: _0x1aaeb9, title: _0x182d2c, className: className = '' }) {
-  const _0x638160 = document.createElement('button');
+function createEntryButton({ id: id, label: label, title: title, className: className = '' }) {
+  const el2 = document.createElement('button');
   return (
-    (_0x638160.type = 'button'),
-    (_0x638160.id = _0x3f0a41),
-    (_0x638160.className = ('dev-entry-btn ' + className).trim()),
-    (_0x638160.title = _0x182d2c),
-    _0x638160.setAttribute('aria-label', _0x182d2c),
-    (_0x638160.textContent = _0x1aaeb9),
-    _0x638160
+    (el2.type = 'button'),
+    (el2.id = id),
+    (el2.className = ('dev-entry-btn ' + className).trim()),
+    (el2.title = title),
+    el2.setAttribute('aria-label', title),
+    (el2.textContent = label),
+    el2
   );
 }
-function setButtonTextAndTitle(_0x5c28fe, _0x1ec846, _0x24bfa7) {
-  if (!_0x5c28fe) return;
-  ((_0x5c28fe.textContent = _0x1ec846),
-    (_0x5c28fe.title = _0x24bfa7),
-    _0x5c28fe.setAttribute('aria-label', _0x24bfa7));
+function setButtonTextAndTitle(el3, entry, record) {
+  if (!el3) return;
+  ((el3.textContent = entry), (el3.title = record), el3.setAttribute('aria-label', record));
 }
 function syncDevEntryTexts() {
-  const _0xadfc5a = document.getElementById('devEntryModeBtn');
-  (setButtonTextAndTitle(_0xadfc5a, devEntryText('buttons.dev'), devEntryText('titles.devOff')),
-    setDevButtonState(_0xadfc5a, Boolean(window.DEV_MODE)));
-  const _0x302cb8 = document.getElementById('devEntryPreviewModeBtn');
-  (setButtonTextAndTitle(_0x302cb8, devEntryText('buttons.preview'), devEntryText('titles.previewOff')),
-    setPreviewButtonState(_0x302cb8, isPreviewModeEnabled()),
+  const payload = document.getElementById('devEntryModeBtn');
+  (setButtonTextAndTitle(payload, devEntryText('buttons.dev'), devEntryText('titles.devOff')),
+    setDevButtonState(payload, Boolean(window.DEV_MODE)));
+  const handle = document.getElementById('devEntryPreviewModeBtn');
+  (setButtonTextAndTitle(handle, devEntryText('buttons.preview'), devEntryText('titles.previewOff')),
+    setPreviewButtonState(handle, isPreviewModeEnabled()),
     setButtonTextAndTitle(
       document.getElementById('devEntryPreviewUploadBtn'),
       devEntryText('buttons.upload'),
@@ -84,13 +82,13 @@ function bindLocaleSync() {
 function bindExternalModeSync() {
   if (syncBound) return;
   ((syncBound = true),
-    window.addEventListener('dev-mode-changed', (_0x565ed3) => {
-      const _0xcf8466 = Boolean(_0x565ed3?.detail?.enabled ?? window.DEV_MODE);
-      setDevButtonState(document.getElementById('devEntryModeBtn'), _0xcf8466);
+    window.addEventListener('dev-mode-changed', (state) => {
+      const config = Boolean(state?.detail?.enabled ?? window.DEV_MODE);
+      setDevButtonState(document.getElementById('devEntryModeBtn'), config);
     }),
-    window.addEventListener('preview-mode-changed', (_0x48e104) => {
-      const _0x174422 = Boolean(_0x48e104?.detail?.enabled ?? globalThis.window?.PREVIEW_MODE);
-      setPreviewButtonState(document.getElementById('devEntryPreviewModeBtn'), _0x174422);
+    window.addEventListener('preview-mode-changed', (scope) => {
+      const input = Boolean(scope?.detail?.enabled ?? globalThis.window?.PREVIEW_MODE);
+      setPreviewButtonState(document.getElementById('devEntryPreviewModeBtn'), input);
     }));
 }
 function removeDevEntries() {
@@ -101,77 +99,85 @@ function removeDevEntries() {
     document.getElementById(DEV_ENTRY_WRAP_ID)?.remove(),
     document.getElementById(LEGACY_DEV_HELPER_ID)?.remove());
 }
-export function initDevEntries({ isDevBuild: _0x33c655 } = {}) {
+export function initDevEntries({ isDevBuild: isDevBuild } = {}) {
   document.getElementById(LEGACY_DEV_HELPER_ID)?.remove();
-  const _0x432fd7 = Boolean(_0x33c655);
-  ((window.LOCAL_DEV_BUILD = _0x432fd7), document.body?.classList?.toggle('dev-build', _0x432fd7));
-  if (!_0x432fd7) {
+  const enabled2 = Boolean(isDevBuild);
+  ((window.LOCAL_DEV_BUILD = enabled2), document.body?.classList?.toggle('dev-build', enabled2));
+  if (!enabled2) {
     (setPreviewMode(false), removeDevEntries());
     return;
   }
   bindExternalModeSync();
   if (document.getElementById(DEV_ENTRY_WRAP_ID)) return;
-  const _0x2aa185 = document.createElement('div');
-  ((_0x2aa185.id = DEV_ENTRY_WRAP_ID), (_0x2aa185.className = 'dev-entry-wrap'));
-  const _0x2dda2e = createEntryButton({
+  const el4 = document.createElement('div');
+  ((el4.id = DEV_ENTRY_WRAP_ID), (el4.className = 'dev-entry-wrap'));
+  const el5 = createEntryButton({
     id: 'devEntryModeBtn',
     label: devEntryText('buttons.dev'),
     title: devEntryText('titles.devOff'),
     className: 'dev-entry-btn-mode',
   });
-  (setDevButtonState(_0x2dda2e, Boolean(window.DEV_MODE)),
-    _0x2dda2e.addEventListener('click', () => {
-      const _0x4873d0 = !Boolean(window.DEV_MODE);
-      (setDevMode(_0x4873d0, _0x2dda2e),
-        window.showToast?.(_0x4873d0 ? devEntryText('toasts.devOn') : devEntryText('toasts.devOff')));
+  (setDevButtonState(el5, Boolean(window.DEV_MODE)),
+    el5.addEventListener('click', () => {
+      const output = !Boolean(window.DEV_MODE);
+      (setDevMode(output, el5),
+        window.showToast?.(output ? devEntryText('toasts.devOn') : devEntryText('toasts.devOff')));
     }));
-  const _0x51b5ae = createEntryButton({
+  const button = createEntryButton({
     id: 'devEntryPerfPanelBtn',
     label: 'Perf',
     title: 'Open performance panel',
     className: 'dev-entry-btn-perf dev-mode-only',
   });
-  perfPanelController = initPerfPanelDevEntry({ button: _0x51b5ae });
-  const _0x417319 = createEntryButton({
+  perfPanelController = initPerfPanelDevEntry({ button: button });
+  const el6 = createEntryButton({
     id: 'devEntryPreviewModeBtn',
     label: devEntryText('buttons.preview'),
     title: devEntryText('titles.previewOff'),
     className: 'dev-entry-btn-preview-mode',
   });
-  (setPreviewButtonState(_0x417319, isPreviewModeEnabled()),
-    _0x417319.addEventListener('click', () => {
-      const _0x443103 = !isPreviewModeEnabled();
-      (setPreviewMode(_0x443103),
-        window.showToast?.(_0x443103 ? devEntryText('toasts.previewOn') : devEntryText('toasts.previewOff')));
+  (setPreviewButtonState(el6, isPreviewModeEnabled()),
+    el6.addEventListener('click', () => {
+      const value2 = !isPreviewModeEnabled();
+      (setPreviewMode(value2),
+        window.showToast?.(value2 ? devEntryText('toasts.previewOn') : devEntryText('toasts.previewOff')));
     }));
-  const _0xdc811c = createEntryButton({
+  const button2 = createEntryButton({
       id: 'devEntryPreviewUploadBtn',
       label: devEntryText('buttons.upload'),
       title: devEntryText('titles.upload'),
       className: 'dev-entry-btn-preview-upload preview-mode-only',
     }),
-    _0x3d752f = document.createElement('input');
-  ((_0x3d752f.type = 'file'),
-    (_0x3d752f.id = 'devEntryPreviewUploadInput'),
-    (_0x3d752f.hidden = true),
-    bindPreviewUploadEntry({ button: _0xdc811c, input: _0x3d752f }));
-  const _0x4ad6e8 = createEntryButton({
+    input2 = document.createElement('input');
+  ((input2.type = 'file'),
+    (input2.id = 'devEntryPreviewUploadInput'),
+    (input2.hidden = true),
+    bindPreviewUploadEntry({ button: button2, input: input2 }));
+  const el7 = createEntryButton({
     id: 'devEntryUpdatePreviewBtn',
     label: devEntryText('buttons.updatePreview'),
     title: devEntryText('titles.updatePreview'),
     className: 'dev-entry-btn-update-preview',
   });
-  (_0x4ad6e8.addEventListener('click', () => {
+  (el7.addEventListener('click', () => {
     showLocalUpdatePreview();
   }),
-    _0x2aa185.appendChild(_0x2dda2e),
-    _0x2aa185.appendChild(_0x51b5ae),
-    _0x2aa185.appendChild(_0x417319),
-    _0x2aa185.appendChild(_0xdc811c),
-    _0x2aa185.appendChild(_0x3d752f),
-    _0x2aa185.appendChild(_0x4ad6e8),
-    document.body.appendChild(_0x2aa185),
+    el4.appendChild(el5),
+    el4.appendChild(button),
+    el4.appendChild(el6),
+    el4.appendChild(button2),
+    el4.appendChild(input2),
+    el4.appendChild(el7),
+    document.body.appendChild(el4),
     bindLocaleSync());
 }
 
-export function toggleDevMode(){if(window["LOCAL_DEV_BUILD"]!==!![])return null;const _0xfbba1a=!Boolean(window['DEV_MODE']);return setDevMode(_0xfbba1a,document["getElementById"]('devEntryModeBtn')),window["showToast"]?.(_0xfbba1a?devEntryText("toasts.devOn"):devEntryText("toasts.devOff")),_0xfbba1a;}
+export function toggleDevMode() {
+  if (window['LOCAL_DEV_BUILD'] !== !![]) return null;
+  const value3 = !Boolean(window['DEV_MODE']);
+  return (
+    setDevMode(value3, document['getElementById']('devEntryModeBtn')),
+    window['showToast']?.(value3 ? devEntryText('toasts.devOn') : devEntryText('toasts.devOff')),
+    value3
+  );
+}

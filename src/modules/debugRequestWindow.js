@@ -1,1 +1,233 @@
-import{maskDebugPayloadSecrets}from'../utils/debugRequestMasking.js';import{DEBUG_WRENCH_ICON_HTML}from'../utils/debugRequestPreview.js';import{buildDebugJsonPreview}from'../utils/debugImagePreview.js';import{renderDebugRequestImages}from'./debugRequestImages.js';const windows=new WeakMap(),rememberedBounds=new WeakMap(),BOUNDS_STORAGE_KEY="aicanvas.request-debug-window.bounds.v1";function readWindowBounds(_0x3e0e37){if(rememberedBounds["has"](_0x3e0e37))return rememberedBounds['get'](_0x3e0e37);try{const _0x223b4c=JSON["parse"](_0x3e0e37['localStorage']?.["getItem"](BOUNDS_STORAGE_KEY)||"null");if(_0x223b4c&&['left',"top","width","height"]["every"](_0x599413=>Number["isFinite"](_0x223b4c[_0x599413]))&&_0x223b4c["width"]>0x0&&_0x223b4c['height']>0x0)return _0x223b4c;}catch{}return null;}export const DEBUG_GEAR_ICON="<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"m9 3-.6 2.2-2 .9-2-.6-2 3.4 1.5 1.6v2.3L2.4 15l2 3.4 2-.6 2 .9L9 21h4l.6-2.3 2-.9 2 .6 2-3.4-1.5-1.6v-2.3l1.5-1.6-2-3.4-2 .6-2-.9L13 3Z\"/><circle cx=\"11\" cy=\"12\" r=\"3\"/></svg>";export function isRequestDebugEnabled(_0x18f06c=globalThis['window']){return _0x18f06c?.["DEV_MODE"]===!![];}export function renderRequestDebugButton(_0x13e6f1=''){return "<button type=\"button\" class=\"request-debug-trigger debug-wrench-btn\" aria-label=\"调试请求\" data-tooltip=\"预览生成提示词和请求参数\" "+_0x13e6f1+'>'+DEBUG_GEAR_ICON+"</button>";}export function closeDebugRequestWindow(_0x466867=globalThis["document"]){windows["get"](_0x466867)?.['close']();}export function openDebugRequestWindow({documentObject:documentObject=globalThis["document"],windowObject:windowObject=documentObject?.["defaultView"]||globalThis["window"],title:title="API 请求调试",subtitle:subtitle='',outputText:_0x5cdac5,payload:_0x3fe303,tabs:_0xed68af,images:_0xf41945,prepare:_0x7ef24,requireDeveloperMode:requireDeveloperMode=!![]}={}){if(!documentObject?.['body']||requireDeveloperMode&&!isRequestDebugEnabled(windowObject))return null;closeDebugRequestWindow(documentObject);const _0x32190a=documentObject["activeElement"],_0x38a8dc=documentObject["createElement"]("section");_0x38a8dc["className"]='request-debug-window',_0x38a8dc["setAttribute"]("role",'dialog'),_0x38a8dc["setAttribute"]("aria-label",title),_0x38a8dc["innerHTML"]='<header\x20class=\x22request-debug-header\x22><strong></strong><button\x20type=\x22button\x22\x20aria-label=\x22关闭调试窗口\x22>×</button></header><p\x20class=\x22request-debug-subtitle\x22></p><nav\x20class=\x22request-debug-tabs\x22></nav><pre\x20class=\x22request-debug-code\x20custom-scrollbar\x22\x20tabindex=\x220\x22></pre><footer><span\x20role=\x22status\x22></span><button\x20type=\x22button\x22>复制当前内容</button></footer>',_0x38a8dc["querySelector"]("strong")["textContent"]=title,_0x38a8dc["querySelector"](".request-debug-subtitle")["textContent"]=subtitle;const _0x59831e=_0x38a8dc["querySelector"]("pre"),_0x214ed8=_0x38a8dc['querySelector']('nav'),_0x559616=_0x38a8dc['querySelector']("[role=\"status\"]"),_0x4689e0=_0x38a8dc["querySelector"]("footer button"),_0xdc701b=documentObject["createElement"]("div");_0xdc701b['className']="request-debug-image-preview",_0xdc701b["hidden"]=!![],_0x38a8dc["append"](_0xdc701b);let _0x542584='',_0x3c8e2a=![],_0x47eec2=null,_0x4259c3=null;const _0x3bce4d=[],_0x21c3b6=(_0x52a599,_0x2fff5a,_0x344dd9,_0x1b869d)=>{_0x52a599['addEventListener'](_0x2fff5a,_0x344dd9,_0x1b869d),_0x3bce4d['push'](()=>_0x52a599["removeEventListener"](_0x2fff5a,_0x344dd9,_0x1b869d));},_0x372544=()=>{windowObject["clearTimeout"](_0x4259c3),_0x4259c3=null;if(!_0x38a8dc["isConnected"])return;const _0x34bbb9=_0x38a8dc['getBoundingClientRect'](),_0x34458c=windowObject["getComputedStyle"](_0x38a8dc),_0x3983d3={'left':_0x34bbb9["left"],'top':_0x34bbb9['top'],'width':parseFloat(_0x34458c["width"]),'height':parseFloat(_0x34458c["height"])};if(!(_0x3983d3["width"]>0x0&&_0x3983d3["height"]>0x0))return;rememberedBounds["set"](windowObject,_0x3983d3);try{windowObject["localStorage"]?.["setItem"](BOUNDS_STORAGE_KEY,JSON["stringify"](_0x3983d3));}catch{}},_0x426a23=()=>{windowObject["clearTimeout"](_0x4259c3),_0x4259c3=windowObject["setTimeout"](_0x372544,0x96);},_0x4dda71=()=>{if(_0x3c8e2a)return;_0x372544(),_0x3c8e2a=!![],_0x3bce4d['forEach'](_0x6beaac=>_0x6beaac()),_0x38a8dc["remove"](),windows["delete"](documentObject);if(_0x32190a?.["isConnected"])_0x32190a["focus"]?.({'preventScroll':!![]});},_0x1e1f1c=(_0x3d8291,_0x35fb12)=>{const _0x3381a1=_0x38a8dc['getBoundingClientRect']();_0x38a8dc['style']["left"]=Math["max"](0x0,Math['min'](_0x3d8291,windowObject['innerWidth']-_0x3381a1['width']))+'px',_0x38a8dc["style"]['top']=Math["max"](0x0,Math['min'](_0x35fb12,windowObject['innerHeight']-_0x3381a1['height']))+'px',_0x38a8dc['style']['right']="auto";};_0x21c3b6(_0x38a8dc["querySelector"]("header button"),"click",_0x4dda71),_0x21c3b6(_0x38a8dc,"keydown",_0x543c74=>{_0x543c74["stopPropagation"]();_0x543c74["key"]==='Escape'&&(_0x543c74["preventDefault"](),_0x4dda71());if((_0x543c74["ctrlKey"]||_0x543c74["metaKey"])&&_0x543c74["key"]["toLowerCase"]()==='a'&&_0x543c74["target"]===_0x59831e){_0x543c74['preventDefault']();const _0xeab85=documentObject["createRange"]();_0xeab85["selectNodeContents"](_0x59831e);const _0x45b18b=windowObject["getSelection"]();_0x45b18b["removeAllRanges"](),_0x45b18b['addRange'](_0xeab85);}}),_0x21c3b6(_0x38a8dc,"pointerdown",_0x5cb4de=>_0x5cb4de["stopPropagation"]()),_0x21c3b6(_0x38a8dc,'wheel',_0x376142=>_0x376142["stopPropagation"](),{'passive':!![]}),_0x21c3b6(_0x59831e,"scroll",()=>{_0xdc701b["hidden"]=!![],_0xdc701b['replaceChildren']();},{'passive':!![]}),_0x21c3b6(_0x38a8dc["querySelector"]("header"),"pointerdown",_0x2384b6=>{if(_0x2384b6["button"]!==0x0||_0x2384b6["target"]["closest"]("button"))return;_0x2384b6["preventDefault"]();const _0x1a5a9d=_0x38a8dc['getBoundingClientRect']();_0x47eec2={'x':_0x2384b6["clientX"]-_0x1a5a9d["left"],'y':_0x2384b6["clientY"]-_0x1a5a9d['top']};}),_0x21c3b6(windowObject,'pointermove',_0x397910=>{if(_0x47eec2)_0x1e1f1c(_0x397910['clientX']-_0x47eec2['x'],_0x397910["clientY"]-_0x47eec2['y']);}),_0x21c3b6(windowObject,"pointerup",()=>{if(_0x47eec2)_0x372544();_0x47eec2=null;}),_0x21c3b6(windowObject,"pointercancel",()=>{if(_0x47eec2)_0x372544();_0x47eec2=null;}),_0x21c3b6(windowObject,"pagehide",_0x372544),_0x21c3b6(windowObject,"resize",()=>{const _0x199326=_0x38a8dc["getBoundingClientRect"]();_0x1e1f1c(_0x199326["left"],_0x199326['top']);}),_0x21c3b6(windowObject,"dev-mode-changed",()=>{if(!isRequestDebugEnabled(windowObject))_0x4dda71();}),_0x21c3b6(_0x4689e0,"click",async()=>{try{await windowObject["navigator"]["clipboard"]["writeText"](_0x542584);if(!_0x3c8e2a)_0x559616["textContent"]='已复制';}catch{if(!_0x3c8e2a)_0x559616["textContent"]="复制失败，可选择文本手动复制";}});const _0x63fefd=(_0x534100={})=>{if(_0x3c8e2a)return;_0x38a8dc["removeAttribute"]("aria-busy"),_0x4689e0["disabled"]=![],_0x559616["textContent"]='只读预览\x20·\x20未提交生成';const _0x16c657=_0x534100["tabs"]||[{'label':"请求参数",..._0x534100["outputText"]!=null?{'content':_0x534100["outputText"],'images':_0x534100["images"]}:buildDebugJsonPreview(maskDebugPayloadSecrets(_0x534100["payload"]||{}))}];_0x214ed8['replaceChildren'](),_0x16c657['forEach']((_0x3500ab,_0x58badc)=>{const _0x3a6e53=documentObject['createElement']("button");_0x3a6e53["type"]="button",_0x3a6e53['textContent']=_0x3500ab["label"],_0x3a6e53['addEventListener']('click',()=>{_0x542584=_0x3500ab["content"]||'',renderDebugRequestImages(_0x59831e,_0x542584,_0x3500ab["images"],_0xdc701b),_0x214ed8["querySelectorAll"]("button")["forEach"](_0x1bf1f1=>_0x1bf1f1["setAttribute"]("aria-pressed",String(_0x1bf1f1===_0x3a6e53)));}),_0x214ed8['append'](_0x3a6e53);if(!_0x58badc)_0x3a6e53["click"]();});};documentObject["body"]['append'](_0x38a8dc);const _0x38205f=readWindowBounds(windowObject);_0x38205f&&(_0x38a8dc["style"]["width"]=_0x38205f['width']+'px',_0x38a8dc["style"]['height']=_0x38205f['height']+'px',_0x1e1f1c(_0x38205f['left'],_0x38205f["top"]));if(windowObject["ResizeObserver"]){const _0x57a60c=new windowObject[("ResizeObserver")](()=>{if(!_0x3c8e2a){const _0x195f03=_0x38a8dc['getBoundingClientRect']();_0x1e1f1c(_0x195f03["left"],_0x195f03["top"]),_0x426a23();}});_0x57a60c["observe"](_0x38a8dc),_0x3bce4d['push'](()=>_0x57a60c["disconnect"]());}windows["set"](documentObject,{'close':_0x4dda71,'root':_0x38a8dc}),_0x38a8dc["querySelector"]("header button")["focus"]({'preventScroll':!![]});if(_0x7ef24)_0x38a8dc["setAttribute"]("aria-busy",'true'),_0x59831e["textContent"]='正在组装调试内容…',_0x4689e0['disabled']=!![],_0x559616['innerHTML']=DEBUG_WRENCH_ICON_HTML,Promise["resolve"]()["then"](_0x7ef24)['then'](_0x63fefd,_0x4cff7c=>{_0x63fefd({'outputText':_0x4cff7c?.['message']||"请求预览失败"});if(!_0x3c8e2a)_0x559616["textContent"]="组装失败 · 未提交生成";});else _0x63fefd({'outputText':_0x5cdac5,'payload':_0x3fe303,'tabs':_0xed68af,'images':_0xf41945});return{'root':_0x38a8dc,'close':_0x4dda71,'update':_0x63fefd};}
+import { maskDebugPayloadSecrets } from '../utils/debugRequestMasking.js';
+import { DEBUG_WRENCH_ICON_HTML } from '../utils/debugRequestPreview.js';
+import { buildDebugJsonPreview } from '../utils/debugImagePreview.js';
+import { renderDebugRequestImages } from './debugRequestImages.js';
+const windows = new WeakMap(),
+  rememberedBounds = new WeakMap(),
+  BOUNDS_STORAGE_KEY = 'aicanvas.request-debug-window.bounds.v1';
+function readWindowBounds(value) {
+  if (rememberedBounds['has'](value)) return rememberedBounds['get'](value);
+  try {
+    const box = JSON['parse'](value['localStorage']?.['getItem'](BOUNDS_STORAGE_KEY) || 'null');
+    if (
+      box &&
+      ['left', 'top', 'width', 'height']['every']((item) => Number['isFinite'](box[item])) &&
+      box['width'] > 0x0 &&
+      box['height'] > 0x0
+    )
+      return box;
+  } catch {}
+  return null;
+}
+export const DEBUG_GEAR_ICON =
+  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 3-.6 2.2-2 .9-2-.6-2 3.4 1.5 1.6v2.3L2.4 15l2 3.4 2-.6 2 .9L9 21h4l.6-2.3 2-.9 2 .6 2-3.4-1.5-1.6v-2.3l1.5-1.6-2-3.4-2 .6-2-.9L13 3Z"/><circle cx="11" cy="12" r="3"/></svg>';
+export function isRequestDebugEnabled(key = globalThis['window']) {
+  return key?.['DEV_MODE'] === !![];
+}
+export function renderRequestDebugButton(index = '') {
+  return (
+    '<button type="button" class="request-debug-trigger debug-wrench-btn" aria-label="调试请求" data-tooltip="预览生成提示词和请求参数" ' +
+    index +
+    '>' +
+    DEBUG_GEAR_ICON +
+    '</button>'
+  );
+}
+export function closeDebugRequestWindow(result = globalThis['document']) {
+  windows['get'](result)?.['close']();
+}
+export function openDebugRequestWindow({
+  documentObject: documentObject = globalThis['document'],
+  windowObject: windowObject = documentObject?.['defaultView'] || globalThis['window'],
+  title: title = 'API 请求调试',
+  subtitle: subtitle = '',
+  outputText: outputText,
+  payload: payload,
+  tabs: tabs,
+  images: images,
+  prepare: prepare,
+  requireDeveloperMode: requireDeveloperMode = !![],
+} = {}) {
+  if (!documentObject?.['body'] || (requireDeveloperMode && !isRequestDebugEnabled(windowObject)))
+    return null;
+  closeDebugRequestWindow(documentObject);
+  const data = documentObject['activeElement'],
+    el = documentObject['createElement']('section');
+  ((el['className'] = 'request-debug-window'),
+    el['setAttribute']('role', 'dialog'),
+    el['setAttribute']('aria-label', title),
+    (el['innerHTML'] =
+      '<header\x20class=\x22request-debug-header\x22><strong></strong><button\x20type=\x22button\x22\x20aria-label=\x22关闭调试窗口\x22>×</button></header><p\x20class=\x22request-debug-subtitle\x22></p><nav\x20class=\x22request-debug-tabs\x22></nav><pre\x20class=\x22request-debug-code\x20custom-scrollbar\x22\x20tabindex=\x220\x22></pre><footer><span\x20role=\x22status\x22></span><button\x20type=\x22button\x22>复制当前内容</button></footer>'),
+    (el['querySelector']('strong')['textContent'] = title),
+    (el['querySelector']('.request-debug-subtitle')['textContent'] = subtitle));
+  const options = el['querySelector']('pre'),
+    target = el['querySelector']('nav'),
+    el2 = el['querySelector']('[role="status"]'),
+    el3 = el['querySelector']('footer button'),
+    source = documentObject['createElement']('div');
+  ((source['className'] = 'request-debug-image-preview'), (source['hidden'] = !![]), el['append'](source));
+  let next = '',
+    enabled = ![],
+    box2 = null,
+    current = null;
+  const list = [],
+    handler = (el4, entry, record, handle) => {
+      (el4['addEventListener'](entry, record, handle),
+        list['push'](() => el4['removeEventListener'](entry, record, handle)));
+    },
+    handler2 = () => {
+      (windowObject['clearTimeout'](current), (current = null));
+      if (!el['isConnected']) return;
+      const box3 = el['getBoundingClientRect'](),
+        state = windowObject['getComputedStyle'](el),
+        config = {
+          left: box3['left'],
+          top: box3['top'],
+          width: parseFloat(state['width']),
+          height: parseFloat(state['height']),
+        };
+      if (!(config['width'] > 0x0 && config['height'] > 0x0)) return;
+      rememberedBounds['set'](windowObject, config);
+      try {
+        windowObject['localStorage']?.['setItem'](BOUNDS_STORAGE_KEY, JSON['stringify'](config));
+      } catch {}
+    },
+    handler3 = () => {
+      (windowObject['clearTimeout'](current), (current = windowObject['setTimeout'](handler2, 0x96)));
+    },
+    handler4 = () => {
+      if (enabled) return;
+      (handler2(),
+        (enabled = !![]),
+        list['forEach']((handler5) => handler5()),
+        el['remove'](),
+        windows['delete'](documentObject));
+      if (data?.['isConnected']) data['focus']?.({ preventScroll: !![] });
+    },
+    handler6 = (scope, input) => {
+      const box4 = el['getBoundingClientRect']();
+      ((el['style']['left'] =
+        Math['max'](0x0, Math['min'](scope, windowObject['innerWidth'] - box4['width'])) + 'px'),
+        (el['style']['top'] =
+          Math['max'](0x0, Math['min'](input, windowObject['innerHeight'] - box4['height'])) + 'px'),
+        (el['style']['right'] = 'auto'));
+    };
+  (handler(el['querySelector']('header button'), 'click', handler4),
+    handler(el, 'keydown', (event) => {
+      event['stopPropagation']();
+      event['key'] === 'Escape' && (event['preventDefault'](), handler4());
+      if (
+        (event['ctrlKey'] || event['metaKey']) &&
+        event['key']['toLowerCase']() === 'a' &&
+        event['target'] === options
+      ) {
+        event['preventDefault']();
+        const output = documentObject['createRange']();
+        output['selectNodeContents'](options);
+        const value2 = windowObject['getSelection']();
+        (value2['removeAllRanges'](), value2['addRange'](output));
+      }
+    }),
+    handler(el, 'pointerdown', (value3) => value3['stopPropagation']()),
+    handler(el, 'wheel', (value4) => value4['stopPropagation'](), { passive: !![] }),
+    handler(
+      options,
+      'scroll',
+      () => {
+        ((source['hidden'] = !![]), source['replaceChildren']());
+      },
+      { passive: !![] },
+    ),
+    handler(el['querySelector']('header'), 'pointerdown', (value5) => {
+      if (value5['button'] !== 0x0 || value5['target']['closest']('button')) return;
+      value5['preventDefault']();
+      const box5 = el['getBoundingClientRect']();
+      box2 = { x: value5['clientX'] - box5['left'], y: value5['clientY'] - box5['top'] };
+    }),
+    handler(windowObject, 'pointermove', (event2) => {
+      if (box2) handler6(event2['clientX'] - box2['x'], event2['clientY'] - box2['y']);
+    }),
+    handler(windowObject, 'pointerup', () => {
+      if (box2) handler2();
+      box2 = null;
+    }),
+    handler(windowObject, 'pointercancel', () => {
+      if (box2) handler2();
+      box2 = null;
+    }),
+    handler(windowObject, 'pagehide', handler2),
+    handler(windowObject, 'resize', () => {
+      const box6 = el['getBoundingClientRect']();
+      handler6(box6['left'], box6['top']);
+    }),
+    handler(windowObject, 'dev-mode-changed', () => {
+      if (!isRequestDebugEnabled(windowObject)) handler4();
+    }),
+    handler(el3, 'click', async () => {
+      try {
+        await windowObject['navigator']['clipboard']['writeText'](next);
+        if (!enabled) el2['textContent'] = '已复制';
+      } catch {
+        if (!enabled) el2['textContent'] = '复制失败，可选择文本手动复制';
+      }
+    }));
+  const run = (args = {}) => {
+    if (enabled) return;
+    (el['removeAttribute']('aria-busy'),
+      (el3['disabled'] = ![]),
+      (el2['textContent'] = '只读预览\x20·\x20未提交生成'));
+    const list2 = args['tabs'] || [
+      {
+        label: '请求参数',
+        ...(args['outputText'] != null
+          ? { content: args['outputText'], images: args['images'] }
+          : buildDebugJsonPreview(maskDebugPayloadSecrets(args['payload'] || {}))),
+      },
+    ];
+    (target['replaceChildren'](),
+      list2['forEach']((value6, enabled2) => {
+        const el5 = documentObject['createElement']('button');
+        ((el5['type'] = 'button'),
+          (el5['textContent'] = value6['label']),
+          el5['addEventListener']('click', () => {
+            ((next = value6['content'] || ''),
+              renderDebugRequestImages(options, next, value6['images'], source),
+              target['querySelectorAll']('button')['forEach']((value7) =>
+                value7['setAttribute']('aria-pressed', String(value7 === el5)),
+              ));
+          }),
+          target['append'](el5));
+        if (!enabled2) el5['click']();
+      }));
+  };
+  documentObject['body']['append'](el);
+  const box7 = readWindowBounds(windowObject);
+  box7 &&
+    ((el['style']['width'] = box7['width'] + 'px'),
+    (el['style']['height'] = box7['height'] + 'px'),
+    handler6(box7['left'], box7['top']));
+  if (windowObject['ResizeObserver']) {
+    const value8 = new windowObject['ResizeObserver'](() => {
+      if (!enabled) {
+        const value9 = el['getBoundingClientRect']();
+        (handler6(value9['left'], value9['top']), handler3());
+      }
+    });
+    (value8['observe'](el), list['push'](() => value8['disconnect']()));
+  }
+  (windows['set'](documentObject, { close: handler4, root: el }),
+    el['querySelector']('header button')['focus']({ preventScroll: !![] }));
+  if (prepare)
+    (el['setAttribute']('aria-busy', 'true'),
+      (options['textContent'] = '正在组装调试内容…'),
+      (el3['disabled'] = !![]),
+      (el2['innerHTML'] = DEBUG_WRENCH_ICON_HTML),
+      Promise['resolve']()
+        ['then'](prepare)
+        ['then'](run, (error) => {
+          run({ outputText: error?.['message'] || '请求预览失败' });
+          if (!enabled) el2['textContent'] = '组装失败 · 未提交生成';
+        }));
+  else run({ outputText: outputText, payload: payload, tabs: tabs, images: images });
+  return { root: el, close: handler4, update: run };
+}

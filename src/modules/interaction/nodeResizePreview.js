@@ -1,173 +1,173 @@
 import { beginResizeFpsSession, endResizeFpsSession } from '../perf/perfProbe.js';
 const RESIZE_BODY_CLASS = 'is-node-resizing',
   RESIZE_NODE_CLASS = 'is-resizing';
-function requestFrame(_0x2cc2cd) {
-  if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(_0x2cc2cd);
-  return setTimeout(_0x2cc2cd, 0);
+function requestFrame(value) {
+  if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(value);
+  return setTimeout(value, 0);
 }
-function cancelFrame(_0x5eaa83) {
-  if (!_0x5eaa83) return;
+function cancelFrame(enabled) {
+  if (!enabled) return;
   if (typeof cancelAnimationFrame === 'function') {
-    cancelAnimationFrame(_0x5eaa83);
+    cancelAnimationFrame(enabled);
     return;
   }
-  clearTimeout(_0x5eaa83);
+  clearTimeout(enabled);
 }
-function toFiniteNumber(_0x1b891e, _0x1979df) {
-  const _0x419b6b = Number(_0x1b891e);
-  return Number.isFinite(_0x419b6b) ? _0x419b6b : _0x1979df;
+function toFiniteNumber(item, key) {
+  const index = Number(item);
+  return Number.isFinite(index) ? index : key;
 }
-function normalizeSize(_0x28be1a, _0x4707ad, _0x8549ce) {
+function normalizeSize(box, result, data) {
   return {
-    width: Math.max(1, toFiniteNumber(_0x28be1a?.width, _0x4707ad)),
-    height: Math.max(1, toFiniteNumber(_0x28be1a?.height, _0x8549ce)),
+    width: Math.max(1, toFiniteNumber(box?.width, result)),
+    height: Math.max(1, toFiniteNumber(box?.height, data)),
   };
 }
-function sizesEqual(_0x1cd602, _0x4da5fd) {
+function sizesEqual(box2, box3) {
   return (
-    Math.round(toFiniteNumber(_0x1cd602?.width, 0)) === Math.round(toFiniteNumber(_0x4da5fd?.width, 0)) &&
-    Math.round(toFiniteNumber(_0x1cd602?.height, 0)) === Math.round(toFiniteNumber(_0x4da5fd?.height, 0))
+    Math.round(toFiniteNumber(box2?.width, 0)) === Math.round(toFiniteNumber(box3?.width, 0)) &&
+    Math.round(toFiniteNumber(box2?.height, 0)) === Math.round(toFiniteNumber(box3?.height, 0))
   );
 }
-function applyPreviewSize(_0x2eda02, _0x3f43e3) {
-  if (!_0x2eda02?.style) return;
-  ((_0x2eda02.style.width = _0x3f43e3.width + 'px'), (_0x2eda02.style.height = _0x3f43e3.height + 'px'));
+function applyPreviewSize(el, box4) {
+  if (!el?.style) return;
+  ((el.style.width = box4.width + 'px'), (el.style.height = box4.height + 'px'));
 }
-function syncPreviewGeometry(_0xf6ee90, _0x6b5153, _0x5178f9, _0x80868c) {
-  const _0x1d6ffe = typeof window !== 'undefined' ? window : null;
-  if (!_0x1d6ffe || !_0xf6ee90 || !_0x6b5153) return;
-  _0x1d6ffe.v2Renderer?.previewNodeResizeGeometry?.({
-    nodeId: _0xf6ee90,
-    width: _0x6b5153.width,
-    height: _0x6b5153.height,
+function syncPreviewGeometry(nodeId, width, options, target) {
+  const enabled2 = typeof window !== 'undefined' ? window : null;
+  if (!enabled2 || !nodeId || !width) return;
+  enabled2.v2Renderer?.previewNodeResizeGeometry?.({
+    nodeId: nodeId,
+    width: width.width,
+    height: width.height,
   });
-  const _0x381d8d =
-    typeof _0x1d6ffe._v2UpdateSidePlusNow === 'function'
-      ? _0x1d6ffe._v2UpdateSidePlusNow
-      : _0x1d6ffe._v2UpdateSidePlus;
-  if (typeof _0x381d8d !== 'function') return;
-  _0x381d8d(
-    Number.isFinite(_0x1d6ffe._lastMx) ? _0x1d6ffe._lastMx : _0x5178f9,
-    Number.isFinite(_0x1d6ffe._lastMy) ? _0x1d6ffe._lastMy : _0x80868c,
-    { nodeSizeOverrides: { [_0xf6ee90]: { width: _0x6b5153.width, height: _0x6b5153.height } } },
+  const run =
+    typeof enabled2._v2UpdateSidePlusNow === 'function'
+      ? enabled2._v2UpdateSidePlusNow
+      : enabled2._v2UpdateSidePlus;
+  if (typeof run !== 'function') return;
+  run(
+    Number.isFinite(enabled2._lastMx) ? enabled2._lastMx : options,
+    Number.isFinite(enabled2._lastMy) ? enabled2._lastMy : target,
+    { nodeSizeOverrides: { [nodeId]: { width: width.width, height: width.height } } },
   );
 }
-function readViewportZoom(_0x5fb702) {
-  const _0x1cfb70 = (typeof _0x5fb702 === 'function' && _0x5fb702()) || { zoom: 1 };
-  return Math.max(0.01, toFiniteNumber(_0x1cfb70.zoom, 1));
+function readViewportZoom(handler) {
+  const box5 = (typeof handler === 'function' && handler()) || { zoom: 1 };
+  return Math.max(0.01, toFiniteNumber(box5.zoom, 1));
 }
 export function startNodeResizePreview({
-  event: _0x30761e,
-  nodeId: _0xc41a0e,
-  getNode: _0x5d2117,
-  getViewport: _0x163573,
-  resolveSize: _0x1a034e,
-  applyPatch: _0x15b520,
-  buildFinalPatch: _0xe577fc,
-  afterApply: _0x528cef,
-  onPreview: _0x35a3d8,
-  onPreviewEnd: _0x5f160a,
-  commit: _0x3565f3,
+  event: event,
+  nodeId: nodeId2,
+  getNode: getNode,
+  getViewport: getViewport,
+  resolveSize: resolveSize,
+  applyPatch: applyPatch,
+  buildFinalPatch: buildFinalPatch,
+  afterApply: afterApply,
+  onPreview: onPreview,
+  onPreviewEnd: onPreviewEnd,
+  commit: commit,
   label: label = 'node-resize',
 } = {}) {
-  if (!_0x30761e || !_0xc41a0e || typeof _0x1a034e !== 'function') return false;
-  (_0x30761e.preventDefault?.(), _0x30761e.stopPropagation?.());
-  const _0x15b35c = (typeof _0x5d2117 === 'function' && _0x5d2117()) || {},
-    _0x437bc1 = toFiniteNumber(_0x30761e.clientX, 0),
-    _0x190025 = toFiniteNumber(_0x30761e.clientY, 0),
-    _0x15b68e = Math.max(1, toFiniteNumber(_0x15b35c.width, 0x104)),
-    _0x51c4d2 = Math.max(1, toFiniteNumber(_0x15b35c.height, 0x104)),
-    _0x4e9c74 = { width: _0x15b68e, height: _0x51c4d2 },
-    _0x205038 = typeof document !== 'undefined' ? document.getElementById(_0xc41a0e) : null,
-    _0x5d4d28 = typeof document !== 'undefined' ? document.body : null;
-  let _0x445e9a = null,
-    _0x57515e = _0x4e9c74,
-    _0x178fe7 = _0x437bc1,
-    _0x138fb8 = _0x190025,
-    _0x48d62e = 0,
-    _0x3f7a50 = false;
-  const _0x2067cd = () => {
-      _0x48d62e = 0;
-      if (!_0x445e9a) return;
-      ((_0x57515e = _0x445e9a),
-        (_0x445e9a = null),
-        applyPreviewSize(_0x205038, _0x57515e),
-        syncPreviewGeometry(_0xc41a0e, _0x57515e, _0x178fe7, _0x138fb8),
-        _0x35a3d8?.(_0x57515e));
+  if (!event || !nodeId2 || typeof resolveSize !== 'function') return false;
+  (event.preventDefault?.(), event.stopPropagation?.());
+  const startNode = (typeof getNode === 'function' && getNode()) || {},
+    toFiniteNumber2 = toFiniteNumber(event.clientX, 0),
+    toFiniteNumber3 = toFiniteNumber(event.clientY, 0),
+    width2 = Math.max(1, toFiniteNumber(startNode.width, 0x104)),
+    height = Math.max(1, toFiniteNumber(startNode.height, 0x104)),
+    startSize = { width: width2, height: height },
+    el2 = typeof document !== 'undefined' ? document.getElementById(nodeId2) : null,
+    el3 = typeof document !== 'undefined' ? document.body : null;
+  let enabled3 = null,
+    source = startSize,
+    toFiniteNumber4 = toFiniteNumber2,
+    toFiniteNumber5 = toFiniteNumber3,
+    requestFrame2 = 0,
+    next = false;
+  const run2 = () => {
+      requestFrame2 = 0;
+      if (!enabled3) return;
+      ((source = enabled3),
+        (enabled3 = null),
+        applyPreviewSize(el2, source),
+        syncPreviewGeometry(nodeId2, source, toFiniteNumber4, toFiniteNumber5),
+        onPreview?.(source));
     },
-    _0x4891b3 = (_0x1acf6e) => {
-      _0x445e9a = _0x1acf6e;
-      if (_0x48d62e) return;
-      _0x48d62e = requestFrame(_0x2067cd);
+    handler2 = (current) => {
+      enabled3 = current;
+      if (requestFrame2) return;
+      requestFrame2 = requestFrame(run2);
     },
-    _0x558392 = () => {
-      (_0x48d62e && (cancelFrame(_0x48d62e), (_0x48d62e = 0)),
-        window.removeEventListener('pointermove', _0x27d99b),
-        window.removeEventListener('pointerup', _0xc37cf2),
-        window.removeEventListener('pointercancel', _0xc37cf2),
-        _0x5d4d28?.classList?.remove(RESIZE_BODY_CLASS),
-        _0x205038?.classList?.remove(RESIZE_NODE_CLASS),
-        _0x5f160a?.(),
+    handler3 = () => {
+      (requestFrame2 && (cancelFrame(requestFrame2), (requestFrame2 = 0)),
+        window.removeEventListener('pointermove', run3),
+        window.removeEventListener('pointerup', run4),
+        window.removeEventListener('pointercancel', run4),
+        el3?.classList?.remove(RESIZE_BODY_CLASS),
+        el2?.classList?.remove(RESIZE_NODE_CLASS),
+        onPreviewEnd?.(),
         endResizeFpsSession(label));
     },
-    _0x46c0a8 = () => {
-      const _0x17a48c = _0x445e9a || _0x57515e;
-      if (_0x445e9a) _0x2067cd();
-      const _0x4967ff =
-          (typeof _0xe577fc === 'function' &&
-            _0xe577fc({ startNode: _0x15b35c, startSize: _0x4e9c74, finalSize: _0x17a48c })) ||
+    handler4 = () => {
+      const finalSize = enabled3 || source;
+      if (enabled3) run2();
+      const args =
+          (typeof buildFinalPatch === 'function' &&
+            buildFinalPatch({ startNode: startNode, startSize: startSize, finalSize: finalSize })) ||
           {},
-        _0x391eb0 = Object.keys(_0x4967ff).length > 0,
-        _0x14588c = !sizesEqual(_0x17a48c, _0x4e9c74);
-      let _0x3303eb = false;
-      (_0x14588c || _0x391eb0) &&
-        typeof _0x15b520 === 'function' &&
-        (_0x15b520({ width: _0x17a48c.width, height: _0x17a48c.height, ..._0x4967ff }), (_0x3303eb = true));
-      syncPreviewGeometry(_0xc41a0e, _0x17a48c, _0x178fe7, _0x138fb8);
-      const _0x1db263 =
-        typeof _0x528cef === 'function' &&
-        _0x528cef({
-          startNode: _0x15b35c,
-          startSize: _0x4e9c74,
-          finalSize: _0x17a48c,
-          didApply: _0x3303eb,
+        entry = Object.keys(args).length > 0,
+        record = !sizesEqual(finalSize, startSize);
+      let didApply = false;
+      (record || entry) &&
+        typeof applyPatch === 'function' &&
+        (applyPatch({ width: finalSize.width, height: finalSize.height, ...args }), (didApply = true));
+      syncPreviewGeometry(nodeId2, finalSize, toFiniteNumber4, toFiniteNumber5);
+      const payload =
+        typeof afterApply === 'function' &&
+        afterApply({
+          startNode: startNode,
+          startSize: startSize,
+          finalSize: finalSize,
+          didApply: didApply,
         }) === true;
-      (_0x3303eb || _0x1db263) && typeof _0x3565f3 === 'function' && _0x3565f3();
+      (didApply || payload) && typeof commit === 'function' && commit();
     };
-  function _0x27d99b(_0x517822) {
-    if (_0x3f7a50) return;
-    ((_0x178fe7 = toFiniteNumber(_0x517822.clientX, _0x178fe7)),
-      (_0x138fb8 = toFiniteNumber(_0x517822.clientY, _0x138fb8)));
-    const _0x293e88 = readViewportZoom(_0x163573),
-      _0x3d3b68 = (_0x178fe7 - _0x437bc1) / _0x293e88,
-      _0x7b71da = (_0x138fb8 - _0x190025) / _0x293e88,
-      _0x2b4026 = normalizeSize(
-        _0x1a034e({
-          startNode: _0x15b35c,
-          startWidth: _0x15b68e,
-          startHeight: _0x51c4d2,
-          dx: _0x3d3b68,
-          dy: _0x7b71da,
-          event: _0x517822,
+  function run3(event2) {
+    if (next) return;
+    ((toFiniteNumber4 = toFiniteNumber(event2.clientX, toFiniteNumber4)),
+      (toFiniteNumber5 = toFiniteNumber(event2.clientY, toFiniteNumber5)));
+    const viewportZoom = readViewportZoom(getViewport),
+      dx = (toFiniteNumber4 - toFiniteNumber2) / viewportZoom,
+      dy = (toFiniteNumber5 - toFiniteNumber3) / viewportZoom,
+      size = normalizeSize(
+        resolveSize({
+          startNode: startNode,
+          startWidth: width2,
+          startHeight: height,
+          dx: dx,
+          dy: dy,
+          event: event2,
         }),
-        _0x15b68e,
-        _0x51c4d2,
+        width2,
+        height,
       );
-    if (_0x445e9a && sizesEqual(_0x445e9a, _0x2b4026)) return;
-    if (!_0x445e9a && sizesEqual(_0x57515e, _0x2b4026)) return;
-    _0x4891b3(_0x2b4026);
+    if (enabled3 && sizesEqual(enabled3, size)) return;
+    if (!enabled3 && sizesEqual(source, size)) return;
+    handler2(size);
   }
-  function _0xc37cf2() {
-    if (_0x3f7a50) return;
-    ((_0x3f7a50 = true), _0x558392(), _0x46c0a8());
+  function run4() {
+    if (next) return;
+    ((next = true), handler3(), handler4());
   }
   return (
-    _0x5d4d28?.classList?.add(RESIZE_BODY_CLASS),
-    _0x205038?.classList?.add(RESIZE_NODE_CLASS),
+    el3?.classList?.add(RESIZE_BODY_CLASS),
+    el2?.classList?.add(RESIZE_NODE_CLASS),
     beginResizeFpsSession(label),
-    window.addEventListener('pointermove', _0x27d99b),
-    window.addEventListener('pointerup', _0xc37cf2),
-    window.addEventListener('pointercancel', _0xc37cf2),
+    window.addEventListener('pointermove', run3),
+    window.addEventListener('pointerup', run4),
+    window.addEventListener('pointercancel', run4),
     true
   );
 }

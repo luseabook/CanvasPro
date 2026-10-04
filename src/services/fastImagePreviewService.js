@@ -1,169 +1,166 @@
 const DEFAULT_PREVIEW_MAX_DIMENSION = 0x400,
   DEFAULT_HEADER_BYTES = 0x200 * 0x400,
   JPEG_SOF_MARKERS = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
-function positiveInteger(_0x3d6424) {
-  const _0x14d364 = Math['round'](Number(_0x3d6424) || 0x0);
-  return _0x14d364 > 0x0 ? _0x14d364 : 0x0;
+function positiveInteger(value) {
+  const count = Math['round'](Number(value) || 0x0);
+  return count > 0x0 ? count : 0x0;
 }
-function isJpegSofMarker(_0x13310f) {
-  return JPEG_SOF_MARKERS['has'](_0x13310f);
+function isJpegSofMarker(item) {
+  return JPEG_SOF_MARKERS['has'](item);
 }
-function readJpegSize(_0x2b63aa) {
-  if (_0x2b63aa['length'] < 0x4 || _0x2b63aa[0x0] !== 0xff || _0x2b63aa[0x1] !== 0xd8) return null;
-  let _0x472e56 = 0x2;
-  while (_0x472e56 + 0x8 < _0x2b63aa['length']) {
-    if (_0x2b63aa[_0x472e56] !== 0xff) {
-      _0x472e56 += 0x1;
+function readJpegSize(list) {
+  if (list['length'] < 0x4 || list[0x0] !== 0xff || list[0x1] !== 0xd8) return null;
+  let key = 0x2;
+  while (key + 0x8 < list['length']) {
+    if (list[key] !== 0xff) {
+      key += 0x1;
       continue;
     }
-    while (_0x472e56 < _0x2b63aa['length'] && _0x2b63aa[_0x472e56] === 0xff) _0x472e56 += 0x1;
-    const _0x3c407d = _0x2b63aa[_0x472e56];
-    _0x472e56 += 0x1;
-    if (_0x3c407d === 0xd8 || _0x3c407d === 0xd9) continue;
-    if (_0x3c407d === 0xda) break;
-    if (_0x472e56 + 0x1 >= _0x2b63aa['length']) break;
-    const _0x5db84d = (_0x2b63aa[_0x472e56] << 0x8) | _0x2b63aa[_0x472e56 + 0x1];
-    if (_0x5db84d < 0x2 || _0x472e56 + _0x5db84d > _0x2b63aa['length']) break;
-    if (isJpegSofMarker(_0x3c407d) && _0x5db84d >= 0x7) {
-      const _0x3bec3d = (_0x2b63aa[_0x472e56 + 0x3] << 0x8) | _0x2b63aa[_0x472e56 + 0x4],
-        _0xb44c18 = (_0x2b63aa[_0x472e56 + 0x5] << 0x8) | _0x2b63aa[_0x472e56 + 0x6];
-      return _0xb44c18 > 0x0 && _0x3bec3d > 0x0 ? { width: _0xb44c18, height: _0x3bec3d } : null;
+    while (key < list['length'] && list[key] === 0xff) key += 0x1;
+    const count2 = list[key];
+    key += 0x1;
+    if (count2 === 0xd8 || count2 === 0xd9) continue;
+    if (count2 === 0xda) break;
+    if (key + 0x1 >= list['length']) break;
+    const count3 = (list[key] << 0x8) | list[key + 0x1];
+    if (count3 < 0x2 || key + count3 > list['length']) break;
+    if (isJpegSofMarker(count2) && count3 >= 0x7) {
+      const height = (list[key + 0x3] << 0x8) | list[key + 0x4],
+        width = (list[key + 0x5] << 0x8) | list[key + 0x6];
+      return width > 0x0 && height > 0x0 ? { width: width, height: height } : null;
     }
-    _0x472e56 += _0x5db84d;
+    key += count3;
   }
   return null;
 }
-function readPngSize(_0xa5a4e1) {
+function readPngSize(list2) {
   if (
-    _0xa5a4e1['length'] < 0x18 ||
-    _0xa5a4e1[0x0] !== 0x89 ||
-    _0xa5a4e1[0x1] !== 0x50 ||
-    _0xa5a4e1[0x2] !== 0x4e ||
-    _0xa5a4e1[0x3] !== 0x47
+    list2['length'] < 0x18 ||
+    list2[0x0] !== 0x89 ||
+    list2[0x1] !== 0x50 ||
+    list2[0x2] !== 0x4e ||
+    list2[0x3] !== 0x47
   )
     return null;
-  const _0x36764c = new DataView(_0xa5a4e1['buffer'], _0xa5a4e1['byteOffset'], _0xa5a4e1['byteLength']),
-    _0xf67433 = _0x36764c['getUint32'](0x10, ![]),
-    _0x1cde8e = _0x36764c['getUint32'](0x14, ![]);
-  return _0xf67433 > 0x0 && _0x1cde8e > 0x0 ? { width: _0xf67433, height: _0x1cde8e } : null;
+  const dataView = new DataView(list2['buffer'], list2['byteOffset'], list2['byteLength']),
+    width2 = dataView['getUint32'](0x10, ![]),
+    height2 = dataView['getUint32'](0x14, ![]);
+  return width2 > 0x0 && height2 > 0x0 ? { width: width2, height: height2 } : null;
 }
-function readGifSize(_0x599c9a) {
-  if (_0x599c9a['length'] < 0xa) return null;
-  const _0x84d166 = String['fromCharCode'](..._0x599c9a['subarray'](0x0, 0x6));
-  if (_0x84d166 !== 'GIF87a' && _0x84d166 !== 'GIF89a') return null;
-  const _0x287cf0 = _0x599c9a[0x6] | (_0x599c9a[0x7] << 0x8),
-    _0x2ece15 = _0x599c9a[0x8] | (_0x599c9a[0x9] << 0x8);
-  return _0x287cf0 > 0x0 && _0x2ece15 > 0x0 ? { width: _0x287cf0, height: _0x2ece15 } : null;
+function readGifSize(list3) {
+  if (list3['length'] < 0xa) return null;
+  const index = String['fromCharCode'](...list3['subarray'](0x0, 0x6));
+  if (index !== 'GIF87a' && index !== 'GIF89a') return null;
+  const width3 = list3[0x6] | (list3[0x7] << 0x8),
+    height3 = list3[0x8] | (list3[0x9] << 0x8);
+  return width3 > 0x0 && height3 > 0x0 ? { width: width3, height: height3 } : null;
 }
-function readUint24LittleEndian(_0x6ba45b, _0x5a333d) {
-  return _0x6ba45b[_0x5a333d] | (_0x6ba45b[_0x5a333d + 0x1] << 0x8) | (_0x6ba45b[_0x5a333d + 0x2] << 0x10);
+function readUint24LittleEndian(result, data) {
+  return result[data] | (result[data + 0x1] << 0x8) | (result[data + 0x2] << 0x10);
 }
-function readWebpSize(_0x5c9e08) {
-  if (_0x5c9e08['length'] < 0x1e) return null;
-  const _0x2d49fe = String['fromCharCode'](..._0x5c9e08['subarray'](0x0, 0x4)),
-    _0x39abeb = String['fromCharCode'](..._0x5c9e08['subarray'](0x8, 0xc));
-  if (_0x2d49fe !== 'RIFF' || _0x39abeb !== 'WEBP') return null;
-  const _0x278275 = String['fromCharCode'](..._0x5c9e08['subarray'](0xc, 0x10));
-  if (_0x278275 === 'VP8X')
+function readWebpSize(list4) {
+  if (list4['length'] < 0x1e) return null;
+  const options = String['fromCharCode'](...list4['subarray'](0x0, 0x4)),
+    target = String['fromCharCode'](...list4['subarray'](0x8, 0xc));
+  if (options !== 'RIFF' || target !== 'WEBP') return null;
+  const source = String['fromCharCode'](...list4['subarray'](0xc, 0x10));
+  if (source === 'VP8X')
     return {
-      width: readUint24LittleEndian(_0x5c9e08, 0x18) + 0x1,
-      height: readUint24LittleEndian(_0x5c9e08, 0x1b) + 0x1,
+      width: readUint24LittleEndian(list4, 0x18) + 0x1,
+      height: readUint24LittleEndian(list4, 0x1b) + 0x1,
     };
-  if (_0x278275 === 'VP8 ' && _0x5c9e08['length'] >= 0x1e) {
-    const _0x1c162f = (_0x5c9e08[0x1a] | (_0x5c9e08[0x1b] << 0x8)) & 0x3fff,
-      _0x53a428 = (_0x5c9e08[0x1c] | (_0x5c9e08[0x1d] << 0x8)) & 0x3fff;
-    return _0x1c162f > 0x0 && _0x53a428 > 0x0 ? { width: _0x1c162f, height: _0x53a428 } : null;
+  if (source === 'VP8 ' && list4['length'] >= 0x1e) {
+    const width4 = (list4[0x1a] | (list4[0x1b] << 0x8)) & 0x3fff,
+      height4 = (list4[0x1c] | (list4[0x1d] << 0x8)) & 0x3fff;
+    return width4 > 0x0 && height4 > 0x0 ? { width: width4, height: height4 } : null;
   }
-  if (_0x278275 === 'VP8L' && _0x5c9e08['length'] >= 0x19 && _0x5c9e08[0x14] === 0x2f) {
-    const _0x1300c8 = 0x1 + (_0x5c9e08[0x15] | ((_0x5c9e08[0x16] & 0x3f) << 0x8)),
-      _0x2dd7c9 =
-        0x1 + ((_0x5c9e08[0x16] >> 0x6) | (_0x5c9e08[0x17] << 0x2) | ((_0x5c9e08[0x18] & 0xf) << 0xa));
-    return { width: _0x1300c8, height: _0x2dd7c9 };
+  if (source === 'VP8L' && list4['length'] >= 0x19 && list4[0x14] === 0x2f) {
+    const width5 = 0x1 + (list4[0x15] | ((list4[0x16] & 0x3f) << 0x8)),
+      height5 = 0x1 + ((list4[0x16] >> 0x6) | (list4[0x17] << 0x2) | ((list4[0x18] & 0xf) << 0xa));
+    return { width: width5, height: height5 };
   }
   return null;
 }
-export function readImageHeaderSize(_0xb7695f) {
-  const _0x19182b = _0xb7695f instanceof Uint8Array ? _0xb7695f : new Uint8Array(_0xb7695f || 0x0);
-  return (
-    readPngSize(_0x19182b) || readJpegSize(_0x19182b) || readWebpSize(_0x19182b) || readGifSize(_0x19182b)
-  );
+export function readImageHeaderSize(next) {
+  const current = next instanceof Uint8Array ? next : new Uint8Array(next || 0x0);
+  return readPngSize(current) || readJpegSize(current) || readWebpSize(current) || readGifSize(current);
 }
 export async function readImageFileHeaderSize(
-  _0x5da39c,
+  list5,
   { maxHeaderBytes: maxHeaderBytes = DEFAULT_HEADER_BYTES } = {},
 ) {
-  if (!_0x5da39c) return null;
-  const _0x2f7db7 =
-    typeof _0x5da39c['slice'] === 'function'
-      ? _0x5da39c['slice'](0x0, Math['max'](0x20, positiveInteger(maxHeaderBytes)))
-      : _0x5da39c;
-  if (typeof _0x2f7db7?.['arrayBuffer'] !== 'function') return null;
+  if (!list5) return null;
+  const entry =
+    typeof list5['slice'] === 'function'
+      ? list5['slice'](0x0, Math['max'](0x20, positiveInteger(maxHeaderBytes)))
+      : list5;
+  if (typeof entry?.['arrayBuffer'] !== 'function') return null;
   try {
-    return readImageHeaderSize(await _0x2f7db7['arrayBuffer']());
+    return readImageHeaderSize(await entry['arrayBuffer']());
   } catch {
     return null;
   }
 }
-function getPreviewDimensions(_0x8986c7, _0x2fa199, _0x3a9b22) {
-  const _0x98a0f7 = positiveInteger(_0x8986c7),
-    _0xd46e76 = positiveInteger(_0x2fa199),
-    _0x2ab809 = positiveInteger(_0x3a9b22) || DEFAULT_PREVIEW_MAX_DIMENSION;
-  if (!_0x98a0f7 || !_0xd46e76) return null;
-  const _0x192ae7 = Math['min'](0x1, _0x2ab809 / Math['max'](_0x98a0f7, _0xd46e76));
+function getPreviewDimensions(record, payload, handle) {
+  const positiveInteger2 = positiveInteger(record),
+    positiveInteger3 = positiveInteger(payload),
+    positiveInteger4 = positiveInteger(handle) || DEFAULT_PREVIEW_MAX_DIMENSION;
+  if (!positiveInteger2 || !positiveInteger3) return null;
+  const state = Math['min'](0x1, positiveInteger4 / Math['max'](positiveInteger2, positiveInteger3));
   return {
-    width: Math['max'](0x1, Math['round'](_0x98a0f7 * _0x192ae7)),
-    height: Math['max'](0x1, Math['round'](_0xd46e76 * _0x192ae7)),
+    width: Math['max'](0x1, Math['round'](positiveInteger2 * state)),
+    height: Math['max'](0x1, Math['round'](positiveInteger3 * state)),
   };
 }
 function createPreviewCanvas(
-  _0x477a7a,
+  enabled,
   {
-    sourceWidth: _0x25d7ee,
-    sourceHeight: _0x33b6f5,
-    outputWidth: _0x399024,
-    outputHeight: _0x435c10,
+    sourceWidth: sourceWidth,
+    sourceHeight: sourceHeight,
+    outputWidth: outputWidth,
+    outputHeight: outputHeight,
     documentRef: documentRef = globalThis['document'],
   } = {},
 ) {
-  if (!_0x477a7a || typeof documentRef?.['createElement'] !== 'function') return null;
-  const _0x1fd9b1 = documentRef['createElement']('canvas');
-  ((_0x1fd9b1['width'] = positiveInteger(_0x399024)), (_0x1fd9b1['height'] = positiveInteger(_0x435c10)));
-  if (!_0x1fd9b1['width'] || !_0x1fd9b1['height']) return null;
-  const _0x293505 = _0x1fd9b1['getContext']?.('2d', { alpha: !![] });
-  if (!_0x293505?.['drawImage']) return null;
-  _0x293505['drawImage'](_0x477a7a, 0x0, 0x0, _0x1fd9b1['width'], _0x1fd9b1['height']);
-  let _0x2348d5 = '';
+  if (!enabled || typeof documentRef?.['createElement'] !== 'function') return null;
+  const image = documentRef['createElement']('canvas');
+  ((image['width'] = positiveInteger(outputWidth)), (image['height'] = positiveInteger(outputHeight)));
+  if (!image['width'] || !image['height']) return null;
+  const ctx = image['getContext']?.('2d', { alpha: !![] });
+  if (!ctx?.['drawImage']) return null;
+  ctx['drawImage'](enabled, 0x0, 0x0, image['width'], image['height']);
+  let thumbnailDataUrl = '';
   try {
-    _0x2348d5 = String(_0x1fd9b1['toDataURL']?.('image/webp', 0.72) || '');
+    thumbnailDataUrl = String(image['toDataURL']?.('image/webp', 0.72) || '');
   } catch {}
   return {
-    image: _0x1fd9b1,
-    width: positiveInteger(_0x25d7ee),
-    height: positiveInteger(_0x33b6f5),
-    thumbnailDataUrl: _0x2348d5,
+    image: image,
+    width: positiveInteger(sourceWidth),
+    height: positiveInteger(sourceHeight),
+    thumbnailDataUrl: thumbnailDataUrl,
   };
 }
 export function createImagePreviewFromDecodedImage(
-  _0x29ecc5,
+  box,
   {
     maxDimension: maxDimension = DEFAULT_PREVIEW_MAX_DIMENSION,
     documentRef: documentRef = globalThis['document'],
   } = {},
 ) {
-  const _0x485fef = positiveInteger(_0x29ecc5?.['naturalWidth'] || _0x29ecc5?.['width']),
-    _0x130c8e = positiveInteger(_0x29ecc5?.['naturalHeight'] || _0x29ecc5?.['height']),
-    _0x48d3fe = getPreviewDimensions(_0x485fef, _0x130c8e, maxDimension);
-  if (!_0x48d3fe) return null;
-  return createPreviewCanvas(_0x29ecc5, {
-    sourceWidth: _0x485fef,
-    sourceHeight: _0x130c8e,
-    outputWidth: _0x48d3fe['width'],
-    outputHeight: _0x48d3fe['height'],
+  const sourceWidth2 = positiveInteger(box?.['naturalWidth'] || box?.['width']),
+    sourceHeight2 = positiveInteger(box?.['naturalHeight'] || box?.['height']),
+    outputWidth2 = getPreviewDimensions(sourceWidth2, sourceHeight2, maxDimension);
+  if (!outputWidth2) return null;
+  return createPreviewCanvas(box, {
+    sourceWidth: sourceWidth2,
+    sourceHeight: sourceHeight2,
+    outputWidth: outputWidth2['width'],
+    outputHeight: outputWidth2['height'],
     documentRef: documentRef,
   });
 }
 export async function createFastImagePreview(
-  _0x53a6ce,
+  enabled2,
   {
     maxDimension: maxDimension = DEFAULT_PREVIEW_MAX_DIMENSION,
     createImageBitmapImpl: createImageBitmapImpl = globalThis['createImageBitmap'],
@@ -172,34 +169,34 @@ export async function createFastImagePreview(
   } = {},
 ) {
   if (
-    !_0x53a6ce ||
+    !enabled2 ||
     typeof createImageBitmapImpl !== 'function' ||
     typeof documentRef?.['createElement'] !== 'function'
   )
     return null;
-  const _0x3afee3 = await readHeaderSizeImpl(_0x53a6ce),
-    _0x424669 = getPreviewDimensions(_0x3afee3?.['width'], _0x3afee3?.['height'], maxDimension);
-  if (!_0x3afee3 || !_0x424669) return null;
-  let _0x1334bd = null;
+  const sourceWidth3 = await readHeaderSizeImpl(enabled2),
+    resizeWidth = getPreviewDimensions(sourceWidth3?.['width'], sourceWidth3?.['height'], maxDimension);
+  if (!sourceWidth3 || !resizeWidth) return null;
+  let box2 = null;
   try {
     return (
-      (_0x1334bd = await createImageBitmapImpl(_0x53a6ce, {
+      (box2 = await createImageBitmapImpl(enabled2, {
         imageOrientation: 'from-image',
-        resizeWidth: _0x424669['width'],
-        resizeHeight: _0x424669['height'],
+        resizeWidth: resizeWidth['width'],
+        resizeHeight: resizeWidth['height'],
         resizeQuality: 'low',
       })),
-      createPreviewCanvas(_0x1334bd, {
-        sourceWidth: _0x3afee3['width'],
-        sourceHeight: _0x3afee3['height'],
-        outputWidth: positiveInteger(_0x1334bd?.['width']) || _0x424669['width'],
-        outputHeight: positiveInteger(_0x1334bd?.['height']) || _0x424669['height'],
+      createPreviewCanvas(box2, {
+        sourceWidth: sourceWidth3['width'],
+        sourceHeight: sourceWidth3['height'],
+        outputWidth: positiveInteger(box2?.['width']) || resizeWidth['width'],
+        outputHeight: positiveInteger(box2?.['height']) || resizeWidth['height'],
         documentRef: documentRef,
       })
     );
   } catch {
     return null;
   } finally {
-    _0x1334bd?.['close']?.();
+    box2?.['close']?.();
   }
 }

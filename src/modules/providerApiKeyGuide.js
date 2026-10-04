@@ -1,1 +1,202 @@
-import{t}from'../i18n/index.js';import{openExternalLink}from'../services/externalLinkService.js';import{openSettingsPanelToField}from'./settings/panelSettings.js';export const PROVIDER_API_KEY_GUIDES=Object['freeze']({'apimart':Object["freeze"]({'consoleUrl':'https://apimart.ai/register?aff=ashuoai','guideImage':'images/apimart-api-key-guide.svg','inputIds':Object["freeze"](['providerKey-apimart']),'imageWidth':0x3c0,'imageHeight':0x834}),'agnes':Object["freeze"]({'consoleUrl':"https://platform.agnes-ai.com/settings/apiKeys",'guideImage':"images/agnes-api-key-guide.svg",'inputIds':Object["freeze"](["providerKey-agnes"]),'imageWidth':0x3c0,'imageHeight':0x834}),'agnes-domestic':Object["freeze"]({'consoleUrl':'https://platform.agnes-ai.cn/settings/apiKeys','guideImage':"images/agnes-api-key-guide.svg",'inputIds':Object["freeze"](['providerKey-agnes-domestic']),'imageWidth':0x3c0,'imageHeight':0x834}),'volcengine':Object["freeze"]({'consoleUrl':"https://console.volcengine.com/ark/region:ark+cn-beijing/openManagement",'guideImage':"images/volcengine-ark-api-key-guide.svg",'inputIds':Object['freeze'](["providerKey-volcengine"]),'imageWidth':0x3c0,'imageHeight':0x834}),'grsai':Object["freeze"]({'consoleUrl':"https://grsai.com/zh/dashboard/api-keys",'guideImage':"images/grsai-api-key-guide.svg",'inputIds':Object["freeze"](['providerKey-grsai']),'imageWidth':0x3c0,'imageHeight':0x834})});const GUIDE_BACKDROP_ID="provider-api-key-guide-backdrop",GUIDE_DIALOG_ID="provider-api-key-guide";function getGuideConfig(_0x4034ac){const _0x2ae6f7=String(_0x4034ac||'')["trim"]()['toLowerCase']();return _0x2ae6f7&&PROVIDER_API_KEY_GUIDES[_0x2ae6f7]?{'id':_0x2ae6f7,...PROVIDER_API_KEY_GUIDES[_0x2ae6f7]}:null;}function guideText(_0x595296,_0xfc79b4){const _0x469022=_0x595296==='agnes-domestic'?"agnes":_0x595296;return t('settings.apiInput.providers.'+_0x469022+'.'+_0xfc79b4);}function createEl(_0x13acd8,_0x198d18='',_0x1a374a=''){const _0x1e986d=document["createElement"](_0x13acd8);if(_0x198d18)_0x1e986d["className"]=_0x198d18;if(_0x1a374a)_0x1e986d["textContent"]=_0x1a374a;return _0x1e986d;}function iconSvg(){return "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path><path d=\"M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z\"></path></svg>";}export function closeProviderApiKeyGuide(){document['getElementById'](GUIDE_BACKDROP_ID)?.["remove"]?.(),document["getElementById"](GUIDE_DIALOG_ID)?.["remove"]?.(),document["removeEventListener"]("keydown",handleGuideKeydown);}function handleGuideKeydown(_0x525af1){if(_0x525af1["key"]!=='Escape'||!document["getElementById"](GUIDE_DIALOG_ID))return;_0x525af1["preventDefault"]?.(),closeProviderApiKeyGuide();}export function openProviderApiKeySettings(_0x1d9b2e){const _0xef9b9e=getGuideConfig(_0x1d9b2e);if(!_0xef9b9e)return;closeProviderApiKeyGuide(),openSettingsPanelToField({'paneName':"api-input",'fieldIds':_0xef9b9e["inputIds"],'select':!![],'highlight':!![]});}function createGuideNote(_0x619400){const _0x3d0929=createEl('li',"audio-voice-api-key-guide-note");return _0x3d0929["textContent"]=_0x619400,_0x3d0929;}function openGuideExternalLink(_0x1f274a,_0x32ffba,_0x2b7bdb){void openExternalLink(_0x32ffba,{'label':guideText(_0x1f274a,_0x2b7bdb)})['catch'](_0x23ec36=>{globalThis['window']?.["showToast"]?.(_0x23ec36?.['message']||t("coreServices.externalLink.openFailed"),'error');});}export function showProviderApiKeyGuide(_0x27d3){const _0x3a85c6=getGuideConfig(_0x27d3);if(!_0x3a85c6)return;closeProviderApiKeyGuide();const _0x11574a=createEl("div","audio-voice-api-key-guide-backdrop");_0x11574a['id']=GUIDE_BACKDROP_ID,_0x11574a["setAttribute"]('aria-hidden',"true");const _0x4418f7=createEl("section",'audio-voice-api-key-guide');_0x4418f7['id']=GUIDE_DIALOG_ID,_0x4418f7["setAttribute"]("role","dialog"),_0x4418f7["setAttribute"]("aria-modal",'true'),_0x4418f7['setAttribute']("aria-label",guideText(_0x3a85c6['id'],"guideTitle"));const _0x3a61f7=createEl("div","audio-voice-api-key-guide-header"),_0x5acde7=createEl("span",'audio-voice-api-key-guide-icon');_0x5acde7["setAttribute"]('aria-hidden',"true"),_0x5acde7['innerHTML']=iconSvg();const _0x1d3855=createEl("div","audio-voice-api-key-guide-title",guideText(_0x3a85c6['id'],'guideTitle')),_0x2fef05=createEl("button","audio-voice-api-key-guide-close",'x');_0x2fef05["type"]="button",_0x2fef05["title"]=guideText(_0x3a85c6['id'],"close"),_0x2fef05["setAttribute"]("aria-label",guideText(_0x3a85c6['id'],"close")),_0x2fef05["dataset"]['providerApiKeyGuideAction']='close',_0x3a61f7["append"](_0x5acde7,_0x1d3855,_0x2fef05);const _0xbf4bf=createEl("div",'audio-voice-api-key-guide-body'),_0x31b798=createEl('div',"audio-voice-api-key-guide-subtitle",guideText(_0x3a85c6['id'],'guideSubtitle')),_0x5c108b=createEl("div","audio-voice-api-key-guide-section-title",guideText(_0x3a85c6['id'],"guideChecklistTitle")),_0x21449d=createEl('ol',"audio-voice-api-key-guide-notes");["guideNote1","guideNote2","guideNote3","guideNote4"]["forEach"](_0x12b698=>_0x21449d["appendChild"](createGuideNote(guideText(_0x3a85c6['id'],_0x12b698))));const _0xfaa0fe=createEl("div","audio-voice-api-key-guide-image-wrap"),_0x101475=createEl("img","audio-voice-api-key-guide-image");_0x101475['src']=_0x3a85c6["guideImage"],_0x101475["alt"]=guideText(_0x3a85c6['id'],'guideAlt'),_0x101475['width']=_0x3a85c6["imageWidth"],_0x101475["height"]=_0x3a85c6['imageHeight'],_0x101475["decoding"]='async',_0x101475["loading"]="eager",_0x101475["fetchPriority"]="high";const _0x5a167d=createEl("div","audio-voice-api-key-guide-image-links");[{'action':"open-console",'className':"audio-voice-api-key-guide-image-link-console",'label':guideText(_0x3a85c6['id'],"openConsole")},{'action':'open-settings','className':"audio-voice-api-key-guide-image-link-settings",'label':guideText(_0x3a85c6['id'],"openSettings")}]['forEach'](({action:_0x11b7c6,className:_0x47f56b,label:_0x3f6b2e})=>{const _0x49e7cb=createEl("button",'audio-voice-api-key-guide-image-link\x20'+_0x47f56b,_0x3f6b2e);_0x49e7cb["type"]="button",_0x49e7cb['dataset']["providerApiKeyGuideAction"]=_0x11b7c6,_0x49e7cb["setAttribute"]("aria-label",_0x3f6b2e),_0x5a167d["appendChild"](_0x49e7cb);}),_0xfaa0fe['append'](_0x101475,_0x5a167d),_0xbf4bf['append'](_0x31b798,_0x5c108b,_0x21449d,_0xfaa0fe);const _0x233720=createEl("div","audio-voice-api-key-guide-actions"),_0x1a537f=createEl('button',"audio-voice-api-key-guide-btn audio-voice-api-key-guide-btn-secondary",guideText(_0x3a85c6['id'],'openSettings'));_0x1a537f["type"]="button",_0x1a537f["dataset"]["providerApiKeyGuideAction"]="open-settings";const _0x5eb9e6=createEl("button",'audio-voice-api-key-guide-btn\x20audio-voice-api-key-guide-btn-primary',guideText(_0x3a85c6['id'],"openConsole"));_0x5eb9e6['type']="button",_0x5eb9e6["dataset"]["providerApiKeyGuideAction"]="open-console",_0x233720["append"](_0x1a537f,_0x5eb9e6),_0x4418f7['append'](_0x3a61f7,_0xbf4bf,_0x233720),document['body']?.["append"](_0x11574a,_0x4418f7),_0x11574a['addEventListener']?.("click",closeProviderApiKeyGuide),_0x4418f7['addEventListener']?.("click",_0x2eb515=>{const _0x357e4b=_0x2eb515['target']?.["closest"]?.('[data-provider-api-key-guide-action]');if(!_0x357e4b)return;_0x2eb515['preventDefault']?.();const _0x1c1e24=_0x357e4b["dataset"]["providerApiKeyGuideAction"];if(_0x1c1e24==="close")closeProviderApiKeyGuide();if(_0x1c1e24==="open-settings")openProviderApiKeySettings(_0x3a85c6['id']);_0x1c1e24==="open-console"&&openGuideExternalLink(_0x3a85c6['id'],_0x3a85c6["consoleUrl"],"openConsole");}),document["addEventListener"]("keydown",handleGuideKeydown),_0x4418f7["classList"]['add']("open"),_0x11574a["classList"]["add"]("open"),_0x2fef05["focus"]?.();}export function bindProviderApiKeyGuideTriggers(_0x2e7dc7=document){_0x2e7dc7?.["querySelectorAll"]?.("[data-provider-api-key-guide-trigger]")?.["forEach"](_0x48c9a7=>{if(_0x48c9a7["dataset"]["providerApiKeyGuideBound"]==='1')return;_0x48c9a7["dataset"]["providerApiKeyGuideBound"]='1',_0x48c9a7["addEventListener"]("click",_0x708ebb=>{_0x708ebb["preventDefault"](),showProviderApiKeyGuide(_0x48c9a7["dataset"]["providerApiKeyGuideTrigger"]);});});}
+import { t } from '../i18n/index.js';
+import { openExternalLink } from '../services/externalLinkService.js';
+import { openSettingsPanelToField } from './settings/panelSettings.js';
+export const PROVIDER_API_KEY_GUIDES = Object['freeze']({
+  apimart: Object['freeze']({
+    consoleUrl: 'https://apimart.ai/register?aff=ashuoai',
+    guideImage: 'images/apimart-api-key-guide.svg',
+    inputIds: Object['freeze'](['providerKey-apimart']),
+    imageWidth: 0x3c0,
+    imageHeight: 0x834,
+  }),
+  agnes: Object['freeze']({
+    consoleUrl: 'https://platform.agnes-ai.com/settings/apiKeys',
+    guideImage: 'images/agnes-api-key-guide.svg',
+    inputIds: Object['freeze'](['providerKey-agnes']),
+    imageWidth: 0x3c0,
+    imageHeight: 0x834,
+  }),
+  'agnes-domestic': Object['freeze']({
+    consoleUrl: 'https://platform.agnes-ai.cn/settings/apiKeys',
+    guideImage: 'images/agnes-api-key-guide.svg',
+    inputIds: Object['freeze'](['providerKey-agnes-domestic']),
+    imageWidth: 0x3c0,
+    imageHeight: 0x834,
+  }),
+  volcengine: Object['freeze']({
+    consoleUrl: 'https://console.volcengine.com/ark/region:ark+cn-beijing/openManagement',
+    guideImage: 'images/volcengine-ark-api-key-guide.svg',
+    inputIds: Object['freeze'](['providerKey-volcengine']),
+    imageWidth: 0x3c0,
+    imageHeight: 0x834,
+  }),
+  grsai: Object['freeze']({
+    consoleUrl: 'https://grsai.com/zh/dashboard/api-keys',
+    guideImage: 'images/grsai-api-key-guide.svg',
+    inputIds: Object['freeze'](['providerKey-grsai']),
+    imageWidth: 0x3c0,
+    imageHeight: 0x834,
+  }),
+});
+const GUIDE_BACKDROP_ID = 'provider-api-key-guide-backdrop',
+  GUIDE_DIALOG_ID = 'provider-api-key-guide';
+function getGuideConfig(value) {
+  const item = String(value || '')
+    ['trim']()
+    ['toLowerCase']();
+  return item && PROVIDER_API_KEY_GUIDES[item] ? { id: item, ...PROVIDER_API_KEY_GUIDES[item] } : null;
+}
+function guideText(key, index) {
+  const result = key === 'agnes-domestic' ? 'agnes' : key;
+  return t('settings.apiInput.providers.' + result + '.' + index);
+}
+function createEl(data, options = '', target = '') {
+  const source = document['createElement'](data);
+  if (options) source['className'] = options;
+  if (target) source['textContent'] = target;
+  return source;
+}
+function iconSvg() {
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path></svg>';
+}
+export function closeProviderApiKeyGuide() {
+  (document['getElementById'](GUIDE_BACKDROP_ID)?.['remove']?.(),
+    document['getElementById'](GUIDE_DIALOG_ID)?.['remove']?.(),
+    document['removeEventListener']('keydown', handleGuideKeydown));
+}
+function handleGuideKeydown(next) {
+  if (next['key'] !== 'Escape' || !document['getElementById'](GUIDE_DIALOG_ID)) return;
+  (next['preventDefault']?.(), closeProviderApiKeyGuide());
+}
+export function openProviderApiKeySettings(current) {
+  const guideConfig = getGuideConfig(current);
+  if (!guideConfig) return;
+  (closeProviderApiKeyGuide(),
+    openSettingsPanelToField({
+      paneName: 'api-input',
+      fieldIds: guideConfig['inputIds'],
+      select: !![],
+      highlight: !![],
+    }));
+}
+function createGuideNote(entry) {
+  const el = createEl('li', 'audio-voice-api-key-guide-note');
+  return ((el['textContent'] = entry), el);
+}
+function openGuideExternalLink(record, payload, handle) {
+  void openExternalLink(payload, { label: guideText(record, handle) })['catch']((error) => {
+    globalThis['window']?.['showToast']?.(
+      error?.['message'] || t('coreServices.externalLink.openFailed'),
+      'error',
+    );
+  });
+}
+export function showProviderApiKeyGuide(state) {
+  const guideConfig2 = getGuideConfig(state);
+  if (!guideConfig2) return;
+  closeProviderApiKeyGuide();
+  const el2 = createEl('div', 'audio-voice-api-key-guide-backdrop');
+  ((el2['id'] = GUIDE_BACKDROP_ID), el2['setAttribute']('aria-hidden', 'true'));
+  const el3 = createEl('section', 'audio-voice-api-key-guide');
+  ((el3['id'] = GUIDE_DIALOG_ID),
+    el3['setAttribute']('role', 'dialog'),
+    el3['setAttribute']('aria-modal', 'true'),
+    el3['setAttribute']('aria-label', guideText(guideConfig2['id'], 'guideTitle')));
+  const el4 = createEl('div', 'audio-voice-api-key-guide-header'),
+    el5 = createEl('span', 'audio-voice-api-key-guide-icon');
+  (el5['setAttribute']('aria-hidden', 'true'), (el5['innerHTML'] = iconSvg()));
+  const el6 = createEl('div', 'audio-voice-api-key-guide-title', guideText(guideConfig2['id'], 'guideTitle')),
+    el7 = createEl('button', 'audio-voice-api-key-guide-close', 'x');
+  ((el7['type'] = 'button'),
+    (el7['title'] = guideText(guideConfig2['id'], 'close')),
+    el7['setAttribute']('aria-label', guideText(guideConfig2['id'], 'close')),
+    (el7['dataset']['providerApiKeyGuideAction'] = 'close'),
+    el4['append'](el5, el6, el7));
+  const el8 = createEl('div', 'audio-voice-api-key-guide-body'),
+    el9 = createEl(
+      'div',
+      'audio-voice-api-key-guide-subtitle',
+      guideText(guideConfig2['id'], 'guideSubtitle'),
+    ),
+    el10 = createEl(
+      'div',
+      'audio-voice-api-key-guide-section-title',
+      guideText(guideConfig2['id'], 'guideChecklistTitle'),
+    ),
+    el11 = createEl('ol', 'audio-voice-api-key-guide-notes');
+  ['guideNote1', 'guideNote2', 'guideNote3', 'guideNote4']['forEach']((config) =>
+    el11['appendChild'](createGuideNote(guideText(guideConfig2['id'], config))),
+  );
+  const el12 = createEl('div', 'audio-voice-api-key-guide-image-wrap'),
+    box = createEl('img', 'audio-voice-api-key-guide-image');
+  ((box['src'] = guideConfig2['guideImage']),
+    (box['alt'] = guideText(guideConfig2['id'], 'guideAlt')),
+    (box['width'] = guideConfig2['imageWidth']),
+    (box['height'] = guideConfig2['imageHeight']),
+    (box['decoding'] = 'async'),
+    (box['loading'] = 'eager'),
+    (box['fetchPriority'] = 'high'));
+  const el13 = createEl('div', 'audio-voice-api-key-guide-image-links');
+  ([
+    {
+      action: 'open-console',
+      className: 'audio-voice-api-key-guide-image-link-console',
+      label: guideText(guideConfig2['id'], 'openConsole'),
+    },
+    {
+      action: 'open-settings',
+      className: 'audio-voice-api-key-guide-image-link-settings',
+      label: guideText(guideConfig2['id'], 'openSettings'),
+    },
+  ]['forEach'](({ action: action, className: className, label: label }) => {
+    const el14 = createEl('button', 'audio-voice-api-key-guide-image-link\x20' + className, label);
+    ((el14['type'] = 'button'),
+      (el14['dataset']['providerApiKeyGuideAction'] = action),
+      el14['setAttribute']('aria-label', label),
+      el13['appendChild'](el14));
+  }),
+    el12['append'](box, el13),
+    el8['append'](el9, el10, el11, el12));
+  const el15 = createEl('div', 'audio-voice-api-key-guide-actions'),
+    el16 = createEl(
+      'button',
+      'audio-voice-api-key-guide-btn audio-voice-api-key-guide-btn-secondary',
+      guideText(guideConfig2['id'], 'openSettings'),
+    );
+  ((el16['type'] = 'button'), (el16['dataset']['providerApiKeyGuideAction'] = 'open-settings'));
+  const el17 = createEl(
+    'button',
+    'audio-voice-api-key-guide-btn\x20audio-voice-api-key-guide-btn-primary',
+    guideText(guideConfig2['id'], 'openConsole'),
+  );
+  ((el17['type'] = 'button'),
+    (el17['dataset']['providerApiKeyGuideAction'] = 'open-console'),
+    el15['append'](el16, el17),
+    el3['append'](el4, el8, el15),
+    document['body']?.['append'](el2, el3),
+    el2['addEventListener']?.('click', closeProviderApiKeyGuide),
+    el3['addEventListener']?.('click', (event) => {
+      const enabled = event['target']?.['closest']?.('[data-provider-api-key-guide-action]');
+      if (!enabled) return;
+      event['preventDefault']?.();
+      const scope = enabled['dataset']['providerApiKeyGuideAction'];
+      if (scope === 'close') closeProviderApiKeyGuide();
+      if (scope === 'open-settings') openProviderApiKeySettings(guideConfig2['id']);
+      scope === 'open-console' &&
+        openGuideExternalLink(guideConfig2['id'], guideConfig2['consoleUrl'], 'openConsole');
+    }),
+    document['addEventListener']('keydown', handleGuideKeydown),
+    el3['classList']['add']('open'),
+    el2['classList']['add']('open'),
+    el7['focus']?.());
+}
+export function bindProviderApiKeyGuideTriggers(input = document) {
+  input?.['querySelectorAll']?.('[data-provider-api-key-guide-trigger]')?.['forEach']((output) => {
+    if (output['dataset']['providerApiKeyGuideBound'] === '1') return;
+    ((output['dataset']['providerApiKeyGuideBound'] = '1'),
+      output['addEventListener']('click', (value2) => {
+        (value2['preventDefault'](),
+          showProviderApiKeyGuide(output['dataset']['providerApiKeyGuideTrigger']));
+      }));
+  });
+}

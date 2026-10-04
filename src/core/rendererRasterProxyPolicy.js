@@ -1,235 +1,244 @@
-function toIdSet(_0x1bcfe1) {
-  if (_0x1bcfe1 instanceof Set) return new Set(_0x1bcfe1);
-  if (Array['isArray'](_0x1bcfe1)) return new Set(_0x1bcfe1);
+function toIdSet(value) {
+  if (value instanceof Set) return new Set(value);
+  if (Array['isArray'](value)) return new Set(value);
   return new Set();
 }
-function createNodeAccessor(_0x288fb4) {
-  if (_0x288fb4 instanceof Map) return (_0x1338b3) => _0x288fb4['get'](_0x1338b3);
-  if (Array['isArray'](_0x288fb4)) {
-    let _0x8ecde4 = null;
-    return (_0x2715c7) => {
-      if (!_0x8ecde4) {
-        _0x8ecde4 = new Map();
-        for (const _0x1fc6dc of _0x288fb4) {
-          if (!_0x1fc6dc || typeof _0x1fc6dc !== 'object') continue;
-          const _0x2421c8 = _0x1fc6dc['id'];
-          if (_0x2421c8 == null || _0x2421c8 === '') continue;
-          _0x8ecde4['set'](_0x2421c8, _0x1fc6dc);
+function createNodeAccessor(map) {
+  if (map instanceof Map) return (item) => map['get'](item);
+  if (Array['isArray'](map)) {
+    let map2 = null;
+    return (key) => {
+      if (!map2) {
+        map2 = new Map();
+        for (const enabled of map) {
+          if (!enabled || typeof enabled !== 'object') continue;
+          const index = enabled['id'];
+          if (index == null || index === '') continue;
+          map2['set'](index, enabled);
         }
       }
-      return _0x8ecde4['get'](_0x2715c7);
+      return map2['get'](key);
     };
   }
-  if (_0x288fb4 && typeof _0x288fb4 === 'object')
-    return (_0x4a4c05) => {
-      if (!Object['prototype']['hasOwnProperty']['call'](_0x288fb4, _0x4a4c05)) return undefined;
-      const _0x48c639 = _0x288fb4[_0x4a4c05];
-      return _0x48c639 && typeof _0x48c639 === 'object' ? _0x48c639 : undefined;
+  if (map && typeof map === 'object')
+    return (result) => {
+      if (!Object['prototype']['hasOwnProperty']['call'](map, result)) return undefined;
+      const data = map[result];
+      return data && typeof data === 'object' ? data : undefined;
     };
   return () => undefined;
 }
-function clampUnit(_0x4c4ecb) {
-  const _0x54bfae = Number(_0x4c4ecb);
-  if (!Number['isFinite'](_0x54bfae)) return 0x0;
-  return Math['max'](0x0, Math['min'](0x1, _0x54bfae));
+function clampUnit(options) {
+  const target = Number(options);
+  if (!Number['isFinite'](target)) return 0x0;
+  return Math['max'](0x0, Math['min'](0x1, target));
 }
-function smoothstep(_0x58617e, _0x23680c, _0x38400b) {
-  if (_0x38400b <= _0x58617e) return 0x0;
-  if (_0x38400b >= _0x23680c) return 0x1;
-  const _0x17c364 = (_0x38400b - _0x58617e) / (_0x23680c - _0x58617e);
-  return _0x17c364 * _0x17c364 * (0x3 - 0x2 * _0x17c364);
+function smoothstep(source, next, current) {
+  if (current <= source) return 0x0;
+  if (current >= next) return 0x1;
+  const entry = (current - source) / (next - source);
+  return entry * entry * (0x3 - 0x2 * entry);
 }
 const DENSE_RASTER_FULL_STRENGTH_ZOOM = 0.4,
   DENSE_RASTER_EXIT_ZOOM = 0.55;
-export function calculateDenseLowZoomRasterStrength(_0x17113a, _0x2a5c69) {
-  const _0x243fff = clampUnit(_0x17113a),
-    _0x2f5c8a = Number(_0x2a5c69?.['zoom']),
-    _0x4f42d8 = Number['isFinite'](_0x2f5c8a) && _0x2f5c8a > 0x0 ? _0x2f5c8a : 0x1,
-    _0x7b1d77 = 0x1 - smoothstep(DENSE_RASTER_FULL_STRENGTH_ZOOM, DENSE_RASTER_EXIT_ZOOM, _0x4f42d8);
-  return _0x243fff * _0x7b1d77;
+export function calculateDenseLowZoomRasterStrength(record, box) {
+  const clampUnit2 = clampUnit(record),
+    count = Number(box?.['zoom']),
+    payload = Number['isFinite'](count) && count > 0x0 ? count : 0x1,
+    handle = 0x1 - smoothstep(DENSE_RASTER_FULL_STRENGTH_ZOOM, DENSE_RASTER_EXIT_ZOOM, payload);
+  return clampUnit2 * handle;
 }
-function addId(_0x50390f, _0x53b4db) {
-  if (_0x53b4db != null && _0x53b4db !== '') _0x50390f['add'](_0x53b4db);
+function addId(state, config) {
+  if (config != null && config !== '') state['add'](config);
 }
-function addIds(_0x5582d3, _0x2212c8) {
-  for (const _0x1d7394 of toIdSet(_0x2212c8)) addId(_0x5582d3, _0x1d7394);
+function addIds(scope, input) {
+  for (const output of toIdSet(input)) addId(scope, output);
 }
 function collectDomRequiredIds({
-  selectedNodeIds: _0x32452d,
-  hoveredNodeIds: _0x12741e,
-  hoverNodeId: _0xf1210f,
-  dragNodeIds: _0x47382e,
-  dragTargets: _0x34323f,
-  connectingNodeIds: _0x2a1a26,
-  connOverlay: _0x393c63,
-  pickNodeIds: _0x5cbc7e,
-  pickConnectMode: _0x45b495,
-  activeMediaNodeIds: _0x30e19a,
-  activeNodeIds: _0x4f4941,
-  domRequiredNodeIds: _0x3e1416,
+  selectedNodeIds: selectedNodeIds,
+  hoveredNodeIds: hoveredNodeIds,
+  hoverNodeId: hoverNodeId,
+  dragNodeIds: dragNodeIds,
+  dragTargets: dragTargets,
+  connectingNodeIds: connectingNodeIds,
+  connOverlay: connOverlay,
+  pickNodeIds: pickNodeIds,
+  pickConnectMode: pickConnectMode,
+  activeMediaNodeIds: activeMediaNodeIds,
+  activeNodeIds: activeNodeIds,
+  domRequiredNodeIds: domRequiredNodeIds,
 } = {}) {
-  const _0x4118a1 = new Set();
+  const value2 = new Set();
   return (
-    [_0x32452d, _0x12741e, _0x47382e, _0x34323f, _0x2a1a26, _0x5cbc7e, _0x30e19a, _0x4f4941, _0x3e1416][
-      'forEach'
-    ]((_0x383796) => addIds(_0x4118a1, _0x383796)),
-    addId(_0x4118a1, _0xf1210f),
-    addId(_0x4118a1, _0x393c63?.['srcId']),
-    addId(_0x4118a1, _0x393c63?.['hoverId']),
-    addIds(_0x4118a1, _0x393c63?.['activeNodeIds']),
-    _0x45b495?.['active'] === !![] &&
-      (addId(_0x4118a1, _0x45b495['sourceNodeId']),
-      addId(_0x4118a1, _0x45b495['srcId']),
-      addId(_0x4118a1, _0x45b495['hoverNodeId']),
-      addId(_0x4118a1, _0x45b495['hoverId']),
-      addIds(_0x4118a1, _0x45b495['activeNodeIds'])),
-    _0x4118a1
+    [
+      selectedNodeIds,
+      hoveredNodeIds,
+      dragNodeIds,
+      dragTargets,
+      connectingNodeIds,
+      pickNodeIds,
+      activeMediaNodeIds,
+      activeNodeIds,
+      domRequiredNodeIds,
+    ]['forEach']((value3) => addIds(value2, value3)),
+    addId(value2, hoverNodeId),
+    addId(value2, connOverlay?.['srcId']),
+    addId(value2, connOverlay?.['hoverId']),
+    addIds(value2, connOverlay?.['activeNodeIds']),
+    pickConnectMode?.['active'] === !![] &&
+      (addId(value2, pickConnectMode['sourceNodeId']),
+      addId(value2, pickConnectMode['srcId']),
+      addId(value2, pickConnectMode['hoverNodeId']),
+      addId(value2, pickConnectMode['hoverId']),
+      addIds(value2, pickConnectMode['activeNodeIds'])),
+    value2
   );
 }
-function isRasterSupported(_0x47a7b1, _0x42bb2d, _0x2a01a0, _0x22b7c8) {
-  if (_0x2a01a0['has'](_0x47a7b1)) return !![];
-  const _0x11947a = String(_0x42bb2d?.['type'] || '')
+function isRasterSupported(value4, value5, map3, map4) {
+  if (map3['has'](value4)) return !![];
+  const enabled2 = String(value5?.['type'] || '')
     ['trim']()
     ['toLowerCase']();
-  return !!_0x11947a && _0x22b7c8['has'](_0x11947a);
+  return !!enabled2 && map4['has'](enabled2);
 }
-function getProjectedMetrics(_0x255ac5, _0x5c3168, _0x58dabf) {
-  const _0x40002e = Math['max'](0x1, Number(_0x255ac5?.['width']) || 0xa0) * _0x5c3168,
-    _0x5c0056 = Math['max'](0x1, Number(_0x255ac5?.['height']) || 0x78) * _0x5c3168,
-    _0x4f80e4 = _0x40002e * _0x5c0056,
-    _0x43d1cc = 0xbb8 + (0x1f40 - 0xbb8) * _0x58dabf,
-    _0x3a13f5 = 0x36b0 + (0x9c40 - 0x36b0) * _0x58dabf;
-  return { area: _0x4f80e4, compactness: 0x1 - smoothstep(_0x43d1cc, _0x3a13f5, _0x4f80e4) };
+function getProjectedMetrics(box2, value6, value7) {
+  const value8 = Math['max'](0x1, Number(box2?.['width']) || 0xa0) * value6,
+    value9 = Math['max'](0x1, Number(box2?.['height']) || 0x78) * value6,
+    area = value8 * value9,
+    value10 = 0xbb8 + (0x1f40 - 0xbb8) * value7,
+    value11 = 0x36b0 + (0x9c40 - 0x36b0) * value7;
+  return { area: area, compactness: 0x1 - smoothstep(value10, value11, area) };
 }
-function buildCoverageSignature(_0x3555ca, _0x4618e8, _0x364824) {
-  const _0x3541aa = (_0x1b138a) => [..._0x1b138a]['map'](String)['sort']();
-  return ['full', ..._0x3541aa(_0x3555ca), 'raster', ..._0x3541aa(_0x4618e8), 'dom', ..._0x3541aa(_0x364824)][
-    'join'
-  ]('\x1f');
+function buildCoverageSignature(value12, value13, value14) {
+  const run = (args) => [...args]['map'](String)['sort']();
+  return ['full', ...run(value12), 'raster', ...run(value13), 'dom', ...run(value14)]['join']('\x1f');
 }
 export function planRendererRasterProxies({
   nodes: nodes = [],
-  fullSurfaceIds: _0x5f159b,
-  proxySurfaceIds: _0x53f94a,
-  exactVisibleIds: _0x222056,
-  rasterSupportedNodeIds: _0x4aef7b,
-  rasterSupportedNodeTypes: _0x43d985,
-  previousRasterIds: _0x4b8ee7,
-  viewport: _0x332869,
+  fullSurfaceIds: fullSurfaceIds,
+  proxySurfaceIds: proxySurfaceIds,
+  exactVisibleIds: exactVisibleIds,
+  rasterSupportedNodeIds: rasterSupportedNodeIds,
+  rasterSupportedNodeTypes: rasterSupportedNodeTypes,
+  previousRasterIds: previousRasterIds,
+  viewport: viewport,
   scenePressure: scenePressure = 0x0,
-  ..._0x3073b2
+  ...args2
 } = {}) {
-  const _0xcc87cc = createNodeAccessor(nodes),
-    _0x59d001 = toIdSet(_0x5f159b),
-    _0x25d363 = new Set([...toIdSet(_0x53f94a)]['filter']((_0xcc888b) => !_0x59d001['has'](_0xcc888b))),
-    _0x4ee0b5 = toIdSet(_0x222056),
-    _0x849ca5 = toIdSet(_0x4aef7b),
-    _0x331282 = new Set(
-      [...toIdSet(_0x43d985)]['map']((_0x371be5) =>
-        String(_0x371be5 || '')
+  const run2 = createNodeAccessor(nodes),
+    map5 = toIdSet(fullSurfaceIds),
+    proxyCount = new Set([...toIdSet(proxySurfaceIds)]['filter']((value15) => !map5['has'](value15))),
+    exactVisible = toIdSet(exactVisibleIds),
+    toIdSet2 = toIdSet(rasterSupportedNodeIds),
+    value16 = new Set(
+      [...toIdSet(rasterSupportedNodeTypes)]['map']((value17) =>
+        String(value17 || '')
           ['trim']()
           ['toLowerCase'](),
       ),
     ),
-    _0x517ed3 = toIdSet(_0x4b8ee7),
-    _0x4d18eb = collectDomRequiredIds(_0x3073b2),
-    _0x2c567f = new Set(),
-    _0xb939d0 = new Set(),
-    _0x5bf69d = [];
-  let _0x1c32e7 = 0x0,
-    _0xae145d = 0x0,
-    _0x216474 = 0x0;
-  const _0xcfc2a5 = Number(_0x332869?.['zoom']),
-    _0x2e5a09 = Number['isFinite'](_0xcfc2a5) && _0xcfc2a5 > 0x0 ? _0xcfc2a5 : 0x1,
-    _0x5a6949 = clampUnit(scenePressure),
-    _0x34104d = calculateDenseLowZoomRasterStrength(_0x5a6949, _0x332869);
-  for (const _0x341e50 of _0x25d363) {
-    if (_0x4d18eb['has'](_0x341e50)) {
-      (_0xb939d0['add'](_0x341e50), (_0x1c32e7 += 0x1));
+    retained = toIdSet(previousRasterIds),
+    map6 = collectDomRequiredIds(args2),
+    active = new Set(),
+    domProxyIds = new Set(),
+    rasterCandidateCount = [];
+  let interactiveDomCount = 0x0,
+    unsupportedDomCount = 0x0,
+    projectedDomCount = 0x0;
+  const count2 = Number(viewport?.['zoom']),
+    value18 = Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x1,
+    scenePressure2 = clampUnit(scenePressure),
+    denseRasterStrength = calculateDenseLowZoomRasterStrength(scenePressure2, viewport);
+  for (const id of proxyCount) {
+    if (map6['has'](id)) {
+      (domProxyIds['add'](id), (interactiveDomCount += 0x1));
       continue;
     }
-    const _0x3c0077 = _0xcc87cc(_0x341e50);
-    if (!isRasterSupported(_0x341e50, _0x3c0077, _0x849ca5, _0x331282)) {
-      (_0xb939d0['add'](_0x341e50), (_0xae145d += 0x1));
+    const value19 = run2(id);
+    if (!isRasterSupported(id, value19, toIdSet2, value16)) {
+      (domProxyIds['add'](id), (unsupportedDomCount += 0x1));
       continue;
     }
-    const _0x5d709b = getProjectedMetrics(_0x3c0077, _0x2e5a09, _0x34104d);
-    if (_0x5d709b['compactness'] < 0.2) {
-      (_0xb939d0['add'](_0x341e50), (_0x216474 += 0x1));
+    const args3 = getProjectedMetrics(value19, value18, denseRasterStrength);
+    if (args3['compactness'] < 0.2) {
+      (domProxyIds['add'](id), (projectedDomCount += 0x1));
       continue;
     }
-    _0x5bf69d['push']({
-      id: _0x341e50,
-      ..._0x5d709b,
-      exactVisible: _0x4ee0b5['has'](_0x341e50),
-      retained: _0x517ed3['has'](_0x341e50),
+    rasterCandidateCount['push']({
+      id: id,
+      ...args3,
+      exactVisible: exactVisible['has'](id),
+      retained: retained['has'](id),
     });
   }
-  const _0xe20e32 = smoothstep(0xc, 0x48, _0x25d363['size']),
-    _0x519743 = 0x1 - (0x1 - _0x5a6949) * (0x1 - _0xe20e32),
-    _0xc8606e =
-      _0x5bf69d['length'] > 0x0
-        ? _0x5bf69d['reduce']((_0x8a2d0a, _0x53f94c) => _0x8a2d0a + _0x53f94c['compactness'], 0x0) /
-          _0x5bf69d['length']
+  const proxyPressure = smoothstep(0xc, 0x48, proxyCount['size']),
+    value20 = 0x1 - (0x1 - scenePressure2) * (0x1 - proxyPressure),
+    value21 =
+      rasterCandidateCount['length'] > 0x0
+        ? rasterCandidateCount['reduce']((value22, value23) => value22 + value23['compactness'], 0x0) /
+          rasterCandidateCount['length']
         : 0x0,
-    _0x50d7d9 = _0x519743 * _0xc8606e,
-    _0x183fd9 = smoothstep(0.32, 0.78, _0x50d7d9),
-    _0x460a90 = _0x517ed3['size'] > 0x0 ? 0.24 : 0.32,
-    _0x194ccd = Math['min'](_0x5bf69d['length'], _0x50d7d9 >= _0x460a90 ? _0x5bf69d['length'] : 0x0);
-  _0x5bf69d['sort']((_0x1ac6ff, _0x33aa32) => {
-    const _0x2b9a1f = Number(!_0x1ac6ff['exactVisible']) - Number(!_0x33aa32['exactVisible']);
-    if (_0x2b9a1f !== 0x0) return _0x2b9a1f;
-    const _0x4a53c9 = _0x1ac6ff['compactness'] + (_0x1ac6ff['retained'] ? 0.08 : 0x0),
-      _0x3f1c2b = _0x33aa32['compactness'] + (_0x33aa32['retained'] ? 0.08 : 0x0);
-    if (_0x4a53c9 !== _0x3f1c2b) return _0x3f1c2b - _0x4a53c9;
-    if (_0x1ac6ff['area'] !== _0x33aa32['area']) return _0x1ac6ff['area'] - _0x33aa32['area'];
-    return String(_0x1ac6ff['id'])['localeCompare'](String(_0x33aa32['id']));
+    activationSignal = value20 * value21,
+    rasterShare = smoothstep(0.32, 0.78, activationSignal),
+    activationFloor = retained['size'] > 0x0 ? 0.24 : 0.32,
+    value24 = Math['min'](
+      rasterCandidateCount['length'],
+      activationSignal >= activationFloor ? rasterCandidateCount['length'] : 0x0,
+    );
+  rasterCandidateCount['sort']((enabled3, enabled4) => {
+    const count3 = Number(!enabled3['exactVisible']) - Number(!enabled4['exactVisible']);
+    if (count3 !== 0x0) return count3;
+    const value25 = enabled3['compactness'] + (enabled3['retained'] ? 0.08 : 0x0),
+      value26 = enabled4['compactness'] + (enabled4['retained'] ? 0.08 : 0x0);
+    if (value25 !== value26) return value26 - value25;
+    if (enabled3['area'] !== enabled4['area']) return enabled3['area'] - enabled4['area'];
+    return String(enabled3['id'])['localeCompare'](String(enabled4['id']));
   });
-  for (const _0x4c8451 of _0x5bf69d['slice'](0x0, _0x194ccd)) {
-    _0x2c567f['add'](_0x4c8451['id']);
+  for (const value27 of rasterCandidateCount['slice'](0x0, value24)) {
+    active['add'](value27['id']);
   }
-  for (const _0x2f994d of _0x5bf69d['slice'](_0x194ccd)) {
-    _0xb939d0['add'](_0x2f994d['id']);
+  for (const value28 of rasterCandidateCount['slice'](value24)) {
+    domProxyIds['add'](value28['id']);
   }
-  let _0x4eeacc = 'mixed-raster-dom';
-  if (_0x25d363['size'] === 0x0) _0x4eeacc = 'no-proxy-candidates';
+  let reason = 'mixed-raster-dom';
+  if (proxyCount['size'] === 0x0) reason = 'no-proxy-candidates';
   else {
-    if (_0x5bf69d['length'] === 0x0) _0x4eeacc = 'dom-required-only';
+    if (rasterCandidateCount['length'] === 0x0) reason = 'dom-required-only';
     else {
-      if (_0x2c567f['size'] === 0x0) _0x4eeacc = 'below-raster-load';
-      else _0xb939d0['size'] === 0x0 && (_0x4eeacc = 'rasterized-all-proxies');
+      if (active['size'] === 0x0) reason = 'below-raster-load';
+      else domProxyIds['size'] === 0x0 && (reason = 'rasterized-all-proxies');
     }
   }
-  let _0x5cb176 = 0x0;
-  for (const _0x48967a of _0x4ee0b5) {
-    (_0x59d001['has'](_0x48967a) || _0x2c567f['has'](_0x48967a) || _0xb939d0['has'](_0x48967a)) &&
-      (_0x5cb176 += 0x1);
+  let exactVisibleCoveredCount = 0x0;
+  for (const value29 of exactVisible) {
+    (map5['has'](value29) || active['has'](value29) || domProxyIds['has'](value29)) &&
+      (exactVisibleCoveredCount += 0x1);
   }
-  const _0x5e7758 = buildCoverageSignature(_0x59d001, _0x2c567f, _0xb939d0);
+  const signature = buildCoverageSignature(map5, active, domProxyIds);
   return {
-    active: _0x2c567f['size'] > 0x0,
-    rasterIds: _0x2c567f,
-    domProxyIds: _0xb939d0,
-    reason: _0x4eeacc,
-    signature: _0x5e7758,
-    coverageSignature: _0x5e7758,
+    active: active['size'] > 0x0,
+    rasterIds: active,
+    domProxyIds: domProxyIds,
+    reason: reason,
+    signature: signature,
+    coverageSignature: signature,
     stats: {
-      scenePressure: _0x5a6949,
-      denseRasterStrength: _0x34104d,
-      proxyPressure: _0xe20e32,
-      activationSignal: _0x50d7d9,
-      activationFloor: _0x460a90,
-      rasterShare: _0x183fd9,
-      proxyCount: _0x25d363['size'],
-      rasterCandidateCount: _0x5bf69d['length'],
-      rasterCount: _0x2c567f['size'],
-      domProxyCount: _0xb939d0['size'],
-      interactiveDomCount: _0x1c32e7,
-      unsupportedDomCount: _0xae145d,
-      projectedDomCount: _0x216474,
-      exactVisibleCount: _0x4ee0b5['size'],
-      exactVisibleCoveredCount: _0x5cb176,
-      exactVisibleMissingCount: _0x4ee0b5['size'] - _0x5cb176,
+      scenePressure: scenePressure2,
+      denseRasterStrength: denseRasterStrength,
+      proxyPressure: proxyPressure,
+      activationSignal: activationSignal,
+      activationFloor: activationFloor,
+      rasterShare: rasterShare,
+      proxyCount: proxyCount['size'],
+      rasterCandidateCount: rasterCandidateCount['length'],
+      rasterCount: active['size'],
+      domProxyCount: domProxyIds['size'],
+      interactiveDomCount: interactiveDomCount,
+      unsupportedDomCount: unsupportedDomCount,
+      projectedDomCount: projectedDomCount,
+      exactVisibleCount: exactVisible['size'],
+      exactVisibleCoveredCount: exactVisibleCoveredCount,
+      exactVisibleMissingCount: exactVisible['size'] - exactVisibleCoveredCount,
     },
   };
 }

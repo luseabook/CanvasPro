@@ -10,177 +10,177 @@ const STORYBOARD_STANDARD_ASPECTS = Object.freeze([
   { label: '3:4', value: 3 / 4 },
   { label: '1:1', value: 1 },
 ]);
-function _trimString(_0x5ca9dc) {
-  return typeof _0x5ca9dc === 'string' ? _0x5ca9dc.trim() : '';
+function _trimString(value) {
+  return typeof value === 'string' ? value.trim() : '';
 }
-function _asPositiveNumber(_0x1d8d54) {
-  const _0x2b37bd = Number(_0x1d8d54);
-  return Number.isFinite(_0x2b37bd) && _0x2b37bd > 0 ? _0x2b37bd : 0;
+function _asPositiveNumber(item) {
+  const count = Number(item);
+  return Number.isFinite(count) && count > 0 ? count : 0;
 }
-function _getSafeGridCount(_0x3fcf3a) {
-  return Math.max(1, Math.round(_asPositiveNumber(_0x3fcf3a)) || 0);
+function _getSafeGridCount(key) {
+  return Math.max(1, Math.round(_asPositiveNumber(key)) || 0);
 }
-function _normalizeLocalPath(_0x11bb68) {
-  const _0x35c00b = _trimString(_0x11bb68);
-  if (!_0x35c00b) return '';
-  return _0x35c00b.startsWith('/') ? _0x35c00b : '/' + _0x35c00b;
+function _normalizeLocalPath(index) {
+  const _trimString2 = _trimString(index);
+  if (!_trimString2) return '';
+  return _trimString2.startsWith('/') ? _trimString2 : '/' + _trimString2;
 }
-function _findStoryboardSourceContext(_0x5f498e = []) {
-  if (!Array.isArray(_0x5f498e)) return {};
-  for (const _0x52f635 of _0x5f498e) {
-    if (!_0x52f635 || typeof _0x52f635 !== 'object') continue;
-    const _0x38b6f5 = _trimString(_0x52f635.sourceLocalPath),
-      _0x82a096 = _trimString(_0x52f635.sourceUrl);
-    if (!_0x38b6f5 && !_0x82a096) continue;
+function _findStoryboardSourceContext(list = []) {
+  if (!Array.isArray(list)) return {};
+  for (const storyboardSourceWidth of list) {
+    if (!storyboardSourceWidth || typeof storyboardSourceWidth !== 'object') continue;
+    const storyboardSourceLocalPath = _trimString(storyboardSourceWidth.sourceLocalPath),
+      _trimString3 = _trimString(storyboardSourceWidth.sourceUrl);
+    if (!storyboardSourceLocalPath && !_trimString3) continue;
     return {
-      storyboardSourceLocalPath: _0x38b6f5 || null,
-      storyboardSourceUrl: _0x38b6f5 ? '' : _0x82a096,
-      storyboardSourceWidth: _0x52f635.sourceWidth || null,
-      storyboardSourceHeight: _0x52f635.sourceHeight || null,
+      storyboardSourceLocalPath: storyboardSourceLocalPath || null,
+      storyboardSourceUrl: storyboardSourceLocalPath ? '' : _trimString3,
+      storyboardSourceWidth: storyboardSourceWidth.sourceWidth || null,
+      storyboardSourceHeight: storyboardSourceWidth.sourceHeight || null,
     };
   }
   return {};
 }
-function _normalizeStoryboardPieceCell(_0x5580b9, _0x24e9fd) {
-  if (!_0x5580b9 || typeof _0x5580b9 !== 'object') return _0x5580b9;
-  if (isStoryboardCellEmpty(_0x5580b9)) return { ..._0x5580b9 };
+function _normalizeStoryboardPieceCell(extracted, result) {
+  if (!extracted || typeof extracted !== 'object') return extracted;
+  if (isStoryboardCellEmpty(extracted)) return { ...extracted };
   return {
-    ...detachStoryboardCellSourceContext(_0x5580b9, {
+    ...detachStoryboardCellSourceContext(extracted, {
       locked: true,
-      extracted: _0x5580b9.storyboardExtractedCell === true,
+      extracted: extracted.storyboardExtractedCell === true,
     }),
     storyboardPiece: true,
-    storyboardSourceIndex: resolveStoryboardCellSourceIndex(_0x5580b9, _0x24e9fd),
+    storyboardSourceIndex: resolveStoryboardCellSourceIndex(extracted, result),
     isEmpty: false,
   };
 }
-function _parseAspectLabel(_0x36172c) {
-  const _0x4bccf0 = String(_0x36172c || '')
+function _parseAspectLabel(data) {
+  const options = String(data || '')
       .trim()
       .match(/^(\d+(?:\.\d+)?)\s*:\s*(\d+(?:\.\d+)?)$/),
-    _0x4bd0e7 = _asPositiveNumber(_0x4bccf0?.[1]),
-    _0xe61c90 = _asPositiveNumber(_0x4bccf0?.[2]);
-  if (_0x4bd0e7 > 0 && _0xe61c90 > 0) return { width: _0x4bd0e7, height: _0xe61c90 };
+    width2 = _asPositiveNumber(options?.[1]),
+    height2 = _asPositiveNumber(options?.[2]);
+  if (width2 > 0 && height2 > 0) return { width: width2, height: height2 };
   return { width: 1, height: 1 };
 }
-export function resolveNearestStoryboardAspect(_0x10cb52, _0x947050) {
-  const _0x21513d = _asPositiveNumber(_0x10cb52),
-    _0x10b522 = _asPositiveNumber(_0x947050);
-  if (!(_0x21513d > 0 && _0x10b522 > 0)) return '1:1';
-  const _0x37153b = _0x21513d / _0x10b522;
-  let _0x178b2a = STORYBOARD_STANDARD_ASPECTS[0],
-    _0x5dd475 = Math.abs(_0x37153b - _0x178b2a.value);
-  for (let _0x1a30dc = 1; _0x1a30dc < STORYBOARD_STANDARD_ASPECTS.length; _0x1a30dc++) {
-    const _0x2c2c52 = STORYBOARD_STANDARD_ASPECTS[_0x1a30dc],
-      _0x2cc324 = Math.abs(_0x37153b - _0x2c2c52.value);
-    _0x2cc324 < _0x5dd475 && ((_0x5dd475 = _0x2cc324), (_0x178b2a = _0x2c2c52));
+export function resolveNearestStoryboardAspect(target, source) {
+  const _asPositiveNumber2 = _asPositiveNumber(target),
+    _asPositiveNumber3 = _asPositiveNumber(source);
+  if (!(_asPositiveNumber2 > 0 && _asPositiveNumber3 > 0)) return '1:1';
+  const next = _asPositiveNumber2 / _asPositiveNumber3;
+  let el = STORYBOARD_STANDARD_ASPECTS[0],
+    current = Math.abs(next - el.value);
+  for (let entry = 1; entry < STORYBOARD_STANDARD_ASPECTS.length; entry++) {
+    const el2 = STORYBOARD_STANDARD_ASPECTS[entry],
+      record = Math.abs(next - el2.value);
+    record < current && ((current = record), (el = el2));
   }
-  return _0x178b2a.label;
+  return el.label;
 }
-export function resolveStoryboardSourceImageRef(_0xfb0df7) {
-  if (!_0xfb0df7 || typeof _0xfb0df7 !== 'object') return '';
-  const _0x491eef =
-    _trimString(_0xfb0df7.sourceUrl) || _trimString(_0xfb0df7.imageUrl) || _trimString(_0xfb0df7.src);
-  if (_0x491eef) return _0x491eef;
-  return _normalizeLocalPath(_0xfb0df7.localPath);
+export function resolveStoryboardSourceImageRef(enabled) {
+  if (!enabled || typeof enabled !== 'object') return '';
+  const _trimString4 =
+    _trimString(enabled.sourceUrl) || _trimString(enabled.imageUrl) || _trimString(enabled.src);
+  if (_trimString4) return _trimString4;
+  return _normalizeLocalPath(enabled.localPath);
 }
-export function buildQuickCreateStoryboardCells({ cols: _0x349f46, rows: _0x50457c, imageRef: _0x5cb4e3 }) {
-  const _0x5c5ed6 = _getSafeGridCount(_0x349f46) * _getSafeGridCount(_0x50457c),
-    _0x319716 = _trimString(_0x5cb4e3);
-  return Array.from({ length: _0x5c5ed6 }, (_0x12cd4, _0x320d0a) => {
-    if (_0x320d0a === 0 && _0x319716) return { url: _0x319716 };
+export function buildQuickCreateStoryboardCells({ cols: cols2, rows: rows2, imageRef: imageRef }) {
+  const length = _getSafeGridCount(cols2) * _getSafeGridCount(rows2),
+    url = _trimString(imageRef);
+  return Array.from({ length: length }, (payload, count2) => {
+    if (count2 === 0 && url) return { url: url };
     return { url: '', isEmpty: true };
   });
 }
 export function computeQuickCreateStoryboardSize({
-  sourceWidth: _0xb1a477,
-  sourceHeight: _0x4e58c0,
-  baseShortSide: _0x8246ee,
+  sourceWidth: sourceWidth,
+  sourceHeight: sourceHeight,
+  baseShortSide: baseShortSide,
 }) {
-  const _0x169b0e = _asPositiveNumber(_0xb1a477),
-    _0x227a14 = _asPositiveNumber(_0x4e58c0),
-    _0x1f6cdc = Math.max(1, Math.round(_asPositiveNumber(_0x8246ee) || 1));
-  if (!(_0x169b0e > 0 && _0x227a14 > 0)) return { width: _0x1f6cdc, height: _0x1f6cdc };
-  const _0x306faf = _0x169b0e / _0x227a14;
-  if (_0x306faf >= 1) return { width: Math.round(_0x1f6cdc * _0x306faf), height: _0x1f6cdc };
-  return { width: _0x1f6cdc, height: Math.round(_0x1f6cdc / _0x306faf) };
+  const _asPositiveNumber4 = _asPositiveNumber(sourceWidth),
+    _asPositiveNumber5 = _asPositiveNumber(sourceHeight),
+    width3 = Math.max(1, Math.round(_asPositiveNumber(baseShortSide) || 1));
+  if (!(_asPositiveNumber4 > 0 && _asPositiveNumber5 > 0)) return { width: width3, height: width3 };
+  const count3 = _asPositiveNumber4 / _asPositiveNumber5;
+  if (count3 >= 1) return { width: Math.round(width3 * count3), height: width3 };
+  return { width: width3, height: Math.round(width3 / count3) };
 }
 export function computePreparedStoryboardSize({
-  aspectLabel: _0x64416a,
-  cols: _0x217f74,
-  rows: _0x9cf393,
-  sourceWidth: _0x56bb93,
-  sourceHeight: _0x5b1b03,
+  aspectLabel: aspectLabel,
+  cols: cols3,
+  rows: rows3,
+  sourceWidth: sourceWidth2,
+  sourceHeight: sourceHeight2,
   minCellShortSide: minCellShortSide = 0x12c,
 }) {
-  const { width: _0x3ce898, height: _0x486fb9 } = _parseAspectLabel(_0x64416a),
-    _0x572e70 = _getSafeGridCount(_0x217f74),
-    _0x45bfd6 = _getSafeGridCount(_0x9cf393),
-    _0x1cf11f = _asPositiveNumber(_0x56bb93) / _asPositiveNumber(_0x5b1b03),
-    _0x4eb3dc =
-      Number.isFinite(_0x1cf11f) && _0x1cf11f > 0
-        ? _0x1cf11f * (_0x45bfd6 / _0x572e70)
-        : _0x3ce898 / _0x486fb9,
-    _0x165978 = Math.max(1, Math.round(_asPositiveNumber(minCellShortSide) || 0x12c));
-  let _0x137dbb = _0x165978,
-    _0x43ab67 = _0x165978;
+  const { width: width4, height: height3 } = _parseAspectLabel(aspectLabel),
+    _getSafeGridCount2 = _getSafeGridCount(cols3),
+    _getSafeGridCount3 = _getSafeGridCount(rows3),
+    _asPositiveNumber6 = _asPositiveNumber(sourceWidth2) / _asPositiveNumber(sourceHeight2),
+    count4 =
+      Number.isFinite(_asPositiveNumber6) && _asPositiveNumber6 > 0
+        ? _asPositiveNumber6 * (_getSafeGridCount3 / _getSafeGridCount2)
+        : width4 / height3,
+    handle = Math.max(1, Math.round(_asPositiveNumber(minCellShortSide) || 0x12c));
+  let state = handle,
+    config = handle;
   return (
-    _0x4eb3dc >= 1
-      ? ((_0x43ab67 = _0x165978), (_0x137dbb = _0x43ab67 * _0x4eb3dc))
-      : ((_0x137dbb = _0x165978), (_0x43ab67 = _0x137dbb / _0x4eb3dc)),
-    { width: Math.round(_0x137dbb * _0x572e70), height: Math.round(_0x43ab67 * _0x45bfd6) }
+    count4 >= 1
+      ? ((config = handle), (state = config * count4))
+      : ((state = handle), (config = state / count4)),
+    { width: Math.round(state * _getSafeGridCount2), height: Math.round(config * _getSafeGridCount3) }
   );
 }
 export function buildStoryboardNodePayload({
-  id: _0x5bb11d,
-  name: _0x20c3a3,
-  x: _0x418d55,
-  y: _0x2b0b72,
-  cols: _0x4013a4,
-  rows: _0x28d0d6,
-  width: _0x26360a,
-  height: _0x9f7cce,
-  aspectRatio: _0x549997,
-  cells: _0x2dd07a,
+  id: id,
+  name: name2,
+  x: x2,
+  y: y2,
+  cols: cols4,
+  rows: rows4,
+  width: width5,
+  height: height4,
+  aspectRatio: aspectRatio2,
+  cells: cells,
   isEditing: isEditing = false,
-  storyboardSourceLocalPath: _0x3f92b7,
-  storyboardSourceUrl: _0x4bc1d5,
-  storyboardSourceWidth: _0x4b6465,
-  storyboardSourceHeight: _0x297c8d,
+  storyboardSourceLocalPath: storyboardSourceLocalPath2,
+  storyboardSourceUrl: storyboardSourceUrl,
+  storyboardSourceWidth: storyboardSourceWidth2,
+  storyboardSourceHeight: storyboardSourceHeight,
 }) {
-  const _0x50d94d = {
-    ..._findStoryboardSourceContext(_0x2dd07a),
+  const args = {
+    ..._findStoryboardSourceContext(cells),
     ...Object.fromEntries(
       Object.entries({
-        storyboardSourceLocalPath: _0x3f92b7 || undefined,
-        storyboardSourceUrl: _0x4bc1d5 || undefined,
-        storyboardSourceWidth: _0x4b6465 || undefined,
-        storyboardSourceHeight: _0x297c8d || undefined,
-      }).filter(([, _0x3195df]) => _0x3195df !== undefined),
+        storyboardSourceLocalPath: storyboardSourceLocalPath2 || undefined,
+        storyboardSourceUrl: storyboardSourceUrl || undefined,
+        storyboardSourceWidth: storyboardSourceWidth2 || undefined,
+        storyboardSourceHeight: storyboardSourceHeight || undefined,
+      }).filter(([, scope]) => scope !== undefined),
     ),
   };
   return {
-    id: _0x5bb11d,
+    id: id,
     type: 'storyboard',
-    name: _0x20c3a3,
-    x: _0x418d55,
-    y: _0x2b0b72,
-    width: _0x26360a,
-    height: _0x9f7cce,
-    cells: Array.isArray(_0x2dd07a)
-      ? _0x2dd07a.map((_0x176d37, _0x56f1cd) => _normalizeStoryboardPieceCell(_0x176d37, _0x56f1cd))
+    name: name2,
+    x: x2,
+    y: y2,
+    width: width5,
+    height: height4,
+    cells: Array.isArray(cells)
+      ? cells.map((item2, input) => _normalizeStoryboardPieceCell(item2, input))
       : [],
-    cols: _0x4013a4,
-    rows: _0x28d0d6,
-    aspectRatio: _0x549997,
+    cols: cols4,
+    rows: rows4,
+    aspectRatio: aspectRatio2,
     isEditing: isEditing,
-    ..._0x50d94d,
+    ...args,
   };
 }
 export const STORYBOARD_EMPTY_GRID_DEFAULTS = Object.freeze({ cols: 3, rows: 3, aspectRatio: '1:1' });
 
 export function createEmptyStoryboardNodeData({
-  id: _0x1fd928,
+  id: id2,
   name: name = '宫格图',
   x: x = 0,
   y: y = 0,
@@ -192,7 +192,7 @@ export function createEmptyStoryboardNodeData({
   isEditing: isEditing = false,
 } = {}) {
   return buildStoryboardNodePayload({
-    id: _0x1fd928,
+    id: id2,
     name: name,
     x: x,
     y: y,

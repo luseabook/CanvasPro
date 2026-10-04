@@ -1,209 +1,188 @@
 const TAU = Math['PI'] * 0x2,
   STRAIGHT_BEND_EPSILON = 0.0001,
-  finiteNumberOr = (_0x21c3d7, _0x25b354 = 0x0) => {
-    const _0x47f20a = Number(_0x21c3d7);
-    return Number['isFinite'](_0x47f20a) ? _0x47f20a : _0x25b354;
+  finiteNumberOr = (value, item = 0x0) => {
+    const key = Number(value);
+    return Number['isFinite'](key) ? key : item;
   },
-  positiveAngle = (_0x120abe) => {
-    const _0x3ad88f = _0x120abe % TAU;
-    return _0x3ad88f < 0x0 ? _0x3ad88f + TAU : _0x3ad88f;
+  positiveAngle = (index) => {
+    const count = index % TAU;
+    return count < 0x0 ? count + TAU : count;
   },
-  getArrowEndpoints = (_0x481856) => ({
-    start: { x: finiteNumberOr(_0x481856?.['x1']), y: finiteNumberOr(_0x481856?.['y1']) },
-    end: { x: finiteNumberOr(_0x481856?.['x2']), y: finiteNumberOr(_0x481856?.['y2']) },
+  getArrowEndpoints = (result) => ({
+    start: { x: finiteNumberOr(result?.['x1']), y: finiteNumberOr(result?.['y1']) },
+    end: { x: finiteNumberOr(result?.['x2']), y: finiteNumberOr(result?.['y2']) },
   }),
-  getLineGeometry = (_0x5b82e6, _0x419ee3) => {
-    const _0x522faf = _0x419ee3['x'] - _0x5b82e6['x'],
-      _0x282888 = _0x419ee3['y'] - _0x5b82e6['y'],
-      _0x3b1d7a = Math['hypot'](_0x522faf, _0x282888),
-      _0x3bce9e =
-        _0x3b1d7a > 0x0 ? { x: _0x522faf / _0x3b1d7a, y: _0x282888 / _0x3b1d7a } : { x: 0x1, y: 0x0 };
+  getLineGeometry = (start, end) => {
+    const x = end['x'] - start['x'],
+      y = end['y'] - start['y'],
+      length = Math['hypot'](x, y),
+      startTangent = length > 0x0 ? { x: x / length, y: y / length } : { x: 0x1, y: 0x0 };
     return {
       type: 'straight',
-      start: _0x5b82e6,
-      end: _0x419ee3,
-      middle: { x: (_0x5b82e6['x'] + _0x419ee3['x']) / 0x2, y: (_0x5b82e6['y'] + _0x419ee3['y']) / 0x2 },
-      length: _0x3b1d7a,
-      startTangent: _0x3bce9e,
-      endTangent: _0x3bce9e,
+      start: start,
+      end: end,
+      middle: { x: (start['x'] + end['x']) / 0x2, y: (start['y'] + end['y']) / 0x2 },
+      length: length,
+      startTangent: startTangent,
+      endTangent: startTangent,
     };
   },
-  getSegmentDistance = (_0x28b2d7, _0x45a31e, _0x9c1174) => {
-    const _0xdd66df = _0x9c1174['x'] - _0x45a31e['x'],
-      _0x4ed42a = _0x9c1174['y'] - _0x45a31e['y'],
-      _0x592280 = _0xdd66df * _0xdd66df + _0x4ed42a * _0x4ed42a;
-    if (_0x592280 <= 0x0)
-      return Math['hypot'](_0x28b2d7['x'] - _0x45a31e['x'], _0x28b2d7['y'] - _0x45a31e['y']);
-    const _0x2e3620 = Math['max'](
+  getSegmentDistance = (box, box2, box3) => {
+    const data = box3['x'] - box2['x'],
+      options = box3['y'] - box2['y'],
+      count2 = data * data + options * options;
+    if (count2 <= 0x0) return Math['hypot'](box['x'] - box2['x'], box['y'] - box2['y']);
+    const target = Math['max'](
       0x0,
-      Math['min'](
-        0x1,
-        ((_0x28b2d7['x'] - _0x45a31e['x']) * _0xdd66df + (_0x28b2d7['y'] - _0x45a31e['y']) * _0x4ed42a) /
-          _0x592280,
-      ),
+      Math['min'](0x1, ((box['x'] - box2['x']) * data + (box['y'] - box2['y']) * options) / count2),
     );
-    return Math['hypot'](
-      _0x28b2d7['x'] - (_0x45a31e['x'] + _0xdd66df * _0x2e3620),
-      _0x28b2d7['y'] - (_0x45a31e['y'] + _0x4ed42a * _0x2e3620),
-    );
+    return Math['hypot'](box['x'] - (box2['x'] + data * target), box['y'] - (box2['y'] + options * target));
   },
-  getElbowGeometry = (_0x3148d7, _0x527257, _0x45a7fe = 0x0) => {
-    const _0xf43806 = _0x527257['x'] - _0x3148d7['x'],
-      _0x5cf5e2 = _0x527257['y'] - _0x3148d7['y'],
-      _0x362d44 = Math['abs'](_0xf43806) >= Math['abs'](_0x5cf5e2),
-      _0x5a800a = _0x362d44
+  getElbowGeometry = (y2, y3, source = 0x0) => {
+    const next = y3['x'] - y2['x'],
+      current = y3['y'] - y2['y'],
+      horizontalRoute = Math['abs'](next) >= Math['abs'](current),
+      x2 = horizontalRoute
         ? {
-            x: (_0x3148d7['x'] + _0x527257['x']) / 0x2 + _0x45a7fe,
-            y: (_0x3148d7['y'] + _0x527257['y']) / 0x2,
+            x: (y2['x'] + y3['x']) / 0x2 + source,
+            y: (y2['y'] + y3['y']) / 0x2,
           }
         : {
-            x: (_0x3148d7['x'] + _0x527257['x']) / 0x2,
-            y: (_0x3148d7['y'] + _0x527257['y']) / 0x2 + _0x45a7fe,
+            x: (y2['x'] + y3['x']) / 0x2,
+            y: (y2['y'] + y3['y']) / 0x2 + source,
           },
-      _0x518302 = _0x362d44
-        ? [
-            _0x3148d7,
-            { x: _0x5a800a['x'], y: _0x3148d7['y'] },
-            { x: _0x5a800a['x'], y: _0x527257['y'] },
-            _0x527257,
-          ]
-        : [
-            _0x3148d7,
-            { x: _0x3148d7['x'], y: _0x5a800a['y'] },
-            { x: _0x527257['x'], y: _0x5a800a['y'] },
-            _0x527257,
-          ],
-      _0x510ec8 = [];
-    let _0xb84db3 = 0x0;
-    for (let _0x348bfb = 0x1; _0x348bfb < _0x518302['length']; _0x348bfb += 0x1) {
-      const _0x5200f4 = _0x518302[_0x348bfb]['x'] - _0x518302[_0x348bfb - 0x1]['x'],
-        _0xedbde = _0x518302[_0x348bfb]['y'] - _0x518302[_0x348bfb - 0x1]['y'],
-        _0x39ed2c = Math['hypot'](_0x5200f4, _0xedbde);
-      if (_0x39ed2c <= STRAIGHT_BEND_EPSILON) continue;
-      ((_0xb84db3 += _0x39ed2c),
-        _0x510ec8['push']({ tangent: { x: _0x5200f4 / _0x39ed2c, y: _0xedbde / _0x39ed2c } }));
+      points = horizontalRoute
+        ? [y2, { x: x2['x'], y: y2['y'] }, { x: x2['x'], y: y3['y'] }, y3]
+        : [y2, { x: y2['x'], y: x2['y'] }, { x: y3['x'], y: x2['y'] }, y3],
+      startTangent2 = [];
+    let length2 = 0x0;
+    for (let entry = 0x1; entry < points['length']; entry += 0x1) {
+      const x3 = points[entry]['x'] - points[entry - 0x1]['x'],
+        y4 = points[entry]['y'] - points[entry - 0x1]['y'],
+        record = Math['hypot'](x3, y4);
+      if (record <= STRAIGHT_BEND_EPSILON) continue;
+      ((length2 += record), startTangent2['push']({ tangent: { x: x3 / record, y: y4 / record } }));
     }
-    const _0x722131 = getLineGeometry(_0x3148d7, _0x527257)['startTangent'];
+    const lineGeometry = getLineGeometry(y2, y3)['startTangent'];
     return {
       type: 'elbow',
-      start: _0x3148d7,
-      end: _0x527257,
-      middle: _0x5a800a,
-      points: _0x518302,
-      horizontalRoute: _0x362d44,
-      length: _0xb84db3,
-      startTangent: _0x510ec8[0x0]?.['tangent'] || _0x722131,
-      endTangent: _0x510ec8['at'](-0x1)?.['tangent'] || _0x722131,
+      start: y2,
+      end: y3,
+      middle: x2,
+      points: points,
+      horizontalRoute: horizontalRoute,
+      length: length2,
+      startTangent: startTangent2[0x0]?.['tangent'] || lineGeometry,
+      endTangent: startTangent2['at'](-0x1)?.['tangent'] || lineGeometry,
     };
   };
-export function getArrowGeometry(_0x15e128) {
-  const { start: _0x3fca35, end: _0x2308ff } = getArrowEndpoints(_0x15e128),
-    _0x14d369 = getLineGeometry(_0x3fca35, _0x2308ff),
-    _0x3be672 = String(_0x15e128?.['arrowKind'] || '')['trim']();
-  if (_0x3be672 === 'elbow')
-    return getElbowGeometry(_0x3fca35, _0x2308ff, finiteNumberOr(_0x15e128?.['elbowOffset']));
-  if (_0x3be672 === 'straight') return _0x14d369;
-  const _0x40a22d = finiteNumberOr(_0x15e128?.['bend']);
-  if (_0x14d369['length'] <= STRAIGHT_BEND_EPSILON || Math['abs'](_0x40a22d) < STRAIGHT_BEND_EPSILON)
-    return _0x14d369;
-  const _0x4875a8 = _0x2308ff['x'] - _0x3fca35['x'],
-    _0x13abb7 = _0x2308ff['y'] - _0x3fca35['y'],
-    _0x475a78 = { x: -_0x13abb7 / _0x14d369['length'], y: _0x4875a8 / _0x14d369['length'] },
-    _0x590785 = {
-      x: _0x14d369['middle']['x'] + _0x475a78['x'] * _0x40a22d,
-      y: _0x14d369['middle']['y'] + _0x475a78['y'] * _0x40a22d,
+export function getArrowGeometry(payload) {
+  const { start: start2, end: end2 } = getArrowEndpoints(payload),
+    x4 = getLineGeometry(start2, end2),
+    handle = String(payload?.['arrowKind'] || '')['trim']();
+  if (handle === 'elbow') return getElbowGeometry(start2, end2, finiteNumberOr(payload?.['elbowOffset']));
+  if (handle === 'straight') return x4;
+  const finiteNumberOr2 = finiteNumberOr(payload?.['bend']);
+  if (x4['length'] <= STRAIGHT_BEND_EPSILON || Math['abs'](finiteNumberOr2) < STRAIGHT_BEND_EPSILON)
+    return x4;
+  const y5 = end2['x'] - start2['x'],
+    state = end2['y'] - start2['y'],
+    box4 = { x: -state / x4['length'], y: y5 / x4['length'] },
+    middle = {
+      x: x4['middle']['x'] + box4['x'] * finiteNumberOr2,
+      y: x4['middle']['y'] + box4['y'] * finiteNumberOr2,
     },
-    _0x11baa8 = _0x14d369['length'] / 0x2,
-    _0x1d2177 = (_0x40a22d * _0x40a22d - _0x11baa8 * _0x11baa8) / (0x2 * _0x40a22d),
-    _0x3008df = {
-      x: _0x14d369['middle']['x'] + _0x475a78['x'] * _0x1d2177,
-      y: _0x14d369['middle']['y'] + _0x475a78['y'] * _0x1d2177,
+    config = x4['length'] / 0x2,
+    scope = (finiteNumberOr2 * finiteNumberOr2 - config * config) / (0x2 * finiteNumberOr2),
+    center = {
+      x: x4['middle']['x'] + box4['x'] * scope,
+      y: x4['middle']['y'] + box4['y'] * scope,
     },
-    _0x2e5356 = Math['hypot'](_0x11baa8, _0x1d2177);
-  if (!Number['isFinite'](_0x2e5356) || _0x2e5356 <= STRAIGHT_BEND_EPSILON) return _0x14d369;
-  const _0x5e92ec = Math['atan2'](_0x3fca35['y'] - _0x3008df['y'], _0x3fca35['x'] - _0x3008df['x']),
-    _0x8196eb = Math['atan2'](_0x2308ff['y'] - _0x3008df['y'], _0x2308ff['x'] - _0x3008df['x']),
-    _0x5b2e1b = Math['atan2'](_0x590785['y'] - _0x3008df['y'], _0x590785['x'] - _0x3008df['x']),
-    _0x39ec24 = positiveAngle(_0x8196eb - _0x5e92ec),
-    _0x56627c = positiveAngle(_0x5b2e1b - _0x5e92ec),
-    _0x140ad1 = _0x56627c > _0x39ec24 + STRAIGHT_BEND_EPSILON,
-    _0x2aa015 = _0x140ad1 ? positiveAngle(_0x5e92ec - _0x8196eb) : _0x39ec24;
-  if (!Number['isFinite'](_0x2aa015) || _0x2aa015 <= STRAIGHT_BEND_EPSILON) return _0x14d369;
-  const _0x363f40 = _0x140ad1 ? -0x1 : 0x1,
-    _0x1d6785 = (_0x405aef) => ({
-      x: -Math['sin'](_0x405aef) * _0x363f40,
-      y: Math['cos'](_0x405aef) * _0x363f40,
+    radius = Math['hypot'](config, scope);
+  if (!Number['isFinite'](radius) || radius <= STRAIGHT_BEND_EPSILON) return x4;
+  const startAngle = Math['atan2'](start2['y'] - center['y'], start2['x'] - center['x']),
+    endAngle = Math['atan2'](end2['y'] - center['y'], end2['x'] - center['x']),
+    input = Math['atan2'](middle['y'] - center['y'], middle['x'] - center['x']),
+    positiveAngle2 = positiveAngle(endAngle - startAngle),
+    positiveAngle3 = positiveAngle(input - startAngle),
+    anticlockwise = positiveAngle3 > positiveAngle2 + STRAIGHT_BEND_EPSILON,
+    sweep = anticlockwise ? positiveAngle(startAngle - endAngle) : positiveAngle2;
+  if (!Number['isFinite'](sweep) || sweep <= STRAIGHT_BEND_EPSILON) return x4;
+  const output = anticlockwise ? -0x1 : 0x1,
+    startTangent3 = (value2) => ({
+      x: -Math['sin'](value2) * output,
+      y: Math['cos'](value2) * output,
     });
   return {
     type: 'arc',
-    start: _0x3fca35,
-    end: _0x2308ff,
-    middle: _0x590785,
-    center: _0x3008df,
-    radius: _0x2e5356,
-    startAngle: _0x5e92ec,
-    endAngle: _0x8196eb,
-    anticlockwise: _0x140ad1,
-    sweep: _0x2aa015,
-    length: _0x2e5356 * _0x2aa015,
-    startTangent: _0x1d6785(_0x5e92ec),
-    endTangent: _0x1d6785(_0x8196eb),
+    start: start2,
+    end: end2,
+    middle: middle,
+    center: center,
+    radius: radius,
+    startAngle: startAngle,
+    endAngle: endAngle,
+    anticlockwise: anticlockwise,
+    sweep: sweep,
+    length: radius * sweep,
+    startTangent: startTangent3(startAngle),
+    endTangent: startTangent3(endAngle),
   };
 }
-export function getArrowElbowOffsetFromPoint(_0x5ec9c5, _0x22dab9) {
-  const { start: _0xb95501, end: _0x2cc3d1 } = getArrowEndpoints(_0x5ec9c5),
-    _0x4752f9 = Math['abs'](_0x2cc3d1['x'] - _0xb95501['x']) >= Math['abs'](_0x2cc3d1['y'] - _0xb95501['y']);
-  return _0x4752f9
-    ? finiteNumberOr(_0x22dab9?.['x']) - (_0xb95501['x'] + _0x2cc3d1['x']) / 0x2
-    : finiteNumberOr(_0x22dab9?.['y']) - (_0xb95501['y'] + _0x2cc3d1['y']) / 0x2;
+export function getArrowElbowOffsetFromPoint(value3, box5) {
+  const { start: start3, end: end3 } = getArrowEndpoints(value3),
+    value4 = Math['abs'](end3['x'] - start3['x']) >= Math['abs'](end3['y'] - start3['y']);
+  return value4
+    ? finiteNumberOr(box5?.['x']) - (start3['x'] + end3['x']) / 0x2
+    : finiteNumberOr(box5?.['y']) - (start3['y'] + end3['y']) / 0x2;
 }
-export function getArrowBendFromPoint(_0x34be0d, _0x404035) {
-  const { start: _0x28ab6b, end: _0x28dc6c } = getArrowEndpoints(_0x34be0d),
-    _0x24e180 = _0x28dc6c['x'] - _0x28ab6b['x'],
-    _0x21496f = _0x28dc6c['y'] - _0x28ab6b['y'],
-    _0x476571 = Math['hypot'](_0x24e180, _0x21496f);
-  if (_0x476571 <= STRAIGHT_BEND_EPSILON) return 0x0;
-  const _0x1f3ea1 = {
-      x: (_0x28ab6b['x'] + _0x28dc6c['x']) / 0x2,
-      y: (_0x28ab6b['y'] + _0x28dc6c['y']) / 0x2,
+export function getArrowBendFromPoint(value5, box6) {
+  const { start: start4, end: end4 } = getArrowEndpoints(value5),
+    y6 = end4['x'] - start4['x'],
+    value6 = end4['y'] - start4['y'],
+    value7 = Math['hypot'](y6, value6);
+  if (value7 <= STRAIGHT_BEND_EPSILON) return 0x0;
+  const box7 = {
+      x: (start4['x'] + end4['x']) / 0x2,
+      y: (start4['y'] + end4['y']) / 0x2,
     },
-    _0x4c0d99 = { x: -_0x21496f / _0x476571, y: _0x24e180 / _0x476571 };
+    box8 = { x: -value6 / value7, y: y6 / value7 };
   return (
-    (finiteNumberOr(_0x404035?.['x']) - _0x1f3ea1['x']) * _0x4c0d99['x'] +
-    (finiteNumberOr(_0x404035?.['y']) - _0x1f3ea1['y']) * _0x4c0d99['y']
+    (finiteNumberOr(box6?.['x']) - box7['x']) * box8['x'] +
+    (finiteNumberOr(box6?.['y']) - box7['y']) * box8['y']
   );
 }
-export function getDistanceToArrowPath(_0x2f7b28, _0x1ac076) {
-  const _0x3c7502 = getArrowGeometry(_0x1ac076),
-    _0x4e92ed = finiteNumberOr(_0x2f7b28?.['x']),
-    _0x5c10f4 = finiteNumberOr(_0x2f7b28?.['y']);
-  if (_0x3c7502['type'] === 'straight')
-    return getSegmentDistance({ x: _0x4e92ed, y: _0x5c10f4 }, _0x3c7502['start'], _0x3c7502['end']);
-  if (_0x3c7502['type'] === 'elbow') {
-    let _0x5cf1b3 = Number['POSITIVE_INFINITY'];
-    for (let _0x5eb102 = 0x1; _0x5eb102 < _0x3c7502['points']['length']; _0x5eb102 += 0x1) {
-      _0x5cf1b3 = Math['min'](
-        _0x5cf1b3,
+export function getDistanceToArrowPath(box9, value8) {
+  const arrowGeometry = getArrowGeometry(value8),
+    x5 = finiteNumberOr(box9?.['x']),
+    y7 = finiteNumberOr(box9?.['y']);
+  if (arrowGeometry['type'] === 'straight')
+    return getSegmentDistance({ x: x5, y: y7 }, arrowGeometry['start'], arrowGeometry['end']);
+  if (arrowGeometry['type'] === 'elbow') {
+    let value9 = Number['POSITIVE_INFINITY'];
+    for (let value10 = 0x1; value10 < arrowGeometry['points']['length']; value10 += 0x1) {
+      value9 = Math['min'](
+        value9,
         getSegmentDistance(
-          { x: _0x4e92ed, y: _0x5c10f4 },
-          _0x3c7502['points'][_0x5eb102 - 0x1],
-          _0x3c7502['points'][_0x5eb102],
+          { x: x5, y: y7 },
+          arrowGeometry['points'][value10 - 0x1],
+          arrowGeometry['points'][value10],
         ),
       );
     }
-    return _0x5cf1b3;
+    return value9;
   }
-  const _0x1ee5a2 = Math['atan2'](_0x5c10f4 - _0x3c7502['center']['y'], _0x4e92ed - _0x3c7502['center']['x']),
-    _0x1b70d1 = _0x3c7502['anticlockwise']
-      ? positiveAngle(_0x3c7502['startAngle'] - _0x1ee5a2)
-      : positiveAngle(_0x1ee5a2 - _0x3c7502['startAngle']);
-  if (_0x1b70d1 <= _0x3c7502['sweep'] + STRAIGHT_BEND_EPSILON)
+  const value11 = Math['atan2'](y7 - arrowGeometry['center']['y'], x5 - arrowGeometry['center']['x']),
+    value12 = arrowGeometry['anticlockwise']
+      ? positiveAngle(arrowGeometry['startAngle'] - value11)
+      : positiveAngle(value11 - arrowGeometry['startAngle']);
+  if (value12 <= arrowGeometry['sweep'] + STRAIGHT_BEND_EPSILON)
     return Math['abs'](
-      Math['hypot'](_0x4e92ed - _0x3c7502['center']['x'], _0x5c10f4 - _0x3c7502['center']['y']) -
-        _0x3c7502['radius'],
+      Math['hypot'](x5 - arrowGeometry['center']['x'], y7 - arrowGeometry['center']['y']) -
+        arrowGeometry['radius'],
     );
   return Math['min'](
-    Math['hypot'](_0x4e92ed - _0x3c7502['start']['x'], _0x5c10f4 - _0x3c7502['start']['y']),
-    Math['hypot'](_0x4e92ed - _0x3c7502['end']['x'], _0x5c10f4 - _0x3c7502['end']['y']),
+    Math['hypot'](x5 - arrowGeometry['start']['x'], y7 - arrowGeometry['start']['y']),
+    Math['hypot'](x5 - arrowGeometry['end']['x'], y7 - arrowGeometry['end']['y']),
   );
 }

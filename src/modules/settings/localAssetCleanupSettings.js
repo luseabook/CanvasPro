@@ -27,163 +27,158 @@ const MAX_RENDERED_ITEMS = 120,
     size: 'legacyAssetCleanupSize',
     list: 'legacyAssetCleanupList',
   });
-function fileSaveText(_0xc4cb33, _0x23f929 = {}) {
-  return t('settings.fileSave.' + _0xc4cb33, _0x23f929);
+function fileSaveText(value, item = {}) {
+  return t('settings.fileSave.' + value, item);
 }
-function cleanupText(_0x3c42c3, _0x532118 = {}) {
-  return fileSaveText('cleanupRuntime.' + _0x3c42c3, _0x532118);
+function cleanupText(key, index = {}) {
+  return fileSaveText('cleanupRuntime.' + key, index);
 }
-function errorMessage(_0x4e6517) {
-  return _0x4e6517?.message || fileSaveText('runtime.unknownError');
+function errorMessage(error) {
+  return error?.message || fileSaveText('runtime.unknownError');
 }
-function getElements(_0x3aee43) {
+function getElements(response) {
   return {
-    card: document.getElementById(_0x3aee43.card),
-    scanBtn: document.getElementById(_0x3aee43.scanBtn),
-    trashBtn: document.getElementById(_0x3aee43.trashBtn),
-    status: document.getElementById(_0x3aee43.status),
-    count: document.getElementById(_0x3aee43.count),
-    size: document.getElementById(_0x3aee43.size),
-    list: document.getElementById(_0x3aee43.list),
+    card: document.getElementById(response.card),
+    scanBtn: document.getElementById(response.scanBtn),
+    trashBtn: document.getElementById(response.trashBtn),
+    status: document.getElementById(response.status),
+    count: document.getElementById(response.count),
+    size: document.getElementById(response.size),
+    list: document.getElementById(response.list),
   };
 }
-function setButtonBusy(_0x5175b7, _0x50a17b, _0x558a48) {
-  if (!_0x5175b7) return;
-  _0x5175b7.disabled = !!_0x50a17b;
-  if (_0x558a48) _0x5175b7.textContent = _0x558a48;
+function setButtonBusy(el, enabled, result) {
+  if (!el) return;
+  el.disabled = !!enabled;
+  if (result) el.textContent = result;
 }
-function setStatus(_0x3e0c8d, _0x594148, _0x118761 = '') {
-  if (!_0x3e0c8d) return;
-  ((_0x3e0c8d.textContent = _0x594148 || ''),
-    _0x3e0c8d.classList.toggle('is-error', _0x118761 === 'error'),
-    _0x3e0c8d.classList.toggle('is-success', _0x118761 === 'success'));
+function setStatus(el2, data, options = '') {
+  if (!el2) return;
+  ((el2.textContent = data || ''),
+    el2.classList.toggle('is-error', options === 'error'),
+    el2.classList.toggle('is-success', options === 'success'));
 }
-function createItemRow(_0x29e193) {
-  const _0x12f8b5 = document.createElement('div');
-  _0x12f8b5.className = 'settings-local-cleanup-item';
-  const _0x11a61e = document.createElement('div');
-  ((_0x11a61e.className = 'settings-local-cleanup-path'),
-    (_0x11a61e.textContent = _0x29e193?.localPath || ''),
-    (_0x11a61e.title = _0x29e193?.localPath || ''));
-  const _0x3a45e7 = document.createElement('div');
+function createItemRow(target) {
+  const el3 = document.createElement('div');
+  el3.className = 'settings-local-cleanup-item';
+  const el4 = document.createElement('div');
+  ((el4.className = 'settings-local-cleanup-path'),
+    (el4.textContent = target?.localPath || ''),
+    (el4.title = target?.localPath || ''));
+  const el5 = document.createElement('div');
   return (
-    (_0x3a45e7.className = 'settings-local-cleanup-meta'),
-    (_0x3a45e7.textContent =
-      formatCleanupBytes(_0x29e193?.size) + ' · ' + (_0x29e193?.kind || cleanupText('mediaKind'))),
-    _0x12f8b5.appendChild(_0x11a61e),
-    _0x12f8b5.appendChild(_0x3a45e7),
-    _0x12f8b5
+    (el5.className = 'settings-local-cleanup-meta'),
+    (el5.textContent = formatCleanupBytes(target?.size) + ' · ' + (target?.kind || cleanupText('mediaKind'))),
+    el3.appendChild(el4),
+    el3.appendChild(el5),
+    el3
   );
 }
-function renderScanResult(_0x1c137a, _0x4df5c2) {
-  const _0x3ee140 = Array.isArray(_0x1c137a?.items) ? _0x1c137a.items : [];
-  _0x4df5c2.count && (_0x4df5c2.count.textContent = String(Number(_0x1c137a?.orphanCount || 0)));
-  _0x4df5c2.size && (_0x4df5c2.size.textContent = formatCleanupBytes(_0x1c137a?.orphanBytes || 0));
-  setStatus(
-    _0x4df5c2.status,
-    summarizeLocalAssetCleanupScan(_0x1c137a),
-    _0x3ee140.length > 0 ? '' : 'success',
-  );
-  if (_0x4df5c2.list) {
-    (_0x4df5c2.list.replaceChildren(),
-      (_0x4df5c2.list.hidden = _0x3ee140.length === 0),
-      _0x3ee140.slice(0, MAX_RENDERED_ITEMS).forEach((_0x241435) => {
-        _0x4df5c2.list.appendChild(createItemRow(_0x241435));
+function renderScanResult(source, response2) {
+  const count = Array.isArray(source?.items) ? source.items : [];
+  response2.count && (response2.count.textContent = String(Number(source?.orphanCount || 0)));
+  response2.size && (response2.size.textContent = formatCleanupBytes(source?.orphanBytes || 0));
+  setStatus(response2.status, summarizeLocalAssetCleanupScan(source), count.length > 0 ? '' : 'success');
+  if (response2.list) {
+    (response2.list.replaceChildren(),
+      (response2.list.hidden = count.length === 0),
+      count.slice(0, MAX_RENDERED_ITEMS).forEach((item2) => {
+        response2.list.appendChild(createItemRow(item2));
       }));
-    if (_0x3ee140.length > MAX_RENDERED_ITEMS) {
-      const _0x12fc97 = document.createElement('div');
-      ((_0x12fc97.className = 'settings-local-cleanup-more'),
-        (_0x12fc97.textContent = cleanupText('moreFiles', { count: _0x3ee140.length - MAX_RENDERED_ITEMS })),
-        _0x4df5c2.list.appendChild(_0x12fc97));
+    if (count.length > MAX_RENDERED_ITEMS) {
+      const el6 = document.createElement('div');
+      ((el6.className = 'settings-local-cleanup-more'),
+        (el6.textContent = cleanupText('moreFiles', { count: count.length - MAX_RENDERED_ITEMS })),
+        response2.list.appendChild(el6));
     }
   }
-  _0x4df5c2.trashBtn && (_0x4df5c2.trashBtn.disabled = _0x3ee140.length === 0);
+  response2.trashBtn && (response2.trashBtn.disabled = count.length === 0);
 }
-function resetScanResult(_0x23264a) {
-  if (_0x23264a.count) _0x23264a.count.textContent = '0';
-  if (_0x23264a.size) _0x23264a.size.textContent = '0 B';
-  _0x23264a.list && ((_0x23264a.list.hidden = true), _0x23264a.list.replaceChildren());
-  if (_0x23264a.trashBtn) _0x23264a.trashBtn.disabled = true;
+function resetScanResult(next) {
+  if (next.count) next.count.textContent = '0';
+  if (next.size) next.size.textContent = '0 B';
+  next.list && ((next.list.hidden = true), next.list.replaceChildren());
+  if (next.trashBtn) next.trashBtn.disabled = true;
 }
-function initCleanupCard({ ids: _0x5463fe, scan: _0x2266e2, textScope: _0x41c4c2 }) {
-  const _0x1ed67f = getElements(_0x5463fe);
-  if (!_0x1ed67f.card || !_0x1ed67f.scanBtn || !_0x1ed67f.trashBtn) return;
-  const _0x370dcf = (_0x1ccbde, _0xe52c41 = {}) => fileSaveText(_0x41c4c2 + '.' + _0x1ccbde, _0xe52c41),
-    _0x46fa83 = canUseLocalAssetCleanup();
-  _0x1ed67f.card.hidden = !_0x46fa83;
-  if (!_0x46fa83) return;
-  let _0x272680 = null;
-  (resetScanResult(_0x1ed67f),
-    setStatus(_0x1ed67f.status, _0x370dcf('idle')),
-    _0x1ed67f.scanBtn.addEventListener('click', async () => {
-      ((_0x272680 = null),
-        resetScanResult(_0x1ed67f),
-        setStatus(_0x1ed67f.status, _0x370dcf('scanning')),
-        setButtonBusy(_0x1ed67f.scanBtn, true, _0x370dcf('scanBusy')),
-        (_0x1ed67f.trashBtn.disabled = true));
+function initCleanupCard({ ids: ids, scan: scan, textScope: textScope }) {
+  const response3 = getElements(ids);
+  if (!response3.card || !response3.scanBtn || !response3.trashBtn) return;
+  const prefix = (current, entry = {}) => fileSaveText(textScope + '.' + current, entry),
+    canUseLocalAssetCleanup2 = canUseLocalAssetCleanup();
+  response3.card.hidden = !canUseLocalAssetCleanup2;
+  if (!canUseLocalAssetCleanup2) return;
+  let enabled2 = null;
+  (resetScanResult(response3),
+    setStatus(response3.status, prefix('idle')),
+    response3.scanBtn.addEventListener('click', async () => {
+      ((enabled2 = null),
+        resetScanResult(response3),
+        setStatus(response3.status, prefix('scanning')),
+        setButtonBusy(response3.scanBtn, true, prefix('scanBusy')),
+        (response3.trashBtn.disabled = true));
       try {
-        const _0x5b9050 = await _0x2266e2(),
-          _0x3ba342 = { ..._0x5b9050, items: Array.isArray(_0x5b9050?.items) ? _0x5b9050.items : [] };
-        ((_0x272680 = _0x3ba342),
-          renderScanResult(_0x3ba342, _0x1ed67f),
-          Number(_0x3ba342?.orphanCount || 0) > 0
-            ? window.showToast?.(_0x370dcf('scanSuccess'), 'success')
-            : showSuccess(_0x370dcf('scanEmpty')));
-      } catch (_0xd85f59) {
-        (console.error('[Settings] 本地素材清理扫描失败:', _0xd85f59),
-          setStatus(_0x1ed67f.status, _0xd85f59?.message || cleanupText('scanFailed'), 'error'),
-          showError(cleanupText('scanFailedDetail', { error: errorMessage(_0xd85f59) })));
+        const args = await scan(),
+          record = { ...args, items: Array.isArray(args?.items) ? args.items : [] };
+        ((enabled2 = record),
+          renderScanResult(record, response3),
+          Number(record?.orphanCount || 0) > 0
+            ? window.showToast?.(prefix('scanSuccess'), 'success')
+            : showSuccess(prefix('scanEmpty')));
+      } catch (error2) {
+        (console.error('[Settings] 本地素材清理扫描失败:', error2),
+          setStatus(response3.status, error2?.message || cleanupText('scanFailed'), 'error'),
+          showError(cleanupText('scanFailedDetail', { error: errorMessage(error2) })));
       } finally {
-        (setButtonBusy(_0x1ed67f.scanBtn, false, _0x370dcf('scan')),
-          (_0x1ed67f.trashBtn.disabled = !_0x272680?.items?.length));
+        (setButtonBusy(response3.scanBtn, false, prefix('scan')),
+          (response3.trashBtn.disabled = !enabled2?.items?.length));
       }
     }),
-    _0x1ed67f.trashBtn.addEventListener('click', async () => {
-      const _0x23bb8d = Array.isArray(_0x272680?.items) ? _0x272680.items : [];
-      if (_0x23bb8d.length === 0) return;
-      const _0x16dcff =
+    response3.trashBtn.addEventListener('click', async () => {
+      const count2 = Array.isArray(enabled2?.items) ? enabled2.items : [];
+      if (count2.length === 0) return;
+      const enabled3 =
         typeof window.confirm === 'function' &&
         window.confirm(
           cleanupText('confirmTrash', {
-            prefix: _0x370dcf('confirmPrefix'),
-            count: _0x23bb8d.length,
-            bytes: formatCleanupBytes(_0x272680.orphanBytes),
+            prefix: prefix('confirmPrefix'),
+            count: count2.length,
+            bytes: formatCleanupBytes(enabled2.orphanBytes),
           }),
         );
-      if (!_0x16dcff) return;
-      (setStatus(_0x1ed67f.status, _0x370dcf('trashing')),
-        setButtonBusy(_0x1ed67f.trashBtn, true, _0x370dcf('trashBusy')),
-        (_0x1ed67f.scanBtn.disabled = true));
+      if (!enabled3) return;
+      (setStatus(response3.status, prefix('trashing')),
+        setButtonBusy(response3.trashBtn, true, prefix('trashBusy')),
+        (response3.scanBtn.disabled = true));
       try {
-        const _0x185430 = await trashLocalAssetCleanup(
-            _0x272680,
-            _0x23bb8d.map((_0x2e2090) => _0x2e2090.localPath),
+        const count3 = await trashLocalAssetCleanup(
+            enabled2,
+            count2.map((item3) => item3.localPath),
           ),
-          _0x5966af = Array.isArray(_0x185430?.skipped) ? _0x185430.skipped.length : 0,
-          _0x51f2b4 = Array.isArray(_0x185430?.errors) ? _0x185430.errors.length : 0,
-          _0x30ff8f = cleanupText('trashedMessage', {
-            count: _0x185430?.trashedCount || 0,
-            bytes: formatCleanupBytes(_0x185430?.trashedBytes || 0),
+          skipped = Array.isArray(count3?.skipped) ? count3.skipped.length : 0,
+          failed = Array.isArray(count3?.errors) ? count3.errors.length : 0,
+          message = cleanupText('trashedMessage', {
+            count: count3?.trashedCount || 0,
+            bytes: formatCleanupBytes(count3?.trashedBytes || 0),
           }),
-          _0x1277bd = await _0x2266e2();
-        ((_0x272680 = { ..._0x1277bd, items: Array.isArray(_0x1277bd?.items) ? _0x1277bd.items : [] }),
-          renderScanResult(_0x272680, _0x1ed67f),
+          args2 = await scan();
+        ((enabled2 = { ...args2, items: Array.isArray(args2?.items) ? args2.items : [] }),
+          renderScanResult(enabled2, response3),
           setStatus(
-            _0x1ed67f.status,
-            _0x5966af || _0x51f2b4
-              ? cleanupText('trashPartial', { message: _0x30ff8f, skipped: _0x5966af, failed: _0x51f2b4 })
-              : _0x30ff8f,
-            _0x51f2b4 ? 'error' : 'success',
+            response3.status,
+            skipped || failed
+              ? cleanupText('trashPartial', { message: message, skipped: skipped, failed: failed })
+              : message,
+            failed ? 'error' : 'success',
           ),
-          _0x51f2b4 ? showError(cleanupText('trashPartialToast')) : showSuccess(_0x370dcf('success')));
-      } catch (_0x809474) {
-        (console.error('[Settings] 本地素材清理失败:', _0x809474),
-          setStatus(_0x1ed67f.status, _0x809474?.message || cleanupText('trashFailed'), 'error'),
-          showError(cleanupText('trashFailedDetail', { error: errorMessage(_0x809474) })));
+          failed ? showError(cleanupText('trashPartialToast')) : showSuccess(prefix('success')));
+      } catch (error3) {
+        (console.error('[Settings] 本地素材清理失败:', error3),
+          setStatus(response3.status, error3?.message || cleanupText('trashFailed'), 'error'),
+          showError(cleanupText('trashFailedDetail', { error: errorMessage(error3) })));
       } finally {
-        (setButtonBusy(_0x1ed67f.trashBtn, false, _0x370dcf('trash')),
-          (_0x1ed67f.scanBtn.disabled = false),
-          (_0x1ed67f.trashBtn.disabled = !_0x272680?.items?.length));
+        (setButtonBusy(response3.trashBtn, false, prefix('trash')),
+          (response3.scanBtn.disabled = false),
+          (response3.trashBtn.disabled = !enabled2?.items?.length));
       }
     }));
 }

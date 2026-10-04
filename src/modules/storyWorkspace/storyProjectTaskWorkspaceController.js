@@ -17,189 +17,197 @@ import {
 import { isStoryAssetVoiceLoading } from './storyAssetGenerationState.js';
 import { reportStoryTaskCenter } from './storyTaskCenterProjection.js';
 import { getProviderConfig } from '../../../api/configApi.js';
-function normalizeText(_0x5e473a) {
-  return String(_0x5e473a || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function cloneData(_0x9138b3) {
-  return JSON['parse'](JSON['stringify'](_0x9138b3));
+function cloneData(item) {
+  return JSON['parse'](JSON['stringify'](item));
 }
 export function createStoryProjectTaskWorkspaceController({
-  state: _0x126207,
-  activeClipGenerationControllers: _0x210f2b,
-  activeBackgroundExecutions: _0x4a2ee4,
-  activeBackgroundRecoveries: _0x44f0d9,
-  replicationAnalysisPromises: _0x54e39f,
-  replicationSourceFileByEpisodeKey: _0x416ab3,
-  projectData: _0x4b0ae6,
+  state: state,
+  activeClipGenerationControllers: activeClipGenerationControllers,
+  activeBackgroundExecutions: activeBackgroundExecutions,
+  activeBackgroundRecoveries: activeBackgroundRecoveries,
+  replicationAnalysisPromises: replicationAnalysisPromises,
+  replicationSourceFileByEpisodeKey: replicationSourceFileByEpisodeKey,
+  projectData: projectData,
   getWorkspaceDestroyed: getWorkspaceDestroyed = () => ![],
   stopAssetBreakdownProgress: stopAssetBreakdownProgress = () => {},
   schedulePersistence: schedulePersistence = () => {},
   render: render = () => {},
 } = {}) {
-  if (!_0x126207 || typeof _0x126207 !== 'object')
+  if (!state || typeof state !== 'object')
     throw new TypeError('Story project tasks require workspace state.');
-  for (const [_0x58a10d, _0x4c8d2d] of Object['entries']({
-    activeClipGenerationControllers: _0x210f2b,
-    activeBackgroundExecutions: _0x4a2ee4,
-    activeBackgroundRecoveries: _0x44f0d9,
-    replicationAnalysisPromises: _0x54e39f,
-    replicationSourceFileByEpisodeKey: _0x416ab3,
-    projectData: _0x4b0ae6,
+  for (const [key, enabled] of Object['entries']({
+    activeClipGenerationControllers: activeClipGenerationControllers,
+    activeBackgroundExecutions: activeBackgroundExecutions,
+    activeBackgroundRecoveries: activeBackgroundRecoveries,
+    replicationAnalysisPromises: replicationAnalysisPromises,
+    replicationSourceFileByEpisodeKey: replicationSourceFileByEpisodeKey,
+    projectData: projectData,
   })) {
-    if (!_0x4c8d2d || typeof _0x4c8d2d !== 'object')
-      throw new TypeError('Story project tasks require ' + _0x58a10d + '.');
+    if (!enabled || typeof enabled !== 'object')
+      throw new TypeError('Story project tasks require ' + key + '.');
   }
-  let _0x33a58c = 0x0;
-  const _0x20cf9c = () => getWorkspaceDestroyed() === !![],
-    _0x25ff5e = () => {
-      (Object['assign'](_0x126207, deriveStoryProjectTaskState()),
-        (_0x126207['exportingAssetAppearanceKey'] = ''));
+  let index = 0x0;
+  const run = () => getWorkspaceDestroyed() === !![],
+    resetTaskState = () => {
+      (Object['assign'](state, deriveStoryProjectTaskState()), (state['exportingAssetAppearanceKey'] = ''));
     },
-    _0x259bf5 = (_0x5b21da = _0x126207['data']) => {
-      (reconcileStoryClipVideoBackgroundTasks(_0x5b21da),
-        reportStoryTaskCenter(_0x5b21da),
-        _0x25ff5e(),
-        Object['assign'](_0x126207, deriveStoryProjectTaskState(_0x5b21da)),
-        _0x126207['characterVoiceEditor'] &&
-          (_0x126207['characterVoiceEditor']['isGenerating'] = isStoryAssetVoiceLoading(
-            _0x126207,
-            _0x126207['characterVoiceEditor']['assetId'],
+    restoreTaskState = (result = state['data']) => {
+      (reconcileStoryClipVideoBackgroundTasks(result),
+        reportStoryTaskCenter(result),
+        resetTaskState(),
+        Object['assign'](state, deriveStoryProjectTaskState(result)),
+        state['characterVoiceEditor'] &&
+          (state['characterVoiceEditor']['isGenerating'] = isStoryAssetVoiceLoading(
+            state,
+            state['characterVoiceEditor']['assetId'],
           )));
     },
-    _0x3881a0 = (_0x12c936) => {
-      const _0x6dc9ff = normalizeText(_0x12c936);
-      if (!_0x6dc9ff) return ![];
-      for (const [_0x133519, _0x5cde9f] of _0x210f2b) {
-        if (!_0x133519['startsWith'](_0x6dc9ff + ':')) continue;
-        (_0x5cde9f['pause'](), _0x210f2b['delete'](_0x133519));
+    invalidateRuntime = (data) => {
+      const id = normalizeText(data);
+      if (!id) return ![];
+      for (const [enabled2, options] of activeClipGenerationControllers) {
+        if (!enabled2['startsWith'](id + ':')) continue;
+        (options['pause'](), activeClipGenerationControllers['delete'](enabled2));
       }
-      for (const _0x2025c1 of _0x4a2ee4) {
-        _0x2025c1['startsWith'](_0x6dc9ff + ':') && _0x4a2ee4['delete'](_0x2025c1);
+      for (const target of activeBackgroundExecutions) {
+        target['startsWith'](id + ':') && activeBackgroundExecutions['delete'](target);
       }
-      for (const _0x4026f5 of _0x44f0d9) {
-        _0x4026f5['startsWith'](_0x6dc9ff + ':') && _0x44f0d9['delete'](_0x4026f5);
+      for (const source of activeBackgroundRecoveries) {
+        source['startsWith'](id + ':') && activeBackgroundRecoveries['delete'](source);
       }
-      _0x54e39f['delete'](_0x6dc9ff);
-      for (const _0x3e1ac5 of _0x416ab3['keys']()) {
-        _0x3e1ac5['startsWith'](_0x6dc9ff + ':') && _0x416ab3['delete'](_0x3e1ac5);
+      replicationAnalysisPromises['delete'](id);
+      for (const next of replicationSourceFileByEpisodeKey['keys']()) {
+        next['startsWith'](id + ':') && replicationSourceFileByEpisodeKey['delete'](next);
       }
       return (
-        _0x4b0ae6['releaseData'](_0x6dc9ff),
-        advanceStoryProjectSession(_0x126207, _0x6dc9ff),
-        reportStoryTaskCenter({ project: { id: _0x6dc9ff, backgroundTasks: [] } }),
+        projectData['releaseData'](id),
+        advanceStoryProjectSession(state, id),
+        reportStoryTaskCenter({ project: { id: id, backgroundTasks: [] } }),
         !![]
       );
     },
-    _0x5a0879 = ({ invalidateCurrentProject: invalidateCurrentProject = ![] } = {}) => {
-      const _0x43c5d6 = normalizeText(_0x126207['data']?.['project']?.['id']);
-      if (invalidateCurrentProject) _0x3881a0(_0x43c5d6);
+    beginSession = ({ invalidateCurrentProject: invalidateCurrentProject = ![] } = {}) => {
+      const text = normalizeText(state['data']?.['project']?.['id']);
+      if (invalidateCurrentProject) invalidateRuntime(text);
       return (
         stopAssetBreakdownProgress({ clearState: !![] }),
-        _0x25ff5e(),
-        createStoryProjectTaskToken(_0x126207)
+        resetTaskState(),
+        createStoryProjectTaskToken(state)
       );
     },
-    _0xde53a4 = (_0x353b72 = _0x126207['data']) => {
-      const _0x509faf = _0x4b0ae6['getEntry'](_0x353b72?.['project']?.['id']),
-        _0x234244 = createStoryProjectTaskToken({ ..._0x126207, data: _0x353b72 });
+    createTokenForData = (data2 = state['data']) => {
+      const current = projectData['getEntry'](data2?.['project']?.['id']),
+        storyProjectTaskToken = createStoryProjectTaskToken({ ...state, data: data2 });
       return (
-        (_0x234244['projectTitleEdited'] =
-          _0x353b72 === _0x126207['data']
-            ? _0x126207['projectTitleEdited'] === !![]
-            : _0x509faf?.['projectTitleEdited'] === !![]),
-        _0x234244
+        (storyProjectTaskToken['projectTitleEdited'] =
+          data2 === state['data']
+            ? state['projectTitleEdited'] === !![]
+            : current?.['projectTitleEdited'] === !![]),
+        storyProjectTaskToken
       );
     },
-    _0xaec0c9 = (_0x436a34) => isStoryProjectTaskTokenCurrent(_0x126207, _0x436a34) && !_0x20cf9c(),
-    _0x4d6860 = (_0x40dbbc) => isStoryProjectTaskTokenLive(_0x126207, _0x40dbbc) && !_0x20cf9c(),
-    _0x2cb2f3 = (_0x753dcf) => _0x4d6860(_0x753dcf) && _0x4b0ae6['registerTaskData'](_0x753dcf),
-    _0x35416c = (_0x284f90, _0x5c31db) => {
-      const _0x2eea3a = normalizeText(_0x284f90?.['projectId']),
-        _0x3c11bc = normalizeText(_0x5c31db);
-      return _0x2eea3a && _0x3c11bc ? _0x2eea3a + ':' + _0x3c11bc : '';
+    isCurrent = (entry) => isStoryProjectTaskTokenCurrent(state, entry) && !run(),
+    isLive = (record) => isStoryProjectTaskTokenLive(state, record) && !run(),
+    registerProjectData = (payload) => isLive(payload) && projectData['registerTaskData'](payload),
+    getBackgroundExecutionKey = (handle, config) => {
+      const text2 = normalizeText(handle?.['projectId']),
+        text3 = normalizeText(config);
+      return text2 && text3 ? text2 + ':' + text3 : '';
     },
-    _0x176996 = (_0x39fb00) => _0x4d6860(_0x39fb00) && _0x4b0ae6['syncTaskEntry'](_0x39fb00),
-    _0x581500 = (_0x5c308a, { refreshHome: refreshHome = ![] } = {}) => {
-      if (!_0x4d6860(_0x5c308a)) return;
-      (_0x176996(_0x5c308a),
-        reportStoryTaskCenter(_0x5c308a?.['data']),
+    syncProjectEntry = (scope) => isLive(scope) && projectData['syncTaskEntry'](scope),
+    persistChange = (input, { refreshHome: refreshHome = ![] } = {}) => {
+      if (!isLive(input)) return;
+      (syncProjectEntry(input),
+        reportStoryTaskCenter(input?.['data']),
         schedulePersistence({ immediate: !![] }),
-        refreshHome && _0x126207['view'] === 'home' && !_0x20cf9c() && render({ capturePageState: ![] }));
+        refreshHome && state['view'] === 'home' && !run() && render({ capturePageState: ![] }));
     },
-    _0x4c95c4 = (_0x2d3118, _0x5f2295 = {}, { refreshHome: refreshHome = !![] } = {}) => {
-      if (!_0x2d3118?.['data']?.['project']) return null;
-      _0x2cb2f3(_0x2d3118);
-      const _0x1ff40a = startStoryBackgroundTask(_0x2d3118['data'], {
-          ..._0x5f2295,
+    startBackgroundTask = (enabled3, providerProfileId = {}, { refreshHome: refreshHome = !![] } = {}) => {
+      if (!enabled3?.['data']?.['project']) return null;
+      registerProjectData(enabled3);
+      const startStoryBackgroundTask2 = startStoryBackgroundTask(enabled3['data'], {
+          ...providerProfileId,
           providerProfileId:
-            _0x5f2295['providerProfileId'] ||
-            (_0x5f2295['provider'] ? getProviderConfig(_0x5f2295['provider'])?.['providerProfileId'] : ''),
+            providerProfileId['providerProfileId'] ||
+            (providerProfileId['provider']
+              ? getProviderConfig(providerProfileId['provider'])?.['providerProfileId']
+              : ''),
         }),
-        _0x4ff5eb = _0x35416c(_0x2d3118, _0x1ff40a?.['id'] || _0x5f2295['id']);
-      if (_0x4ff5eb) _0x4a2ee4['add'](_0x4ff5eb);
-      return (_0x581500(_0x2d3118, { refreshHome: refreshHome }), _0x1ff40a);
+        output = getBackgroundExecutionKey(
+          enabled3,
+          startStoryBackgroundTask2?.['id'] || providerProfileId['id'],
+        );
+      if (output) activeBackgroundExecutions['add'](output);
+      return (persistChange(enabled3, { refreshHome: refreshHome }), startStoryBackgroundTask2);
     },
-    _0x39f828 = (_0x30aaf8, _0xf4e6a9, _0x2cf4d8 = {}, { refreshHome: refreshHome = !![] } = {}) => {
-      if (!_0x30aaf8?.['data']?.['project']) return null;
-      const _0x2321db = updateStoryBackgroundTask(_0x30aaf8['data'], _0xf4e6a9, _0x2cf4d8);
-      if (_0x2321db) _0x581500(_0x30aaf8, { refreshHome: refreshHome });
-      return _0x2321db;
+    updateBackgroundTask = (enabled4, value2, value3 = {}, { refreshHome: refreshHome = !![] } = {}) => {
+      if (!enabled4?.['data']?.['project']) return null;
+      const updateStoryBackgroundTask2 = updateStoryBackgroundTask(enabled4['data'], value2, value3);
+      if (updateStoryBackgroundTask2) persistChange(enabled4, { refreshHome: refreshHome });
+      return updateStoryBackgroundTask2;
     },
-    _0x53289f = (_0x185986, _0xc850bf, _0x584143 = {}) => {
-      if (!_0x185986?.['data']?.['project']) return 0x0;
-      const _0x339bc8 = updateStoryBackgroundTaskBatch(_0x185986['data'], _0xc850bf, _0x584143);
-      if (_0x339bc8) _0x581500(_0x185986, { refreshHome: !![] });
-      return _0x339bc8;
+    updateBackgroundTaskBatch = (enabled5, value4, value5 = {}) => {
+      if (!enabled5?.['data']?.['project']) return 0x0;
+      const updateStoryBackgroundTaskBatch2 = updateStoryBackgroundTaskBatch(
+        enabled5['data'],
+        value4,
+        value5,
+      );
+      if (updateStoryBackgroundTaskBatch2) persistChange(enabled5, { refreshHome: !![] });
+      return updateStoryBackgroundTaskBatch2;
     },
-    _0x4a0deb = (_0x26ec29, _0x5ad2f4 = {}) => {
-      const _0x1c68c9 = normalizeText(_0x126207['data']?.['project']?.['id']) || 'project';
+    createTaskBatch = (value6, value7 = {}) => {
+      const text4 = normalizeText(state['data']?.['project']?.['id']) || 'project';
       return (
-        (_0x33a58c += 0x1),
+        (index += 0x1),
         {
-          ...cloneData(_0x5ad2f4),
-          id: (normalizeText(_0x26ec29) || 'batch') + ':' + _0x1c68c9 + ':' + Date['now']() + ':' + _0x33a58c,
-          type: normalizeText(_0x26ec29) || 'batch',
-          total: Math['max'](0x0, Math['trunc'](Number(_0x5ad2f4['total']) || 0x0)),
-          completed: Math['max'](0x0, Math['trunc'](Number(_0x5ad2f4['completed']) || 0x0)),
-          label: normalizeText(_0x5ad2f4['label']),
+          ...cloneData(value7),
+          id: (normalizeText(value6) || 'batch') + ':' + text4 + ':' + Date['now']() + ':' + index,
+          type: normalizeText(value6) || 'batch',
+          total: Math['max'](0x0, Math['trunc'](Number(value7['total']) || 0x0)),
+          completed: Math['max'](0x0, Math['trunc'](Number(value7['completed']) || 0x0)),
+          label: normalizeText(value7['label']),
         }
       );
     },
-    _0x52503d = (_0x5d10c7, _0x5aa341, _0x59d86e = {}) => {
-      if (!_0x5aa341?.['id']) return null;
+    syncTaskBatch = (value8, enabled6, value9 = {}) => {
+      if (!enabled6?.['id']) return null;
       return (
-        Object['assign'](_0x5aa341, cloneData(_0x59d86e)),
-        _0x53289f(_0x5d10c7, _0x5aa341['id'], _0x5aa341),
-        _0x5aa341
+        Object['assign'](enabled6, cloneData(value9)),
+        updateBackgroundTaskBatch(value8, enabled6['id'], enabled6),
+        enabled6
       );
     },
-    _0x36aafa = (_0x3cb164, _0xd49634, _0x10945a = {}, { refreshHome: refreshHome = !![] } = {}) => {
-      if (!_0x3cb164?.['data']?.['project']) return null;
-      const _0x3fda1c = finishStoryBackgroundTask(_0x3cb164['data'], _0xd49634, _0x10945a);
-      if (_0x3fda1c) _0x581500(_0x3cb164, { refreshHome: refreshHome });
-      const _0x1c023b = _0x35416c(_0x3cb164, _0xd49634);
-      if (_0x1c023b) _0x4a2ee4['delete'](_0x1c023b);
-      return _0x3fda1c;
+    finishBackgroundTask = (enabled7, value10, value11 = {}, { refreshHome: refreshHome = !![] } = {}) => {
+      if (!enabled7?.['data']?.['project']) return null;
+      const finishStoryBackgroundTask2 = finishStoryBackgroundTask(enabled7['data'], value10, value11);
+      if (finishStoryBackgroundTask2) persistChange(enabled7, { refreshHome: refreshHome });
+      const value12 = getBackgroundExecutionKey(enabled7, value10);
+      if (value12) activeBackgroundExecutions['delete'](value12);
+      return finishStoryBackgroundTask2;
     };
   return Object['freeze']({
     advanceProjectSession: advanceStoryProjectSession,
-    beginSession: _0x5a0879,
+    beginSession: beginSession,
     createProjectToken: createStoryProjectTaskToken,
-    createTaskBatch: _0x4a0deb,
-    createTokenForData: _0xde53a4,
-    finishBackgroundTask: _0x36aafa,
-    getBackgroundExecutionKey: _0x35416c,
-    invalidateRuntime: _0x3881a0,
-    isCurrent: _0xaec0c9,
-    isLive: _0x4d6860,
-    persistChange: _0x581500,
-    registerProjectData: _0x2cb2f3,
-    resetTaskState: _0x25ff5e,
-    restoreTaskState: _0x259bf5,
-    startBackgroundTask: _0x4c95c4,
-    syncProjectEntry: _0x176996,
-    syncTaskBatch: _0x52503d,
-    updateBackgroundTask: _0x39f828,
-    updateBackgroundTaskBatch: _0x53289f,
+    createTaskBatch: createTaskBatch,
+    createTokenForData: createTokenForData,
+    finishBackgroundTask: finishBackgroundTask,
+    getBackgroundExecutionKey: getBackgroundExecutionKey,
+    invalidateRuntime: invalidateRuntime,
+    isCurrent: isCurrent,
+    isLive: isLive,
+    persistChange: persistChange,
+    registerProjectData: registerProjectData,
+    resetTaskState: resetTaskState,
+    restoreTaskState: restoreTaskState,
+    startBackgroundTask: startBackgroundTask,
+    syncProjectEntry: syncProjectEntry,
+    syncTaskBatch: syncTaskBatch,
+    updateBackgroundTask: updateBackgroundTask,
+    updateBackgroundTaskBatch: updateBackgroundTaskBatch,
   });
 }

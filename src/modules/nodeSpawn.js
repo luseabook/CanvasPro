@@ -1,124 +1,181 @@
 import { findAvailablePosition } from '../core/math.js';
-function toFiniteNumber(_0xc21c97, _0x54f6db) {
-  const _0x4e9cf9 = Number(_0xc21c97);
-  return Number.isFinite(_0x4e9cf9) ? _0x4e9cf9 : _0x54f6db;
+function toFiniteNumber(value, item) {
+  const key = Number(value);
+  return Number.isFinite(key) ? key : item;
 }
-function clampPositiveInteger(_0x3a1dcd, _0x558622) {
-  const _0x363008 = Math.trunc(Number(_0x3a1dcd));
-  return Number.isFinite(_0x363008) && _0x363008 > 0 ? _0x363008 : _0x558622;
+function clampPositiveInteger(index, result) {
+  const count = Math.trunc(Number(index));
+  return Number.isFinite(count) && count > 0 ? count : result;
 }
-function normalizeSpawnDirection(_0x5a191c) {
-  if (_0x5a191c === 'down' || _0x5a191c === 'left') return _0x5a191c;
+function normalizeSpawnDirection(data) {
+  if (data === 'down' || data === 'left') return data;
   return 'right';
 }
 export function getNodeSpawnPrefs() {
-  const _0x1985f8 = globalThis.window || {};
+  const spacing = globalThis.window || {};
   return {
-    spacing: _0x1985f8.v2NodeSpacing ?? 120,
-    direction: _0x1985f8.v2NodeDirection ?? 'right',
-    avoidOverlap: _0x1985f8.v2NodeAvoidOverlap ?? true,
+    spacing: spacing.v2NodeSpacing ?? 120,
+    direction: spacing.v2NodeDirection ?? 'right',
+    avoidOverlap: spacing.v2NodeAvoidOverlap ?? true,
   };
 }
-export function calcSpawnStartFromAnchor(_0x579f1f, _0x3c26e0, _0xc352d4) {
-  const _0x4a4386 = _0x579f1f?.x || 0,
-    _0x2b8852 = _0x579f1f?.y || 0,
-    _0x56ff38 = _0x579f1f?.width || 0x12c,
-    _0x2e98d4 = _0x579f1f?.height || 0x12c;
+export function calcSpawnStartFromAnchor(box, options, target) {
+  const startX = box?.x || 0,
+    startY = box?.y || 0,
+    source = box?.width || 0x12c,
+    next = box?.height || 0x12c;
   return {
-    startX: _0x4a4386 + (_0xc352d4 === 'right' ? _0x56ff38 + _0x3c26e0 : 0),
-    startY: _0x2b8852 + (_0xc352d4 === 'down' ? _0x2e98d4 + _0x3c26e0 : 0),
+    startX: startX + (target === 'right' ? source + options : 0),
+    startY: startY + (target === 'down' ? next + options : 0),
   };
 }
-export function calcSafeSpawnPosNearNode(_0x58608f, _0x1cbf39, _0x12b09a, _0x20a516) {
-  const { spacing: _0x431583, direction: _0x297aaf, avoidOverlap: _0x1e5b14 } = getNodeSpawnPrefs(),
-    _0x385351 = normalizeSpawnDirection(_0x297aaf),
-    _0x25814b = _0x1cbf39?.x || 0,
-    _0x32a6c5 = _0x1cbf39?.y || 0,
-    _0x295166 = _0x1cbf39?.width || 0x12c,
-    _0x2fb5a8 = _0x1cbf39?.height || 0x12c,
-    _0x1f795f = Number(_0x12b09a) || 0x12c,
-    _0x45c22f = Number(_0x20a516) || 0x12c,
-    _0x3a5ce4 =
-      _0x385351 === 'left'
-        ? _0x25814b - _0x431583 - _0x1f795f
-        : _0x25814b + (_0x385351 === 'right' ? _0x295166 + _0x431583 : 0),
-    _0x2e6b51 = _0x32a6c5 + (_0x385351 === 'down' ? _0x2fb5a8 + _0x431583 : 0);
-  if (!_0x1e5b14) return { x: _0x3a5ce4, y: _0x2e6b51 };
-  return findAvailablePosition(_0x58608f, _0x3a5ce4, _0x2e6b51, _0x1f795f, _0x45c22f, _0x431583, _0x385351);
+export function calcSafeSpawnPosNearNode(current, box2, entry, record) {
+  const { spacing: spacing2, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+    spawnDirection = normalizeSpawnDirection(direction),
+    payload = box2?.x || 0,
+    handle = box2?.y || 0,
+    state = box2?.width || 0x12c,
+    config = box2?.height || 0x12c,
+    scope = Number(entry) || 0x12c,
+    input = Number(record) || 0x12c,
+    x =
+      spawnDirection === 'left'
+        ? payload - spacing2 - scope
+        : payload + (spawnDirection === 'right' ? state + spacing2 : 0),
+    y = handle + (spawnDirection === 'down' ? config + spacing2 : 0);
+  if (!avoidOverlap) return { x: x, y: y };
+  return findAvailablePosition(current, x, y, scope, input, spacing2, spawnDirection);
 }
 export function createBatchSpawnLayoutNearNode({
   nodes: nodes = {},
-  anchorNode: _0x4e5120,
-  itemCount: _0x2ef3d1,
-  itemWidth: _0x495232,
-  itemHeight: _0x496681,
+  anchorNode: anchorNode,
+  itemCount: itemCount,
+  itemWidth: itemWidth,
+  itemHeight: itemHeight,
   maxPerLine: maxPerLine = 5,
   padding: padding = 0,
   titleHeight: titleHeight = 0,
-  itemGap: _0x29b3d8,
+  itemGap: itemGap,
 } = {}) {
-  const _0x292e82 = getNodeSpawnPrefs(),
-    _0x29e46b = Math.max(0, toFiniteNumber(_0x292e82.spacing, 120)),
-    _0x140094 = normalizeSpawnDirection(_0x292e82.direction),
-    _0x21dca1 = _0x292e82.avoidOverlap !== false,
-    _0x4308de = clampPositiveInteger(_0x2ef3d1, 1),
-    _0x569511 = Math.max(1, toFiniteNumber(_0x495232, 0x12c)),
-    _0x928596 = Math.max(1, toFiniteNumber(_0x496681, 0x12c)),
-    _0x5c1f91 = Math.max(0, toFiniteNumber(_0x29b3d8, _0x29e46b)),
-    _0x3f0f1f = Math.max(0, toFiniteNumber(padding, 0)),
-    _0x37a1b5 = Math.max(0, toFiniteNumber(titleHeight, 0)),
-    _0x11f382 = Math.min(clampPositiveInteger(maxPerLine, 5), Math.max(1, Math.ceil(Math.sqrt(_0x4308de)))),
-    _0x1c3047 = _0x140094 === 'down' ? Math.max(1, Math.ceil(_0x4308de / _0x11f382)) : _0x11f382,
-    _0x1e2486 = _0x140094 === 'down' ? _0x11f382 : Math.max(1, Math.ceil(_0x4308de / _0x11f382)),
-    _0x3e0ecd = _0x1c3047 * _0x569511 + (_0x1c3047 - 1) * _0x5c1f91 + _0x3f0f1f * 2,
-    _0x3d4f1f = _0x1e2486 * _0x928596 + (_0x1e2486 - 1) * _0x5c1f91 + _0x3f0f1f * 2 + _0x37a1b5,
-    _0x120b49 = toFiniteNumber(_0x4e5120?.x, 0),
-    _0x344796 = toFiniteNumber(_0x4e5120?.y, 0),
-    _0x56e2f7 = toFiniteNumber(_0x4e5120?.width, 0x12c),
-    _0x31cad2 = toFiniteNumber(_0x4e5120?.height, 0x12c);
-  let _0x5cd235 = _0x120b49 + _0x56e2f7 + _0x29e46b,
-    _0x37063b = _0x344796;
-  if (_0x140094 === 'down') ((_0x5cd235 = _0x120b49), (_0x37063b = _0x344796 + _0x31cad2 + _0x29e46b));
-  else _0x140094 === 'left' && ((_0x5cd235 = _0x120b49 - _0x29e46b - _0x3e0ecd), (_0x37063b = _0x344796));
-  if (_0x21dca1) {
-    const _0x5b97f7 = findAvailablePosition(
-      nodes,
-      _0x5cd235,
-      _0x37063b,
-      _0x3e0ecd,
-      _0x3d4f1f,
-      _0x29e46b,
-      _0x140094,
-    );
-    ((_0x5cd235 = _0x5b97f7.x), (_0x37063b = _0x5b97f7.y));
+  const nodeSpawnPrefs = getNodeSpawnPrefs(),
+    spacing3 = Math.max(0, toFiniteNumber(nodeSpawnPrefs.spacing, 120)),
+    direction2 = normalizeSpawnDirection(nodeSpawnPrefs.direction),
+    output = nodeSpawnPrefs.avoidOverlap !== false,
+    clampPositiveInteger2 = clampPositiveInteger(itemCount, 1),
+    value2 = Math.max(1, toFiniteNumber(itemWidth, 0x12c)),
+    value3 = Math.max(1, toFiniteNumber(itemHeight, 0x12c)),
+    itemGap2 = Math.max(0, toFiniteNumber(itemGap, spacing3)),
+    value4 = Math.max(0, toFiniteNumber(padding, 0)),
+    value5 = Math.max(0, toFiniteNumber(titleHeight, 0)),
+    value6 = Math.min(
+      clampPositiveInteger(maxPerLine, 5),
+      Math.max(1, Math.ceil(Math.sqrt(clampPositiveInteger2))),
+    ),
+    columns = direction2 === 'down' ? Math.max(1, Math.ceil(clampPositiveInteger2 / value6)) : value6,
+    rows = direction2 === 'down' ? value6 : Math.max(1, Math.ceil(clampPositiveInteger2 / value6)),
+    groupWidth = columns * value2 + (columns - 1) * itemGap2 + value4 * 2,
+    groupHeight = rows * value3 + (rows - 1) * itemGap2 + value4 * 2 + value5,
+    toFiniteNumber2 = toFiniteNumber(anchorNode?.x, 0),
+    toFiniteNumber3 = toFiniteNumber(anchorNode?.y, 0),
+    toFiniteNumber4 = toFiniteNumber(anchorNode?.width, 0x12c),
+    toFiniteNumber5 = toFiniteNumber(anchorNode?.height, 0x12c);
+  let groupX = toFiniteNumber2 + toFiniteNumber4 + spacing3,
+    groupY = toFiniteNumber3;
+  if (direction2 === 'down')
+    ((groupX = toFiniteNumber2), (groupY = toFiniteNumber3 + toFiniteNumber5 + spacing3));
+  else
+    direction2 === 'left' && ((groupX = toFiniteNumber2 - spacing3 - groupWidth), (groupY = toFiniteNumber3));
+  if (output) {
+    const box3 = findAvailablePosition(nodes, groupX, groupY, groupWidth, groupHeight, spacing3, direction2);
+    ((groupX = box3.x), (groupY = box3.y));
   }
-  const _0x2c2ff1 = _0x5cd235 + _0x3f0f1f,
-    _0x16e8fc = _0x37063b + _0x3f0f1f + _0x37a1b5,
-    _0x396572 = (_0x33f547) => {
-      const _0x49e629 = Math.max(0, Math.trunc(Number(_0x33f547)) || 0),
-        _0x47ce59 = _0x140094 === 'down' ? Math.floor(_0x49e629 / _0x1e2486) : _0x49e629 % _0x1c3047,
-        _0x3b1a27 = _0x140094 === 'down' ? _0x49e629 % _0x1e2486 : Math.floor(_0x49e629 / _0x1c3047);
+  const x2 = groupX + value4,
+    y2 = groupY + value4 + value5,
+    getItemPosition = (value7) => {
+      const value8 = Math.max(0, Math.trunc(Number(value7)) || 0),
+        col = direction2 === 'down' ? Math.floor(value8 / rows) : value8 % columns,
+        row = direction2 === 'down' ? value8 % rows : Math.floor(value8 / columns);
       return {
-        x: _0x2c2ff1 + _0x47ce59 * (_0x569511 + _0x5c1f91),
-        y: _0x16e8fc + _0x3b1a27 * (_0x928596 + _0x5c1f91),
-        col: _0x47ce59,
-        row: _0x3b1a27,
+        x: x2 + col * (value2 + itemGap2),
+        y: y2 + row * (value3 + itemGap2),
+        col: col,
+        row: row,
       };
     };
   return {
-    direction: _0x140094,
-    spacing: _0x29e46b,
-    itemGap: _0x5c1f91,
-    columns: _0x1c3047,
-    rows: _0x1e2486,
-    groupX: _0x5cd235,
-    groupY: _0x37063b,
-    groupWidth: _0x3e0ecd,
-    groupHeight: _0x3d4f1f,
-    itemStartX: _0x2c2ff1,
-    itemStartY: _0x16e8fc,
-    getItemPosition: _0x396572,
+    direction: direction2,
+    spacing: spacing3,
+    itemGap: itemGap2,
+    columns: columns,
+    rows: rows,
+    groupX: groupX,
+    groupY: groupY,
+    groupWidth: groupWidth,
+    groupHeight: groupHeight,
+    itemStartX: x2,
+    itemStartY: y2,
+    getItemPosition: getItemPosition,
   };
 }
 
-export function createDuplicateSpawnOffsets({nodes:nodes={},sourceNodes:sourceNodes=[],copies:copies=0x1}={}){const _0x3dbbbf=(Array["isArray"](sourceNodes)?sourceNodes:[])["filter"](_0x3a24a5=>_0x3a24a5&&typeof _0x3a24a5==='object');if(_0x3dbbbf["length"]===0x0)return[];const _0x1c5532=getNodeSpawnPrefs(),_0x3f9e43=Math["max"](0x0,toFiniteNumber(_0x1c5532["spacing"],0x78)),_0x5b7053=normalizeSpawnDirection(_0x1c5532["direction"]),_0x26debe=_0x1c5532["avoidOverlap"]!==![],_0x9dc45a=clampPositiveInteger(copies,0x1),_0xc7fc01=Math['min'](..._0x3dbbbf["map"](_0x18d049=>toFiniteNumber(_0x18d049['x'],0x0))),_0x5b0bef=Math['min'](..._0x3dbbbf["map"](_0x5c81fc=>toFiniteNumber(_0x5c81fc['y'],0x0))),_0x78fde6=Math["max"](..._0x3dbbbf["map"](_0x30963b=>toFiniteNumber(_0x30963b['x'],0x0)+Math["max"](0x1,toFiniteNumber(_0x30963b["width"],0x64)))),_0x4f0221=Math["max"](..._0x3dbbbf["map"](_0x54e8fd=>toFiniteNumber(_0x54e8fd['y'],0x0)+Math["max"](0x1,toFiniteNumber(_0x54e8fd["height"],0x64)))),_0xf21a5b=Math["max"](0x1,_0x78fde6-_0xc7fc01),_0x2c7a55=Math["max"](0x1,_0x4f0221-_0x5b0bef),_0x5601b8=_0x26debe?{...nodes||{}}:{},_0x5613b0=[];for(let _0x5701d8=0x1;_0x5701d8<=_0x9dc45a;_0x5701d8+=0x1){let _0x54acbb=_0xc7fc01,_0x4b78d3=_0x5b0bef;if(_0x5b7053==="down")_0x4b78d3+=(_0x2c7a55+_0x3f9e43)*_0x5701d8;else _0x5b7053==="left"?_0x54acbb-=(_0xf21a5b+_0x3f9e43)*_0x5701d8:_0x54acbb+=(_0xf21a5b+_0x3f9e43)*_0x5701d8;if(_0x26debe){const _0x1c696d=findAvailablePosition(_0x5601b8,_0x54acbb,_0x4b78d3,_0xf21a5b,_0x2c7a55,_0x3f9e43,_0x5b7053);_0x54acbb=_0x1c696d['x'],_0x4b78d3=_0x1c696d['y'],_0x5601b8["duplicate-spawn-"+_0x5701d8]={'x':_0x54acbb,'y':_0x4b78d3,'width':_0xf21a5b,'height':_0x2c7a55};}_0x5613b0["push"]({'dx':_0x54acbb-_0xc7fc01,'dy':_0x4b78d3-_0x5b0bef});}return _0x5613b0;}
+export function createDuplicateSpawnOffsets({
+  nodes: nodes = {},
+  sourceNodes: sourceNodes = [],
+  copies: copies = 0x1,
+} = {}) {
+  const args = (Array['isArray'](sourceNodes) ? sourceNodes : [])['filter'](
+    (value9) => value9 && typeof value9 === 'object',
+  );
+  if (args['length'] === 0x0) return [];
+  const nodeSpawnPrefs2 = getNodeSpawnPrefs(),
+    value10 = Math['max'](0x0, toFiniteNumber(nodeSpawnPrefs2['spacing'], 0x78)),
+    spawnDirection2 = normalizeSpawnDirection(nodeSpawnPrefs2['direction']),
+    value11 = nodeSpawnPrefs2['avoidOverlap'] !== ![],
+    clampPositiveInteger3 = clampPositiveInteger(copies, 0x1),
+    value12 = Math['min'](...args['map']((box4) => toFiniteNumber(box4['x'], 0x0))),
+    value13 = Math['min'](...args['map']((box5) => toFiniteNumber(box5['y'], 0x0))),
+    value14 = Math['max'](
+      ...args['map'](
+        (box6) => toFiniteNumber(box6['x'], 0x0) + Math['max'](0x1, toFiniteNumber(box6['width'], 0x64)),
+      ),
+    ),
+    value15 = Math['max'](
+      ...args['map'](
+        (box7) => toFiniteNumber(box7['y'], 0x0) + Math['max'](0x1, toFiniteNumber(box7['height'], 0x64)),
+      ),
+    ),
+    value16 = Math['max'](0x1, value14 - value12),
+    value17 = Math['max'](0x1, value15 - value13),
+    value18 = value11 ? { ...(nodes || {}) } : {},
+    value19 = [];
+  for (let value20 = 0x1; value20 <= clampPositiveInteger3; value20 += 0x1) {
+    let value21 = value12,
+      value22 = value13;
+    if (spawnDirection2 === 'down') value22 += (value17 + value10) * value20;
+    else
+      spawnDirection2 === 'left'
+        ? (value21 -= (value16 + value10) * value20)
+        : (value21 += (value16 + value10) * value20);
+    if (value11) {
+      const box8 = findAvailablePosition(
+        value18,
+        value21,
+        value22,
+        value16,
+        value17,
+        value10,
+        spawnDirection2,
+      );
+      ((value21 = box8['x']),
+        (value22 = box8['y']),
+        (value18['duplicate-spawn-' + value20] = {
+          x: value21,
+          y: value22,
+          width: value16,
+          height: value17,
+        }));
+    }
+    value19['push']({ dx: value21 - value12, dy: value22 - value13 });
+  }
+  return value19;
+}

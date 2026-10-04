@@ -7,205 +7,205 @@ import {
 import { DEFAULT_APIMART_API_URL } from '../../modules/providers.js';
 import { t } from '../../i18n/index.js';
 const ACTION_CLASS = '.act-apimart-face-detect';
-function faceDetectText(_0x587832, _0xa70167 = {}) {
-  return t('nodeToolbar.faceDetect.' + _0x587832, _0xa70167);
+function faceDetectText(value, item = {}) {
+  return t('nodeToolbar.faceDetect.' + value, item);
 }
-function getNodeId(_0x50735d = {}) {
-  return String(_0x50735d.nodeId || _0x50735d.nodeData?.id || '').trim();
+function getNodeId(options = {}) {
+  return String(options.nodeId || options.nodeData?.id || '').trim();
 }
-function getLatestNodeData(_0x468fb2 = {}) {
-  const _0x3e1f7d = getNodeId(_0x468fb2),
-    _0x4770a9 = typeof _0x468fb2.getStateSnapshot === 'function' ? _0x468fb2.getStateSnapshot() : {};
-  return _0x4770a9?.nodes?.[_0x3e1f7d] || _0x468fb2.getNodeData?.() || _0x468fb2.nodeData || {};
+function getLatestNodeData(options2 = {}) {
+  const nodeId = getNodeId(options2),
+    key = typeof options2.getStateSnapshot === 'function' ? options2.getStateSnapshot() : {};
+  return key?.nodes?.[nodeId] || options2.getNodeData?.() || options2.nodeData || {};
 }
-function basenameFromUrl(_0x10f1c4) {
-  const _0x1a4941 = String(_0x10f1c4 || '').split(/[?#]/, 1)[0],
-    _0x43dc26 = _0x1a4941.split(/[\\/]/).filter(Boolean);
-  return _0x43dc26[_0x43dc26.length - 1] || '';
+function basenameFromUrl(index) {
+  const result = String(index || '').split(/[?#]/, 1)[0],
+    list = result.split(/[\\/]/).filter(Boolean);
+  return list[list.length - 1] || '';
 }
-function resolveLocalPathUrl(_0x1c4125, _0x374b4) {
-  const _0x26367b = String(_0x374b4 || '').trim();
-  if (!_0x26367b) return '';
-  if (/^(https?:|blob:|data:|asset:\/\/)/i.test(_0x26367b)) return _0x26367b;
-  if (_0x26367b.startsWith('/')) return _0x26367b;
-  return _0x1c4125.localPathToUrl?.(_0x26367b) || _0x26367b;
+function resolveLocalPathUrl(data, target) {
+  const enabled = String(target || '').trim();
+  if (!enabled) return '';
+  if (/^(https?:|blob:|data:|asset:\/\/)/i.test(enabled)) return enabled;
+  if (enabled.startsWith('/')) return enabled;
+  return data.localPathToUrl?.(enabled) || enabled;
 }
-function resolveImageSourceUrl(_0x14f363, _0x3b3f17 = {}) {
-  const _0x33ea19 = [
-    _0x14f363.resolveCanvasImagePreviewUrl?.(_0x3b3f17),
-    _0x3b3f17.originalLocalPath,
-    _0x3b3f17.displayLocalPath,
-    _0x3b3f17.localPath,
-    _0x3b3f17.imageUrl,
-    _0x3b3f17.sourceUrl,
-    _0x3b3f17.src,
-    _0x3b3f17.url,
+function resolveImageSourceUrl(source, response = {}) {
+  const next = [
+    source.resolveCanvasImagePreviewUrl?.(response),
+    response.originalLocalPath,
+    response.displayLocalPath,
+    response.localPath,
+    response.imageUrl,
+    response.sourceUrl,
+    response.src,
+    response.url,
   ];
-  for (const _0x84b2b6 of _0x33ea19) {
-    const _0x58ec51 = resolveLocalPathUrl(_0x14f363, _0x84b2b6);
-    if (_0x58ec51) return _0x58ec51;
+  for (const current of next) {
+    const localPathUrl = resolveLocalPathUrl(source, current);
+    if (localPathUrl) return localPathUrl;
   }
   return '';
 }
-function resolveVideoSourceUrl(_0x5908c6, _0x59910a = {}) {
-  const _0x4ab025 = _0x5908c6._getCurrentVideoUrl?.();
-  if (_0x4ab025) return _0x4ab025;
-  const _0x448c06 = Array.isArray(_0x59910a.videos) ? _0x59910a.videos : [],
-    _0xe7371b = Number.isFinite(Number(_0x59910a.mainVideoIndex))
-      ? Math.max(0, Math.trunc(Number(_0x59910a.mainVideoIndex)))
+function resolveVideoSourceUrl(entry, response2 = {}) {
+  const record = entry._getCurrentVideoUrl?.();
+  if (record) return record;
+  const payload = Array.isArray(response2.videos) ? response2.videos : [],
+    handle = Number.isFinite(Number(response2.mainVideoIndex))
+      ? Math.max(0, Math.trunc(Number(response2.mainVideoIndex)))
       : 0,
-    _0x59656d = _0x448c06[_0xe7371b] || _0x448c06[0] || {},
-    _0x35692b = [
-      _0x59656d.originalLocalPath,
-      _0x59656d.displayLocalPath,
-      _0x59656d.localPath,
-      _0x59656d.videoUrl,
-      _0x59910a.originalLocalPath,
-      _0x59910a.displayLocalPath,
-      _0x59910a.localPath,
-      _0x59910a.videoLocalPath,
-      _0x59910a.videoUrl,
-      _0x59910a.sourceUrl,
-      _0x59910a.src,
-      _0x59910a.url,
+    state = payload[handle] || payload[0] || {},
+    config = [
+      state.originalLocalPath,
+      state.displayLocalPath,
+      state.localPath,
+      state.videoUrl,
+      response2.originalLocalPath,
+      response2.displayLocalPath,
+      response2.localPath,
+      response2.videoLocalPath,
+      response2.videoUrl,
+      response2.sourceUrl,
+      response2.src,
+      response2.url,
     ];
-  for (const _0x5220d1 of _0x35692b) {
-    const _0x28ead8 = resolveLocalPathUrl(_0x5908c6, _0x5220d1);
-    if (_0x28ead8) return _0x28ead8;
+  for (const scope of config) {
+    const localPathUrl2 = resolveLocalPathUrl(entry, scope);
+    if (localPathUrl2) return localPathUrl2;
   }
   return '';
 }
-function resolveSource(_0x3feca5, _0x547541 = {}) {
-  const _0x148d2a = String(_0x3feca5.mediaKind || '').toLowerCase();
-  if (_0x148d2a === 'video') {
-    const _0x5dc283 = resolveVideoSourceUrl(_0x3feca5, _0x547541);
-    return { url: _0x5dc283, assetType: 'Video', sourceKind: 'video' };
+function resolveSource(input, output = {}) {
+  const value2 = String(input.mediaKind || '').toLowerCase();
+  if (value2 === 'video') {
+    const url = resolveVideoSourceUrl(input, output);
+    return { url: url, assetType: 'Video', sourceKind: 'video' };
   }
-  const _0x55b703 = resolveImageSourceUrl(_0x3feca5, _0x547541);
-  return { url: _0x55b703, assetType: 'Image', sourceKind: 'image' };
+  const url2 = resolveImageSourceUrl(input, output);
+  return { url: url2, assetType: 'Image', sourceKind: 'image' };
 }
-function applyButtonState(_0x292467, _0x26bb71) {
-  const _0x32f50b = String(_0x26bb71?.status || '')
+function applyButtonState(el, error) {
+  const value3 = String(error?.status || '')
       .trim()
       .toLowerCase(),
-    _0x504db2 = _0x32f50b === 'processing',
-    _0x327361 = _0x292467.querySelector?.('svg');
-  (_0x292467.classList.toggle('is-provider-asset-pass', _0x32f50b === 'passed'),
-    _0x292467.classList.toggle('is-provider-asset-fail', _0x32f50b === 'failed'),
-    _0x292467.classList.toggle('is-provider-asset-running', _0x504db2),
-    _0x327361?.classList?.toggle?.('v2-spinning', _0x504db2),
-    (_0x292467.dataset.loading = _0x504db2 ? 'true' : 'false'),
-    (_0x292467.disabled = _0x504db2),
-    _0x292467.setAttribute('aria-busy', _0x504db2 ? 'true' : 'false'));
-  if (_0x32f50b === 'passed') _0x292467.dataset.tooltip = faceDetectText('passedTooltip');
+    value4 = value3 === 'processing',
+    el2 = el.querySelector?.('svg');
+  (el.classList.toggle('is-provider-asset-pass', value3 === 'passed'),
+    el.classList.toggle('is-provider-asset-fail', value3 === 'failed'),
+    el.classList.toggle('is-provider-asset-running', value4),
+    el2?.classList?.toggle?.('v2-spinning', value4),
+    (el.dataset.loading = value4 ? 'true' : 'false'),
+    (el.disabled = value4),
+    el.setAttribute('aria-busy', value4 ? 'true' : 'false'));
+  if (value3 === 'passed') el.dataset.tooltip = faceDetectText('passedTooltip');
   else {
-    if (_0x32f50b === 'failed')
-      _0x292467.dataset.tooltip = _0x26bb71?.error
-        ? faceDetectText('failedTooltipWithError', { error: _0x26bb71.error })
+    if (value3 === 'failed')
+      el.dataset.tooltip = error?.error
+        ? faceDetectText('failedTooltipWithError', { error: error.error })
         : faceDetectText('failedTooltip');
     else
-      _0x32f50b === 'processing'
-        ? (_0x292467.dataset.tooltip = faceDetectText('processingTooltip'))
-        : (_0x292467.dataset.tooltip = faceDetectText('defaultTooltip'));
+      value3 === 'processing'
+        ? (el.dataset.tooltip = faceDetectText('processingTooltip'))
+        : (el.dataset.tooltip = faceDetectText('defaultTooltip'));
   }
 }
-function persistAsset(_0x5b10a0, _0x594578, _0x260d9a) {
-  const _0x5dbd7d = getNodeId(_0x5b10a0);
-  if (!_0x5dbd7d) return;
-  const _0x30f3fc = buildApimartPrivateAvatarPatch(_0x594578, _0x260d9a);
-  (_0x5b10a0.store?.updateNodeData?.(_0x5dbd7d, _0x30f3fc),
-    _0x594578 &&
-      typeof _0x594578 === 'object' &&
-      (_0x594578.providerAssetRefs = _0x30f3fc.providerAssetRefs));
+function persistAsset(value5, value6, value7) {
+  const nodeId2 = getNodeId(value5);
+  if (!nodeId2) return;
+  const apimartPrivateAvatarPatch = buildApimartPrivateAvatarPatch(value6, value7);
+  (value5.store?.updateNodeData?.(nodeId2, apimartPrivateAvatarPatch),
+    value6 &&
+      typeof value6 === 'object' &&
+      (value6.providerAssetRefs = apimartPrivateAvatarPatch.providerAssetRefs));
 }
-export function bindApimartPrivateAvatarAction(_0x166440 = {}) {
-  const _0x3b2b89 = _0x166440.toolbarEl?.querySelector?.(ACTION_CLASS);
-  if (!_0x3b2b89) return;
-  const _0x1ffc16 = getNodeId(_0x166440);
-  if (!_0x1ffc16) return;
-  const _0x120437 = () => {
-    applyButtonState(_0x3b2b89, readApimartPrivateAvatarAsset(getLatestNodeData(_0x166440)));
+export function bindApimartPrivateAvatarAction(options3 = {}) {
+  const el3 = options3.toolbarEl?.querySelector?.(ACTION_CLASS);
+  if (!el3) return;
+  const nodeId3 = getNodeId(options3);
+  if (!nodeId3) return;
+  const run = () => {
+    applyButtonState(el3, readApimartPrivateAvatarAsset(getLatestNodeData(options3)));
   };
-  _0x120437();
-  const _0x110129 =
-    typeof _0x166440.store?.subscribeSelector === 'function'
-      ? _0x166440.store.subscribeSelector(
-          (_0x2f205e) => _0x2f205e.nodes?.[_0x1ffc16]?.providerAssetRefs?.[APIMART_PRIVATE_AVATAR_ASSET_KEY],
-          () => _0x120437(),
+  run();
+  const value8 =
+    typeof options3.store?.subscribeSelector === 'function'
+      ? options3.store.subscribeSelector(
+          (value9) => value9.nodes?.[nodeId3]?.providerAssetRefs?.[APIMART_PRIVATE_AVATAR_ASSET_KEY],
+          () => run(),
         )
       : null;
-  (_0x3b2b89._cleanupApimartPrivateAvatarState?.(),
-    (_0x3b2b89._cleanupApimartPrivateAvatarState = () => _0x110129?.()),
-    _0x3b2b89.addEventListener('click', async (_0x4c8395) => {
-      (_0x4c8395.preventDefault(), _0x4c8395.stopPropagation());
-      if (_0x3b2b89.dataset.loading === 'true') return;
-      const _0x32e090 = getLatestNodeData(_0x166440),
-        { url: _0x5a106f, assetType: _0x5c4798, sourceKind: _0x3c48fd } = resolveSource(_0x166440, _0x32e090);
-      if (!_0x5a106f) {
-        (persistAsset(_0x166440, _0x32e090, {
+  (el3._cleanupApimartPrivateAvatarState?.(),
+    (el3._cleanupApimartPrivateAvatarState = () => value8?.()),
+    el3.addEventListener('click', async (event) => {
+      (event.preventDefault(), event.stopPropagation());
+      if (el3.dataset.loading === 'true') return;
+      const latestNodeData = getLatestNodeData(options3),
+        { url: url3, assetType: assetType, sourceKind: sourceKind } = resolveSource(options3, latestNodeData);
+      if (!url3) {
+        (persistAsset(options3, latestNodeData, {
           provider: 'apimart',
           capability: 'seedance2PrivateAvatar',
           status: 'failed',
           error: faceDetectText('missingUrlError'),
         }),
           window.showToast?.(faceDetectText('missingUrlToast'), 'error'),
-          _0x120437());
+          run());
         return;
       }
-      (persistAsset(_0x166440, _0x32e090, {
+      (persistAsset(options3, latestNodeData, {
         provider: 'apimart',
         capability: 'seedance2PrivateAvatar',
         status: 'processing',
-        sourceUrl: _0x5a106f,
-        sourceKind: _0x3c48fd,
-        assetType: _0x5c4798,
+        sourceUrl: url3,
+        sourceKind: sourceKind,
+        assetType: assetType,
         checkedAt: new Date().toISOString(),
       }),
-        _0x120437());
-      const _0x5a601d = _0x166440.ensureConfig,
-        _0x221101 = _0x166440.getProviderConfig;
+        run());
+      const value10 = options3.ensureConfig,
+        value11 = options3.getProviderConfig;
       try {
-        await _0x5a601d?.();
-        const _0x33047c = _0x221101?.('apimart') || {},
-          _0x22564f = String(_0x33047c.apiKey || '').trim(),
-          _0x103a81 = String(_0x33047c.apiUrl || DEFAULT_APIMART_API_URL).trim();
-        if (!_0x22564f) throw new Error(faceDetectText('apiKeyMissing'));
+        await value10?.();
+        const value12 = value11?.('apimart') || {},
+          apiKey = String(value12.apiKey || '').trim(),
+          apiUrl = String(value12.apiUrl || DEFAULT_APIMART_API_URL).trim();
+        if (!apiKey) throw new Error(faceDetectText('apiKeyMissing'));
         window.showToast?.(faceDetectText('running'), 'info');
-        const _0x449706 = await submitApimartSeedance2PrivateAvatar({
-          apiKey: _0x22564f,
-          apiUrl: _0x103a81,
-          url: _0x5a106f,
-          assetType: _0x5c4798,
-          name: basenameFromUrl(_0x5a106f) || _0x3c48fd + '-asset',
+        const assetUrl = await submitApimartSeedance2PrivateAvatar({
+          apiKey: apiKey,
+          apiUrl: apiUrl,
+          url: url3,
+          assetType: assetType,
+          name: basenameFromUrl(url3) || sourceKind + '-asset',
         });
-        (persistAsset(_0x166440, getLatestNodeData(_0x166440), {
+        (persistAsset(options3, getLatestNodeData(options3), {
           provider: 'apimart',
           capability: 'seedance2PrivateAvatar',
           status: 'passed',
-          assetUrl: _0x449706.assetUrl,
-          sourceUrl: _0x5a106f,
-          uploadedSourceUrl: _0x449706.sourceUrl || '',
-          sourceKind: _0x3c48fd,
-          assetType: _0x449706.assetType || _0x5c4798,
-          taskId: _0x449706.taskId || '',
+          assetUrl: assetUrl.assetUrl,
+          sourceUrl: url3,
+          uploadedSourceUrl: assetUrl.sourceUrl || '',
+          sourceKind: sourceKind,
+          assetType: assetUrl.assetType || assetType,
+          taskId: assetUrl.taskId || '',
           checkedAt: new Date().toISOString(),
         }),
           window.showToast?.(faceDetectText('passedToast'), 'success'));
-      } catch (_0x6bb357) {
-        const _0x5e5d85 = _0x6bb357?.message || faceDetectText('failedFallback');
-        (persistAsset(_0x166440, getLatestNodeData(_0x166440), {
+      } catch (error2) {
+        const error3 = error2?.message || faceDetectText('failedFallback');
+        (persistAsset(options3, getLatestNodeData(options3), {
           provider: 'apimart',
           capability: 'seedance2PrivateAvatar',
           status: 'failed',
-          sourceUrl: _0x5a106f,
-          sourceKind: _0x3c48fd,
-          assetType: _0x5c4798,
+          sourceUrl: url3,
+          sourceKind: sourceKind,
+          assetType: assetType,
           checkedAt: new Date().toISOString(),
-          error: _0x5e5d85,
+          error: error3,
         }),
-          window.showToast?.(faceDetectText('failedToastWithError', { error: _0x5e5d85 }), 'error'));
+          window.showToast?.(faceDetectText('failedToastWithError', { error: error3 }), 'error'));
       } finally {
-        _0x120437();
+        run();
       }
     }));
 }

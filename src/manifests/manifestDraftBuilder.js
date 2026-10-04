@@ -1,199 +1,198 @@
 const ADAPTER_TYPES = new Set(['workflow', 'modelApi', 'localRuntime']),
   KINDS = new Set(['image', 'video', 'audio', 'text']);
-function normalizeText(_0x25c198, _0x1da09b = '') {
-  const _0x207b5f = String(_0x25c198 ?? '')['trim']();
-  return _0x207b5f || _0x1da09b;
+function normalizeText(value, item = '') {
+  const key = String(value ?? '')['trim']();
+  return key || item;
 }
-function normalizeKind(_0x2e503d) {
-  const _0x278cf0 = normalizeText(_0x2e503d);
-  return KINDS['has'](_0x278cf0) ? _0x278cf0 : 'image';
+function normalizeKind(index) {
+  const text = normalizeText(index);
+  return KINDS['has'](text) ? text : 'image';
 }
-function clonePlainData(_0x55d8f2) {
-  if (_0x55d8f2 === undefined || _0x55d8f2 === null) return _0x55d8f2;
-  return JSON['parse'](JSON['stringify'](_0x55d8f2));
+function clonePlainData(result) {
+  if (result === undefined || result === null) return result;
+  return JSON['parse'](JSON['stringify'](result));
 }
-function toSlug(_0x2ef0a3) {
-  const _0x2655ac = normalizeText(_0x2ef0a3)
+function toSlug(data) {
+  const text2 = normalizeText(data)
     ['toLowerCase']()
     ['replace'](/[^a-z0-9]+/g, '-')
     ['replace'](/^-+|-+$/g, '');
-  return _0x2655ac || 'draft';
+  return text2 || 'draft';
 }
-function hasWorkflowShape(_0x5bf140 = {}) {
+function hasWorkflowShape(options = {}) {
   return Boolean(
-    _0x5bf140['workflowId'] ||
-    _0x5bf140['appId'] ||
-    _0x5bf140['mapping']?.['nodeInfoList'] ||
-    _0x5bf140['nodeInfoList'],
+    options['workflowId'] ||
+    options['appId'] ||
+    options['mapping']?.['nodeInfoList'] ||
+    options['nodeInfoList'],
   );
 }
-function hasModelApiShape(_0x38fb58 = {}) {
-  return Boolean(_0x38fb58['endpoint'] || _0x38fb58['apiModel'] || _0x38fb58['modelToken']);
+function hasModelApiShape(options2 = {}) {
+  return Boolean(options2['endpoint'] || options2['apiModel'] || options2['modelToken']);
 }
-export function inferManifestDraftAdapterType(_0x94a5d6 = {}) {
-  const _0x55d083 = normalizeText(_0x94a5d6['adapterType']);
-  if (_0x55d083) {
-    if (!ADAPTER_TYPES['has'](_0x55d083))
-      throw new Error('Unsupported manifest draft adapterType: ' + _0x55d083);
-    return _0x55d083;
+export function inferManifestDraftAdapterType(options3 = {}) {
+  const text3 = normalizeText(options3['adapterType']);
+  if (text3) {
+    if (!ADAPTER_TYPES['has'](text3)) throw new Error('Unsupported manifest draft adapterType: ' + text3);
+    return text3;
   }
-  if (hasWorkflowShape(_0x94a5d6)) return 'workflow';
-  if (hasModelApiShape(_0x94a5d6)) return 'modelApi';
+  if (hasWorkflowShape(options3)) return 'workflow';
+  if (hasModelApiShape(options3)) return 'modelApi';
   throw new Error('Unable\x20to\x20infer\x20manifest\x20draft\x20adapterType');
 }
 function buildExecutionId({
-  source: _0x3553e0,
-  provider: _0x449eaf,
-  kind: _0x574421,
-  adapterType: _0x4d23e1,
-  modelId: _0x2ebb5c,
+  source: source,
+  provider: provider,
+  kind: kind,
+  adapterType: adapterType,
+  modelId: modelId,
 }) {
-  const _0x4ce2dc = normalizeText(_0x3553e0['executionId']);
-  if (_0x4ce2dc) return _0x4ce2dc;
-  return _0x449eaf + '.' + _0x4d23e1 + '.' + _0x574421 + '.' + toSlug(_0x2ebb5c) + '.v1';
+  const text4 = normalizeText(source['executionId']);
+  if (text4) return text4;
+  return provider + '.' + adapterType + '.' + kind + '.' + toSlug(modelId) + '.v1';
 }
-function buildSourceId(_0x5c8f50, _0x132659) {
-  return normalizeText(_0x5c8f50['sourceId'], 'manifest-draft:' + _0x132659);
+function buildSourceId(target, next) {
+  return normalizeText(target['sourceId'], 'manifest-draft:' + next);
 }
-function buildUiSchema(_0x1e1be5 = {}) {
-  if (_0x1e1be5['uiSchema']) return _0x1e1be5['uiSchema'];
-  return { fields: Array['isArray'](_0x1e1be5['uiFields']) ? _0x1e1be5['uiFields'] : [] };
+function buildUiSchema(options4 = {}) {
+  if (options4['uiSchema']) return options4['uiSchema'];
+  return { fields: Array['isArray'](options4['uiFields']) ? options4['uiFields'] : [] };
 }
-function buildInputSlots(_0x23ecf6 = {}) {
-  if (_0x23ecf6['inputSlots']) return _0x23ecf6['inputSlots'];
+function buildInputSlots(options5 = {}) {
+  if (options5['inputSlots']) return options5['inputSlots'];
   return { maxByKind: { image: 0x0, video: 0x0, audio: 0x0 } };
 }
-function buildOutputType(_0x73bb70 = {}, _0x55ba72) {
-  return normalizeText(_0x73bb70['outputType'] || _0x73bb70['result']?.['outputType'], _0x55ba72);
+function buildOutputType(options6 = {}, current) {
+  return normalizeText(options6['outputType'] || options6['result']?.['outputType'], current);
 }
 function buildWorkflowExecutionManifest({
-  source: _0x5e41bd,
-  provider: _0x17ea20,
-  kind: _0x359b84,
-  executionId: _0x422a0d,
-  outputType: _0xfa5ef7,
+  source: source2,
+  provider: provider2,
+  kind: kind2,
+  executionId: executionId,
+  outputType: outputType2,
 }) {
-  const _0x87d78d =
-    _0x5e41bd['mapping'] ||
-    (Array['isArray'](_0x5e41bd['nodeInfoList']) ? { nodeInfoList: _0x5e41bd['nodeInfoList'] } : {});
+  const mapping =
+    source2['mapping'] ||
+    (Array['isArray'](source2['nodeInfoList']) ? { nodeInfoList: source2['nodeInfoList'] } : {});
   return {
-    schemaVersion: normalizeText(_0x5e41bd['schemaVersion'], '1.0'),
-    id: _0x422a0d,
-    provider: _0x17ea20,
-    kind: _0x359b84,
+    schemaVersion: normalizeText(source2['schemaVersion'], '1.0'),
+    id: executionId,
+    provider: provider2,
+    kind: kind2,
     adapterType: 'workflow',
-    ...(_0x5e41bd['workflowId'] ? { workflowId: String(_0x5e41bd['workflowId']) } : {}),
-    ...(_0x5e41bd['appId'] ? { appId: String(_0x5e41bd['appId']) } : {}),
+    ...(source2['workflowId'] ? { workflowId: String(source2['workflowId']) } : {}),
+    ...(source2['appId'] ? { appId: String(source2['appId']) } : {}),
     submitMode: normalizeText(
-      _0x5e41bd['submitMode'],
-      _0x5e41bd['appId'] ? 'openapi-v2-ai-app' : 'runninghub-task-create',
+      source2['submitMode'],
+      source2['appId'] ? 'openapi-v2-ai-app' : 'runninghub-task-create',
     ),
     queryMode: normalizeText(
-      _0x5e41bd['queryMode'],
-      _0x5e41bd['appId'] ? 'openapi-v2-query' : 'runninghubwf-query',
+      source2['queryMode'],
+      source2['appId'] ? 'openapi-v2-query' : 'runninghubwf-query',
     ),
-    mapping: _0x87d78d,
-    result: _0x5e41bd['result'] || {
-      outputType: _0xfa5ef7,
+    mapping: mapping,
+    result: source2['result'] || {
+      outputType: outputType2,
       taskIdPath: 'taskId',
-      paths: Array['isArray'](_0x5e41bd['resultPaths']) ? _0x5e41bd['resultPaths'] : [],
+      paths: Array['isArray'](source2['resultPaths']) ? source2['resultPaths'] : [],
     },
-    ...(_0x5e41bd['instanceType'] ? { instanceType: _0x5e41bd['instanceType'] } : {}),
-    ...(_0x5e41bd['executionExtensions'] || _0x5e41bd['extensions']
-      ? { extensions: _0x5e41bd['executionExtensions'] || _0x5e41bd['extensions'] }
+    ...(source2['instanceType'] ? { instanceType: source2['instanceType'] } : {}),
+    ...(source2['executionExtensions'] || source2['extensions']
+      ? { extensions: source2['executionExtensions'] || source2['extensions'] }
       : {}),
-    ...(_0x5e41bd['validation'] ? { validation: _0x5e41bd['validation'] } : {}),
-    ...(_0x5e41bd['capabilities'] ? { capabilities: clonePlainData(_0x5e41bd['capabilities']) } : {}),
+    ...(source2['validation'] ? { validation: source2['validation'] } : {}),
+    ...(source2['capabilities'] ? { capabilities: clonePlainData(source2['capabilities']) } : {}),
   };
 }
 function buildModelApiExecutionManifest({
-  source: _0xa8977d,
-  provider: _0x39ce80,
-  kind: _0x4a3696,
-  executionId: _0x540077,
-  outputType: _0x4cb94f,
+  source: source3,
+  provider: provider3,
+  kind: kind3,
+  executionId: executionId2,
+  outputType: outputType3,
 }) {
-  const _0x24c369 =
-    _0xa8977d['responseMapping'] ||
-    (Array['isArray'](_0xa8977d['resultPaths']) ? { paths: _0xa8977d['resultPaths'] } : {});
+  const responseMapping =
+    source3['responseMapping'] ||
+    (Array['isArray'](source3['resultPaths']) ? { paths: source3['resultPaths'] } : {});
   return {
-    schemaVersion: normalizeText(_0xa8977d['schemaVersion'], '1.0'),
-    id: _0x540077,
-    provider: _0x39ce80,
-    kind: _0x4a3696,
+    schemaVersion: normalizeText(source3['schemaVersion'], '1.0'),
+    id: executionId2,
+    provider: provider3,
+    kind: kind3,
     adapterType: 'modelApi',
-    endpoint: _0xa8977d['endpoint'],
-    method: normalizeText(_0xa8977d['method'], 'POST'),
-    model: _0xa8977d['apiModel'] || _0xa8977d['modelToken'] || _0xa8977d['model'],
-    ...(_0xa8977d['endpointMode'] ? { endpointMode: _0xa8977d['endpointMode'] } : {}),
-    ...(_0xa8977d['modeModels'] ? { modeModels: _0xa8977d['modeModels'] } : {}),
-    ...(_0xa8977d['routeModels'] ? { routeModels: _0xa8977d['routeModels'] } : {}),
-    ...(_0xa8977d['imageSizeModels'] ? { imageSizeModels: _0xa8977d['imageSizeModels'] } : {}),
-    ...(_0xa8977d['headers'] ? { headers: _0xa8977d['headers'] } : {}),
-    bodyMapping: Array['isArray'](_0xa8977d['bodyMapping']) ? _0xa8977d['bodyMapping'] : [],
-    responseMapping: _0x24c369,
-    result: _0xa8977d['result'] || { outputType: _0x4cb94f, paths: _0x24c369['paths'] || [] },
-    ...(_0xa8977d['executionExtensions'] || _0xa8977d['extensions']
-      ? { extensions: _0xa8977d['executionExtensions'] || _0xa8977d['extensions'] }
+    endpoint: source3['endpoint'],
+    method: normalizeText(source3['method'], 'POST'),
+    model: source3['apiModel'] || source3['modelToken'] || source3['model'],
+    ...(source3['endpointMode'] ? { endpointMode: source3['endpointMode'] } : {}),
+    ...(source3['modeModels'] ? { modeModels: source3['modeModels'] } : {}),
+    ...(source3['routeModels'] ? { routeModels: source3['routeModels'] } : {}),
+    ...(source3['imageSizeModels'] ? { imageSizeModels: source3['imageSizeModels'] } : {}),
+    ...(source3['headers'] ? { headers: source3['headers'] } : {}),
+    bodyMapping: Array['isArray'](source3['bodyMapping']) ? source3['bodyMapping'] : [],
+    responseMapping: responseMapping,
+    result: source3['result'] || { outputType: outputType3, paths: responseMapping['paths'] || [] },
+    ...(source3['executionExtensions'] || source3['extensions']
+      ? { extensions: source3['executionExtensions'] || source3['extensions'] }
       : {}),
-    ...(_0xa8977d['validation'] ? { validation: _0xa8977d['validation'] } : {}),
-    ...(_0xa8977d['capabilities'] ? { capabilities: clonePlainData(_0xa8977d['capabilities']) } : {}),
+    ...(source3['validation'] ? { validation: source3['validation'] } : {}),
+    ...(source3['capabilities'] ? { capabilities: clonePlainData(source3['capabilities']) } : {}),
   };
 }
-export function buildManifestDraftBundle(_0x19d151 = {}) {
-  if (!_0x19d151 || typeof _0x19d151 !== 'object' || Array['isArray'](_0x19d151))
+export function buildManifestDraftBundle(source4 = {}) {
+  if (!source4 || typeof source4 !== 'object' || Array['isArray'](source4))
     throw new TypeError('Manifest draft source must be an object');
-  const _0x4f85e8 = inferManifestDraftAdapterType(_0x19d151),
-    _0x213f2e = normalizeKind(_0x19d151['kind']),
-    _0x1edd26 = normalizeText(_0x19d151['provider'], _0x4f85e8 === 'workflow' ? 'runninghubwf' : ''),
-    _0x3aa51e = normalizeText(_0x19d151['modelId']);
-  if (!_0x3aa51e) throw new Error('Manifest\x20draft\x20source\x20missing\x20modelId');
-  if (!_0x1edd26) throw new Error('Manifest draft source missing provider');
-  const _0x10ca01 = buildOutputType(_0x19d151, _0x213f2e),
-    _0x374549 = buildExecutionId({
-      source: _0x19d151,
-      provider: _0x1edd26,
-      kind: _0x213f2e,
-      adapterType: _0x4f85e8,
-      modelId: _0x3aa51e,
+  const adapterType2 = inferManifestDraftAdapterType(source4),
+    kind4 = normalizeKind(source4['kind']),
+    provider4 = normalizeText(source4['provider'], adapterType2 === 'workflow' ? 'runninghubwf' : ''),
+    modelId2 = normalizeText(source4['modelId']);
+  if (!modelId2) throw new Error('Manifest\x20draft\x20source\x20missing\x20modelId');
+  if (!provider4) throw new Error('Manifest draft source missing provider');
+  const outputType4 = buildOutputType(source4, kind4),
+    executionId3 = buildExecutionId({
+      source: source4,
+      provider: provider4,
+      kind: kind4,
+      adapterType: adapterType2,
+      modelId: modelId2,
     }),
-    _0x2cdad6 = {
-      schemaVersion: normalizeText(_0x19d151['schemaVersion'], '1.0'),
-      modelId: _0x3aa51e,
-      provider: _0x1edd26,
-      kind: _0x213f2e,
-      adapterType: _0x4f85e8,
-      executionId: _0x374549,
-      displayName: normalizeText(_0x19d151['displayName'], _0x3aa51e),
-      uiSchema: buildUiSchema(_0x19d151),
-      inputSlots: buildInputSlots(_0x19d151),
-      outputType: _0x10ca01,
-      async: _0x19d151['async'] ?? _0x4f85e8 === 'workflow',
-      cancellable: _0x19d151['cancellable'] ?? _0x4f85e8 === 'workflow',
-      ...(_0x19d151['aliases'] ? { aliases: _0x19d151['aliases'] } : {}),
-      ...(_0x19d151['description'] ? { description: _0x19d151['description'] } : {}),
-      ...(_0x19d151['icon'] ? { icon: _0x19d151['icon'] } : {}),
-      ...(_0x19d151['vip'] !== undefined ? { vip: _0x19d151['vip'] } : {}),
-      ...(_0x19d151['help'] ? { help: clonePlainData(_0x19d151['help']) } : {}),
-      ...(_0x19d151['prompt'] ? { prompt: _0x19d151['prompt'] } : {}),
-      ...(_0x19d151['capabilities'] ? { capabilities: clonePlainData(_0x19d151['capabilities']) } : {}),
-      ...(_0x19d151['modelExtensions'] ? { extensions: _0x19d151['modelExtensions'] } : {}),
+    entry = {
+      schemaVersion: normalizeText(source4['schemaVersion'], '1.0'),
+      modelId: modelId2,
+      provider: provider4,
+      kind: kind4,
+      adapterType: adapterType2,
+      executionId: executionId3,
+      displayName: normalizeText(source4['displayName'], modelId2),
+      uiSchema: buildUiSchema(source4),
+      inputSlots: buildInputSlots(source4),
+      outputType: outputType4,
+      async: source4['async'] ?? adapterType2 === 'workflow',
+      cancellable: source4['cancellable'] ?? adapterType2 === 'workflow',
+      ...(source4['aliases'] ? { aliases: source4['aliases'] } : {}),
+      ...(source4['description'] ? { description: source4['description'] } : {}),
+      ...(source4['icon'] ? { icon: source4['icon'] } : {}),
+      ...(source4['vip'] !== undefined ? { vip: source4['vip'] } : {}),
+      ...(source4['help'] ? { help: clonePlainData(source4['help']) } : {}),
+      ...(source4['prompt'] ? { prompt: source4['prompt'] } : {}),
+      ...(source4['capabilities'] ? { capabilities: clonePlainData(source4['capabilities']) } : {}),
+      ...(source4['modelExtensions'] ? { extensions: source4['modelExtensions'] } : {}),
     },
-    _0x45d437 =
-      _0x4f85e8 === 'workflow'
+    record =
+      adapterType2 === 'workflow'
         ? buildWorkflowExecutionManifest({
-            source: _0x19d151,
-            provider: _0x1edd26,
-            kind: _0x213f2e,
-            executionId: _0x374549,
-            outputType: _0x10ca01,
+            source: source4,
+            provider: provider4,
+            kind: kind4,
+            executionId: executionId3,
+            outputType: outputType4,
           })
         : buildModelApiExecutionManifest({
-            source: _0x19d151,
-            provider: _0x1edd26,
-            kind: _0x213f2e,
-            executionId: _0x374549,
-            outputType: _0x10ca01,
+            source: source4,
+            provider: provider4,
+            kind: kind4,
+            executionId: executionId3,
+            outputType: outputType4,
           });
-  return { sourceId: buildSourceId(_0x19d151, _0x3aa51e), executions: [_0x45d437], models: [_0x2cdad6] };
+  return { sourceId: buildSourceId(source4, modelId2), executions: [record], models: [entry] };
 }

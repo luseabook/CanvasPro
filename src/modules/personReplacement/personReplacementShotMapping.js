@@ -1,1 +1,238 @@
-import{getPersonReplacementBindingOccurrences,getPersonReplacementCrossRoleSourceCharacterIds}from'./personReplacementProject.js';import{resolvePersonReplacementImageGenerationState,updatePersonReplacementImageGenerationState}from'./personReplacementImageGeneration.js';import{resolvePersonReplacementVideoGenerationState,updatePersonReplacementVideoGenerationState}from'./personReplacementVideoGeneration.js';import{getWorkspaceAssetAppearances}from'../workspaceAssetAppearance.js';function normalizeText(_0x3ab486){return String(_0x3ab486??'')["trim"]();}export function reconcilePersonReplacementShotGenerationState(_0x5c720e,_0x1452c7){if(!_0x1452c7["size"])return _0x5c720e;let _0x58182d={..._0x5c720e["workspace"]};return _0x1452c7['forEach'](_0x26b057=>{const _0x19cde4=resolvePersonReplacementImageGenerationState(_0x58182d,_0x26b057);_0x58182d=updatePersonReplacementImageGenerationState(_0x58182d,_0x19cde4["status"]==="running"?_0x19cde4:{'status':"idle",'shotId':_0x26b057,'error':''});const _0x3fa982=resolvePersonReplacementVideoGenerationState(_0x58182d,_0x26b057);_0x58182d=updatePersonReplacementVideoGenerationState(_0x58182d,_0x3fa982['status']==="running"?_0x3fa982:{'status':"idle",'shotId':_0x26b057,'error':''});}),{..._0x5c720e,'workspace':_0x58182d};}export function applyPersonReplacementShotSceneReference(_0x3ffdaf,{shotId:shotId='',sceneId:sceneId='',appearanceId:appearanceId=''}={},{reason:reason='scene-reference-change'}={}){const _0x195517=normalizeText(shotId),_0x2c1c35=normalizeText(sceneId),_0x40525a=normalizeText(appearanceId),_0x2f68d5=_0x3ffdaf?.["shots"]?.["find"](_0x3b5f7c=>_0x3b5f7c['id']===_0x195517);if(!_0x2f68d5)return null;if(_0x2c1c35){const _0x411067=_0x3ffdaf["scenes"]["find"](_0x5e986a=>_0x5e986a['id']===_0x2c1c35),_0x505f13=getWorkspaceAssetAppearances(_0x411067)["find"](_0x197fe8=>_0x197fe8['id']===_0x40525a);if(!_0x411067||!_0x505f13?.['imageUrl'])return null;}if(normalizeText(_0x2f68d5["sceneReference"]?.["sceneId"])===_0x2c1c35&&normalizeText(_0x2f68d5["sceneReference"]?.["appearanceId"])===_0x40525a)return null;const _0x2295df=new Set([_0x195517]),_0x4c0e0b=reconcilePersonReplacementShotGenerationState({..._0x3ffdaf,'shots':_0x3ffdaf["shots"]["map"](_0x2afaab=>_0x2afaab['id']===_0x195517?{..._0x2afaab,'sceneReference':{'sceneId':_0x2c1c35,'appearanceId':_0x40525a}}:_0x2afaab)},_0x2295df);return{'project':_0x4c0e0b,'reason':reason,'changedShotIds':_0x2295df};}export function clearPersonReplacementShotPersonMappings(_0xe83aae,{shotId:shotId='',personId:personId='',targetCharacterId:targetCharacterId='',targetAppearanceId:targetAppearanceId=''}={},{reason:reason="person-mapping-clear"}={}){const _0x52eae9=normalizeText(shotId),_0x2b8ac5=normalizeText(personId),_0x2ae98f=normalizeText(targetCharacterId),_0x2add13=normalizeText(targetAppearanceId);if(!_0x52eae9||!_0x2b8ac5&&!_0x2ae98f)return null;const _0x1d9a66=_0xe83aae?.["shots"]?.['find'](_0x94e680=>_0x94e680['id']===_0x52eae9);if(!_0x1d9a66)return null;const _0x1c01de=new Map(_0xe83aae["mappings"]['map'](_0x379d1e=>[normalizeText(_0x379d1e["sourceCharacterId"]),normalizeText(_0x379d1e["targetCharacterId"])])),_0x592e9b=_0x1d9a66["people"]["filter"](_0x278e19=>{if(_0x2b8ac5)return _0x278e19['id']===_0x2b8ac5;const _0x38cadd=normalizeText(_0x278e19["sourceCharacterId"]),_0x3fa200=normalizeText(_0x278e19["targetCharacterId"])||_0x1c01de["get"](_0x38cadd)||'';return _0x3fa200===_0x2ae98f&&normalizeText(_0x278e19["targetAppearanceId"])===_0x2add13;});if(!_0x592e9b["length"])return null;const _0x475e53=_0x592e9b['flatMap'](_0x234f0a=>getPersonReplacementBindingOccurrences(_0xe83aae,{'shotId':_0x52eae9,'personId':_0x234f0a['id']})),_0x40f117=new Set(_0x475e53["map"](_0x560fd0=>_0x560fd0["shotId"]+':'+_0x560fd0["personId"])),_0x2fd801=new Set(_0x475e53['map'](_0xa2416f=>normalizeText(_0xa2416f["sourceCharacterId"]))["filter"](Boolean)),_0x2c1263=new Set(),_0xedcfb9=_0xe83aae["shots"]["map"](_0x132325=>{let _0x3269e5=![];const _0x4a0303=_0x132325["people"]["map"](_0x578dd1=>{const _0x553c69=normalizeText(_0x578dd1["sourceCharacterId"]),_0x416144=_0x40f117["has"](_0x132325['id']+':'+_0x578dd1['id']);if(!_0x416144||!normalizeText(_0x578dd1["targetCharacterId"])&&!normalizeText(_0x578dd1['targetAppearanceId'])&&!_0x1c01de["get"](_0x553c69))return _0x578dd1;return _0x3269e5=!![],{..._0x578dd1,'targetCharacterId':'','targetAppearanceId':''};});if(!_0x3269e5)return _0x132325;return _0x2c1263["add"](_0x132325['id']),{..._0x132325,'people':_0x4a0303};}),_0x53b8b4=_0xe83aae["mappings"]["filter"](_0x2f3eeb=>!_0x2fd801["has"](normalizeText(_0x2f3eeb["sourceCharacterId"])));if(!_0x2c1263['size']&&_0x53b8b4["length"]===_0xe83aae['mappings']["length"])return null;const _0x499019=reconcilePersonReplacementShotGenerationState({..._0xe83aae,'shots':_0xedcfb9,'mappings':_0x53b8b4},_0x2c1263);return{'project':_0x499019,'reason':reason,'changedShotIds':_0x2c1263};}export function assignPersonReplacementShotPersonMapping(_0x166a4d,{shotId:shotId='',personId:personId='',targetCharacterId:targetCharacterId='',targetAppearanceId:targetAppearanceId='',scope:scope='current'}={}){const _0x99e7e1=normalizeText(shotId),_0x3d8829=normalizeText(personId),_0xf9e445=normalizeText(targetCharacterId),_0x548701=normalizeText(targetAppearanceId);if(!_0x99e7e1||!_0x3d8829||!_0xf9e445||!_0x548701)return null;const _0x37426b=_0x166a4d?.["shots"]?.["find"](_0x1e199f=>_0x1e199f['id']===_0x99e7e1),_0x50f7b9=_0x37426b?.["people"]["find"](_0x567c14=>_0x567c14['id']===_0x3d8829);if(!_0x50f7b9)return null;const _0x5945ca=normalizeText(scope)["toLowerCase"]()!=="current",_0x215f91=_0x5945ca?getPersonReplacementBindingOccurrences(_0x166a4d,{'shotId':_0x99e7e1,'personId':_0x3d8829}):[{'shotId':_0x99e7e1,'personId':_0x3d8829,'sourceCharacterId':normalizeText(_0x50f7b9["sourceCharacterId"])}],_0x16a848=new Set(_0x215f91['map'](_0x50c629=>_0x50c629["shotId"]+':'+_0x50c629["personId"])),_0x4ac9d6=new Set(_0x215f91["map"](_0x265956=>normalizeText(_0x265956['sourceCharacterId']))['filter'](Boolean)),_0x52a062=getPersonReplacementCrossRoleSourceCharacterIds(_0x166a4d),_0x1d5294=new Set([..._0x4ac9d6]["filter"](_0x117637=>!_0x52a062["has"](_0x117637))),_0x3ec8e8=new Map(_0x166a4d["mappings"]['map'](_0x34f00e=>[normalizeText(_0x34f00e['sourceCharacterId']),normalizeText(_0x34f00e["targetCharacterId"])])),_0x499b09=new Set(),_0x31e3e0=_0x166a4d["shots"]["map"](_0x3eb8b0=>{let _0x4f5c8d=![];const _0x34b0a6=_0x3eb8b0["people"]['map'](_0x3e47ca=>{const _0x47deea=_0x16a848["has"](_0x3eb8b0['id']+':'+_0x3e47ca['id']);if(_0x47deea){if(normalizeText(_0x3e47ca["targetCharacterId"])===_0xf9e445&&normalizeText(_0x3e47ca["targetAppearanceId"])===_0x548701)return _0x3e47ca;return _0x4f5c8d=!![],{..._0x3e47ca,'targetCharacterId':_0xf9e445,'targetAppearanceId':_0x548701};}const _0x145791=normalizeText(_0x3e47ca["sourceCharacterId"]),_0x4f6810=_0x3ec8e8["get"](_0x145791)||'',_0x82bee5=Boolean(_0x5945ca&&_0x4ac9d6["has"](_0x145791)&&_0x52a062['has'](_0x145791)&&_0x4f6810&&normalizeText(_0x3e47ca["targetCharacterId"])===_0x4f6810);if(!_0x82bee5)return _0x3e47ca;return _0x4f5c8d=!![],{..._0x3e47ca,'targetCharacterId':'','targetAppearanceId':''};});if(!_0x4f5c8d)return _0x3eb8b0;return _0x499b09["add"](_0x3eb8b0['id']),{..._0x3eb8b0,'people':_0x34b0a6};}),_0x271219=_0x5945ca&&_0x4ac9d6["size"]?[..._0x166a4d["mappings"]["filter"](_0x2659c3=>!_0x4ac9d6["has"](normalizeText(_0x2659c3["sourceCharacterId"]))),...[..._0x1d5294]['map'](_0x55b7d2=>({'sourceCharacterId':_0x55b7d2,'targetCharacterId':_0xf9e445}))]:_0x166a4d["mappings"],_0x3e83e9=_0x5945ca&&([..._0x4ac9d6]["some"](_0x32f2eb=>_0x3ec8e8["has"](_0x32f2eb)&&!_0x1d5294["has"](_0x32f2eb))||[..._0x1d5294]['some'](_0x539bca=>_0x3ec8e8["get"](_0x539bca)!==_0xf9e445));if(!_0x499b09['size']&&!_0x3e83e9)return null;const _0x557968=reconcilePersonReplacementShotGenerationState({..._0x166a4d,'shots':_0x31e3e0,'mappings':_0x271219},_0x499b09);return{'project':_0x557968,'reason':_0x5945ca?'person-mapping':"person-mapping-current-shot",'changedShotIds':_0x499b09};}
+import {
+  getPersonReplacementBindingOccurrences,
+  getPersonReplacementCrossRoleSourceCharacterIds,
+} from './personReplacementProject.js';
+import {
+  resolvePersonReplacementImageGenerationState,
+  updatePersonReplacementImageGenerationState,
+} from './personReplacementImageGeneration.js';
+import {
+  resolvePersonReplacementVideoGenerationState,
+  updatePersonReplacementVideoGenerationState,
+} from './personReplacementVideoGeneration.js';
+import { getWorkspaceAssetAppearances } from '../workspaceAssetAppearance.js';
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
+}
+export function reconcilePersonReplacementShotGenerationState(args, list) {
+  if (!list['size']) return args;
+  let updatePersonReplacementImageGenerationState2 = { ...args['workspace'] };
+  return (
+    list['forEach']((item) => {
+      const personReplacementImageGenerationState = resolvePersonReplacementImageGenerationState(
+        updatePersonReplacementImageGenerationState2,
+        item,
+      );
+      updatePersonReplacementImageGenerationState2 = updatePersonReplacementImageGenerationState(
+        updatePersonReplacementImageGenerationState2,
+        personReplacementImageGenerationState['status'] === 'running'
+          ? personReplacementImageGenerationState
+          : { status: 'idle', shotId: item, error: '' },
+      );
+      const response = resolvePersonReplacementVideoGenerationState(
+        updatePersonReplacementImageGenerationState2,
+        item,
+      );
+      updatePersonReplacementImageGenerationState2 = updatePersonReplacementVideoGenerationState(
+        updatePersonReplacementImageGenerationState2,
+        response['status'] === 'running' ? response : { status: 'idle', shotId: item, error: '' },
+      );
+    }),
+    { ...args, workspace: updatePersonReplacementImageGenerationState2 }
+  );
+}
+export function applyPersonReplacementShotSceneReference(
+  args2,
+  { shotId: shotId = '', sceneId: sceneId = '', appearanceId: appearanceId = '' } = {},
+  { reason: reason = 'scene-reference-change' } = {},
+) {
+  const text = normalizeText(shotId),
+    text2 = normalizeText(sceneId),
+    text3 = normalizeText(appearanceId),
+    enabled = args2?.['shots']?.['find']((key) => key['id'] === text);
+  if (!enabled) return null;
+  if (text2) {
+    const enabled2 = args2['scenes']['find']((index) => index['id'] === text2),
+      workspaceAssetAppearances = getWorkspaceAssetAppearances(enabled2)['find'](
+        (result) => result['id'] === text3,
+      );
+    if (!enabled2 || !workspaceAssetAppearances?.['imageUrl']) return null;
+  }
+  if (
+    normalizeText(enabled['sceneReference']?.['sceneId']) === text2 &&
+    normalizeText(enabled['sceneReference']?.['appearanceId']) === text3
+  )
+    return null;
+  const data = new Set([text]),
+    reconcilePersonReplacementShotGenerationState2 = reconcilePersonReplacementShotGenerationState(
+      {
+        ...args2,
+        shots: args2['shots']['map']((args3) =>
+          args3['id'] === text
+            ? { ...args3, sceneReference: { sceneId: text2, appearanceId: text3 } }
+            : args3,
+        ),
+      },
+      data,
+    );
+  return { project: reconcilePersonReplacementShotGenerationState2, reason: reason, changedShotIds: data };
+}
+export function clearPersonReplacementShotPersonMappings(
+  args4,
+  {
+    shotId: shotId = '',
+    personId: personId = '',
+    targetCharacterId: targetCharacterId = '',
+    targetAppearanceId: targetAppearanceId = '',
+  } = {},
+  { reason: reason = 'person-mapping-clear' } = {},
+) {
+  const text4 = normalizeText(shotId),
+    text5 = normalizeText(personId),
+    text6 = normalizeText(targetCharacterId),
+    text7 = normalizeText(targetAppearanceId);
+  if (!text4 || (!text5 && !text6)) return null;
+  const enabled3 = args4?.['shots']?.['find']((options) => options['id'] === text4);
+  if (!enabled3) return null;
+  const enabled4 = new Map(
+      args4['mappings']['map']((target) => [
+        normalizeText(target['sourceCharacterId']),
+        normalizeText(target['targetCharacterId']),
+      ]),
+    ),
+    list2 = enabled3['people']['filter']((source) => {
+      if (text5) return source['id'] === text5;
+      const text8 = normalizeText(source['sourceCharacterId']),
+        text9 = normalizeText(source['targetCharacterId']) || enabled4['get'](text8) || '';
+      return text9 === text6 && normalizeText(source['targetAppearanceId']) === text7;
+    });
+  if (!list2['length']) return null;
+  const list3 = list2['flatMap']((next) =>
+      getPersonReplacementBindingOccurrences(args4, { shotId: text4, personId: next['id'] }),
+    ),
+    current = new Set(list3['map']((entry) => entry['shotId'] + ':' + entry['personId'])),
+    enabled5 = new Set(
+      list3['map']((record) => normalizeText(record['sourceCharacterId']))['filter'](Boolean),
+    ),
+    enabled6 = new Set(),
+    payload = args4['shots']['map']((args5) => {
+      let enabled7 = ![];
+      const handle = args5['people']['map']((args6) => {
+        const text10 = normalizeText(args6['sourceCharacterId']),
+          enabled8 = current['has'](args5['id'] + ':' + args6['id']);
+        if (
+          !enabled8 ||
+          (!normalizeText(args6['targetCharacterId']) &&
+            !normalizeText(args6['targetAppearanceId']) &&
+            !enabled4['get'](text10))
+        )
+          return args6;
+        return ((enabled7 = !![]), { ...args6, targetCharacterId: '', targetAppearanceId: '' });
+      });
+      if (!enabled7) return args5;
+      return (enabled6['add'](args5['id']), { ...args5, people: handle });
+    }),
+    state = args4['mappings']['filter'](
+      (config) => !enabled5['has'](normalizeText(config['sourceCharacterId'])),
+    );
+  if (!enabled6['size'] && state['length'] === args4['mappings']['length']) return null;
+  const reconcilePersonReplacementShotGenerationState3 = reconcilePersonReplacementShotGenerationState(
+    { ...args4, shots: payload, mappings: state },
+    enabled6,
+  );
+  return {
+    project: reconcilePersonReplacementShotGenerationState3,
+    reason: reason,
+    changedShotIds: enabled6,
+  };
+}
+export function assignPersonReplacementShotPersonMapping(
+  args7,
+  {
+    shotId: shotId = '',
+    personId: personId = '',
+    targetCharacterId: targetCharacterId = '',
+    targetAppearanceId: targetAppearanceId = '',
+    scope: scope = 'current',
+  } = {},
+) {
+  const text11 = normalizeText(shotId),
+    text12 = normalizeText(personId),
+    text13 = normalizeText(targetCharacterId),
+    text14 = normalizeText(targetAppearanceId);
+  if (!text11 || !text12 || !text13 || !text14) return null;
+  const input = args7?.['shots']?.['find']((output) => output['id'] === text11),
+    enabled9 = input?.['people']['find']((value2) => value2['id'] === text12);
+  if (!enabled9) return null;
+  const text15 = normalizeText(scope)['toLowerCase']() !== 'current',
+    list4 = text15
+      ? getPersonReplacementBindingOccurrences(args7, { shotId: text11, personId: text12 })
+      : [
+          {
+            shotId: text11,
+            personId: text12,
+            sourceCharacterId: normalizeText(enabled9['sourceCharacterId']),
+          },
+        ],
+    value3 = new Set(list4['map']((value4) => value4['shotId'] + ':' + value4['personId'])),
+    args8 = new Set(list4['map']((value5) => normalizeText(value5['sourceCharacterId']))['filter'](Boolean)),
+    map = getPersonReplacementCrossRoleSourceCharacterIds(args7),
+    args9 = new Set([...args8]['filter']((value6) => !map['has'](value6))),
+    value7 = new Map(
+      args7['mappings']['map']((value8) => [
+        normalizeText(value8['sourceCharacterId']),
+        normalizeText(value8['targetCharacterId']),
+      ]),
+    ),
+    enabled10 = new Set(),
+    value9 = args7['shots']['map']((args10) => {
+      let enabled11 = ![];
+      const value10 = args10['people']['map']((args11) => {
+        const value11 = value3['has'](args10['id'] + ':' + args11['id']);
+        if (value11) {
+          if (
+            normalizeText(args11['targetCharacterId']) === text13 &&
+            normalizeText(args11['targetAppearanceId']) === text14
+          )
+            return args11;
+          return ((enabled11 = !![]), { ...args11, targetCharacterId: text13, targetAppearanceId: text14 });
+        }
+        const text16 = normalizeText(args11['sourceCharacterId']),
+          value12 = value7['get'](text16) || '',
+          enabled12 = Boolean(
+            text15 &&
+            args8['has'](text16) &&
+            map['has'](text16) &&
+            value12 &&
+            normalizeText(args11['targetCharacterId']) === value12,
+          );
+        if (!enabled12) return args11;
+        return ((enabled11 = !![]), { ...args11, targetCharacterId: '', targetAppearanceId: '' });
+      });
+      if (!enabled11) return args10;
+      return (enabled10['add'](args10['id']), { ...args10, people: value10 });
+    }),
+    value13 =
+      text15 && args8['size']
+        ? [
+            ...args7['mappings']['filter'](
+              (value14) => !args8['has'](normalizeText(value14['sourceCharacterId'])),
+            ),
+            ...[...args9]['map']((value15) => ({ sourceCharacterId: value15, targetCharacterId: text13 })),
+          ]
+        : args7['mappings'],
+    enabled13 =
+      text15 &&
+      ([...args8]['some']((value16) => value7['has'](value16) && !args9['has'](value16)) ||
+        [...args9]['some']((value17) => value7['get'](value17) !== text13));
+  if (!enabled10['size'] && !enabled13) return null;
+  const reconcilePersonReplacementShotGenerationState4 = reconcilePersonReplacementShotGenerationState(
+    { ...args7, shots: value9, mappings: value13 },
+    enabled10,
+  );
+  return {
+    project: reconcilePersonReplacementShotGenerationState4,
+    reason: text15 ? 'person-mapping' : 'person-mapping-current-shot',
+    changedShotIds: enabled10,
+  };
+}

@@ -1,50 +1,45 @@
 const videoFramePresentationState = new WeakMap();
-function normalizeSource(_0x2b9cd5) {
-  const _0x518fbe = String(_0x2b9cd5 || '')['trim']();
-  if (!_0x518fbe) return '';
+function normalizeSource(value) {
+  const enabled = String(value || '')['trim']();
+  if (!enabled) return '';
   try {
-    return new URL(
-      _0x518fbe,
-      globalThis['location']?.['href'] || globalThis['window']?.['location']?.['href'],
-    )['href'];
+    return new URL(enabled, globalThis['location']?.['href'] || globalThis['window']?.['location']?.['href'])[
+      'href'
+    ];
   } catch {
-    return _0x518fbe;
+    return enabled;
   }
 }
-export function getVideoPresentationSource(_0x24dbcb) {
+export function getVideoPresentationSource(el) {
   return normalizeSource(
-    _0x24dbcb?.['dataset']?.['desktopMediaSourceUrl'] ||
-      _0x24dbcb?.['currentSrc'] ||
-      _0x24dbcb?.['getAttribute']?.('src') ||
-      _0x24dbcb?.['src'],
+    el?.['dataset']?.['desktopMediaSourceUrl'] ||
+      el?.['currentSrc'] ||
+      el?.['getAttribute']?.('src') ||
+      el?.['src'],
   );
 }
-function getDeclaredVideoSource(_0x46cfd9) {
-  return normalizeSource(
-    _0x46cfd9?.['getAttribute']?.('src') || _0x46cfd9?.['src'] || _0x46cfd9?.['currentSrc'],
-  );
+function getDeclaredVideoSource(item) {
+  return normalizeSource(item?.['getAttribute']?.('src') || item?.['src'] || item?.['currentSrc']);
 }
-function cancelPendingFrameCallback(_0x559c02, _0x43224b) {
-  if (!_0x43224b || _0x43224b['callbackId'] == null) return;
+function cancelPendingFrameCallback(key, enabled2) {
+  if (!enabled2 || enabled2['callbackId'] == null) return;
   try {
-    _0x559c02?.['cancelVideoFrameCallback']?.(_0x43224b['callbackId']);
+    key?.['cancelVideoFrameCallback']?.(enabled2['callbackId']);
   } catch {}
-  _0x43224b['callbackId'] = null;
+  enabled2['callbackId'] = null;
 }
-function clearPresentedDataset(_0x4d47f5) {
-  if (!_0x4d47f5?.['dataset']) return;
-  (delete _0x4d47f5['dataset']['firstFramePresented'],
-    delete _0x4d47f5['dataset']['firstFramePresentedAt'],
-    delete _0x4d47f5['dataset']['firstFramePresentedSource']);
+function clearPresentedDataset(el2) {
+  if (!el2?.['dataset']) return;
+  (delete el2['dataset']['firstFramePresented'],
+    delete el2['dataset']['firstFramePresentedAt'],
+    delete el2['dataset']['firstFramePresentedSource']);
 }
-function createSourceState(_0x26dccc, _0x4fcd07) {
-  const _0x310788 = videoFramePresentationState['get'](_0x26dccc);
-  (cancelPendingFrameCallback(_0x26dccc, _0x310788),
-    _0x310788?.['cleanup']?.(),
-    clearPresentedDataset(_0x26dccc));
-  const _0x45f7dd = {
-    source: _0x4fcd07,
-    declaredSource: getDeclaredVideoSource(_0x26dccc),
+function createSourceState(el3, source) {
+  const index = videoFramePresentationState['get'](el3);
+  (cancelPendingFrameCallback(el3, index), index?.['cleanup']?.(), clearPresentedDataset(el3));
+  const result = {
+    source: source,
+    declaredSource: getDeclaredVideoSource(el3),
     callbackId: null,
     frameCallbackObserved: ![],
     frameCallbackAt: 0x0,
@@ -53,165 +48,157 @@ function createSourceState(_0x26dccc, _0x4fcd07) {
     metadata: null,
     listeners: new Set(),
   };
-  videoFramePresentationState['set'](_0x26dccc, _0x45f7dd);
-  const _0x39daca = () => resetVideoFramePresentation(_0x26dccc);
+  videoFramePresentationState['set'](el3, result);
+  const data = () => resetVideoFramePresentation(el3);
   return (
-    _0x26dccc['addEventListener']?.('emptied', _0x39daca),
-    (_0x45f7dd['cleanup'] = () => _0x26dccc['removeEventListener']?.('emptied', _0x39daca)),
-    _0x45f7dd
+    el3['addEventListener']?.('emptied', data),
+    (result['cleanup'] = () => el3['removeEventListener']?.('emptied', data)),
+    result
   );
 }
-function readSourceState(_0x50c956) {
-  const _0x3dfd78 = getVideoPresentationSource(_0x50c956),
-    _0x46f87b = videoFramePresentationState['get'](_0x50c956);
-  if (!_0x3dfd78) {
-    if (_0x46f87b) createSourceState(_0x50c956, '');
-    return { source: '', state: videoFramePresentationState['get'](_0x50c956) || null };
+function readSourceState(options) {
+  const source2 = getVideoPresentationSource(options),
+    state = videoFramePresentationState['get'](options);
+  if (!source2) {
+    if (state) createSourceState(options, '');
+    return { source: '', state: videoFramePresentationState['get'](options) || null };
   }
-  if (
-    !_0x46f87b ||
-    _0x46f87b['source'] !== _0x3dfd78 ||
-    _0x46f87b['declaredSource'] !== getDeclaredVideoSource(_0x50c956)
-  )
-    return { source: _0x3dfd78, state: createSourceState(_0x50c956, _0x3dfd78) };
-  return { source: _0x3dfd78, state: _0x46f87b };
+  if (!state || state['source'] !== source2 || state['declaredSource'] !== getDeclaredVideoSource(options))
+    return { source: source2, state: createSourceState(options, source2) };
+  return { source: source2, state: state };
 }
-function isCurrentPresentedFrameValid(_0x503122, _0x39a453, _0x3278bc = 0x2) {
+function isCurrentPresentedFrameValid(el4, target, next = 0x2) {
   return !!(
-    _0x503122 &&
-    _0x39a453 &&
-    _0x503122['isConnected'] !== ![] &&
-    getVideoPresentationSource(_0x503122) === _0x39a453 &&
-    videoFramePresentationState['get'](_0x503122)?.['declaredSource'] === getDeclaredVideoSource(_0x503122) &&
-    Number(_0x503122['readyState'] || 0x0) >= _0x3278bc &&
-    Number(_0x503122['videoWidth'] || 0x0) > 0x0 &&
-    Number(_0x503122['videoHeight'] || 0x0) > 0x0 &&
-    !_0x503122['error']
+    el4 &&
+    target &&
+    el4['isConnected'] !== ![] &&
+    getVideoPresentationSource(el4) === target &&
+    videoFramePresentationState['get'](el4)?.['declaredSource'] === getDeclaredVideoSource(el4) &&
+    Number(el4['readyState'] || 0x0) >= next &&
+    Number(el4['videoWidth'] || 0x0) > 0x0 &&
+    Number(el4['videoHeight'] || 0x0) > 0x0 &&
+    !el4['error']
   );
 }
-export function resetVideoFramePresentation(_0x4f780c) {
-  if (!_0x4f780c) return;
-  const _0x3fc189 = videoFramePresentationState['get'](_0x4f780c);
-  (cancelPendingFrameCallback(_0x4f780c, _0x3fc189),
-    _0x3fc189?.['cleanup']?.(),
-    videoFramePresentationState['delete'](_0x4f780c),
-    clearPresentedDataset(_0x4f780c));
+export function resetVideoFramePresentation(enabled3) {
+  if (!enabled3) return;
+  const current = videoFramePresentationState['get'](enabled3);
+  (cancelPendingFrameCallback(enabled3, current),
+    current?.['cleanup']?.(),
+    videoFramePresentationState['delete'](enabled3),
+    clearPresentedDataset(enabled3));
 }
-export function hasPresentedVideoFrame(_0x5dd21e, _0x212ba2 = '') {
-  if (!_0x5dd21e) return ![];
-  const _0x330ea9 = getVideoPresentationSource(_0x5dd21e),
-    _0x4c4656 = normalizeSource(_0x212ba2);
-  if (!_0x330ea9 || (_0x4c4656 && _0x330ea9 !== _0x4c4656)) return ![];
-  const _0x20393d = videoFramePresentationState['get'](_0x5dd21e);
+export function hasPresentedVideoFrame(enabled4, entry = '') {
+  if (!enabled4) return ![];
+  const videoPresentationSource = getVideoPresentationSource(enabled4),
+    source3 = normalizeSource(entry);
+  if (!videoPresentationSource || (source3 && videoPresentationSource !== source3)) return ![];
+  const record = videoFramePresentationState['get'](enabled4);
   return !!(
-    _0x20393d?.['presented'] === !![] &&
-    _0x20393d['source'] === _0x330ea9 &&
-    isCurrentPresentedFrameValid(_0x5dd21e, _0x330ea9, 0x1)
+    record?.['presented'] === !![] &&
+    record['source'] === videoPresentationSource &&
+    isCurrentPresentedFrameValid(enabled4, videoPresentationSource, 0x1)
   );
 }
-export function watchVideoFramePresentation(_0x1b421f, _0x11ee61) {
-  if (!_0x1b421f) return ![];
-  const { source: _0x2256c2, state: _0x307a0d } = readSourceState(_0x1b421f);
-  if (!_0x2256c2 || !_0x307a0d) return ![];
-  if (
-    !_0x307a0d['presented'] &&
-    _0x307a0d['frameCallbackObserved'] &&
-    isCurrentPresentedFrameValid(_0x1b421f, _0x2256c2)
-  ) {
-    ((_0x307a0d['presented'] = !![]), (_0x307a0d['presentedAt'] = _0x307a0d['frameCallbackAt']));
-    _0x1b421f['dataset'] &&
-      ((_0x1b421f['dataset']['firstFramePresented'] = '1'),
-      (_0x1b421f['dataset']['firstFramePresentedAt'] = String(_0x307a0d['presentedAt'])),
-      (_0x1b421f['dataset']['firstFramePresentedSource'] = _0x2256c2));
+export function watchVideoFramePresentation(el5, payload) {
+  if (!el5) return ![];
+  const { source: source4, state: state2 } = readSourceState(el5);
+  if (!source4 || !state2) return ![];
+  if (!state2['presented'] && state2['frameCallbackObserved'] && isCurrentPresentedFrameValid(el5, source4)) {
+    ((state2['presented'] = !![]), (state2['presentedAt'] = state2['frameCallbackAt']));
+    el5['dataset'] &&
+      ((el5['dataset']['firstFramePresented'] = '1'),
+      (el5['dataset']['firstFramePresentedAt'] = String(state2['presentedAt'])),
+      (el5['dataset']['firstFramePresentedSource'] = source4));
     globalThis['window']?.['__runtimeCompareMark']?.('video-frame-presentation:ready', {
-      source: _0x2256c2,
-      readyState: Number(_0x1b421f['readyState'] || 0x0),
-      videoWidth: Number(_0x1b421f['videoWidth'] || 0x0),
-      videoHeight: Number(_0x1b421f['videoHeight'] || 0x0),
+      source: source4,
+      readyState: Number(el5['readyState'] || 0x0),
+      videoWidth: Number(el5['videoWidth'] || 0x0),
+      videoHeight: Number(el5['videoHeight'] || 0x0),
     });
-    const _0x2e1dd3 = Array['from'](_0x307a0d['listeners']);
-    _0x307a0d['listeners']['clear']();
-    const _0x414e0f = {
-      source: _0x2256c2,
-      presentedAt: _0x307a0d['presentedAt'],
-      metadata: _0x307a0d['metadata'],
+    const handle = Array['from'](state2['listeners']);
+    state2['listeners']['clear']();
+    const config = {
+      source: source4,
+      presentedAt: state2['presentedAt'],
+      metadata: state2['metadata'],
     };
-    for (const _0x387160 of _0x2e1dd3) {
-      if (videoFramePresentationState['get'](_0x1b421f) !== _0x307a0d) break;
-      _0x387160(_0x414e0f);
+    for (const run of handle) {
+      if (videoFramePresentationState['get'](el5) !== state2) break;
+      run(config);
     }
   }
-  if (_0x307a0d['presented'] && isCurrentPresentedFrameValid(_0x1b421f, _0x2256c2))
+  if (state2['presented'] && isCurrentPresentedFrameValid(el5, source4))
     return (
-      _0x11ee61?.({
-        source: _0x2256c2,
-        presentedAt: _0x307a0d['presentedAt'],
-        metadata: _0x307a0d['metadata'],
+      payload?.({
+        source: source4,
+        presentedAt: state2['presentedAt'],
+        metadata: state2['metadata'],
       }),
       !![]
     );
-  if (typeof _0x11ee61 === 'function') _0x307a0d['listeners']['add'](_0x11ee61);
-  if (_0x307a0d['callbackId'] != null) return !![];
-  if (typeof _0x1b421f['requestVideoFrameCallback'] !== 'function') return ![];
+  if (typeof payload === 'function') state2['listeners']['add'](payload);
+  if (state2['callbackId'] != null) return !![];
+  if (typeof el5['requestVideoFrameCallback'] !== 'function') return ![];
   return (
-    (_0x307a0d['callbackId'] = _0x1b421f['requestVideoFrameCallback']((_0x794c49, _0x1953f8 = {}) => {
-      const _0x39f35c = videoFramePresentationState['get'](_0x1b421f);
-      if (_0x39f35c !== _0x307a0d) return;
-      _0x307a0d['callbackId'] = null;
-      const _0x40d82b = !!(
-        _0x1b421f?.['isConnected'] !== ![] &&
-        getVideoPresentationSource(_0x1b421f) === _0x2256c2 &&
-        Number(_0x1b421f?.['videoWidth'] || _0x1953f8['width'] || 0x0) > 0x0 &&
-        Number(_0x1b421f?.['videoHeight'] || _0x1953f8['height'] || 0x0) > 0x0 &&
-        !_0x1b421f?.['error']
+    (state2['callbackId'] = el5['requestVideoFrameCallback']((scope, box = {}) => {
+      const input = videoFramePresentationState['get'](el5);
+      if (input !== state2) return;
+      state2['callbackId'] = null;
+      const output = !!(
+        el5?.['isConnected'] !== ![] &&
+        getVideoPresentationSource(el5) === source4 &&
+        Number(el5?.['videoWidth'] || box['width'] || 0x0) > 0x0 &&
+        Number(el5?.['videoHeight'] || box['height'] || 0x0) > 0x0 &&
+        !el5?.['error']
       );
-      _0x40d82b &&
-        ((_0x307a0d['frameCallbackObserved'] = !![]),
-        (_0x307a0d['frameCallbackAt'] = Number(_0x794c49 || 0x0)),
-        (_0x307a0d['metadata'] = {
-          mediaTime: Number(_0x1953f8['mediaTime'] || 0x0),
-          presentedFrames: Number(_0x1953f8['presentedFrames'] || 0x0),
-          width: Number(_0x1953f8['width'] || _0x1b421f['videoWidth'] || 0x0),
-          height: Number(_0x1953f8['height'] || _0x1b421f['videoHeight'] || 0x0),
+      output &&
+        ((state2['frameCallbackObserved'] = !![]),
+        (state2['frameCallbackAt'] = Number(scope || 0x0)),
+        (state2['metadata'] = {
+          mediaTime: Number(box['mediaTime'] || 0x0),
+          presentedFrames: Number(box['presentedFrames'] || 0x0),
+          width: Number(box['width'] || el5['videoWidth'] || 0x0),
+          height: Number(box['height'] || el5['videoHeight'] || 0x0),
         }));
-      if (!isCurrentPresentedFrameValid(_0x1b421f, _0x2256c2)) {
+      if (!isCurrentPresentedFrameValid(el5, source4)) {
         globalThis['window']?.['__runtimeCompareMark']?.('video-frame-presentation:invalid', {
-          source: _0x2256c2,
-          currentSource: getVideoPresentationSource(_0x1b421f),
-          readyState: Number(_0x1b421f?.['readyState'] || 0x0),
-          videoWidth: Number(_0x1b421f?.['videoWidth'] || 0x0),
-          videoHeight: Number(_0x1b421f?.['videoHeight'] || 0x0),
+          source: source4,
+          currentSource: getVideoPresentationSource(el5),
+          readyState: Number(el5?.['readyState'] || 0x0),
+          videoWidth: Number(el5?.['videoWidth'] || 0x0),
+          videoHeight: Number(el5?.['videoHeight'] || 0x0),
         });
         return;
       }
-      ((_0x307a0d['presented'] = !![]), (_0x307a0d['presentedAt'] = _0x307a0d['frameCallbackAt']));
-      _0x1b421f['dataset'] &&
-        ((_0x1b421f['dataset']['firstFramePresented'] = '1'),
-        (_0x1b421f['dataset']['firstFramePresentedAt'] = String(_0x307a0d['presentedAt'])),
-        (_0x1b421f['dataset']['firstFramePresentedSource'] = _0x2256c2));
+      ((state2['presented'] = !![]), (state2['presentedAt'] = state2['frameCallbackAt']));
+      el5['dataset'] &&
+        ((el5['dataset']['firstFramePresented'] = '1'),
+        (el5['dataset']['firstFramePresentedAt'] = String(state2['presentedAt'])),
+        (el5['dataset']['firstFramePresentedSource'] = source4));
       globalThis['window']?.['__runtimeCompareMark']?.('video-frame-presentation:ready', {
-        source: _0x2256c2,
-        readyState: Number(_0x1b421f['readyState'] || 0x0),
-        videoWidth: Number(_0x1b421f['videoWidth'] || 0x0),
-        videoHeight: Number(_0x1b421f['videoHeight'] || 0x0),
+        source: source4,
+        readyState: Number(el5['readyState'] || 0x0),
+        videoWidth: Number(el5['videoWidth'] || 0x0),
+        videoHeight: Number(el5['videoHeight'] || 0x0),
       });
-      const _0xa48175 = Array['from'](_0x307a0d['listeners']);
-      _0x307a0d['listeners']['clear']();
-      const _0x1f40f3 = {
-        source: _0x2256c2,
-        presentedAt: _0x307a0d['presentedAt'],
-        metadata: _0x307a0d['metadata'],
+      const value2 = Array['from'](state2['listeners']);
+      state2['listeners']['clear']();
+      const value3 = {
+        source: source4,
+        presentedAt: state2['presentedAt'],
+        metadata: state2['metadata'],
       };
-      for (const _0x31c3cc of _0xa48175) {
-        if (videoFramePresentationState['get'](_0x1b421f) !== _0x307a0d) break;
-        _0x31c3cc(_0x1f40f3);
+      for (const run2 of value2) {
+        if (videoFramePresentationState['get'](el5) !== state2) break;
+        run2(value3);
       }
     })),
     !![]
   );
 }
 export const __videoFramePresentationForTest = {
-  getState(_0x33a769) {
-    return videoFramePresentationState['get'](_0x33a769) || null;
+  getState(value4) {
+    return videoFramePresentationState['get'](value4) || null;
   },
 };

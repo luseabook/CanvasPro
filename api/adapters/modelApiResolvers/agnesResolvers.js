@@ -7,194 +7,177 @@ import {
 import { isPublicHttpMediaUrl, uploadModelApiMediaInputs } from '../../mediaInputUploadRouter.js';
 import { isConfiguredObjectStorageEnabled } from '../../objectStorageApi.js';
 import { convertImageBlobToDataUrl } from '../../../src/services/imagePngConversionService.js';
-function isReusableAgnesImageInput(_0x3ed1ab) {
-  const _0x2324b7 = String(_0x3ed1ab || '')['trim']();
+function isReusableAgnesImageInput(value) {
+  const item = String(value || '')['trim']();
   return (
-    /^data:image\/[a-z0-9.+-]+;base64,/i['test'](_0x2324b7) ||
-    (/^https:\/\//i['test'](_0x2324b7) && isPublicHttpMediaUrl(_0x2324b7))
+    /^data:image\/[a-z0-9.+-]+;base64,/i['test'](item) ||
+    (/^https:\/\//i['test'](item) && isPublicHttpMediaUrl(item))
   );
 }
-async function resolveAgnesImageInputs(_0x3cb2eb, _0x2a150f = {}) {
-  const _0x34a19e = normalizeInputList(_0x3cb2eb);
-  if (_0x34a19e['length'] === 0x0) return [];
+async function resolveAgnesImageInputs(key, index = {}) {
+  const list = normalizeInputList(key);
+  if (list['length'] === 0x0) return [];
   if (isConfiguredObjectStorageEnabled())
-    return uploadModelApiMediaInputs('image', _0x34a19e, _0x2a150f, { strictUpload: !![] });
-  const _0xc3d7fc = [];
-  for (const _0x508e4c of _0x34a19e) {
-    if (isReusableAgnesImageInput(_0x508e4c)) {
-      _0xc3d7fc['push'](_0x508e4c);
+    return uploadModelApiMediaInputs('image', list, index, { strictUpload: !![] });
+  const list2 = [];
+  for (const result of list) {
+    if (isReusableAgnesImageInput(result)) {
+      list2['push'](result);
       continue;
     }
-    if (typeof _0x2a150f['loadInputImageBlob'] !== 'function')
-      throw new Error('Agnes 图生图无法读取本地参考图');
-    const _0x5b1cd5 = await _0x2a150f['loadInputImageBlob'](_0x508e4c),
-      _0x117a74 = await convertImageBlobToDataUrl(_0x5b1cd5, _0x508e4c);
-    if (!_0x117a74) throw new Error('Agnes\x20图生图无法读取本地参考图');
-    _0xc3d7fc['push'](_0x117a74);
+    if (typeof index['loadInputImageBlob'] !== 'function') throw new Error('Agnes 图生图无法读取本地参考图');
+    const data = await index['loadInputImageBlob'](result),
+      dataUrl = await convertImageBlobToDataUrl(data, result);
+    if (!dataUrl) throw new Error('Agnes\x20图生图无法读取本地参考图');
+    list2['push'](dataUrl);
   }
-  return _0xc3d7fc;
+  return list2;
 }
-export async function agnesImage({ currentBody: _0x4cfac6, ctx: _0x19d2bc }) {
-  const _0x40e4f6 = { ..._0x4cfac6 },
-    _0xa8a45a = await resolveAgnesImageInputs(_0x40e4f6['extra_body']?.['image'], _0x19d2bc),
-    _0x20cd83 =
-      _0x40e4f6['extra_body'] &&
-      typeof _0x40e4f6['extra_body'] === 'object' &&
-      !Array['isArray'](_0x40e4f6['extra_body'])
-        ? { ..._0x40e4f6['extra_body'] }
+export async function agnesImage({ currentBody: currentBody, ctx: ctx }) {
+  const args = { ...currentBody },
+    list3 = await resolveAgnesImageInputs(args['extra_body']?.['image'], ctx),
+    options =
+      args['extra_body'] && typeof args['extra_body'] === 'object' && !Array['isArray'](args['extra_body'])
+        ? { ...args['extra_body'] }
         : {};
   return (
-    delete _0x40e4f6['tags'],
-    (_0x20cd83['response_format'] = _0xa8a45a['length'] > 0x0 ? 'b64_json' : 'url'),
-    _0xa8a45a['length'] > 0x0 ? (_0x20cd83['image'] = _0xa8a45a) : delete _0x20cd83['image'],
-    Object['keys'](_0x20cd83)['length'] > 0x0
-      ? (_0x40e4f6['extra_body'] = _0x20cd83)
-      : delete _0x40e4f6['extra_body'],
-    _0x40e4f6
+    delete args['tags'],
+    (options['response_format'] = list3['length'] > 0x0 ? 'b64_json' : 'url'),
+    list3['length'] > 0x0 ? (options['image'] = list3) : delete options['image'],
+    Object['keys'](options)['length'] > 0x0 ? (args['extra_body'] = options) : delete args['extra_body'],
+    args
   );
 }
-function normalizeAgnesVideoFrameCount(_0x375456) {
-  const _0x393edf = Number(_0x375456);
-  if (!Number['isFinite'](_0x393edf)) return _0x375456;
-  const _0x2c64de = 0x31,
-    _0x1eddcd = 0x1b9,
-    _0x23e2c9 = Math['min'](Math['max'](_0x2c64de, Math['trunc'](_0x393edf)), _0x1eddcd),
-    _0x5bb9c1 = Math['round']((_0x23e2c9 - 0x1) / 0x8) * 0x8 + 0x1;
-  return Math['min'](_0x1eddcd, Math['max'](_0x2c64de, _0x5bb9c1));
+function normalizeAgnesVideoFrameCount(target) {
+  const source = Number(target);
+  if (!Number['isFinite'](source)) return target;
+  const next = 0x31,
+    current = 0x1b9,
+    entry = Math['min'](Math['max'](next, Math['trunc'](source)), current),
+    record = Math['round']((entry - 0x1) / 0x8) * 0x8 + 0x1;
+  return Math['min'](current, Math['max'](next, record));
 }
-function normalizeAgnesVideoFrameRate(_0x3fb32f) {
-  const _0x39456b = Number(_0x3fb32f);
-  if (!Number['isFinite'](_0x39456b)) return _0x3fb32f;
-  const _0x5e7a00 = Math['min'](Math['max'](0x1, Math['trunc'](_0x39456b)), 0x3c);
-  return _0x5e7a00;
+function normalizeAgnesVideoFrameRate(payload) {
+  const handle = Number(payload);
+  if (!Number['isFinite'](handle)) return payload;
+  const state = Math['min'](Math['max'](0x1, Math['trunc'](handle)), 0x3c);
+  return state;
 }
-export function agnesVideo({ currentBody: _0x1968fc }) {
-  const _0xac82c7 = { ..._0x1968fc },
-    _0x5bd710 = normalizeOptionalIntegerInRange(_0xac82c7['seed']);
-  if (_0x5bd710 === null) delete _0xac82c7['seed'];
-  else _0xac82c7['seed'] = _0x5bd710;
-  delete _0xac82c7['agnes_video_mode'];
-  _0xac82c7['num_frames'] !== undefined &&
-    (_0xac82c7['num_frames'] = normalizeAgnesVideoFrameCount(_0xac82c7['num_frames']));
-  _0xac82c7['frame_rate'] !== undefined &&
-    (_0xac82c7['frame_rate'] = normalizeAgnesVideoFrameRate(_0xac82c7['frame_rate']));
-  const _0x15149a = normalizeInputList(_0xac82c7['extra_body']?.['image']),
-    _0x18ccd4 = _0x15149a['slice'](0x0, 0x2);
-  if (_0x18ccd4['length'] === 0x0)
-    return (delete _0xac82c7['image'], delete _0xac82c7['extra_body'], _0xac82c7);
-  if (_0x18ccd4['length'] === 0x1)
-    return ((_0xac82c7['image'] = _0x18ccd4[0x0]), delete _0xac82c7['extra_body'], _0xac82c7);
-  return (
-    (_0xac82c7['extra_body'] = { image: _0x18ccd4, mode: 'keyframes' }),
-    delete _0xac82c7['image'],
-    _0xac82c7
-  );
+export function agnesVideo({ currentBody: currentBody2 }) {
+  const config = { ...currentBody2 },
+    optionalIntegerInRange = normalizeOptionalIntegerInRange(config['seed']);
+  if (optionalIntegerInRange === null) delete config['seed'];
+  else config['seed'] = optionalIntegerInRange;
+  delete config['agnes_video_mode'];
+  config['num_frames'] !== undefined &&
+    (config['num_frames'] = normalizeAgnesVideoFrameCount(config['num_frames']));
+  config['frame_rate'] !== undefined &&
+    (config['frame_rate'] = normalizeAgnesVideoFrameRate(config['frame_rate']));
+  const list4 = normalizeInputList(config['extra_body']?.['image']),
+    image = list4['slice'](0x0, 0x2);
+  if (image['length'] === 0x0) return (delete config['image'], delete config['extra_body'], config);
+  if (image['length'] === 0x1) return ((config['image'] = image[0x0]), delete config['extra_body'], config);
+  return ((config['extra_body'] = { image: image, mode: 'keyframes' }), delete config['image'], config);
 }
-function normalizeAgnesVideo25Mode(_0x2f2acf) {
-  const _0x292550 = String(_0x2f2acf || '')
+function normalizeAgnesVideo25Mode(scope) {
+  const input = String(scope || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x292550 === 'reference' ? 'reference' : 'keyframe';
+  return input === 'reference' ? 'reference' : 'keyframe';
 }
-function normalizeAgnesVideo25PromptReferences(_0x129ae0) {
-  return String(_0x129ae0 || '')
+function normalizeAgnesVideo25PromptReferences(output) {
+  return String(output || '')
     ['replace'](/@\s*(?:图片|图像)\s*([1-9]\d*)/gu, '<Picture $1>')
     ['replace'](/@\s*视频\s*([1-9]\d*)/gu, '<Video\x20$1>')
     ['replace'](/@\s*(?:声音|音频)\s*([1-9]\d*)/gu, '<Audio $1>');
 }
-function getAgnesVideo25Policy(_0x28538d = {}) {
-  const _0x23c626 = _0x28538d?.['extensions']?.['agnesVideo25'];
-  return _0x23c626 && typeof _0x23c626 === 'object' && !Array['isArray'](_0x23c626) ? _0x23c626 : {};
+function getAgnesVideo25Policy(options2 = {}) {
+  const value2 = options2?.['extensions']?.['agnesVideo25'];
+  return value2 && typeof value2 === 'object' && !Array['isArray'](value2) ? value2 : {};
 }
-function getAgnesVideo25Maximum(_0x10aaa3, _0xf08479, _0x280fa3) {
-  const _0x5ee7e5 = Number(_0x10aaa3?.[_0xf08479]);
-  return Number['isInteger'](_0x5ee7e5) && _0x5ee7e5 >= 0x0 ? _0x5ee7e5 : _0x280fa3;
+function getAgnesVideo25Maximum(value3, value4, value5) {
+  const count = Number(value3?.[value4]);
+  return Number['isInteger'](count) && count >= 0x0 ? count : value5;
 }
 function collectAgnesVideo25Images({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
   selectedSlots: selectedSlots = [],
 }) {
-  const _0x5893db = [],
-    _0xad3173 = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    _0x4953ff = new Set(normalizeInputList(Object['values'](_0xad3173)));
+  const images = [],
+    slotUrls = normalizeInputUrlsBySlot(finalUrlsBySlot),
+    map = new Set(normalizeInputList(Object['values'](slotUrls)));
   return (
-    selectedSlots['forEach']((_0x322a60) => appendUniqueUrl(_0x5893db, _0xad3173[_0x322a60])),
-    normalizeInputList(inputImages)['forEach']((_0x3b8534) => {
-      if (!_0x4953ff['has'](_0x3b8534)) appendUniqueUrl(_0x5893db, _0x3b8534);
+    selectedSlots['forEach']((value6) => appendUniqueUrl(images, slotUrls[value6])),
+    normalizeInputList(inputImages)['forEach']((value7) => {
+      if (!map['has'](value7)) appendUniqueUrl(images, value7);
     }),
-    { images: _0x5893db, slotUrls: _0xad3173 }
+    { images: images, slotUrls: slotUrls }
   );
 }
-function assertAgnesVideo25Maximum(_0x5d4537, _0x47527b, _0x467f38) {
-  if (_0x47527b['length'] <= _0x467f38) return;
+function assertAgnesVideo25Maximum(value8, list5, value9) {
+  if (list5['length'] <= value9) return;
   throw new Error(
-    'Agnes Video 2.5 ' +
-      _0x5d4537 +
-      '最多支持 ' +
-      _0x467f38 +
-      '\x20个，当前传入\x20' +
-      _0x47527b['length'] +
-      '\x20个',
+    'Agnes Video 2.5 ' + value8 + '最多支持 ' + value9 + '\x20个，当前传入\x20' + list5['length'] + '\x20个',
   );
 }
 export function agnesVideo25({
-  currentBody: _0x3a515f,
-  executionManifest: _0x2b0d95,
+  currentBody: currentBody3,
+  executionManifest: executionManifest,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x1a904e = { ..._0x3a515f },
-    _0x527722 = normalizeOptionalIntegerInRange(_0x1a904e['seed']);
-  if (_0x527722 === null) delete _0x1a904e['seed'];
-  else _0x1a904e['seed'] = _0x527722;
-  const _0x377b13 = normalizeAgnesVideo25Mode(_0x1a904e['mode']),
-    _0xc357 = normalizeInputList(inputVideos),
-    _0x1149b0 = normalizeInputList(inputAudios),
-    _0xa05c7f = getAgnesVideo25Policy(_0x2b0d95),
-    _0x45aede = getAgnesVideo25Maximum(_0xa05c7f, 'maxReferenceImages', 0x9),
-    _0x398493 = getAgnesVideo25Maximum(_0xa05c7f, 'maxReferenceVideos', 0x3),
-    _0x291600 = getAgnesVideo25Maximum(_0xa05c7f, 'maxReferenceAudios', 0x3);
-  _0x1a904e['mode'] = _0x377b13;
-  if (_0x377b13 === 'keyframe') {
-    if (_0xc357['length'] > 0x0 || _0x1149b0['length'] > 0x0)
+  const value10 = { ...currentBody3 },
+    optionalIntegerInRange2 = normalizeOptionalIntegerInRange(value10['seed']);
+  if (optionalIntegerInRange2 === null) delete value10['seed'];
+  else value10['seed'] = optionalIntegerInRange2;
+  const agnesVideo25Mode = normalizeAgnesVideo25Mode(value10['mode']),
+    list6 = normalizeInputList(inputVideos),
+    list7 = normalizeInputList(inputAudios),
+    agnesVideo25Policy = getAgnesVideo25Policy(executionManifest),
+    agnesVideo25Maximum = getAgnesVideo25Maximum(agnesVideo25Policy, 'maxReferenceImages', 0x9),
+    agnesVideo25Maximum2 = getAgnesVideo25Maximum(agnesVideo25Policy, 'maxReferenceVideos', 0x3),
+    agnesVideo25Maximum3 = getAgnesVideo25Maximum(agnesVideo25Policy, 'maxReferenceAudios', 0x3);
+  value10['mode'] = agnesVideo25Mode;
+  if (agnesVideo25Mode === 'keyframe') {
+    if (list6['length'] > 0x0 || list7['length'] > 0x0)
       throw new Error('Agnes\x20Video\x202.5\x20首尾帧模式只接受图片输入');
-    const { images: _0x1dc06b, slotUrls: _0x4c7b53 } = collectAgnesVideo25Images({
+    const { images: images2, slotUrls: slotUrls2 } = collectAgnesVideo25Images({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
       selectedSlots: ['firstFrame', 'lastFrame'],
     });
-    if (_0x1dc06b['length'] === 0x0) return ((_0x1a904e['mode'] = 'text'), _0x1a904e);
-    if (_0x1dc06b['length'] > 0x2) throw new Error('Agnes Video 2.5 首尾帧模式最多支持两张图片');
-    const _0x38bf79 = Boolean(_0x4c7b53['firstFrame'] || _0x4c7b53['lastFrame']),
-      _0x255930 = String(_0x38bf79 ? _0x4c7b53['firstFrame'] || '' : _0x1dc06b[0x0] || '')['trim'](),
-      _0x17ede3 = String(_0x38bf79 ? _0x4c7b53['lastFrame'] || '' : _0x1dc06b[0x1] || '')['trim']();
-    if (_0x255930) _0x1a904e['first_frame'] = _0x255930;
-    if (_0x17ede3) _0x1a904e['last_frame'] = _0x17ede3;
-    return _0x1a904e;
+    if (images2['length'] === 0x0) return ((value10['mode'] = 'text'), value10);
+    if (images2['length'] > 0x2) throw new Error('Agnes Video 2.5 首尾帧模式最多支持两张图片');
+    const value11 = Boolean(slotUrls2['firstFrame'] || slotUrls2['lastFrame']),
+      value12 = String(value11 ? slotUrls2['firstFrame'] || '' : images2[0x0] || '')['trim'](),
+      value13 = String(value11 ? slotUrls2['lastFrame'] || '' : images2[0x1] || '')['trim']();
+    if (value12) value10['first_frame'] = value12;
+    if (value13) value10['last_frame'] = value13;
+    return value10;
   }
-  _0x1a904e['prompt'] = normalizeAgnesVideo25PromptReferences(_0x1a904e['prompt']);
-  const { images: _0x406c18 } = collectAgnesVideo25Images({
+  value10['prompt'] = normalizeAgnesVideo25PromptReferences(value10['prompt']);
+  const { images: images3 } = collectAgnesVideo25Images({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
     selectedSlots: ['referenceImage'],
   });
-  (assertAgnesVideo25Maximum('参考图片', _0x406c18, _0x45aede),
-    assertAgnesVideo25Maximum('参考视频', _0xc357, _0x398493),
-    assertAgnesVideo25Maximum('参考音频', _0x1149b0, _0x291600));
-  if (_0x406c18['length'] === 0x0 && _0xc357['length'] === 0x0 && _0x1149b0['length'] === 0x0)
+  (assertAgnesVideo25Maximum('参考图片', images3, agnesVideo25Maximum),
+    assertAgnesVideo25Maximum('参考视频', list6, agnesVideo25Maximum2),
+    assertAgnesVideo25Maximum('参考音频', list7, agnesVideo25Maximum3));
+  if (images3['length'] === 0x0 && list6['length'] === 0x0 && list7['length'] === 0x0)
     throw new Error('Agnes Video 2.5 多模态参考模式至少需要一种参考素材');
-  if (_0x406c18['length'] > 0x0) _0x1a904e['images'] = _0x406c18;
-  if (_0x1149b0['length'] > 0x0) _0x1a904e['audios'] = _0x1149b0;
+  if (images3['length'] > 0x0) value10['images'] = images3;
+  if (list7['length'] > 0x0) value10['audios'] = list7;
   return (
-    _0xc357['length'] > 0x0 &&
-      (_0x1a904e['videos'] = _0xc357['map']((_0x1127ca) => ({
-        url: _0x1127ca,
+    list6['length'] > 0x0 &&
+      (value10['videos'] = list6['map']((url) => ({
+        url: url,
         start_seconds: 0x0,
         require_audio: ![],
       }))),
-    _0x1a904e
+    value10
   );
 }

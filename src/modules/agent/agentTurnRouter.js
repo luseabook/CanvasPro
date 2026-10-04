@@ -37,38 +37,36 @@ const NEGATED_CANVAS_ACTION_PATTERNS = Object['freeze']([
     /生成|创建|新建|添加|插入|画图|画(?:一|个|张|幅)|制作|做(?:一个|一张|一段|一版|成|出)|出图|出视频/,
     /修改|改成|调整|重排|排列|对齐|连接|删除|复制|选中(?!的)|选择(?!的)|运行|开始|继续|执行/,
   ]);
-function isInformationalQuestion(_0x219be7) {
+function isInformationalQuestion(value) {
   if (
     /(?:我想了解|讲讲|解释|告诉我|帮我看看).{0,12}(?:如何|怎么).{0,48}(?:生成|创建|制作|修改|切换|使用)/u[
       'test'
-    ](_0x219be7)
+    ](value)
   )
     return !![];
   if (
     /^(?:请问)?(?:如何|怎么|为什么|为何|哪些|什么|是否|能否|可否).{0,64}(?:生成|创建|制作|修改|切换|使用|模型|画布|节点|图片|视频)/u[
       'test'
-    ](_0x219be7)
+    ](value)
   )
     return !![];
   if (
-    /^(?:你|这个产品)?(?:支持|能|会|可以).{0,24}(?:生成|创建|制作).{0,16}(?:吗|么)[？?]?$/u['test'](
-      _0x219be7,
-    ) &&
-    !/(?:帮我|替我|为我|给我|一张|一幅|一个|一段)/u['test'](_0x219be7)
+    /^(?:你|这个产品)?(?:支持|能|会|可以).{0,24}(?:生成|创建|制作).{0,16}(?:吗|么)[？?]?$/u['test'](value) &&
+    !/(?:帮我|替我|为我|给我|一张|一幅|一个|一段)/u['test'](value)
   )
     return !![];
   if (
     /^\s*(?:how|what|why|which|where)\b.{0,80}\b(?:create|generate|make|edit|change|switch|use|model|canvas|node|image|video)\b/iu[
       'test'
-    ](_0x219be7)
+    ](value)
   )
     return !![];
   return /^\s*(?:can|could|do)\s+you\s+(?:create|generate|make)\s+(?:images?|pictures?|videos?|audio|music)\s*[?？]?$/iu[
     'test'
-  ](_0x219be7);
+  ](value);
 }
-function isDiscussionOnly(_0x2d7605) {
-  return DISCUSSION_ONLY_PATTERN['test'](_0x2d7605) && !LATER_EXPLICIT_ACTION_PATTERN['test'](_0x2d7605);
+function isDiscussionOnly(item) {
+  return DISCUSSION_ONLY_PATTERN['test'](item) && !LATER_EXPLICIT_ACTION_PATTERN['test'](item);
 }
 export function routeAgentTurn({
   message: message = '',
@@ -80,60 +78,57 @@ export function routeAgentTurn({
   if (clarificationAnswer || pendingPlan) return { channel: 'canvas.tool', reason: 'continuation' };
   if (intent?.['canvasAction'] === !![] || intent?.['mutatesCanvas'] === !![])
     return { channel: 'canvas.tool', reason: 'explicit-intent' };
-  const _0x3e95d4 = String(message || '')['trim']();
-  if (!_0x3e95d4) return { channel: 'assistant.message', reason: 'empty' };
-  if (NEGATED_CANVAS_ACTION_PATTERNS['some']((_0x4fb8fc) => _0x4fb8fc['test'](_0x3e95d4)))
+  const enabled = String(message || '')['trim']();
+  if (!enabled) return { channel: 'assistant.message', reason: 'empty' };
+  if (NEGATED_CANVAS_ACTION_PATTERNS['some']((key) => key['test'](enabled)))
     return { channel: 'assistant.message', reason: 'canvas-action-negated' };
-  if (isInformationalQuestion(_0x3e95d4))
+  if (isInformationalQuestion(enabled))
     return { channel: 'assistant.message', reason: 'informational-question' };
-  const _0x27919d =
+  const enabled2 =
     /(?:放到|放进|写入|写到|写进|填入|保存到).{0,16}(?:画布|节点)|\b(?:put|place|save)\b.{0,24}\b(?:canvas|node)\b/iu[
       'test'
-    ](_0x3e95d4);
-  if (isAgentStoryDeliverable(_0x3e95d4) && !LATER_EXPLICIT_ACTION_PATTERN['test'](_0x3e95d4) && !_0x27919d)
+    ](enabled);
+  if (isAgentStoryDeliverable(enabled) && !LATER_EXPLICIT_ACTION_PATTERN['test'](enabled) && !enabled2)
     return { channel: 'assistant.message', reason: 'story-deliverable' };
   if (
-    CANVAS_TARGET_PATTERN['test'](_0x3e95d4) &&
-    (CANVAS_TARGET_ACTION_PATTERN['test'](_0x3e95d4) || CANVAS_TARGETED_WRITE_PATTERN['test'](_0x3e95d4))
+    CANVAS_TARGET_PATTERN['test'](enabled) &&
+    (CANVAS_TARGET_ACTION_PATTERN['test'](enabled) || CANVAS_TARGETED_WRITE_PATTERN['test'](enabled))
   )
     return { channel: 'canvas.tool', reason: 'canvas-target' };
-  if (
-    EXPLICIT_TEXT_DELIVERABLE_PATTERN['test'](_0x3e95d4) &&
-    !LATER_EXPLICIT_ACTION_PATTERN['test'](_0x3e95d4)
-  )
+  if (EXPLICIT_TEXT_DELIVERABLE_PATTERN['test'](enabled) && !LATER_EXPLICIT_ACTION_PATTERN['test'](enabled))
     return { channel: 'assistant.message', reason: 'text-deliverable' };
-  if (isDiscussionOnly(_0x3e95d4)) return { channel: 'assistant.message', reason: 'discussion-only' };
-  if (NEGATED_MEDIA_GENERATION_PATTERN['test'](_0x3e95d4))
+  if (isDiscussionOnly(enabled)) return { channel: 'assistant.message', reason: 'discussion-only' };
+  if (NEGATED_MEDIA_GENERATION_PATTERN['test'](enabled))
     return { channel: 'assistant.message', reason: 'media-generation-negated' };
-  if (MEDIA_GENERATION_PATTERN['test'](_0x3e95d4))
+  if (MEDIA_GENERATION_PATTERN['test'](enabled))
     return { channel: 'canvas.tool', reason: 'media-generation' };
-  if (MODEL_CHANGE_PATTERN['test'](_0x3e95d4)) return { channel: 'canvas.tool', reason: 'model-change' };
-  const _0x3975b8 = conversationHistory['findLast'](
-    (_0x2bcd8e) => _0x2bcd8e['role'] === 'assistant' && !_0x2bcd8e['messageType'],
+  if (MODEL_CHANGE_PATTERN['test'](enabled)) return { channel: 'canvas.tool', reason: 'model-change' };
+  const index = conversationHistory['findLast'](
+    (enabled3) => enabled3['role'] === 'assistant' && !enabled3['messageType'],
   );
   if (
-    isAgentWritingRequest(_0x3e95d4) ||
-    (_0x3975b8?.['assistantContext'] && isAgentConversationContinuation(_0x3e95d4))
+    isAgentWritingRequest(enabled) ||
+    (index?.['assistantContext'] && isAgentConversationContinuation(enabled))
   )
     return { channel: 'assistant.message', reason: 'creative-conversation' };
-  if (TEXT_CREATION_PATTERN['test'](_0x3e95d4))
+  if (TEXT_CREATION_PATTERN['test'](enabled))
     return { channel: 'assistant.message', reason: 'text-creation' };
-  if (CONVERSATIONAL_CONTINUATION_PATTERN['test'](_0x3e95d4))
+  if (CONVERSATIONAL_CONTINUATION_PATTERN['test'](enabled))
     return { channel: 'assistant.message', reason: 'conversation-continuation' };
-  if (IMPLICIT_CANVAS_OPERATION_PATTERN['test'](_0x3e95d4))
+  if (IMPLICIT_CANVAS_OPERATION_PATTERN['test'](enabled))
     return { channel: 'canvas.tool', reason: 'canvas-operation' };
-  if (GENERAL_ACTION_PATTERN['some']((_0x3c27f7) => _0x3c27f7['test'](_0x3e95d4)))
+  if (GENERAL_ACTION_PATTERN['some']((result) => result['test'](enabled)))
     return { channel: 'canvas.tool', reason: 'general-action' };
   return { channel: 'assistant.message', reason: 'conversation' };
 }
-export function hasAgentCanvasActionIntent(_0x331f60 = '', _0xe60994 = {}) {
+export function hasAgentCanvasActionIntent(message2 = '', intent2 = {}) {
   return (
     routeAgentTurn({
-      message: _0x331f60,
-      intent: _0xe60994?.['intent'],
-      clarificationAnswer: Boolean(_0xe60994?.['clarificationAnswer']),
-      pendingPlan: Boolean(_0xe60994?.['pendingPlan']),
-      conversationHistory: _0xe60994?.['conversationHistory'] || [],
+      message: message2,
+      intent: intent2?.['intent'],
+      clarificationAnswer: Boolean(intent2?.['clarificationAnswer']),
+      pendingPlan: Boolean(intent2?.['pendingPlan']),
+      conversationHistory: intent2?.['conversationHistory'] || [],
     })['channel'] === 'canvas.tool'
   );
 }

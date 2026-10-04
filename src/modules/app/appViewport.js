@@ -5,22 +5,25 @@ import { installProviderIconLodController } from '../providerIconLod.js';
 const TEXT_LOD_ZOOM = CANVAS_LOW_ZOOM_LOD_THRESHOLD,
   ZOOM_SLIDER_END_DELAY_MS = 160;
 export function createAppViewport({
-  graphStore: _0x285f5e,
-  uiStore: _0x19cc14,
-  wrap: _0x159534,
-  debugEl: _0x22c3bb,
-  zoomSliderEl: _0x15203a,
-  zoomPercentEl: _0x24694f,
-  fitActionEl: _0x1492be,
+  graphStore: graphStore,
+  uiStore: uiStore,
+  wrap: wrap,
+  debugEl: debugEl,
+  zoomSliderEl: zoomSliderEl,
+  zoomPercentEl: zoomPercentEl,
+  fitActionEl: fitActionEl,
 } = {}) {
-  let _0x55870b = false,
-    _0x49c8be = null,
-    _0x6ae66b = 0,
-    _0x53856d = null,
-    _0x1b97dc = true,
-    _0x296a38 = 0,
-    _0x5e7e46 = null;
-  const _0x14eac7 = installProviderIconLodController({ rootEl: _0x159534 || document, store: _0x285f5e });
+  let enabled = false,
+    requestAnimationFrame2 = null,
+    value = 0,
+    value2 = null,
+    item = true,
+    count = 0,
+    setTimeout2 = null;
+  const installProviderIconLodController2 = installProviderIconLodController({
+    rootEl: wrap || document,
+    store: graphStore,
+  });
   // The offline banner used to send every user looking for a backend console, which only
   // exists when the server was started by hand from source. Pick the wording per environment.
   const serverAlertEl = document.getElementById('v2-server-disconnect-alert');
@@ -28,167 +31,165 @@ export function createAppViewport({
     const alertKey = globalThis.window?.aiCanvasDesktop?.isElectron
       ? 'app.serverDisconnected'
       : 'app.serverDisconnectedDev';
-    (serverAlertEl.setAttribute('data-i18n', alertKey),
-      (serverAlertEl.textContent = t(alertKey)));
+    (serverAlertEl.setAttribute('data-i18n', alertKey), (serverAlertEl.textContent = t(alertKey)));
   }
-  function _0xc712a9(_0x5452c8) {
-    (document.body.classList.toggle('is-zoom-low', _0x5452c8), _0x14eac7?.scheduleSync?.());
+  function run(key) {
+    (document.body.classList.toggle('is-zoom-low', key), installProviderIconLodController2?.scheduleSync?.());
   }
-  function _0x594d35(_0x2575e6) {
-    const _0x2d4f9b = Math.round(((_0x2575e6 - 0.2) / 1.8) * 100),
-      _0x50f77a = Math.max(0, Math.min(_0x2d4f9b, 100));
-    if (_0x24694f) _0x24694f.textContent = _0x50f77a + '%';
-    if (_0x15203a) _0x15203a.value = String(_0x50f77a);
+  function run2(index) {
+    const result = Math.round(((index - 0.2) / 1.8) * 100),
+      data = Math.max(0, Math.min(result, 100));
+    if (zoomPercentEl) zoomPercentEl.textContent = data + '%';
+    if (zoomSliderEl) zoomSliderEl.value = String(data);
   }
-  function _0xd9e9e9(_0x3accf2) {
-    if (_0x1b97dc === _0x3accf2) return;
-    _0x1b97dc = _0x3accf2;
-    const _0x4b7e33 = document.getElementById('v2-server-disconnect-alert');
-    _0x4b7e33 && (_0x4b7e33.style.display = _0x3accf2 ? 'none' : 'block');
+  function run3(options) {
+    if (item === options) return;
+    item = options;
+    const el = document.getElementById('v2-server-disconnect-alert');
+    el && (el.style.display = options ? 'none' : 'block');
   }
-  function _0x190844() {
-    const _0x425fbd =
+  function run4() {
+    const run5 =
       typeof window._v2UpdateSidePlusNow === 'function'
         ? window._v2UpdateSidePlusNow
         : window._v2UpdateSidePlus;
-    if (typeof _0x425fbd !== 'function') return;
-    const _0x5e8830 = Number(window._lastMx),
-      _0x205afd = Number(window._lastMy);
-    _0x425fbd(
-      Number.isFinite(_0x5e8830) ? _0x5e8830 : undefined,
-      Number.isFinite(_0x205afd) ? _0x205afd : undefined,
-    );
+    if (typeof run5 !== 'function') return;
+    const target = Number(window._lastMx),
+      source = Number(window._lastMy);
+    run5(Number.isFinite(target) ? target : undefined, Number.isFinite(source) ? source : undefined);
   }
-  function _0x8d21a0() {
+  function run6() {
     document.body.classList.add('is-zooming');
-    if (_0x5e7e46) clearTimeout(_0x5e7e46);
-    _0x5e7e46 = setTimeout(() => {
-      ((_0x5e7e46 = null), document.body.classList.remove('is-zooming'));
+    if (setTimeout2) clearTimeout(setTimeout2);
+    setTimeout2 = setTimeout(() => {
+      ((setTimeout2 = null), document.body.classList.remove('is-zooming'));
     }, ZOOM_SLIDER_END_DELAY_MS);
   }
-  (_0x285f5e.subscribeSelector(
-    (_0x4be964) => _0x4be964.viewport?.zoom,
-    (_0x37cf7a) => {
-      if (typeof _0x37cf7a !== 'number') return;
-      if (!_0x55870b) _0x594d35(_0x37cf7a);
-      const _0x154c47 = _0x37cf7a <= TEXT_LOD_ZOOM;
-      _0x55870b ? (_0x53856d = _0x154c47) : ((_0x53856d = null), _0xc712a9(_0x154c47));
+  (graphStore.subscribeSelector(
+    (next) => next.viewport?.zoom,
+    (current) => {
+      if (typeof current !== 'number') return;
+      if (!enabled) run2(current);
+      const entry = current <= TEXT_LOD_ZOOM;
+      enabled ? (value2 = entry) : ((value2 = null), run(entry));
     },
   ),
-    _0x19cc14.subscribeSelector(
-      (_0x1babd2) => _0x1babd2.isServerConnected,
-      (_0x2b1ee0) => {
-        _0xd9e9e9(_0x2b1ee0);
+    uiStore.subscribeSelector(
+      (record) => record.isServerConnected,
+      (payload) => {
+        run3(payload);
       },
     ),
-    _0x285f5e.subscribeSelector(
-      (_0x2eba62) => {
-        const _0x13e707 = _0x2eba62.viewport ?? {},
-          _0x4cdef3 = Number(_0x13e707.x) || 0,
-          _0x190eb9 = Number(_0x13e707.y) || 0,
-          _0x2a76d4 = Number(_0x13e707.zoom) || 1,
-          _0x2e2041 = _0x2eba62._nodeCount ?? Object.keys(_0x2eba62.nodes || {}).length;
-        return _0x4cdef3 + '|' + _0x190eb9 + '|' + _0x2a76d4 + '|' + _0x2e2041;
+    graphStore.subscribeSelector(
+      (handle) => {
+        const box = handle.viewport ?? {},
+          state = Number(box.x) || 0,
+          config = Number(box.y) || 0,
+          scope = Number(box.zoom) || 1,
+          input = handle._nodeCount ?? Object.keys(handle.nodes || {}).length;
+        return state + '|' + config + '|' + scope + '|' + input;
       },
-      (_0x1a24d1) => {
-        if (!_0x22c3bb) return;
-        const _0x26cd7b = performance.now();
-        if (_0x26cd7b - _0x296a38 < 120) return;
-        _0x296a38 = _0x26cd7b;
-        const [_0x45a7fa, _0x2eb531, _0x3b017d, _0x1148ce] = String(_0x1a24d1 || '').split('|'),
-          _0xab6f3d = Number(_0x45a7fa) || 0,
-          _0x317897 = Number(_0x2eb531) || 0,
-          _0x246e70 = Number(_0x3b017d) || 1,
-          _0x2dac5e = Number(_0x1148ce) || 0;
-        _0x22c3bb.textContent =
+      (output) => {
+        if (!debugEl) return;
+        const value3 = performance.now();
+        if (value3 - count < 120) return;
+        count = value3;
+        const [value4, value5, value6, value7] = String(output || '').split('|'),
+          value8 = Number(value4) || 0,
+          value9 = Number(value5) || 0,
+          value10 = Number(value6) || 1,
+          value11 = Number(value7) || 0;
+        debugEl.textContent =
           'V2 Sandbox | Nodes: ' +
-          _0x2dac5e +
+          value11 +
           ' | x: ' +
-          _0xab6f3d.toFixed(0) +
+          value8.toFixed(0) +
           ' y: ' +
-          _0x317897.toFixed(0) +
+          value9.toFixed(0) +
           ' z: ' +
-          _0x246e70.toFixed(2) +
+          value10.toFixed(2) +
           ' ';
       },
     ));
-  function _0x2b263e(_0x332468, _0x16e51f, _0xb8e87b, _0x59026c, _0x573edb, _0x5dbdef, _0x51e58b = 0x320) {
-    _0x49c8be !== null && (cancelAnimationFrame(_0x49c8be), (_0x49c8be = null));
-    const _0x1002c7 = ++_0x6ae66b,
-      _0x574132 = performance.now();
-    ((_0x55870b = true), document.body.classList.add('is-viewport-animating'));
-    const _0x2c3d62 = (_0x1ddd7e) => 1 - Math.pow(1 - _0x1ddd7e, 3);
-    function _0x2d6667(_0x3b6134) {
-      if (_0x1002c7 !== _0x6ae66b) return;
-      const _0x339e1d = _0x3b6134 - _0x574132,
-        _0x49c6e8 = Math.min(_0x339e1d / _0x51e58b, 1),
-        _0x406048 = _0x2c3d62(_0x49c6e8);
-      (_0x285f5e.updateViewport(
-        _0x332468 + (_0x59026c - _0x332468) * _0x406048,
-        _0x16e51f + (_0x573edb - _0x16e51f) * _0x406048,
-        _0xb8e87b + (_0x5dbdef - _0xb8e87b) * _0x406048,
+  function animateViewport(value12, value13, value14, value15, value16, value17, value18 = 0x320) {
+    requestAnimationFrame2 !== null &&
+      (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = null));
+    const value19 = ++value,
+      value20 = performance.now();
+    ((enabled = true), document.body.classList.add('is-viewport-animating'));
+    const run7 = (value21) => 1 - Math.pow(1 - value21, 3);
+    function run8(value22) {
+      if (value19 !== value) return;
+      const value23 = value22 - value20,
+        count2 = Math.min(value23 / value18, 1),
+        value24 = run7(count2);
+      (graphStore.updateViewport(
+        value12 + (value15 - value12) * value24,
+        value13 + (value16 - value13) * value24,
+        value14 + (value17 - value14) * value24,
       ),
-        _0x190844());
-      if (_0x49c6e8 < 1) {
-        _0x49c8be = requestAnimationFrame(_0x2d6667);
+        run4());
+      if (count2 < 1) {
+        requestAnimationFrame2 = requestAnimationFrame(run8);
         return;
       }
-      ((_0x49c8be = null),
-        (_0x55870b = false),
+      ((requestAnimationFrame2 = null),
+        (enabled = false),
         document.body.classList.remove('is-viewport-animating'),
-        _0x53856d !== null && (_0xc712a9(_0x53856d), (_0x53856d = null)),
-        _0x285f5e.markViewportPersist?.(),
-        _0x594d35(_0x285f5e.getState().viewport.zoom),
-        _0x190844());
+        value2 !== null && (run(value2), (value2 = null)),
+        graphStore.markViewportPersist?.(),
+        run2(graphStore.getState().viewport.zoom),
+        run4());
     }
-    _0x49c8be = requestAnimationFrame(_0x2d6667);
+    requestAnimationFrame2 = requestAnimationFrame(run8);
   }
-  function _0x7e0315() {
-    (_0x49c8be !== null && (cancelAnimationFrame(_0x49c8be), (_0x49c8be = null)),
-      (_0x6ae66b += 1),
-      (_0x55870b = false),
+  function cancelAnimation() {
+    (requestAnimationFrame2 !== null &&
+      (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = null)),
+      (value += 1),
+      (enabled = false),
       document.body.classList.remove('is-viewport-animating'),
-      _0x53856d !== null && (_0xc712a9(_0x53856d), (_0x53856d = null)));
+      value2 !== null && (run(value2), (value2 = null)));
   }
-  const _0x536cfa = createViewportFocusController({
-    store: _0x285f5e,
-    animateViewport: _0x2b263e,
-    cancelAnimation: _0x7e0315,
-    containerEl: _0x159534,
+  const viewportFocusController = createViewportFocusController({
+    store: graphStore,
+    animateViewport: animateViewport,
+    cancelAnimation: cancelAnimation,
+    containerEl: wrap,
   });
   return (
-    _0x15203a &&
-      _0x15203a.addEventListener('input', (_0x317231) => {
-        const _0x2b01de = parseInt(_0x317231.target.value, 10),
-          _0x1a8acf = 0.2 + (_0x2b01de / 100) * 1.8,
-          { viewport: _0x1ecec1 } = _0x285f5e.getState();
-        (_0x536cfa?.clearTrackedFocus('zoom-slider'), _0x8d21a0());
-        if (_0x24694f) _0x24694f.textContent = _0x2b01de + '%';
-        const _0x53a968 = window.innerWidth / 2,
-          _0x37818f = window.innerHeight / 2,
-          _0x1e3a97 = _0x53a968 - (_0x53a968 - _0x1ecec1.x) * (_0x1a8acf / _0x1ecec1.zoom),
-          _0x2dd384 = _0x37818f - (_0x37818f - _0x1ecec1.y) * (_0x1a8acf / _0x1ecec1.zoom);
-        _0x285f5e.updateViewport(_0x1e3a97, _0x2dd384, _0x1a8acf);
+    zoomSliderEl &&
+      zoomSliderEl.addEventListener('input', (event) => {
+        const value25 = parseInt(event.target.value, 10),
+          value26 = 0.2 + (value25 / 100) * 1.8,
+          { viewport: viewport } = graphStore.getState();
+        (viewportFocusController?.clearTrackedFocus('zoom-slider'), run6());
+        if (zoomPercentEl) zoomPercentEl.textContent = value25 + '%';
+        const value27 = window.innerWidth / 2,
+          value28 = window.innerHeight / 2,
+          value29 = value27 - (value27 - viewport.x) * (value26 / viewport.zoom),
+          value30 = value28 - (value28 - viewport.y) * (value26 / viewport.zoom);
+        graphStore.updateViewport(value29, value30, value26);
       }),
-    _0x1492be?.addEventListener('click', () => {
-      const _0x1dd574 = Object.keys(_0x285f5e.getState().nodes || {});
-      _0x536cfa?.focusNodes(_0x1dd574, 80, 0x320);
+    fitActionEl?.addEventListener('click', () => {
+      const value31 = Object.keys(graphStore.getState().nodes || {});
+      viewportFocusController?.focusNodes(value31, 80, 0x320);
     }),
     {
-      animateViewport: _0x2b263e,
-      cancelViewportAnimation: _0x7e0315,
-      focusNode: (..._0x16503a) => _0x536cfa?.focusNode(..._0x16503a),
-      focusNodeAtZoomPercent: (..._0x183820) => _0x536cfa?.focusNodeAtZoomPercent(..._0x183820),
-      focusNodes: (..._0xc6db82) => _0x536cfa?.focusNodes(..._0xc6db82),
-      clearTrackedFocus: (..._0xc6d735) => _0x536cfa?.clearTrackedFocus(..._0xc6d735),
-      installWindowBindings(_0x515d1e = window) {
-        ((_0x515d1e.v2AnimateViewport = _0x2b263e),
-          (_0x515d1e.v2FocusOnNode = (_0x24d646, _0x8c324 = 120, _0x537f17 = 0x5dc, _0x2d35aa) =>
-            _0x536cfa?.focusNode(_0x24d646, _0x8c324, _0x537f17, _0x2d35aa)),
-          (_0x515d1e.v2FocusOnNodeAtZoomPercent = (_0x54b9c9, _0x916276 = 60, _0x2fe7be = 0x320) =>
-            _0x536cfa?.focusNodeAtZoomPercent(_0x54b9c9, _0x916276, _0x2fe7be)),
-          (_0x515d1e.v2FocusOnNodes = (_0x1abf12, _0x31f7b6 = 80, _0x26477e = 0x320, _0x119c65) =>
-            _0x536cfa?.focusNodes(_0x1abf12, _0x31f7b6, _0x26477e, _0x119c65)));
+      animateViewport: animateViewport,
+      cancelViewportAnimation: cancelAnimation,
+      focusNode: (...args) => viewportFocusController?.focusNode(...args),
+      focusNodeAtZoomPercent: (...args2) => viewportFocusController?.focusNodeAtZoomPercent(...args2),
+      focusNodes: (...args3) => viewportFocusController?.focusNodes(...args3),
+      clearTrackedFocus: (...args4) => viewportFocusController?.clearTrackedFocus(...args4),
+      installWindowBindings(value32 = window) {
+        ((value32.v2AnimateViewport = animateViewport),
+          (value32.v2FocusOnNode = (value33, value34 = 120, value35 = 0x5dc, value36) =>
+            viewportFocusController?.focusNode(value33, value34, value35, value36)),
+          (value32.v2FocusOnNodeAtZoomPercent = (value37, value38 = 60, value39 = 0x320) =>
+            viewportFocusController?.focusNodeAtZoomPercent(value37, value38, value39)),
+          (value32.v2FocusOnNodes = (value40, value41 = 80, value42 = 0x320, value43) =>
+            viewportFocusController?.focusNodes(value40, value41, value42, value43)));
       },
     }
   );

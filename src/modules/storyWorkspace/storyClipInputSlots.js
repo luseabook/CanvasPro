@@ -1,155 +1,141 @@
 import { resolveModelExecution } from '../../manifests/index.js';
 const MEDIA_KINDS = Object['freeze'](['image', 'video', 'audio']),
   KIND_LABELS = Object['freeze']({ image: '图片', video: '视频', audio: '音频' });
-function asObject(_0x2c675c) {
-  return _0x2c675c && typeof _0x2c675c === 'object' && !Array['isArray'](_0x2c675c) ? _0x2c675c : {};
+function asObject(item) {
+  return item && typeof item === 'object' && !Array['isArray'](item) ? item : {};
 }
-function normalizeText(_0x19f2d7) {
-  return String(_0x19f2d7 || '')['trim']();
+function normalizeText(key) {
+  return String(key || '')['trim']();
 }
-function normalizeStoredInput(_0x192e6c, _0x5648e1, _0x19635f) {
-  const _0x31b7d3 = typeof _0x192e6c === 'string' ? { url: _0x192e6c } : asObject(_0x192e6c),
-    _0x340c20 = normalizeText(
-      _0x31b7d3['url'] ||
-        _0x31b7d3['localUrl'] ||
-        _0x31b7d3['imageUrl'] ||
-        _0x31b7d3['videoUrl'] ||
-        _0x31b7d3['audioUrl'] ||
-        _0x31b7d3['localPath'],
+function normalizeStoredInput(url, kind, result) {
+  const response = typeof url === 'string' ? { url: url } : asObject(url),
+    url2 = normalizeText(
+      response['url'] ||
+        response['localUrl'] ||
+        response['imageUrl'] ||
+        response['videoUrl'] ||
+        response['audioUrl'] ||
+        response['localPath'],
     );
   return {
-    ..._0x31b7d3,
-    kind: _0x5648e1,
-    url: _0x340c20,
-    slotId: normalizeText(_0x31b7d3['slotId'] || _0x31b7d3['refSlot']),
-    order: Number['isFinite'](Number(_0x31b7d3['order'])) ? Number(_0x31b7d3['order']) : _0x19635f,
+    ...response,
+    kind: kind,
+    url: url2,
+    slotId: normalizeText(response['slotId'] || response['refSlot']),
+    order: Number['isFinite'](Number(response['order'])) ? Number(response['order']) : result,
   };
 }
-export function normalizeStoryClipInputs(_0x15317f = {}) {
-  const _0x32f470 = asObject(_0x15317f);
+export function normalizeStoryClipInputs(options = {}) {
+  const asObject2 = asObject(options);
   return Object['fromEntries'](
-    MEDIA_KINDS['map']((_0x3123a1) => {
-      const _0x4ed2a9 = _0x32f470[_0x3123a1] ?? _0x32f470[_0x3123a1 + 's'] ?? [],
-        _0x1285ae = Array['isArray'](_0x4ed2a9) ? _0x4ed2a9 : _0x4ed2a9 ? [_0x4ed2a9] : [];
-      return [
-        _0x3123a1,
-        _0x1285ae['map']((_0x22a840, _0x2ffbe7) => normalizeStoredInput(_0x22a840, _0x3123a1, _0x2ffbe7)),
-      ];
+    MEDIA_KINDS['map']((data) => {
+      const target = asObject2[data] ?? asObject2[data + 's'] ?? [],
+        list = Array['isArray'](target) ? target : target ? [target] : [];
+      return [data, list['map']((source, next) => normalizeStoredInput(source, data, next))];
     }),
   );
 }
-function getSlotCount(_0xf51995, _0x4b42cc, _0x3cd711) {
-  const _0x1fd25b = Number(_0xf51995?.['maxByKind']?.[_0x4b42cc]);
-  if (Number['isFinite'](_0x1fd25b)) return Math['max'](0x0, Math['trunc'](_0x1fd25b));
-  const _0x97a976 = (_0xf51995?.['fixedSlots'] || [])['filter'](
-      (_0x3007b9) => normalizeText(_0x3007b9?.['kind']) === _0x4b42cc,
+function getSlotCount(current, entry, record) {
+  const payload = Number(current?.['maxByKind']?.[entry]);
+  if (Number['isFinite'](payload)) return Math['max'](0x0, Math['trunc'](payload));
+  const handle = (current?.['fixedSlots'] || [])['filter'](
+      (state) => normalizeText(state?.['kind']) === entry,
     )['length'],
-    _0xd1db40 = Number(_0xf51995?.['minByKind']?.[_0x4b42cc]);
-  return Math['max'](
-    _0x97a976,
-    _0x3cd711 + 0x1,
-    Number['isFinite'](_0xd1db40) ? Math['trunc'](_0xd1db40) : 0x0,
-    0x1,
-  );
+    config = Number(current?.['minByKind']?.[entry]);
+  return Math['max'](handle, record + 0x1, Number['isFinite'](config) ? Math['trunc'](config) : 0x0, 0x1);
 }
-function assignInputsToSlots(_0x5d9558, _0x456c96) {
-  const _0x31443d = new Map(),
-    _0x279405 = new Set(_0x5d9558['map']((_0x1eeb6b) => _0x1eeb6b['id']));
-  for (const _0x34b0e0 of _0x456c96) {
-    _0x34b0e0['slotId'] &&
-      _0x279405['has'](_0x34b0e0['slotId']) &&
-      !_0x31443d['has'](_0x34b0e0['slotId']) &&
-      _0x31443d['set'](_0x34b0e0['slotId'], _0x34b0e0);
+function assignInputsToSlots(list2, list3) {
+  const input = new Map(),
+    map = new Set(list2['map']((scope) => scope['id']));
+  for (const output of list3) {
+    output['slotId'] &&
+      map['has'](output['slotId']) &&
+      !input['has'](output['slotId']) &&
+      input['set'](output['slotId'], output);
   }
-  const _0x1866ee = _0x456c96['filter'](
-    (_0x2003e1) =>
-      !_0x2003e1['slotId'] ||
-      !_0x279405['has'](_0x2003e1['slotId']) ||
-      _0x31443d['get'](_0x2003e1['slotId']) !== _0x2003e1,
+  const value2 = list3['filter'](
+    (enabled) =>
+      !enabled['slotId'] || !map['has'](enabled['slotId']) || input['get'](enabled['slotId']) !== enabled,
   );
-  for (const _0x4e05b8 of _0x5d9558) {
-    if (_0x31443d['has'](_0x4e05b8['id'])) continue;
-    const _0x29d4b6 = _0x1866ee['shift']();
-    if (_0x29d4b6) _0x31443d['set'](_0x4e05b8['id'], _0x29d4b6);
+  for (const value3 of list2) {
+    if (input['has'](value3['id'])) continue;
+    const value4 = value2['shift']();
+    if (value4) input['set'](value3['id'], value4);
   }
-  return _0x5d9558['map']((_0x9bf34) => ({ ..._0x9bf34, input: _0x31443d['get'](_0x9bf34['id']) || null }));
+  return list2['map']((args) => ({ ...args, input: input['get'](args['id']) || null }));
 }
 export function buildStoryClipInputSlotViewModel({
-  modelId: _0x5e357d,
+  modelId: modelId,
   provider: provider = '',
   inputs: inputs = {},
 } = {}) {
-  const _0x44eeeb = resolveModelExecution(_0x5e357d, { providerHint: provider });
-  if (!_0x44eeeb?.['modelManifest'] || _0x44eeeb['modelManifest']['kind'] !== 'video')
-    throw new Error('视频模型缺少\x20manifest：' + (normalizeText(_0x5e357d) || '(empty)'));
-  const _0x137e9e = asObject(_0x44eeeb['modelManifest']['inputSlots']),
-    _0x34ed77 = new Set(
-      (Array['isArray'](_0x137e9e['allowedKinds']) ? _0x137e9e['allowedKinds'] : [])
+  const modelId2 = resolveModelExecution(modelId, { providerHint: provider });
+  if (!modelId2?.['modelManifest'] || modelId2['modelManifest']['kind'] !== 'video')
+    throw new Error('视频模型缺少\x20manifest：' + (normalizeText(modelId) || '(empty)'));
+  const asObject3 = asObject(modelId2['modelManifest']['inputSlots']),
+    map2 = new Set(
+      (Array['isArray'](asObject3['allowedKinds']) ? asObject3['allowedKinds'] : [])
         ['map'](normalizeText)
         ['filter'](Boolean),
     ),
-    _0x27641e = normalizeStoryClipInputs(inputs),
-    _0x2ff33f = Array['isArray'](_0x137e9e['fixedSlots']) ? _0x137e9e['fixedSlots'] : [],
-    _0x1e58d2 = MEDIA_KINDS['filter']((_0x243b31) => _0x34ed77['has'](_0x243b31))['map']((_0x5f3e29) => {
-      const _0x31f6fd = _0x2ff33f['filter']((_0x5f0a70) => normalizeText(_0x5f0a70?.['kind']) === _0x5f3e29)[
-          'sort'
-        ](
-          (_0x299585, _0x5a6d92) =>
-            Number(_0x299585?.['displayOrder'] || 0x0) - Number(_0x5a6d92?.['displayOrder'] || 0x0),
+    storyClipInputs = normalizeStoryClipInputs(inputs),
+    list4 = Array['isArray'](asObject3['fixedSlots']) ? asObject3['fixedSlots'] : [],
+    groups = MEDIA_KINDS['filter']((value5) => map2['has'](value5))['map']((kind2) => {
+      const value6 = list4['filter']((value7) => normalizeText(value7?.['kind']) === kind2)['sort'](
+          (value8, value9) =>
+            Number(value8?.['displayOrder'] || 0x0) - Number(value9?.['displayOrder'] || 0x0),
         ),
-        _0x34d716 = getSlotCount(_0x137e9e, _0x5f3e29, _0x27641e[_0x5f3e29]['length']),
-        _0x4604fb = Array['from']({ length: _0x34d716 }, (_0x18012e, _0x2c0009) => {
-          const _0x3f1df0 = _0x31f6fd[_0x2c0009] || null;
+        length = getSlotCount(asObject3, kind2, storyClipInputs[kind2]['length']),
+        value10 = Array['from']({ length: length }, (value11, index2) => {
+          const required = value6[index2] || null;
           return {
-            id: normalizeText(_0x3f1df0?.['id']) || _0x5f3e29 + '-' + (_0x2c0009 + 0x1),
-            kind: _0x5f3e29,
-            index: _0x2c0009,
-            label: normalizeText(_0x3f1df0?.['label']) || KIND_LABELS[_0x5f3e29] + '\x20' + (_0x2c0009 + 0x1),
+            id: normalizeText(required?.['id']) || kind2 + '-' + (index2 + 0x1),
+            kind: kind2,
+            index: index2,
+            label: normalizeText(required?.['label']) || KIND_LABELS[kind2] + '\x20' + (index2 + 0x1),
             required:
-              _0x3f1df0?.['required'] === !![] ||
-              _0x2c0009 < Number(_0x137e9e?.['minByKind']?.[_0x5f3e29] || 0x0),
-            fixed: Boolean(_0x3f1df0),
+              required?.['required'] === !![] || index2 < Number(asObject3?.['minByKind']?.[kind2] || 0x0),
+            fixed: Boolean(required),
           };
         });
       return {
-        kind: _0x5f3e29,
-        label: KIND_LABELS[_0x5f3e29],
-        min: Math['max'](0x0, Number(_0x137e9e?.['minByKind']?.[_0x5f3e29] || 0x0)),
-        max: _0x34d716,
-        slots: assignInputsToSlots(_0x4604fb, _0x27641e[_0x5f3e29]),
+        kind: kind2,
+        label: KIND_LABELS[kind2],
+        min: Math['max'](0x0, Number(asObject3?.['minByKind']?.[kind2] || 0x0)),
+        max: length,
+        slots: assignInputsToSlots(value10, storyClipInputs[kind2]),
       };
     });
   return {
-    modelId: _0x44eeeb['modelManifest']['modelId'],
-    provider: _0x44eeeb['modelManifest']['provider'],
-    displayName: normalizeText(_0x44eeeb['modelManifest']['displayName']),
-    groups: _0x1e58d2,
-    slots: _0x1e58d2['flatMap']((_0xeb68a1) => _0xeb68a1['slots']),
+    modelId: modelId2['modelManifest']['modelId'],
+    provider: modelId2['modelManifest']['provider'],
+    displayName: normalizeText(modelId2['modelManifest']['displayName']),
+    groups: groups,
+    slots: groups['flatMap']((value12) => value12['slots']),
   };
 }
 export function updateStoryClipInput(
-  _0x1d37c7,
-  { kind: _0xeff4db, slotId: _0xe14be5, index: index = null, value: value = null } = {},
+  value13,
+  { kind: kind3, slotId: slotId, index: index = null, value: value = null } = {},
 ) {
-  const _0x5883f9 = normalizeText(_0xeff4db);
-  if (!MEDIA_KINDS['includes'](_0x5883f9))
-    throw new Error('不支持的片段输入类型：' + (_0x5883f9 || '(empty)'));
-  const _0x57b15b = normalizeText(_0xe14be5);
-  if (!_0x57b15b) throw new Error('更新片段输入时缺少 slotId');
-  const _0xbaa105 = normalizeStoryClipInputs(asObject(_0x1d37c7)['inputs']),
-    _0x1bce8e = index === null || index === undefined ? Number['NaN'] : Number(index),
-    _0xa46f45 = _0xbaa105[_0x5883f9]['filter'](
-      (_0x255961, _0xab73a0) =>
-        normalizeText(_0x255961['slotId']) !== _0x57b15b &&
+  const text = normalizeText(kind3);
+  if (!MEDIA_KINDS['includes'](text)) throw new Error('不支持的片段输入类型：' + (text || '(empty)'));
+  const slotId2 = normalizeText(slotId);
+  if (!slotId2) throw new Error('更新片段输入时缺少 slotId');
+  const args2 = normalizeStoryClipInputs(asObject(value13)['inputs']),
+    value14 = index === null || index === undefined ? Number['NaN'] : Number(index),
+    list5 = args2[text]['filter'](
+      (value15, value16) =>
+        normalizeText(value15['slotId']) !== slotId2 &&
         !(
-          Number['isFinite'](_0x1bce8e) &&
-          !normalizeText(_0x255961['slotId']) &&
-          _0xab73a0 === Math['max'](0x0, Math['trunc'](_0x1bce8e))
+          Number['isFinite'](value14) &&
+          !normalizeText(value15['slotId']) &&
+          value16 === Math['max'](0x0, Math['trunc'](value14))
         ),
     );
   if (value !== null && value !== undefined && value !== '') {
-    const _0x3ffaee = normalizeStoredInput(value, _0x5883f9, _0xa46f45['length']);
-    _0xa46f45['push']({ ..._0x3ffaee, slotId: _0x57b15b });
+    const args3 = normalizeStoredInput(value, text, list5['length']);
+    list5['push']({ ...args3, slotId: slotId2 });
   }
-  return { ...asObject(_0x1d37c7), inputs: { ..._0xbaa105, [_0x5883f9]: _0xa46f45 } };
+  return { ...asObject(value13), inputs: { ...args2, [text]: list5 } };
 }

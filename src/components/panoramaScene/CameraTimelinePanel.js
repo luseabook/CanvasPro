@@ -1,186 +1,177 @@
 import { normalizeCameraTimeline } from '../../modules/panoramaSceneNode/cameraTimeline.js';
 import { t } from '../../i18n/index.js';
-function sceneText(_0x2fcf99, _0x445c1c = {}) {
-  return t('panoramaSceneNode.cameraTimeline.' + _0x2fcf99, _0x445c1c);
+function sceneText(value, item = {}) {
+  return t('panoramaSceneNode.cameraTimeline.' + value, item);
 }
-function formatTime(_0x433fe8) {
-  return Math['max'](0x0, Number(_0x433fe8) || 0x0)['toFixed'](0x2) + 's';
+function formatTime(key) {
+  return Math['max'](0x0, Number(key) || 0x0)['toFixed'](0x2) + 's';
 }
-function syncStaticText(_0x30bb45, { isPlaying: isPlaying = ![] } = {}) {
-  const _0x14611d = _0x30bb45['querySelector']('.panorama-camera-timeline__play');
-  _0x14611d &&
-    ((_0x14611d['textContent'] = isPlaying ? 'Ⅱ' : '▶'),
-    (_0x14611d['title'] = sceneText(isPlaying ? 'pause' : 'play')),
-    _0x14611d['setAttribute']('aria-label', sceneText(isPlaying ? 'pauseAria' : 'playAria')));
-  const _0x57c451 = _0x30bb45['querySelector']('.panorama-camera-timeline__add');
-  _0x57c451 &&
-    ((_0x57c451['title'] = sceneText('addKeyframe')),
-    _0x57c451['setAttribute']('aria-label', sceneText('addKeyframeAria')));
-  const _0x29e01b = _0x30bb45['querySelector']('.panorama-camera-timeline__track');
-  if (_0x29e01b) _0x29e01b['setAttribute']('aria-label', sceneText('trackAria'));
-  const _0x202a39 = _0x30bb45['querySelector']('.panorama-camera-timeline__duration');
-  _0x202a39 &&
-    ((_0x202a39['title'] = sceneText('duration')),
-    _0x202a39['setAttribute']('aria-label', sceneText('durationAria')));
-  const _0x5d2223 = _0x30bb45['querySelector']('.panorama-camera-timeline__fps');
-  _0x5d2223 &&
-    ((_0x5d2223['title'] = sceneText('fps')), _0x5d2223['setAttribute']('aria-label', sceneText('fpsAria')));
-  const _0x30c0c0 = _0x30bb45['querySelector']('.panorama-camera-timeline__loop-text');
-  if (_0x30c0c0) _0x30c0c0['textContent'] = sceneText('loop');
+function syncStaticText(el, { isPlaying: isPlaying = ![] } = {}) {
+  const el2 = el['querySelector']('.panorama-camera-timeline__play');
+  el2 &&
+    ((el2['textContent'] = isPlaying ? 'Ⅱ' : '▶'),
+    (el2['title'] = sceneText(isPlaying ? 'pause' : 'play')),
+    el2['setAttribute']('aria-label', sceneText(isPlaying ? 'pauseAria' : 'playAria')));
+  const el3 = el['querySelector']('.panorama-camera-timeline__add');
+  el3 &&
+    ((el3['title'] = sceneText('addKeyframe')),
+    el3['setAttribute']('aria-label', sceneText('addKeyframeAria')));
+  const el4 = el['querySelector']('.panorama-camera-timeline__track');
+  if (el4) el4['setAttribute']('aria-label', sceneText('trackAria'));
+  const el5 = el['querySelector']('.panorama-camera-timeline__duration');
+  el5 &&
+    ((el5['title'] = sceneText('duration')), el5['setAttribute']('aria-label', sceneText('durationAria')));
+  const el6 = el['querySelector']('.panorama-camera-timeline__fps');
+  el6 && ((el6['title'] = sceneText('fps')), el6['setAttribute']('aria-label', sceneText('fpsAria')));
+  const el7 = el['querySelector']('.panorama-camera-timeline__loop-text');
+  if (el7) el7['textContent'] = sceneText('loop');
 }
 export function createCameraTimelinePanel({
-  onAddKeyframe: _0x114d19,
-  onPlayToggle: _0x354684,
-  onScrub: _0x31d3be,
-  onScrubCommit: _0x35ff0b,
-  onDeleteKeyframe: _0x31b27e,
-  onSettingsChange: _0x306712,
+  onAddKeyframe: onAddKeyframe,
+  onPlayToggle: onPlayToggle,
+  onScrub: onScrub,
+  onScrubCommit: onScrubCommit,
+  onDeleteKeyframe: onDeleteKeyframe,
+  onSettingsChange: onSettingsChange,
 } = {}) {
-  const _0xe8a525 = document['createElement']('div');
-  ((_0xe8a525['className'] = 'panorama-camera-timeline'), (_0xe8a525['dataset']['uiStop'] = '1'));
-  const _0x29943e = document['createElement']('button');
-  ((_0x29943e['type'] = 'button'),
-    (_0x29943e['className'] = 'panorama-camera-timeline__icon\x20panorama-camera-timeline__play'));
-  const _0x6b72de = document['createElement']('button');
-  ((_0x6b72de['type'] = 'button'),
-    (_0x6b72de['className'] = 'panorama-camera-timeline__icon\x20panorama-camera-timeline__add'),
-    (_0x6b72de['textContent'] = '+'));
-  const _0x2a6290 = document['createElement']('output');
-  ((_0x2a6290['className'] = 'panorama-camera-timeline__time'), (_0x2a6290['textContent'] = '0.00s'));
-  const _0x1bd3c2 = document['createElement']('div');
-  _0x1bd3c2['className'] = 'panorama-camera-timeline__track-wrap';
-  const _0x1fd6b0 = document['createElement']('input');
-  ((_0x1fd6b0['type'] = 'range'),
-    (_0x1fd6b0['className'] = 'panorama-camera-timeline__track'),
-    (_0x1fd6b0['min'] = '0'),
-    (_0x1fd6b0['max'] = '6'),
-    (_0x1fd6b0['step'] = '0.01'),
-    (_0x1fd6b0['value'] = '0'));
-  const _0x48bde7 = document['createElement']('div');
-  ((_0x48bde7['className'] = 'panorama-camera-timeline__markers'), _0x1bd3c2['append'](_0x1fd6b0, _0x48bde7));
-  const _0x42a15e = document['createElement']('input');
-  ((_0x42a15e['type'] = 'number'),
-    (_0x42a15e['className'] = 'panorama-camera-timeline__duration'),
-    (_0x42a15e['min'] = '0.1'),
-    (_0x42a15e['max'] = '3600'),
-    (_0x42a15e['step'] = '0.5'),
-    (_0x42a15e['value'] = '6'));
-  const _0x21a826 = document['createElement']('select');
-  ((_0x21a826['className'] = 'panorama-camera-timeline__fps'),
-    [0xc, 0x18, 0x19, 0x1e, 0x32, 0x3c]['forEach']((_0x5e1d8a) => {
-      const _0x5c4805 = document['createElement']('option');
-      ((_0x5c4805['value'] = String(_0x5e1d8a)),
-        (_0x5c4805['textContent'] = _0x5e1d8a + ' FPS'),
-        _0x21a826['appendChild'](_0x5c4805));
+  const el8 = document['createElement']('div');
+  ((el8['className'] = 'panorama-camera-timeline'), (el8['dataset']['uiStop'] = '1'));
+  const el9 = document['createElement']('button');
+  ((el9['type'] = 'button'),
+    (el9['className'] = 'panorama-camera-timeline__icon\x20panorama-camera-timeline__play'));
+  const el10 = document['createElement']('button');
+  ((el10['type'] = 'button'),
+    (el10['className'] = 'panorama-camera-timeline__icon\x20panorama-camera-timeline__add'),
+    (el10['textContent'] = '+'));
+  const el11 = document['createElement']('output');
+  ((el11['className'] = 'panorama-camera-timeline__time'), (el11['textContent'] = '0.00s'));
+  const index = document['createElement']('div');
+  index['className'] = 'panorama-camera-timeline__track-wrap';
+  const el12 = document['createElement']('input');
+  ((el12['type'] = 'range'),
+    (el12['className'] = 'panorama-camera-timeline__track'),
+    (el12['min'] = '0'),
+    (el12['max'] = '6'),
+    (el12['step'] = '0.01'),
+    (el12['value'] = '0'));
+  const el13 = document['createElement']('div');
+  ((el13['className'] = 'panorama-camera-timeline__markers'), index['append'](el12, el13));
+  const el14 = document['createElement']('input');
+  ((el14['type'] = 'number'),
+    (el14['className'] = 'panorama-camera-timeline__duration'),
+    (el14['min'] = '0.1'),
+    (el14['max'] = '3600'),
+    (el14['step'] = '0.5'),
+    (el14['value'] = '6'));
+  const el15 = document['createElement']('select');
+  ((el15['className'] = 'panorama-camera-timeline__fps'),
+    [0xc, 0x18, 0x19, 0x1e, 0x32, 0x3c]['forEach']((result) => {
+      const el16 = document['createElement']('option');
+      ((el16['value'] = String(result)), (el16['textContent'] = result + ' FPS'), el15['appendChild'](el16));
     }));
-  const _0x11c0b7 = document['createElement']('label');
-  _0x11c0b7['className'] = 'panorama-camera-timeline__loop';
-  const _0x4f7a17 = document['createElement']('input');
-  _0x4f7a17['type'] = 'checkbox';
-  const _0xad9675 = document['createElement']('span');
+  const data = document['createElement']('label');
+  data['className'] = 'panorama-camera-timeline__loop';
+  const loop = document['createElement']('input');
+  loop['type'] = 'checkbox';
+  const options = document['createElement']('span');
   return (
-    (_0xad9675['className'] = 'panorama-camera-timeline__loop-text'),
-    _0x11c0b7['append'](_0x4f7a17, _0xad9675),
-    _0xe8a525['append'](_0x29943e, _0x6b72de, _0x2a6290, _0x1bd3c2, _0x42a15e, _0x21a826, _0x11c0b7),
-    _0x29943e['addEventListener']('click', () => _0x354684?.()),
-    _0x6b72de['addEventListener']('click', () => _0x114d19?.(Number(_0x1fd6b0['value']) || 0x0)),
-    _0x1fd6b0['addEventListener']('input', () => {
-      const _0x164731 = Number(_0x1fd6b0['value']) || 0x0;
-      ((_0x2a6290['textContent'] = formatTime(_0x164731)), _0x31d3be?.(_0x164731));
+    (options['className'] = 'panorama-camera-timeline__loop-text'),
+    data['append'](loop, options),
+    el8['append'](el9, el10, el11, index, el14, el15, data),
+    el9['addEventListener']('click', () => onPlayToggle?.()),
+    el10['addEventListener']('click', () => onAddKeyframe?.(Number(el12['value']) || 0x0)),
+    el12['addEventListener']('input', () => {
+      const target = Number(el12['value']) || 0x0;
+      ((el11['textContent'] = formatTime(target)), onScrub?.(target));
     }),
-    _0x1fd6b0['addEventListener']('change', () => _0x35ff0b?.(Number(_0x1fd6b0['value']) || 0x0)),
-    _0x42a15e['addEventListener']('change', () => {
-      _0x306712?.({ duration: Number(_0x42a15e['value']) || 0x6 });
+    el12['addEventListener']('change', () => onScrubCommit?.(Number(el12['value']) || 0x0)),
+    el14['addEventListener']('change', () => {
+      onSettingsChange?.({ duration: Number(el14['value']) || 0x6 });
     }),
-    _0x21a826['addEventListener']('change', () => {
-      _0x306712?.({ fps: Number(_0x21a826['value']) || 0x18 });
+    el15['addEventListener']('change', () => {
+      onSettingsChange?.({ fps: Number(el15['value']) || 0x18 });
     }),
-    _0x4f7a17['addEventListener']('change', () => {
-      _0x306712?.({ loop: _0x4f7a17['checked'] });
+    loop['addEventListener']('change', () => {
+      onSettingsChange?.({ loop: loop['checked'] });
     }),
-    _0x48bde7['addEventListener']('click', (_0x3ddfe7) => {
-      const _0x49dc72 = _0x3ddfe7['target']?.['closest']?.('[data-keyframe-id]');
-      if (!_0x49dc72) return;
-      if (_0x3ddfe7['shiftKey']) {
-        _0x31b27e?.(_0x49dc72['dataset']['keyframeId']);
+    el13['addEventListener']('click', (event) => {
+      const el17 = event['target']?.['closest']?.('[data-keyframe-id]');
+      if (!el17) return;
+      if (event['shiftKey']) {
+        onDeleteKeyframe?.(el17['dataset']['keyframeId']);
         return;
       }
-      const _0x21d343 = Number(_0x49dc72['dataset']['keyframeTime']) || 0x0;
-      ((_0x1fd6b0['value'] = String(_0x21d343)),
-        (_0x2a6290['textContent'] = formatTime(_0x21d343)),
-        _0x31d3be?.(_0x21d343));
+      const source = Number(el17['dataset']['keyframeTime']) || 0x0;
+      ((el12['value'] = String(source)), (el11['textContent'] = formatTime(source)), onScrub?.(source));
     }),
-    _0x48bde7['addEventListener']('contextmenu', (_0x360247) => {
-      const _0x4b5e42 = _0x360247['target']?.['closest']?.('[data-keyframe-id]');
-      if (!_0x4b5e42) return;
-      (_0x360247['preventDefault'](), _0x31b27e?.(_0x4b5e42['dataset']['keyframeId']));
+    el13['addEventListener']('contextmenu', (event2) => {
+      const el18 = event2['target']?.['closest']?.('[data-keyframe-id]');
+      if (!el18) return;
+      (event2['preventDefault'](), onDeleteKeyframe?.(el18['dataset']['keyframeId']));
     }),
-    syncStaticText(_0xe8a525),
-    _0xe8a525
+    syncStaticText(el8),
+    el8
   );
 }
 export function renderCameraTimelinePanel(
-  _0x1962cf,
-  _0x64ffc0,
-  { currentTime: _0x14942a, isPlaying: _0x265463 } = {},
+  el19,
+  next,
+  { currentTime: currentTime, isPlaying: isPlaying2 } = {},
 ) {
-  if (!_0x1962cf) return;
-  const _0x1c1a61 = normalizeCameraTimeline(_0x64ffc0),
-    _0x1e9aca = Math['max'](
+  if (!el19) return;
+  const args = normalizeCameraTimeline(next),
+    current = Math['max'](
       0x0,
-      Math['min'](
-        _0x1c1a61['duration'],
-        Number['isFinite'](_0x14942a) ? _0x14942a : _0x1c1a61['currentTime'],
-      ),
+      Math['min'](args['duration'], Number['isFinite'](currentTime) ? currentTime : args['currentTime']),
     ),
-    _0x18906e = _0x1962cf['querySelector']('.panorama-camera-timeline__track');
-  _0x18906e &&
-    ((_0x18906e['max'] = String(_0x1c1a61['duration'])),
-    (_0x18906e['step'] = String(0x1 / _0x1c1a61['fps'])),
-    (_0x18906e['value'] = String(_0x1e9aca)));
-  const _0x57bdf3 = _0x1962cf['querySelector']('.panorama-camera-timeline__time');
-  if (_0x57bdf3) _0x57bdf3['textContent'] = formatTime(_0x1e9aca);
-  const _0x5c2ab7 = _0x1962cf['querySelector']('.panorama-camera-timeline__duration');
-  if (_0x5c2ab7) _0x5c2ab7['value'] = String(_0x1c1a61['duration']);
-  const _0x5746cc = _0x1962cf['querySelector']('.panorama-camera-timeline__fps');
-  if (_0x5746cc) _0x5746cc['value'] = String(_0x1c1a61['fps']);
-  const _0x57a262 = _0x1962cf['querySelector']('.panorama-camera-timeline__loop input');
-  if (_0x57a262) _0x57a262['checked'] = _0x1c1a61['loop'];
-  syncStaticText(_0x1962cf, { isPlaying: _0x265463 });
-  const _0xab3be5 = _0x1962cf['querySelector']('.panorama-camera-timeline__markers');
-  _0xab3be5 &&
-    _0xab3be5['replaceChildren'](
-      ..._0x1c1a61['keyframes']['map']((_0x427bc1) => {
-        const _0x158630 = document['createElement']('button');
-        ((_0x158630['type'] = 'button'),
-          (_0x158630['className'] = 'panorama-camera-timeline__marker'),
-          (_0x158630['dataset']['keyframeId'] = _0x427bc1['id']),
-          (_0x158630['dataset']['keyframeTime'] = String(_0x427bc1['time'])));
-        const _0x1e9143 = Math['round'](_0x427bc1['time'] * _0x1c1a61['fps']),
-          _0x314813 = _0x1c1a61['duration'] > 0x0 ? (_0x427bc1['time'] / _0x1c1a61['duration']) * 0x64 : 0x0;
+    el20 = el19['querySelector']('.panorama-camera-timeline__track');
+  el20 &&
+    ((el20['max'] = String(args['duration'])),
+    (el20['step'] = String(0x1 / args['fps'])),
+    (el20['value'] = String(current)));
+  const el21 = el19['querySelector']('.panorama-camera-timeline__time');
+  if (el21) el21['textContent'] = formatTime(current);
+  const el22 = el19['querySelector']('.panorama-camera-timeline__duration');
+  if (el22) el22['value'] = String(args['duration']);
+  const el23 = el19['querySelector']('.panorama-camera-timeline__fps');
+  if (el23) el23['value'] = String(args['fps']);
+  const entry = el19['querySelector']('.panorama-camera-timeline__loop input');
+  if (entry) entry['checked'] = args['loop'];
+  syncStaticText(el19, { isPlaying: isPlaying2 });
+  const record = el19['querySelector']('.panorama-camera-timeline__markers');
+  record &&
+    record['replaceChildren'](
+      ...args['keyframes']['map']((payload) => {
+        const el24 = document['createElement']('button');
+        ((el24['type'] = 'button'),
+          (el24['className'] = 'panorama-camera-timeline__marker'),
+          (el24['dataset']['keyframeId'] = payload['id']),
+          (el24['dataset']['keyframeTime'] = String(payload['time'])));
+        const frame = Math['round'](payload['time'] * args['fps']),
+          handle = args['duration'] > 0x0 ? (payload['time'] / args['duration']) * 0x64 : 0x0;
         return (
-          _0x158630['style']['setProperty']('--panorama-keyframe-position', _0x314813 + '%'),
-          (_0x158630['title'] = sceneText('keyframeTitle', {
-            time: formatTime(_0x427bc1['time']),
-            frame: _0x1e9143,
+          el24['style']['setProperty']('--panorama-keyframe-position', handle + '%'),
+          (el24['title'] = sceneText('keyframeTitle', {
+            time: formatTime(payload['time']),
+            frame: frame,
           })),
-          _0x158630['setAttribute'](
+          el24['setAttribute'](
             'aria-label',
-            sceneText('keyframeAria', { time: formatTime(_0x427bc1['time']), frame: _0x1e9143 }),
+            sceneText('keyframeAria', { time: formatTime(payload['time']), frame: frame }),
           ),
-          _0x158630['classList']['toggle'](
+          el24['classList']['toggle'](
             'is-current',
-            Math['abs'](_0x427bc1['time'] - _0x1e9aca) <= 0.5 / _0x1c1a61['fps'],
+            Math['abs'](payload['time'] - current) <= 0.5 / args['fps'],
           ),
-          _0x158630
+          el24
         );
       }),
     );
 }
-export function setCameraTimelineDisplayTime(_0x22f7a0, _0xe0cb0) {
-  if (!_0x22f7a0) return;
-  const _0x598e6b = _0x22f7a0['querySelector']('.panorama-camera-timeline__track'),
-    _0xbfbfc3 = _0x22f7a0['querySelector']('.panorama-camera-timeline__time');
-  if (_0x598e6b) _0x598e6b['value'] = String(_0xe0cb0);
-  if (_0xbfbfc3) _0xbfbfc3['textContent'] = formatTime(_0xe0cb0);
+export function setCameraTimelineDisplayTime(el25, state) {
+  if (!el25) return;
+  const el26 = el25['querySelector']('.panorama-camera-timeline__track'),
+    el27 = el25['querySelector']('.panorama-camera-timeline__time');
+  if (el26) el26['value'] = String(state);
+  if (el27) el27['textContent'] = formatTime(state);
 }
