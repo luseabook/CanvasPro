@@ -18,6 +18,10 @@ const SCAN_DIRS = ['src', 'electron', 'api'];
 const ROOT_CONSUMERS = ['index.html', 'main.js', 'server.py', 'playwright.config.js'];
 const SKIP = /^(node_modules|dist[^/]*|deobfuscated|\.git|\.kilo|playwright-report|test-results|build|\.workbuddy)(\/|$)/;
 const OBFUSCATED = /_0x[0-9a-f]{4,}/;
+// Text files that may reference a module. Consumers are searched across the
+// whole repository, not just the source directories: a module can be pulled in
+// from tools/, e2e/ or a root level script too.
+const CONSUMER_EXTENSIONS = /\.(js|cjs|mjs|json|html|py|ps1|nsh|yml|yaml)$/;
 
 const args = process.argv.slice(2);
 const minBytes = Number(args[args.indexOf('--min-bytes') + 1]) || 1200;
@@ -35,29 +39,27 @@ function walk(dir, out = []) {
 }
 
 const files = [];
-for (const dir of SCAN_DIRS) {
-  const absolute = path.join(root, dir);
-  if (fs.existsSync(absolute)) walk(absolute, files);
-}
-for (const name of ROOT_CONSUMERS) {
-  if (fs.existsSync(path.join(root, name))) files.push(name);
-}
+walk(root, files);
 
 const sources = new Map();
-for (const rel of files) sources.set(rel, fs.readFileSync(path.join(root, rel), 'utf8'));
+for (const rel of files) {
+  if (CONSUMER_EXTENSIONS.test(rel)) sources.set(rel, fs.readFileSync(path.join(root, rel), 'utf8'));
+}
+const consumerCorpus = [...sources.entries()].filter(([rel]) => !rel.startsWith('docs/'));
 
 const rows = [];
 for (const rel of files) {
   if (rel.endsWith('.test.js') || rel.endsWith('.spec.js')) continue;
+  if (!SCAN_DIRS.some(dir => rel.startsWith(dir + '/'))) continue;
   const source = sources.get(rel);
-  if (!OBFUSCATED.test(source)) continue;
+  if (!source || !OBFUSCATED.test(source)) continue;
   const testRel = rel.replace(/\.js$/, '.test.js');
   const testSource = sources.get(testRel);
   if (!testSource) continue;
 
   const basename = path.basename(rel, '.js');
   let consumers = 0;
-  for (const [other, text] of sources) {
+  for (const [other, text] of consumerCorpus) {
     if (other === rel || other === testRel) continue;
     if (text.includes(basename)) consumers += 1;
   }
