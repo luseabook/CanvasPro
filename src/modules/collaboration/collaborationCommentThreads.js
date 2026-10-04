@@ -6,80 +6,71 @@ import {
   appendMentionText,
 } from './collaborationReviewDom.js';
 export function renderCommentThreads({
-  list: _0x1092e2,
-  comments: _0x3519e5,
-  session: _0x9bf684,
-  reply: _0x586443,
-  resolve: _0x3b296d,
+  list: list,
+  comments: comments,
+  session: session,
+  reply: reply,
+  resolve: resolve,
 }) {
-  const _0xc8cef3 = _0x1092e2['scrollTop'];
-  _0x1092e2['replaceChildren']();
-  const _0x3c0b9b = new Map(
-    _0x9bf684['state']['members']['map']((_0xdf6fb5) => [_0xdf6fb5['id'], _0xdf6fb5['name']]),
-  );
-  for (const _0x308f86 of _0x3519e5['filter']((_0x592b68) => _0x592b68['id'] === _0x592b68['thread'])) {
-    const _0x2f0698 = reviewElement('section', 'collaboration-comment-thread');
-    _0x2f0698['classList']['toggle']('is-resolved', !!_0x308f86['resolved']);
-    for (const _0x5e9500 of [
-      _0x308f86,
-      ..._0x3519e5['filter'](
-        (_0x10e68a) => _0x10e68a['thread'] === _0x308f86['id'] && _0x10e68a['id'] !== _0x308f86['id'],
-      ),
+  const value = list['scrollTop'];
+  list['replaceChildren']();
+  const map = new Map(session['state']['members']['map']((error) => [error['id'], error['name']]));
+  for (const enabled of comments['filter']((item) => item['id'] === item['thread'])) {
+    const el = reviewElement('section', 'collaboration-comment-thread');
+    el['classList']['toggle']('is-resolved', !!enabled['resolved']);
+    for (const id2 of [
+      enabled,
+      ...comments['filter']((key) => key['thread'] === enabled['id'] && key['id'] !== enabled['id']),
     ]) {
-      const _0x17a89d = reviewElement('div', 'collaboration-comment-message');
-      (_0x17a89d['classList']['toggle'](
-        'is-mentioned',
-        _0x5e9500['mentions']['includes'](_0x9bf684['state']['actorId']),
-      ),
-        _0x17a89d['classList']['toggle']('is-reply', _0x5e9500['id'] !== _0x308f86['id']));
-      const _0x4b625c = reviewElement('div', 'collaboration-chat-meta');
-      (_0x4b625c['append'](
-        reviewElement('strong', '', _0x3c0b9b['get'](_0x5e9500['actor']) || _0x5e9500['name']),
-        reviewElement('time', 'collaboration-subtle', reviewTime(_0x5e9500['created'])),
+      const el2 = reviewElement('div', 'collaboration-comment-message');
+      (el2['classList']['toggle']('is-mentioned', id2['mentions']['includes'](session['state']['actorId'])),
+        el2['classList']['toggle']('is-reply', id2['id'] !== enabled['id']));
+      const el3 = reviewElement('div', 'collaboration-chat-meta');
+      (el3['append'](
+        reviewElement('strong', '', map['get'](id2['actor']) || id2['name']),
+        reviewElement('time', 'collaboration-subtle', reviewTime(id2['created'])),
       ),
         colorMemberName(
-          _0x4b625c['firstChild'],
-          _0x9bf684['state']['members']['find']((_0x326540) => _0x326540['id'] === _0x5e9500['actor']) || {
-            id: _0x5e9500['actor'],
+          el3['firstChild'],
+          session['state']['members']['find']((index) => index['id'] === id2['actor']) || {
+            id: id2['actor'],
           },
         ));
-      const _0x4ee20d = reviewElement('div', 'collaboration-message-bubble'),
-        _0x21da13 = reviewElement('p');
-      (appendMentionText(_0x21da13, _0x5e9500['body'], _0x9bf684['state']['members'], _0x5e9500['mentions']),
-        _0x4ee20d['append'](_0x21da13),
-        _0x17a89d['append'](
+      const reviewElement2 = reviewElement('div', 'collaboration-message-bubble'),
+        reviewElement3 = reviewElement('p');
+      (appendMentionText(reviewElement3, id2['body'], session['state']['members'], id2['mentions']),
+        reviewElement2['append'](reviewElement3),
+        el2['append'](
           reviewAvatar(
-            _0x9bf684['state']['members']['find']((_0x37391d) => _0x37391d['id'] === _0x5e9500['actor']) || {
-              id: _0x5e9500['actor'],
-              name: _0x5e9500['name'],
+            session['state']['members']['find']((result) => result['id'] === id2['actor']) || {
+              id: id2['actor'],
+              name: id2['name'],
             },
           ),
-          _0x4b625c,
-          _0x4ee20d,
+          el3,
+          reviewElement2,
         ),
-        _0x2f0698['append'](_0x17a89d));
+        el['append'](el2));
     }
-    const _0xddbcc5 = reviewElement('div', 'collaboration-actions');
-    if (!_0x308f86['resolved']) {
-      const _0x7b434e = reviewElement('button', 'collaboration-button', '回复');
-      (_0x7b434e['addEventListener']('click', () => _0x586443(_0x308f86)), _0xddbcc5['append'](_0x7b434e));
-    } else _0xddbcc5['append'](reviewElement('span', 'collaboration-subtle', '已解决'));
+    const reviewElement4 = reviewElement('div', 'collaboration-actions');
+    if (!enabled['resolved']) {
+      const el4 = reviewElement('button', 'collaboration-button', '回复');
+      (el4['addEventListener']('click', () => reply(enabled)), reviewElement4['append'](el4));
+    } else reviewElement4['append'](reviewElement('span', 'collaboration-subtle', '已解决'));
     if (
-      _0x308f86['actor'] === _0x9bf684['state']['actorId'] ||
-      ['owner', 'admin']['includes'](_0x9bf684['state']['role'])
+      enabled['actor'] === session['state']['actorId'] ||
+      ['owner', 'admin']['includes'](session['state']['role'])
     ) {
-      const _0x5dd4c7 = reviewElement(
+      const el5 = reviewElement(
         'button',
         'collaboration-button',
-        _0x308f86['resolved'] ? '重新打开' : '标记解决',
+        enabled['resolved'] ? '重新打开' : '标记解决',
       );
-      (_0x5dd4c7['addEventListener']('click', () => _0x3b296d(_0x308f86, _0x5dd4c7)),
-        _0xddbcc5['append'](_0x5dd4c7));
+      (el5['addEventListener']('click', () => resolve(enabled, el5)), reviewElement4['append'](el5));
     }
-    (_0x2f0698['insertBefore'](_0xddbcc5, _0x2f0698['children'][0x1] || null),
-      _0x1092e2['append'](_0x2f0698));
+    (el['insertBefore'](reviewElement4, el['children'][0x1] || null), list['append'](el));
   }
-  if (!_0x3519e5['length'])
-    _0x1092e2['append'](reviewElement('p', 'collaboration-subtle', '还没有评论，写下你的建议吧'));
-  _0x1092e2['scrollTop'] = _0xc8cef3;
+  if (!comments['length'])
+    list['append'](reviewElement('p', 'collaboration-subtle', '还没有评论，写下你的建议吧'));
+  list['scrollTop'] = value;
 }

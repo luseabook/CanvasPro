@@ -71,23 +71,23 @@ const DREAMINA_IMAGE_SIZE_FIELD = Object.freeze({
     }),
   ]);
 function createDreaminaModelManifest({
-  modelId: _0x75c6f2,
-  executionId: _0x549a3d,
-  displayName: _0x281fea,
-  imageMenu: _0x5eed6c,
+  modelId: modelId,
+  executionId: executionId,
+  displayName: displayName,
+  imageMenu: imageMenu,
 }) {
   return Object.freeze({
     schemaVersion: '1.0',
-    modelId: _0x75c6f2,
+    modelId: modelId,
     provider: 'dreamina',
     kind: 'image',
     adapterType: 'localRuntime',
-    executionId: _0x549a3d,
-    displayName: _0x281fea,
+    executionId: executionId,
+    displayName: displayName,
     icon: 'images/jimeng.png',
     extensions: Object.freeze({
       ratioPolicy: Object.freeze({ capability: 'aspectRatio' }),
-      imageMenu: Object.freeze({ group: 'dreamina', ..._0x5eed6c }),
+      imageMenu: Object.freeze({ group: 'dreamina', ...imageMenu }),
     }),
     inputSlots: Object.freeze({
       allowedKinds: Object.freeze(['text', 'image']),
@@ -106,10 +106,10 @@ function createDreaminaModelManifest({
     outputType: 'image',
   });
 }
-function createDreaminaExecutionManifest({ executionId: _0x3272e9 }) {
+function createDreaminaExecutionManifest({ executionId: executionId2 }) {
   return Object.freeze({
     schemaVersion: '1.0',
-    id: _0x3272e9,
+    id: executionId2,
     provider: 'dreamina',
     kind: 'image',
     adapterType: 'localRuntime',

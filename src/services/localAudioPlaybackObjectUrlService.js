@@ -3,111 +3,109 @@ import { createTrackedMediaObjectUrl, revokeTrackedMediaObjectUrl } from './medi
 const LOCAL_AUDIO_PLAYBACK_MAX_BYTES = 0x20 * 0x400 * 0x400,
   ALLOWED_LOCAL_AUDIO_PATH = /^\/(?:output|data\/assets|data\/uploads)\//i,
   entriesBySource = new Map();
-function resolveCanonicalLocalSource(_0x448ef3) {
-  const _0x26b98d = String(_0x448ef3 || '')['trim'](),
-    _0x247c69 = globalThis['location'] || globalThis['window']?.['location'],
-    _0x59d0b4 = String(_0x247c69?.['href'] || '')['trim'](),
-    _0xc83440 = String(_0x247c69?.['origin'] || '')['trim']();
-  if (!_0x26b98d || !_0x59d0b4 || !_0xc83440 || _0xc83440 === 'null') return '';
+function resolveCanonicalLocalSource(value) {
+  const enabled = String(value || '')['trim'](),
+    item = globalThis['location'] || globalThis['window']?.['location'],
+    enabled2 = String(item?.['href'] || '')['trim'](),
+    enabled3 = String(item?.['origin'] || '')['trim']();
+  if (!enabled || !enabled2 || !enabled3 || enabled3 === 'null') return '';
   try {
-    const _0x47836d = new URL(_0x26b98d, _0x59d0b4);
+    const uRL = new URL(enabled, enabled2);
     if (
-      _0x47836d['origin'] !== _0xc83440 ||
-      _0x47836d['username'] ||
-      _0x47836d['password'] ||
-      !ALLOWED_LOCAL_AUDIO_PATH['test'](_0x47836d['pathname'])
+      uRL['origin'] !== enabled3 ||
+      uRL['username'] ||
+      uRL['password'] ||
+      !ALLOWED_LOCAL_AUDIO_PATH['test'](uRL['pathname'])
     )
       return '';
-    return ((_0x47836d['hash'] = ''), _0x47836d['href']);
+    return ((uRL['hash'] = ''), uRL['href']);
   } catch {
     return '';
   }
 }
-function countOwnerRefs(_0x1727e9) {
-  return _0x1727e9['ownerRefs']['size'];
+function countOwnerRefs(key) {
+  return key['ownerRefs']['size'];
 }
-function disposeEntry(_0xd5fb64) {
-  (_0xd5fb64['controller']['abort'](),
-    _0xd5fb64['objectUrl'] &&
-      (revokeTrackedMediaObjectUrl(_0xd5fb64['objectUrl']), (_0xd5fb64['objectUrl'] = '')));
+function disposeEntry(index) {
+  (index['controller']['abort'](),
+    index['objectUrl'] && (revokeTrackedMediaObjectUrl(index['objectUrl']), (index['objectUrl'] = '')));
 }
-function startSharedFetch(_0x382880, _0x37dd24) {
+function startSharedFetch(signal, timeout) {
   return (async () => {
     try {
-      const _0x2be84d = await fetchLocalMediaPlaybackBlob(_0x382880['sourceUrl'], {
-        signal: _0x382880['controller']['signal'],
-        timeout: _0x37dd24,
+      const fetchLocalMediaPlaybackBlob2 = await fetchLocalMediaPlaybackBlob(signal['sourceUrl'], {
+        signal: signal['controller']['signal'],
+        timeout: timeout,
         maxBytes: LOCAL_AUDIO_PLAYBACK_MAX_BYTES,
       });
       if (
-        !_0x2be84d ||
-        _0x382880['controller']['signal']['aborted'] ||
-        entriesBySource['get'](_0x382880['sourceUrl']) !== _0x382880 ||
-        countOwnerRefs(_0x382880) === 0x0
+        !fetchLocalMediaPlaybackBlob2 ||
+        signal['controller']['signal']['aborted'] ||
+        entriesBySource['get'](signal['sourceUrl']) !== signal ||
+        countOwnerRefs(signal) === 0x0
       )
         return '';
       return (
-        (_0x382880['objectUrl'] = createTrackedMediaObjectUrl(_0x2be84d, {
+        (signal['objectUrl'] = createTrackedMediaObjectUrl(fetchLocalMediaPlaybackBlob2, {
           kind: 'audio',
-          ownerId: _0x382880['firstOwnerId'],
-          sourceUrl: _0x382880['sourceUrl'],
+          ownerId: signal['firstOwnerId'],
+          sourceUrl: signal['sourceUrl'],
         })),
-        _0x382880['objectUrl']
+        signal['objectUrl']
       );
     } catch {
       return '';
     } finally {
-      !_0x382880['objectUrl'] &&
-        entriesBySource['get'](_0x382880['sourceUrl']) === _0x382880 &&
-        (entriesBySource['delete'](_0x382880['sourceUrl']), _0x382880['ownerRefs']['clear']());
+      !signal['objectUrl'] &&
+        entriesBySource['get'](signal['sourceUrl']) === signal &&
+        (entriesBySource['delete'](signal['sourceUrl']), signal['ownerRefs']['clear']());
     }
   })();
 }
-export async function acquireLocalAudioPlaybackObjectUrl(_0x18aff4, _0x16b581, { timeout: _0x5d9030 } = {}) {
-  const _0x22137a = resolveCanonicalLocalSource(_0x18aff4),
-    _0x1fd4d3 = String(_0x16b581 || '')['trim']();
-  if (!_0x22137a || !_0x1fd4d3) return '';
-  let _0x4cdb90 = entriesBySource['get'](_0x22137a);
-  !_0x4cdb90 &&
-    ((_0x4cdb90 = {
-      sourceUrl: _0x22137a,
-      firstOwnerId: _0x1fd4d3,
+export async function acquireLocalAudioPlaybackObjectUrl(result, data, { timeout: timeout2 } = {}) {
+  const sourceUrl = resolveCanonicalLocalSource(result),
+    firstOwnerId = String(data || '')['trim']();
+  if (!sourceUrl || !firstOwnerId) return '';
+  let enabled4 = entriesBySource['get'](sourceUrl);
+  !enabled4 &&
+    ((enabled4 = {
+      sourceUrl: sourceUrl,
+      firstOwnerId: firstOwnerId,
       ownerRefs: new Set(),
       controller: new AbortController(),
       objectUrl: '',
       promise: null,
     }),
-    entriesBySource['set'](_0x22137a, _0x4cdb90),
-    (_0x4cdb90['promise'] = startSharedFetch(_0x4cdb90, _0x5d9030)));
-  _0x4cdb90['ownerRefs']['add'](_0x1fd4d3);
-  const _0x21404e = await _0x4cdb90['promise'];
-  return _0x4cdb90['ownerRefs']['has'](_0x1fd4d3) ? _0x21404e : '';
+    entriesBySource['set'](sourceUrl, enabled4),
+    (enabled4['promise'] = startSharedFetch(enabled4, timeout2)));
+  enabled4['ownerRefs']['add'](firstOwnerId);
+  const options = await enabled4['promise'];
+  return enabled4['ownerRefs']['has'](firstOwnerId) ? options : '';
 }
-export function releaseLocalAudioPlaybackObjectUrl(_0x11207d, _0x5ebdf6) {
-  const _0x19d74f = resolveCanonicalLocalSource(_0x11207d),
-    _0x2f265c = String(_0x5ebdf6 || '')['trim'](),
-    _0x50bb05 = _0x19d74f ? entriesBySource['get'](_0x19d74f) : null;
-  if (!_0x50bb05 || !_0x2f265c || !_0x50bb05['ownerRefs']['has'](_0x2f265c)) return ![];
+export function releaseLocalAudioPlaybackObjectUrl(target, source) {
+  const canonicalLocalSource = resolveCanonicalLocalSource(target),
+    enabled5 = String(source || '')['trim'](),
+    enabled6 = canonicalLocalSource ? entriesBySource['get'](canonicalLocalSource) : null;
+  if (!enabled6 || !enabled5 || !enabled6['ownerRefs']['has'](enabled5)) return ![];
   return (
-    _0x50bb05['ownerRefs']['delete'](_0x2f265c),
-    countOwnerRefs(_0x50bb05) === 0x0 && (entriesBySource['delete'](_0x19d74f), disposeEntry(_0x50bb05)),
+    enabled6['ownerRefs']['delete'](enabled5),
+    countOwnerRefs(enabled6) === 0x0 &&
+      (entriesBySource['delete'](canonicalLocalSource), disposeEntry(enabled6)),
     !![]
   );
 }
 export const __localAudioPlaybackObjectUrlServiceForTest = {
   clear() {
-    for (const _0x4bfb94 of entriesBySource['values']()) disposeEntry(_0x4bfb94);
+    for (const next of entriesBySource['values']()) disposeEntry(next);
     entriesBySource['clear']();
   },
   snapshot() {
-    return Array['from'](entriesBySource['values']())['map']((_0x2e2480) => ({
-      sourceUrl: _0x2e2480['sourceUrl'],
-      objectUrl: _0x2e2480['objectUrl'],
-      totalRefs: countOwnerRefs(_0x2e2480),
-      ownerRefs: Object['fromEntries'](
-        Array['from'](_0x2e2480['ownerRefs'], (_0x172487) => [_0x172487, 0x1]),
-      ),
-      aborted: _0x2e2480['controller']['signal']['aborted'],
+    return Array['from'](entriesBySource['values']())['map']((sourceUrl2) => ({
+      sourceUrl: sourceUrl2['sourceUrl'],
+      objectUrl: sourceUrl2['objectUrl'],
+      totalRefs: countOwnerRefs(sourceUrl2),
+      ownerRefs: Object['fromEntries'](Array['from'](sourceUrl2['ownerRefs'], (current) => [current, 0x1])),
+      aborted: sourceUrl2['controller']['signal']['aborted'],
     }));
   },
 };

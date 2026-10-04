@@ -1,70 +1,64 @@
 export function createProviderStatusTooltipController() {
-  let _0x4be229 = null,
-    _0x11c4f8 = null;
-  function _0x4c70f6() {
-    if (_0x4be229) return _0x4be229;
-    const _0x177211 = globalThis['document'];
-    if (!_0x177211?.['body']) return null;
+  let el = null,
+    value = null;
+  function run() {
+    if (el) return el;
+    const el2 = globalThis['document'];
+    if (!el2?.['body']) return null;
     return (
-      (_0x4be229 = _0x177211['createElement']('div')),
-      (_0x4be229['className'] = 'settings-provider-test-tooltip'),
-      _0x4be229['setAttribute']('role', 'tooltip'),
-      (_0x4be229['hidden'] = !![]),
-      _0x177211['body']['appendChild'](_0x4be229),
-      _0x4be229
+      (el = el2['createElement']('div')),
+      (el['className'] = 'settings-provider-test-tooltip'),
+      el['setAttribute']('role', 'tooltip'),
+      (el['hidden'] = !![]),
+      el2['body']['appendChild'](el),
+      el
     );
   }
-  function _0x54bc07(_0x1305d) {
-    return String(_0x1305d?.['getAttribute']('data-provider-test-tooltip') || '')['trim']();
+  function run2(item) {
+    return String(item?.['getAttribute']('data-provider-test-tooltip') || '')['trim']();
   }
-  function _0x25157e(_0xd4c7c4) {
-    if (!_0x4be229 || !_0xd4c7c4) return;
-    const _0x2c127b = globalThis['window'];
-    if (!_0x2c127b) return;
-    const _0x5945cd = _0x4be229,
-      _0x2e5594 = _0xd4c7c4['getBoundingClientRect'](),
-      _0x522ba7 = _0x5945cd['getBoundingClientRect'](),
-      _0x1a0a62 = 0x18,
-      _0x2d70aa = _0xd4c7c4['closest']('.settings-modal')?.['getBoundingClientRect']()['top'] ?? 0x0,
-      _0x520a55 = Math['max'](_0x1a0a62, _0x2d70aa + 0xa),
-      _0x1194fb = Math['max'](_0x1a0a62, _0x2c127b['innerWidth'] - _0x522ba7['width'] - _0x1a0a62),
-      _0x412693 = Math['min'](
-        _0x1194fb,
-        Math['max'](_0x1a0a62, _0x2e5594['left'] + _0x2e5594['width'] / 0x2 - _0x522ba7['width'] / 0x2),
-      ),
-      _0x2b1cbc = Math['max'](_0x520a55, _0x2e5594['top'] - _0x522ba7['height'] - 0xc),
-      _0x3e4e4a = Math['min'](
-        _0x522ba7['width'] - 0xe,
-        Math['max'](0xe, _0x2e5594['left'] + _0x2e5594['width'] / 0x2 - _0x412693),
-      );
-    ((_0x5945cd['style']['left'] = _0x412693 + 'px'),
-      (_0x5945cd['style']['top'] = _0x2b1cbc + 'px'),
-      _0x5945cd['style']['setProperty']('--settings-provider-test-tooltip-arrow-left', _0x3e4e4a + 'px'));
+  function run3(el3) {
+    if (!el || !el3) return;
+    const enabled = globalThis['window'];
+    if (!enabled) return;
+    const el4 = el,
+      box = el3['getBoundingClientRect'](),
+      box2 = el4['getBoundingClientRect'](),
+      key = 0x18,
+      index = el3['closest']('.settings-modal')?.['getBoundingClientRect']()['top'] ?? 0x0,
+      result = Math['max'](key, index + 0xa),
+      data = Math['max'](key, enabled['innerWidth'] - box2['width'] - key),
+      options = Math['min'](data, Math['max'](key, box['left'] + box['width'] / 0x2 - box2['width'] / 0x2)),
+      target = Math['max'](result, box['top'] - box2['height'] - 0xc),
+      source = Math['min'](box2['width'] - 0xe, Math['max'](0xe, box['left'] + box['width'] / 0x2 - options));
+    ((el4['style']['left'] = options + 'px'),
+      (el4['style']['top'] = target + 'px'),
+      el4['style']['setProperty']('--settings-provider-test-tooltip-arrow-left', source + 'px'));
   }
-  function _0x452a7d(_0x1143f0) {
-    const _0x479530 = _0x54bc07(_0x1143f0);
-    if (!_0x479530) return;
-    const _0x146f22 = _0x4c70f6();
-    if (!_0x146f22) return;
-    ((_0x11c4f8 = _0x1143f0),
-      (_0x146f22['textContent'] = _0x479530),
-      (_0x146f22['hidden'] = ![]),
-      _0x25157e(_0x1143f0),
-      _0x146f22['classList']['add']('is-visible'));
+  function run4(next) {
+    const enabled2 = run2(next);
+    if (!enabled2) return;
+    const el5 = run();
+    if (!el5) return;
+    ((value = next),
+      (el5['textContent'] = enabled2),
+      (el5['hidden'] = ![]),
+      run3(next),
+      el5['classList']['add']('is-visible'));
   }
-  function _0x47012c(_0x3a49fe = null) {
-    if (_0x3a49fe && _0x11c4f8 !== _0x3a49fe) return;
-    _0x11c4f8 = null;
-    if (!_0x4be229) return;
-    (_0x4be229['classList']['remove']('is-visible'), (_0x4be229['hidden'] = !![]));
+  function hide(value2 = null) {
+    if (value2 && value !== value2) return;
+    value = null;
+    if (!el) return;
+    (el['classList']['remove']('is-visible'), (el['hidden'] = !![]));
   }
-  function _0x12bc5c(_0x4eb80b) {
-    if (!_0x4eb80b || _0x4eb80b['dataset']['providerTestTooltipBound'] === '1') return;
-    ((_0x4eb80b['dataset']['providerTestTooltipBound'] = '1'),
-      _0x4eb80b['addEventListener']('pointerenter', () => _0x452a7d(_0x4eb80b)),
-      _0x4eb80b['addEventListener']('pointerleave', () => _0x47012c(_0x4eb80b)),
-      _0x4eb80b['addEventListener']('focus', () => _0x452a7d(_0x4eb80b)),
-      _0x4eb80b['addEventListener']('blur', () => _0x47012c(_0x4eb80b)));
+  function bind(el6) {
+    if (!el6 || el6['dataset']['providerTestTooltipBound'] === '1') return;
+    ((el6['dataset']['providerTestTooltipBound'] = '1'),
+      el6['addEventListener']('pointerenter', () => run4(el6)),
+      el6['addEventListener']('pointerleave', () => hide(el6)),
+      el6['addEventListener']('focus', () => run4(el6)),
+      el6['addEventListener']('blur', () => hide(el6)));
   }
-  return { bind: _0x12bc5c, hide: _0x47012c };
+  return { bind: bind, hide: hide };
 }

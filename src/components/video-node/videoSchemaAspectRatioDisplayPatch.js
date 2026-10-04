@@ -11,79 +11,79 @@ export const VIDEO_DISPLAY_RATIO_RESULT_FIELDS = Object['freeze']([
   'videoUrl',
   'src',
 ]);
-function findUiSchemaFieldById(_0x134f41 = [], _0x4391e5 = '') {
-  const _0x570556 = String(_0x4391e5 || '')['trim']();
-  if (!_0x570556) return null;
-  return _0x134f41['find']((_0x1912c3) => String(_0x1912c3?.['id'] || '')['trim']() === _0x570556) || null;
+function findUiSchemaFieldById(list = [], value = '') {
+  const enabled = String(value || '')['trim']();
+  if (!enabled) return null;
+  return list['find']((item) => String(item?.['id'] || '')['trim']() === enabled) || null;
 }
-function isAspectRatioSchemaField(_0x39fb91, _0x3bad99) {
-  const _0x307cd7 = String(_0x39fb91 || '')['trim']();
-  return _0x307cd7 === 'aspectRatio' || String(_0x3bad99?.['displayRole'] || '')['trim']() === 'aspectRatio';
+function isAspectRatioSchemaField(key, index) {
+  const result = String(key || '')['trim']();
+  return result === 'aspectRatio' || String(index?.['displayRole'] || '')['trim']() === 'aspectRatio';
 }
 function resolveSchemaPatchRatioValue({
   fieldId: fieldId = '',
-  value: _0x7b7e68,
+  value: value2,
   schemaPatch: schemaPatch = {},
 } = {}) {
-  const _0x443fa4 = String(fieldId || '')['trim'](),
-    _0x30a3e1 = getPlainGenerationParams(schemaPatch?.['generationParams']);
-  if (_0x443fa4 && Object['prototype']['hasOwnProperty']['call'](_0x30a3e1, _0x443fa4))
-    return _0x30a3e1[_0x443fa4];
-  if (Object['prototype']['hasOwnProperty']['call'](_0x30a3e1, 'aspectRatio'))
-    return _0x30a3e1['aspectRatio'];
-  return _0x7b7e68;
+  const data = String(fieldId || '')['trim'](),
+    plainGenerationParams = getPlainGenerationParams(schemaPatch?.['generationParams']);
+  if (data && Object['prototype']['hasOwnProperty']['call'](plainGenerationParams, data))
+    return plainGenerationParams[data];
+  if (Object['prototype']['hasOwnProperty']['call'](plainGenerationParams, 'aspectRatio'))
+    return plainGenerationParams['aspectRatio'];
+  return value2;
 }
 export function buildVideoSchemaAspectRatioDisplayPatch({
-  owner: _0x3d3ad2,
-  store: _0x4fe39e,
+  owner: owner,
+  store: store,
   nodeId: nodeId = '',
   latestNodeData: latestNodeData = {},
   fallbackNodeData: fallbackNodeData = {},
-  resolved: _0x35279d,
+  resolved: resolved,
   fieldId: fieldId = '',
-  value: _0x5f2d6a,
+  value: value3,
   schemaPatch: schemaPatch = {},
   adapterType: adapterType = '',
-  minSide: _0x3ff188,
-  previewEl: _0x36fbd4,
-  resultMediaElement: _0xf8edff,
+  minSide: minSide,
+  previewEl: previewEl,
+  resultMediaElement: resultMediaElement,
 } = {}) {
-  const _0x4733be = String(fieldId || '')['trim'](),
-    _0x5541fa = String(adapterType || '')['trim']();
-  if (!_0x4733be || !_0x5541fa) return {};
+  const fieldId2 = String(fieldId || '')['trim'](),
+    enabled2 = String(adapterType || '')['trim']();
+  if (!fieldId2 || !enabled2) return {};
   if (
-    _0x35279d?.['modelManifest']?.['kind'] !== 'video' ||
-    _0x35279d?.['modelManifest']?.['adapterType'] !== _0x5541fa ||
-    _0x35279d?.['executionManifest']?.['adapterType'] !== _0x5541fa
+    resolved?.['modelManifest']?.['kind'] !== 'video' ||
+    resolved?.['modelManifest']?.['adapterType'] !== enabled2 ||
+    resolved?.['executionManifest']?.['adapterType'] !== enabled2
   )
     return {};
-  const _0x18bf9b = Array['isArray'](_0x35279d?.['modelManifest']?.['uiSchema']?.['fields'])
-      ? _0x35279d['modelManifest']['uiSchema']['fields']
+  const options = Array['isArray'](resolved?.['modelManifest']?.['uiSchema']?.['fields'])
+      ? resolved['modelManifest']['uiSchema']['fields']
       : [],
-    _0x34b322 = findUiSchemaFieldById(_0x18bf9b, _0x4733be);
-  if (!isAspectRatioSchemaField(_0x4733be, _0x34b322)) return {};
-  const _0x54990e = String(
-    resolveSchemaPatchRatioValue({ fieldId: _0x4733be, value: _0x5f2d6a, schemaPatch: schemaPatch }) || '',
+    uiSchemaFieldById = findUiSchemaFieldById(options, fieldId2);
+  if (!isAspectRatioSchemaField(fieldId2, uiSchemaFieldById)) return {};
+  const ratioValue = String(
+    resolveSchemaPatchRatioValue({ fieldId: fieldId2, value: value3, schemaPatch: schemaPatch }) || '',
   )['trim']();
-  if (!_0x54990e) return {};
-  const _0x3db5bd = buildImageSchemaAspectRatioDisplayPatch({
-    store: _0x4fe39e,
+  if (!ratioValue) return {};
+  const patch = buildImageSchemaAspectRatioDisplayPatch({
+    store: store,
     nodeId: nodeId,
     nodeData: latestNodeData,
     fallbackNodeData: fallbackNodeData,
-    ratioValue: _0x54990e,
-    minSide: _0x3ff188,
+    ratioValue: ratioValue,
+    minSide: minSide,
     inputKinds: ['image', 'video'],
-    resultMediaElement: _0xf8edff,
+    resultMediaElement: resultMediaElement,
     resultFields: VIDEO_DISPLAY_RATIO_RESULT_FIELDS,
   });
   return (
-    applyImageSchemaRatioResizeAnimation(_0x3d3ad2, {
+    applyImageSchemaRatioResizeAnimation(owner, {
       nodeId: nodeId,
-      previewEl: _0x36fbd4,
+      previewEl: previewEl,
       nodeData: latestNodeData,
-      patch: _0x3db5bd,
+      patch: patch,
     }),
-    { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![], aspectRatio: _0x54990e, ..._0x3db5bd }
+    { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![], aspectRatio: ratioValue, ...patch }
   );
 }

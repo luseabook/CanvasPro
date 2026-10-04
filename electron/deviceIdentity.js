@@ -3,108 +3,108 @@ import { readFileSync } from 'node:fs';
 import { writeJsonAtomicallySync } from './atomicJsonStore.js';
 import path from 'node:path';
 const DEVICE_IDENTITY_FILENAME = 'device-identity.json';
-function readJsonFileSyncSafe(_0x4e81ae) {
+function readJsonFileSyncSafe(value) {
   try {
-    return JSON.parse(readFileSync(_0x4e81ae, 'utf8').replace(/^\uFEFF/, ''));
+    return JSON.parse(readFileSync(value, 'utf8').replace(/^\uFEFF/, ''));
   } catch {
     return {};
   }
 }
-function writeJsonFileSyncSafe(_0x27f88b, _0x46179c) {
-  writeJsonAtomicallySync(_0x27f88b, _0x46179c || {});
+function writeJsonFileSyncSafe(item, key) {
+  writeJsonAtomicallySync(item, key || {});
 }
-function normalizeDeviceIdentityValue(_0x22b0fa) {
-  const _0x155885 = String(_0x22b0fa || '').trim();
-  if (!_0x155885 || _0x155885.length > 0x100) return '';
-  return /^[A-Za-z0-9._:-]+$/.test(_0x155885) ? _0x155885 : '';
+function normalizeDeviceIdentityValue(index) {
+  const list = String(index || '').trim();
+  if (!list || list.length > 0x100) return '';
+  return /^[A-Za-z0-9._:-]+$/.test(list) ? list : '';
 }
-function readDeviceIdFromFile(_0x50450f) {
-  const _0x565736 = readJsonFileSyncSafe(_0x50450f);
-  return normalizeDeviceIdentityValue(_0x565736.deviceId || _0x565736.device_id);
+function readDeviceIdFromFile(result) {
+  const jsonFileSyncSafe = readJsonFileSyncSafe(result);
+  return normalizeDeviceIdentityValue(jsonFileSyncSafe.deviceId || jsonFileSyncSafe.device_id);
 }
-function readInstallIdFromFile(_0x55590b) {
-  const _0x1050d5 = readJsonFileSyncSafe(_0x55590b);
-  return normalizeDeviceIdentityValue(_0x1050d5.installId || _0x1050d5.install_id);
+function readInstallIdFromFile(data) {
+  const jsonFileSyncSafe2 = readJsonFileSyncSafe(data);
+  return normalizeDeviceIdentityValue(jsonFileSyncSafe2.installId || jsonFileSyncSafe2.install_id);
 }
 export function createDeviceIdentityManager({
-  app: _0x2cfe96,
-  appRoot: _0x27e5d8,
-  getUserRoot: _0x1ada4c,
+  app: app,
+  appRoot: appRoot,
+  getUserRoot: getUserRoot,
   isolatedProfile = false,
   logEvent: logEvent = () => {},
 }) {
-  function _0x46dd2f() {
-    const _0x1573b8 = 'AI-CanvasPro';
+  function run() {
+    const options = 'AI-CanvasPro';
     if (process.platform === 'win32') {
-      const _0xde2214 = process.env.LOCALAPPDATA || process.env.APPDATA || _0x2cfe96.getPath('userData');
-      return path.join(_0xde2214, _0x1573b8);
+      const target = process.env.LOCALAPPDATA || process.env.APPDATA || app.getPath('userData');
+      return path.join(target, options);
     }
-    if (process.platform === 'darwin') return path.join(_0x2cfe96.getPath('appData'), _0x1573b8);
-    const _0x520bcf = process.env.XDG_STATE_HOME || path.join(_0x2cfe96.getPath('home'), '.local', 'state');
-    return path.join(_0x520bcf, _0x1573b8);
+    if (process.platform === 'darwin') return path.join(app.getPath('appData'), options);
+    const source = process.env.XDG_STATE_HOME || path.join(app.getPath('home'), '.local', 'state');
+    return path.join(source, options);
   }
-  function _0x4cdea1() {
-    if (isolatedProfile) return [path.join(_0x2cfe96.getPath('userData'), DEVICE_IDENTITY_FILENAME)];
+  function run2() {
+    if (isolatedProfile) return [path.join(app.getPath('userData'), DEVICE_IDENTITY_FILENAME)];
     return [
-      path.join(_0x2cfe96.getPath('userData'), DEVICE_IDENTITY_FILENAME),
-      path.join(_0x46dd2f(), DEVICE_IDENTITY_FILENAME),
+      path.join(app.getPath('userData'), DEVICE_IDENTITY_FILENAME),
+      path.join(run(), DEVICE_IDENTITY_FILENAME),
     ];
   }
-  function _0x54fa5d() {
-    if (isolatedProfile) return [path.join(_0x1ada4c(), 'settings.json')];
+  function run3() {
+    if (isolatedProfile) return [path.join(getUserRoot(), 'settings.json')];
     return [
-      path.join(_0x1ada4c(), 'settings.json'),
-      path.join(_0x46dd2f(), 'settings.json'),
-      path.join(_0x27e5d8, 'user', 'settings.json'),
+      path.join(getUserRoot(), 'settings.json'),
+      path.join(run(), 'settings.json'),
+      path.join(appRoot, 'user', 'settings.json'),
     ];
   }
-  function _0x3be05d(_0x5e5356) {
-    const _0xec6844 = normalizeDeviceIdentityValue(_0x5e5356);
-    if (!_0xec6844) return;
-    for (const _0x5f3bb2 of _0x4cdea1()) {
+  function run4(next) {
+    const deviceId = normalizeDeviceIdentityValue(next);
+    if (!deviceId) return;
+    for (const current of run2()) {
       try {
-        writeJsonFileSyncSafe(_0x5f3bb2, { deviceId: _0xec6844, updatedAt: new Date().toISOString() });
-      } catch (_0x4020f3) {
+        writeJsonFileSyncSafe(current, { deviceId: deviceId, updatedAt: new Date().toISOString() });
+      } catch (error) {
         logEvent({
           type: 'device_identity.write_failed',
           level: 'warn',
           source: 'main',
           message: 'Failed to persist device identity',
-          error: _0x4020f3,
-          context: { target: path.basename(_0x5f3bb2) },
+          error: error,
+          context: { target: path.basename(current) },
         });
       }
     }
-    for (const _0xdf7b98 of _0x54fa5d().slice(0, 2)) {
+    for (const entry of run3().slice(0, 2)) {
       try {
-        const _0x499703 = readJsonFileSyncSafe(_0xdf7b98);
-        if (normalizeDeviceIdentityValue(_0x499703.deviceId) === _0xec6844) continue;
-        writeJsonFileSyncSafe(_0xdf7b98, { ..._0x499703, deviceId: _0xec6844 });
-      } catch (_0x5af85d) {
+        const args = readJsonFileSyncSafe(entry);
+        if (normalizeDeviceIdentityValue(args.deviceId) === deviceId) continue;
+        writeJsonFileSyncSafe(entry, { ...args, deviceId: deviceId });
+      } catch (error2) {
         logEvent({
           type: 'device_identity.settings_write_failed',
           level: 'warn',
           source: 'main',
           message: 'Failed to mirror device identity into settings',
-          error: _0x5af85d,
-          context: { target: path.basename(_0xdf7b98) },
+          error: error2,
+          context: { target: path.basename(entry) },
         });
       }
     }
   }
-  function _0x572a9f(_0x5cbe7d = {}) {
-    const _0x203392 = normalizeDeviceIdentityValue(_0x5cbe7d?.installId || _0x5cbe7d?.seedInstallId),
-      _0x209dcd = _0x4cdea1(),
-      _0x480472 = _0x54fa5d(),
-      _0x58b6b5 = [
-        ..._0x209dcd.map((_0x16f5ae) => readDeviceIdFromFile(_0x16f5ae)),
-        ..._0x480472.map((_0x463e9d) => readDeviceIdFromFile(_0x463e9d)),
-        ..._0x480472.map((_0x4870f3) => readInstallIdFromFile(_0x4870f3)),
-        _0x203392,
+  function getStableDeviceId(options2 = {}) {
+    const deviceIdentityValue = normalizeDeviceIdentityValue(options2?.installId || options2?.seedInstallId),
+      list2 = run2(),
+      list3 = run3(),
+      list4 = [
+        ...list2.map((item2) => readDeviceIdFromFile(item2)),
+        ...list3.map((item3) => readDeviceIdFromFile(item3)),
+        ...list3.map((item4) => readInstallIdFromFile(item4)),
+        deviceIdentityValue,
       ],
-      _0x14a881 = _0x58b6b5.find(Boolean),
-      _0x15395a = _0x14a881 || 'aicdev-' + randomBytes(16).toString('hex');
-    return (_0x3be05d(_0x15395a), _0x15395a);
+      record = list4.find(Boolean),
+      payload = record || 'aicdev-' + randomBytes(16).toString('hex');
+    return (run4(payload), payload);
   }
-  return { getStableDeviceId: _0x572a9f };
+  return { getStableDeviceId: getStableDeviceId };
 }

@@ -1,94 +1,92 @@
 import { attachMediaElementPlaybackSource } from '../services/desktopMediaBlobSource.js';
-export function getVideoElementSource(_0x32b60c) {
-  return String(_0x32b60c?.getAttribute?.('src') || _0x32b60c?.currentSrc || _0x32b60c?.src || '').trim();
+export function getVideoElementSource(value) {
+  return String(value?.getAttribute?.('src') || value?.currentSrc || value?.src || '').trim();
 }
-export function setVideoKeyingMediaKeepAlive(_0x41c49b, _0x1a1960) {
-  if (!_0x41c49b?.dataset) return;
-  if (_0x1a1960) {
-    _0x41c49b.dataset.desktopMediaKeepAlive = 'video-keying';
+export function setVideoKeyingMediaKeepAlive(el, item) {
+  if (!el?.dataset) return;
+  if (item) {
+    el.dataset.desktopMediaKeepAlive = 'video-keying';
     return;
   }
-  _0x41c49b.dataset.desktopMediaKeepAlive === 'video-keying' &&
-    delete _0x41c49b.dataset.desktopMediaKeepAlive;
+  el.dataset.desktopMediaKeepAlive === 'video-keying' && delete el.dataset.desktopMediaKeepAlive;
 }
-export async function attachVideoKeyingPlaybackSource(_0x1f3170, _0x41a2b3, _0x46f566 = 'metadata') {
-  const _0x50a5c1 = String(_0x41a2b3 || '').trim();
-  if (!_0x1f3170 || !_0x50a5c1) return false;
+export async function attachVideoKeyingPlaybackSource(enabled, key, preload = 'metadata') {
+  const enabled2 = String(key || '').trim();
+  if (!enabled || !enabled2) return false;
   return (
-    await attachMediaElementPlaybackSource(_0x1f3170, _0x50a5c1, { preload: _0x46f566 }),
-    !!getVideoElementSource(_0x1f3170)
+    await attachMediaElementPlaybackSource(enabled, enabled2, { preload: preload }),
+    !!getVideoElementSource(enabled)
   );
 }
-function seekTo(_0x28f665, _0x341a31) {
-  return new Promise((_0x173919, _0x5afb1e) => {
-    let _0x9eb692 = false;
-    const _0x38ff9a = () => {
-        (_0x28f665.removeEventListener('seeked', _0x1a1a87),
-          _0x28f665.removeEventListener('error', _0x292814));
+function seekTo(el2, index) {
+  return new Promise((handler, handler2) => {
+    let result = false;
+    const run = () => {
+        (el2.removeEventListener('seeked', data), el2.removeEventListener('error', options));
       },
-      _0x1a1a87 = () => {
-        if (_0x9eb692) return;
-        ((_0x9eb692 = true), _0x38ff9a(), _0x173919());
+      data = () => {
+        if (result) return;
+        ((result = true), run(), handler());
       },
-      _0x292814 = () => {
-        if (_0x9eb692) return;
-        ((_0x9eb692 = true), _0x38ff9a(), _0x5afb1e(new Error('video seek error')));
+      options = () => {
+        if (result) return;
+        ((result = true), run(), handler2(new Error('video seek error')));
       };
-    (_0x28f665.addEventListener('seeked', _0x1a1a87),
-      _0x28f665.addEventListener('error', _0x292814),
-      (_0x28f665.currentTime = Math.max(0, _0x341a31)));
+    (el2.addEventListener('seeked', data),
+      el2.addEventListener('error', options),
+      (el2.currentTime = Math.max(0, index)));
   });
 }
-function waitForLoadedMetadata(_0x443182) {
-  return new Promise((_0x13b613, _0x18fedb) => {
-    const _0x557e55 = () => _0x13b613(),
-      _0x2cf3e0 = () => _0x18fedb(new Error('video load error'));
-    (_0x443182.addEventListener('loadedmetadata', _0x557e55, { once: true }),
-      _0x443182.addEventListener('error', _0x2cf3e0, { once: true }));
+function waitForLoadedMetadata(el3) {
+  return new Promise((handler3, handler4) => {
+    const target = () => handler3(),
+      source = () => handler4(new Error('video load error'));
+    (el3.addEventListener('loadedmetadata', target, { once: true }),
+      el3.addEventListener('error', source, { once: true }));
   });
 }
 export async function renderVideoKeyingThumbs({
-  src: _0x16e78a,
-  thumbs: _0x4af583,
-  token: _0x469119,
-  isCurrent: _0x4573ba,
-  readDurationSec: _0x307031,
-  onDuration: _0xb0c75e,
+  src: src,
+  thumbs: thumbs,
+  token: token,
+  isCurrent: isCurrent,
+  readDurationSec: readDurationSec,
+  onDuration: onDuration,
 }) {
-  const _0x752b56 = Array.isArray(_0x4af583) ? _0x4af583 : [],
-    _0x24cc9a = String(_0x16e78a || '').trim();
-  if (!_0x24cc9a || !_0x752b56.length) return;
-  let _0x16d315, _0x521574, _0x1d4b59;
-  const _0x515f24 = () => _0x4573ba?.(_0x469119) === true;
+  const list = Array.isArray(thumbs) ? thumbs : [],
+    enabled3 = String(src || '').trim();
+  if (!enabled3 || !list.length) return;
+  let next, box, ctx;
+  const run2 = () => isCurrent?.(token) === true;
   try {
-    ((_0x16d315 = document.createElement('video')),
-      (_0x16d315.muted = true),
-      (_0x16d315.playsInline = true),
-      (_0x16d315.crossOrigin = 'anonymous'),
-      (_0x16d315.preload = 'auto'),
-      await attachVideoKeyingPlaybackSource(_0x16d315, _0x24cc9a, 'auto'),
-      await waitForLoadedMetadata(_0x16d315));
-    if (!_0x515f24()) return;
-    const _0x3af014 = Number(_0x307031?.(_0x16d315) || 0);
-    if (_0x3af014 > 0) _0xb0c75e?.(_0x3af014);
-    ((_0x521574 = document.createElement('canvas')),
-      (_0x521574.width = 120),
-      (_0x521574.height = 68),
-      (_0x1d4b59 = _0x521574.getContext('2d', { willReadFrequently: false })));
-    if (!_0x1d4b59) return;
-    for (let _0x13ee2 = 0; _0x13ee2 < _0x752b56.length; _0x13ee2 += 1) {
-      if (!_0x515f24()) return;
-      const _0x5161c3 = (_0x3af014 * (_0x13ee2 + 0.5)) / _0x752b56.length;
-      await seekTo(_0x16d315, _0x5161c3);
-      if (!_0x515f24()) return;
-      _0x1d4b59.drawImage(_0x16d315, 0, 0, _0x521574.width, _0x521574.height);
-      const _0x181d86 = _0x521574.toDataURL('image/jpeg', 0.72),
-        _0x5d29a8 = _0x752b56[_0x13ee2];
-      if (_0x5d29a8) _0x5d29a8.style.backgroundImage = 'url("' + _0x181d86 + '")';
+    ((next = document.createElement('video')),
+      (next.muted = true),
+      (next.playsInline = true),
+      (next.crossOrigin = 'anonymous'),
+      (next.preload = 'auto'),
+      await attachVideoKeyingPlaybackSource(next, enabled3, 'auto'),
+      await waitForLoadedMetadata(next));
+    if (!run2()) return;
+    const count = Number(readDurationSec?.(next) || 0);
+    if (count > 0) onDuration?.(count);
+    ((box = document.createElement('canvas')),
+      (box.width = 120),
+      (box.height = 68),
+      (ctx = box.getContext('2d', { willReadFrequently: false })));
+    if (!ctx) return;
+    for (let current = 0; current < list.length; current += 1) {
+      if (!run2()) return;
+      const entry = (count * (current + 0.5)) / list.length;
+      await seekTo(next, entry);
+      if (!run2()) return;
+      ctx.drawImage(next, 0, 0, box.width, box.height);
+      const record = box.toDataURL('image/jpeg', 0.72),
+        el4 = list[current];
+      if (el4) el4.style.backgroundImage = 'url("' + record + '")';
     }
   } catch {
   } finally {
-    _0x16d315 && (_0x16d315.removeAttribute('src'), _0x16d315.load?.());
-    if (_0x521574) _0x521574.width = _0x521574.height = 0;
+    next && (next.removeAttribute('src'), next.load?.());
+    if (box) box.width = box.height = 0;
   }
 }

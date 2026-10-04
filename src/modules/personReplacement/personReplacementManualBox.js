@@ -1,72 +1,66 @@
-function clamp(_0x4c5d88, _0x108ceb, _0x651e1b, _0x5c4ec3 = _0x108ceb) {
-  const _0x2fff13 = Number(_0x4c5d88);
-  return Number['isFinite'](_0x2fff13)
-    ? Math['min'](_0x651e1b, Math['max'](_0x108ceb, _0x2fff13))
-    : _0x5c4ec3;
+function clamp(value, item, key, index = item) {
+  const result = Number(value);
+  return Number['isFinite'](result) ? Math['min'](key, Math['max'](item, result)) : index;
 }
 export function normalizePersonReplacementManualSelection(
-  _0x290c27 = {},
-  _0x90236 = {},
+  box = {},
+  box2 = {},
   { minWidth: minWidth = 0.025, minHeight: minHeight = 0.05 } = {},
 ) {
-  const _0xfa7158 = clamp(_0x290c27['x'], 0x0, 0x1, 0x0),
-    _0x49a0d4 = clamp(_0x290c27['y'], 0x0, 0x1, 0x0),
-    _0x31049b = clamp(_0x90236['x'], 0x0, 0x1, _0xfa7158),
-    _0x135670 = clamp(_0x90236['y'], 0x0, 0x1, _0x49a0d4),
-    _0x2c3cc4 = {
-      x: Math['round'](Math['min'](_0xfa7158, _0x31049b) * 0xf4240) / 0xf4240,
-      y: Math['round'](Math['min'](_0x49a0d4, _0x135670) * 0xf4240) / 0xf4240,
-      width: Math['round'](Math['abs'](_0x31049b - _0xfa7158) * 0xf4240) / 0xf4240,
-      height: Math['round'](Math['abs'](_0x135670 - _0x49a0d4) * 0xf4240) / 0xf4240,
+  const clamp2 = clamp(box['x'], 0x0, 0x1, 0x0),
+    clamp3 = clamp(box['y'], 0x0, 0x1, 0x0),
+    clamp4 = clamp(box2['x'], 0x0, 0x1, clamp2),
+    clamp5 = clamp(box2['y'], 0x0, 0x1, clamp3),
+    box3 = {
+      x: Math['round'](Math['min'](clamp2, clamp4) * 0xf4240) / 0xf4240,
+      y: Math['round'](Math['min'](clamp3, clamp5) * 0xf4240) / 0xf4240,
+      width: Math['round'](Math['abs'](clamp4 - clamp2) * 0xf4240) / 0xf4240,
+      height: Math['round'](Math['abs'](clamp5 - clamp3) * 0xf4240) / 0xf4240,
     };
-  return _0x2c3cc4['width'] >= minWidth && _0x2c3cc4['height'] >= minHeight ? _0x2c3cc4 : null;
+  return box3['width'] >= minWidth && box3['height'] >= minHeight ? box3 : null;
 }
-export function resolvePersonReplacementSourceImageSize(_0x6add5c, _0x2278a0 = {}) {
-  const _0x28bb84 = Number(_0x6add5c?.['naturalWidth']),
-    _0x81e27e = Number(_0x6add5c?.['naturalHeight']);
-  if (Number['isFinite'](_0x28bb84) && _0x28bb84 > 0x0 && Number['isFinite'](_0x81e27e) && _0x81e27e > 0x0)
-    return { width: _0x28bb84, height: _0x81e27e };
-  const _0x2e0ee8 = Number(_0x2278a0?.['frame']?.['width']),
-    _0x417a81 = Number(_0x2278a0?.['frame']?.['height']);
-  return Number['isFinite'](_0x2e0ee8) && _0x2e0ee8 > 0x0 && Number['isFinite'](_0x417a81) && _0x417a81 > 0x0
-    ? { width: _0x2e0ee8, height: _0x417a81 }
+export function resolvePersonReplacementSourceImageSize(data, options = {}) {
+  const width = Number(data?.['naturalWidth']),
+    height = Number(data?.['naturalHeight']);
+  if (Number['isFinite'](width) && width > 0x0 && Number['isFinite'](height) && height > 0x0)
+    return { width: width, height: height };
+  const width2 = Number(options?.['frame']?.['width']),
+    height2 = Number(options?.['frame']?.['height']);
+  return Number['isFinite'](width2) && width2 > 0x0 && Number['isFinite'](height2) && height2 > 0x0
+    ? { width: width2, height: height2 }
     : { width: 0x0, height: 0x0 };
 }
 export function normalizePersonReplacementManualBoxEdit(
-  _0x1dd0f3 = {},
-  _0x143381 = {},
-  _0x463d33 = 'move',
+  box4 = {},
+  box5 = {},
+  list = 'move',
   { minWidth: minWidth = 0.025, minHeight: minHeight = 0.05 } = {},
 ) {
-  const _0x16957b = clamp(_0x1dd0f3['x'], 0x0, 0x1, 0x0),
-    _0x5514cd = clamp(_0x1dd0f3['y'], 0x0, 0x1, 0x0),
-    _0x4e1b0f = clamp(_0x1dd0f3['width'], minWidth, 0x1 - _0x16957b, minWidth),
-    _0x3ca234 = clamp(_0x1dd0f3['height'], minHeight, 0x1 - _0x5514cd, minHeight),
-    _0xf60910 = Number(_0x143381['x']) || 0x0,
-    _0x452a75 = Number(_0x143381['y']) || 0x0;
-  if (_0x463d33 === 'move')
+  const clamp6 = clamp(box4['x'], 0x0, 0x1, 0x0),
+    clamp7 = clamp(box4['y'], 0x0, 0x1, 0x0),
+    clamp8 = clamp(box4['width'], minWidth, 0x1 - clamp6, minWidth),
+    clamp9 = clamp(box4['height'], minHeight, 0x1 - clamp7, minHeight),
+    target = Number(box5['x']) || 0x0,
+    source = Number(box5['y']) || 0x0;
+  if (list === 'move')
     return {
-      x: Math['round'](clamp(_0x16957b + _0xf60910, 0x0, 0x1 - _0x4e1b0f, _0x16957b) * 0xf4240) / 0xf4240,
-      y: Math['round'](clamp(_0x5514cd + _0x452a75, 0x0, 0x1 - _0x3ca234, _0x5514cd) * 0xf4240) / 0xf4240,
-      width: Math['round'](_0x4e1b0f * 0xf4240) / 0xf4240,
-      height: Math['round'](_0x3ca234 * 0xf4240) / 0xf4240,
+      x: Math['round'](clamp(clamp6 + target, 0x0, 0x1 - clamp8, clamp6) * 0xf4240) / 0xf4240,
+      y: Math['round'](clamp(clamp7 + source, 0x0, 0x1 - clamp9, clamp7) * 0xf4240) / 0xf4240,
+      width: Math['round'](clamp8 * 0xf4240) / 0xf4240,
+      height: Math['round'](clamp9 * 0xf4240) / 0xf4240,
     };
-  let _0x5e0ece = _0x16957b,
-    _0x43aa7d = _0x5514cd,
-    _0x306da1 = _0x16957b + _0x4e1b0f,
-    _0x40904d = _0x5514cd + _0x3ca234;
-  if (_0x463d33['includes']('w'))
-    _0x5e0ece = clamp(_0x5e0ece + _0xf60910, 0x0, _0x306da1 - minWidth, _0x5e0ece);
-  if (_0x463d33['includes']('e'))
-    _0x306da1 = clamp(_0x306da1 + _0xf60910, _0x5e0ece + minWidth, 0x1, _0x306da1);
-  if (_0x463d33['includes']('n'))
-    _0x43aa7d = clamp(_0x43aa7d + _0x452a75, 0x0, _0x40904d - minHeight, _0x43aa7d);
-  if (_0x463d33['includes']('s'))
-    _0x40904d = clamp(_0x40904d + _0x452a75, _0x43aa7d + minHeight, 0x1, _0x40904d);
+  let clamp10 = clamp6,
+    clamp11 = clamp7,
+    clamp12 = clamp6 + clamp8,
+    clamp13 = clamp7 + clamp9;
+  if (list['includes']('w')) clamp10 = clamp(clamp10 + target, 0x0, clamp12 - minWidth, clamp10);
+  if (list['includes']('e')) clamp12 = clamp(clamp12 + target, clamp10 + minWidth, 0x1, clamp12);
+  if (list['includes']('n')) clamp11 = clamp(clamp11 + source, 0x0, clamp13 - minHeight, clamp11);
+  if (list['includes']('s')) clamp13 = clamp(clamp13 + source, clamp11 + minHeight, 0x1, clamp13);
   return {
-    x: Math['round'](_0x5e0ece * 0xf4240) / 0xf4240,
-    y: Math['round'](_0x43aa7d * 0xf4240) / 0xf4240,
-    width: Math['round']((_0x306da1 - _0x5e0ece) * 0xf4240) / 0xf4240,
-    height: Math['round']((_0x40904d - _0x43aa7d) * 0xf4240) / 0xf4240,
+    x: Math['round'](clamp10 * 0xf4240) / 0xf4240,
+    y: Math['round'](clamp11 * 0xf4240) / 0xf4240,
+    width: Math['round']((clamp12 - clamp10) * 0xf4240) / 0xf4240,
+    height: Math['round']((clamp13 - clamp11) * 0xf4240) / 0xf4240,
   };
 }

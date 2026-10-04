@@ -1,27 +1,25 @@
 import { getActiveManifestInputPolicyVariant, getTargetInputPolicy } from '../../modules/modelInputPolicy.js';
-function getInputArray(_0x2be4fc, _0x1b2c22) {
-  return Array['isArray'](_0x2be4fc?.[_0x1b2c22]) ? _0x2be4fc[_0x1b2c22] : [];
+function getInputArray(value, item) {
+  return Array['isArray'](value?.[item]) ? value[item] : [];
 }
-function getKindMax(_0x45566f, _0x8a986f) {
-  const _0x2458f7 = Number(_0x45566f?.['maxByKind']?.[_0x8a986f]);
-  return Number['isFinite'](_0x2458f7) && _0x2458f7 >= 0x0 ? _0x2458f7 : Infinity;
+function getKindMax(key, index) {
+  const count = Number(key?.['maxByKind']?.[index]);
+  return Number['isFinite'](count) && count >= 0x0 ? count : Infinity;
 }
 function filterKindMaterials({
-  allowedKinds: _0x3699f8,
-  policy: _0x58f86e,
-  kind: _0x3d55da,
-  urls: _0x146c50,
-  refs: _0x3f3ff9,
-  entries: _0x489417,
+  allowedKinds: allowedKinds,
+  policy: policy,
+  kind: kind,
+  urls: urls,
+  refs: refs,
+  entries: entries,
 }) {
-  const _0x401f7b = _0x3699f8['has'](_0x3d55da)
-      ? _0x146c50['slice'](0x0, getKindMax(_0x58f86e, _0x3d55da))
-      : [],
-    _0x2682ec = new Set(_0x401f7b);
+  const urls2 = allowedKinds['has'](kind) ? urls['slice'](0x0, getKindMax(policy, kind)) : [],
+    map = new Set(urls2);
   return {
-    urls: _0x401f7b,
-    refs: _0x3f3ff9['filter']((_0x5c7cfc) => _0x2682ec['has'](String(_0x5c7cfc?.['url'] || '')['trim']())),
-    entries: _0x489417['filter']((_0x588c45) => _0x2682ec['has'](String(_0x588c45?.['url'] || '')['trim']())),
+    urls: urls2,
+    refs: refs['filter']((response) => map['has'](String(response?.['url'] || '')['trim']())),
+    entries: entries['filter']((response2) => map['has'](String(response2?.['url'] || '')['trim']())),
   };
 }
 export function resolveModelApiVideoInputMaterials({
@@ -29,7 +27,7 @@ export function resolveModelApiVideoInputMaterials({
   modelManifest: modelManifest = null,
   nodeData: nodeData = {},
 } = {}) {
-  const _0x246216 = {
+  const urls3 = {
     images: getInputArray(inputMaterials, 'images'),
     imageRefs: getInputArray(inputMaterials, 'imageRefs'),
     imageEntries: getInputArray(inputMaterials, 'imageEntries'),
@@ -40,47 +38,47 @@ export function resolveModelApiVideoInputMaterials({
     audioEntries: getInputArray(inputMaterials, 'audioEntries'),
     providerAssetRefs: getInputArray(inputMaterials, 'providerAssetRefs'),
   };
-  if (!getActiveManifestInputPolicyVariant(modelManifest?.['inputSlots'], nodeData)) return _0x246216;
-  const _0x266c25 = getTargetInputPolicy({
+  if (!getActiveManifestInputPolicyVariant(modelManifest?.['inputSlots'], nodeData)) return urls3;
+  const policy2 = getTargetInputPolicy({
       ...nodeData,
       type: nodeData?.['type'] || 'ai-video',
       model: nodeData?.['model'] || modelManifest?.['modelId'] || '',
       provider: nodeData?.['provider'] || modelManifest?.['provider'] || '',
     }),
-    _0x459008 = new Set(Array['isArray'](_0x266c25?.['allowedKinds']) ? _0x266c25['allowedKinds'] : []),
-    _0x4b0c7f = filterKindMaterials({
-      allowedKinds: _0x459008,
-      policy: _0x266c25,
+    allowedKinds2 = new Set(Array['isArray'](policy2?.['allowedKinds']) ? policy2['allowedKinds'] : []),
+    images = filterKindMaterials({
+      allowedKinds: allowedKinds2,
+      policy: policy2,
       kind: 'image',
-      urls: _0x246216['images'],
-      refs: _0x246216['imageRefs'],
-      entries: _0x246216['imageEntries'],
+      urls: urls3['images'],
+      refs: urls3['imageRefs'],
+      entries: urls3['imageEntries'],
     }),
-    _0x251f9b = filterKindMaterials({
-      allowedKinds: _0x459008,
-      policy: _0x266c25,
+    videos = filterKindMaterials({
+      allowedKinds: allowedKinds2,
+      policy: policy2,
       kind: 'video',
-      urls: _0x246216['videos'],
-      refs: _0x246216['videoRefs'],
-      entries: _0x246216['videoEntries'],
+      urls: urls3['videos'],
+      refs: urls3['videoRefs'],
+      entries: urls3['videoEntries'],
     }),
-    _0x15508e = filterKindMaterials({
-      allowedKinds: _0x459008,
-      policy: _0x266c25,
+    audios = filterKindMaterials({
+      allowedKinds: allowedKinds2,
+      policy: policy2,
       kind: 'audio',
-      urls: _0x246216['audios'],
+      urls: urls3['audios'],
       refs: [],
-      entries: _0x246216['audioEntries'],
+      entries: urls3['audioEntries'],
     });
   return {
-    images: _0x4b0c7f['urls'],
-    imageRefs: _0x4b0c7f['refs'],
-    imageEntries: _0x4b0c7f['entries'],
-    videos: _0x251f9b['urls'],
-    videoRefs: _0x251f9b['refs'],
-    videoEntries: _0x251f9b['entries'],
-    audios: _0x15508e['urls'],
-    audioEntries: _0x15508e['entries'],
-    providerAssetRefs: _0x246216['providerAssetRefs'],
+    images: images['urls'],
+    imageRefs: images['refs'],
+    imageEntries: images['entries'],
+    videos: videos['urls'],
+    videoRefs: videos['refs'],
+    videoEntries: videos['entries'],
+    audios: audios['urls'],
+    audioEntries: audios['entries'],
+    providerAssetRefs: urls3['providerAssetRefs'],
   };
 }

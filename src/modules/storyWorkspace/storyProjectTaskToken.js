@@ -1,1 +1,88 @@
-import{resolveStoryTextProviderProfileId}from'./storyProjectPlanning.js';function normalizeText(_0x1b995d){return String(_0x1b995d||'')['trim']();}export function sanitizeStoryTaskResumePayload(_0x4a6e76={}){if(!_0x4a6e76||typeof _0x4a6e76!=="object"||Array['isArray'](_0x4a6e76))return{};const _0x3e7da4={..._0x4a6e76};return delete _0x3e7da4['apiKey'],delete _0x3e7da4['installId'],delete _0x3e7da4["authorization"],delete _0x3e7da4['headers'],_0x3e7da4;}export function createStoryProjectTaskToken(_0x3fe7a9={}){const _0x3bb0ae=normalizeText(_0x3fe7a9?.['data']?.["project"]?.['id']),_0x4388d6=_0x3fe7a9?.['storyProjectSessionById'],_0x302e61=_0x4388d6&&typeof _0x4388d6==="object"?Math["max"](0x0,Math["trunc"](Number(_0x4388d6[_0x3bb0ae])||0x0)):Math["max"](0x0,Math["trunc"](Number(_0x3fe7a9?.["storyProjectSessionId"])||0x0));return{'projectId':_0x3bb0ae,'sessionId':_0x302e61,'data':_0x3fe7a9?.["data"]||null,'projectTitleEdited':_0x3fe7a9?.["projectTitleEdited"]===!![],'modelSettings':{'models':{..._0x3fe7a9?.['models']||{}},'textProvider':normalizeText(_0x3fe7a9?.["textProvider"]),'textProviderProfileId':resolveStoryTextProviderProfileId(_0x3fe7a9?.["textProvider"],_0x3fe7a9?.['textProviderProfileId']),'imageProvider':normalizeText(_0x3fe7a9?.['imageProvider']),'videoProvider':normalizeText(_0x3fe7a9?.["videoProvider"]),'videoProviderProfileId':normalizeText(_0x3fe7a9?.["videoProviderProfileId"]),'videoProviderProfileIdByModel':{..._0x3fe7a9?.["videoProviderProfileIdByModel"]||{}},'imageGenerationParams':{..._0x3fe7a9?.["imageGenerationParams"]||{}},'videoGenerationParams':{..._0x3fe7a9?.["videoGenerationParams"]||{}},'imageGenerationParamsByModel':{..._0x3fe7a9?.['imageGenerationParamsByModel']||{}},'videoGenerationParamsByModel':{..._0x3fe7a9?.["videoGenerationParamsByModel"]||{}}}};}export function isStoryProjectTaskTokenLive(_0x21b88e={},_0x1a105d=null){if(!_0x1a105d||typeof _0x1a105d!=="object")return![];const _0x31d355=normalizeText(_0x1a105d['projectId']);if(!_0x31d355||_0x31d355!==normalizeText(_0x1a105d["data"]?.["project"]?.['id']))return![];const _0x4b0027=_0x21b88e?.["storyProjectSessionById"],_0x2fb99b=_0x4b0027&&typeof _0x4b0027==="object"?Math["max"](0x0,Math["trunc"](Number(_0x4b0027[_0x31d355])||0x0)):Math['max'](0x0,Math["trunc"](Number(_0x21b88e?.["storyProjectSessionId"])||0x0));if(_0x1a105d["sessionId"]!==_0x2fb99b)return![];if(_0x31d355===normalizeText(_0x21b88e?.['data']?.["project"]?.['id']))return!![];return(Array["isArray"](_0x21b88e?.["projects"])?_0x21b88e["projects"]:[])['some'](_0x4b85f0=>normalizeText(_0x4b85f0?.['id']||_0x4b85f0?.["data"]?.["project"]?.['id'])===_0x31d355);}export function isStoryProjectTaskTokenCurrent(_0x11239d={},_0x181e8e=null){return isStoryProjectTaskTokenLive(_0x11239d,_0x181e8e)&&_0x181e8e["projectId"]===normalizeText(_0x11239d?.["data"]?.["project"]?.['id']);}export function advanceStoryProjectSession(_0x18a08f={},_0x258f64=normalizeText(_0x18a08f?.['data']?.["project"]?.['id'])){if(!_0x18a08f||typeof _0x18a08f!=="object")return 0x0;const _0x5b9f29=normalizeText(_0x258f64);if(!_0x5b9f29)return 0x0;(!_0x18a08f["storyProjectSessionById"]||typeof _0x18a08f["storyProjectSessionById"]!=="object")&&(_0x18a08f["storyProjectSessionById"]={});const _0x551b38=normalizeText(_0x18a08f?.["data"]?.["project"]?.['id']),_0x28568e=Object["prototype"]["hasOwnProperty"]["call"](_0x18a08f["storyProjectSessionById"],_0x5b9f29)?_0x18a08f["storyProjectSessionById"][_0x5b9f29]:_0x5b9f29===_0x551b38?_0x18a08f["storyProjectSessionId"]:0x0,_0x1f73a7=Math["max"](0x0,Math['trunc'](Number(_0x28568e)||0x0))+0x1;return _0x18a08f["storyProjectSessionById"][_0x5b9f29]=_0x1f73a7,_0x5b9f29===_0x551b38&&(_0x18a08f["storyProjectSessionId"]=_0x1f73a7),_0x1f73a7;}
+import { resolveStoryTextProviderProfileId } from './storyProjectPlanning.js';
+function normalizeText(value) {
+  return String(value || '')['trim']();
+}
+export function sanitizeStoryTaskResumePayload(args = {}) {
+  if (!args || typeof args !== 'object' || Array['isArray'](args)) return {};
+  const response = { ...args };
+  return (
+    delete response['apiKey'],
+    delete response['installId'],
+    delete response['authorization'],
+    delete response['headers'],
+    response
+  );
+}
+export function createStoryProjectTaskToken(args2 = {}) {
+  const text = normalizeText(args2?.['data']?.['project']?.['id']),
+    item = args2?.['storyProjectSessionById'],
+    key =
+      item && typeof item === 'object'
+        ? Math['max'](0x0, Math['trunc'](Number(item[text]) || 0x0))
+        : Math['max'](0x0, Math['trunc'](Number(args2?.['storyProjectSessionId']) || 0x0));
+  return {
+    projectId: text,
+    sessionId: key,
+    data: args2?.['data'] || null,
+    projectTitleEdited: args2?.['projectTitleEdited'] === !![],
+    modelSettings: {
+      models: { ...(args2?.['models'] || {}) },
+      textProvider: normalizeText(args2?.['textProvider']),
+      textProviderProfileId: resolveStoryTextProviderProfileId(
+        args2?.['textProvider'],
+        args2?.['textProviderProfileId'],
+      ),
+      imageProvider: normalizeText(args2?.['imageProvider']),
+      videoProvider: normalizeText(args2?.['videoProvider']),
+      videoProviderProfileId: normalizeText(args2?.['videoProviderProfileId']),
+      videoProviderProfileIdByModel: { ...(args2?.['videoProviderProfileIdByModel'] || {}) },
+      imageGenerationParams: { ...(args2?.['imageGenerationParams'] || {}) },
+      videoGenerationParams: { ...(args2?.['videoGenerationParams'] || {}) },
+      imageGenerationParamsByModel: { ...(args2?.['imageGenerationParamsByModel'] || {}) },
+      videoGenerationParamsByModel: { ...(args2?.['videoGenerationParamsByModel'] || {}) },
+    },
+  };
+}
+export function isStoryProjectTaskTokenLive(options = {}, enabled = null) {
+  if (!enabled || typeof enabled !== 'object') return ![];
+  const text2 = normalizeText(enabled['projectId']);
+  if (!text2 || text2 !== normalizeText(enabled['data']?.['project']?.['id'])) return ![];
+  const index = options?.['storyProjectSessionById'],
+    result =
+      index && typeof index === 'object'
+        ? Math['max'](0x0, Math['trunc'](Number(index[text2]) || 0x0))
+        : Math['max'](0x0, Math['trunc'](Number(options?.['storyProjectSessionId']) || 0x0));
+  if (enabled['sessionId'] !== result) return ![];
+  if (text2 === normalizeText(options?.['data']?.['project']?.['id'])) return !![];
+  return (Array['isArray'](options?.['projects']) ? options['projects'] : [])['some'](
+    (data) => normalizeText(data?.['id'] || data?.['data']?.['project']?.['id']) === text2,
+  );
+}
+export function isStoryProjectTaskTokenCurrent(options2 = {}, target = null) {
+  return (
+    isStoryProjectTaskTokenLive(options2, target) &&
+    target['projectId'] === normalizeText(options2?.['data']?.['project']?.['id'])
+  );
+}
+export function advanceStoryProjectSession(
+  enabled2 = {},
+  text3 = normalizeText(enabled2?.['data']?.['project']?.['id']),
+) {
+  if (!enabled2 || typeof enabled2 !== 'object') return 0x0;
+  const text4 = normalizeText(text3);
+  if (!text4) return 0x0;
+  (!enabled2['storyProjectSessionById'] || typeof enabled2['storyProjectSessionById'] !== 'object') &&
+    (enabled2['storyProjectSessionById'] = {});
+  const text5 = normalizeText(enabled2?.['data']?.['project']?.['id']),
+    source = Object['prototype']['hasOwnProperty']['call'](enabled2['storyProjectSessionById'], text4)
+      ? enabled2['storyProjectSessionById'][text4]
+      : text4 === text5
+        ? enabled2['storyProjectSessionId']
+        : 0x0,
+    next = Math['max'](0x0, Math['trunc'](Number(source) || 0x0)) + 0x1;
+  return (
+    (enabled2['storyProjectSessionById'][text4] = next),
+    text4 === text5 && (enabled2['storyProjectSessionId'] = next),
+    next
+  );
+}

@@ -2,88 +2,88 @@ import { logVideoPlaybackEvent } from '../video-node/mediaPlaybackRecovery.js';
 import { shouldKeepManualPlaybackPresentationActive } from '../shared/hoverVideoPlaybackLifecycle.js';
 import { shouldActivateRendererMediaHoverPlayback } from '../../core/rendererDeferredMedia.js';
 import { clearSourceVideoPlaybackFeedback } from './sourceVideoPlaybackFeedback.js';
-export function shouldActivateSourceVideoHoverPlayback(_0x11721c, _0x50c5cb) {
-  const _0x5bc736 =
-    typeof _0x11721c?.['getStateRaw'] === 'function'
-      ? _0x11721c['getStateRaw']()
-      : _0x11721c?.['getState']?.();
+export function shouldActivateSourceVideoHoverPlayback(store, value) {
+  const viewport =
+    typeof store?.['getStateRaw'] === 'function' ? store['getStateRaw']() : store?.['getState']?.();
   return shouldActivateRendererMediaHoverPlayback({
-    viewport: _0x5bc736?.['viewport'],
-    nodeCount: Number['isFinite'](_0x5bc736?.['_nodeCount'])
-      ? _0x5bc736['_nodeCount']
-      : Object['keys'](_0x5bc736?.['nodes'] || {})['length'],
-    isSelected: _0x5bc736?.['selectedNodeIds']?.['includes']?.(_0x50c5cb) === !![],
+    viewport: viewport?.['viewport'],
+    nodeCount: Number['isFinite'](viewport?.['_nodeCount'])
+      ? viewport['_nodeCount']
+      : Object['keys'](viewport?.['nodes'] || {})['length'],
+    isSelected: viewport?.['selectedNodeIds']?.['includes']?.(value) === !![],
   });
 }
-export function syncSourceVideoPlaybackChromeVisibility(_0xff15, { forceHidden: forceHidden = ![] } = {}) {
-  const _0x400961 =
+export function syncSourceVideoPlaybackChromeVisibility(item, { forceHidden: forceHidden = ![] } = {}) {
+  const key =
     forceHidden !== !![] &&
-    !!String(_0xff15?.['_currentSrc'] || '')['trim']() &&
+    !!String(item?.['_currentSrc'] || '')['trim']() &&
     !!(
-      _0xff15?.['_isHovered'] ||
-      _0xff15?.['_isManualControl'] ||
-      _0xff15?.['_isManualLoopPlayback'] ||
-      _0xff15?.['_isSeeking']
+      item?.['_isHovered'] ||
+      item?.['_isManualControl'] ||
+      item?.['_isManualLoopPlayback'] ||
+      item?.['_isSeeking']
     );
-  _0xff15?.['_controls']?.['style'] &&
-    ((_0xff15['_controls']['style']['opacity'] = _0x400961 ? '1' : '0'),
-    (_0xff15['_controls']['style']['pointerEvents'] = _0x400961 ? 'auto' : 'none'));
-  _0xff15?.['_muteBtn']?.['style'] &&
-    ((_0xff15['_muteBtn']['style']['display'] = _0x400961 ? 'flex' : 'none'),
-    (_0xff15['_muteBtn']['style']['pointerEvents'] = _0x400961 ? 'auto' : 'none'));
-  const _0x4d3165 = _0x400961 && !!(_0xff15?.['_isManualControl'] || _0xff15?.['_isManualLoopPlayback']);
+  item?.['_controls']?.['style'] &&
+    ((item['_controls']['style']['opacity'] = key ? '1' : '0'),
+    (item['_controls']['style']['pointerEvents'] = key ? 'auto' : 'none'));
+  item?.['_muteBtn']?.['style'] &&
+    ((item['_muteBtn']['style']['display'] = key ? 'flex' : 'none'),
+    (item['_muteBtn']['style']['pointerEvents'] = key ? 'auto' : 'none'));
+  const enabled = key && !!(item?.['_isManualControl'] || item?.['_isManualLoopPlayback']);
   return (
-    _0xff15?.['_centerIndicator']?.['style'] &&
-      (_0xff15['_centerIndicator']['style']['display'] = _0x4d3165 ? 'flex' : 'none'),
-    !_0x4d3165 || _0xff15?.['_video']?.['paused'] === ![]
-      ? _0xff15?.['_hideCenterIndicator']?.()
-      : _0xff15?.['_showPausedCenterIndicator']?.(),
-    _0x400961
+    item?.['_centerIndicator']?.['style'] &&
+      (item['_centerIndicator']['style']['display'] = enabled ? 'flex' : 'none'),
+    !enabled || item?.['_video']?.['paused'] === ![]
+      ? item?.['_hideCenterIndicator']?.()
+      : item?.['_showPausedCenterIndicator']?.(),
+    key
   );
 }
-export function deactivateSourceVideoHoverPlayback(_0x4ff404) {
-  if (!_0x4ff404) return ![];
-  _0x4ff404['_isHovered'] = ![];
-  const _0xc16a0e = _0x4ff404['_video'],
-    _0x54b001 = shouldKeepManualPlaybackPresentationActive(_0x4ff404, _0xc16a0e);
-  if (!_0x54b001) clearSourceVideoPlaybackFeedback(_0x4ff404);
-  if (!_0x54b001) _0x4ff404['_autoPlayToken']++;
-  if (_0xc16a0e) {
-    if (!_0x54b001) _0xc16a0e['loop'] = ![];
-    logVideoPlaybackEvent(_0xc16a0e, 'hover-leave', { label: _0x4ff404['_getPlaybackLabel']('hover') });
-    if (!_0x54b001) _0xc16a0e['pause']();
+export function deactivateSourceVideoHoverPlayback(label) {
+  if (!label) return ![];
+  label['_isHovered'] = ![];
+  const enabled2 = label['_video'],
+    shouldKeepManualPlaybackPresentationActive2 = shouldKeepManualPlaybackPresentationActive(label, enabled2);
+  if (!shouldKeepManualPlaybackPresentationActive2) clearSourceVideoPlaybackFeedback(label);
+  if (!shouldKeepManualPlaybackPresentationActive2) label['_autoPlayToken']++;
+  if (enabled2) {
+    if (!shouldKeepManualPlaybackPresentationActive2) enabled2['loop'] = ![];
+    logVideoPlaybackEvent(enabled2, 'hover-leave', { label: label['_getPlaybackLabel']('hover') });
+    if (!shouldKeepManualPlaybackPresentationActive2) enabled2['pause']();
   }
   return (
-    (_0x4ff404['_hoverManualPause'] = ![]),
-    !_0x54b001 && !_0x4ff404['_isManualLoopPlayback'] && (_0x4ff404['_isManualControl'] = ![]),
-    _0x4ff404['_syncPlaybackChromeVisibility']({ forceHidden: !_0x54b001 }),
-    _0x4ff404['_syncRendererPlaybackPin'](),
-    _0x4ff404['_hoverPlaybackLifecycle']?.['deactivate']?.({ release: ![] }),
-    !!_0xc16a0e
+    (label['_hoverManualPause'] = ![]),
+    !shouldKeepManualPlaybackPresentationActive2 &&
+      !label['_isManualLoopPlayback'] &&
+      (label['_isManualControl'] = ![]),
+    label['_syncPlaybackChromeVisibility']({ forceHidden: !shouldKeepManualPlaybackPresentationActive2 }),
+    label['_syncRendererPlaybackPin'](),
+    label['_hoverPlaybackLifecycle']?.['deactivate']?.({ release: ![] }),
+    !!enabled2
   );
 }
-export function releaseIdleSourceVideoHoverPlaybackMedia(_0x1cae64) {
-  const _0x4096c5 = _0x1cae64?.['_video'];
+export function releaseIdleSourceVideoHoverPlaybackMedia(enabled3) {
+  const enabled4 = enabled3?.['_video'];
   if (
-    !_0x4096c5 ||
-    _0x1cae64['_isHovered'] === !![] ||
-    _0x1cae64['_isManualControl'] === !![] ||
-    _0x1cae64['_isManualLoopPlayback'] === !![] ||
-    _0x1cae64['_isSeeking'] === !![] ||
-    _0x4096c5['paused'] === ![]
+    !enabled4 ||
+    enabled3['_isHovered'] === !![] ||
+    enabled3['_isManualControl'] === !![] ||
+    enabled3['_isManualLoopPlayback'] === !![] ||
+    enabled3['_isSeeking'] === !![] ||
+    enabled4['paused'] === ![]
   )
     return ![];
-  const _0x4de1a1 = String(_0x1cae64['_currentSrc'] || '')['trim'](),
-    _0xe84617 = Number(_0x4096c5['currentTime'] || 0x0);
+  const index = String(enabled3['_currentSrc'] || '')['trim'](),
+    result = Number(enabled4['currentTime'] || 0x0);
   return (
-    _0x1cae64['_replacePendingPlaybackResume'](_0x4de1a1, _0xe84617),
-    (_0x1cae64['_playbackSourceToken'] = Number(_0x1cae64['_playbackSourceToken'] || 0x0) + 0x1),
-    (_0x1cae64['_playbackSourcePromise'] = null),
-    (_0x1cae64['_playbackSourcePromiseSource'] = ''),
-    (_0x4096c5['preload'] = 'none'),
-    _0x1cae64['_clearVideoElementSource'](),
-    _0x1cae64['_syncPosterFrameVisibility']({ force: !!_0x1cae64['_lastPosterSrc'] }),
-    _0x1cae64['_syncPlaybackChromeVisibility']({ forceHidden: !![] }),
+    enabled3['_replacePendingPlaybackResume'](index, result),
+    (enabled3['_playbackSourceToken'] = Number(enabled3['_playbackSourceToken'] || 0x0) + 0x1),
+    (enabled3['_playbackSourcePromise'] = null),
+    (enabled3['_playbackSourcePromiseSource'] = ''),
+    (enabled4['preload'] = 'none'),
+    enabled3['_clearVideoElementSource'](),
+    enabled3['_syncPosterFrameVisibility']({ force: !!enabled3['_lastPosterSrc'] }),
+    enabled3['_syncPlaybackChromeVisibility']({ forceHidden: !![] }),
     !![]
   );
 }

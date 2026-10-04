@@ -4,89 +4,88 @@ import {
   TUTORIAL_RELEASES_URL,
 } from '../../../api/tutorialReleaseNotesApi.js';
 const CACHE_KEY = 'aicanvas.tutorial-releases.v1';
-export function createTutorialReleaseNotes({ storage: _0x2acae1, external: _0x467834 }) {
-  let _0x2d7be6 = [];
+export function createTutorialReleaseNotes({ storage: storage, external: external }) {
+  let list = [];
   try {
-    _0x2d7be6 = normalizeTutorialReleases(JSON['parse'](_0x2acae1?.['getItem'](CACHE_KEY) || '[]'));
+    list = normalizeTutorialReleases(JSON['parse'](storage?.['getItem'](CACHE_KEY) || '[]'));
   } catch {}
-  let _0x2f3c81 = null,
-    _0x411aa2 = ![],
-    _0x5148a1 = _0x2d7be6['length'] ? '正在显示缓存的更新说明' : '',
-    _0x152384 = null,
-    _0x3f452e = ![];
-  const _0x28d903 = new Set(_0x2d7be6['slice'](0x0, 0x1)['map']((_0x4a8fad) => _0x4a8fad['tag_name']));
-  function _0x3d836d() {
-    if (!_0x152384?.['isConnected'] || _0x3f452e) return;
-    const _0x327405 = _0x152384['scrollTop'];
-    _0x152384['replaceChildren']();
-    const _0x515dea = document['createElement']('div');
-    _0x515dea['className'] = 'tutorial-release-source';
-    const _0x2a6478 = document['createElement']('span');
-    (_0x2a6478['setAttribute']('role', 'status'), (_0x2a6478['textContent'] = _0x5148a1));
-    const _0x1bd7d4 = document['createElement']('button');
-    ((_0x1bd7d4['type'] = 'button'),
-      (_0x1bd7d4['className'] = 'tutorial-action'),
-      (_0x1bd7d4['textContent'] = 'GitHub\x20全部版本\x20↗'),
-      (_0x1bd7d4['onclick'] = () => void _0x467834(TUTORIAL_RELEASES_URL)),
-      _0x515dea['append'](_0x2a6478, _0x1bd7d4),
-      _0x152384['append'](_0x515dea));
-    for (const _0x7fdf5b of _0x2d7be6) {
-      const _0x37852f = document['createElement']('details');
-      ((_0x37852f['className'] = 'tutorial-release'),
-        (_0x37852f['open'] = _0x28d903['has'](_0x7fdf5b['tag_name'])));
-      const _0x2f40a7 = document['createElement']('summary'),
-        _0x5c4873 = document['createElement']('strong');
-      _0x5c4873['textContent'] = _0x7fdf5b['tag_name'];
-      const _0x71f72b = document['createElement']('time');
-      ((_0x71f72b['className'] = 'tutorial-description'),
-        (_0x71f72b['textContent'] = _0x7fdf5b['published_at']['slice'](0x0, 0xa)),
-        _0x2f40a7['append'](_0x5c4873, _0x71f72b));
-      const _0x396a17 = document['createElement']('div');
-      ((_0x396a17['className'] = 'tutorial-notes'),
-        (_0x396a17['textContent'] = _0x7fdf5b['body']),
-        _0x37852f['append'](_0x2f40a7, _0x396a17),
-        _0x37852f['addEventListener']('toggle', () => {
-          if (_0x37852f['open']) _0x28d903['add'](_0x7fdf5b['tag_name']);
-          else _0x28d903['delete'](_0x7fdf5b['tag_name']);
+  let enabled = null,
+    enabled2 = ![],
+    value = list['length'] ? '正在显示缓存的更新说明' : '',
+    el = null,
+    enabled3 = ![];
+  const map = new Set(list['slice'](0x0, 0x1)['map']((item) => item['tag_name']));
+  function run() {
+    if (!el?.['isConnected'] || enabled3) return;
+    const key = el['scrollTop'];
+    el['replaceChildren']();
+    const index = document['createElement']('div');
+    index['className'] = 'tutorial-release-source';
+    const el2 = document['createElement']('span');
+    (el2['setAttribute']('role', 'status'), (el2['textContent'] = value));
+    const el3 = document['createElement']('button');
+    ((el3['type'] = 'button'),
+      (el3['className'] = 'tutorial-action'),
+      (el3['textContent'] = 'GitHub\x20全部版本\x20↗'),
+      (el3['onclick'] = () => void external(TUTORIAL_RELEASES_URL)),
+      index['append'](el2, el3),
+      el['append'](index));
+    for (const dom of list) {
+      const el4 = document['createElement']('details');
+      ((el4['className'] = 'tutorial-release'), (el4['open'] = map['has'](dom['tag_name'])));
+      const result = document['createElement']('summary'),
+        el5 = document['createElement']('strong');
+      el5['textContent'] = dom['tag_name'];
+      const el6 = document['createElement']('time');
+      ((el6['className'] = 'tutorial-description'),
+        (el6['textContent'] = dom['published_at']['slice'](0x0, 0xa)),
+        result['append'](el5, el6));
+      const el7 = document['createElement']('div');
+      ((el7['className'] = 'tutorial-notes'),
+        (el7['textContent'] = dom['body']),
+        el4['append'](result, el7),
+        el4['addEventListener']('toggle', () => {
+          if (el4['open']) map['add'](dom['tag_name']);
+          else map['delete'](dom['tag_name']);
         }),
-        _0x152384['append'](_0x37852f));
+        el['append'](el4));
     }
-    _0x152384['scrollTop'] = _0x327405;
+    el['scrollTop'] = key;
   }
-  async function _0x597d93() {
-    _0x2f3c81?.['abort']();
-    const _0x104395 = new AbortController();
-    ((_0x2f3c81 = _0x104395), (_0x5148a1 = '正在获取 GitHub 更新说明…'), _0x3d836d());
+  async function reload() {
+    enabled?.['abort']();
+    const signal = new AbortController();
+    ((enabled = signal), (value = '正在获取 GitHub 更新说明…'), run());
     try {
-      const _0x478c89 = await fetchTutorialReleases({ signal: _0x104395['signal'] });
-      if (_0x3f452e || _0x2f3c81 !== _0x104395) return;
-      if (!_0x2d7be6['length'] && _0x478c89['length']) _0x28d903['add'](_0x478c89[0x0]['tag_name']);
-      ((_0x2d7be6 = _0x478c89),
-        (_0x411aa2 = !![]),
-        (_0x5148a1 = _0x2d7be6['length'] ? '来自\x20GitHub\x20正式发布记录' : '暂无正式发布记录'));
+      const list2 = await fetchTutorialReleases({ signal: signal['signal'] });
+      if (enabled3 || enabled !== signal) return;
+      if (!list['length'] && list2['length']) map['add'](list2[0x0]['tag_name']);
+      ((list = list2),
+        (enabled2 = !![]),
+        (value = list['length'] ? '来自\x20GitHub\x20正式发布记录' : '暂无正式发布记录'));
       try {
-        _0x2acae1?.['setItem'](CACHE_KEY, JSON['stringify'](_0x2d7be6));
+        storage?.['setItem'](CACHE_KEY, JSON['stringify'](list));
       } catch {}
     } catch {
-      if (_0x3f452e || _0x2f3c81 !== _0x104395) return;
-      _0x5148a1 = _0x2d7be6['length']
+      if (enabled3 || enabled !== signal) return;
+      value = list['length']
         ? 'GitHub\x20暂不可用，显示上次获取的更新说明'
         : 'GitHub 暂不可用，请刷新重试或打开仓库查看';
     } finally {
-      !_0x3f452e && _0x2f3c81 === _0x104395 && ((_0x2f3c81 = null), _0x3d836d());
+      !enabled3 && enabled === signal && ((enabled = null), run());
     }
   }
   return {
-    mount(_0x5b45eb) {
-      ((_0x152384 = _0x5b45eb), _0x3d836d());
-      if (!_0x411aa2 && !_0x2f3c81) void _0x597d93();
+    mount(data) {
+      ((el = data), run());
+      if (!enabled2 && !enabled) void reload();
     },
     unmount() {
-      _0x152384 = null;
+      el = null;
     },
-    reload: _0x597d93,
+    reload: reload,
     close() {
-      ((_0x3f452e = !![]), (_0x152384 = null), _0x2f3c81?.['abort']());
+      ((enabled3 = !![]), (el = null), enabled?.['abort']());
     },
   };
 }

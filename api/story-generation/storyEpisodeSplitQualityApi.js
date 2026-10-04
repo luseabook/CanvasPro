@@ -7,67 +7,65 @@ import { resolveStoryPromptModeClipMaxSeconds } from '../../src/domain/storyGene
 import { groupStoryEpisodeRepairClips } from './storyEpisodeRepairGrouping.js';
 import { normalizeStoryGenerationAssetReferences } from './storyAssetReferenceContract.js';
 import { applyReplicationSegmentPlan } from '../../src/domain/storyGeneration/videoReplicationSegmentPlan.js';
-function normalizeText(_0x567c03) {
-  return String(_0x567c03 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-export function reviewStoryEpisodeSplitQuality(_0x438c7a = {}) {
-  const _0xbb805a = normalizeStoryGenerationAssetReferences(_0x438c7a['assets']),
-    _0x5e70e4 = { ...(_0x438c7a['project']?.['planning'] || {}), ...(_0x438c7a['constraints'] || {}) },
-    _0x28323d = normalizeText(_0x5e70e4['promptMode']) || 'seedance-2.0';
+export function reviewStoryEpisodeSplitQuality(clips = {}) {
+  const assets = normalizeStoryGenerationAssetReferences(clips['assets']),
+    constraints = { ...(clips['project']?.['planning'] || {}), ...(clips['constraints'] || {}) },
+    promptMode = normalizeText(constraints['promptMode']) || 'seedance-2.0';
   return (
-    (_0x5e70e4['sceneMaxSeconds'] = resolveStoryPromptModeClipMaxSeconds(
-      _0x28323d,
-      _0x5e70e4['sceneMaxSeconds'],
+    (constraints['sceneMaxSeconds'] = resolveStoryPromptModeClipMaxSeconds(
+      promptMode,
+      constraints['sceneMaxSeconds'],
     )),
     reviewStoryEpisodeSplitQuality_2({
-      ..._0x438c7a,
-      assets: _0xbb805a,
-      constraints: _0x5e70e4,
-      validateClips: ({ episodeRef: _0x4a405a, sourceClipRef: _0x3a01ea, clips: _0x44ca31 }) => {
-        const _0xe0aff0 = groupStoryEpisodeRepairClips(
+      ...clips,
+      assets: assets,
+      constraints: constraints,
+      validateClips: ({ episodeRef: episodeRef, sourceClipRef: sourceClipRef, clips: clips2 }) => {
+        const clips3 = groupStoryEpisodeRepairClips(
             parseStoryEpisodeSplitResult(
               {
-                episodeRef: _0x4a405a,
-                clips: _0x438c7a['episode']?.['replication']?.['sourceAnalysis']
-                  ? _0x44ca31['map']((_0x176224) => ({
-                      ..._0x176224,
-                      replicationContentType: _0x438c7a['result']?.['clips']?.['find'](
-                        (_0x561a95) => _0x561a95['ref'] === _0x3a01ea,
+                episodeRef: episodeRef,
+                clips: clips['episode']?.['replication']?.['sourceAnalysis']
+                  ? clips2['map']((args) => ({
+                      ...args,
+                      replicationContentType: clips['result']?.['clips']?.['find'](
+                        (item) => item['ref'] === sourceClipRef,
                       )?.['replicationContentType'],
                     }))
-                  : _0x44ca31,
+                  : clips2,
               },
               {
                 ...createStoryEpisodeDefaultSplitParseContext({
-                  episodeRef: _0x4a405a,
-                  episode: _0x438c7a['episode'],
-                  scriptMode: normalizeText(_0x438c7a['project']?.['scriptMode']),
-                  constraints: _0x5e70e4,
-                  assets: _0xbb805a,
-                  clipDurationConstraints: _0x438c7a['clipDurationConstraints'],
-                  promptMode: _0x28323d,
+                  episodeRef: episodeRef,
+                  episode: clips['episode'],
+                  scriptMode: normalizeText(clips['project']?.['scriptMode']),
+                  constraints: constraints,
+                  assets: assets,
+                  clipDurationConstraints: clips['clipDurationConstraints'],
+                  promptMode: promptMode,
                 }),
                 enforceMaxDuration: !![],
                 repackOverlongClips: ![],
                 completeCharacterAssetUsages: ![],
-                rejectUnsupportedClipDuration: Boolean(_0x438c7a['clipDurationConstraints']),
+                rejectUnsupportedClipDuration: Boolean(clips['clipDurationConstraints']),
               },
             )['clips'],
             {
-              promptMode: _0x28323d,
-              maxSeconds: _0x5e70e4['sceneMaxSeconds'],
-              assets: _0xbb805a,
-              rawClips: _0x44ca31,
+              promptMode: promptMode,
+              maxSeconds: constraints['sceneMaxSeconds'],
+              assets: assets,
+              rawClips: clips2,
             },
           ),
-          _0x59788c = _0x438c7a['episode']?.['replication']?.['segmentPlan']?.['find'](
-            (_0x49cf19) => _0x49cf19['ref'] === _0x3a01ea,
+          key = clips['episode']?.['replication']?.['segmentPlan']?.['find'](
+            (index) => index['ref'] === sourceClipRef,
           );
-        return _0x59788c
-          ? applyReplicationSegmentPlan({ clips: _0xe0aff0 }, { replication: { segmentPlan: [_0x59788c] } })[
-              'clips'
-            ]
-          : _0xe0aff0;
+        return key
+          ? applyReplicationSegmentPlan({ clips: clips3 }, { replication: { segmentPlan: [key] } })['clips']
+          : clips3;
       },
     })
   );

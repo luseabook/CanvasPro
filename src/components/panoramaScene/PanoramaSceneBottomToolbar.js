@@ -1,7 +1,7 @@
 import { createToolbarHtml, createToolbarIconButton } from '../nodeToolbar/buttonFactory.js';
 import { t } from '../../i18n/index.js';
-function panoramaSceneText(_0x480895, _0x4434e0 = {}) {
-  return t('panoramaSceneNode.' + _0x480895, _0x4434e0);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
 const ICONS = {
   cube: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="m12 2 8 4.5v11L12 22 4 17.5v-11L12 2Z"/><path d="M12 22V11.5"/><path d="M20 6.5 12 11.5 4 6.5"/></svg>',

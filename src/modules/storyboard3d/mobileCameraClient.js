@@ -8,13 +8,12 @@ let translation = [0x0, 0x0, 0x0],
   dirty = !![],
   sequence = Date['now'](),
   sending = ![];
-const radians = (_0x17e020) => ((Number(_0x17e020) || 0x0) * Math['PI']) / 0xb4,
-  wrapped = (_0x1ec7c3) => Math['atan2'](Math['sin'](_0x1ec7c3), Math['cos'](_0x1ec7c3));
-(document['querySelectorAll']('[data-move]')['forEach']((_0x9a3a98) =>
-  _0x9a3a98['addEventListener']('click', () => {
-    const [_0x235d90, _0xbef028] = _0x9a3a98['dataset']['move']['split'](',')['map'](Number);
-    ((translation[_0x235d90] = Math['max'](-0x64, Math['min'](0x64, translation[_0x235d90] + _0xbef028))),
-      (dirty = !![]));
+const radians = (value) => ((Number(value) || 0x0) * Math['PI']) / 0xb4,
+  wrapped = (item) => Math['atan2'](Math['sin'](item), Math['cos'](item));
+(document['querySelectorAll']('[data-move]')['forEach']((el) =>
+  el['addEventListener']('click', () => {
+    const [key, index] = el['dataset']['move']['split'](',')['map'](Number);
+    ((translation[key] = Math['max'](-0x64, Math['min'](0x64, translation[key] + index))), (dirty = !![]));
   }),
 ),
   document['querySelector']('#reset')['addEventListener']('click', () => {
@@ -22,30 +21,30 @@ const radians = (_0x17e020) => ((Number(_0x17e020) || 0x0) * Math['PI']) / 0xb4,
   }));
 let gesture = null,
   gyroEnabled = ![];
-(look['addEventListener']('keydown', (_0x284d18) => {
-  if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']['includes'](_0x284d18['key'])) return;
-  (_0x284d18['preventDefault'](),
-    (rotation[_0x284d18['key'] === 'ArrowLeft' || _0x284d18['key'] === 'ArrowRight' ? 0x1 : 0x0] += [
+(look['addEventListener']('keydown', (event) => {
+  if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']['includes'](event['key'])) return;
+  (event['preventDefault'](),
+    (rotation[event['key'] === 'ArrowLeft' || event['key'] === 'ArrowRight' ? 0x1 : 0x0] += [
       'ArrowLeft',
       'ArrowUp',
-    ]['includes'](_0x284d18['key'])
+    ]['includes'](event['key'])
       ? 0.03
       : -0.03),
     (rotation = rotation['map'](wrapped)),
     (dirty = !![]));
 }),
-  look['addEventListener']('pointerdown', (_0x2c41d1) => {
-    ((gesture = { x: _0x2c41d1['clientX'], y: _0x2c41d1['clientY'], rotation: [...rotation] }),
-      look['setPointerCapture'](_0x2c41d1['pointerId']));
+  look['addEventListener']('pointerdown', (x) => {
+    ((gesture = { x: x['clientX'], y: x['clientY'], rotation: [...rotation] }),
+      look['setPointerCapture'](x['pointerId']));
   }),
-  look['addEventListener']('pointermove', (_0x2d3e63) => {
+  look['addEventListener']('pointermove', (event2) => {
     if (!gesture) return;
     ((rotation = [
       Math['max'](
         -1.5,
-        Math['min'](1.5, gesture['rotation'][0x0] - (_0x2d3e63['clientY'] - gesture['y']) * 0.005),
+        Math['min'](1.5, gesture['rotation'][0x0] - (event2['clientY'] - gesture['y']) * 0.005),
       ),
-      wrapped(gesture['rotation'][0x1] - (_0x2d3e63['clientX'] - gesture['x']) * 0.005),
+      wrapped(gesture['rotation'][0x1] - (event2['clientX'] - gesture['x']) * 0.005),
       gesture['rotation'][0x2],
     ]),
       (dirty = !![]));
@@ -61,28 +60,24 @@ document['querySelector']('#gyro')['addEventListener']('click', async () => {
     return;
   }
   try {
-    const _0x30b9cd = window['DeviceOrientationEvent'];
-    if (!_0x30b9cd) throw new Error('当前设备不支持方向传感器。');
+    const enabled = window['DeviceOrientationEvent'];
+    if (!enabled) throw new Error('当前设备不支持方向传感器。');
     if (
-      typeof _0x30b9cd['requestPermission'] === 'function' &&
-      (await _0x30b9cd['requestPermission']()) !== 'granted'
+      typeof enabled['requestPermission'] === 'function' &&
+      (await enabled['requestPermission']()) !== 'granted'
     )
       throw new Error('未获得传感器权限。');
-    (window['addEventListener']('deviceorientation', (_0x128f6c) => {
-      if (_0x128f6c['alpha'] == null || _0x128f6c['beta'] == null || _0x128f6c['gamma'] == null) return;
-      const _0x2d3016 = [
-        radians(_0x128f6c['beta']),
-        radians(_0x128f6c['alpha']),
-        radians(_0x128f6c['gamma']),
-      ];
-      ((origin ||= _0x2d3016),
-        (rotation = _0x2d3016['map']((_0x5bec11, _0x392fc2) => wrapped(_0x5bec11 - origin[_0x392fc2]))),
+    (window['addEventListener']('deviceorientation', (result) => {
+      if (result['alpha'] == null || result['beta'] == null || result['gamma'] == null) return;
+      const list = [radians(result['beta']), radians(result['alpha']), radians(result['gamma'])];
+      ((origin ||= list),
+        (rotation = list['map']((data, options) => wrapped(data - origin[options]))),
         (dirty = !![]));
     }),
       (gyroEnabled = !![]),
       (status['textContent'] = '陀螺仪已开启，可重新校准零位。'));
-  } catch (_0x49c1be) {
-    status['textContent'] = _0x49c1be['message'];
+  } catch (error) {
+    status['textContent'] = error['message'];
   }
 });
 const timer = setInterval(async () => {
@@ -90,8 +85,8 @@ const timer = setInterval(async () => {
   ((sending = !![]), (dirty = ![]));
   try {
     await publishDirectorMobilePose(token, { translation: translation, rotation: rotation, seq: ++sequence });
-  } catch (_0x192fa4) {
-    status['textContent'] = _0x192fa4['message'];
+  } catch (error2) {
+    status['textContent'] = error2['message'];
   } finally {
     sending = ![];
   }

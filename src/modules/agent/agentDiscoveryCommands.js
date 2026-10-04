@@ -5,11 +5,11 @@ export const AGENT_DISCOVERY_COMMAND_IDS = Object['freeze']([
   'agent.models.search',
 ]);
 const SAFE_DISCOVERY_CAPABILITY = Object['freeze']({ reads: ['agent.capabilityCatalog'], writes: [] });
-export function registerAgentDiscoveryCommands(_0x191a4d) {
-  if (!_0x191a4d?.['register'] || !_0x191a4d?.['has']) return _0x191a4d;
+export function registerAgentDiscoveryCommands(commandRegistry) {
+  if (!commandRegistry?.['register'] || !commandRegistry?.['has']) return commandRegistry;
   return (
-    !_0x191a4d['has']('agent.capabilities.search') &&
-      _0x191a4d['register']({
+    !commandRegistry['has']('agent.capabilities.search') &&
+      commandRegistry['register']({
         id: 'agent.capabilities.search',
         description:
           'Search\x20registered\x20Canvas\x20Commands\x20by\x20user\x20intent\x20without\x20executing\x20them.',
@@ -29,12 +29,12 @@ export function registerAgentDiscoveryCommands(_0x191a4d) {
             commands: { type: 'array' },
           },
         },
-        execute(_0x4ded17 = {}) {
-          return searchAgentCommands({ commandRegistry: _0x191a4d, ..._0x4ded17 });
+        execute(args = {}) {
+          return searchAgentCommands({ commandRegistry: commandRegistry, ...args });
         },
       }),
-    !_0x191a4d['has']('agent.command.describe') &&
-      _0x191a4d['register']({
+    !commandRegistry['has']('agent.command.describe') &&
+      commandRegistry['register']({
         id: 'agent.command.describe',
         description: 'Load the complete planning schema for one registered Canvas Command.',
         riskLevel: 'safe',
@@ -51,12 +51,12 @@ export function registerAgentDiscoveryCommands(_0x191a4d) {
             capabilitySchema: { type: 'object' },
           },
         },
-        execute(_0x3ec018 = {}) {
-          return describeAgentCommand({ commandRegistry: _0x191a4d, ..._0x3ec018 });
+        execute(args2 = {}) {
+          return describeAgentCommand({ commandRegistry: commandRegistry, ...args2 });
         },
       }),
-    !_0x191a4d['has']('agent.models.search') &&
-      _0x191a4d['register']({
+    !commandRegistry['has']('agent.models.search') &&
+      commandRegistry['register']({
         id: 'agent.models.search',
         description: 'Search model manifests and return planning-safe model fields and input slots.',
         riskLevel: 'safe',
@@ -77,10 +77,10 @@ export function registerAgentDiscoveryCommands(_0x191a4d) {
         returnSchema: {
           properties: { modelIds: { type: 'array', items: { type: 'string' } }, models: { type: 'array' } },
         },
-        execute(_0x5e0a33 = {}) {
-          return searchAgentModels(_0x5e0a33);
+        execute(options = {}) {
+          return searchAgentModels(options);
         },
       }),
-    _0x191a4d
+    commandRegistry
   );
 }

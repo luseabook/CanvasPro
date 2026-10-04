@@ -55,7 +55,7 @@ export const EDGE = {
 };
 export const API_BASE = '';
 export const API_ENDPOINTS = {
-  USER_FILE: (_0x1b2cac) => '/api/v2/user/' + _0x1b2cac,
+  USER_FILE: (value) => '/api/v2/user/' + value,
   PROJECTS: '/api/v2/projects',
   IMAGES: '/api/v2/images',
 };

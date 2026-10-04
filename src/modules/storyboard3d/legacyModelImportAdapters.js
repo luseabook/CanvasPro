@@ -9,95 +9,95 @@ import {
   createThreeGltfStoryboard3DParser,
   countStoryboard3DSceneTriangles,
 } from './gltfImportAdapter.js';
-function requireReadableFile(_0x55a11f, _0x56d44c) {
-  if (typeof _0x55a11f?.['arrayBuffer'] !== 'function')
-    throw new Error(_0x56d44c['toUpperCase']() + ' file is unreadable.');
+function requireReadableFile(value, item) {
+  if (typeof value?.['arrayBuffer'] !== 'function')
+    throw new Error(item['toUpperCase']() + ' file is unreadable.');
 }
 export function createThreeObjStoryboard3DParser() {
-  return async function _0xf060d5(_0x2aff36) {
-    requireReadableFile(_0x2aff36, 'obj');
-    const _0xb2423c = new TextDecoder()['decode'](await _0x2aff36['arrayBuffer']()),
-      _0x46760f = new OBJLoader()['parse'](_0xb2423c);
+  return async function run(key) {
+    requireReadableFile(key, 'obj');
+    const textDecoder = new TextDecoder()['decode'](await key['arrayBuffer']()),
+      scene = new OBJLoader()['parse'](textDecoder);
     return {
-      scene: _0x46760f,
-      scenes: [_0x46760f],
+      scene: scene,
+      scenes: [scene],
       animations: [],
       cameras: [],
-      bounds: measureStoryboard3DImportedSceneBounds(_0x46760f),
-      triangleCount: countStoryboard3DSceneTriangles(_0x46760f),
-      materialLibraries: [...(_0x46760f['materialLibraries'] || [])],
+      bounds: measureStoryboard3DImportedSceneBounds(scene),
+      triangleCount: countStoryboard3DSceneTriangles(scene),
+      materialLibraries: [...(scene['materialLibraries'] || [])],
     };
   };
 }
 export function createThreeStlStoryboard3DParser({
-  materialFactory: materialFactory = (_0x1fd7b2) =>
+  materialFactory: materialFactory = (vertexColors) =>
     new threeRuntime['MeshStandardMaterial']({
       color: 0xb8bec8,
-      vertexColors: _0x1fd7b2['hasAttribute']('color'),
+      vertexColors: vertexColors['hasAttribute']('color'),
       roughness: 0.72,
       metalness: 0.04,
     }),
 } = {}) {
-  return async function _0x53903f(_0x3e51f9) {
-    requireReadableFile(_0x3e51f9, 'stl');
-    const _0x1ca182 = new STLLoader()['parse'](await _0x3e51f9['arrayBuffer']());
-    (_0x1ca182['computeBoundingBox'](), _0x1ca182['computeBoundingSphere']());
-    const _0xb813d9 = new threeRuntime['Mesh'](_0x1ca182, materialFactory(_0x1ca182));
-    _0xb813d9['name'] = String(_0x3e51f9['name'] || 'STL\x20model')['replace'](/\.stl$/i, '');
-    const _0x48b447 = new threeRuntime['Group']();
+  return async function run2(error) {
+    requireReadableFile(error, 'stl');
+    const geometry = new STLLoader()['parse'](await error['arrayBuffer']());
+    (geometry['computeBoundingBox'](), geometry['computeBoundingSphere']());
+    const error2 = new threeRuntime['Mesh'](geometry, materialFactory(geometry));
+    error2['name'] = String(error['name'] || 'STL\x20model')['replace'](/\.stl$/i, '');
+    const scene2 = new threeRuntime['Group']();
     return (
-      (_0x48b447['name'] = _0xb813d9['name']),
-      _0x48b447['add'](_0xb813d9),
+      (scene2['name'] = error2['name']),
+      scene2['add'](error2),
       {
-        scene: _0x48b447,
-        scenes: [_0x48b447],
+        scene: scene2,
+        scenes: [scene2],
         animations: [],
         cameras: [],
-        geometry: _0x1ca182,
-        bounds: measureStoryboard3DImportedSceneBounds(_0x48b447),
-        triangleCount: countStoryboard3DSceneTriangles(_0x48b447),
+        geometry: geometry,
+        bounds: measureStoryboard3DImportedSceneBounds(scene2),
+        triangleCount: countStoryboard3DSceneTriangles(scene2),
       }
     );
   };
 }
 export function createThreeFbxStoryboard3DParser({ urlApi: urlApi = globalThis['URL'] } = {}) {
-  return async function _0x2cb2d2(_0x52ecd3, { resources: resources = new Map() } = {}) {
-    requireReadableFile(_0x52ecd3, 'fbx');
+  return async function run3(index, { resources: resources = new Map() } = {}) {
+    requireReadableFile(index, 'fbx');
     if (
       typeof urlApi?.['createObjectURL'] !== 'function' ||
       typeof urlApi?.['revokeObjectURL'] !== 'function'
     )
       throw new Error('Browser\x20object\x20URL\x20support\x20is\x20unavailable.');
-    const _0x147956 = new threeRuntime['LoadingManager'](),
-      _0x2ca229 = createStoryboard3DResourceUrlScope(resources, urlApi);
-    (_0x147956['setURLModifier']((_0x13ad17) => _0x2ca229['resolve'](_0x13ad17)),
-      (_0x147956['onLoad'] = () => _0x2ca229['dispose']()),
-      (_0x147956['onError'] = () => _0x2ca229['dispose']()));
+    const result = new threeRuntime['LoadingManager'](),
+      promise = createStoryboard3DResourceUrlScope(resources, urlApi);
+    (result['setURLModifier']((data) => promise['resolve'](data)),
+      (result['onLoad'] = () => promise['dispose']()),
+      (result['onError'] = () => promise['dispose']()));
     try {
-      const _0xf2dcaf = new FBXLoader(_0x147956)['parse'](
-        await _0x52ecd3['arrayBuffer'](),
+      const scene3 = new FBXLoader(result)['parse'](
+        await index['arrayBuffer'](),
         STORYBOARD_3D_RESOURCE_BASE_URL,
       );
       return {
-        scene: _0xf2dcaf,
-        scenes: [_0xf2dcaf],
-        animations: _0xf2dcaf['animations'] || [],
+        scene: scene3,
+        scenes: [scene3],
+        animations: scene3['animations'] || [],
         cameras: [],
-        bounds: measureStoryboard3DImportedSceneBounds(_0xf2dcaf),
-        triangleCount: countStoryboard3DSceneTriangles(_0xf2dcaf),
-        disposeResources: () => _0x2ca229['dispose'](),
+        bounds: measureStoryboard3DImportedSceneBounds(scene3),
+        triangleCount: countStoryboard3DSceneTriangles(scene3),
+        disposeResources: () => promise['dispose'](),
       };
-    } catch (_0x49aff4) {
-      _0x2ca229['dispose']();
-      throw _0x49aff4;
+    } catch (options) {
+      promise['dispose']();
+      throw options;
     }
   };
 }
-export function createThreeStoryboard3DModelParsers(_0x203aeb = {}) {
+export function createThreeStoryboard3DModelParsers(options2 = {}) {
   return {
-    gltf: createThreeGltfStoryboard3DParser(_0x203aeb['gltf']),
-    obj: createThreeObjStoryboard3DParser(_0x203aeb['obj']),
-    stl: createThreeStlStoryboard3DParser(_0x203aeb['stl']),
-    fbx: createThreeFbxStoryboard3DParser(_0x203aeb['fbx']),
+    gltf: createThreeGltfStoryboard3DParser(options2['gltf']),
+    obj: createThreeObjStoryboard3DParser(options2['obj']),
+    stl: createThreeStlStoryboard3DParser(options2['stl']),
+    fbx: createThreeFbxStoryboard3DParser(options2['fbx']),
   };
 }

@@ -7,95 +7,95 @@ import {
 } from './rendererSpatialIndex.js';
 import { RENDERER_VIRTUALIZATION_CONFIG } from './rendererVirtualization.js';
 const PRIORITY_MEDIA_VIEWPORT_PADDING = 0xc8;
-function resolveNodeCount(_0x3495e9, _0x393888, _0x3ce160) {
-  if (Number['isFinite'](_0x3ce160)) return Number(_0x3ce160);
-  if (Number['isFinite'](_0x3495e9?.['_nodeCount'])) return Number(_0x3495e9['_nodeCount']);
-  return Object['keys'](_0x393888 || {})['length'];
+function resolveNodeCount(value, item, key) {
+  if (Number['isFinite'](key)) return Number(key);
+  if (Number['isFinite'](value?.['_nodeCount'])) return Number(value['_nodeCount']);
+  return Object['keys'](item || {})['length'];
 }
-function resolveGeometryRev(_0x55a7de, _0x1237a0, _0x2a81db) {
-  if (Number['isFinite'](_0x2a81db)) return Number(_0x2a81db);
-  if (Number['isFinite'](_0x55a7de?.['_nodeGeometryRev'])) return Number(_0x55a7de['_nodeGeometryRev']);
-  if (Number['isFinite'](_0x55a7de?.['_persistRev'])) return Number(_0x55a7de['_persistRev']);
-  return _0x1237a0;
+function resolveGeometryRev(index, result, data) {
+  if (Number['isFinite'](data)) return Number(data);
+  if (Number['isFinite'](index?.['_nodeGeometryRev'])) return Number(index['_nodeGeometryRev']);
+  if (Number['isFinite'](index?.['_persistRev'])) return Number(index['_persistRev']);
+  return result;
 }
-function normalizeContainerRect(_0x2b0476) {
+function normalizeContainerRect(box) {
   return Object['freeze']({
-    width: Number['isFinite'](_0x2b0476?.['width']) ? _0x2b0476['width'] : 0x0,
-    height: Number['isFinite'](_0x2b0476?.['height']) ? _0x2b0476['height'] : 0x0,
+    width: Number['isFinite'](box?.['width']) ? box['width'] : 0x0,
+    height: Number['isFinite'](box?.['height']) ? box['height'] : 0x0,
   });
 }
 export function createRendererFramePlan({
   snapshot: snapshot = null,
   nodes: nodes = snapshot?.['nodes'] || {},
   viewport: viewport = snapshot?.['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 },
-  containerRect: _0x7abf95,
-  nodeCount: _0x568a8c,
-  geometryRev: _0x2ba890,
+  containerRect: containerRect,
+  nodeCount: nodeCount,
+  geometryRev: geometryRev,
 } = {}) {
-  const _0x1e046b = resolveNodeCount(snapshot, nodes, _0x568a8c),
-    _0x1dec3a = resolveGeometryRev(snapshot, _0x1e046b, _0x2ba890),
-    _0x279e36 = normalizeContainerRect(_0x7abf95);
-  let _0x353d75 = ![],
-    _0x4e275a = null,
-    _0x50f467 = ![],
-    _0x390fd4 = ![];
-  function _0x288022() {
-    if (!_0x353d75) {
-      _0x4e275a = getCachedRendererSpatialIndex(nodes, {
-        geometryRev: _0x1dec3a,
-        nodeCount: _0x1e046b,
+  const nodeCount2 = resolveNodeCount(snapshot, nodes, nodeCount),
+    geometryRev2 = resolveGeometryRev(snapshot, nodeCount2, geometryRev),
+    containerWidth = normalizeContainerRect(containerRect);
+  let enabled = ![],
+    args = null,
+    enabled2 = ![],
+    hasRendererPriorityMediaWork2 = ![];
+  function getSpatialIndex() {
+    if (!enabled) {
+      args = getCachedRendererSpatialIndex(nodes, {
+        geometryRev: geometryRev2,
+        nodeCount: nodeCount2,
         denseNodeCount: RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'],
       });
-      if (_0x4e275a) _0x4e275a = { ..._0x4e275a, frameQueryCache: new Map() };
-      _0x353d75 = !![];
+      if (args) args = { ...args, frameQueryCache: new Map() };
+      enabled = !![];
     }
-    return _0x4e275a;
+    return args;
   }
-  function _0x18fef2() {
-    const _0x531343 = _0x288022();
-    if (!_0x531343) return undefined;
+  function candidateNodeIds() {
+    const enabled3 = getSpatialIndex();
+    if (!enabled3) return undefined;
     return queryRendererSpatialIndexIds(
-      _0x531343,
+      enabled3,
       screenViewportToWorldBounds({
         viewport: viewport,
-        containerWidth: _0x279e36['width'],
-        containerHeight: _0x279e36['height'],
+        containerWidth: containerWidth['width'],
+        containerHeight: containerWidth['height'],
         padding: PRIORITY_MEDIA_VIEWPORT_PADDING,
       }),
     );
   }
-  function _0x201590({ needed: needed = !![] } = {}) {
+  function hasPriorityMediaWork({ needed: needed = !![] } = {}) {
     if (!needed) return ![];
     return (
-      !_0x50f467 &&
-        ((_0x390fd4 = hasRendererPriorityMediaWork({
+      !enabled2 &&
+        ((hasRendererPriorityMediaWork2 = hasRendererPriorityMediaWork({
           nodes: nodes,
           selectedNodeIds: snapshot?.['selectedNodeIds'],
           connOverlay: snapshot?.['connOverlay'],
           pickConnectMode: snapshot?.['pickConnectMode'],
           viewport: viewport,
-          containerWidth: _0x279e36['width'],
-          containerHeight: _0x279e36['height'],
+          containerWidth: containerWidth['width'],
+          containerHeight: containerWidth['height'],
           viewportPadding: PRIORITY_MEDIA_VIEWPORT_PADDING,
-          candidateNodeIds: _0x18fef2(),
+          candidateNodeIds: candidateNodeIds(),
         })),
-        (_0x50f467 = !![])),
-      _0x390fd4
+        (enabled2 = !![])),
+      hasRendererPriorityMediaWork2
     );
   }
   return Object['freeze']({
-    nodeCount: _0x1e046b,
+    nodeCount: nodeCount2,
     viewport: viewport,
-    containerRect: _0x279e36,
-    getSpatialIndex: _0x288022,
-    hasPriorityMediaWork: _0x201590,
-    buildScenePlan(_0x324a94 = {}) {
+    containerRect: containerWidth,
+    getSpatialIndex: getSpatialIndex,
+    hasPriorityMediaWork: hasPriorityMediaWork,
+    buildScenePlan(args2 = {}) {
       return buildRendererScenePlan({
-        ..._0x324a94,
+        ...args2,
         nodes: nodes,
-        spatialIndex: _0x288022(),
+        spatialIndex: getSpatialIndex(),
         viewport: viewport,
-        containerRect: _0x279e36,
+        containerRect: containerWidth,
       });
     },
   });

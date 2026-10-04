@@ -1,77 +1,75 @@
 import { getLocale, t } from '../i18n/index.js';
-function formatRelativeTimeUnit(_0x26f270, _0x4f6fa5) {
-  const _0x21a0ec = _0x4f6fa5 === 1 ? 'One' : '';
-  return t('format.relativeTime.' + _0x26f270 + _0x21a0ec, { count: _0x4f6fa5 });
+function formatRelativeTimeUnit(value, count) {
+  const item = count === 1 ? 'One' : '';
+  return t('format.relativeTime.' + value + item, { count: count });
 }
-export function formatFileSize(_0xe9424d, _0x97de28 = 2) {
-  if (_0xe9424d === 0) return '0 Bytes';
-  if (!_0xe9424d || isNaN(_0xe9424d)) return 'Unknown';
-  const _0x1a2d1c = 0x400,
-    _0x20f7c6 = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'],
-    _0x26cb79 = Math.floor(Math.log(_0xe9424d) / Math.log(_0x1a2d1c));
-  return (
-    parseFloat((_0xe9424d / Math.pow(_0x1a2d1c, _0x26cb79)).toFixed(_0x97de28)) + ' ' + _0x20f7c6[_0x26cb79]
-  );
+export function formatFileSize(enabled, key = 2) {
+  if (enabled === 0) return '0 Bytes';
+  if (!enabled || isNaN(enabled)) return 'Unknown';
+  const index = 0x400,
+    result = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'],
+    data = Math.floor(Math.log(enabled) / Math.log(index));
+  return parseFloat((enabled / Math.pow(index, data)).toFixed(key)) + ' ' + result[data];
 }
-export function formatDate(_0xee3b80, _0x590d49 = 'YYYY-MM-DD HH:mm:ss') {
-  const _0x2ddfb5 = _0xee3b80 instanceof Date ? _0xee3b80 : new Date(_0xee3b80);
-  if (isNaN(_0x2ddfb5.getTime())) return 'Invalid Date';
-  const _0x5757d2 = (_0x3f3564) => String(_0x3f3564).padStart(2, '0'),
-    _0x8e55cd = {
-      YYYY: _0x2ddfb5.getFullYear(),
-      MM: _0x5757d2(_0x2ddfb5.getMonth() + 1),
-      DD: _0x5757d2(_0x2ddfb5.getDate()),
-      HH: _0x5757d2(_0x2ddfb5.getHours()),
-      mm: _0x5757d2(_0x2ddfb5.getMinutes()),
-      ss: _0x5757d2(_0x2ddfb5.getSeconds()),
+export function formatDate(options, target = 'YYYY-MM-DD HH:mm:ss') {
+  const YYYY = options instanceof Date ? options : new Date(options);
+  if (isNaN(YYYY.getTime())) return 'Invalid Date';
+  const MM = (source) => String(source).padStart(2, '0'),
+    next = {
+      YYYY: YYYY.getFullYear(),
+      MM: MM(YYYY.getMonth() + 1),
+      DD: MM(YYYY.getDate()),
+      HH: MM(YYYY.getHours()),
+      mm: MM(YYYY.getMinutes()),
+      ss: MM(YYYY.getSeconds()),
     };
-  return _0x590d49.replace(/YYYY|MM|DD|HH|mm|ss/g, (_0x1f6ddf) => _0x8e55cd[_0x1f6ddf]);
+  return target.replace(/YYYY|MM|DD|HH|mm|ss/g, (current) => next[current]);
 }
-export function formatRelativeTime(_0x38ad95) {
-  const _0x14bd6d = _0x38ad95 instanceof Date ? _0x38ad95 : new Date(_0x38ad95),
-    _0x38b6da = new Date(),
-    _0x23849a = _0x38b6da.getTime() - _0x14bd6d.getTime(),
-    _0x5ce251 = 60 * 0x3e8,
-    _0x58ad0f = 60 * _0x5ce251,
-    _0x9c9db2 = 24 * _0x58ad0f,
-    _0x2a1202 = 7 * _0x9c9db2,
-    _0x1a6400 = 30 * _0x9c9db2,
-    _0x109076 = 0x16d * _0x9c9db2;
-  if (_0x23849a < _0x5ce251) return t('format.relativeTime.justNow');
-  if (_0x23849a < _0x58ad0f) return formatRelativeTimeUnit('minute', Math.floor(_0x23849a / _0x5ce251));
-  if (_0x23849a < _0x9c9db2) return formatRelativeTimeUnit('hour', Math.floor(_0x23849a / _0x58ad0f));
-  if (_0x23849a < _0x2a1202) return formatRelativeTimeUnit('day', Math.floor(_0x23849a / _0x9c9db2));
-  if (_0x23849a < _0x1a6400) return formatRelativeTimeUnit('week', Math.floor(_0x23849a / _0x2a1202));
-  if (_0x23849a < _0x109076) return formatRelativeTimeUnit('month', Math.floor(_0x23849a / _0x1a6400));
-  return formatRelativeTimeUnit('year', Math.floor(_0x23849a / _0x109076));
+export function formatRelativeTime(entry) {
+  const record = entry instanceof Date ? entry : new Date(entry),
+    payload = new Date(),
+    handle = payload.getTime() - record.getTime(),
+    state = 60 * 0x3e8,
+    config = 60 * state,
+    scope = 24 * config,
+    input = 7 * scope,
+    output = 30 * scope,
+    value2 = 0x16d * scope;
+  if (handle < state) return t('format.relativeTime.justNow');
+  if (handle < config) return formatRelativeTimeUnit('minute', Math.floor(handle / state));
+  if (handle < scope) return formatRelativeTimeUnit('hour', Math.floor(handle / config));
+  if (handle < input) return formatRelativeTimeUnit('day', Math.floor(handle / scope));
+  if (handle < output) return formatRelativeTimeUnit('week', Math.floor(handle / input));
+  if (handle < value2) return formatRelativeTimeUnit('month', Math.floor(handle / output));
+  return formatRelativeTimeUnit('year', Math.floor(handle / value2));
 }
-export function formatNumber(_0x50a74c, _0x3f1e21 = 0) {
-  if (_0x50a74c === null || _0x50a74c === undefined || isNaN(_0x50a74c)) return '-';
-  return Number(_0x50a74c).toLocaleString(getLocale(), {
-    minimumFractionDigits: _0x3f1e21,
-    maximumFractionDigits: _0x3f1e21,
+export function formatNumber(value3, minimumFractionDigits = 0) {
+  if (value3 === null || value3 === undefined || isNaN(value3)) return '-';
+  return Number(value3).toLocaleString(getLocale(), {
+    minimumFractionDigits: minimumFractionDigits,
+    maximumFractionDigits: minimumFractionDigits,
   });
 }
-export function formatDuration(_0x3845b5) {
-  if (!_0x3845b5 || _0x3845b5 < 0) return '00:00';
-  const _0x2f269c = Math.floor(_0x3845b5 / 0xe10),
-    _0x5a5945 = Math.floor((_0x3845b5 % 0xe10) / 60),
-    _0x523130 = Math.floor(_0x3845b5 % 60),
-    _0x34a7bc = (_0x3ca6f0) => String(_0x3ca6f0).padStart(2, '0');
-  if (_0x2f269c > 0) return _0x34a7bc(_0x2f269c) + ':' + _0x34a7bc(_0x5a5945) + ':' + _0x34a7bc(_0x523130);
-  return _0x34a7bc(_0x5a5945) + ':' + _0x34a7bc(_0x523130);
+export function formatDuration(enabled2) {
+  if (!enabled2 || enabled2 < 0) return '00:00';
+  const count2 = Math.floor(enabled2 / 0xe10),
+    value4 = Math.floor((enabled2 % 0xe10) / 60),
+    value5 = Math.floor(enabled2 % 60),
+    handler = (value6) => String(value6).padStart(2, '0');
+  if (count2 > 0) return handler(count2) + ':' + handler(value4) + ':' + handler(value5);
+  return handler(value4) + ':' + handler(value5);
 }
-export function truncateText(_0x558ebb, _0x28505e, _0x4daa03 = '...') {
-  if (!_0x558ebb || _0x558ebb.length <= _0x28505e) return _0x558ebb || '';
-  return _0x558ebb.slice(0, _0x28505e - _0x4daa03.length) + _0x4daa03;
+export function truncateText(list, value7, list2 = '...') {
+  if (!list || list.length <= value7) return list || '';
+  return list.slice(0, value7 - list2.length) + list2;
 }
-export function capitalize(_0x5664d5) {
-  if (!_0x5664d5) return '';
-  return _0x5664d5.charAt(0).toUpperCase() + _0x5664d5.slice(1);
+export function capitalize(list3) {
+  if (!list3) return '';
+  return list3.charAt(0).toUpperCase() + list3.slice(1);
 }
-export function camelToKebab(_0x51418a) {
-  return _0x51418a.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+export function camelToKebab(value8) {
+  return value8.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }
-export function kebabToCamel(_0x3155ef) {
-  return _0x3155ef.replace(/-([a-z])/g, (_0x422bb1, _0x5407ee) => _0x5407ee.toUpperCase());
+export function kebabToCamel(value9) {
+  return value9.replace(/-([a-z])/g, (value10, value11) => value11.toUpperCase());
 }

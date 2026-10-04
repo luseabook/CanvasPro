@@ -7,7 +7,7 @@ import {
   freezeBodyMapping,
   freezeOption,
 } from './vendorVideoModelApiShared.js';
-const DURATION_VALUES = Array['from']({ length: 0xf }, (_0x31067f, _0x5c52d6) => _0x5c52d6 + 0x1),
+const DURATION_VALUES = Array['from']({ length: 0xf }, (value, item) => item + 0x1),
   GRSAI_H3_FIELDS = Object['freeze']([
     createResolutionField({ defaultValue: '768p', options: ['480p', '768p', '1080p'] }),
     Object['freeze']({
@@ -19,8 +19,8 @@ const DURATION_VALUES = Array['from']({ length: 0xf }, (_0x31067f, _0x5c52d6) =>
       values: DURATION_VALUES,
       defaultValue: 0xa,
       optionOverridesByValue: Object['fromEntries'](
-        DURATION_VALUES['filter']((_0x2c02d0) => _0x2c02d0 > 0xa)['map']((_0x359ab3) => [
-          _0x359ab3,
+        DURATION_VALUES['filter']((count) => count > 0xa)['map']((key) => [
+          key,
           Object['freeze']({
             disableWhen: Object['freeze']({ field: 'resolution', value: '1080p' }),
             hideWhen: Object['freeze']({ field: 'resolution', value: '1080p' }),
@@ -38,11 +38,11 @@ const DURATION_VALUES = Array['from']({ length: 0xf }, (_0x31067f, _0x5c52d6) =>
     ...[
       ['9:16', 'portrait'],
       ['1:1', 'square'],
-    ]['map'](([_0x3594eb, _0x141602]) => ({
+    ]['map'](([equals, value2]) => ({
       path: 'aspectRatio',
       from: 'constant',
-      value: _0x141602,
-      when: Object['freeze']({ field: 'generationParams.aspectRatio', equals: _0x3594eb }),
+      value: value2,
+      when: Object['freeze']({ field: 'generationParams.aspectRatio', equals: equals }),
     })),
     { path: 'resolution', from: 'param', field: 'generationParams.resolution' },
     { path: 'duration', from: 'param', field: 'generationParams.duration', transform: 'integerParam' },

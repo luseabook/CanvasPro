@@ -1,86 +1,76 @@
-function getRect(_0x53fb35) {
-  const _0xd80393 = _0x53fb35?.getBoundingClientRect?.();
-  if (!_0xd80393) return null;
-  const _0x22715e = Number(_0xd80393.left ?? 0),
-    _0x1b85c0 = Number(_0xd80393.top ?? 0),
-    _0x18e988 = Number(_0xd80393.width),
-    _0x589004 = Number(_0xd80393.height),
-    _0x12d401 = Number(_0xd80393.right),
-    _0xb3fe0b = Number(_0xd80393.bottom),
-    _0x444cc9 =
-      Number.isFinite(_0x18e988) && _0x18e988 > 0
-        ? _0x18e988
-        : Number.isFinite(_0x12d401)
-          ? _0x12d401 - _0x22715e
-          : 0,
-    _0x580fd7 =
-      Number.isFinite(_0x589004) && _0x589004 > 0
-        ? _0x589004
-        : Number.isFinite(_0xb3fe0b)
-          ? _0xb3fe0b - _0x1b85c0
-          : 0;
+function getRect(el) {
+  const box = el?.getBoundingClientRect?.();
+  if (!box) return null;
+  const left = Number(box.left ?? 0),
+    top = Number(box.top ?? 0),
+    count = Number(box.width),
+    count2 = Number(box.height),
+    value = Number(box.right),
+    item = Number(box.bottom),
+    width = Number.isFinite(count) && count > 0 ? count : Number.isFinite(value) ? value - left : 0,
+    height = Number.isFinite(count2) && count2 > 0 ? count2 : Number.isFinite(item) ? item - top : 0;
   if (
-    !Number.isFinite(_0x22715e) ||
-    !Number.isFinite(_0x1b85c0) ||
-    !Number.isFinite(_0x444cc9) ||
-    !Number.isFinite(_0x580fd7) ||
-    _0x444cc9 <= 0 ||
-    _0x580fd7 <= 0
+    !Number.isFinite(left) ||
+    !Number.isFinite(top) ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0
   )
     return null;
   return {
-    left: _0x22715e,
-    top: _0x1b85c0,
-    width: _0x444cc9,
-    height: _0x580fd7,
-    right: _0x22715e + _0x444cc9,
-    bottom: _0x1b85c0 + _0x580fd7,
+    left: left,
+    top: top,
+    width: width,
+    height: height,
+    right: left + width,
+    bottom: top + height,
   };
 }
-function stripDuplicateIds(_0x2d3a36) {
-  if (!_0x2d3a36) return;
-  (_0x2d3a36.id && typeof _0x2d3a36.removeAttribute === 'function' && _0x2d3a36.removeAttribute('id'),
-    _0x2d3a36.querySelectorAll?.('[id]')?.forEach((_0x36c625) => {
-      _0x36c625.removeAttribute?.('id');
+function stripDuplicateIds(el2) {
+  if (!el2) return;
+  (el2.id && typeof el2.removeAttribute === 'function' && el2.removeAttribute('id'),
+    el2.querySelectorAll?.('[id]')?.forEach((item2) => {
+      item2.removeAttribute?.('id');
     }));
 }
 export function playWorkflowSaveFly({
-  sourceEl: _0x4a5f9c,
+  sourceEl: sourceEl,
   targetEl: targetEl = null,
   documentRef: documentRef = globalThis.document,
   windowRef: windowRef = globalThis.window,
 } = {}) {
-  const _0x4448c7 = documentRef || _0x4a5f9c?.ownerDocument || globalThis.document,
-    _0x3d5ccb = windowRef || globalThis.window;
-  if (!_0x4448c7?.body || !_0x4a5f9c || !_0x3d5ccb) return null;
-  const _0x359028 = _0x3d5ccb.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-  if (_0x359028) return null;
-  const _0x3bf496 = getRect(_0x4a5f9c),
-    _0x347228 = targetEl || _0x4448c7.getElementById?.('btnWorkflows'),
-    _0x553874 = getRect(_0x347228);
-  if (!_0x3bf496 || !_0x553874) return null;
-  const _0x569ac1 = _0x4448c7.createElement('div');
-  ((_0x569ac1.className = 'v2-workflow-save-fly'),
-    (_0x569ac1.style.left = _0x3bf496.left + 'px'),
-    (_0x569ac1.style.top = _0x3bf496.top + 'px'),
-    (_0x569ac1.style.width = _0x3bf496.width + 'px'),
-    (_0x569ac1.style.height = _0x3bf496.height + 'px'));
-  const _0x5414e3 = _0x4a5f9c.cloneNode?.(true);
-  _0x5414e3 && (stripDuplicateIds(_0x5414e3), _0x569ac1.appendChild(_0x5414e3));
-  _0x4448c7.body.appendChild(_0x569ac1);
-  const _0x57352d = _0x3bf496.left + _0x3bf496.width / 2,
-    _0x12f1bb = _0x3bf496.top + _0x3bf496.height / 2,
-    _0x15cea5 = _0x553874.left + _0x553874.width / 2,
-    _0x324cc7 = _0x553874.top + _0x553874.height / 2,
-    _0x4a37d9 = _0x15cea5 - _0x57352d,
-    _0x49d6bd = _0x324cc7 - _0x12f1bb,
-    _0x457780 = (() => {
-      let _0x3a94b6 = false;
+  const el3 = documentRef || sourceEl?.ownerDocument || globalThis.document,
+    enabled = windowRef || globalThis.window;
+  if (!el3?.body || !sourceEl || !enabled) return null;
+  const key = enabled.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  if (key) return null;
+  const box2 = getRect(sourceEl),
+    index = targetEl || el3.getElementById?.('btnWorkflows'),
+    box3 = getRect(index);
+  if (!box2 || !box3) return null;
+  const fly = el3.createElement('div');
+  ((fly.className = 'v2-workflow-save-fly'),
+    (fly.style.left = box2.left + 'px'),
+    (fly.style.top = box2.top + 'px'),
+    (fly.style.width = box2.width + 'px'),
+    (fly.style.height = box2.height + 'px'));
+  const result = sourceEl.cloneNode?.(true);
+  result && (stripDuplicateIds(result), fly.appendChild(result));
+  el3.body.appendChild(fly);
+  const data = box2.left + box2.width / 2,
+    options = box2.top + box2.height / 2,
+    target = box3.left + box3.width / 2,
+    source = box3.top + box3.height / 2,
+    next = target - data,
+    current = source - options,
+    entry = (() => {
+      let record = false;
       return () => {
-        if (_0x3a94b6) return;
-        ((_0x3a94b6 = true),
-          _0x569ac1.remove?.(),
-          _0x347228?.animate?.(
+        if (record) return;
+        ((record = true),
+          fly.remove?.(),
+          index?.animate?.(
             [
               { transform: 'scale(1)', filter: 'brightness(1)' },
               { transform: 'scale(1.08)', filter: 'brightness(1.2)' },
@@ -90,19 +80,15 @@ export function playWorkflowSaveFly({
           ));
       };
     })();
-  if (typeof _0x569ac1.animate === 'function') {
-    const _0xc77111 = _0x569ac1.animate(
+  if (typeof fly.animate === 'function') {
+    const animation = fly.animate(
       [
         { transform: 'translate(0,0) scale(1)', opacity: 1 },
-        { transform: 'translate(' + _0x4a37d9 + 'px,' + _0x49d6bd + 'px) scale(0.12)', opacity: 0.2 },
+        { transform: 'translate(' + next + 'px,' + current + 'px) scale(0.12)', opacity: 0.2 },
       ],
       { duration: 0x208, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
     );
-    return (
-      (_0xc77111.onfinish = _0x457780),
-      (_0xc77111.oncancel = _0x457780),
-      { fly: _0x569ac1, animation: _0xc77111 }
-    );
+    return ((animation.onfinish = entry), (animation.oncancel = entry), { fly: fly, animation: animation });
   }
-  return (_0x3d5ccb.setTimeout?.(_0x457780, 0x208), { fly: _0x569ac1, animation: null });
+  return (enabled.setTimeout?.(entry, 0x208), { fly: fly, animation: null });
 }

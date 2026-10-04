@@ -43,25 +43,25 @@ const CLI_TEXT_INPUT_SLOTS = Object['freeze']({
   }),
   CLI_TEXT_RESULT = Object['freeze']({ textFields: Object['freeze'](['text']) });
 function createCliTextModelManifest({
-  modelId: _0x88719,
-  executionId: _0x470b52,
-  provider: _0x5fe2a5,
-  displayName: _0x3e4fd3,
-  icon: _0x59b291,
-  title: _0x578a4f,
-  subtitle: _0x559b47,
-  order: _0x1995f5,
+  modelId: modelId,
+  executionId: executionId,
+  provider: provider,
+  displayName: displayName,
+  icon: icon,
+  title: title,
+  subtitle: subtitle,
+  order: order,
 }) {
   return Object['freeze']({
     schemaVersion: '1.0',
-    modelId: _0x88719,
-    provider: _0x5fe2a5,
+    modelId: modelId,
+    provider: provider,
     kind: 'text',
     adapterType: 'localRuntime',
-    executionId: _0x470b52,
-    displayName: _0x3e4fd3,
-    icon: _0x59b291,
-    description: _0x559b47,
+    executionId: executionId,
+    displayName: displayName,
+    icon: icon,
+    description: subtitle,
     inputSlots: CLI_TEXT_INPUT_SLOTS,
     uiSchema: CLI_TEXT_UI_SCHEMA,
     async: ![],
@@ -69,25 +69,25 @@ function createCliTextModelManifest({
     outputType: 'text',
     extensions: Object['freeze']({
       textMenu: Object['freeze']({
-        group: _0x5fe2a5,
-        order: _0x1995f5,
-        title: _0x578a4f,
-        subtitle: _0x559b47,
+        group: provider,
+        order: order,
+        title: title,
+        subtitle: subtitle,
         icon: 'oa',
       }),
     }),
   });
 }
-function createCliTextExecutionManifest({ id: _0x16510a, provider: _0x5248e0, cliProvider: _0x282eda }) {
+function createCliTextExecutionManifest({ id: id, provider: provider2, cliProvider: cliProvider }) {
   return Object['freeze']({
     schemaVersion: '1.0',
-    id: _0x16510a,
-    provider: _0x5248e0,
+    id: id,
+    provider: provider2,
     kind: 'text',
     adapterType: 'localRuntime',
     runtime: 'cliText',
     result: CLI_TEXT_RESULT,
-    extensions: Object['freeze']({ cliProvider: _0x282eda }),
+    extensions: Object['freeze']({ cliProvider: cliProvider }),
   });
 }
 export const CODEX_CLI_TEXT_MODEL_ID = 'codex-cli/default';

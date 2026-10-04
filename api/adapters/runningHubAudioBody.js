@@ -1,27 +1,28 @@
 export function buildRunningHubAudioBody({
-  modelType: _0x495ff0,
+  modelType: modelType,
   params: params = {},
   prompt: prompt = '',
   uploadedAudioUrl: uploadedAudioUrl = '',
 }) {
-  let _0x24cf72 = {};
-  if (_0x495ff0 === 'suno-single') {
-    const _0x20f520 = params?.['make_instrumental'] === !![] || params?.['make_instrumental'] === 'true',
-      _0x254358 = String(params?.['title'] || '')['trim']();
-    _0x24cf72 = {
+  let value = {};
+  if (modelType === 'suno-single') {
+    const make_instrumental =
+        params?.['make_instrumental'] === !![] || params?.['make_instrumental'] === 'true',
+      title = String(params?.['title'] || '')['trim']();
+    value = {
       description: prompt || '',
-      ...(_0x254358 && _0x254358 !== '-' ? { title: _0x254358 } : {}),
-      make_instrumental: _0x20f520 ? 'true' : 'false',
+      ...(title && title !== '-' ? { title: title } : {}),
+      make_instrumental: make_instrumental ? 'true' : 'false',
     };
   } else {
-    if (_0x495ff0 === 'suno-custom') {
-      const _0x3f8dcc = String(params?.['tags'] || 'pop')['trim']() || 'pop',
-        _0x378d53 = String(params?.['title'] || '')['trim'](),
-        _0x1323af = !_0x378d53 || _0x378d53 === '-' ? 'Untitled' : _0x378d53;
-      _0x24cf72 = { prompt: prompt || '', tags: _0x3f8dcc, title: _0x1323af };
+    if (modelType === 'suno-custom') {
+      const tags = String(params?.['tags'] || 'pop')['trim']() || 'pop',
+        enabled = String(params?.['title'] || '')['trim'](),
+        title2 = !enabled || enabled === '-' ? 'Untitled' : enabled;
+      value = { prompt: prompt || '', tags: tags, title: title2 };
     } else {
-      if (_0x495ff0 === 'minimax-tts')
-        _0x24cf72 = {
+      if (modelType === 'minimax-tts')
+        value = {
           text: prompt || '',
           voice_id: String(params?.['customVoiceId'] || params?.['voice_id'] || 'Wise_Woman')['trim'](),
           speed: Number(params?.['speed']) || 0x1,
@@ -35,8 +36,8 @@ export function buildRunningHubAudioBody({
             : {}),
         };
       else {
-        if (_0x495ff0 === 'minimax-music-instrumental')
-          _0x24cf72 = {
+        if (modelType === 'minimax-music-instrumental')
+          value = {
             prompt: prompt || '',
             is_instrumental: !![],
             sampleRate: String(params?.['sampleRate'] || '44100')['trim'](),
@@ -44,21 +45,22 @@ export function buildRunningHubAudioBody({
             format: String(params?.['format'] || 'mp3')['trim'](),
           };
         else {
-          if (_0x495ff0 === 'minimax-music') {
-            const _0x394ffb = String(params?.['prompt'] || '')['trim'](),
-              _0x4750e3 = _0x394ffb && _0x394ffb !== '-' ? _0x394ffb : prompt || '',
-              _0x283968 = params?.['lyricsOptimizer'] === !![] || params?.['lyricsOptimizer'] === 'true';
-            _0x24cf72 = {
+          if (modelType === 'minimax-music') {
+            const item = String(params?.['prompt'] || '')['trim'](),
+              prompt2 = item && item !== '-' ? item : prompt || '',
+              lyricsOptimizer =
+                params?.['lyricsOptimizer'] === !![] || params?.['lyricsOptimizer'] === 'true';
+            value = {
               lyrics: prompt || '',
-              prompt: _0x4750e3,
+              prompt: prompt2,
               is_instrumental: ![],
-              lyricsOptimizer: _0x283968,
+              lyricsOptimizer: lyricsOptimizer,
               sampleRate: String(params?.['sampleRate'] || '44100')['trim'](),
               bitrate: String(params?.['bitrate'] || '256000')['trim'](),
               format: String(params?.['format'] || 'mp3')['trim'](),
             };
           } else
-            _0x24cf72 = {
+            value = {
               prompt: prompt || '',
               ...(uploadedAudioUrl ? { audioUrl: uploadedAudioUrl } : {}),
               ...params,
@@ -67,5 +69,5 @@ export function buildRunningHubAudioBody({
       }
     }
   }
-  return _0x24cf72;
+  return value;
 }

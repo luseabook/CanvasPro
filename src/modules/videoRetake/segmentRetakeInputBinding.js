@@ -4,99 +4,97 @@ import { localPathToUrl } from '../../utils/localMediaPath.js';
 import { getNodeSpawnPrefs } from '../nodeSpawn.js';
 import { calcSegmentRetakeInputStart } from './segmentRetakeSession.js';
 import { t } from '../../i18n/index.js';
-export function getSegmentRetakeVideoEdges(_0x213bba, _0x3577b7) {
-  const _0x3ae47d = _0x213bba['getState']();
-  return _0x213bba['getIncomingEdges'](_0x3577b7)['filter'](
-    (_0x3051f) =>
-      String(_0x3ae47d['nodes']?.[_0x3051f['sourceId']]?.['type'] || '')['includes']('video') ||
-      _0x3051f['refSlot'] === 'referenceVideo',
+export function getSegmentRetakeVideoEdges(store, value) {
+  const state = store['getState']();
+  return store['getIncomingEdges'](value)['filter'](
+    (item) =>
+      String(state['nodes']?.[item['sourceId']]?.['type'] || '')['includes']('video') ||
+      item['refSlot'] === 'referenceVideo',
   );
 }
-function createClipNode(_0x1a3d46, _0x17a11c, _0x403f2b, _0x15484d) {
-  const _0x9ef7c4 = _0x1a3d46['nodes']?.[_0x403f2b['sourceNodeId']] || _0x17a11c,
-    _0x2e9636 = getAutoMediaSizeByShortSide(_0x17a11c['width'] || 0x230, _0x17a11c['height'] || 0x13b),
-    { spacing: _0xb5ae2e, direction: _0x51a487, avoidOverlap: _0x509f54 } = getNodeSpawnPrefs(),
-    _0x3f5877 = calcSegmentRetakeInputStart({
-      targetNode: _0x17a11c,
-      itemWidth: _0x2e9636['width'],
-      itemHeight: _0x2e9636['height'],
-      spacing: _0xb5ae2e,
-      direction: _0x51a487,
+function createClipNode(state2, targetNode, key, localPath) {
+  const name = state2['nodes']?.[key['sourceNodeId']] || targetNode,
+    itemWidth = getAutoMediaSizeByShortSide(targetNode['width'] || 0x230, targetNode['height'] || 0x13b),
+    { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+    box = calcSegmentRetakeInputStart({
+      targetNode: targetNode,
+      itemWidth: itemWidth['width'],
+      itemHeight: itemWidth['height'],
+      spacing: spacing,
+      direction: direction,
     }),
-    _0x870be9 = _0x509f54
+    x = avoidOverlap
       ? findAvailablePosition(
-          _0x1a3d46['nodes'],
-          _0x3f5877['x'],
-          _0x3f5877['y'],
-          _0x2e9636['width'],
-          _0x2e9636['height'],
-          _0xb5ae2e,
+          state2['nodes'],
+          box['x'],
+          box['y'],
+          itemWidth['width'],
+          itemWidth['height'],
+          spacing,
           'down',
         )
-      : _0x3f5877,
-    _0x357f76 = localPathToUrl(_0x15484d['localPath']);
+      : box,
+    src = localPathToUrl(localPath['localPath']);
   return buildSourceMediaNodePayload({
     id: generateId('source-video-retake'),
     type: 'source-video',
-    x: _0x870be9['x'],
-    y: _0x870be9['y'],
-    ..._0x2e9636,
-    name: t('videoClip.cut.newNodeName', { name: _0x9ef7c4['name'] || t('videoClip.cut.videoFallback') }),
-    src: _0x357f76,
-    videoUrl: _0x357f76,
-    videoThumbSrc: _0x357f76,
-    localPath: _0x15484d['localPath'],
-    originalLocalPath: _0x15484d['localPath'],
-    videoDuration: _0x15484d['durationSec'],
+    x: x['x'],
+    y: x['y'],
+    ...itemWidth,
+    name: t('videoClip.cut.newNodeName', { name: name['name'] || t('videoClip.cut.videoFallback') }),
+    src: src,
+    videoUrl: src,
+    videoThumbSrc: src,
+    localPath: localPath['localPath'],
+    originalLocalPath: localPath['localPath'],
+    videoDuration: localPath['durationSec'],
     needsAutoResize: ![],
     fixedSize: !![],
   });
 }
 export function bindSegmentRetakeInput({
-  store: _0x267da5,
-  nodeId: _0x59e887,
-  nodePatch: _0x5e0a51,
-  fullLength: _0x12b2a8,
+  store: store2,
+  nodeId: nodeId,
+  nodePatch: nodePatch,
+  fullLength: fullLength,
 }) {
-  const _0x591f3b = _0x267da5['getState'](),
-    _0xcaf27a = _0x591f3b['nodes'][_0x59e887],
-    _0x5c922c = _0x5e0a51['segmentRetake'],
-    _0x21e40d = _0x5c922c['materializedClip'];
-  let _0x667395 = _0x12b2a8
-      ? _0x591f3b['nodes'][_0x5c922c['sourceNodeId']]
-      : _0x591f3b['nodes'][_0x21e40d?.['nodeId']],
-    _0x400990 = null;
-  !_0x12b2a8 &&
-    (_0x667395?.['type'] !== 'source-video' || _0x667395['localPath'] !== _0x21e40d['localPath']) &&
-    ((_0x400990 = createClipNode(_0x591f3b, _0xcaf27a, _0x5c922c, _0x21e40d)), (_0x667395 = _0x400990));
-  !_0x12b2a8 && (_0x5c922c['materializedClip'] = { ..._0x21e40d, nodeId: _0x667395['id'] });
-  const _0x313ef9 = getSegmentRetakeVideoEdges(_0x267da5, _0x59e887),
-    _0x3e3894 = _0x12b2a8
-      ? _0x5c922c['sourceMediaKey'] || _0x5c922c['sourceLocalPath'] || _0x5c922c['sourceUrl']
-      : _0x21e40d['localPath'],
-    _0x47d9e7 = _0x313ef9['find'](
-      (_0x313050) =>
-        _0x313050['sourceId'] === _0x667395?.['id'] &&
-        (!_0x313050['sourceMediaKey'] || _0x313050['sourceMediaKey'] === _0x3e3894),
+  const state3 = store2['getState'](),
+    index = state3['nodes'][nodeId],
+    result = nodePatch['segmentRetake'],
+    args = result['materializedClip'];
+  let nodeId2 = fullLength ? state3['nodes'][result['sourceNodeId']] : state3['nodes'][args?.['nodeId']],
+    clipNode = null;
+  !fullLength &&
+    (nodeId2?.['type'] !== 'source-video' || nodeId2['localPath'] !== args['localPath']) &&
+    ((clipNode = createClipNode(state3, index, result, args)), (nodeId2 = clipNode));
+  !fullLength && (result['materializedClip'] = { ...args, nodeId: nodeId2['id'] });
+  const list = getSegmentRetakeVideoEdges(store2, nodeId),
+    sourceMediaKey = fullLength
+      ? result['sourceMediaKey'] || result['sourceLocalPath'] || result['sourceUrl']
+      : args['localPath'],
+    enabled = list['find'](
+      (enabled2) =>
+        enabled2['sourceId'] === nodeId2?.['id'] &&
+        (!enabled2['sourceMediaKey'] || enabled2['sourceMediaKey'] === sourceMediaKey),
     ),
-    _0x10be39 = _0x667395 ? _0x313ef9['filter']((_0x1a3182) => _0x1a3182 !== _0x47d9e7) : [],
-    _0x3f8bc6 =
-      _0x667395 && !_0x47d9e7
+    list2 = nodeId2 ? list['filter']((data) => data !== enabled) : [],
+    options =
+      nodeId2 && !enabled
         ? {
             id: generateId('edge-retake-video'),
-            sourceId: _0x667395['id'],
-            targetId: _0x59e887,
+            sourceId: nodeId2['id'],
+            targetId: nodeId,
             refSlot: 'referenceVideo',
-            sourceMediaKey: _0x3e3894,
+            sourceMediaKey: sourceMediaKey,
           }
         : null;
   return (
-    _0x267da5['batch'](() => {
-      if (_0x400990) _0x267da5['addNode'](_0x400990);
-      _0x10be39['forEach']((_0x391272) => _0x267da5['removeEdge'](_0x391272['id']));
-      if (_0x3f8bc6) _0x267da5['addEdge'](_0x3f8bc6);
-      _0x267da5['updateNodeData'](_0x59e887, _0x5e0a51);
+    store2['batch'](() => {
+      if (clipNode) store2['addNode'](clipNode);
+      list2['forEach']((target) => store2['removeEdge'](target['id']));
+      if (options) store2['addEdge'](options);
+      store2['updateNodeData'](nodeId, nodePatch);
     }),
-    Boolean(_0x400990 || _0x3f8bc6 || _0x10be39['length'])
+    Boolean(clipNode || options || list2['length'])
   );
 }

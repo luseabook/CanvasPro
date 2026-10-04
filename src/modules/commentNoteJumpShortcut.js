@@ -22,78 +22,77 @@ const MODIFIER_ORDER = Object.freeze(['Ctrl', 'Shift', 'Alt']),
 export function getDefaultJumpZoomPercent() {
   return DEFAULT_JUMP_ZOOM_PERCENT;
 }
-function _normalizeKeyPart(_0x200c80) {
-  const _0x1e6db6 = String(_0x200c80 ?? '').trim();
-  if (!_0x1e6db6) return '';
-  if (_0x1e6db6 === ' ') return 'Space';
-  const _0x5526ab = _0x1e6db6.toUpperCase();
-  if (MODIFIER_ALIAS_MAP[_0x5526ab]) return MODIFIER_ALIAS_MAP[_0x5526ab];
-  if (NAMED_KEY_MAP[_0x5526ab]) return NAMED_KEY_MAP[_0x5526ab];
-  if (_0x1e6db6.length === 1) return _0x1e6db6.toUpperCase();
-  return _0x1e6db6[0].toUpperCase() + _0x1e6db6.slice(1).toLowerCase();
+function _normalizeKeyPart(value) {
+  const list = String(value ?? '').trim();
+  if (!list) return '';
+  if (list === ' ') return 'Space';
+  const item = list.toUpperCase();
+  if (MODIFIER_ALIAS_MAP[item]) return MODIFIER_ALIAS_MAP[item];
+  if (NAMED_KEY_MAP[item]) return NAMED_KEY_MAP[item];
+  if (list.length === 1) return list.toUpperCase();
+  return list[0].toUpperCase() + list.slice(1).toLowerCase();
 }
-export function normalizeJumpShortcutKeys(_0x41d0e4) {
-  const _0x1767f0 = Array.isArray(_0x41d0e4) ? _0x41d0e4 : [],
-    _0x460d3f = new Set(),
-    _0x57e594 = [];
-  _0x1767f0.forEach((_0x3bd3a0) => {
-    const _0x5a0a41 = _normalizeKeyPart(_0x3bd3a0);
-    if (!_0x5a0a41) return;
-    if (MODIFIER_ORDER.includes(_0x5a0a41)) {
-      _0x460d3f.add(_0x5a0a41);
+export function normalizeJumpShortcutKeys(key) {
+  const list2 = Array.isArray(key) ? key : [],
+    map = new Set(),
+    list3 = [];
+  list2.forEach((item2) => {
+    const _normalizeKeyPart2 = _normalizeKeyPart(item2);
+    if (!_normalizeKeyPart2) return;
+    if (MODIFIER_ORDER.includes(_normalizeKeyPart2)) {
+      map.add(_normalizeKeyPart2);
       return;
     }
-    !_0x57e594.includes(_0x5a0a41) && _0x57e594.push(_0x5a0a41);
+    !list3.includes(_normalizeKeyPart2) && list3.push(_normalizeKeyPart2);
   });
-  const _0x174eb2 = _0x57e594[0];
-  if (!_0x174eb2) return [];
-  const _0x503698 = MODIFIER_ORDER.filter((_0x10ed78) => _0x460d3f.has(_0x10ed78));
-  return [..._0x503698, _0x174eb2];
+  const enabled = list3[0];
+  if (!enabled) return [];
+  const args = MODIFIER_ORDER.filter((item3) => map.has(item3));
+  return [...args, enabled];
 }
-export function buildJumpShortcutBinding(_0x2029e1) {
-  const _0x4088b8 = normalizeJumpShortcutKeys(_0x2029e1);
-  if (!_0x4088b8.length) return '';
-  return _0x4088b8.join('+').toUpperCase();
+export function buildJumpShortcutBinding(index) {
+  const list4 = normalizeJumpShortcutKeys(index);
+  if (!list4.length) return '';
+  return list4.join('+').toUpperCase();
 }
-export function formatJumpShortcutLabel(_0x32d1b0, _0x1e4036 = '未设置') {
-  const _0x163b1f = normalizeJumpShortcutKeys(_0x32d1b0);
-  if (!_0x163b1f.length) return _0x1e4036;
-  return _0x163b1f.join('+');
+export function formatJumpShortcutLabel(result, data = '未设置') {
+  const list5 = normalizeJumpShortcutKeys(result);
+  if (!list5.length) return data;
+  return list5.join('+');
 }
-export function normalizeJumpShortcutZoomPercent(_0x10a95d, _0x26fe18 = DEFAULT_JUMP_ZOOM_PERCENT) {
-  if (_0x10a95d === null || _0x10a95d === undefined || _0x10a95d === '')
-    return normalizeJumpShortcutZoomPercent(_0x26fe18, DEFAULT_JUMP_ZOOM_PERCENT);
-  const _0x1d8ec7 = Number(_0x10a95d);
-  if (!Number.isFinite(_0x1d8ec7))
-    return normalizeJumpShortcutZoomPercent(_0x26fe18, DEFAULT_JUMP_ZOOM_PERCENT);
-  return Math.max(0, Math.min(100, Math.round(_0x1d8ec7)));
+export function normalizeJumpShortcutZoomPercent(options, target = DEFAULT_JUMP_ZOOM_PERCENT) {
+  if (options === null || options === undefined || options === '')
+    return normalizeJumpShortcutZoomPercent(target, DEFAULT_JUMP_ZOOM_PERCENT);
+  const source = Number(options);
+  if (!Number.isFinite(source)) return normalizeJumpShortcutZoomPercent(target, DEFAULT_JUMP_ZOOM_PERCENT);
+  return Math.max(0, Math.min(100, Math.round(source)));
 }
-export function normalizeCommentNoteJumpShortcut(_0x33d6ee) {
-  const _0xbb1028 = _0x33d6ee && typeof _0x33d6ee === 'object' ? _0x33d6ee : {};
+export function normalizeCommentNoteJumpShortcut(next) {
+  const map2 = next && typeof next === 'object' ? next : {};
   return {
-    keys: normalizeJumpShortcutKeys(_0xbb1028.keys),
-    zoomPercent: normalizeJumpShortcutZoomPercent(_0xbb1028.zoomPercent),
+    keys: normalizeJumpShortcutKeys(map2.keys),
+    zoomPercent: normalizeJumpShortcutZoomPercent(map2.zoomPercent),
   };
 }
-export function parseJumpShortcutFromKeydown(_0x768208) {
-  const _0x1416eb = [];
-  if (_0x768208?.ctrlKey || _0x768208?.metaKey) _0x1416eb.push('Ctrl');
-  if (_0x768208?.shiftKey) _0x1416eb.push('Shift');
-  if (_0x768208?.altKey) _0x1416eb.push('Alt');
-  const _0x4b851a = _0x768208?.key === ' ' ? 'Space' : _0x768208?.key;
-  return (_0x1416eb.push(_0x4b851a), normalizeJumpShortcutKeys(_0x1416eb));
+export function parseJumpShortcutFromKeydown(event) {
+  const list6 = [];
+  if (event?.ctrlKey || event?.metaKey) list6.push('Ctrl');
+  if (event?.shiftKey) list6.push('Shift');
+  if (event?.altKey) list6.push('Alt');
+  const current = event?.key === ' ' ? 'Space' : event?.key;
+  return (list6.push(current), normalizeJumpShortcutKeys(list6));
 }
-export function jumpZoomPercentToViewportZoom(_0x51e677) {
-  const _0x572bc4 = normalizeJumpShortcutZoomPercent(_0x51e677);
-  return Math.max(0.2, Math.min(0.2 + (_0x572bc4 / 100) * 1.8, 2));
+export function jumpZoomPercentToViewportZoom(entry) {
+  const jumpShortcutZoomPercent = normalizeJumpShortcutZoomPercent(entry);
+  return Math.max(0.2, Math.min(0.2 + (jumpShortcutZoomPercent / 100) * 1.8, 2));
 }
-export function viewportZoomToJumpZoomPercent(_0x64728d) {
-  const _0x242c0e = Number(_0x64728d);
-  if (!Number.isFinite(_0x242c0e)) return DEFAULT_JUMP_ZOOM_PERCENT;
-  const _0x51a3ec = Math.max(0.2, Math.min(_0x242c0e, 2)),
-    _0x2f75a0 = ((_0x51a3ec - 0.2) / 1.8) * 100;
-  return normalizeJumpShortcutZoomPercent(_0x2f75a0);
+export function viewportZoomToJumpZoomPercent(record) {
+  const payload = Number(record);
+  if (!Number.isFinite(payload)) return DEFAULT_JUMP_ZOOM_PERCENT;
+  const handle = Math.max(0.2, Math.min(payload, 2)),
+    state = ((handle - 0.2) / 1.8) * 100;
+  return normalizeJumpShortcutZoomPercent(state);
 }
-export function resolveJumpZoom(_0xcd2a60) {
-  return jumpZoomPercentToViewportZoom(_0xcd2a60);
+export function resolveJumpZoom(config) {
+  return jumpZoomPercentToViewportZoom(config);
 }

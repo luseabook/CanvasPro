@@ -6,92 +6,89 @@ import {
 } from '../../../api/configApi.js';
 import { onLocaleChange, t } from '../../i18n/index.js';
 import { openSettingsPanelToField } from '../settings/panelSettings.js';
-export function hasConfiguredApi(_0x4ec3bb = {}) {
-  return Object['values'](_0x4ec3bb?.['providers'] || {})['some']((_0x9a599b) =>
-    [_0x9a599b?.['apiKey'], _0x9a599b?.['modelApiKey']]['some'](
-      (_0xb57586) => typeof _0xb57586 === 'string' && _0xb57586['trim']()['length'] > 0x0,
+export function hasConfiguredApi(options = {}) {
+  return Object['values'](options?.['providers'] || {})['some']((value) =>
+    [value?.['apiKey'], value?.['modelApiKey']]['some'](
+      (item) => typeof item === 'string' && item['trim']()['length'] > 0x0,
     ),
   );
 }
 export function createCanvasOnboardingState() {
-  let _0x203dae = null,
-    _0xc4adfa = ![],
-    _0x245e55 = ![];
+  let visible = null,
+    configured = ![],
+    enabled = ![];
   return {
-    update(_0x3b1539, _0x59c710 = 0x0) {
-      _0xc4adfa = hasConfiguredApi(_0x3b1539);
-      if (_0x203dae === null) _0x203dae = !_0xc4adfa;
-      !_0xc4adfa && ((_0x203dae = !![]), (_0x245e55 = ![]));
-      if (_0x203dae && _0xc4adfa && _0x59c710 > 0x0) _0x245e55 = !![];
-      return { visible: _0x203dae && !_0x245e55, configured: _0xc4adfa };
+    update(key, count = 0x0) {
+      configured = hasConfiguredApi(key);
+      if (visible === null) visible = !configured;
+      !configured && ((visible = !![]), (enabled = ![]));
+      if (visible && configured && count > 0x0) enabled = !![];
+      return { visible: visible && !enabled, configured: configured };
     },
-    onNodesChanged(_0xa020fc) {
-      if (_0x203dae && _0xc4adfa && _0xa020fc > 0x0) _0x245e55 = !![];
-      return { visible: _0x203dae === !![] && !_0x245e55, configured: _0xc4adfa };
+    onNodesChanged(count2) {
+      if (visible && configured && count2 > 0x0) enabled = !![];
+      return { visible: visible === !![] && !enabled, configured: configured };
     },
   };
 }
-export function initEmptyCanvasOnboarding({ store: _0x1320ec }) {
-  const _0x40ec62 = document['querySelector']('#emptyHint .empty-hint-main');
-  if (!_0x40ec62 || _0x40ec62['querySelector']('.canvas-onboarding')) return;
-  const _0x4ca69e = document['createElement']('div');
-  ((_0x4ca69e['className'] = 'canvas-onboarding'),
-    (_0x4ca69e['hidden'] = !![]),
-    _0x4ca69e['setAttribute']('role', 'group'));
-  const _0x498f33 = document['createElement']('button');
-  ((_0x498f33['type'] = 'button'),
-    (_0x498f33['className'] = 'canvas-onboarding-step canvas-onboarding-connect'));
-  const _0x16f38e = document['createElement']('span');
-  ((_0x16f38e['className'] = 'canvas-onboarding-divider'), _0x16f38e['setAttribute']('aria-hidden', 'true'));
-  const _0x58ee63 = document['createElement']('span');
-  ((_0x58ee63['className'] = 'canvas-onboarding-step canvas-onboarding-create'),
-    _0x4ca69e['append'](_0x498f33, _0x16f38e, _0x58ee63),
-    _0x40ec62['prepend'](_0x4ca69e));
-  const _0xca3488 = createCanvasOnboardingState();
-  let _0x4a5a19 = { visible: ![], configured: ![] },
-    _0x4b265 = ![];
-  function _0x2573cc(_0x37b129 = _0x4a5a19) {
-    ((_0x4a5a19 = _0x37b129),
-      (_0x4ca69e['hidden'] = !_0x37b129['visible']),
-      _0x4ca69e['classList']['toggle']('is-configured', _0x37b129['configured']),
-      _0x4ca69e['setAttribute']('aria-label', t('emptyHint.onboarding.label')),
-      (_0x498f33['textContent'] = t(
-        _0x37b129['configured'] ? 'emptyHint.onboarding.connected' : 'emptyHint.onboarding.connect',
+export function initEmptyCanvasOnboarding({ store: store }) {
+  const el = document['querySelector']('#emptyHint .empty-hint-main');
+  if (!el || el['querySelector']('.canvas-onboarding')) return;
+  const el2 = document['createElement']('div');
+  ((el2['className'] = 'canvas-onboarding'), (el2['hidden'] = !![]), el2['setAttribute']('role', 'group'));
+  const el3 = document['createElement']('button');
+  ((el3['type'] = 'button'), (el3['className'] = 'canvas-onboarding-step canvas-onboarding-connect'));
+  const el4 = document['createElement']('span');
+  ((el4['className'] = 'canvas-onboarding-divider'), el4['setAttribute']('aria-hidden', 'true'));
+  const el5 = document['createElement']('span');
+  ((el5['className'] = 'canvas-onboarding-step canvas-onboarding-create'),
+    el2['append'](el3, el4, el5),
+    el['prepend'](el2));
+  const canvasOnboardingState = createCanvasOnboardingState();
+  let index = { visible: ![], configured: ![] },
+    enabled2 = ![];
+  function run(enabled3 = index) {
+    ((index = enabled3),
+      (el2['hidden'] = !enabled3['visible']),
+      el2['classList']['toggle']('is-configured', enabled3['configured']),
+      el2['setAttribute']('aria-label', t('emptyHint.onboarding.label')),
+      (el3['textContent'] = t(
+        enabled3['configured'] ? 'emptyHint.onboarding.connected' : 'emptyHint.onboarding.connect',
       )),
-      (_0x498f33['disabled'] = _0x37b129['configured']),
-      _0x498f33['setAttribute']('aria-current', _0x37b129['configured'] ? 'false' : 'step'),
-      (_0x58ee63['textContent'] = t('emptyHint.onboarding.create')),
-      _0x58ee63['setAttribute']('aria-current', _0x37b129['configured'] ? 'step' : 'false'));
+      (el3['disabled'] = enabled3['configured']),
+      el3['setAttribute']('aria-current', enabled3['configured'] ? 'false' : 'step'),
+      (el5['textContent'] = t('emptyHint.onboarding.create')),
+      el5['setAttribute']('aria-current', enabled3['configured'] ? 'step' : 'false'));
   }
-  const _0x4d9864 = () => _0x1320ec['getStateRaw']()['_nodeCount'] || 0x0,
-    _0x42cf8f = () => {
-      if (!_0x4b265 && isApiConfigLoaded())
-        _0x2573cc(_0xca3488['update'](getApiConfigSnapshot(), _0x4d9864()));
+  const run2 = () => store['getStateRaw']()['_nodeCount'] || 0x0,
+    handler = () => {
+      if (!enabled2 && isApiConfigLoaded())
+        run(canvasOnboardingState['update'](getApiConfigSnapshot(), run2()));
     },
-    _0x4b892c = (_0x201dd6) => {
-      if (_0x201dd6['detail']?.['reason'] === 'save-pending') return;
-      _0x42cf8f();
+    result = (data) => {
+      if (data['detail']?.['reason'] === 'save-pending') return;
+      handler();
     };
-  (_0x498f33['addEventListener']('click', (_0x15136d) => {
-    (_0x15136d['stopPropagation'](), openSettingsPanelToField({ paneName: 'api-input' }));
+  (el3['addEventListener']('click', (event) => {
+    (event['stopPropagation'](), openSettingsPanelToField({ paneName: 'api-input' }));
   }),
-    _0x4ca69e['addEventListener']('dblclick', (_0x26c53d) => _0x26c53d['stopPropagation']()),
-    window['addEventListener'](API_CONFIG_CHANGED_EVENT, _0x4b892c));
-  const _0x5808b2 = _0x1320ec['subscribeSelector'](
-      (_0xc6ac60) => _0xc6ac60['_nodeCount'] || 0x0,
-      (_0x27c279) => _0x2573cc(_0xca3488['onNodesChanged'](_0x27c279)),
+    el2['addEventListener']('dblclick', (event2) => event2['stopPropagation']()),
+    window['addEventListener'](API_CONFIG_CHANGED_EVENT, result));
+  const target = store['subscribeSelector'](
+      (source) => source['_nodeCount'] || 0x0,
+      (next) => run(canvasOnboardingState['onNodesChanged'](next)),
     ),
-    _0x15a3bb = onLocaleChange(() => _0x2573cc());
+    handler2 = onLocaleChange(() => run());
   return (
     ensureConfig()
-      ['then'](_0x42cf8f)
+      ['then'](handler)
       ['catch'](() => {}),
     () => {
-      ((_0x4b265 = !![]),
-        window['removeEventListener'](API_CONFIG_CHANGED_EVENT, _0x4b892c),
-        _0x5808b2?.(),
-        _0x15a3bb(),
-        _0x4ca69e['remove']());
+      ((enabled2 = !![]),
+        window['removeEventListener'](API_CONFIG_CHANGED_EVENT, result),
+        target?.(),
+        handler2(),
+        el2['remove']());
     }
   );
 }

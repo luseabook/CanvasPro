@@ -1,31 +1,31 @@
 import { normalizeProviderId, resolveModelExecution } from '../../manifests/index.js';
-function resolveTaskModelExecution(_0x33d138, _0x3c48b7) {
-  const _0x302555 = normalizeProviderId(_0x3c48b7);
-  return resolveModelExecution(_0x33d138, { providerHint: _0x302555 }) || resolveModelExecution(_0x33d138);
+function resolveTaskModelExecution(value, item) {
+  const providerHint = normalizeProviderId(item);
+  return resolveModelExecution(value, { providerHint: providerHint }) || resolveModelExecution(value);
 }
-function resolveTaskProviderIds(_0x3b5b0f, _0xbe117e) {
-  const _0x8b291d = resolveTaskModelExecution(_0x3b5b0f, _0xbe117e);
+function resolveTaskProviderIds(key, index) {
+  const taskModelExecution = resolveTaskModelExecution(key, index);
   return [
-    normalizeProviderId(_0xbe117e),
-    normalizeProviderId(_0x8b291d?.modelManifest?.provider),
-    normalizeProviderId(_0x8b291d?.executionManifest?.provider),
+    normalizeProviderId(index),
+    normalizeProviderId(taskModelExecution?.modelManifest?.provider),
+    normalizeProviderId(taskModelExecution?.executionManifest?.provider),
   ].filter(Boolean);
 }
-export const isRunningHubTaskModel = (_0x6caae0, _0x4d817d) => {
-  const _0x57ad14 = resolveTaskProviderIds(_0x6caae0, _0x4d817d);
-  return _0x57ad14.includes('runninghub') || _0x57ad14.includes('runninghubwf');
+export const isRunningHubTaskModel = (result, data) => {
+  const list = resolveTaskProviderIds(result, data);
+  return list.includes('runninghub') || list.includes('runninghubwf');
 };
-export const isRunningHubModelApiTaskModel = (_0x25b602, _0xb679c1) => {
-  const _0x8bcdf4 = resolveTaskModelExecution(_0x25b602, _0xb679c1),
-    _0x12055e = resolveTaskProviderIds(_0x25b602, _0xb679c1);
+export const isRunningHubModelApiTaskModel = (options, target) => {
+  const taskModelExecution2 = resolveTaskModelExecution(options, target),
+    list2 = resolveTaskProviderIds(options, target);
   return (
-    _0x12055e.includes('runninghub') &&
-    _0x8bcdf4?.modelManifest?.adapterType === 'modelApi' &&
-    _0x8bcdf4?.executionManifest?.adapterType === 'modelApi'
+    list2.includes('runninghub') &&
+    taskModelExecution2?.modelManifest?.adapterType === 'modelApi' &&
+    taskModelExecution2?.executionManifest?.adapterType === 'modelApi'
   );
 };
-export const isDreaminaTaskModel = (_0x377f66, _0x5236a8) => {
-  return resolveTaskProviderIds(_0x377f66, _0x5236a8).includes('dreamina');
+export const isDreaminaTaskModel = (source, next) => {
+  return resolveTaskProviderIds(source, next).includes('dreamina');
 };
 export const buildRunningHubTaskPatch = ({
   taskId: taskId = '',

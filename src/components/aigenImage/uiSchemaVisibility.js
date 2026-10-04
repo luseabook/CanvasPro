@@ -1,71 +1,61 @@
 import { getModelManifest } from '../../manifests/index.js';
-function getUiSchemaNodeFieldValue(_0x4202fc = {}, _0x14701c = '', _0x4a8fdd = '') {
-  const _0x17051b = String(_0x14701c || '')['trim']();
-  if (!_0x17051b) return _0x4a8fdd;
-  const _0x5137e0 =
-    _0x4202fc?.['generationParams'] &&
-    typeof _0x4202fc['generationParams'] === 'object' &&
-    !Array['isArray'](_0x4202fc['generationParams'])
-      ? _0x4202fc['generationParams']
+function getUiSchemaNodeFieldValue(options = {}, value = '', item = '') {
+  const enabled = String(value || '')['trim']();
+  if (!enabled) return item;
+  const key =
+    options?.['generationParams'] &&
+    typeof options['generationParams'] === 'object' &&
+    !Array['isArray'](options['generationParams'])
+      ? options['generationParams']
       : {};
-  if (_0x5137e0[_0x17051b] !== undefined) return _0x5137e0[_0x17051b];
-  if (
-    _0x4202fc &&
-    typeof _0x4202fc === 'object' &&
-    !Array['isArray'](_0x4202fc) &&
-    _0x4202fc[_0x17051b] !== undefined
-  )
-    return _0x4202fc[_0x17051b];
-  return _0x4a8fdd;
+  if (key[enabled] !== undefined) return key[enabled];
+  if (options && typeof options === 'object' && !Array['isArray'](options) && options[enabled] !== undefined)
+    return options[enabled];
+  return item;
 }
-function collectVisibilityConditionFields(_0x53f384, _0x51bec8) {
-  if (Array['isArray'](_0x53f384))
-    return (
-      _0x53f384['forEach']((_0x2462e1) => collectVisibilityConditionFields(_0x2462e1, _0x51bec8)),
-      _0x51bec8
-    );
-  if (!_0x53f384 || typeof _0x53f384 !== 'object') return _0x51bec8;
-  Array['isArray'](_0x53f384['any']) &&
-    _0x53f384['any']['forEach']((_0x38d9b2) => collectVisibilityConditionFields(_0x38d9b2, _0x51bec8));
-  Array['isArray'](_0x53f384['all']) &&
-    _0x53f384['all']['forEach']((_0x44b2de) => collectVisibilityConditionFields(_0x44b2de, _0x51bec8));
-  const _0x2ba3c9 = String(_0x53f384['field'] || _0x53f384['param'] || '')['trim']();
-  if (_0x2ba3c9) _0x51bec8['add'](_0x2ba3c9);
-  return _0x51bec8;
+function collectVisibilityConditionFields(list, index) {
+  if (Array['isArray'](list))
+    return (list['forEach']((result) => collectVisibilityConditionFields(result, index)), index);
+  if (!list || typeof list !== 'object') return index;
+  Array['isArray'](list['any']) &&
+    list['any']['forEach']((data) => collectVisibilityConditionFields(data, index));
+  Array['isArray'](list['all']) &&
+    list['all']['forEach']((target) => collectVisibilityConditionFields(target, index));
+  const source = String(list['field'] || list['param'] || '')['trim']();
+  if (source) index['add'](source);
+  return index;
 }
-function collectVisibilityDependencyFields(_0x39c141 = []) {
-  const _0x5967f6 = new Set();
+function collectVisibilityDependencyFields(list2 = []) {
+  const next = new Set();
   return (
-    (Array['isArray'](_0x39c141) ? _0x39c141 : [])['forEach']((_0x44f261) => {
-      (collectVisibilityConditionFields(_0x44f261?.['showWhen'], _0x5967f6),
-        collectVisibilityConditionFields(_0x44f261?.['hideWhen'], _0x5967f6));
-      const _0x242b7a = [
-        ...(Array['isArray'](_0x44f261?.['options']) ? _0x44f261['options'] : []),
-        ...(Array['isArray'](_0x44f261?.['advancedOptions']) ? _0x44f261['advancedOptions'] : []),
+    (Array['isArray'](list2) ? list2 : [])['forEach']((current) => {
+      (collectVisibilityConditionFields(current?.['showWhen'], next),
+        collectVisibilityConditionFields(current?.['hideWhen'], next));
+      const list3 = [
+        ...(Array['isArray'](current?.['options']) ? current['options'] : []),
+        ...(Array['isArray'](current?.['advancedOptions']) ? current['advancedOptions'] : []),
       ];
-      _0x242b7a['forEach']((_0x27cd4e) => {
-        collectVisibilityConditionFields(_0x27cd4e?.['hideWhen'], _0x5967f6);
+      list3['forEach']((entry) => {
+        collectVisibilityConditionFields(entry?.['hideWhen'], next);
       });
     }),
-    _0x5967f6
+    next
   );
 }
-export function buildUiSchemaVisibilitySignature(_0xb1c879, _0x2e4ead = {}) {
-  const _0x25f632 = String(_0xb1c879 || _0x2e4ead?.['model'] || '')['trim'](),
-    _0x1f98da = getModelManifest(_0x25f632),
-    _0x176ce1 = Array['isArray'](_0x1f98da?.['uiSchema']?.['fields']) ? _0x1f98da['uiSchema']['fields'] : [],
-    _0x4e7888 = collectVisibilityDependencyFields(_0x176ce1),
-    _0xf0d2ef = new Map(
-      _0x176ce1['map']((_0x224926) => [
-        String(_0x224926?.['id'] || '')['trim'](),
-        _0x224926?.['defaultValue'],
-      ])['filter'](([_0x237fae]) => _0x237fae),
+export function buildUiSchemaVisibilitySignature(record, payload = {}) {
+  const modelId = String(record || payload?.['model'] || '')['trim'](),
+    modelManifest = getModelManifest(modelId),
+    list4 = Array['isArray'](modelManifest?.['uiSchema']?.['fields'])
+      ? modelManifest['uiSchema']['fields']
+      : [],
+    args = collectVisibilityDependencyFields(list4),
+    map = new Map(
+      list4['map']((handle) => [String(handle?.['id'] || '')['trim'](), handle?.['defaultValue']])['filter'](
+        ([state]) => state,
+      ),
     ),
-    _0x284182 = [..._0x4e7888]
+    dependencies = [...args]
       ['sort']()
-      ['map']((_0x7608d5) => [
-        _0x7608d5,
-        getUiSchemaNodeFieldValue(_0x2e4ead, _0x7608d5, _0xf0d2ef['get'](_0x7608d5)),
-      ]);
-  return JSON['stringify']({ modelId: _0x25f632, dependencies: _0x284182 });
+      ['map']((config) => [config, getUiSchemaNodeFieldValue(payload, config, map['get'](config))]);
+  return JSON['stringify']({ modelId: modelId, dependencies: dependencies });
 }

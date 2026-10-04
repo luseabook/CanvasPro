@@ -6,41 +6,40 @@ export const PERSON_REPLACEMENT_GENERATION_TASK_IDENTITY_FIELDS = Object['freeze
   'providerProfileId',
   'executionId',
 ]);
-function normalizeText(_0x526e10) {
-  return String(_0x526e10 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function firstText(..._0x2a36b5) {
-  for (const _0x8b8e9f of _0x2a36b5) {
-    const _0x244e01 = normalizeText(_0x8b8e9f);
-    if (_0x244e01) return _0x244e01;
+function firstText(...args) {
+  for (const item of args) {
+    const text = normalizeText(item);
+    if (text) return text;
   }
   return '';
 }
-function firstPositiveNumber(..._0x579cbd) {
-  for (const _0x201a56 of _0x579cbd) {
-    const _0x28ab86 = Number(_0x201a56);
-    if (Number['isFinite'](_0x28ab86) && _0x28ab86 > 0x0) return _0x28ab86;
+function firstPositiveNumber(...args2) {
+  for (const key of args2) {
+    const count = Number(key);
+    if (Number['isFinite'](count) && count > 0x0) return count;
   }
   return 0x0;
 }
-export function isPersonReplacementGenerationTaskActive(_0x52ba6f) {
-  const _0x4e8839 = _0x52ba6f && typeof _0x52ba6f === 'object' ? _0x52ba6f['status'] : _0x52ba6f;
-  return ACTIVE_GENERATION_TASK_STATUSES['has'](normalizeText(_0x4e8839)['toLowerCase']());
+export function isPersonReplacementGenerationTaskActive(response) {
+  const index = response && typeof response === 'object' ? response['status'] : response;
+  return ACTIVE_GENERATION_TASK_STATUSES['has'](normalizeText(index)['toLowerCase']());
 }
-export function normalizePersonReplacementGenerationTaskIdentity(_0x1c1469 = {}) {
-  const _0x186c61 =
-      _0x1c1469 && typeof _0x1c1469 === 'object' && !Array['isArray'](_0x1c1469) ? _0x1c1469 : {},
-    _0x4d1b9f = Object['fromEntries'](
-      PERSON_REPLACEMENT_GENERATION_TASK_IDENTITY_FIELDS['flatMap']((_0x5b36c1) => {
-        const _0x4e5e1b = normalizeText(_0x186c61[_0x5b36c1]);
-        return _0x4e5e1b ? [[_0x5b36c1, _0x4e5e1b]] : [];
+export function normalizePersonReplacementGenerationTaskIdentity(options = {}) {
+  const result = options && typeof options === 'object' && !Array['isArray'](options) ? options : {},
+    args3 = Object['fromEntries'](
+      PERSON_REPLACEMENT_GENERATION_TASK_IDENTITY_FIELDS['flatMap']((data) => {
+        const text2 = normalizeText(result[data]);
+        return text2 ? [[data, text2]] : [];
       }),
     ),
-    _0xf52991 = firstPositiveNumber(_0x186c61['startedAt']);
+    startedAt = firstPositiveNumber(result['startedAt']);
   return {
-    ..._0x4d1b9f,
-    ...(_0xf52991 ? { startedAt: _0xf52991 } : {}),
-    ...(_0x186c61['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
+    ...args3,
+    ...(startedAt ? { startedAt: startedAt } : {}),
+    ...(result['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
   };
 }
 export function projectPersonReplacementGenerationTaskIdentity({
@@ -48,39 +47,42 @@ export function projectPersonReplacementGenerationTaskIdentity({
   meta: meta = {},
   defaults: defaults = {},
 } = {}) {
-  const _0x3541d6 = meta && typeof meta === 'object' ? meta : {},
-    _0x409fb5 = defaults && typeof defaults === 'object' ? defaults : {};
+  const useOpenapiQuery = meta && typeof meta === 'object' ? meta : {},
+    target = defaults && typeof defaults === 'object' ? defaults : {};
   return normalizePersonReplacementGenerationTaskIdentity({
-    taskId: firstText(_0x3541d6['taskId'], taskId, _0x409fb5['taskId']),
-    modelId: firstText(_0x3541d6['modelId'], _0x409fb5['modelId']),
-    provider: firstText(_0x3541d6['provider'], _0x409fb5['provider']),
+    taskId: firstText(useOpenapiQuery['taskId'], taskId, target['taskId']),
+    modelId: firstText(useOpenapiQuery['modelId'], target['modelId']),
+    provider: firstText(useOpenapiQuery['provider'], target['provider']),
     providerProfileId: firstText(
-      _0x3541d6['providerProfileId'],
-      _0x3541d6['rhProviderProfileId'],
-      _0x409fb5['providerProfileId'],
-      _0x409fb5['rhProviderProfileId'],
+      useOpenapiQuery['providerProfileId'],
+      useOpenapiQuery['rhProviderProfileId'],
+      target['providerProfileId'],
+      target['rhProviderProfileId'],
     ),
-    executionId: firstText(_0x3541d6['executionId'], _0x409fb5['executionId']),
-    startedAt: firstPositiveNumber(_0x3541d6['startedAt'], _0x409fb5['startedAt']),
-    useOpenapiQuery: _0x3541d6['useOpenapiQuery'] === !![] || _0x409fb5['useOpenapiQuery'] === !![],
+    executionId: firstText(useOpenapiQuery['executionId'], target['executionId']),
+    startedAt: firstPositiveNumber(useOpenapiQuery['startedAt'], target['startedAt']),
+    useOpenapiQuery: useOpenapiQuery['useOpenapiQuery'] === !![] || target['useOpenapiQuery'] === !![],
   });
 }
-export function hasPersonReplacementGenerationTaskIdentityChanged(_0x5f0d89 = {}, _0x1a9fc3 = {}) {
-  const _0x480b4e = normalizePersonReplacementGenerationTaskIdentity(_0x5f0d89),
-    _0x1bfe3f = normalizePersonReplacementGenerationTaskIdentity(_0x1a9fc3);
+export function hasPersonReplacementGenerationTaskIdentityChanged(options2 = {}, source = {}) {
+  const personReplacementGenerationTaskIdentity = normalizePersonReplacementGenerationTaskIdentity(options2),
+    personReplacementGenerationTaskIdentity2 = normalizePersonReplacementGenerationTaskIdentity(source);
   return [...PERSON_REPLACEMENT_GENERATION_TASK_IDENTITY_FIELDS, 'startedAt', 'useOpenapiQuery']['some'](
-    (_0xf72141) => !Object['is'](_0x480b4e[_0xf72141], _0x1bfe3f[_0xf72141]),
+    (next) =>
+      !Object['is'](
+        personReplacementGenerationTaskIdentity[next],
+        personReplacementGenerationTaskIdentity2[next],
+      ),
   );
 }
-export function getRecoverablePersonReplacementGenerationTask(_0xc5dbd5 = {}) {
-  const _0xace668 =
-      _0xc5dbd5 && typeof _0xc5dbd5 === 'object' && !Array['isArray'](_0xc5dbd5) ? _0xc5dbd5 : {},
-    _0x59b6e0 = normalizePersonReplacementGenerationTaskIdentity(_0xace668);
-  if (!isPersonReplacementGenerationTaskActive(_0xace668) || !_0x59b6e0['taskId'] || !_0x59b6e0['modelId'])
+export function getRecoverablePersonReplacementGenerationTask(options3 = {}) {
+  const response2 = options3 && typeof options3 === 'object' && !Array['isArray'](options3) ? options3 : {},
+    args4 = normalizePersonReplacementGenerationTaskIdentity(response2);
+  if (!isPersonReplacementGenerationTaskActive(response2) || !args4['taskId'] || !args4['modelId'])
     return null;
   return {
-    status: normalizeText(_0xace668['status'])['toLowerCase'](),
-    ..._0x59b6e0,
-    requestId: normalizeText(_0xace668['requestId']),
+    status: normalizeText(response2['status'])['toLowerCase'](),
+    ...args4,
+    requestId: normalizeText(response2['requestId']),
   };
 }

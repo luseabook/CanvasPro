@@ -2,77 +2,75 @@ import {
   createTrackedMediaObjectUrl,
   revokeTrackedMediaObjectUrl,
 } from '../../services/mediaObjectUrlRegistry.js';
-function isLifecycleCurrent(_0x15a524, _0x5cb659) {
+function isLifecycleCurrent(value, item) {
   return Boolean(
-    _0x15a524?.['_imageObjectUrlsDisposed'] !== !![] &&
-    (Number(_0x15a524?.['_imageObjectUrlLifecycleEpoch']) || 0x0) === _0x5cb659,
+    value?.['_imageObjectUrlsDisposed'] !== !![] &&
+    (Number(value?.['_imageObjectUrlLifecycleEpoch']) || 0x0) === item,
   );
 }
-export function disposeImageObjectUrls(_0x53a3a1) {
-  if (!_0x53a3a1) return;
-  ((_0x53a3a1['_imageObjectUrlsDisposed'] = !![]),
-    (_0x53a3a1['_imageObjectUrlLifecycleEpoch'] =
-      (Number(_0x53a3a1['_imageObjectUrlLifecycleEpoch']) || 0x0) + 0x1),
-    (_0x53a3a1['_imageDisplayLoadToken'] = (Number(_0x53a3a1['_imageDisplayLoadToken']) || 0x0) + 0x1));
-  const _0xbfd3bb = new Set(
+export function disposeImageObjectUrls(enabled) {
+  if (!enabled) return;
+  ((enabled['_imageObjectUrlsDisposed'] = !![]),
+    (enabled['_imageObjectUrlLifecycleEpoch'] =
+      (Number(enabled['_imageObjectUrlLifecycleEpoch']) || 0x0) + 0x1),
+    (enabled['_imageDisplayLoadToken'] = (Number(enabled['_imageDisplayLoadToken']) || 0x0) + 0x1));
+  const key = new Set(
     [
-      _0x53a3a1['_cachedThumbUrl'],
-      _0x53a3a1['_cachedSourceUrl'],
-      ...(_0x53a3a1['_thumbObjectUrls']?.['values']?.() || []),
-      ...(_0x53a3a1['_refThumbObjectUrls']?.['values']?.() || []),
-      ...(_0x53a3a1['_pendingImageObjectUrlReleases'] || []),
-    ]['filter']((_0x43e3ba) => String(_0x43e3ba || '')['startsWith']('blob:')),
+      enabled['_cachedThumbUrl'],
+      enabled['_cachedSourceUrl'],
+      ...(enabled['_thumbObjectUrls']?.['values']?.() || []),
+      ...(enabled['_refThumbObjectUrls']?.['values']?.() || []),
+      ...(enabled['_pendingImageObjectUrlReleases'] || []),
+    ]['filter']((index) => String(index || '')['startsWith']('blob:')),
   );
-  for (const _0x343d05 of _0xbfd3bb) revokeTrackedMediaObjectUrl(_0x343d05);
-  ((_0x53a3a1['_cachedThumbUrl'] = null),
-    (_0x53a3a1['_cachedSourceUrl'] = null),
-    _0x53a3a1['_thumbObjectUrls']?.['clear']?.(),
-    _0x53a3a1['_refThumbObjectUrls']?.['clear']?.(),
-    _0x53a3a1['_activeRefThumbIds']?.['clear']?.(),
-    _0x53a3a1['_thumbObjectUrlLoads']?.['clear']?.(),
-    _0x53a3a1['_refThumbObjectUrlLoads']?.['clear']?.(),
-    _0x53a3a1['_pendingImageObjectUrlReleases']?.['clear']?.(),
-    _0x53a3a1['_imageObjectUrlReleaseCallbacks']?.['clear']?.());
+  for (const result of key) revokeTrackedMediaObjectUrl(result);
+  ((enabled['_cachedThumbUrl'] = null),
+    (enabled['_cachedSourceUrl'] = null),
+    enabled['_thumbObjectUrls']?.['clear']?.(),
+    enabled['_refThumbObjectUrls']?.['clear']?.(),
+    enabled['_activeRefThumbIds']?.['clear']?.(),
+    enabled['_thumbObjectUrlLoads']?.['clear']?.(),
+    enabled['_refThumbObjectUrlLoads']?.['clear']?.(),
+    enabled['_pendingImageObjectUrlReleases']?.['clear']?.(),
+    enabled['_imageObjectUrlReleaseCallbacks']?.['clear']?.());
 }
-export function hydrateStoredImageThumbsInBackground(_0x22053c, _0x4a3f08, _0x1df18c, _0x3aea1b) {
-  const _0x53f234 = Array['from'](
-    new Set((_0x4a3f08 || [])['map']((_0x334db6) => String(_0x334db6 || '')['trim']())['filter'](Boolean)),
+export function hydrateStoredImageThumbsInBackground(enabled2, data, options, handler) {
+  const list = Array['from'](
+    new Set((data || [])['map']((target) => String(target || '')['trim']())['filter'](Boolean)),
   );
-  if (_0x53f234['length'] === 0x0) return;
-  if (!_0x22053c['_thumbObjectUrlLoads']) _0x22053c['_thumbObjectUrlLoads'] = new Map();
-  const _0x418437 = Number(_0x22053c['_imageObjectUrlLifecycleEpoch']) || 0x0,
-    _0x1adaa2 = _0x53f234['map']((_0x1eb31b) => {
-      if (_0x22053c['_thumbObjectUrls']['has'](_0x1eb31b)) return Promise['resolve']();
-      if (_0x22053c['_thumbObjectUrlLoads']['has'](_0x1eb31b))
-        return _0x22053c['_thumbObjectUrlLoads']['get'](_0x1eb31b);
-      const _0x51b07c = Promise['resolve']()
-        ['then'](() => _0x3aea1b(_0x1eb31b))
-        ['then']((_0x26b851) => {
-          if (!_0x26b851 || _0x22053c['_thumbObjectUrls']['has'](_0x1eb31b)) return ![];
-          const _0x808b49 = createTrackedMediaObjectUrl(_0x26b851, {
+  if (list['length'] === 0x0) return;
+  if (!enabled2['_thumbObjectUrlLoads']) enabled2['_thumbObjectUrlLoads'] = new Map();
+  const source = Number(enabled2['_imageObjectUrlLifecycleEpoch']) || 0x0,
+    next = list['map']((sourceUrl) => {
+      if (enabled2['_thumbObjectUrls']['has'](sourceUrl)) return Promise['resolve']();
+      if (enabled2['_thumbObjectUrlLoads']['has'](sourceUrl))
+        return enabled2['_thumbObjectUrlLoads']['get'](sourceUrl);
+      const current = Promise['resolve']()
+        ['then'](() => handler(sourceUrl))
+        ['then']((enabled3) => {
+          if (!enabled3 || enabled2['_thumbObjectUrls']['has'](sourceUrl)) return ![];
+          const trackedMediaObjectUrl = createTrackedMediaObjectUrl(enabled3, {
             kind: 'image',
-            ownerId: 'ai-image:' + _0x22053c['nodeId'] + ':thumb',
-            sourceUrl: _0x1eb31b,
+            ownerId: 'ai-image:' + enabled2['nodeId'] + ':thumb',
+            sourceUrl: sourceUrl,
           });
-          if (!_0x808b49) return ![];
+          if (!trackedMediaObjectUrl) return ![];
           if (
-            !isLifecycleCurrent(_0x22053c, _0x418437) ||
-            _0x22053c['_resolvedUrlsKey'] !== _0x1df18c ||
-            _0x22053c['_thumbObjectUrls']['has'](_0x1eb31b)
+            !isLifecycleCurrent(enabled2, source) ||
+            enabled2['_resolvedUrlsKey'] !== options ||
+            enabled2['_thumbObjectUrls']['has'](sourceUrl)
           )
-            return (revokeTrackedMediaObjectUrl(_0x808b49), ![]);
-          return (_0x22053c['_thumbObjectUrls']['set'](_0x1eb31b, _0x808b49), !![]);
+            return (revokeTrackedMediaObjectUrl(trackedMediaObjectUrl), ![]);
+          return (enabled2['_thumbObjectUrls']['set'](sourceUrl, trackedMediaObjectUrl), !![]);
         })
         ['catch'](() => ![])
-        ['finally'](() => _0x22053c['_thumbObjectUrlLoads']['delete'](_0x1eb31b));
-      return (_0x22053c['_thumbObjectUrlLoads']['set'](_0x1eb31b, _0x51b07c), _0x51b07c);
+        ['finally'](() => enabled2['_thumbObjectUrlLoads']['delete'](sourceUrl));
+      return (enabled2['_thumbObjectUrlLoads']['set'](sourceUrl, current), current);
     });
-  void Promise['allSettled'](_0x1adaa2)['then']((_0x3708f7) => {
-    if (!isLifecycleCurrent(_0x22053c, _0x418437)) return;
-    const _0x157f4b = _0x3708f7['some'](
-      (_0x1c3729) => _0x1c3729['status'] === 'fulfilled' && _0x1c3729['value'] === !![],
-    );
-    if (!_0x157f4b || _0x22053c['_resolvedUrlsKey'] !== _0x1df18c || !_0x22053c['imgEl']) return;
-    ((_0x22053c['_resolvedUrlsKey'] = ''), void _0x22053c['_loadAndDisplayImage']());
+  void Promise['allSettled'](next)['then']((list2) => {
+    if (!isLifecycleCurrent(enabled2, source)) return;
+    const enabled4 = list2['some']((el) => el['status'] === 'fulfilled' && el['value'] === !![]);
+    if (!enabled4 || enabled2['_resolvedUrlsKey'] !== options || !enabled2['imgEl']) return;
+    ((enabled2['_resolvedUrlsKey'] = ''), void enabled2['_loadAndDisplayImage']());
   });
 }

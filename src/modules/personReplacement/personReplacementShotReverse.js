@@ -1,91 +1,96 @@
 import { getPersonReplacementShotCutPositionAtTimelineSec } from './personReplacementShotCutModel.js';
-function normalizeText(_0x28e114) {
-  return String(_0x28e114 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-export function togglePersonReplacementShotReverseAtTimelineSec(_0xdbc018 = [], _0x3ebd62 = 0x0) {
-  const _0x3d233b = getPersonReplacementShotCutPositionAtTimelineSec(_0xdbc018, _0x3ebd62),
-    _0x3fa345 = _0xdbc018[_0x3d233b['shotIndex']];
-  if (!_0x3fa345) return null;
-  const _0x4ad6fa = _0x3fa345['isReversed'] !== !![];
+export function togglePersonReplacementShotReverseAtTimelineSec(draft = [], item = 0x0) {
+  const position = getPersonReplacementShotCutPositionAtTimelineSec(draft, item),
+    enabled = draft[position['shotIndex']];
+  if (!enabled) return null;
+  const isReversed = enabled['isReversed'] !== !![];
   return {
-    draft: _0xdbc018['map']((_0x37376d, _0x5c68c6) =>
-      _0x5c68c6 === _0x3d233b['shotIndex'] ? { ..._0x37376d, isReversed: _0x4ad6fa } : _0x37376d,
+    draft: draft['map']((args, key) =>
+      key === position['shotIndex'] ? { ...args, isReversed: isReversed } : args,
     ),
-    position: _0x3d233b,
-    isReversed: _0x4ad6fa,
-    message: _0x4ad6fa ? '当前片段已倒放。' : '已取消当前片段倒放。',
+    position: position,
+    isReversed: isReversed,
+    message: isReversed ? '当前片段已倒放。' : '已取消当前片段倒放。',
   };
 }
-export function resolveShotCutSubmissionUi(_0x347aea = '', _0x5f22c7 = ![]) {
-  const _0x3a5b84 = _0x347aea === 'reverse',
-    _0x3a5913 = _0x347aea === 'cuts';
+export function resolveShotCutSubmissionUi(index = '', loadingTitle = ![]) {
+  const reversePending = index === 'reverse',
+    cutSubmitting = index === 'cuts';
   return {
-    reversePending: _0x3a5b84,
-    cutSubmitting: _0x3a5913,
-    editorBusy: Boolean(_0x347aea) || _0x5f22c7,
-    loadingTitle: _0x5f22c7 ? '智能裁切中' : _0x3a5b84 ? '正在倒放视频' : '正在应用切口',
-    loadingDescription: _0x5f22c7
+    reversePending: reversePending,
+    cutSubmitting: cutSubmitting,
+    editorBusy: Boolean(index) || loadingTitle,
+    loadingTitle: loadingTitle ? '智能裁切中' : reversePending ? '正在倒放视频' : '正在应用切口',
+    loadingDescription: loadingTitle
       ? '正在检测并裁切视频，完成后会自动更新时间线。'
-      : _0x3a5b84
+      : reversePending
         ? '正在处理当前片段，完成后会直接更新时间线。'
         : '正在裁切视频，完成后会自动更新时间线。',
   };
 }
 export async function materializePersonReplacementShotPlayback({
-  currentShot: _0x30148a,
-  range: _0x5ed764,
+  currentShot: currentShot,
+  range: range,
   isNewShot: isNewShot = ![],
-  sourceVideoRef: _0x326528,
-  outputFps: _0x5106f2,
-  epsilonSec: _0x20e634,
-  enqueueMediaTask: _0x58cd04,
-  resolveMediaRef: _0xa1cf46,
+  sourceVideoRef: sourceVideoRef,
+  outputFps: outputFps,
+  epsilonSec: epsilonSec,
+  enqueueMediaTask: enqueueMediaTask,
+  resolveMediaRef: resolveMediaRef,
 } = {}) {
-  if (!_0x30148a || !_0x5ed764 || typeof _0x58cd04 !== 'function' || typeof _0xa1cf46 !== 'function')
+  if (
+    !currentShot ||
+    !range ||
+    typeof enqueueMediaTask !== 'function' ||
+    typeof resolveMediaRef !== 'function'
+  )
     throw new Error('镜头片段倒放参数不完整');
-  const _0x479609 =
+  const enabled2 =
       isNewShot ||
-      Math['abs'](Number(_0x5ed764['startSec']) - Number(_0x30148a['startTimeSec'])) > _0x20e634 ||
-      Math['abs'](Number(_0x5ed764['endSec']) - Number(_0x30148a['endTimeSec'])) > _0x20e634,
-    _0x209088 =
-      Boolean(_0x5ed764['isReversed']) !==
+      Math['abs'](Number(range['startSec']) - Number(currentShot['startTimeSec'])) > epsilonSec ||
+      Math['abs'](Number(range['endSec']) - Number(currentShot['endTimeSec'])) > epsilonSec,
+    reverseChanged =
+      Boolean(range['isReversed']) !==
       Boolean(
-        typeof _0x30148a['materializedIsReversed'] === 'boolean'
-          ? _0x30148a['materializedIsReversed']
-          : normalizeText(_0x30148a['videoRef']) && _0x30148a['isReversed'],
+        typeof currentShot['materializedIsReversed'] === 'boolean'
+          ? currentShot['materializedIsReversed']
+          : normalizeText(currentShot['videoRef']) && currentShot['isReversed'],
       ),
-    _0x514a7f = Boolean(
-      typeof _0x30148a['materializedIsReversed'] === 'boolean'
-        ? _0x30148a['materializedIsReversed']
-        : normalizeText(_0x30148a['videoRef']) && _0x30148a['isReversed'],
+    result = Boolean(
+      typeof currentShot['materializedIsReversed'] === 'boolean'
+        ? currentShot['materializedIsReversed']
+        : normalizeText(currentShot['videoRef']) && currentShot['isReversed'],
     );
-  let _0x2c85a4 = normalizeText(_0x30148a['videoRef']);
-  const _0x4c62db = Boolean(_0x30148a['videoRefIsCropped'] === !![] && !_0x479609 && _0x2c85a4),
-    _0x11ae7f = Boolean(_0x4c62db && _0x209088);
-  if (_0x479609 || !_0x2c85a4 || (_0x514a7f && _0x5ed764['isReversed'] !== !![] && !_0x11ae7f)) {
-    const _0x2804d0 = await _0x58cd04(
+  let src = normalizeText(currentShot['videoRef']);
+  const videoRefIsCropped = Boolean(currentShot['videoRefIsCropped'] === !![] && !enabled2 && src),
+    enabled3 = Boolean(videoRefIsCropped && reverseChanged);
+  if (enabled2 || !src || (result && range['isReversed'] !== !![] && !enabled3)) {
+    const error = await enqueueMediaTask(
       {
         kind: 'mediaClipExport',
-        src: _0x326528,
-        args: { videoStart: _0x5ed764['startSec'], videoEnd: _0x5ed764['endSec'], fps: _0x5106f2 },
+        src: sourceVideoRef,
+        args: { videoStart: range['startSec'], videoEnd: range['endSec'], fps: outputFps },
       },
       { wait: !![], timeout: 0x927c0 },
     );
-    _0x2c85a4 = _0xa1cf46(_0x2804d0);
-    if (_0x2804d0?.['success'] === ![] || !_0x2c85a4)
-      throw new Error(_0x2804d0?.['error'] || _0x2804d0?.['message'] || '镜头片段导出失败');
+    src = resolveMediaRef(error);
+    if (error?.['success'] === ![] || !src)
+      throw new Error(error?.['error'] || error?.['message'] || '镜头片段导出失败');
   }
   if (
-    _0x11ae7f ||
-    (_0x5ed764['isReversed'] === !![] && (_0x479609 || _0x209088 || !normalizeText(_0x30148a['videoRef'])))
+    enabled3 ||
+    (range['isReversed'] === !![] && (enabled2 || reverseChanged || !normalizeText(currentShot['videoRef'])))
   ) {
-    const _0x26c1f5 = await _0x58cd04(
-      { kind: 'videoReverse', src: _0x2c85a4 },
+    const error2 = await enqueueMediaTask(
+      { kind: 'videoReverse', src: src },
       { wait: !![], timeout: 0x927c0 },
     );
-    _0x2c85a4 = _0xa1cf46(_0x26c1f5);
-    if (_0x26c1f5?.['success'] === ![] || !_0x2c85a4)
-      throw new Error(_0x26c1f5?.['error'] || _0x26c1f5?.['message'] || '镜头片段倒放失败');
+    src = resolveMediaRef(error2);
+    if (error2?.['success'] === ![] || !src)
+      throw new Error(error2?.['error'] || error2?.['message'] || '镜头片段倒放失败');
   }
-  return { videoRef: _0x2c85a4, reverseChanged: _0x209088, videoRefIsCropped: _0x4c62db };
+  return { videoRef: src, reverseChanged: reverseChanged, videoRefIsCropped: videoRefIsCropped };
 }

@@ -14,7 +14,7 @@ const MODELS = Object['freeze']([
     'qwen3.7-flash',
     'qwen3.7-flash-2026-07-15',
   ]),
-  executionId = (_0xa8b498) => 'bailian.model-api.text.' + _0xa8b498['replaceAll']('.', '-') + '.v1',
+  executionId = (value) => 'bailian.model-api.text.' + value['replaceAll']('.', '-') + '.v1',
   responseMapping = Object['freeze']({ resultPaths: Object['freeze'](['choices[].message.content']) });
 export const BAILIAN_TEXT_OUTPUT_TOKENS_FIELD = Object['freeze']({
   id: 'maxOutputTokens',
@@ -23,21 +23,21 @@ export const BAILIAN_TEXT_OUTPUT_TOKENS_FIELD = Object['freeze']({
   variant: 'pillMenu',
   label: '输出上限',
   defaultValue: 0x2000,
-  options: [0x1000, 0x2000, 0x4000, 0x8000]['map']((_0x79e744) => ({
-    value: _0x79e744,
-    label: _0x79e744 / 0x400 + 'K',
+  options: [0x1000, 0x2000, 0x4000, 0x8000]['map']((value2) => ({
+    value: value2,
+    label: value2 / 0x400 + 'K',
   })),
 });
 export const bailianTextModelManifests = Object['freeze'](
-  MODELS['map']((_0x347b0c) =>
+  MODELS['map']((displayName) =>
     Object['freeze']({
       schemaVersion: '1.0',
-      modelId: 'bailian/' + _0x347b0c,
-      executionId: executionId(_0x347b0c),
+      modelId: 'bailian/' + displayName,
+      executionId: executionId(displayName),
       provider: 'bailian',
       kind: 'text',
       adapterType: 'modelApi',
-      displayName: _0x347b0c,
+      displayName: displayName,
       icon: 'images/qwen.svg',
       description: '百炼官方 · 文本、图片与视频画面理解',
       inputSlots: Object['freeze']({
@@ -47,7 +47,7 @@ export const bailianTextModelManifests = Object['freeze'](
       }),
       uiSchema: Object['freeze']({
         fields: Object['freeze']([
-          ...(_0x347b0c['startsWith']('qwen3.8')
+          ...(displayName['startsWith']('qwen3.8')
             ? [
                 {
                   id: 'reasoningEffort',
@@ -79,7 +79,7 @@ export const bailianTextModelManifests = Object['freeze'](
       extensions: Object['freeze']({
         textMenu: Object['freeze']({
           group: 'bailian',
-          title: _0x347b0c,
+          title: displayName,
           subtitle: '百炼官方 · 图文 / 视频理解',
           icon: 'qwen',
         }),
@@ -91,17 +91,17 @@ export const bailianTextModelManifests = Object['freeze'](
   ),
 );
 export const bailianTextExecutionManifests = Object['freeze'](
-  MODELS['map']((_0xaf1400) =>
+  MODELS['map']((model) =>
     Object['freeze']({
       schemaVersion: '1.0',
-      id: executionId(_0xaf1400),
+      id: executionId(model),
       provider: 'bailian',
       kind: 'text',
       adapterType: 'modelApi',
       endpoint: '/compatible-mode/v1/chat/completions',
       endpointMode: 'chat-completion',
       method: 'POST',
-      model: _0xaf1400,
+      model: model,
       headers: Object['freeze']({ 'Content-Type': 'application/json' }),
       bodyMapping: Object['freeze']({ modelField: 'model', messagesField: 'messages' }),
       responseMapping: responseMapping,
@@ -113,7 +113,7 @@ export const bailianTextExecutionManifests = Object['freeze'](
         streaming: !![],
         chatCompletionBodyMapping: Object['freeze']([
           { path: 'enable_search', from: 'param', field: 'generationParams.webSearch' },
-          ...(_0xaf1400['startsWith']('qwen3.8')
+          ...(model['startsWith']('qwen3.8')
             ? [{ path: 'reasoning_effort', from: 'param', field: 'generationParams.reasoningEffort' }]
             : [{ path: 'enable_thinking', from: 'param', field: 'generationParams.enableThinking' }]),
         ]),

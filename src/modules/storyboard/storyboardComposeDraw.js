@@ -1,102 +1,86 @@
-function parseComposeLengthRatio(_0x1b0f7c, _0x3dc62c, _0x47b0d8) {
-  const _0x228bc6 = String(_0x1b0f7c || '').trim();
-  if (!_0x228bc6) return _0x47b0d8;
-  const _0x1f7917 = Number.parseFloat(_0x228bc6);
-  if (!Number.isFinite(_0x1f7917)) return _0x47b0d8;
-  if (_0x228bc6.endsWith('%')) return _0x1f7917 / 100;
-  if (_0x228bc6.endsWith('px')) {
-    const _0x38fa50 = Math.max(1, Number(_0x3dc62c) || 1);
-    return _0x1f7917 / _0x38fa50;
+function parseComposeLengthRatio(value, item, key) {
+  const enabled = String(value || '').trim();
+  if (!enabled) return key;
+  const index = Number.parseFloat(enabled);
+  if (!Number.isFinite(index)) return key;
+  if (enabled.endsWith('%')) return index / 100;
+  if (enabled.endsWith('px')) {
+    const result = Math.max(1, Number(item) || 1);
+    return index / result;
   }
-  return _0x1f7917;
+  return index;
 }
-export function buildStoryboardComposeRenderedCrop(_0x47969b, _0x50dd26, _0x3cfdc4) {
-  if (!_0x47969b || !_0x50dd26 || !_0x3cfdc4) return null;
-  if (!_0x47969b.classList?.contains?.('storyboard-cell-img--source-crop')) return null;
-  const _0x5a0bab = Math.max(1, Math.trunc(Number(_0x50dd26.naturalWidth || _0x50dd26.width) || 0)),
-    _0x2215ce = Math.max(1, Math.trunc(Number(_0x50dd26.naturalHeight || _0x50dd26.height) || 0)),
-    _0x32705b = parseComposeLengthRatio(_0x47969b.style?.width, _0x3cfdc4.drawW, 1),
-    _0x2307e8 = parseComposeLengthRatio(_0x47969b.style?.height, _0x3cfdc4.drawH, 1);
-  if (_0x32705b <= 0 || _0x2307e8 <= 0) return null;
-  const _0x5b701e = parseComposeLengthRatio(_0x47969b.style?.left, _0x3cfdc4.drawW, 0),
-    _0x1f7330 = parseComposeLengthRatio(_0x47969b.style?.top, _0x3cfdc4.drawH, 0),
-    _0x108516 = Math.max(0, Math.min(_0x5a0bab - 1, (-_0x5b701e / _0x32705b) * _0x5a0bab)),
-    _0x57c6fc = Math.max(0, Math.min(_0x2215ce - 1, (-_0x1f7330 / _0x2307e8) * _0x2215ce)),
-    _0x46698e = Math.max(1, Math.min(_0x5a0bab - _0x108516, _0x5a0bab / _0x32705b)),
-    _0x4cb4cc = Math.max(1, Math.min(_0x2215ce - _0x57c6fc, _0x2215ce / _0x2307e8));
-  return { sx: _0x108516, sy: _0x57c6fc, sw: _0x46698e, sh: _0x4cb4cc };
+export function buildStoryboardComposeRenderedCrop(el, box, enabled2) {
+  if (!el || !box || !enabled2) return null;
+  if (!el.classList?.contains?.('storyboard-cell-img--source-crop')) return null;
+  const data = Math.max(1, Math.trunc(Number(box.naturalWidth || box.width) || 0)),
+    options = Math.max(1, Math.trunc(Number(box.naturalHeight || box.height) || 0)),
+    composeLengthRatio = parseComposeLengthRatio(el.style?.width, enabled2.drawW, 1),
+    composeLengthRatio2 = parseComposeLengthRatio(el.style?.height, enabled2.drawH, 1);
+  if (composeLengthRatio <= 0 || composeLengthRatio2 <= 0) return null;
+  const composeLengthRatio3 = parseComposeLengthRatio(el.style?.left, enabled2.drawW, 0),
+    composeLengthRatio4 = parseComposeLengthRatio(el.style?.top, enabled2.drawH, 0),
+    sx = Math.max(0, Math.min(data - 1, (-composeLengthRatio3 / composeLengthRatio) * data)),
+    sy = Math.max(0, Math.min(options - 1, (-composeLengthRatio4 / composeLengthRatio2) * options)),
+    sw = Math.max(1, Math.min(data - sx, data / composeLengthRatio)),
+    sh = Math.max(1, Math.min(options - sy, options / composeLengthRatio2));
+  return { sx: sx, sy: sy, sw: sw, sh: sh };
 }
 export async function drawStoryboardComposeAsset(
-  _0x59083c,
-  { cell: _0x373e95, finalUrl: _0x1fe87a, imageEl: _0x46ce4e, target: _0x3e5290, loadImage: _0x959005 },
+  ctx,
+  { cell: cell, finalUrl: finalUrl, imageEl: imageEl, target: target, loadImage: loadImage },
 ) {
-  if (!_0x59083c || !_0x1fe87a || typeof _0x959005 !== 'function') return false;
-  const _0x358c63 = await _0x959005(_0x1fe87a);
-  if (!_0x358c63) return false;
-  const _0x277698 = buildStoryboardComposeRenderedCrop(_0x46ce4e, _0x358c63, _0x3e5290);
-  if (_0x277698)
+  if (!ctx || !finalUrl || typeof loadImage !== 'function') return false;
+  const enabled3 = await loadImage(finalUrl);
+  if (!enabled3) return false;
+  const storyboardComposeRenderedCrop = buildStoryboardComposeRenderedCrop(imageEl, enabled3, target);
+  if (storyboardComposeRenderedCrop)
     return (
-      _0x59083c.drawImage(
-        _0x358c63,
-        _0x277698.sx,
-        _0x277698.sy,
-        _0x277698.sw,
-        _0x277698.sh,
-        _0x3e5290.x0,
-        _0x3e5290.y0,
-        _0x3e5290.drawW,
-        _0x3e5290.drawH,
+      ctx.drawImage(
+        enabled3,
+        storyboardComposeRenderedCrop.sx,
+        storyboardComposeRenderedCrop.sy,
+        storyboardComposeRenderedCrop.sw,
+        storyboardComposeRenderedCrop.sh,
+        target.x0,
+        target.y0,
+        target.drawW,
+        target.drawH,
       ),
       true
     );
-  const _0x2d311 = String(_0x46ce4e?.style?.objectFit || '').trim(),
-    _0x126501 =
-      _0x2d311 === 'fill' ||
-      (!_0x46ce4e &&
-        (_0x373e95?.storyboardExtractedCell === true ||
-          _0x373e95?.storyboardLockedCell === true ||
-          _0x373e95?.storyboardPiece === true));
-  if (_0x126501)
+  const source = String(imageEl?.style?.objectFit || '').trim(),
+    next =
+      source === 'fill' ||
+      (!imageEl &&
+        (cell?.storyboardExtractedCell === true ||
+          cell?.storyboardLockedCell === true ||
+          cell?.storyboardPiece === true));
+  if (next)
     return (
-      _0x59083c.drawImage(
-        _0x358c63,
+      ctx.drawImage(
+        enabled3,
         0,
         0,
-        _0x358c63.naturalWidth,
-        _0x358c63.naturalHeight,
-        _0x3e5290.x0,
-        _0x3e5290.y0,
-        _0x3e5290.drawW,
-        _0x3e5290.drawH,
+        enabled3.naturalWidth,
+        enabled3.naturalHeight,
+        target.x0,
+        target.y0,
+        target.drawW,
+        target.drawH,
       ),
       true
     );
-  const _0x171b59 = _0x358c63.naturalWidth,
-    _0x2c5dbc = _0x358c63.naturalHeight,
-    _0x12aa89 = _0x171b59 / _0x2c5dbc,
-    _0xf805f3 = _0x3e5290.drawW / _0x3e5290.drawH;
-  let _0x2c6b33, _0x167382, _0x12bf72, _0x379d72;
+  const current = enabled3.naturalWidth,
+    entry = enabled3.naturalHeight,
+    record = current / entry,
+    payload = target.drawW / target.drawH;
+  let handle, state, config, scope;
   return (
-    _0x12aa89 > _0xf805f3
-      ? ((_0x167382 = _0x2c5dbc),
-        (_0x2c6b33 = _0x2c5dbc * _0xf805f3),
-        (_0x12bf72 = (_0x171b59 - _0x2c6b33) / 2),
-        (_0x379d72 = 0))
-      : ((_0x2c6b33 = _0x171b59),
-        (_0x167382 = _0x171b59 / _0xf805f3),
-        (_0x12bf72 = 0),
-        (_0x379d72 = (_0x2c5dbc - _0x167382) / 2)),
-    _0x59083c.drawImage(
-      _0x358c63,
-      _0x12bf72,
-      _0x379d72,
-      _0x2c6b33,
-      _0x167382,
-      _0x3e5290.x0,
-      _0x3e5290.y0,
-      _0x3e5290.drawW,
-      _0x3e5290.drawH,
-    ),
+    record > payload
+      ? ((state = entry), (handle = entry * payload), (config = (current - handle) / 2), (scope = 0))
+      : ((handle = current), (state = current / payload), (config = 0), (scope = (entry - state) / 2)),
+    ctx.drawImage(enabled3, config, scope, handle, state, target.x0, target.y0, target.drawW, target.drawH),
     true
   );
 }

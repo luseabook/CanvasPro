@@ -1,1 +1,76 @@
-import{STORY_PROMPT_LANGUAGES,normalizeStoryPromptLanguage}from'../../domain/storyGeneration/promptLanguage.js';import{getStoryPromptModeLabel,normalizeStoryPromptMode}from'./storyPromptModes.js';export function canGenerateStoryClipAdjustment(_0x52784a,_0x1819c6,_0x10029c){if(String(_0x52784a['clipAdjustmentInstruction']||'')["trim"]()||normalizeStoryPromptLanguage(_0x52784a["clipAdjustmentLanguage"]))return!![];if(!_0x52784a["clipAdjustmentPromptMode"])return![];const _0x3f6d54=_0x52784a["clipSelectionMode"]?(_0x1819c6?.["clips"]||[])['filter'](_0x5b644d=>_0x52784a["selectedClipGenerationIds"]?.["includes"](_0x5b644d['id'])):[_0x10029c];return _0x3f6d54["some"](_0x340e78=>normalizeStoryPromptMode(_0x340e78?.["promptMode"]||_0x1819c6?.['promptMode']||_0x52784a["data"]?.["project"]?.["planning"]?.['promptMode'],{'allowDeveloperModes':!![]})!==_0x52784a["clipAdjustmentPromptMode"]);}export function syncStoryClipAdjustmentMenu({state:_0x61d3c0,root:_0x16c6e6,episode:_0x549f8d,clip:_0x4c53d3,kind:kind="mode",focus:focus='',updateSelection:updateSelection=![]}){const _0x3e3090=_0x16c6e6?.['querySelector']("[data-story-clip-adjustment-bar]"),_0x3856ef=_0x3e3090?.["querySelector"]('[data-story-adjustment-kind=\x22'+kind+'\x22]'),_0x5b0529=_0x3856ef?.["querySelector"]('[data-story-action=\x22toggle-clip-adjustment-mode\x22]'),_0x140911=_0x3856ef?.["querySelector"]("[role=\"listbox\"]");if(!_0x3e3090||!_0x5b0529||!_0x140911)return![];const _0x45f41f=kind==="language",_0x41497a=_0x45f41f?_0x61d3c0["clipAdjustmentLanguageOpen"]:_0x61d3c0["clipAdjustmentPromptModeOpen"];_0x5b0529['setAttribute']('aria-expanded',String(Boolean(_0x41497a))),_0x140911["hidden"]=!_0x41497a;if(updateSelection){const _0x453410=_0x45f41f?normalizeStoryPromptLanguage(_0x61d3c0["clipAdjustmentLanguage"]):normalizeStoryPromptMode(_0x61d3c0["clipAdjustmentPromptMode"]||_0x4c53d3?.["promptMode"]||_0x549f8d?.['promptMode']||_0x61d3c0['data']?.["project"]?.["planning"]?.["promptMode"],{'allowDeveloperModes':!![]}),_0x4ac68e=_0x3856ef["querySelector"]("[data-story-clip-adjustment-mode-label]");if(_0x4ac68e)_0x4ac68e["textContent"]=_0x45f41f?STORY_PROMPT_LANGUAGES['find'](_0x1db8c7=>_0x1db8c7['value']===_0x453410)?.["label"]||"语言转换":getStoryPromptModeLabel(_0x453410);_0x140911["querySelectorAll"]('[data-story-clip-adjustment-mode-option]')['forEach'](_0x2afe15=>{const _0x434e34=_0x2afe15["dataset"]["storyClipAdjustmentModeOption"]===_0x453410;_0x2afe15["classList"]["toggle"]("is-selected",_0x434e34),_0x2afe15["setAttribute"]('aria-selected',String(_0x434e34));});}const _0x3a2ee5=_0x3e3090["querySelector"]("[data-story-action=\"generate-clip-adjustment\"]");if(_0x3a2ee5)_0x3a2ee5['disabled']=!canGenerateStoryClipAdjustment(_0x61d3c0,_0x549f8d,_0x4c53d3);if(focus==="trigger")_0x5b0529["focus"]({'preventScroll':!![]});if(focus==="selected")(_0x140911["querySelector"]("[aria-selected=\"true\"]")||_0x140911["querySelector"]("button"))?.['focus']({'preventScroll':!![]});if(focus==='instruction')_0x3e3090['querySelector']("[data-story-clip-adjustment-instruction]")?.["focus"]({'preventScroll':!![]});return!![];}
+import {
+  STORY_PROMPT_LANGUAGES,
+  normalizeStoryPromptLanguage,
+} from '../../domain/storyGeneration/promptLanguage.js';
+import { getStoryPromptModeLabel, normalizeStoryPromptMode } from './storyPromptModes.js';
+export function canGenerateStoryClipAdjustment(enabled, value, item) {
+  if (
+    String(enabled['clipAdjustmentInstruction'] || '')['trim']() ||
+    normalizeStoryPromptLanguage(enabled['clipAdjustmentLanguage'])
+  )
+    return !![];
+  if (!enabled['clipAdjustmentPromptMode']) return ![];
+  const key = enabled['clipSelectionMode']
+    ? (value?.['clips'] || [])['filter']((index) =>
+        enabled['selectedClipGenerationIds']?.['includes'](index['id']),
+      )
+    : [item];
+  return key['some'](
+    (result) =>
+      normalizeStoryPromptMode(
+        result?.['promptMode'] ||
+          value?.['promptMode'] ||
+          enabled['data']?.['project']?.['planning']?.['promptMode'],
+        { allowDeveloperModes: !![] },
+      ) !== enabled['clipAdjustmentPromptMode'],
+  );
+}
+export function syncStoryClipAdjustmentMenu({
+  state: state,
+  root: root,
+  episode: episode,
+  clip: clip,
+  kind: kind = 'mode',
+  focus: focus = '',
+  updateSelection: updateSelection = ![],
+}) {
+  const el = root?.['querySelector']('[data-story-clip-adjustment-bar]'),
+    data = el?.['querySelector']('[data-story-adjustment-kind=\x22' + kind + '\x22]'),
+    el2 = data?.['querySelector']('[data-story-action=\x22toggle-clip-adjustment-mode\x22]'),
+    enabled2 = data?.['querySelector']('[role="listbox"]');
+  if (!el || !el2 || !enabled2) return ![];
+  const options = kind === 'language',
+    enabled3 = options ? state['clipAdjustmentLanguageOpen'] : state['clipAdjustmentPromptModeOpen'];
+  (el2['setAttribute']('aria-expanded', String(Boolean(enabled3))), (enabled2['hidden'] = !enabled3));
+  if (updateSelection) {
+    const target = options
+        ? normalizeStoryPromptLanguage(state['clipAdjustmentLanguage'])
+        : normalizeStoryPromptMode(
+            state['clipAdjustmentPromptMode'] ||
+              clip?.['promptMode'] ||
+              episode?.['promptMode'] ||
+              state['data']?.['project']?.['planning']?.['promptMode'],
+            { allowDeveloperModes: !![] },
+          ),
+      source = data['querySelector']('[data-story-clip-adjustment-mode-label]');
+    if (source)
+      source['textContent'] = options
+        ? STORY_PROMPT_LANGUAGES['find']((el3) => el3['value'] === target)?.['label'] || '语言转换'
+        : getStoryPromptModeLabel(target);
+    enabled2['querySelectorAll']('[data-story-clip-adjustment-mode-option]')['forEach']((next) => {
+      const current = next['dataset']['storyClipAdjustmentModeOption'] === target;
+      (next['classList']['toggle']('is-selected', current),
+        next['setAttribute']('aria-selected', String(current)));
+    });
+  }
+  const el4 = el['querySelector']('[data-story-action="generate-clip-adjustment"]');
+  if (el4) el4['disabled'] = !canGenerateStoryClipAdjustment(state, episode, clip);
+  if (focus === 'trigger') el2['focus']({ preventScroll: !![] });
+  if (focus === 'selected')
+    (enabled2['querySelector']('[aria-selected="true"]') || enabled2['querySelector']('button'))?.['focus']({
+      preventScroll: !![],
+    });
+  if (focus === 'instruction')
+    el['querySelector']('[data-story-clip-adjustment-instruction]')?.['focus']({ preventScroll: !![] });
+  return !![];
+}

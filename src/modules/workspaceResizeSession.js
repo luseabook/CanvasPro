@@ -1,68 +1,64 @@
 export function beginWorkspaceResizeSession({
-  event: _0x8216aa,
-  splitter: _0x285cbd,
-  layout: _0xef4a0f,
+  event: event,
+  splitter: splitter,
+  layout: layout,
   orientation: orientation = 'horizontal',
   windowObject: windowObject = globalThis['window'],
   body: body = globalThis['document']?.['body'],
   resizingClass: resizingClass = '',
-  onRatio: _0x19f7c5,
+  onRatio: onRatio,
   onFinish: onFinish = null,
   signal: signal = null,
 } = {}) {
-  if (!_0x8216aa || !_0x285cbd || !_0xef4a0f || typeof _0x19f7c5 !== 'function' || signal?.['aborted'])
+  if (!event || !splitter || !layout || typeof onRatio !== 'function' || signal?.['aborted']) return ![];
+  if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0x0))
     return ![];
-  if (
-    _0x8216aa['isPrimary'] === ![] ||
-    (Number['isFinite'](_0x8216aa['button']) && _0x8216aa['button'] !== 0x0)
-  )
-    return ![];
-  const _0x5dda33 = _0xef4a0f['getBoundingClientRect']?.(),
-    _0x382df0 = orientation === 'vertical',
-    _0xb9352a = _0x382df0 ? Number(_0x5dda33?.['height']) : Number(_0x5dda33?.['width']);
-  if (!(_0xb9352a > 0x0)) return ![];
-  (_0x8216aa['preventDefault']?.(), _0x8216aa['stopPropagation']?.());
-  const _0x100708 = _0x8216aa['pointerId'];
+  const box = layout['getBoundingClientRect']?.(),
+    value = orientation === 'vertical',
+    count = value ? Number(box?.['height']) : Number(box?.['width']);
+  if (!(count > 0x0)) return ![];
+  (event['preventDefault']?.(), event['stopPropagation']?.());
+  const pointerId = event['pointerId'];
   try {
-    _0x285cbd['setPointerCapture']?.(_0x100708);
+    splitter['setPointerCapture']?.(pointerId);
   } catch {}
-  _0x285cbd['classList']?.['add']?.('is-active');
+  splitter['classList']?.['add']?.('is-active');
   if (resizingClass) body?.['classList']?.['add']?.(resizingClass);
-  const _0x1c955e = (_0x625ff7) =>
-      !Number['isFinite'](Number(_0x100708)) ||
-      !Number['isFinite'](Number(_0x625ff7?.['pointerId'])) ||
-      Number(_0x625ff7['pointerId']) === Number(_0x100708),
-    _0xf4528b = (_0x37b4b6) => {
-      if (!_0x1c955e(_0x37b4b6)) return;
-      const _0x4e2a46 = _0x382df0 ? _0x37b4b6?.['clientY'] : _0x37b4b6?.['clientX'],
-        _0x190f98 = _0x382df0 ? _0x5dda33['top'] : _0x5dda33['left'];
-      _0x19f7c5(((Number(_0x4e2a46) - Number(_0x190f98 || 0x0)) / _0xb9352a) * 0x64, _0x37b4b6);
+  const run = (event2) =>
+      !Number['isFinite'](Number(pointerId)) ||
+      !Number['isFinite'](Number(event2?.['pointerId'])) ||
+      Number(event2['pointerId']) === Number(pointerId),
+    item = (event3) => {
+      if (!run(event3)) return;
+      const key = value ? event3?.['clientY'] : event3?.['clientX'],
+        index = value ? box['top'] : box['left'];
+      onRatio(((Number(key) - Number(index || 0x0)) / count) * 0x64, event3);
     },
-    _0x29da25 = (_0x23e9ff) => {
-      if (!_0x1c955e(_0x23e9ff)) return;
-      signal?.['removeEventListener']('abort', _0x3b9076);
+    handler = (result) => {
+      if (!run(result)) return;
+      signal?.['removeEventListener']('abort', data);
       if (resizingClass) body?.['classList']?.['remove']?.(resizingClass);
-      _0x285cbd['classList']?.['remove']?.('is-active');
+      splitter['classList']?.['remove']?.('is-active');
       try {
-        _0x285cbd['hasPointerCapture']?.(_0x100708) && _0x285cbd['releasePointerCapture'](_0x100708);
+        splitter['hasPointerCapture']?.(pointerId) && splitter['releasePointerCapture'](pointerId);
       } catch {}
-      (windowObject?.['removeEventListener']?.('pointermove', _0xf4528b),
-        windowObject?.['removeEventListener']?.('pointerup', _0x29da25),
-        windowObject?.['removeEventListener']?.('pointercancel', _0x29da25),
-        onFinish?.(_0x23e9ff));
+      (windowObject?.['removeEventListener']?.('pointermove', item),
+        windowObject?.['removeEventListener']?.('pointerup', handler),
+        windowObject?.['removeEventListener']?.('pointercancel', handler),
+        onFinish?.(result));
     },
-    _0x3b9076 = () => _0x29da25({ pointerId: _0x100708 });
+    data = () => handler({ pointerId: pointerId });
   return (
-    signal?.['addEventListener']('abort', _0x3b9076, { once: !![] }),
-    windowObject?.['addEventListener']?.('pointermove', _0xf4528b),
-    windowObject?.['addEventListener']?.('pointerup', _0x29da25),
-    windowObject?.['addEventListener']?.('pointercancel', _0x29da25),
+    signal?.['addEventListener']('abort', data, { once: !![] }),
+    windowObject?.['addEventListener']?.('pointermove', item),
+    windowObject?.['addEventListener']?.('pointerup', handler),
+    windowObject?.['addEventListener']?.('pointercancel', handler),
     !![]
   );
 }
-export function beginWorkspaceHorizontalResizeSession(_0x2a9679 = {}) {
-  return beginWorkspaceResizeSession({ ..._0x2a9679, orientation: 'horizontal' });
+export function beginWorkspaceHorizontalResizeSession(args = {}) {
+  return beginWorkspaceResizeSession({ ...args, orientation: 'horizontal' });
 }
-export function beginWorkspaceVerticalResizeSession(_0x452a59 = {}) {
-  return beginWorkspaceResizeSession({ ..._0x452a59, orientation: 'vertical' });
+export function beginWorkspaceVerticalResizeSession(args2 = {}) {
+  return beginWorkspaceResizeSession({ ...args2, orientation: 'vertical' });
 }

@@ -1,50 +1,86 @@
 import { getAutoMediaSizeByShortSide } from '../services/fileService.js';
 const FLAT_MEDIA_TYPES = new Set(['source-image', 'image', 'ai-image', 'source-video', 'video', 'ai-video']);
-function toNumber(_0x5723e7, _0x444ce3 = 0) {
-  const _0x48e77d = Number(_0x5723e7);
-  return Number.isFinite(_0x48e77d) ? _0x48e77d : _0x444ce3;
+function toNumber(value, item = 0) {
+  const key = Number(value);
+  return Number.isFinite(key) ? key : item;
 }
-function getNodeWidth(_0x3d8afd) {
-  return Math.max(1, toNumber(_0x3d8afd?.width ?? _0x3d8afd?.w, 240));
+function getNodeWidth(box) {
+  return Math.max(1, toNumber(box?.width ?? box?.w, 240));
 }
-function getNodeHeight(_0x5ef39d) {
-  return Math.max(1, toNumber(_0x5ef39d?.height ?? _0x5ef39d?.h, 240));
+function getNodeHeight(box2) {
+  return Math.max(1, toNumber(box2?.height ?? box2?.h, 240));
 }
-function isFlatMediaNode(_0x322097) {
-  return FLAT_MEDIA_TYPES.has(String(_0x322097?.type || ''));
+function isFlatMediaNode(index) {
+  return FLAT_MEDIA_TYPES.has(String(index?.type || ''));
 }
-export function shouldTopAlignRestoredAsset(_0x430975, _0x23a8cb) {
-  const _0x98796b = Array.isArray(_0x430975) ? _0x430975.filter(Boolean) : [];
-  if (_0x98796b.length <= 1) return false;
-  if (!_0x98796b.every(isFlatMediaNode)) return false;
-  return !Array.isArray(_0x23a8cb) || _0x23a8cb.length === 0;
+export function shouldTopAlignRestoredAsset(list, list2) {
+  const list3 = Array.isArray(list) ? list.filter(Boolean) : [];
+  if (list3.length <= 1) return false;
+  if (!list3.every(isFlatMediaNode)) return false;
+  return !Array.isArray(list2) || list2.length === 0;
 }
-export function createTopAlignedAssetNodes(_0x1091e0, _0x131bd8 = 24) {
-  const _0x50d23c = Array.isArray(_0x1091e0) ? _0x1091e0.filter(Boolean) : [],
-    _0x257b3f = _0x50d23c
-      .map((_0xb2f362, _0x43a023) => ({ node: _0xb2f362, index: _0x43a023 }))
-      .sort((_0x3aa116, _0x405a62) => {
-        const _0x3fc123 = toNumber(_0x3aa116.node?.x, 0),
-          _0x1e4b28 = toNumber(_0x405a62.node?.x, 0);
-        if (_0x3fc123 !== _0x1e4b28) return _0x3fc123 - _0x1e4b28;
-        const _0x5d61d4 = toNumber(_0x3aa116.node?.y, 0),
-          _0x50d728 = toNumber(_0x405a62.node?.y, 0);
-        if (_0x5d61d4 !== _0x50d728) return _0x5d61d4 - _0x50d728;
-        return _0x3aa116.index - _0x405a62.index;
+export function createTopAlignedAssetNodes(list4, result = 24) {
+  const list5 = Array.isArray(list4) ? list4.filter(Boolean) : [],
+    list6 = list5
+      .map((node, index2) => ({ node: node, index: index2 }))
+      .sort((item2, data) => {
+        const toNumber2 = toNumber(item2.node?.x, 0),
+          toNumber3 = toNumber(data.node?.x, 0);
+        if (toNumber2 !== toNumber3) return toNumber2 - toNumber3;
+        const toNumber4 = toNumber(item2.node?.y, 0),
+          toNumber5 = toNumber(data.node?.y, 0);
+        if (toNumber4 !== toNumber5) return toNumber4 - toNumber5;
+        return item2.index - data.index;
       });
-  let _0x2f09e2 = 0;
-  return _0x257b3f.map(({ node: _0x5c8b53 }) => {
-    const _0x5d1971 = getNodeWidth(_0x5c8b53),
-      _0x29521e = getNodeHeight(_0x5c8b53),
-      _0x2bca0d = { ..._0x5c8b53, x: _0x2f09e2, y: 0, width: _0x5d1971, height: _0x29521e };
-    return ((_0x2f09e2 += _0x5d1971 + _0x131bd8), _0x2bca0d);
+  let x = 0;
+  return list6.map(({ node: node2 }) => {
+    const width = getNodeWidth(node2),
+      height = getNodeHeight(node2),
+      options = { ...node2, x: x, y: 0, width: width, height: height };
+    return ((x += width + result), options);
   });
 }
 
-const IMAGE_MEDIA_TYPES = new Set(["source-image","image","ai-image"]);
+const IMAGE_MEDIA_TYPES = new Set(['source-image', 'image', 'ai-image']);
 
-function getFirstPositiveDimension(..._0x3172f1){for(const _0x1d242f of _0x3172f1){const _0x4a59c8=Number(_0x1d242f);if(Number['isFinite'](_0x4a59c8)&&_0x4a59c8>0x0)return _0x4a59c8;}return 0x0;}
+function getFirstPositiveDimension(...args) {
+  for (const target of args) {
+    const count = Number(target);
+    if (Number['isFinite'](count) && count > 0x0) return count;
+  }
+  return 0x0;
+}
 
-export function prepareAssetNodeForRestore(_0x3bb172,_0x309dcd){if(!_0x309dcd||typeof _0x309dcd!=='object')return _0x309dcd;if(!String(_0x3bb172?.['packageKey']||'')["trim"]())return _0x309dcd;if(!IMAGE_MEDIA_TYPES["has"](String(_0x309dcd["type"]||'')))return _0x309dcd;const _0x3ce1e3=getFirstPositiveDimension(_0x309dcd['originalWidth'],_0x309dcd['imageWidth'],_0x309dcd["naturalWidth"],_0x309dcd['metadata']?.["width"],_0x309dcd['width'],_0x309dcd['w']),_0x1c1889=getFirstPositiveDimension(_0x309dcd['originalHeight'],_0x309dcd["imageHeight"],_0x309dcd['naturalHeight'],_0x309dcd["metadata"]?.['height'],_0x309dcd["height"],_0x309dcd['h']);if(!(_0x3ce1e3>0x0&&_0x1c1889>0x0))return _0x309dcd;const _0x3858ce=getAutoMediaSizeByShortSide(_0x3ce1e3,_0x1c1889);if(getNodeWidth(_0x309dcd)===_0x3858ce["width"]&&getNodeHeight(_0x309dcd)===_0x3858ce["height"])return _0x309dcd;return{..._0x309dcd,'width':_0x3858ce['width'],'height':_0x3858ce["height"]};}
+export function prepareAssetNodeForRestore(source, box3) {
+  if (!box3 || typeof box3 !== 'object') return box3;
+  if (!String(source?.['packageKey'] || '')['trim']()) return box3;
+  if (!IMAGE_MEDIA_TYPES['has'](String(box3['type'] || ''))) return box3;
+  const firstPositiveDimension = getFirstPositiveDimension(
+      box3['originalWidth'],
+      box3['imageWidth'],
+      box3['naturalWidth'],
+      box3['metadata']?.['width'],
+      box3['width'],
+      box3['w'],
+    ),
+    firstPositiveDimension2 = getFirstPositiveDimension(
+      box3['originalHeight'],
+      box3['imageHeight'],
+      box3['naturalHeight'],
+      box3['metadata']?.['height'],
+      box3['height'],
+      box3['h'],
+    );
+  if (!(firstPositiveDimension > 0x0 && firstPositiveDimension2 > 0x0)) return box3;
+  const box4 = getAutoMediaSizeByShortSide(firstPositiveDimension, firstPositiveDimension2);
+  if (getNodeWidth(box3) === box4['width'] && getNodeHeight(box3) === box4['height']) return box3;
+  return { ...box3, width: box4['width'], height: box4['height'] };
+}
 
-export function prepareAssetNodesForRestore(_0x42429e,_0x302919=0x18){const _0x15a5aa=Array['isArray'](_0x42429e?.["nodes"])?_0x42429e["nodes"]:[],_0x8b608e=_0x15a5aa["map"](_0x260e22=>prepareAssetNodeForRestore(_0x42429e,_0x260e22));return shouldTopAlignRestoredAsset(_0x8b608e,_0x42429e?.['edges'])?createTopAlignedAssetNodes(_0x8b608e,_0x302919):_0x8b608e;}
+export function prepareAssetNodesForRestore(next, current = 0x18) {
+  const entry = Array['isArray'](next?.['nodes']) ? next['nodes'] : [],
+    record = entry['map']((payload) => prepareAssetNodeForRestore(next, payload));
+  return shouldTopAlignRestoredAsset(record, next?.['edges'])
+    ? createTopAlignedAssetNodes(record, current)
+    : record;
+}

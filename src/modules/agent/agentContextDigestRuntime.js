@@ -4,86 +4,83 @@ import {
   selectAgentContextDigestBatch,
 } from './agentContextDigest.js';
 export function createAgentContextDigestRuntime({
-  sessionStore: _0x1fe10e,
-  summarize: _0x2ff5e2,
-  recentMessageLimit: _0x57e787,
-  minBatchMessages: _0x3a5597,
+  sessionStore: sessionStore,
+  summarize: summarize,
+  recentMessageLimit: recentMessageLimit,
+  minBatchMessages: minBatchMessages,
 } = {}) {
-  const _0x3f53d3 = new Map();
-  async function _0x407abc({
+  const map = new Map();
+  async function prepare({
     history: history = [],
     projectMemory: projectMemory = null,
     signal: signal = null,
     onTrace: onTrace = null,
   } = {}) {
-    const _0x40e9ed = _0x1fe10e?.['getActiveConversation']?.() || null,
-      _0x56919f = String(_0x40e9ed?.['id'] || '')['trim'](),
-      _0x415355 = normalizeAgentContextDigest(
-        _0x1fe10e?.['getContextDigest']?.() || _0x40e9ed?.['contextDigest'],
+    const value = sessionStore?.['getActiveConversation']?.() || null,
+      conversationId = String(value?.['id'] || '')['trim'](),
+      contextDigest = normalizeAgentContextDigest(
+        sessionStore?.['getContextDigest']?.() || value?.['contextDigest'],
       );
-    if (!_0x56919f || typeof _0x2ff5e2 !== 'function') return _0x415355;
-    const _0x365831 = selectAgentContextDigestBatch({
+    if (!conversationId || typeof summarize !== 'function') return contextDigest;
+    const messageCount = selectAgentContextDigestBatch({
       history: history,
-      contextDigest: _0x415355,
-      ...(_0x57e787 == null ? {} : { recentMessageLimit: _0x57e787 }),
-      ...(_0x3a5597 == null ? {} : { minBatchMessages: _0x3a5597 }),
+      contextDigest: contextDigest,
+      ...(recentMessageLimit == null ? {} : { recentMessageLimit: recentMessageLimit }),
+      ...(minBatchMessages == null ? {} : { minBatchMessages: minBatchMessages }),
     });
-    if (_0x365831['messages']['length'] === 0x0) return _0x415355;
-    const _0x415b89 = [
-        _0x56919f,
-        _0x365831['coveredThrough']?.['itemId'] ||
-          _0x365831['coveredThrough']?.['ts'] ||
-          _0x365831['messages']['length'],
+    if (messageCount['messages']['length'] === 0x0) return contextDigest;
+    const key = [
+        conversationId,
+        messageCount['coveredThrough']?.['itemId'] ||
+          messageCount['coveredThrough']?.['ts'] ||
+          messageCount['messages']['length'],
       ]['join'](':'),
-      _0x2ce95b = _0x3f53d3['get'](_0x56919f);
-    if (_0x2ce95b) return _0x2ce95b['promise'];
-    const _0x358d7f = (async () => {
+      item = map['get'](conversationId);
+    if (item) return item['promise'];
+    const promise = (async () => {
       onTrace?.({
         type: 'agent_context_digest_started',
-        conversationId: _0x56919f,
-        messageCount: _0x365831['messages']['length'],
+        conversationId: conversationId,
+        messageCount: messageCount['messages']['length'],
       });
       try {
-        const _0x507fb3 = await _0x2ff5e2({
-            existingDigest: _0x365831['contextDigest'],
-            messages: _0x365831['messages'],
+        const index = await summarize({
+            existingDigest: messageCount['contextDigest'],
+            messages: messageCount['messages'],
             projectMemory: projectMemory,
             signal: signal,
             onTrace: onTrace,
           }),
-          _0x7dfb5a = attachAgentContextDigestCursor(_0x507fb3, {
-            previousDigest: _0x365831['contextDigest'],
-            coveredThrough: _0x365831['coveredThrough'],
-            messageCount: _0x365831['messages']['length'],
+          coveredMessageCount = attachAgentContextDigestCursor(index, {
+            previousDigest: messageCount['contextDigest'],
+            coveredThrough: messageCount['coveredThrough'],
+            messageCount: messageCount['messages']['length'],
           });
-        if (!_0x7dfb5a) return _0x415355;
+        if (!coveredMessageCount) return contextDigest;
         return (
-          _0x1fe10e?.['setContextDigest']?.(_0x7dfb5a, { conversationId: _0x56919f }),
+          sessionStore?.['setContextDigest']?.(coveredMessageCount, { conversationId: conversationId }),
           onTrace?.({
             type: 'agent_context_digest_completed',
-            conversationId: _0x56919f,
-            coveredMessageCount: _0x7dfb5a['coveredMessageCount'],
+            conversationId: conversationId,
+            coveredMessageCount: coveredMessageCount['coveredMessageCount'],
           }),
-          _0x7dfb5a
+          coveredMessageCount
         );
-      } catch (_0x371651) {
+      } catch (error) {
         return (
           onTrace?.({
             type: 'agent_context_digest_failed',
-            conversationId: _0x56919f,
-            reason: String(_0x371651?.['message'] || _0x371651 || 'context digest failed')['slice'](
-              0x0,
-              0xf0,
-            ),
+            conversationId: conversationId,
+            reason: String(error?.['message'] || error || 'context digest failed')['slice'](0x0, 0xf0),
           }),
-          _0x415355
+          contextDigest
         );
       } finally {
-        const _0x358228 = _0x3f53d3['get'](_0x56919f);
-        if (_0x358228?.['key'] === _0x415b89) _0x3f53d3['delete'](_0x56919f);
+        const event = map['get'](conversationId);
+        if (event?.['key'] === key) map['delete'](conversationId);
       }
     })();
-    return (_0x3f53d3['set'](_0x56919f, { key: _0x415b89, promise: _0x358d7f }), _0x358d7f);
+    return (map['set'](conversationId, { key: key, promise: promise }), promise);
   }
-  return { prepare: _0x407abc };
+  return { prepare: prepare };
 }

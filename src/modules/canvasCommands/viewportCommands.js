@@ -1,21 +1,21 @@
 import { normalizeNodeIds } from './graphCommands.js';
-function getState(_0x4fe395) {
-  return _0x4fe395.store?.getStateRaw?.() || _0x4fe395.store?.getState?.() || {};
+function getState(value) {
+  return value.store?.getStateRaw?.() || value.store?.getState?.() || {};
 }
-function toFinitePositiveNumber(_0xccfbd, _0x10751c) {
-  const _0x1addfb = Number(_0xccfbd);
-  return Number.isFinite(_0x1addfb) && _0x1addfb > 0 ? _0x1addfb : _0x10751c;
+function toFinitePositiveNumber(item, key) {
+  const count = Number(item);
+  return Number.isFinite(count) && count > 0 ? count : key;
 }
-function requireFocusNodes(_0x2ceac1, _0x527859) {
-  if (typeof _0x2ceac1.focusNodes === 'function') return null;
+function requireFocusNodes(index, message) {
+  if (typeof index.focusNodes === 'function') return null;
   return {
     ok: false,
     errorCode: 'VIEWPORT_FOCUS_UNAVAILABLE',
-    message: _0x527859 + ' requires a viewport focus service.',
+    message: message + ' requires a viewport focus service.',
   };
 }
-export function registerViewportCommands(_0xfc0017) {
-  (_0xfc0017.register({
+export function registerViewportCommands(result) {
+  (result.register({
     id: 'viewport.focusNodes',
     description: 'Focus canvas viewport on nodes.',
     riskLevel: 'safe',
@@ -32,39 +32,34 @@ export function registerViewportCommands(_0xfc0017) {
     },
     capabilitySchema: { reads: ['nodes', 'selection'], writes: ['viewport'], selectionFallback: true },
     returnSchema: { aliasFields: ['ids', 'focused'] },
-    validate(_0x5d11e1 = {}, _0x57d87e = {}) {
-      const _0x52c6ec = requireFocusNodes(_0x57d87e, 'viewport.focusNodes');
-      if (_0x52c6ec) return _0x52c6ec;
+    validate(options = {}, data = {}) {
+      const requireFocusNodes2 = requireFocusNodes(data, 'viewport.focusNodes');
+      if (requireFocusNodes2) return requireFocusNodes2;
       try {
         return {
           args: {
-            ids: normalizeNodeIds(_0x5d11e1, _0x57d87e, { min: 1, allowSelection: true }),
-            padding: toFinitePositiveNumber(_0x5d11e1.padding, 80),
-            durationMs: toFinitePositiveNumber(_0x5d11e1.durationMs, 0x320),
-            options: _0x5d11e1.options || null,
+            ids: normalizeNodeIds(options, data, { min: 1, allowSelection: true }),
+            padding: toFinitePositiveNumber(options.padding, 80),
+            durationMs: toFinitePositiveNumber(options.durationMs, 0x320),
+            options: options.options || null,
           },
         };
-      } catch (_0x228617) {
+      } catch (errorCode) {
         return {
           ok: false,
-          errorCode: _0x228617.errorCode || 'INVALID_FOCUS_NODES',
-          message: _0x228617.message,
-          details: _0x228617.details,
+          errorCode: errorCode.errorCode || 'INVALID_FOCUS_NODES',
+          message: errorCode.message,
+          details: errorCode.details,
         };
       }
     },
-    execute(_0x3259a0, _0x22fbba) {
-      const _0x4a8cae = _0x22fbba.focusNodes(
-        _0x3259a0.ids,
-        _0x3259a0.padding,
-        _0x3259a0.durationMs,
-        _0x3259a0.options,
-      );
-      if (_0x4a8cae === false) return { ids: _0x3259a0.ids, focused: false };
-      return { ids: _0x3259a0.ids, focused: true };
+    execute(ids, target) {
+      const source = target.focusNodes(ids.ids, ids.padding, ids.durationMs, ids.options);
+      if (source === false) return { ids: ids.ids, focused: false };
+      return { ids: ids.ids, focused: true };
     },
   }),
-    _0xfc0017.register({
+    result.register({
       id: 'viewport.fitAll',
       description: 'Fit all canvas nodes in the viewport.',
       riskLevel: 'safe',
@@ -78,11 +73,11 @@ export function registerViewportCommands(_0xfc0017) {
       },
       capabilitySchema: { reads: ['nodes'], writes: ['viewport'] },
       returnSchema: { aliasFields: ['ids', 'focused'] },
-      validate(_0x262801 = {}, _0x2996e2 = {}) {
-        const _0x1ff2ab = requireFocusNodes(_0x2996e2, 'viewport.fitAll');
-        if (_0x1ff2ab) return _0x1ff2ab;
-        const _0x5255cb = Object.keys(getState(_0x2996e2).nodes || {});
-        if (_0x5255cb.length === 0)
+      validate(options2 = {}, next = {}) {
+        const requireFocusNodes3 = requireFocusNodes(next, 'viewport.fitAll');
+        if (requireFocusNodes3) return requireFocusNodes3;
+        const ids2 = Object.keys(getState(next).nodes || {});
+        if (ids2.length === 0)
           return {
             ok: false,
             errorCode: 'EMPTY_CANVAS',
@@ -90,21 +85,16 @@ export function registerViewportCommands(_0xfc0017) {
           };
         return {
           args: {
-            ids: _0x5255cb,
-            padding: toFinitePositiveNumber(_0x262801.padding, 80),
-            durationMs: toFinitePositiveNumber(_0x262801.durationMs, 0x320),
-            options: _0x262801.options || null,
+            ids: ids2,
+            padding: toFinitePositiveNumber(options2.padding, 80),
+            durationMs: toFinitePositiveNumber(options2.durationMs, 0x320),
+            options: options2.options || null,
           },
         };
       },
-      execute(_0x3ccb3f, _0x33c5f8) {
-        const _0x4f8c9d = _0x33c5f8.focusNodes(
-          _0x3ccb3f.ids,
-          _0x3ccb3f.padding,
-          _0x3ccb3f.durationMs,
-          _0x3ccb3f.options,
-        );
-        return { ids: _0x3ccb3f.ids, focused: _0x4f8c9d !== false };
+      execute(ids3, current) {
+        const focused = current.focusNodes(ids3.ids, ids3.padding, ids3.durationMs, ids3.options);
+        return { ids: ids3.ids, focused: focused !== false };
       },
     }));
 }

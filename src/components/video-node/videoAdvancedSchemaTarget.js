@@ -1,75 +1,75 @@
 import { normalizeProviderId, resolveModelExecution } from '../../manifests/index.js';
 import { isCustomAiAppManifest, resolveCustomAiAppNodeManifest } from '../shared/rhAiAppNodeBehavior.js';
 import { hasRunningHubVideoWorkflowUiPlacement } from './runningHubVideoUiSchema.js';
-function resolveExecution(_0x6cd5a4, _0x8631af) {
+function resolveExecution(value, providerHint) {
+  return resolveModelExecution(value, { providerHint: providerHint }) || resolveModelExecution(value) || null;
+}
+function isRunningHubVideoWorkflowExecution(item) {
   return (
-    resolveModelExecution(_0x6cd5a4, { providerHint: _0x8631af }) || resolveModelExecution(_0x6cd5a4) || null
+    normalizeProviderId(item?.['modelManifest']?.['provider']) === 'runninghubwf' &&
+    item?.['modelManifest']?.['adapterType'] === 'workflow' &&
+    item?.['executionManifest']?.['adapterType'] === 'workflow'
   );
 }
-function isRunningHubVideoWorkflowExecution(_0xa01dff) {
-  return (
-    normalizeProviderId(_0xa01dff?.['modelManifest']?.['provider']) === 'runninghubwf' &&
-    _0xa01dff?.['modelManifest']?.['adapterType'] === 'workflow' &&
-    _0xa01dff?.['executionManifest']?.['adapterType'] === 'workflow'
-  );
-}
-function hasModelUiSchemaPlacement(_0x3b003d, _0x59fc72) {
-  const _0x4d72ae = String(_0x59fc72 || '')
+function hasModelUiSchemaPlacement(key, index) {
+  const enabled = String(index || '')
     ['trim']()
     ['toLowerCase']();
-  if (!_0x4d72ae) return ![];
-  const _0x4191df = Array['isArray'](_0x3b003d?.['uiSchema']?.['fields'])
-    ? _0x3b003d['uiSchema']['fields']
-    : [];
-  return _0x4191df['some']((_0x38c787) => {
+  if (!enabled) return ![];
+  const list = Array['isArray'](key?.['uiSchema']?.['fields']) ? key['uiSchema']['fields'] : [];
+  return list['some']((result) => {
     return (
-      String(_0x38c787?.['placement'] || '')
+      String(result?.['placement'] || '')
         ['trim']()
-        ['toLowerCase']() === _0x4d72ae
+        ['toLowerCase']() === enabled
     );
   });
 }
-export function isRunningHubVideoWorkflowModel(_0x508164, _0x19d4c3) {
-  return isRunningHubVideoWorkflowExecution(resolveExecution(_0x508164, _0x19d4c3));
+export function isRunningHubVideoWorkflowModel(data, options) {
+  return isRunningHubVideoWorkflowExecution(resolveExecution(data, options));
 }
 export function resolveVideoAdvancedSchemaTarget(
-  _0x1cd3eb = {},
-  { fallbackNodeData: fallbackNodeData = {}, buildRunningHubNodeData: _0x704b06 } = {},
+  options2 = {},
+  { fallbackNodeData: fallbackNodeData = {}, buildRunningHubNodeData: buildRunningHubNodeData } = {},
 ) {
-  const _0x20cb2b = _0x1cd3eb || {},
-    _0x19c8ad = fallbackNodeData || {},
-    _0x22f9e2 = String(_0x20cb2b?.['model'] || _0x19c8ad?.['model'] || '')['trim']();
-  if (!_0x22f9e2) return null;
-  const _0x188b26 = _0x20cb2b?.['provider'] || _0x19c8ad?.['provider'],
-    _0x353ced = resolveExecution(_0x22f9e2, _0x188b26),
-    _0x456bf6 = resolveCustomAiAppNodeManifest({
-      ..._0x19c8ad,
-      ..._0x20cb2b,
-      model: _0x22f9e2,
-      provider: _0x188b26,
+  const nodeData = options2 || {},
+    args = fallbackNodeData || {},
+    model = String(nodeData?.['model'] || args?.['model'] || '')['trim']();
+  if (!model) return null;
+  const provider = nodeData?.['provider'] || args?.['provider'],
+    execution = resolveExecution(model, provider),
+    customAiAppNodeManifest = resolveCustomAiAppNodeManifest({
+      ...args,
+      ...nodeData,
+      model: model,
+      provider: provider,
     });
-  if (isCustomAiAppManifest(_0x456bf6 || _0x353ced?.['modelManifest'])) {
-    const _0x19c388 = _0x456bf6 || _0x353ced?.['modelManifest'];
-    return hasModelUiSchemaPlacement(_0x19c388, 'advanced')
-      ? { modelId: _0x22f9e2, nodeData: _0x704b06?.(_0x20cb2b) || _0x20cb2b, placement: 'advanced' }
+  if (isCustomAiAppManifest(customAiAppNodeManifest || execution?.['modelManifest'])) {
+    const target = customAiAppNodeManifest || execution?.['modelManifest'];
+    return hasModelUiSchemaPlacement(target, 'advanced')
+      ? { modelId: model, nodeData: buildRunningHubNodeData?.(nodeData) || nodeData, placement: 'advanced' }
       : null;
   }
-  if (isRunningHubVideoWorkflowExecution(_0x353ced)) {
-    if (_0x353ced?.['modelManifest']?.['extensions']?.['rhAiApp'])
-      return hasRunningHubVideoWorkflowUiPlacement(_0x22f9e2, 'advanced')
-        ? { modelId: _0x22f9e2, nodeData: _0x704b06?.(_0x20cb2b) || _0x20cb2b, placement: 'advanced' }
+  if (isRunningHubVideoWorkflowExecution(execution)) {
+    if (execution?.['modelManifest']?.['extensions']?.['rhAiApp'])
+      return hasRunningHubVideoWorkflowUiPlacement(model, 'advanced')
+        ? { modelId: model, nodeData: buildRunningHubNodeData?.(nodeData) || nodeData, placement: 'advanced' }
         : null;
-    return hasRunningHubVideoWorkflowUiPlacement(_0x22f9e2, 'videoAdvanced')
-      ? { modelId: _0x22f9e2, nodeData: _0x704b06?.(_0x20cb2b) || _0x20cb2b, placement: 'videoAdvanced' }
+    return hasRunningHubVideoWorkflowUiPlacement(model, 'videoAdvanced')
+      ? {
+          modelId: model,
+          nodeData: buildRunningHubNodeData?.(nodeData) || nodeData,
+          placement: 'videoAdvanced',
+        }
       : null;
   }
   if (
-    _0x353ced?.['modelManifest']?.['adapterType'] !== 'modelApi' ||
-    _0x353ced?.['modelManifest']?.['kind'] !== 'video'
+    execution?.['modelManifest']?.['adapterType'] !== 'modelApi' ||
+    execution?.['modelManifest']?.['kind'] !== 'video'
   )
     return null;
-  const _0x32ff64 = String(
-    _0x353ced?.['canonicalModelId'] || _0x353ced?.['modelManifest']?.['modelId'] || _0x22f9e2,
+  const modelId = String(
+    execution?.['canonicalModelId'] || execution?.['modelManifest']?.['modelId'] || model,
   )['trim']();
-  return _0x32ff64 ? { modelId: _0x32ff64, nodeData: _0x20cb2b, placement: 'advanced' } : null;
+  return modelId ? { modelId: modelId, nodeData: nodeData, placement: 'advanced' } : null;
 }

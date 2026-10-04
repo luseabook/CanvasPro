@@ -2,39 +2,39 @@ import { buildApiUrl, get, post, request } from './apiBase.js';
 export const DREAMINA_CLI_STATUS_CHANGED_EVENT = 'aicanvas:dreamina-cli-status-changed';
 let dreaminaCliStatusCache = null;
 function notifyDreaminaCliStatusChanged() {
-  const _0x469c16 = globalThis.window;
-  if (!_0x469c16 || typeof _0x469c16.dispatchEvent !== 'function') return;
-  const _0x682e55 =
+  const enabled = globalThis.window;
+  if (!enabled || typeof enabled.dispatchEvent !== 'function') return;
+  const value =
     typeof globalThis.CustomEvent === 'function'
       ? new globalThis.CustomEvent(DREAMINA_CLI_STATUS_CHANGED_EVENT)
       : { type: DREAMINA_CLI_STATUS_CHANGED_EVENT };
-  _0x469c16.dispatchEvent(_0x682e55);
+  enabled.dispatchEvent(value);
 }
-function rememberDreaminaCliStatus(_0x588be6) {
-  if (!_0x588be6 || typeof _0x588be6 !== 'object' || Array.isArray(_0x588be6)) return _0x588be6;
+function rememberDreaminaCliStatus(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return args;
   if (
-    !Object.prototype.hasOwnProperty.call(_0x588be6, 'loggedIn') &&
-    !Object.prototype.hasOwnProperty.call(_0x588be6, 'installed')
+    !Object.prototype.hasOwnProperty.call(args, 'loggedIn') &&
+    !Object.prototype.hasOwnProperty.call(args, 'installed')
   )
-    return _0x588be6;
-  return ((dreaminaCliStatusCache = { ..._0x588be6 }), notifyDreaminaCliStatusChanged(), _0x588be6);
+    return args;
+  return ((dreaminaCliStatusCache = { ...args }), notifyDreaminaCliStatusChanged(), args);
 }
-function rememberDreaminaStatusFromPayload(_0x2d10c7) {
-  return (rememberDreaminaCliStatus(_0x2d10c7?.status), _0x2d10c7);
+function rememberDreaminaStatusFromPayload(response) {
+  return (rememberDreaminaCliStatus(response?.status), response);
 }
-function rememberDreaminaLoginRuntime(_0x34927a) {
-  const _0x5a1b95 = String(_0x34927a?.phase || '')
+function rememberDreaminaLoginRuntime(runtime) {
+  const item = String(runtime?.phase || '')
     .trim()
     .toLowerCase();
   return (
-    ['success', 'reused', 'done'].includes(_0x5a1b95) &&
+    ['success', 'reused', 'done'].includes(item) &&
       ((dreaminaCliStatusCache = {
         ...(dreaminaCliStatusCache || {}),
         loggedIn: true,
-        runtime: _0x34927a && typeof _0x34927a === 'object' ? { ..._0x34927a } : _0x34927a,
+        runtime: runtime && typeof runtime === 'object' ? { ...runtime } : runtime,
       }),
       notifyDreaminaCliStatusChanged()),
-    _0x34927a
+    runtime
   );
 }
 export function getCachedDreaminaCliStatus() {
@@ -43,46 +43,46 @@ export function getCachedDreaminaCliStatus() {
 export function _resetDreaminaCliStatusCacheForTests() {
   dreaminaCliStatusCache = null;
 }
-export async function fetchDreaminaCliStatusFromServer(_0x3f5e5c = {}) {
-  const _0x5117ef = _0x3f5e5c?.refresh ? '?refresh=1' : '',
-    _0x4ec10c = await get('/api/v2/dreamina/status' + _0x5117ef);
-  if (!_0x4ec10c.success) throw new Error(_0x4ec10c.error || '获取 Dreamina CLI 状态失败');
-  return rememberDreaminaCliStatus(_0x4ec10c.data || {});
+export async function fetchDreaminaCliStatusFromServer(timer = {}) {
+  const key = timer?.refresh ? '?refresh=1' : '',
+    response2 = await get('/api/v2/dreamina/status' + key);
+  if (!response2.success) throw new Error(response2.error || '获取 Dreamina CLI 状态失败');
+  return rememberDreaminaCliStatus(response2.data || {});
 }
 export async function fetchDreaminaCliLoginRuntimeFromServer() {
-  const _0x50a805 = await request('/api/v2/dreamina/login/runtime', {
+  const response3 = await request('/api/v2/dreamina/login/runtime', {
     method: 'GET',
     cache: 'no-store',
   });
-  if (!_0x50a805.success) throw new Error(_0x50a805.error || '获取 Dreamina 登录运行态失败');
-  return rememberDreaminaLoginRuntime(_0x50a805.data || {});
+  if (!response3.success) throw new Error(response3.error || '获取 Dreamina 登录运行态失败');
+  return rememberDreaminaLoginRuntime(response3.data || {});
 }
 export async function startDreaminaHeadlessLoginFromServer() {
-  const _0x5d0d31 = await post('/api/v2/dreamina/login', { mode: 'headless' });
-  if (!_0x5d0d31.success) throw new Error(_0x5d0d31.error || '发起 Dreamina headless 登录失败');
-  return rememberDreaminaStatusFromPayload(_0x5d0d31.data || {});
+  const response4 = await post('/api/v2/dreamina/login', { mode: 'headless' });
+  if (!response4.success) throw new Error(response4.error || '发起 Dreamina headless 登录失败');
+  return rememberDreaminaStatusFromPayload(response4.data || {});
 }
 export async function startDreaminaHeadlessReloginFromServer() {
-  const _0x8c39e0 = await post('/api/v2/dreamina/relogin', { mode: 'headless' });
-  if (!_0x8c39e0.success) throw new Error(_0x8c39e0.error || '发起 Dreamina headless 重新登录失败');
-  return rememberDreaminaStatusFromPayload(_0x8c39e0.data || {});
+  const response5 = await post('/api/v2/dreamina/relogin', { mode: 'headless' });
+  if (!response5.success) throw new Error(response5.error || '发起 Dreamina headless 重新登录失败');
+  return rememberDreaminaStatusFromPayload(response5.data || {});
 }
-export async function startDreaminaWebLoginFromServer(_0x16abd3 = {}) {
-  const _0x156c06 = await post('/api/v2/dreamina/login/web', { mode: 'web', force: !!_0x16abd3?.force });
-  if (!_0x156c06.success) throw new Error(_0x156c06.error || '发起 Dreamina OAuth 登录失败');
-  return rememberDreaminaStatusFromPayload(_0x156c06.data || {});
+export async function startDreaminaWebLoginFromServer(enabled2 = {}) {
+  const response6 = await post('/api/v2/dreamina/login/web', { mode: 'web', force: !!enabled2?.force });
+  if (!response6.success) throw new Error(response6.error || '发起 Dreamina OAuth 登录失败');
+  return rememberDreaminaStatusFromPayload(response6.data || {});
 }
-export async function importDreaminaLoginResponseFromServer(_0x3ba8af) {
-  const _0x3c0944 = await post('/api/v2/dreamina/login/import', { loginResponse: _0x3ba8af });
-  if (!_0x3c0944.success) throw new Error(_0x3c0944.error || '导入 Dreamina 登录态失败');
-  return rememberDreaminaStatusFromPayload(_0x3c0944.data || {});
+export async function importDreaminaLoginResponseFromServer(loginResponse) {
+  const response7 = await post('/api/v2/dreamina/login/import', { loginResponse: loginResponse });
+  if (!response7.success) throw new Error(response7.error || '导入 Dreamina 登录态失败');
+  return rememberDreaminaStatusFromPayload(response7.data || {});
 }
 export async function logoutDreaminaFromServer() {
-  const _0x2958b7 = await post('/api/v2/dreamina/logout', {});
-  if (!_0x2958b7.success) throw new Error(_0x2958b7.error || '退出 Dreamina 登录失败');
-  return rememberDreaminaStatusFromPayload(_0x2958b7.data || {});
+  const response8 = await post('/api/v2/dreamina/logout', {});
+  if (!response8.success) throw new Error(response8.error || '退出 Dreamina 登录失败');
+  return rememberDreaminaStatusFromPayload(response8.data || {});
 }
-export function buildDreaminaQrImageUrl(_0x4d1818 = 0) {
-  const _0x38419d = _0x4d1818 ? '?v=' + encodeURIComponent(String(_0x4d1818)) : '';
-  return buildApiUrl('/api/v2/dreamina/login/qr' + _0x38419d);
+export function buildDreaminaQrImageUrl(index = 0) {
+  const result = index ? '?v=' + encodeURIComponent(String(index)) : '';
+  return buildApiUrl('/api/v2/dreamina/login/qr' + result);
 }

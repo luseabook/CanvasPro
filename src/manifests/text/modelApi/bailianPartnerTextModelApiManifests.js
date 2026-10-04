@@ -6,27 +6,27 @@ const MODELS = [
     { model: 'deepseek-v4-flash-0731', title: 'DeepSeek V4 Flash 0731', lowEffort: !![] },
     { model: 'kimi-k3', title: 'Kimi\x20K3', image: !![] },
   ],
-  executionId = (_0x358c3c) => 'bailian.model-api.text.' + _0x358c3c + '.v1',
+  executionId = (value) => 'bailian.model-api.text.' + value + '.v1',
   responseMapping = { resultPaths: ['choices[].message.content'] };
 export const bailianPartnerTextModelManifests = Object['freeze'](
-  MODELS['map'](({ model: _0x5124e0, title: _0x12e413, image: _0x43c558, lowEffort: _0x8a91d3 }) => ({
+  MODELS['map'](({ model: model, title: title, image: image, lowEffort: lowEffort }) => ({
     schemaVersion: '1.0',
-    modelId: 'bailian/' + _0x5124e0,
-    executionId: executionId(_0x5124e0),
+    modelId: 'bailian/' + model,
+    executionId: executionId(model),
     provider: 'bailian',
     kind: 'text',
     adapterType: 'modelApi',
-    displayName: _0x12e413,
-    icon: _0x43c558 ? 'images/kimi-logo.png' : 'images/deepseek.svg',
-    description: _0x43c558 ? '百炼官方 · 图文理解 · 仅思考模式' : '百炼官方 · 文本推理',
+    displayName: title,
+    icon: image ? 'images/kimi-logo.png' : 'images/deepseek.svg',
+    description: image ? '百炼官方 · 图文理解 · 仅思考模式' : '百炼官方 · 文本推理',
     inputSlots: {
-      allowedKinds: _0x43c558 ? ['text', 'image'] : ['text'],
+      allowedKinds: image ? ['text', 'image'] : ['text'],
       minByKind: { text: 0x0 },
-      maxByKind: { image: _0x43c558 ? 0x8 : 0x0, video: 0x0, audio: 0x0 },
+      maxByKind: { image: image ? 0x8 : 0x0, video: 0x0, audio: 0x0 },
     },
     uiSchema: {
       fields: [
-        ...(!_0x43c558
+        ...(!image
           ? [
               {
                 id: 'reasoningEffort',
@@ -36,7 +36,7 @@ export const bailianPartnerTextModelManifests = Object['freeze'](
                 label: '思考深度',
                 defaultValue: 'high',
                 options: [
-                  ...(_0x8a91d3 ? [{ value: 'low', label: '低' }] : []),
+                  ...(lowEffort ? [{ value: 'low', label: '低' }] : []),
                   { value: 'high', label: '高' },
                   { value: 'max', label: '最高' },
                 ],
@@ -49,9 +49,9 @@ export const bailianPartnerTextModelManifests = Object['freeze'](
     extensions: {
       textMenu: {
         group: 'bailian',
-        title: _0x12e413,
-        subtitle: _0x43c558 ? '百炼官方 · 图文理解 · 仅思考模式' : '百炼官方 · 文本推理',
-        icon: _0x43c558 ? 'moonshot' : 'deepseek',
+        title: title,
+        subtitle: image ? '百炼官方 · 图文理解 · 仅思考模式' : '百炼官方 · 文本推理',
+        icon: image ? 'moonshot' : 'deepseek',
       },
     },
     async: ![],
@@ -60,28 +60,28 @@ export const bailianPartnerTextModelManifests = Object['freeze'](
   })),
 );
 export const bailianPartnerTextExecutionManifests = Object['freeze'](
-  MODELS['map'](({ model: _0x4105c2, image: _0x44f77b }) => ({
+  MODELS['map'](({ model: model2, image: image2 }) => ({
     schemaVersion: '1.0',
-    id: executionId(_0x4105c2),
+    id: executionId(model2),
     provider: 'bailian',
     kind: 'text',
     adapterType: 'modelApi',
     endpoint: '/compatible-mode/v1/chat/completions',
     endpointMode: 'chat-completion',
     method: 'POST',
-    model: _0x4105c2,
+    model: model2,
     headers: { 'Content-Type': 'application/json' },
     bodyMapping: { modelField: 'model', messagesField: 'messages' },
     responseMapping: responseMapping,
     result: { textFields: responseMapping['resultPaths'] },
     extensions: {
-      chatCompletionInputPolicy: _0x44f77b ? 'image-only' : 'text-only',
+      chatCompletionInputPolicy: image2 ? 'image-only' : 'text-only',
       strictUpload: !![],
       streaming: !![],
       structuredOutputMode: 'json_object',
       chatCompletionBodyMapping: [
         { path: 'enable_thinking', from: 'constant', value: !![] },
-        ...(!_0x44f77b
+        ...(!image2
           ? [{ path: 'reasoning_effort', from: 'param', field: 'generationParams.reasoningEffort' }]
           : []),
       ],

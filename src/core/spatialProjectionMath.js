@@ -1,78 +1,64 @@
-export function clientToViewportNdc(_0x23ff05, _0x14deac, _0x1260d1) {
-  if (!(_0x1260d1['width'] > 0x0 && _0x1260d1['height'] > 0x0)) return null;
+export function clientToViewportNdc(value, item, box) {
+  if (!(box['width'] > 0x0 && box['height'] > 0x0)) return null;
   return {
-    x: ((_0x23ff05 - _0x1260d1['left']) / _0x1260d1['width']) * 0x2 - 0x1,
-    y: 0x1 - ((_0x14deac - _0x1260d1['top']) / _0x1260d1['height']) * 0x2,
+    x: ((value - box['left']) / box['width']) * 0x2 - 0x1,
+    y: 0x1 - ((item - box['top']) / box['height']) * 0x2,
   };
 }
-export function ndcToViewportPoint(_0x3e98e8, _0xf6f2cd) {
-  if (_0x3e98e8['z'] < -0x1 || _0x3e98e8['z'] > 0x1) return null;
+export function ndcToViewportPoint(box2, box3) {
+  if (box2['z'] < -0x1 || box2['z'] > 0x1) return null;
   return {
-    x: ((_0x3e98e8['x'] + 0x1) * _0xf6f2cd['width']) / 0x2,
-    y: ((0x1 - _0x3e98e8['y']) * _0xf6f2cd['height']) / 0x2,
+    x: ((box2['x'] + 0x1) * box3['width']) / 0x2,
+    y: ((0x1 - box2['y']) * box3['height']) / 0x2,
   };
 }
-export function intersectRayWithAxisPlane(_0x5e307c, _0x2d44ea, _0x3fe22c, _0x462229) {
-  if (Math['abs'](_0x2d44ea[_0x3fe22c]) < 1e-7) return null;
-  const _0x1ac551 = (_0x462229 - _0x5e307c[_0x3fe22c]) / _0x2d44ea[_0x3fe22c];
-  if (_0x1ac551 < 0x0 || _0x1ac551 > 0x2710) return null;
-  return _0x5e307c['map']((_0x33edde, _0x2db2aa) => _0x33edde + _0x2d44ea[_0x2db2aa] * _0x1ac551);
+export function intersectRayWithAxisPlane(list, key, index, result) {
+  if (Math['abs'](key[index]) < 1e-7) return null;
+  const count = (result - list[index]) / key[index];
+  if (count < 0x0 || count > 0x2710) return null;
+  return list['map']((data, options) => data + key[options] * count);
 }
-export function adjustSpatialCamera(_0x2df9b1, _0x45a423, _0x3c4720, _0x19b802 = ![]) {
-  const _0x2cf73d = structuredClone(_0x2df9b1),
-    _0x15b84e = _0x2df9b1['target']['map'](
-      (_0x46dacf, _0x1435a1) => _0x46dacf - _0x2df9b1['position'][_0x1435a1],
-    ),
-    _0x5e9920 = Math['max'](0.01, Math['hypot'](..._0x15b84e));
-  if (_0x19b802) {
-    const _0x3e66c3 = Math['max'](
-      -_0x5e9920 * 0.8,
-      Math['min'](_0x5e9920 * 0.8, _0x3c4720 * _0x5e9920 * 0.002),
-    );
-    _0x2cf73d['position'] = _0x2df9b1['position']['map'](
-      (_0x1bee5e, _0x844226) => _0x1bee5e + (_0x15b84e[_0x844226] / _0x5e9920) * _0x3e66c3,
+export function adjustSpatialCamera(event, target, source, next = ![]) {
+  const event2 = structuredClone(event),
+    args = event['target']['map']((current, entry) => current - event['position'][entry]),
+    record = Math['max'](0.01, Math['hypot'](...args));
+  if (next) {
+    const payload = Math['max'](-record * 0.8, Math['min'](record * 0.8, source * record * 0.002));
+    event2['position'] = event['position']['map'](
+      (handle, state) => handle + (args[state] / record) * payload,
     );
   } else {
-    const _0x5042a4 = Math['atan2'](_0x15b84e[0x0], _0x15b84e[0x2]) - _0x45a423 * 0.005,
-      _0x5ea551 = Math['max'](
-        -1.55,
-        Math['min'](1.55, Math['asin'](_0x15b84e[0x1] / _0x5e9920) + _0x3c4720 * 0.005),
-      );
-    _0x2cf73d['target'] = [
-      Math['sin'](_0x5042a4) * Math['cos'](_0x5ea551),
-      Math['sin'](_0x5ea551),
-      Math['cos'](_0x5042a4) * Math['cos'](_0x5ea551),
-    ]['map']((_0x5e4237, _0x2c0ded) => _0x2df9b1['position'][_0x2c0ded] + _0x5e4237 * _0x5e9920);
+    const config = Math['atan2'](args[0x0], args[0x2]) - target * 0.005,
+      scope = Math['max'](-1.55, Math['min'](1.55, Math['asin'](args[0x1] / record) + source * 0.005));
+    event2['target'] = [
+      Math['sin'](config) * Math['cos'](scope),
+      Math['sin'](scope),
+      Math['cos'](config) * Math['cos'](scope),
+    ]['map']((input, output) => event['position'][output] + input * record);
   }
-  return _0x2cf73d;
+  return event2;
 }
-export function applyRelativeCameraPose(_0x484317, _0x4b6c77) {
-  const _0x443210 = adjustSpatialCamera(
-      _0x484317,
-      -_0x4b6c77['rotation'][0x1] / 0.005,
-      _0x4b6c77['rotation'][0x0] / 0.005,
+export function applyRelativeCameraPose(value2, value3) {
+  const event3 = adjustSpatialCamera(
+      value2,
+      -value3['rotation'][0x1] / 0.005,
+      value3['rotation'][0x0] / 0.005,
     ),
-    _0x57b068 = _0x443210['target']['map'](
-      (_0xc88082, _0x4aa1c4) => _0xc88082 - _0x443210['position'][_0x4aa1c4],
-    ),
-    _0x282ac6 = Math['hypot'](..._0x57b068) || 0x1,
-    _0x2b73d9 = _0x57b068['map']((_0x3a6f48) => _0x3a6f48 / _0x282ac6),
-    _0x573b3a = Math['hypot'](_0x2b73d9[0x0], _0x2b73d9[0x2]) || 0x1,
-    _0x3ae5f8 = [-_0x2b73d9[0x2] / _0x573b3a, 0x0, _0x2b73d9[0x0] / _0x573b3a],
-    _0xd37b4a = _0x2b73d9['map'](
-      (_0x1b8b96, _0x1220f4) =>
-        _0x3ae5f8[_0x1220f4] * _0x4b6c77['translation'][0x0] -
-        _0x1b8b96 * _0x4b6c77['translation'][0x2] +
-        (_0x1220f4 === 0x1 ? _0x4b6c77['translation'][0x1] : 0x0),
+    list2 = event3['target']['map']((value4, value5) => value4 - event3['position'][value5]),
+    value6 = Math['hypot'](...list2) || 0x1,
+    list3 = list2['map']((value7) => value7 / value6),
+    value8 = Math['hypot'](list3[0x0], list3[0x2]) || 0x1,
+    value9 = [-list3[0x2] / value8, 0x0, list3[0x0] / value8],
+    value10 = list3['map'](
+      (value11, count2) =>
+        value9[count2] * value3['translation'][0x0] -
+        value11 * value3['translation'][0x2] +
+        (count2 === 0x1 ? value3['translation'][0x1] : 0x0),
     );
   return (
-    (_0x443210['position'] = _0x443210['position']['map'](
-      (_0x27ee4e, _0x7c263d) => _0x27ee4e + _0xd37b4a[_0x7c263d],
-    )),
-    (_0x443210['target'] = _0x443210['target']['map'](
-      (_0x4dd87a, _0x407571) => _0x4dd87a + _0xd37b4a[_0x407571],
-    )),
-    (_0x443210['roll'] = (_0x484317['roll'] || 0x0) + _0x4b6c77['rotation'][0x2]),
-    _0x443210
+    (event3['position'] = event3['position']['map']((value12, value13) => value12 + value10[value13])),
+    (event3['target'] = event3['target']['map']((value14, value15) => value14 + value10[value15])),
+    (event3['roll'] = (value2['roll'] || 0x0) + value3['rotation'][0x2]),
+    event3
   );
 }

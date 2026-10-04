@@ -1,101 +1,97 @@
 import { resolveMappedImageResponseValues, resolveMappedResponseValues } from './modelApiMappingEngine.js';
-function normalizeOutputType(_0x4d2778 = null, _0x3e9ca5 = null) {
+function normalizeOutputType(value = null, item = null) {
   return String(
-    _0x3e9ca5?.['result']?.['outputType'] ||
-      _0x4d2778?.['outputType'] ||
-      _0x3e9ca5?.['kind'] ||
-      _0x4d2778?.['kind'] ||
-      '',
+    item?.['result']?.['outputType'] || value?.['outputType'] || item?.['kind'] || value?.['kind'] || '',
   )['trim']();
 }
-function collectResultPaths(_0x33e45d, _0x3d4a49 = null) {
-  const _0x8517e9 = _0x3d4a49?.['result'] || {},
-    _0x13287f = _0x3d4a49?.['responseMapping'] || {},
-    _0x1f3e12 =
-      _0x33e45d === 'image'
-        ? _0x8517e9['imagePaths']
-        : _0x33e45d === 'video'
-          ? _0x8517e9['videoPaths']
-          : _0x33e45d === 'audio'
-            ? _0x8517e9['audioPaths']
-            : _0x33e45d === 'text'
-              ? _0x8517e9['textPaths']
+function collectResultPaths(key, index = null) {
+  const result = index?.['result'] || {},
+    data = index?.['responseMapping'] || {},
+    options =
+      key === 'image'
+        ? result['imagePaths']
+        : key === 'video'
+          ? result['videoPaths']
+          : key === 'audio'
+            ? result['audioPaths']
+            : key === 'text'
+              ? result['textPaths']
               : null;
   return [
-    ...(Array['isArray'](_0x8517e9['paths']) ? _0x8517e9['paths'] : []),
-    ...(Array['isArray'](_0x1f3e12) ? _0x1f3e12 : []),
-    ...(Array['isArray'](_0x13287f['paths']) ? _0x13287f['paths'] : []),
-    ...(Array['isArray'](_0x13287f['resultPaths']) ? _0x13287f['resultPaths'] : []),
+    ...(Array['isArray'](result['paths']) ? result['paths'] : []),
+    ...(Array['isArray'](options) ? options : []),
+    ...(Array['isArray'](data['paths']) ? data['paths'] : []),
+    ...(Array['isArray'](data['resultPaths']) ? data['resultPaths'] : []),
   ];
 }
-function collectFallbackValues(_0x534c03, _0x3468c1 = {}) {
-  if (!_0x3468c1 || typeof _0x3468c1 !== 'object') return [];
-  if (_0x534c03 === 'image')
+function collectFallbackValues(target, response = {}) {
+  if (!response || typeof response !== 'object') return [];
+  if (target === 'image')
     return [
-      _0x3468c1['outputUrl'],
-      _0x3468c1['imageUrl'],
-      _0x3468c1['image_url'],
-      _0x3468c1['url'],
-      _0x3468c1['fileUrl'],
+      response['outputUrl'],
+      response['imageUrl'],
+      response['image_url'],
+      response['url'],
+      response['fileUrl'],
     ];
-  if (_0x534c03 === 'video')
+  if (target === 'video')
     return [
-      _0x3468c1['outputVideoUrl'],
-      _0x3468c1['videoUrl'],
-      _0x3468c1['video_url'],
-      _0x3468c1['url'],
-      _0x3468c1['fileUrl'],
+      response['outputVideoUrl'],
+      response['videoUrl'],
+      response['video_url'],
+      response['url'],
+      response['fileUrl'],
     ];
-  if (_0x534c03 === 'audio')
+  if (target === 'audio')
     return [
-      _0x3468c1['outputAudioUrl'],
-      _0x3468c1['audioUrl'],
-      _0x3468c1['audio_url'],
-      _0x3468c1['url'],
-      _0x3468c1['fileUrl'],
+      response['outputAudioUrl'],
+      response['audioUrl'],
+      response['audio_url'],
+      response['url'],
+      response['fileUrl'],
     ];
-  if (_0x534c03 === 'text')
+  if (target === 'text')
     return [
-      _0x3468c1['outputText'],
-      _0x3468c1['text'],
-      _0x3468c1['output'],
-      _0x3468c1['content'],
-      _0x3468c1['message'],
+      response['outputText'],
+      response['text'],
+      response['output'],
+      response['content'],
+      response['message'],
     ];
   return [];
 }
 export function resolveManifestResultValues(
-  _0x228412,
+  source,
   { modelManifest: modelManifest = null, executionManifest: executionManifest = null } = {},
 ) {
-  const _0x144b02 = normalizeOutputType(modelManifest, executionManifest),
-    _0x3c492c = collectResultPaths(_0x144b02, executionManifest),
-    _0x3562d6 =
-      _0x144b02 === 'image'
-        ? resolveMappedImageResponseValues(_0x228412, {
+  const outputType = normalizeOutputType(modelManifest, executionManifest),
+    resultPaths = collectResultPaths(outputType, executionManifest),
+    args =
+      outputType === 'image'
+        ? resolveMappedImageResponseValues(source, {
             ...(executionManifest?.['responseMapping'] || {}),
-            resultPaths: _0x3c492c,
+            resultPaths: resultPaths,
           })
-        : resolveMappedResponseValues(_0x228412, _0x3c492c),
-    _0x4c96ad = collectFallbackValues(_0x144b02, _0x228412)
-      ['map']((_0x8edae2) => String(_0x8edae2 ?? '')['trim']())
+        : resolveMappedResponseValues(source, resultPaths),
+    args2 = collectFallbackValues(outputType, source)
+      ['map']((next) => String(next ?? '')['trim']())
       ['filter'](Boolean);
-  return Array['from'](new Set([..._0x3562d6, ..._0x4c96ad]));
+  return Array['from'](new Set([...args, ...args2]));
 }
 export function buildManifestResultPatch(
-  _0x516347,
+  current,
   { modelManifest: modelManifest = null, executionManifest: executionManifest = null } = {},
 ) {
-  const _0x56f418 = normalizeOutputType(modelManifest, executionManifest),
-    _0x66fff = resolveManifestResultValues(_0x516347, {
+  const outputType2 = normalizeOutputType(modelManifest, executionManifest),
+    outputUrl = resolveManifestResultValues(current, {
       modelManifest: modelManifest,
       executionManifest: executionManifest,
     })[0x0];
-  if (!_0x66fff) return {};
-  if (_0x56f418 === 'image')
-    return { outputUrl: _0x66fff, imageUrl: _0x66fff, sourceUrl: _0x66fff, thumbUrl: _0x66fff };
-  if (_0x56f418 === 'video') return { outputVideoUrl: _0x66fff, videoUrl: _0x66fff };
-  if (_0x56f418 === 'audio') return { outputAudioUrl: _0x66fff, audioUrl: _0x66fff, src: _0x66fff };
-  if (_0x56f418 === 'text') return { outputText: _0x66fff };
+  if (!outputUrl) return {};
+  if (outputType2 === 'image')
+    return { outputUrl: outputUrl, imageUrl: outputUrl, sourceUrl: outputUrl, thumbUrl: outputUrl };
+  if (outputType2 === 'video') return { outputVideoUrl: outputUrl, videoUrl: outputUrl };
+  if (outputType2 === 'audio') return { outputAudioUrl: outputUrl, audioUrl: outputUrl, src: outputUrl };
+  if (outputType2 === 'text') return { outputText: outputUrl };
   return {};
 }

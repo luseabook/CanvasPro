@@ -3,100 +3,100 @@ import {
   createAgentExternalInformationRequests,
 } from './agentExternalInformation.js';
 export function createAgentExternalInformationRuntime({
-  toolRegistry: _0x9131ac,
-  sessionStore: _0x1c2f3e,
+  toolRegistry: toolRegistry,
+  sessionStore: sessionStore,
 } = {}) {
-  function _0x4f2f94(_0x5a6aa0 = {}) {
-    (_0x1c2f3e?.['recordTrace']?.(_0x5a6aa0),
-      _0x1c2f3e?.['recordRunEvent']?.({
-        runId: _0x1c2f3e?.['getCurrentRun']?.()?.['id'] || '',
-        type: _0x5a6aa0['type'],
-        status: _0x5a6aa0['status'],
-        commandId: _0x5a6aa0['toolId'],
-        ok: _0x5a6aa0['ok'],
-        errorCode: _0x5a6aa0['errorCode'],
-        message: _0x5a6aa0['message'],
+  function run(type = {}) {
+    (sessionStore?.['recordTrace']?.(type),
+      sessionStore?.['recordRunEvent']?.({
+        runId: sessionStore?.['getCurrentRun']?.()?.['id'] || '',
+        type: type['type'],
+        status: type['status'],
+        commandId: type['toolId'],
+        ok: type['ok'],
+        errorCode: type['errorCode'],
+        message: type['message'],
       }));
   }
-  async function _0x4a70a7({
-    message: _0x12c88a,
+  async function prepare({
+    message: message,
     documentFiles: documentFiles = [],
     signal: signal = null,
   } = {}) {
-    const _0x25201d = createAgentExternalInformationRequests({
-      message: _0x12c88a,
+    const sourceCount = createAgentExternalInformationRequests({
+      message: message,
       documentFiles: documentFiles,
     });
-    if (!_0x25201d) return null;
-    const _0x23c418 = [...new Set(_0x25201d['requests']['map']((_0x43c555) => _0x43c555['toolId']))],
-      _0x266e06 = _0x23c418['length'] === 0x1 ? _0x23c418[0x0] : 'external-information.batch';
-    _0x4f2f94({
+    if (!sourceCount) return null;
+    const toolIds = [...new Set(sourceCount['requests']['map']((value) => value['toolId']))],
+      toolId = toolIds['length'] === 0x1 ? toolIds[0x0] : 'external-information.batch';
+    run({
       type: 'external_tool.selected',
       status: 'running',
-      toolId: _0x266e06,
-      toolIds: _0x23c418,
-      sourceCount: _0x25201d['requests']['length'],
+      toolId: toolId,
+      toolIds: toolIds,
+      sourceCount: sourceCount['requests']['length'],
     });
-    const _0x409fe0 = _0x23c418['find']((_0x8e89e5) => !_0x9131ac?.['has']?.(_0x8e89e5));
-    if (_0x409fe0) {
-      const _0x126e16 = new Error('当前运行环境不支持读取该外部信息。');
-      ((_0x126e16['code'] = 'EXTERNAL_TOOL_UNAVAILABLE'),
-        _0x4f2f94({
+    const toolId2 = toolIds['find']((item) => !toolRegistry?.['has']?.(item));
+    if (toolId2) {
+      const errorCode = new Error('当前运行环境不支持读取该外部信息。');
+      ((errorCode['code'] = 'EXTERNAL_TOOL_UNAVAILABLE'),
+        run({
           type: 'external_tool.completed',
           status: 'failed',
-          toolId: _0x409fe0,
+          toolId: toolId2,
           ok: ![],
-          errorCode: _0x126e16['code'],
-          message: _0x126e16['message'],
+          errorCode: errorCode['code'],
+          message: errorCode['message'],
         }));
-      throw _0x126e16;
+      throw errorCode;
     }
-    const _0x1c582e = await Promise['all'](
-        _0x25201d['requests']['map']((_0x19f88d) =>
-          _0x9131ac['execute']({ toolId: _0x19f88d['toolId'], args: _0x19f88d['args'], signal: signal }),
+    const list = await Promise['all'](
+        sourceCount['requests']['map']((toolId3) =>
+          toolRegistry['execute']({ toolId: toolId3['toolId'], args: toolId3['args'], signal: signal }),
         ),
       ),
-      _0xe401b1 = _0x1c582e['find']((_0x5d45f0) => _0x5d45f0['ok'] !== !![]);
-    if (_0xe401b1) {
-      const _0x1ccc7a = new Error(_0xe401b1['message'] || '外部信息读取失败。');
-      ((_0x1ccc7a['code'] = _0xe401b1['errorCode'] || 'EXTERNAL_INFORMATION_READ_FAILED'),
-        _0x4f2f94({
+      status = list['find']((response) => response['ok'] !== !![]);
+    if (status) {
+      const errorCode2 = new Error(status['message'] || '外部信息读取失败。');
+      ((errorCode2['code'] = status['errorCode'] || 'EXTERNAL_INFORMATION_READ_FAILED'),
+        run({
           type: 'external_tool.completed',
-          status: _0xe401b1['status'] || 'failed',
-          toolId: _0xe401b1['toolId'] || _0x266e06,
+          status: status['status'] || 'failed',
+          toolId: status['toolId'] || toolId,
           ok: ![],
-          errorCode: _0x1ccc7a['code'],
-          message: _0x1ccc7a['message'],
+          errorCode: errorCode2['code'],
+          message: errorCode2['message'],
         }));
-      throw _0x1ccc7a;
+      throw errorCode2;
     }
-    const _0x370c65 = _0x1c582e['map']((_0x3616c2, _0x34900e) => {
-        const _0x367487 = _0x3616c2['result'] || {},
-          _0x214e5d = _0x367487['source'] || _0x367487;
+    const sources = list['map']((key, index) => {
+        const result = key['result'] || {},
+          args = result['source'] || result;
         return {
-          ..._0x214e5d,
-          sourceId: _0x25201d['requests'][_0x34900e]['sourceKind'] + '-' + (_0x34900e + 0x1),
-          toolId: _0x25201d['requests'][_0x34900e]['toolId'],
-          ...(_0x25201d['requests'][_0x34900e]['sourceKind'] === 'url'
-            ? { requestedUrl: _0x25201d['requests'][_0x34900e]['args']['url'] }
+          ...args,
+          sourceId: sourceCount['requests'][index]['sourceKind'] + '-' + (index + 0x1),
+          toolId: sourceCount['requests'][index]['toolId'],
+          ...(sourceCount['requests'][index]['sourceKind'] === 'url'
+            ? { requestedUrl: sourceCount['requests'][index]['args']['url'] }
             : {}),
         };
       }),
-      _0x23f08d = {
-        reason: _0x25201d['reason'],
-        sources: compactAgentExternalInformationForPrompt({ sources: _0x370c65 }),
+      sourceCount2 = {
+        reason: sourceCount['reason'],
+        sources: compactAgentExternalInformationForPrompt({ sources: sources }),
       };
     return (
-      _0x4f2f94({
+      run({
         type: 'external_tool.completed',
         status: 'success',
-        toolId: _0x266e06,
-        toolIds: _0x23c418,
+        toolId: toolId,
+        toolIds: toolIds,
         ok: !![],
-        sourceCount: _0x23f08d['sources']['length'],
+        sourceCount: sourceCount2['sources']['length'],
       }),
-      _0x23f08d
+      sourceCount2
     );
   }
-  return { prepare: _0x4a70a7 };
+  return { prepare: prepare };
 }

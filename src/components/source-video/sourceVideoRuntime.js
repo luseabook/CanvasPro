@@ -6,29 +6,29 @@ import { RENDERER_VIRTUALIZATION_CONFIG } from '../../core/rendererVirtualizatio
 const SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS = 0x78,
   SOURCE_VIDEO_BUSY_RETRY_MS = 0x50,
   SOURCE_VIDEO_MAX_BUSY_WAIT_MS = 0xe10;
-export function sourceVideoText(_0x1a48b9, _0x3a8dda = {}) {
-  return t('sourceVideoNode.' + _0x1a48b9, _0x3a8dda);
+export function sourceVideoText(value, item = {}) {
+  return t('sourceVideoNode.' + value, item);
 }
 export function isDesktopRenderer() {
   return desktopBridge['isElectron'] || desktopBridge['isChromeShell'];
 }
 export function shouldEagerLoadSourceVideoAtCurrentZoom() {
-  let _0x5f2c7c = 0x1;
+  let key = 0x1;
   try {
-    const _0x46ac3f =
+    const index =
         typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']?.(),
-      _0x41bc2d = Number(_0x46ac3f?.['viewport']?.['zoom']);
-    if (Number['isFinite'](_0x41bc2d) && _0x41bc2d > 0x0) _0x5f2c7c = _0x41bc2d;
+      count = Number(index?.['viewport']?.['zoom']);
+    if (Number['isFinite'](count) && count > 0x0) key = count;
   } catch {}
-  return _0x5f2c7c > RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'];
+  return key > RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'];
 }
-export function isClientFetchableMediaUrl(_0x2a7d71) {
-  const _0x1da0d1 = String(_0x2a7d71 || '')['trim']();
+export function isClientFetchableMediaUrl(result) {
+  const enabled = String(result || '')['trim']();
   return (
-    /^https?:\/\//i['test'](_0x1da0d1) ||
-    _0x1da0d1['startsWith']('blob:') ||
-    _0x1da0d1['startsWith']('data:') ||
-    (_0x1da0d1['startsWith']('/') && !_0x1da0d1['startsWith']('//'))
+    /^https?:\/\//i['test'](enabled) ||
+    enabled['startsWith']('blob:') ||
+    enabled['startsWith']('data:') ||
+    (enabled['startsWith']('/') && !enabled['startsWith']('//'))
   );
 }
 function getSourceVideoSchedulerNow() {
@@ -39,52 +39,52 @@ function getSourceVideoSchedulerNow() {
 export function isSourceVideoInteractionBusy() {
   return readViewportInteractionState()['isViewportBusy'];
 }
-export function hasSourceVideoRecoveryWork(_0x419b2a = {}) {
+export function hasSourceVideoRecoveryWork(options = {}) {
   return !!(
-    String(_0x419b2a?.['rhTaskId'] || '')['trim']() ||
-    String(_0x419b2a?.['asyncTaskId'] || '')['trim']() ||
-    _0x419b2a?.['rhTaskRecovering'] === !![] ||
-    _0x419b2a?.['asyncTaskRecovering'] === !![]
+    String(options?.['rhTaskId'] || '')['trim']() ||
+    String(options?.['asyncTaskId'] || '')['trim']() ||
+    options?.['rhTaskRecovering'] === !![] ||
+    options?.['asyncTaskRecovering'] === !![]
   );
 }
 export function scheduleSourceVideoIdleTask(
-  _0x1fb114,
+  handler,
   { timeout: timeout = SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS } = {},
 ) {
-  if (typeof _0x1fb114 !== 'function') return () => {};
-  let _0x522535 = ![],
-    _0x4bf657 = () => {};
-  const _0xe532d6 = getSourceVideoSchedulerNow(),
-    _0x5d3352 = globalThis['window']?.['requestIdleCallback'] || globalThis['requestIdleCallback'],
-    _0xb75702 = globalThis['window']?.['cancelIdleCallback'] || globalThis['cancelIdleCallback'];
-  function _0x1f6f14(_0x42e081) {
-    const _0x4135b4 = setTimeout(_0x29f265, _0x42e081);
-    _0x4bf657 = () => clearTimeout(_0x4135b4);
+  if (typeof handler !== 'function') return () => {};
+  let data = ![],
+    handler2 = () => {};
+  const sourceVideoSchedulerNow = getSourceVideoSchedulerNow(),
+    handler3 = globalThis['window']?.['requestIdleCallback'] || globalThis['requestIdleCallback'],
+    handler4 = globalThis['window']?.['cancelIdleCallback'] || globalThis['cancelIdleCallback'];
+  function run(target) {
+    const setTimeout2 = setTimeout(source, target);
+    handler2 = () => clearTimeout(setTimeout2);
   }
-  const _0x29f265 = () => {
-    if (_0x522535) return;
-    const _0x5730a2 = getSourceVideoSchedulerNow() - _0xe532d6;
-    if (isSourceVideoInteractionBusy() && _0x5730a2 < SOURCE_VIDEO_MAX_BUSY_WAIT_MS) {
-      _0x1f6f14(SOURCE_VIDEO_BUSY_RETRY_MS);
+  const source = () => {
+    if (data) return;
+    const sourceVideoSchedulerNow2 = getSourceVideoSchedulerNow() - sourceVideoSchedulerNow;
+    if (isSourceVideoInteractionBusy() && sourceVideoSchedulerNow2 < SOURCE_VIDEO_MAX_BUSY_WAIT_MS) {
+      run(SOURCE_VIDEO_BUSY_RETRY_MS);
       return;
     }
-    _0x1fb114();
+    handler();
   };
-  if (typeof _0x5d3352 === 'function') {
-    const _0x136224 = _0x5d3352(_0x29f265, { timeout: timeout });
-    _0x4bf657 = () => {
-      if (typeof _0xb75702 === 'function') _0xb75702(_0x136224);
+  if (typeof handler3 === 'function') {
+    const next = handler3(source, { timeout: timeout });
+    handler2 = () => {
+      if (typeof handler4 === 'function') handler4(next);
     };
-  } else _0x1f6f14(0x10);
+  } else run(0x10);
   return () => {
-    ((_0x522535 = !![]), _0x4bf657());
+    ((data = !![]), handler2());
   };
 }
 export function shouldFetchVideoMetaForNodeInfo() {
   try {
-    const _0xe2fbb9 =
+    const current =
       typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
-    return _0xe2fbb9?.['ui']?.['showVideoMeta'] === !![];
+    return current?.['ui']?.['showVideoMeta'] === !![];
   } catch {
     return ![];
   }

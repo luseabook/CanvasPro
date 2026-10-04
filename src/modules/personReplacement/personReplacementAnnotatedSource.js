@@ -1,1 +1,82 @@
-import{loadPersonReplacementGuideImage}from'./personReplacementLocationGuide.js';import{PERSON_REPLACEMENT_MARKER_COLORS}from'./personReplacementPromptMode.js';import{localPathToUrl}from'../../utils/localMediaPath.js';export async function buildPersonReplacementAnnotatedSource({sourceRef:_0x489d67,people:people=[],signal:_0x472703}={}){if(!_0x489d67||!people["length"])throw new Error("测试模式缺少原图或绑定人物框");const _0x21b3b6=await loadPersonReplacementGuideImage(localPathToUrl(_0x489d67)||_0x489d67,_0x472703),_0x2e696d=document["createElement"]("canvas");_0x2e696d["width"]=_0x21b3b6["naturalWidth"],_0x2e696d["height"]=_0x21b3b6["naturalHeight"];try{const _0x57fdd9=_0x2e696d['getContext']('2d');if(!_0x57fdd9||!_0x2e696d["width"]||!_0x2e696d['height'])throw new Error("无法绘制测试模式带框原图");_0x57fdd9["drawImage"](_0x21b3b6,0x0,0x0);const _0x4e5184=getComputedStyle(document['documentElement']),_0x6b09d5=_0x57da4f=>{const _0x3889cd=_0x4e5184["getPropertyValue"](_0x57da4f)["trim"]();if(!_0x3889cd)throw new Error("测试模式颜色未初始化："+_0x57da4f);return _0x3889cd;},_0x53a5c3=Math["min"](_0x2e696d["width"],_0x2e696d["height"]),_0x565e78=Math["max"](0x2,Math["round"](_0x53a5c3/0xb4)),_0x404e1f=Math["max"](0xc,Math["round"](_0x53a5c3/0x1c));_0x57fdd9["lineWidth"]=_0x565e78,_0x57fdd9['font']='700\x20'+_0x404e1f+"px Arial, sans-serif",_0x57fdd9["textBaseline"]="top";for(const {label:_0x3e70a6,referenceSlot:_0x329bc7,markerIndex:_0x24d474,bbox:_0x373b20}of people){const _0x5289e5=_0x373b20['x']*_0x2e696d["width"],_0x200fa3=_0x373b20['y']*_0x2e696d["height"],_0x386355=_0x373b20['width']*_0x2e696d["width"],_0x1e39a2=_0x373b20["height"]*_0x2e696d["height"];_0x57fdd9['strokeStyle']=_0x6b09d5(PERSON_REPLACEMENT_MARKER_COLORS[_0x24d474%PERSON_REPLACEMENT_MARKER_COLORS['length']]),_0x57fdd9['strokeRect'](_0x5289e5+_0x565e78/0x2,_0x200fa3+_0x565e78/0x2,Math['max'](0x0,_0x386355-_0x565e78),Math["max"](0x0,_0x1e39a2-_0x565e78));const _0x17277a=_0x3e70a6+" → 图"+_0x329bc7,_0x32027e=Math["min"](_0x2e696d["width"],_0x57fdd9["measureText"](_0x17277a)['width']+_0x565e78*0x4),_0x3f513a=_0x404e1f+_0x565e78*0x4,_0x424772=Math["max"](0x0,Math['min'](_0x5289e5,_0x2e696d["width"]-_0x32027e)),_0x323cfc=Math["max"](0x0,Math['min'](_0x200fa3,_0x2e696d["height"]-_0x3f513a));_0x57fdd9["fillStyle"]=_0x57fdd9['strokeStyle'],_0x57fdd9["fillRect"](_0x424772,_0x323cfc,_0x32027e,_0x3f513a),_0x57fdd9['fillStyle']=_0x6b09d5('--canvas-black'),_0x57fdd9["fillText"](_0x17277a,_0x424772+_0x565e78*0x2,_0x323cfc+_0x565e78*0x2,_0x32027e-_0x565e78*0x4);}if(_0x472703?.["aborted"])throw new DOMException("测试模式制图已取消","AbortError");const _0x5f2e7c=_0x2e696d['toDataURL']('image/png');if(!_0x5f2e7c["startsWith"]("data:image/png;base64,"))throw new Error('测试模式带框原图导出失败');return{'dataUrl':_0x5f2e7c,'width':_0x2e696d["width"],'height':_0x2e696d["height"]};}finally{_0x2e696d["width"]=0x0,_0x2e696d["height"]=0x0;}}export function applyPersonReplacementAnnotatedSource(_0x4cd1db,_0x3cc553){if(!_0x4cd1db["annotatedSource"])return _0x4cd1db;if(!_0x3cc553?.['dataUrl']?.["startsWith"]("data:image/png;base64,"))throw new Error("带框原图未生成，已停止提交测试模式");return{..._0x4cd1db,'referenceImages':_0x4cd1db["referenceImages"]["map"](_0x4f4dcb=>_0x4f4dcb["role"]==="source-keyframe"?{..._0x4f4dcb,'originalRef':_0x4cd1db["annotatedSource"]["sourceRef"],'ref':_0x3cc553["dataUrl"]}:_0x4f4dcb)};}
+import { loadPersonReplacementGuideImage } from './personReplacementLocationGuide.js';
+import { PERSON_REPLACEMENT_MARKER_COLORS } from './personReplacementPromptMode.js';
+import { localPathToUrl } from '../../utils/localMediaPath.js';
+export async function buildPersonReplacementAnnotatedSource({
+  sourceRef: sourceRef,
+  people: people = [],
+  signal: signal,
+} = {}) {
+  if (!sourceRef || !people['length']) throw new Error('测试模式缺少原图或绑定人物框');
+  const personReplacementGuideImage = await loadPersonReplacementGuideImage(
+      localPathToUrl(sourceRef) || sourceRef,
+      signal,
+    ),
+    el = document['createElement']('canvas');
+  ((el['width'] = personReplacementGuideImage['naturalWidth']),
+    (el['height'] = personReplacementGuideImage['naturalHeight']));
+  try {
+    const ctx = el['getContext']('2d');
+    if (!ctx || !el['width'] || !el['height']) throw new Error('无法绘制测试模式带框原图');
+    ctx['drawImage'](personReplacementGuideImage, 0x0, 0x0);
+    const computedStyle = getComputedStyle(document['documentElement']),
+      handler = (value) => {
+        const enabled = computedStyle['getPropertyValue'](value)['trim']();
+        if (!enabled) throw new Error('测试模式颜色未初始化：' + value);
+        return enabled;
+      },
+      item = Math['min'](el['width'], el['height']),
+      key = Math['max'](0x2, Math['round'](item / 0xb4)),
+      index = Math['max'](0xc, Math['round'](item / 0x1c));
+    ((ctx['lineWidth'] = key),
+      (ctx['font'] = '700\x20' + index + 'px Arial, sans-serif'),
+      (ctx['textBaseline'] = 'top'));
+    for (const {
+      label: label,
+      referenceSlot: referenceSlot,
+      markerIndex: markerIndex,
+      bbox: bbox,
+    } of people) {
+      const result = bbox['x'] * el['width'],
+        data = bbox['y'] * el['height'],
+        options = bbox['width'] * el['width'],
+        target = bbox['height'] * el['height'];
+      ((ctx['strokeStyle'] = handler(
+        PERSON_REPLACEMENT_MARKER_COLORS[markerIndex % PERSON_REPLACEMENT_MARKER_COLORS['length']],
+      )),
+        ctx['strokeRect'](
+          result + key / 0x2,
+          data + key / 0x2,
+          Math['max'](0x0, options - key),
+          Math['max'](0x0, target - key),
+        ));
+      const source = label + ' → 图' + referenceSlot,
+        next = Math['min'](el['width'], ctx['measureText'](source)['width'] + key * 0x4),
+        current = index + key * 0x4,
+        entry = Math['max'](0x0, Math['min'](result, el['width'] - next)),
+        record = Math['max'](0x0, Math['min'](data, el['height'] - current));
+      ((ctx['fillStyle'] = ctx['strokeStyle']),
+        ctx['fillRect'](entry, record, next, current),
+        (ctx['fillStyle'] = handler('--canvas-black')),
+        ctx['fillText'](source, entry + key * 0x2, record + key * 0x2, next - key * 0x4));
+    }
+    if (signal?.['aborted']) throw new DOMException('测试模式制图已取消', 'AbortError');
+    const enabled2 = el['toDataURL']('image/png');
+    if (!enabled2['startsWith']('data:image/png;base64,')) throw new Error('测试模式带框原图导出失败');
+    return { dataUrl: enabled2, width: el['width'], height: el['height'] };
+  } finally {
+    ((el['width'] = 0x0), (el['height'] = 0x0));
+  }
+}
+export function applyPersonReplacementAnnotatedSource(args, enabled3) {
+  if (!args['annotatedSource']) return args;
+  if (!enabled3?.['dataUrl']?.['startsWith']('data:image/png;base64,'))
+    throw new Error('带框原图未生成，已停止提交测试模式');
+  return {
+    ...args,
+    referenceImages: args['referenceImages']['map']((args2) =>
+      args2['role'] === 'source-keyframe'
+        ? { ...args2, originalRef: args['annotatedSource']['sourceRef'], ref: enabled3['dataUrl'] }
+        : args2,
+    ),
+  };
+}

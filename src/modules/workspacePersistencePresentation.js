@@ -1,75 +1,72 @@
 export function createWorkspacePersistencePresentation({
-  getRoot: _0x316a76,
+  getRoot: getRoot,
   showDelayMs: showDelayMs = 0x12c,
   setTimeoutFn: setTimeoutFn = globalThis['setTimeout']?.['bind'](globalThis),
   clearTimeoutFn: clearTimeoutFn = globalThis['clearTimeout']?.['bind'](globalThis),
 } = {}) {
-  let _0x5c4314 = null,
-    _0x5eebca = null,
-    _0x2a648b = null,
-    _0x2d2071 = ![],
-    _0x248d07 = '',
-    _0x44fddb = null,
-    _0x3c285b = { status: 'idle' };
-  const _0x1b11e9 = () => {
-    if (_0x44fddb !== null) clearTimeoutFn?.(_0x44fddb);
-    _0x44fddb = null;
+  let el = null,
+    el2 = null,
+    el3 = null,
+    enabled = ![],
+    value = '',
+    setTimeoutFn2 = null,
+    response = { status: 'idle' };
+  const run = () => {
+    if (setTimeoutFn2 !== null) clearTimeoutFn?.(setTimeoutFn2);
+    setTimeoutFn2 = null;
   };
   return {
-    update(_0x4e1be0 = {}) {
-      if (_0x2d2071) return;
-      const _0x50fecb = _0x3c285b['status'];
-      _0x3c285b = { ..._0x4e1be0 };
-      const _0x5e4439 = _0x316a76?.(),
-        _0x4833f7 = _0x5e4439?.['ownerDocument'] || globalThis['document'];
-      if (!_0x5e4439?.['appendChild'] || !_0x4833f7?.['createElement']) return;
-      !_0x5c4314 &&
-        ((_0x5c4314 = _0x4833f7['createElement']('div')),
-        (_0x5c4314['className'] = 'workspace-persistence-status'),
-        (_0x5c4314['hidden'] = !![]),
-        _0x5c4314['setAttribute']('role', 'status'),
-        _0x5c4314['setAttribute']('aria-live', 'polite'),
-        (_0x2a648b = _0x4833f7['createElement']('span')),
-        (_0x2a648b['className'] = 'storyboard-script-loading-spinner\x20workspace-persistence-spinner'),
-        _0x2a648b['setAttribute']('aria-hidden', 'true'),
-        (_0x5eebca = _0x4833f7['createElement']('span')),
-        _0x5c4314['appendChild'](_0x2a648b),
-        _0x5c4314['appendChild'](_0x5eebca));
-      if (_0x5c4314['parentElement'] !== _0x5e4439) _0x5e4439['appendChild'](_0x5c4314);
-      const _0x50af1f = _0x4e1be0['status'] || 'idle';
-      if (_0x50af1f === 'error') _0x248d07 = String(_0x4e1be0['error'] || '');
-      if (_0x50af1f === 'saved' || _0x50af1f === 'idle') _0x248d07 = '';
-      const _0x494397 = _0x50af1f === 'saving' && Number(_0x4e1be0['retryAttempt']) > 0x0,
-        _0x1b74f8 = _0x50af1f === 'error' || _0x494397 || Boolean(_0x248d07);
-      if (_0x50af1f !== 'saving' || _0x1b74f8) _0x1b11e9();
-      if (_0x1b74f8) _0x5c4314['hidden'] = ![];
+    update(response2 = {}) {
+      if (enabled) return;
+      const item = response['status'];
+      response = { ...response2 };
+      const el4 = getRoot?.(),
+        el5 = el4?.['ownerDocument'] || globalThis['document'];
+      if (!el4?.['appendChild'] || !el5?.['createElement']) return;
+      !el &&
+        ((el = el5['createElement']('div')),
+        (el['className'] = 'workspace-persistence-status'),
+        (el['hidden'] = !![]),
+        el['setAttribute']('role', 'status'),
+        el['setAttribute']('aria-live', 'polite'),
+        (el3 = el5['createElement']('span')),
+        (el3['className'] = 'storyboard-script-loading-spinner\x20workspace-persistence-spinner'),
+        el3['setAttribute']('aria-hidden', 'true'),
+        (el2 = el5['createElement']('span')),
+        el['appendChild'](el3),
+        el['appendChild'](el2));
+      if (el['parentElement'] !== el4) el4['appendChild'](el);
+      const key = response2['status'] || 'idle';
+      if (key === 'error') value = String(response2['error'] || '');
+      if (key === 'saved' || key === 'idle') value = '';
+      const index = key === 'saving' && Number(response2['retryAttempt']) > 0x0,
+        result = key === 'error' || index || Boolean(value);
+      if (key !== 'saving' || result) run();
+      if (result) el['hidden'] = ![];
       else {
-        if (_0x50af1f !== 'saving') _0x5c4314['hidden'] = !![];
+        if (key !== 'saving') el['hidden'] = !![];
         else
-          (_0x50fecb !== 'saving' || (_0x5c4314['hidden'] && _0x44fddb === null)) &&
-            (_0x1b11e9(),
+          (item !== 'saving' || (el['hidden'] && setTimeoutFn2 === null)) &&
+            (run(),
             typeof setTimeoutFn === 'function'
-              ? (_0x44fddb = setTimeoutFn(() => {
-                  _0x44fddb = null;
-                  if (!_0x2d2071 && _0x3c285b['status'] === 'saving') _0x5c4314['hidden'] = ![];
+              ? (setTimeoutFn2 = setTimeoutFn(() => {
+                  setTimeoutFn2 = null;
+                  if (!enabled && response['status'] === 'saving') el['hidden'] = ![];
                 }, showDelayMs))
-              : (_0x5c4314['hidden'] = ![]));
+              : (el['hidden'] = ![]));
       }
-      (_0x5c4314['setAttribute']('data-state', _0x1b74f8 ? 'error' : _0x50af1f),
-        (_0x2a648b['hidden'] = _0x50af1f !== 'saving'),
-        (_0x5eebca['textContent'] = _0x494397
-          ? '保存失败，正在重试' + (_0x248d07 ? '：' + _0x248d07 : '')
-          : _0x50af1f === 'error' || (_0x248d07 && _0x50af1f === 'pending')
+      (el['setAttribute']('data-state', result ? 'error' : key),
+        (el3['hidden'] = key !== 'saving'),
+        (el2['textContent'] = index
+          ? '保存失败，正在重试' + (value ? '：' + value : '')
+          : key === 'error' || (value && key === 'pending')
             ? '尚未保存' +
-              (Number(_0x4e1be0['retryAttempt']) > 0x0 ? '，将自动重试' : '') +
-              (_0x248d07 ? '：' + _0x248d07 : '')
+              (Number(response2['retryAttempt']) > 0x0 ? '，将自动重试' : '') +
+              (value ? '：' + value : '')
             : '正在保存…'));
     },
     destroy() {
-      ((_0x2d2071 = !![]),
-        _0x1b11e9(),
-        _0x5c4314?.['remove']?.(),
-        (_0x5c4314 = _0x5eebca = _0x2a648b = null));
+      ((enabled = !![]), run(), el?.['remove']?.(), (el = el2 = el3 = null));
     },
   };
 }

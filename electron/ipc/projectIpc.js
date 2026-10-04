@@ -1,93 +1,101 @@
 import { assertNodeExportSender } from '../nodeMediaExportService.js';
 import { FULL_PACKAGE_LIMITS } from '../../src/modules/projectPackage/fullProjectPackageModel.js';
 export function registerProjectIpcHandlers({
-  ipcMain: _0x480888,
-  exportFullProjectPackage, restoreFullProjectPackage, getNodeExportWindow, isNodeExportAppUrl,
-  openDesktopProject: _0x538252,
-  saveDesktopProject: _0x511050,
-  exportDesktopProjectPackage: _0x274f5a,
-  importDesktopProjectPackage: _0x517d41,
-  handleRendererUnsavedState: _0x2832b7,
-  listRecentProjects: _0x43e6e6,
-  removeRecentProject: _0x1b8d96,
-  consumeExternalOpenRequests: _0xaccd9f,
-  writeDesktopRecoverySnapshot: _0x132fcc,
-  getDesktopRecoverySnapshotInfo: _0x1a406f,
-  readDesktopRecoverySnapshot: _0x339450,
-  clearDesktopRecoverySnapshot: _0x43364d,
+  ipcMain: ipcMain,
+  exportFullProjectPackage,
+  restoreFullProjectPackage,
+  getNodeExportWindow,
+  isNodeExportAppUrl,
+  openDesktopProject: openDesktopProject,
+  saveDesktopProject: saveDesktopProject,
+  exportDesktopProjectPackage: exportDesktopProjectPackage,
+  importDesktopProjectPackage: importDesktopProjectPackage,
+  handleRendererUnsavedState: handleRendererUnsavedState,
+  listRecentProjects: listRecentProjects,
+  removeRecentProject: removeRecentProject,
+  consumeExternalOpenRequests: consumeExternalOpenRequests,
+  writeDesktopRecoverySnapshot: writeDesktopRecoverySnapshot,
+  getDesktopRecoverySnapshotInfo: getDesktopRecoverySnapshotInfo,
+  readDesktopRecoverySnapshot: readDesktopRecoverySnapshot,
+  clearDesktopRecoverySnapshot: clearDesktopRecoverySnapshot,
 }) {
-  const assertFullSender = event => assertNodeExportSender(event, getNodeExportWindow(), isNodeExportAppUrl);
-  _0x480888.handle('project:fullPackageCapabilities', event => {
+  const assertFullSender = (event) =>
+    assertNodeExportSender(event, getNodeExportWindow(), isNodeExportAppUrl);
+  ipcMain.handle('project:fullPackageCapabilities', (event) => {
     assertFullSender(event);
-    if (typeof exportFullProjectPackage !== 'function' || typeof restoreFullProjectPackage !== 'function') throw new Error('完整工程包宿主未就绪，请更新并重启');
+    if (typeof exportFullProjectPackage !== 'function' || typeof restoreFullProjectPackage !== 'function')
+      throw new Error('完整工程包宿主未就绪，请更新并重启');
     return { version: 1, externalPackageTickets: 1, limits: FULL_PACKAGE_LIMITS };
   });
-  for (const [channel, action] of [['project:exportFullPackage', exportFullProjectPackage], ['project:restoreFullPackage', restoreFullProjectPackage]]) {
-    _0x480888.handle(channel, (event, payload) => {
+  for (const [channel, action] of [
+    ['project:exportFullPackage', exportFullProjectPackage],
+    ['project:restoreFullPackage', restoreFullProjectPackage],
+  ]) {
+    ipcMain.handle(channel, (event, payload) => {
       assertFullSender(event);
       if (typeof action !== 'function') throw new Error('完整工程包宿主未就绪，请更新并重启');
       return action(payload || {}, { sender: event.sender, assertActive: () => assertFullSender(event) });
     });
   }
-  (_0x480888.handle('project:open', (_0x33730f, _0x175e0d) => {
-    return _0x538252(_0x175e0d || {});
+  (ipcMain.handle('project:open', (value, item) => {
+    return openDesktopProject(item || {});
   }),
-    _0x480888.handle('project:save', (_0x40b5f2, _0xcebdb3) => {
-      return _0x511050(_0xcebdb3 || {});
+    ipcMain.handle('project:save', (key, index) => {
+      return saveDesktopProject(index || {});
     }),
-    _0x480888.handle('project:exportPackage', async (_0x4d0970, _0x155be9) => {
-      return await _0x274f5a(_0x155be9 || {}, { sender: _0x4d0970?.sender || null });
+    ipcMain.handle('project:exportPackage', async (sender, result) => {
+      return await exportDesktopProjectPackage(result || {}, { sender: sender?.sender || null });
     }),
-    _0x480888.handle('project:importPackage', async (_0x43dd1f, _0x21e71c) => {
-      return await _0x517d41(_0x21e71c || {}, { sender: _0x43dd1f?.sender || null });
+    ipcMain.handle('project:importPackage', async (sender2, data) => {
+      return await importDesktopProjectPackage(data || {}, { sender: sender2?.sender || null });
     }),
-    _0x480888.on('project:setUnsavedState', (_0x264c2e, _0x1277a3 = {}) => {
-      _0x2832b7(_0x1277a3);
+    ipcMain.on('project:setUnsavedState', (options, target = {}) => {
+      handleRendererUnsavedState(target);
     }),
-    _0x480888.handle('project:listRecent', () => {
-      return _0x43e6e6();
+    ipcMain.handle('project:listRecent', () => {
+      return listRecentProjects();
     }),
-    _0x480888.handle('project:removeRecent', (_0x17c3ba, _0x561997) => {
-      return _0x1b8d96(_0x561997?.recentId || '');
+    ipcMain.handle('project:removeRecent', (source, next) => {
+      return removeRecentProject(next?.recentId || '');
     }),
-    _0x480888.handle('project:consumeExternalOpenRequests', event => {
+    ipcMain.handle('project:consumeExternalOpenRequests', (event) => {
       // Consuming removes queued requests and can expose parsed project contents.
       assertFullSender(event);
-      return _0xaccd9f();
+      return consumeExternalOpenRequests();
     }),
-    _0x480888.handle('project:writeRecoverySnapshot', (_0x4a846f, _0xce5c48 = {}) => {
+    ipcMain.handle('project:writeRecoverySnapshot', (current, entry = {}) => {
       try {
-        return _0x132fcc(_0xce5c48 || {});
-      } catch (_0x83d580) {
-        return { success: false, code: _0x83d580?.code || '', error: String(_0x83d580?.message || _0x83d580) };
+        return writeDesktopRecoverySnapshot(entry || {});
+      } catch (code) {
+        return { success: false, code: code?.code || '', error: String(code?.message || code) };
       }
     }),
-    _0x480888.handle('project:getRecoverySnapshotInfo', (_0x22ba6f, _0x3d526c = {}) => {
+    ipcMain.handle('project:getRecoverySnapshotInfo', (record, handle = {}) => {
       try {
-        return _0x1a406f(_0x3d526c || {});
-      } catch (_0x548ce2) {
+        return getDesktopRecoverySnapshotInfo(handle || {});
+      } catch (error) {
         return {
           exists: false,
           isNewerThanProject: false,
           savedAt: 0,
           currentLastModified: 0,
-          error: String(_0x548ce2?.message || _0x548ce2),
+          error: String(error?.message || error),
         };
       }
     }),
-    _0x480888.handle('project:readRecoverySnapshot', () => {
+    ipcMain.handle('project:readRecoverySnapshot', () => {
       try {
-        return _0x339450();
-      } catch (_0xb6ebca) {
-        return { success: false, exists: false, error: String(_0xb6ebca?.message || _0xb6ebca) };
+        return readDesktopRecoverySnapshot();
+      } catch (error2) {
+        return { success: false, exists: false, error: String(error2?.message || error2) };
       }
     }),
-    _0x480888.handle('project:clearRecoverySnapshot', (event, expected = {}) => {
+    ipcMain.handle('project:clearRecoverySnapshot', (event, expected = {}) => {
       assertFullSender(event);
       try {
-        return _0x43364d(expected || {});
-      } catch (_0x5906b3) {
-        return { success: false, cleared: false, error: String(_0x5906b3?.message || _0x5906b3) };
+        return clearDesktopRecoverySnapshot(expected || {});
+      } catch (error3) {
+        return { success: false, cleared: false, error: String(error3?.message || error3) };
       }
     }));
 }

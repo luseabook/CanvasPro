@@ -1,1 +1,88 @@
-import{normalizeStoryboard3DShotAnimation,upsertStoryboard3DCameraKeyframe,upsertStoryboard3DObjectKeyframe}from'./shotAnimation.js';import{smoothDirectorKeys}from'./directorCurves.js';export function authorDirectorPath(_0x2e4c42,{points:_0x39b0f5,camera:_0x40a779,object:_0xff2605,start:start=0x0,duration:duration=0x3,smooth:smooth=![]}={}){const _0x2de053=(_0x39b0f5||[])["filter"](_0x22a9ce=>Array["isArray"](_0x22a9ce)&&_0x22a9ce['length']===0x3&&_0x22a9ce["every"](Number["isFinite"]))["slice"](0x0,0x64);if(_0x2de053["length"]<0x2)throw new Error("轨迹至少需要两个不同的位置。");if(_0xff2605?.["locked"])throw new Error("请先解锁对象。");const _0x558549=_0x2de053["map"]((_0x4e26bb,_0x2553a1)=>_0x2553a1?Math['hypot'](..._0x4e26bb['map']((_0x303f4d,_0x1148f3)=>_0x303f4d-_0x2de053[_0x2553a1-0x1][_0x1148f3])):0x0),_0x239cae=_0x558549["reduce"]((_0x59aec7,_0x360f99)=>_0x59aec7+_0x360f99,0x0);if(_0x239cae<0.001)throw new Error("轨迹过短，请移动指针绘制路线。");let _0x3bd58e=normalizeStoryboard3DShotAnimation(_0x2e4c42);const _0x5411da=Math["max"](0x0,Math["min"](3599.9,Number(start)||0x0)),_0x58e8ba=Math['max'](0.1,Math["min"](0xe10-_0x5411da,Number(duration)||0x3));let _0x1b52b4=0x0;if(_0xff2605){const _0x48e5da=_0x3bd58e["objectTracks"]["find"](_0x57e18a=>_0x57e18a['objectId']===_0xff2605['id']);if(_0x48e5da){for(const _0x1c9e88 of["positionKeyframes","rotationKeyframes"])_0x48e5da[_0x1c9e88]=_0x48e5da[_0x1c9e88]["filter"](_0x2bba57=>_0x2bba57['time']<_0x5411da||_0x2bba57['time']>_0x5411da+_0x58e8ba);}}else _0x3bd58e["cameraKeyframes"]=_0x3bd58e["cameraKeyframes"]["filter"](_0x5c6356=>_0x5c6356['time']<_0x5411da||_0x5c6356['time']>_0x5411da+_0x58e8ba);_0x2de053["forEach"]((_0x1ec834,_0x24632a)=>{_0x1b52b4+=_0x558549[_0x24632a];const _0x556930=_0x5411da+_0x58e8ba*_0x1b52b4/_0x239cae;if(!_0xff2605)_0x3bd58e=upsertStoryboard3DCameraKeyframe(_0x3bd58e,{'time':_0x556930,'camera':{..._0x40a779,'position':_0x1ec834},'easing':"linear"});else{_0x3bd58e=upsertStoryboard3DObjectKeyframe(_0x3bd58e,{'objectId':_0xff2605['id'],'property':"position",'time':_0x556930,'value':_0x1ec834,'easing':"linear"});const _0x3ebb9f=_0x24632a===_0x2de053["length"]-0x1?_0x2de053[_0x24632a-0x1]:_0x1ec834,_0x597040=_0x24632a===_0x2de053["length"]-0x1?_0x1ec834:_0x2de053[_0x24632a+0x1],_0x5324c8=[..._0xff2605["transform"]['rotation']];_0x5324c8[0x1]=Math["atan2"](_0x597040[0x0]-_0x3ebb9f[0x0],_0x597040[0x2]-_0x3ebb9f[0x2]),_0x3bd58e=upsertStoryboard3DObjectKeyframe(_0x3bd58e,{'objectId':_0xff2605['id'],'property':"rotation",'time':_0x556930,'value':_0x5324c8,'easing':"linear"});}});const _0x41779f=_0xff2605?_0x3bd58e['objectTracks']['find'](_0x213460=>_0x213460["objectId"]===_0xff2605['id'])["positionKeyframes"]:_0x3bd58e["cameraKeyframes"],_0x17ba4b=_0x41779f['filter'](_0x326f95=>_0x326f95["time"]>=_0x5411da&&_0x326f95["time"]<=_0x5411da+_0x58e8ba);if(smooth)smoothDirectorKeys(_0x17ba4b);if(_0xff2605)_0x3bd58e["objectPaths"]={..._0x3bd58e["objectPaths"]||{},[_0xff2605['id']]:{'pointIds':_0x17ba4b["map"](_0x3b7f47=>_0x3b7f47['id'])}};else _0x3bd58e['cameraPath']={'pointIds':_0x17ba4b["map"](_0x44e138=>_0x44e138['id'])};return normalizeStoryboard3DShotAnimation(_0x3bd58e);}
+import {
+  normalizeStoryboard3DShotAnimation,
+  upsertStoryboard3DCameraKeyframe,
+  upsertStoryboard3DObjectKeyframe,
+} from './shotAnimation.js';
+import { smoothDirectorKeys } from './directorCurves.js';
+export function authorDirectorPath(
+  value,
+  {
+    points: points,
+    camera: camera,
+    object: object,
+    start: start = 0x0,
+    duration: duration = 0x3,
+    smooth: smooth = ![],
+  } = {},
+) {
+  const item = (points || [])
+    ['filter'](
+      (list) => Array['isArray'](list) && list['length'] === 0x3 && list['every'](Number['isFinite']),
+    )
+    ['slice'](0x0, 0x64);
+  if (item['length'] < 0x2) throw new Error('轨迹至少需要两个不同的位置。');
+  if (object?.['locked']) throw new Error('请先解锁对象。');
+  const key = item['map']((list2, index) =>
+      index ? Math['hypot'](...list2['map']((result, data) => result - item[index - 0x1][data])) : 0x0,
+    ),
+    count = key['reduce']((options, target) => options + target, 0x0);
+  if (count < 0.001) throw new Error('轨迹过短，请移动指针绘制路线。');
+  let args = normalizeStoryboard3DShotAnimation(value);
+  const source = Math['max'](0x0, Math['min'](3599.9, Number(start) || 0x0)),
+    next = Math['max'](0.1, Math['min'](0xe10 - source, Number(duration) || 0x3));
+  let current = 0x0;
+  if (object) {
+    const entry = args['objectTracks']['find']((record) => record['objectId'] === object['id']);
+    if (entry) {
+      for (const payload of ['positionKeyframes', 'rotationKeyframes'])
+        entry[payload] = entry[payload]['filter'](
+          (handle) => handle['time'] < source || handle['time'] > source + next,
+        );
+    }
+  } else
+    args['cameraKeyframes'] = args['cameraKeyframes']['filter'](
+      (state) => state['time'] < source || state['time'] > source + next,
+    );
+  item['forEach']((config, scope) => {
+    current += key[scope];
+    const input = source + (next * current) / count;
+    if (!object)
+      args = upsertStoryboard3DCameraKeyframe(args, {
+        time: input,
+        camera: { ...camera, position: config },
+        easing: 'linear',
+      });
+    else {
+      args = upsertStoryboard3DObjectKeyframe(args, {
+        objectId: object['id'],
+        property: 'position',
+        time: input,
+        value: config,
+        easing: 'linear',
+      });
+      const output = scope === item['length'] - 0x1 ? item[scope - 0x1] : config,
+        value2 = scope === item['length'] - 0x1 ? config : item[scope + 0x1],
+        value3 = [...object['transform']['rotation']];
+      ((value3[0x1] = Math['atan2'](value2[0x0] - output[0x0], value2[0x2] - output[0x2])),
+        (args = upsertStoryboard3DObjectKeyframe(args, {
+          objectId: object['id'],
+          property: 'rotation',
+          time: input,
+          value: value3,
+          easing: 'linear',
+        })));
+    }
+  });
+  const list3 = object
+      ? args['objectTracks']['find']((value4) => value4['objectId'] === object['id'])['positionKeyframes']
+      : args['cameraKeyframes'],
+    value5 = list3['filter']((value6) => value6['time'] >= source && value6['time'] <= source + next);
+  if (smooth) smoothDirectorKeys(value5);
+  if (object)
+    args['objectPaths'] = {
+      ...(args['objectPaths'] || {}),
+      [object['id']]: { pointIds: value5['map']((value7) => value7['id']) },
+    };
+  else args['cameraPath'] = { pointIds: value5['map']((value8) => value8['id']) };
+  return normalizeStoryboard3DShotAnimation(args);
+}

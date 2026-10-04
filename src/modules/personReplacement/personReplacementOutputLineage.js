@@ -5,26 +5,26 @@ export const PERSON_REPLACEMENT_OUTPUT_TRANSITIONS = Object['freeze']({
   COMPOSITION_SUCCEEDED: 'composition-succeeded',
   FINAL_MUX_SUCCEEDED: 'final-mux-succeeded',
 });
-function normalizeText(_0x175924) {
-  return String(_0x175924 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function invalidateOutput(_0x2a441a) {
-  const _0x2be53c = _0x2a441a['output'] || {},
-    _0x3e0b2c = Boolean(
-      normalizeText(_0x2be53c['originalMasterRef']) &&
-      normalizeText(_0x2be53c['visualMasterRef'] || _0x2be53c['finalVideoRef']),
+function invalidateOutput(args) {
+  const args2 = args['output'] || {},
+    item = Boolean(
+      normalizeText(args2['originalMasterRef']) &&
+      normalizeText(args2['visualMasterRef'] || args2['finalVideoRef']),
     );
-  if (_0x3e0b2c)
+  if (item)
     return {
-      ..._0x2a441a,
-      output: { ..._0x2be53c, composeStatus: 'pending' },
-      workspace: { ...(_0x2a441a['workspace'] || {}), compositePreviewMode: 'full' },
+      ...args,
+      output: { ...args2, composeStatus: 'pending' },
+      workspace: { ...(args['workspace'] || {}), compositePreviewMode: 'full' },
     };
   return {
-    ..._0x2a441a,
-    audio: { ...(_0x2a441a['audio'] || {}), originalAudioRef: '' },
+    ...args,
+    audio: { ...(args['audio'] || {}), originalAudioRef: '' },
     output: {
-      ..._0x2be53c,
+      ...args2,
       originalMasterRef: '',
       visualMasterRef: '',
       finalVideoRef: '',
@@ -32,77 +32,77 @@ function invalidateOutput(_0x2a441a) {
       composeStatus: 'pending',
       composedShotIds: [],
     },
-    workspace: { ...(_0x2a441a['workspace'] || {}), compositePreviewMode: 'shot' },
+    workspace: { ...(args['workspace'] || {}), compositePreviewMode: 'shot' },
   };
 }
-function completeComposition(_0x5aaf0f, _0xd7fbd7) {
-  const _0x13c9e6 = normalizeText(_0xd7fbd7['originalMasterRef']),
-    _0x82ef0 = normalizeText(_0xd7fbd7['visualMasterRef']);
-  if (!_0x13c9e6 || !_0x82ef0)
+function completeComposition(args3, key) {
+  const originalAudioRef = normalizeText(key['originalMasterRef']),
+    visualMasterRef = normalizeText(key['visualMasterRef']);
+  if (!originalAudioRef || !visualMasterRef)
     throw new TypeError(
       'Replacement\x20Studio\x20composition\x20requires\x20original\x20and\x20visual\x20masters',
     );
-  const _0x35e59a = Array['isArray'](_0xd7fbd7['composedShotIds'])
-    ? _0xd7fbd7['composedShotIds']['map'](normalizeText)['filter'](Boolean)
+  const composedShotIds = Array['isArray'](key['composedShotIds'])
+    ? key['composedShotIds']['map'](normalizeText)['filter'](Boolean)
     : [];
   return {
-    ..._0x5aaf0f,
+    ...args3,
     status: 'completed',
-    audio: { ...(_0x5aaf0f['audio'] || {}), originalAudioRef: _0x13c9e6 },
+    audio: { ...(args3['audio'] || {}), originalAudioRef: originalAudioRef },
     output: {
-      ...(_0x5aaf0f['output'] || {}),
-      originalMasterRef: _0x13c9e6,
-      visualMasterRef: _0x82ef0,
+      ...(args3['output'] || {}),
+      originalMasterRef: originalAudioRef,
+      visualMasterRef: visualMasterRef,
       finalVideoRef: '',
       finalAudioTrack: '',
       composeStatus: 'succeeded',
-      composedShotIds: _0x35e59a,
+      composedShotIds: composedShotIds,
     },
-    workspace: { ...(_0x5aaf0f['workspace'] || {}), compositePreviewMode: 'full' },
+    workspace: { ...(args3['workspace'] || {}), compositePreviewMode: 'full' },
   };
 }
-function invalidateFinalMux(_0x62376d) {
-  return { ..._0x62376d, output: { ...(_0x62376d['output'] || {}), finalVideoRef: '', finalAudioTrack: '' } };
+function invalidateFinalMux(args4) {
+  return { ...args4, output: { ...(args4['output'] || {}), finalVideoRef: '', finalAudioTrack: '' } };
 }
-function applySourceGraphChange(_0x424a22, _0x3b9b56) {
+function applySourceGraphChange(args5, index) {
   return {
-    ..._0x424a22,
+    ...args5,
     audio: {
-      ...(_0x424a22['audio'] || {}),
-      originalAudioRef: normalizeText(_0x3b9b56['nextOriginalAudioRef']),
+      ...(args5['audio'] || {}),
+      originalAudioRef: normalizeText(index['nextOriginalAudioRef']),
     },
     output: {
-      ...(_0x424a22['output'] || {}),
+      ...(args5['output'] || {}),
       originalMasterRef: '',
       visualMasterRef: '',
       finalVideoRef: '',
       finalAudioTrack: '',
-      composeStatus: normalizeText(_0x3b9b56['composeStatus']) || 'pending',
+      composeStatus: normalizeText(index['composeStatus']) || 'pending',
       composedShotIds: [],
     },
-    workspace: { ...(_0x424a22['workspace'] || {}), compositePreviewMode: 'shot' },
+    workspace: { ...(args5['workspace'] || {}), compositePreviewMode: 'shot' },
   };
 }
-function completeFinalMux(_0x5df3ed, _0xea04fa) {
-  const _0x538d41 = normalizeText(_0xea04fa['finalVideoRef']),
-    _0x306198 = normalizeText(_0xea04fa['finalAudioTrack']);
-  if (!_0x538d41 || !['original', 'replacement']['includes'](_0x306198))
+function completeFinalMux(args6, result) {
+  const finalVideoRef = normalizeText(result['finalVideoRef']),
+    finalAudioTrack = normalizeText(result['finalAudioTrack']);
+  if (!finalVideoRef || !['original', 'replacement']['includes'](finalAudioTrack))
     throw new TypeError('Replacement Studio final mux requires a video and audio track');
   return {
-    ..._0x5df3ed,
-    output: { ...(_0x5df3ed['output'] || {}), finalVideoRef: _0x538d41, finalAudioTrack: _0x306198 },
+    ...args6,
+    output: { ...(args6['output'] || {}), finalVideoRef: finalVideoRef, finalAudioTrack: finalAudioTrack },
   };
 }
-export function transitionPersonReplacementOutput(_0x2acc24 = {}, _0xb9fa64 = {}) {
-  const _0x2d0d1f = normalizeText(_0xb9fa64['type']);
-  if (_0x2d0d1f === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['INVALIDATE']) return invalidateOutput(_0x2acc24);
-  if (_0x2d0d1f === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['FINAL_MUX_INVALIDATE'])
-    return invalidateFinalMux(_0x2acc24);
-  if (_0x2d0d1f === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['SOURCE_GRAPH_CHANGED'])
-    return applySourceGraphChange(_0x2acc24, _0xb9fa64);
-  if (_0x2d0d1f === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['COMPOSITION_SUCCEEDED'])
-    return completeComposition(_0x2acc24, _0xb9fa64);
-  if (_0x2d0d1f === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['FINAL_MUX_SUCCEEDED'])
-    return completeFinalMux(_0x2acc24, _0xb9fa64);
-  throw new TypeError('Unknown\x20Replacement\x20Studio\x20output\x20transition:\x20' + _0x2d0d1f);
+export function transitionPersonReplacementOutput(options = {}, data = {}) {
+  const text = normalizeText(data['type']);
+  if (text === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['INVALIDATE']) return invalidateOutput(options);
+  if (text === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['FINAL_MUX_INVALIDATE'])
+    return invalidateFinalMux(options);
+  if (text === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['SOURCE_GRAPH_CHANGED'])
+    return applySourceGraphChange(options, data);
+  if (text === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['COMPOSITION_SUCCEEDED'])
+    return completeComposition(options, data);
+  if (text === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['FINAL_MUX_SUCCEEDED'])
+    return completeFinalMux(options, data);
+  throw new TypeError('Unknown\x20Replacement\x20Studio\x20output\x20transition:\x20' + text);
 }

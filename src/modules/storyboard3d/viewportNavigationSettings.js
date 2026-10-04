@@ -32,65 +32,62 @@ export const STORYBOARD_3D_NAVIGATION_PRESETS = Object['freeze']({
 export const DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET = 'unity';
 export const STORYBOARD_3D_NAVIGATION_TOOLS = Object['freeze'](['select', 'move', 'rotate', 'scale']);
 export function getStoryboard3DToolShortcut(
-  _0x934d43 = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET,
-  _0x13b58c = 'select',
+  value = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET,
+  item = 'select',
 ) {
-  const _0x11c2ad =
-    STORYBOARD_3D_NAVIGATION_PRESETS[_0x934d43] ||
+  const key =
+    STORYBOARD_3D_NAVIGATION_PRESETS[value] ||
     STORYBOARD_3D_NAVIGATION_PRESETS[DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET];
-  return _0x11c2ad['toolShortcuts']?.[_0x13b58c] || '';
+  return key['toolShortcuts']?.[item] || '';
 }
-export function resolveStoryboard3DToolFromShortcut(
-  _0x213924,
-  _0x154e3e = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET,
-) {
-  const _0x122c2f = String(_0x213924 || '')
+export function resolveStoryboard3DToolFromShortcut(index, result = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET) {
+  const enabled = String(index || '')
     ['trim']()
     ['toLowerCase']();
-  if (!_0x122c2f) return null;
+  if (!enabled) return null;
   return (
     STORYBOARD_3D_NAVIGATION_TOOLS['find'](
-      (_0x2d60bf) => getStoryboard3DToolShortcut(_0x154e3e, _0x2d60bf)['toLowerCase']() === _0x122c2f,
+      (data) => getStoryboard3DToolShortcut(result, data)['toLowerCase']() === enabled,
     ) || null
   );
 }
-function clamp(_0x42ae2b, _0x15279b, _0x54370e, _0x4f8622) {
-  const _0x13a252 = Number(_0x42ae2b);
-  return Math['min'](
-    _0x54370e,
-    Math['max'](_0x15279b, Number['isFinite'](_0x13a252) ? _0x13a252 : _0x4f8622),
-  );
+function clamp(options, target, source, next) {
+  const current = Number(options);
+  return Math['min'](source, Math['max'](target, Number['isFinite'](current) ? current : next));
 }
-export function normalizeStoryboard3DNavigationSettings(_0x583bef = {}) {
-  const _0x3cf52b = STORYBOARD_3D_NAVIGATION_PRESETS[_0x583bef?.['preset']]
-      ? _0x583bef['preset']
+export function normalizeStoryboard3DNavigationSettings(invertOrbitX = {}) {
+  const preset = STORYBOARD_3D_NAVIGATION_PRESETS[invertOrbitX?.['preset']]
+      ? invertOrbitX['preset']
       : DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET,
-    _0x323579 = STORYBOARD_3D_NAVIGATION_PRESETS[_0x3cf52b]['defaults'];
+    entry = STORYBOARD_3D_NAVIGATION_PRESETS[preset]['defaults'];
   return {
-    preset: _0x3cf52b,
-    orbitSensitivity: clamp(_0x583bef['orbitSensitivity'], 0.2, 0x3, _0x323579['orbitSensitivity']),
-    panSensitivity: clamp(_0x583bef['panSensitivity'], 0.2, 0x3, _0x323579['panSensitivity']),
-    zoomSensitivity: clamp(_0x583bef['zoomSensitivity'], 0.2, 0x3, _0x323579['zoomSensitivity']),
-    invertOrbitX: _0x583bef['invertOrbitX'] === !![],
-    invertOrbitY: _0x583bef['invertOrbitY'] === !![],
-    invertWheel: _0x583bef['invertWheel'] === !![],
+    preset: preset,
+    orbitSensitivity: clamp(invertOrbitX['orbitSensitivity'], 0.2, 0x3, entry['orbitSensitivity']),
+    panSensitivity: clamp(invertOrbitX['panSensitivity'], 0.2, 0x3, entry['panSensitivity']),
+    zoomSensitivity: clamp(invertOrbitX['zoomSensitivity'], 0.2, 0x3, entry['zoomSensitivity']),
+    invertOrbitX: invertOrbitX['invertOrbitX'] === !![],
+    invertOrbitY: invertOrbitX['invertOrbitY'] === !![],
+    invertWheel: invertOrbitX['invertWheel'] === !![],
   };
 }
-export function createStoryboard3DNavigationPresetSettings(_0x28cf96) {
-  return normalizeStoryboard3DNavigationSettings({ preset: _0x28cf96 });
+export function createStoryboard3DNavigationPresetSettings(preset2) {
+  return normalizeStoryboard3DNavigationSettings({ preset: preset2 });
 }
-export function loadStoryboard3DNavigationSettings(_0x156e3c = globalThis['localStorage']) {
+export function loadStoryboard3DNavigationSettings(record = globalThis['localStorage']) {
   try {
-    const _0x27b185 = _0x156e3c?.['getItem']?.(STORYBOARD_3D_NAVIGATION_STORAGE_KEY);
-    return normalizeStoryboard3DNavigationSettings(_0x27b185 ? JSON['parse'](_0x27b185) : {});
+    const payload = record?.['getItem']?.(STORYBOARD_3D_NAVIGATION_STORAGE_KEY);
+    return normalizeStoryboard3DNavigationSettings(payload ? JSON['parse'](payload) : {});
   } catch {
     return normalizeStoryboard3DNavigationSettings();
   }
 }
-export function saveStoryboard3DNavigationSettings(_0x106c1e, _0x125ea6 = globalThis['localStorage']) {
-  const _0x27ad63 = normalizeStoryboard3DNavigationSettings(_0x106c1e);
+export function saveStoryboard3DNavigationSettings(handle, state = globalThis['localStorage']) {
+  const storyboard3DNavigationSettings = normalizeStoryboard3DNavigationSettings(handle);
   try {
-    _0x125ea6?.['setItem']?.(STORYBOARD_3D_NAVIGATION_STORAGE_KEY, JSON['stringify'](_0x27ad63));
+    state?.['setItem']?.(
+      STORYBOARD_3D_NAVIGATION_STORAGE_KEY,
+      JSON['stringify'](storyboard3DNavigationSettings),
+    );
   } catch {}
-  return _0x27ad63;
+  return storyboard3DNavigationSettings;
 }

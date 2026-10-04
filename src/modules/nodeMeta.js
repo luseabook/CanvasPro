@@ -66,40 +66,40 @@ const _NODE_META = {
     'test-video': { aliases: [], wrapperClasses: ['video-node'], refKind: 'video' },
   },
   _ALIAS_TO_CANONICAL = (() => {
-    const _0x5a7a0e = new Map();
-    for (const [_0x42c762, _0x302302] of Object.entries(_NODE_META)) {
-      _0x5a7a0e.set(_0x42c762, _0x42c762);
-      for (const _0x5ede47 of _0x302302.aliases || []) {
-        _0x5a7a0e.set(_0x5ede47, _0x42c762);
+    const map = new Map();
+    for (const [value, item] of Object.entries(_NODE_META)) {
+      map.set(value, value);
+      for (const key of item.aliases || []) {
+        map.set(key, value);
       }
     }
-    return _0x5a7a0e;
+    return map;
   })();
 export function getAllNodeTypeMeta() {
   return _NODE_META;
 }
-export function normalizeNodeType(_0x2468d7) {
-  if (typeof _0x2468d7 !== 'string') return '';
-  const _0x4a997e = _0x2468d7.trim();
-  if (!_0x4a997e) return '';
-  return _ALIAS_TO_CANONICAL.get(_0x4a997e) || _0x4a997e;
+export function normalizeNodeType(index) {
+  if (typeof index !== 'string') return '';
+  const enabled = index.trim();
+  if (!enabled) return '';
+  return _ALIAS_TO_CANONICAL.get(enabled) || enabled;
 }
-export function getNodeTypeAliases(_0x4e7129) {
-  const _0x4c6095 = normalizeNodeType(_0x4e7129),
-    _0x2cc4e4 = _NODE_META[_0x4c6095];
-  return _0x2cc4e4?.aliases ? [..._0x2cc4e4.aliases] : [];
+export function getNodeTypeAliases(result) {
+  const nodeType = normalizeNodeType(result),
+    args = _NODE_META[nodeType];
+  return args?.aliases ? [...args.aliases] : [];
 }
-export function getNodeWrapperExtraClasses(_0x4fdc4c) {
-  const _0x3a630d = normalizeNodeType(_0x4fdc4c),
-    _0x4877f8 = _NODE_META[_0x3a630d],
-    _0x380d38 = _0x4877f8?.wrapperClasses || [];
-  return _0x380d38.length ? _0x380d38.join(' ') : '';
+export function getNodeWrapperExtraClasses(data) {
+  const nodeType2 = normalizeNodeType(data),
+    options = _NODE_META[nodeType2],
+    list = options?.wrapperClasses || [];
+  return list.length ? list.join(' ') : '';
 }
-export function getRefKindByNodeType(_0x4beaa9) {
-  const _0x3feb85 = normalizeNodeType(_0x4beaa9);
-  return _NODE_META[_0x3feb85]?.refKind || '';
+export function getRefKindByNodeType(target) {
+  const nodeType3 = normalizeNodeType(target);
+  return _NODE_META[nodeType3]?.refKind || '';
 }
-export function hasNodeTypeBetaBadge(_0x384ee2) {
-  const _0x241f16 = normalizeNodeType(_0x384ee2);
-  return _NODE_META[_0x241f16]?.beta === true;
+export function hasNodeTypeBetaBadge(source) {
+  const nodeType4 = normalizeNodeType(source);
+  return _NODE_META[nodeType4]?.beta === true;
 }

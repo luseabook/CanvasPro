@@ -16,45 +16,49 @@ const TASK_TERMINAL_STATUS = new Set([
   ]),
   TASK_FAILURE_STATUS = new Set(['failed', 'fail', 'error']),
   TASK_CANCELLED_STATUS = new Set(['cancelled', 'canceled']);
-function normalizeStatus(_0xee3ad) {
-  return String(_0xee3ad || '')
+function normalizeStatus(value) {
+  return String(value || '')
     .trim()
     .toLowerCase();
 }
 function buildGenerationDurationPatch({ startedAt: startedAt = 0, duration: duration = null } = {}) {
-  const _0x3bc36b = Number(duration);
-  if (duration !== null && duration !== undefined && Number.isFinite(_0x3bc36b) && _0x3bc36b >= 0)
-    return { generationDuration: _0x3bc36b };
-  const _0x1c9075 = Number(startedAt);
-  if (Number.isFinite(_0x1c9075) && _0x1c9075 > 0)
-    return { generationDuration: Math.max(0, Date.now() - _0x1c9075) };
+  const generationDuration = Number(duration);
+  if (
+    duration !== null &&
+    duration !== undefined &&
+    Number.isFinite(generationDuration) &&
+    generationDuration >= 0
+  )
+    return { generationDuration: generationDuration };
+  const count = Number(startedAt);
+  if (Number.isFinite(count) && count > 0) return { generationDuration: Math.max(0, Date.now() - count) };
   return {};
 }
-export function isGenerationTaskTerminalStatus(_0x37bd6b) {
-  return TASK_TERMINAL_STATUS.has(normalizeStatus(_0x37bd6b));
+export function isGenerationTaskTerminalStatus(item) {
+  return TASK_TERMINAL_STATUS.has(normalizeStatus(item));
 }
-export function isGenerationTaskFailureStatus(_0x55613a) {
-  return TASK_FAILURE_STATUS.has(normalizeStatus(_0x55613a));
+export function isGenerationTaskFailureStatus(key) {
+  return TASK_FAILURE_STATUS.has(normalizeStatus(key));
 }
-export function isGenerationTaskCancelledStatus(_0x3c32d9) {
-  return TASK_CANCELLED_STATUS.has(normalizeStatus(_0x3c32d9));
+export function isGenerationTaskCancelledStatus(index) {
+  return TASK_CANCELLED_STATUS.has(normalizeStatus(index));
 }
-export function resolveJobStatusFromTaskStatus(_0x292ee2, _0x5838b7 = null) {
-  const _0x11b5a2 = normalizeStatus(_0x292ee2);
-  if (TASK_FAILURE_STATUS.has(_0x11b5a2)) return 'error';
-  if (TASK_CANCELLED_STATUS.has(_0x11b5a2)) return 'cancelled';
+export function resolveJobStatusFromTaskStatus(result, data = null) {
+  const status = normalizeStatus(result);
+  if (TASK_FAILURE_STATUS.has(status)) return 'error';
+  if (TASK_CANCELLED_STATUS.has(status)) return 'cancelled';
   if (
-    _0x11b5a2 === 'success' ||
-    _0x11b5a2 === 'succeeded' ||
-    _0x11b5a2 === 'completed' ||
-    _0x11b5a2 === 'complete' ||
-    _0x11b5a2 === 'done' ||
-    _0x11b5a2 === 'finished' ||
-    _0x11b5a2 === 'finish'
+    status === 'success' ||
+    status === 'succeeded' ||
+    status === 'completed' ||
+    status === 'complete' ||
+    status === 'done' ||
+    status === 'finished' ||
+    status === 'finish'
   )
     return 'success';
-  if (_0x11b5a2 === 'idle') return _0x5838b7;
-  return _0x5838b7;
+  if (status === 'idle') return data;
+  return data;
 }
 export function buildGenerationStartPatch({ startedAt: startedAt = Date.now() } = {}) {
   return {
@@ -78,12 +82,12 @@ export function buildGenerationFailurePatch({
   startedAt: startedAt = 0,
   duration: duration = null,
 } = {}) {
-  const _0x3379b1 = t('coreUi.generationTask.generateFailed'),
-    _0x3eab6c = String(error || _0x3379b1).trim() || _0x3379b1;
+  const t2 = t('coreUi.generationTask.generateFailed'),
+    jobError = String(error || t2).trim() || t2;
   return {
     isGenerating: false,
     jobStatus: 'error',
-    jobError: _0x3eab6c,
+    jobError: jobError,
     ...buildGenerationDurationPatch({ startedAt: startedAt, duration: duration }),
   };
 }

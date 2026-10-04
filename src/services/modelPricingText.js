@@ -71,16 +71,16 @@ const WORDS = {
     'Text-to-image base reference price for this model; image editing charges follow the actual invoice.',
   ],
 };
-export function priceText(_0x4ff16e) {
-  return WORDS[_0x4ff16e]?.[getLocale() === 'en-US' ? 0x1 : 0x0] || _0x4ff16e;
+export function priceText(value) {
+  return WORDS[value]?.[getLocale() === 'en-US' ? 0x1 : 0x0] || value;
 }
-export function formatPrice(_0x4b8814, _0x4859fa = 'USD') {
-  const _0x3cc95e = _0x4859fa === 'USD' ? '$' : _0x4859fa === 'CNY' ? '¥' : _0x4859fa + '\x20';
-  if (_0x4b8814 === 0x0) return _0x3cc95e + '0';
-  if (_0x4b8814 > 0x0 && _0x4b8814 < 0.000001) return '<' + _0x3cc95e + '0.000001';
+export function formatPrice(count, item = 'USD') {
+  const key = item === 'USD' ? '$' : item === 'CNY' ? '¥' : item + '\x20';
+  if (count === 0x0) return key + '0';
+  if (count > 0x0 && count < 0.000001) return '<' + key + '0.000001';
   return (
     '' +
-    _0x3cc95e +
-    Number(_0x4b8814)['toLocaleString']('en-US', { minimumFractionDigits: 0x2, maximumFractionDigits: 0x6 })
+    key +
+    Number(count)['toLocaleString']('en-US', { minimumFractionDigits: 0x2, maximumFractionDigits: 0x6 })
   );
 }

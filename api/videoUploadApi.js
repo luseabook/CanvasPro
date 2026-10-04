@@ -1,64 +1,64 @@
 import { buildApiUrl } from './apiBase.js';
 import { post, get } from './requester.js';
 import { isApimartReusableUrl, uploadVideoToApimart } from './apimartUploadApi.js';
-export async function uploadVideoToRunningHub(_0x10b027, _0x2f47a8) {
-  if (!_0x2f47a8) throw new Error('RunningHUB API Key 未配置，无法上传视频');
-  if (!_0x10b027) throw new Error('视频文件不能为空');
-  const _0x109ca6 = 'https://www.runninghub.cn/openapi/v2/media/upload/binary',
-    _0x10d959 = buildApiUrl('/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(_0x109ca6)),
-    _0x186753 = new FormData(),
-    _0xd26565 = _0x10b027.name || 'video.mp4';
-  _0x186753.append('file', _0x10b027, _0xd26565);
-  const _0x3638d0 = await post(_0x10d959, _0x186753, {
-    headers: { Authorization: 'Bearer ' + _0x2f47a8 },
+export async function uploadVideoToRunningHub(error, enabled) {
+  if (!enabled) throw new Error('RunningHUB API Key 未配置，无法上传视频');
+  if (!error) throw new Error('视频文件不能为空');
+  const value = 'https://www.runninghub.cn/openapi/v2/media/upload/binary',
+    apiUrl = buildApiUrl('/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(value)),
+    formData = new FormData(),
+    item = error.name || 'video.mp4';
+  formData.append('file', error, item);
+  const error2 = await post(apiUrl, formData, {
+    headers: { Authorization: 'Bearer ' + enabled },
     provider: 'runninghub',
     buildUrl: false,
   });
-  if (_0x3638d0.code !== 0) throw new Error('RunningHUB 视频上传失败: ' + (_0x3638d0.message || '未知错误'));
-  const _0xeae081 = _0x3638d0.data?.download_url;
-  if (!_0xeae081) throw new Error('RunningHUB 返回的视频URL为空');
-  return _0xeae081;
+  if (error2.code !== 0) throw new Error('RunningHUB 视频上传失败: ' + (error2.message || '未知错误'));
+  const enabled2 = error2.data?.download_url;
+  if (!enabled2) throw new Error('RunningHUB 返回的视频URL为空');
+  return enabled2;
 }
-export async function uploadVideoToApimartCdn(_0x29e448, _0x2e810f = {}) {
-  if (!_0x29e448) throw new Error('视频文件不能为空');
-  return await uploadVideoToApimart(_0x29e448, _0x2e810f);
+export async function uploadVideoToApimartCdn(enabled3, key = {}) {
+  if (!enabled3) throw new Error('视频文件不能为空');
+  return await uploadVideoToApimart(enabled3, key);
 }
-async function processInputVideosOrdered(_0x4739f8, _0x4c59f5, _0x142a27 = {}) {
-  if (!_0x4739f8 || _0x4739f8.length === 0) return [];
-  const _0x1b507d = String(_0x142a27.provider || 'runninghub').trim() || 'runninghub',
-    _0x1e19c6 = _0x142a27.strictUpload === true,
-    _0x42ddd3 = new Array(_0x4739f8.length).fill('');
-  for (let _0xb30bf7 = 0; _0xb30bf7 < _0x4739f8.length; _0xb30bf7++) {
-    const _0x281fb5 = String(_0x4739f8[_0xb30bf7] || '').trim();
-    if (!_0x281fb5) continue;
+async function processInputVideosOrdered(list, apiKey, args = {}) {
+  if (!list || list.length === 0) return [];
+  const index = String(args.provider || 'runninghub').trim() || 'runninghub',
+    result = args.strictUpload === true,
+    data = new Array(list.length).fill('');
+  for (let options = 0; options < list.length; options++) {
+    const list2 = String(list[options] || '').trim();
+    if (!list2) continue;
     try {
-      if (_0x1b507d === 'runninghub' && _0x281fb5.includes('runninghub.cn')) {
-        _0x42ddd3[_0xb30bf7] = _0x281fb5;
+      if (index === 'runninghub' && list2.includes('runninghub.cn')) {
+        data[options] = list2;
         continue;
       }
-      if (_0x1b507d === 'apimart' && isApimartReusableUrl(_0x281fb5)) {
-        _0x42ddd3[_0xb30bf7] = _0x281fb5;
+      if (index === 'apimart' && isApimartReusableUrl(list2)) {
+        data[options] = list2;
         continue;
       }
-      const _0x15ece3 = /^https?:\/\//.test(_0x281fb5)
-          ? _0x281fb5
-          : buildApiUrl(_0x281fb5.startsWith('/') ? _0x281fb5 : '/' + _0x281fb5),
-        _0x4fbe0f = await get(_0x15ece3, { provider: 'remote', buildUrl: false, responseType: 'blob' }),
-        _0x2f5afc =
-          _0x1b507d === 'apimart'
-            ? await uploadVideoToApimart(_0x4fbe0f, { ..._0x142a27, apiKey: _0x4c59f5 })
-            : await uploadVideoToRunningHub(_0x4fbe0f, _0x4c59f5);
-      _0x42ddd3[_0xb30bf7] = _0x2f5afc;
-    } catch (_0xf37c98) {
-      if (_0x1e19c6) throw _0xf37c98;
+      const target = /^https?:\/\//.test(list2)
+          ? list2
+          : buildApiUrl(list2.startsWith('/') ? list2 : '/' + list2),
+        get2 = await get(target, { provider: 'remote', buildUrl: false, responseType: 'blob' }),
+        source =
+          index === 'apimart'
+            ? await uploadVideoToApimart(get2, { ...args, apiKey: apiKey })
+            : await uploadVideoToRunningHub(get2, apiKey);
+      data[options] = source;
+    } catch (next) {
+      if (result) throw next;
     }
   }
-  return _0x42ddd3;
+  return data;
 }
-export async function processInputVideos(_0x5caade, _0x3607bf, _0x207e8b = {}) {
-  const _0x223678 = await processInputVideosOrdered(_0x5caade, _0x3607bf, _0x207e8b);
-  return _0x223678.filter(Boolean);
+export async function processInputVideos(current, entry, record = {}) {
+  const list3 = await processInputVideosOrdered(current, entry, record);
+  return list3.filter(Boolean);
 }
-export async function processInputVideosPreserveOrder(_0x136092, _0x5e0451, _0x5a3ac7 = {}) {
-  return await processInputVideosOrdered(_0x136092, _0x5e0451, _0x5a3ac7);
+export async function processInputVideosPreserveOrder(payload, handle, state = {}) {
+  return await processInputVideosOrdered(payload, handle, state);
 }

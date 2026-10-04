@@ -60,25 +60,25 @@ const AGNES_IMAGE_INPUT_SLOTS = Object.freeze({
     }),
   ]);
 export const agnesImageModelApiModelManifests = Object.freeze(
-  AGNES_IMAGE_MODELS.map((_0x2a7bd5) =>
+  AGNES_IMAGE_MODELS.map((modelId) =>
     createImageModelApiManifest({
-      modelId: _0x2a7bd5.modelId,
-      executionId: _0x2a7bd5.executionId,
+      modelId: modelId.modelId,
+      executionId: modelId.executionId,
       provider: 'agnes',
-      displayName: _0x2a7bd5.displayName,
+      displayName: modelId.displayName,
       icon: 'AG',
-      description: _0x2a7bd5.description,
+      description: modelId.description,
       fields: Object.freeze([APIMART_NANO_BANANA_IMAGE_SIZE_FIELD, APIMART_QWEN_IMAGE_RATIO_FIELD]),
-      inputSlots: _0x2a7bd5.inputSlots,
+      inputSlots: modelId.inputSlots,
       extensions: Object.freeze({
         // Declares the domestic and international lines so the key panel can offer the route
         // switch, the same way the video manifests already do.
         providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
         imageMenu: Object.freeze({
           group: 'agnes',
-          order: _0x2a7bd5.order,
-          title: _0x2a7bd5.displayName,
-          subtitle: _0x2a7bd5.description,
+          order: modelId.order,
+          title: modelId.displayName,
+          subtitle: modelId.description,
           iconKind: 'agnesBadge',
         }),
       }),
@@ -86,14 +86,14 @@ export const agnesImageModelApiModelManifests = Object.freeze(
   ),
 );
 export const agnesImageModelApiExecutionManifests = Object.freeze(
-  AGNES_IMAGE_MODELS.map((_0x1cec24) =>
+  AGNES_IMAGE_MODELS.map((id) =>
     createModelApiExecutionManifest({
-      id: _0x1cec24.executionId,
+      id: id.executionId,
       provider: 'agnes',
-      model: _0x1cec24.model,
+      model: id.model,
       endpoint: '/v1/images/generations',
       endpointMode: 'image-generation',
-      bodyMapping: _0x1cec24.bodyMapping,
+      bodyMapping: id.bodyMapping,
       responseMapping: AGNES_IMAGE_RESPONSE_MAPPING,
       extensions: Object.freeze({ bodyResolver: 'agnesImage' }),
     }),

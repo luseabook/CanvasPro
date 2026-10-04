@@ -6,73 +6,73 @@ const WASM_ROOT_URL = new URL('../../../vendor/mediapipe/tasks-vision/wasm', imp
     import.meta['url'],
   )['href'];
 let poseLandmarkerPromise = null;
-function serializeLandmark(_0x576c4a = {}) {
+function serializeLandmark(box = {}) {
   return {
-    x: Number(_0x576c4a['x']) || 0x0,
-    y: Number(_0x576c4a['y']) || 0x0,
-    z: Number(_0x576c4a['z']) || 0x0,
-    visibility: Number['isFinite'](Number(_0x576c4a['visibility'])) ? Number(_0x576c4a['visibility']) : 0x1,
-    presence: Number['isFinite'](Number(_0x576c4a['presence'])) ? Number(_0x576c4a['presence']) : 0x1,
+    x: Number(box['x']) || 0x0,
+    y: Number(box['y']) || 0x0,
+    z: Number(box['z']) || 0x0,
+    visibility: Number['isFinite'](Number(box['visibility'])) ? Number(box['visibility']) : 0x1,
+    presence: Number['isFinite'](Number(box['presence'])) ? Number(box['presence']) : 0x1,
   };
 }
 async function getPoseLandmarker() {
   return (
     !poseLandmarkerPromise &&
       (poseLandmarkerPromise = (async () => {
-        const _0x58963b = await FilesetResolver['forVisionTasks'](WASM_ROOT_URL, !![]);
-        return PoseLandmarker['createFromOptions'](_0x58963b, {
+        const value = await FilesetResolver['forVisionTasks'](WASM_ROOT_URL, !![]);
+        return PoseLandmarker['createFromOptions'](value, {
           baseOptions: { modelAssetPath: MODEL_URL },
           ...STORYBOARD_3D_IMAGE_POSE_RUNTIME['options'],
           numPoses: STORYBOARD_3D_IMAGE_POSE_RUNTIME['maxPoses'],
           outputSegmentationMasks: ![],
         });
-      })()['catch']((_0x379c58) => {
+      })()['catch']((item) => {
         poseLandmarkerPromise = null;
-        throw _0x379c58;
+        throw item;
       })),
     poseLandmarkerPromise
   );
 }
-async function estimatePose(_0x10f1c0) {
+async function estimatePose(key) {
   if (typeof createImageBitmap !== 'function') {
-    const _0x16d99f = new Error('当前运行环境不支持离屏图片解码。');
-    _0x16d99f['code'] = 'POSE_IMAGE_BITMAP_UNAVAILABLE';
-    throw _0x16d99f;
+    const error = new Error('当前运行环境不支持离屏图片解码。');
+    error['code'] = 'POSE_IMAGE_BITMAP_UNAVAILABLE';
+    throw error;
   }
-  const _0x1097a7 = await createImageBitmap(_0x10f1c0);
-  let _0x558712 = null;
+  const imageBitmap = await createImageBitmap(key);
+  let index = null;
   try {
-    const _0x46ed44 = await getPoseLandmarker();
-    _0x558712 = _0x46ed44['detect'](_0x1097a7);
-    const _0x44a670 = _0x558712?.['landmarks']?.[0x0],
-      _0x1b5b9e = _0x558712?.['worldLandmarks']?.[0x0];
-    if (!Array['isArray'](_0x44a670) || !Array['isArray'](_0x1b5b9e)) {
-      const _0x5cde5c = new Error('没有在图片中识别到完整人物姿势。');
-      _0x5cde5c['code'] = 'POSE_NOT_FOUND';
-      throw _0x5cde5c;
+    const poseLandmarker = await getPoseLandmarker();
+    index = poseLandmarker['detect'](imageBitmap);
+    const imageLandmarks = index?.['landmarks']?.[0x0],
+      worldLandmarks = index?.['worldLandmarks']?.[0x0];
+    if (!Array['isArray'](imageLandmarks) || !Array['isArray'](worldLandmarks)) {
+      const error2 = new Error('没有在图片中识别到完整人物姿势。');
+      error2['code'] = 'POSE_NOT_FOUND';
+      throw error2;
     }
     return {
-      imageLandmarks: _0x44a670['map'](serializeLandmark),
-      worldLandmarks: _0x1b5b9e['map'](serializeLandmark),
+      imageLandmarks: imageLandmarks['map'](serializeLandmark),
+      worldLandmarks: worldLandmarks['map'](serializeLandmark),
     };
   } finally {
-    (_0x558712?.['close']?.(), _0x1097a7['close']?.());
+    (index?.['close']?.(), imageBitmap['close']?.());
   }
 }
-function errorPayload(_0x31793b) {
+function errorPayload(error3) {
   return {
-    name: String(_0x31793b?.['name'] || 'Error'),
-    code: String(_0x31793b?.['code'] || 'POSE_ESTIMATION_FAILED'),
-    message: String(_0x31793b?.['message'] || '姿势识别失败。'),
+    name: String(error3?.['name'] || 'Error'),
+    code: String(error3?.['code'] || 'POSE_ESTIMATION_FAILED'),
+    message: String(error3?.['message'] || '姿势识别失败。'),
   };
 }
-self['addEventListener']('message', async (_0x357254) => {
-  const _0x593cae = _0x357254?.['data'] || {};
-  if (_0x593cae['type'] !== 'estimate' || !_0x593cae['requestId']) return;
+self['addEventListener']('message', async (result) => {
+  const requestId = result?.['data'] || {};
+  if (requestId['type'] !== 'estimate' || !requestId['requestId']) return;
   try {
-    const _0x2543b2 = await estimatePose(_0x593cae['image']);
-    self['postMessage']({ type: 'result', requestId: _0x593cae['requestId'], payload: _0x2543b2 });
-  } catch (_0x10b1e1) {
-    self['postMessage']({ type: 'error', requestId: _0x593cae['requestId'], error: errorPayload(_0x10b1e1) });
+    const payload = await estimatePose(requestId['image']);
+    self['postMessage']({ type: 'result', requestId: requestId['requestId'], payload: payload });
+  } catch (data) {
+    self['postMessage']({ type: 'error', requestId: requestId['requestId'], error: errorPayload(data) });
   }
 });

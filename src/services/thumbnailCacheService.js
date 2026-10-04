@@ -1,104 +1,104 @@
 import { getThumbnailRecord, saveThumbnailRecord } from '../modules/storage.js';
 import { hasStableThumbnailFallback, isInlineImageDataUrl } from '../utils/thumbnailPersistence.js';
 import { localPathToUrl } from '../utils/localMediaPath.js';
-function normalizePathLike(_0x13c6fb) {
-  const _0x234f2e = String(_0x13c6fb || '').trim();
-  if (!_0x234f2e) return '';
-  const _0x18a70c = localPathToUrl(_0x234f2e);
-  if (_0x18a70c) return _0x18a70c;
-  if (_0x234f2e.startsWith('/')) return _0x234f2e.replace(/^\/+/, '/');
-  if (/^[a-z]+:\/\//i.test(_0x234f2e))
+function normalizePathLike(value) {
+  const enabled = String(value || '').trim();
+  if (!enabled) return '';
+  const url = localPathToUrl(enabled);
+  if (url) return url;
+  if (enabled.startsWith('/')) return enabled.replace(/^\/+/, '/');
+  if (/^[a-z]+:\/\//i.test(enabled))
     try {
-      const _0x20cd2c = new URL(_0x234f2e, window.location.href);
-      if (_0x20cd2c.origin === window.location.origin) return '' + _0x20cd2c.pathname + _0x20cd2c.search;
-      return _0x20cd2c.href;
+      const uRL = new URL(enabled, window.location.href);
+      if (uRL.origin === window.location.origin) return '' + uRL.pathname + uRL.search;
+      return uRL.href;
     } catch {
-      return _0x234f2e;
+      return enabled;
     }
   return '';
 }
-function pickResourceRef(_0x8d8335) {
-  if (!_0x8d8335) return '';
-  if (typeof _0x8d8335 === 'string') return normalizePathLike(_0x8d8335);
+function pickResourceRef(enabled2) {
+  if (!enabled2) return '';
+  if (typeof enabled2 === 'string') return normalizePathLike(enabled2);
   return (
-    normalizePathLike(_0x8d8335.localPath) ||
-    normalizePathLike(_0x8d8335.src) ||
-    normalizePathLike(_0x8d8335.imageUrl) ||
-    normalizePathLike(_0x8d8335.sourceUrl)
+    normalizePathLike(enabled2.localPath) ||
+    normalizePathLike(enabled2.src) ||
+    normalizePathLike(enabled2.imageUrl) ||
+    normalizePathLike(enabled2.sourceUrl)
   );
 }
-export function buildThumbnailCacheKey(_0x312414) {
-  const _0x373135 = pickResourceRef(_0x312414);
-  if (!_0x373135) return '';
-  return 'thumb:' + _0x373135;
+export function buildThumbnailCacheKey(item) {
+  const resourceRef = pickResourceRef(item);
+  if (!resourceRef) return '';
+  return 'thumb:' + resourceRef;
 }
-export async function getThumbnail(_0x1eed29) {
-  const _0x15faaf = buildThumbnailCacheKey(_0x1eed29);
-  if (!_0x15faaf) return '';
-  const _0x23ab37 = await getThumbnailRecord(_0x15faaf),
-    _0x143e48 = String(_0x23ab37?.dataUrl || '').trim();
-  return isInlineImageDataUrl(_0x143e48) ? _0x143e48 : '';
+export async function getThumbnail(key) {
+  const thumbnailCacheKey = buildThumbnailCacheKey(key);
+  if (!thumbnailCacheKey) return '';
+  const thumbnailRecord = await getThumbnailRecord(thumbnailCacheKey),
+    index = String(thumbnailRecord?.dataUrl || '').trim();
+  return isInlineImageDataUrl(index) ? index : '';
 }
-export async function setThumbnail(_0x259ee5, _0x468d7c) {
-  const _0x13a2f6 = buildThumbnailCacheKey(_0x259ee5),
-    _0x272169 = String(_0x468d7c || '').trim();
-  if (!_0x13a2f6 || !isInlineImageDataUrl(_0x272169)) return false;
+export async function setThumbnail(result, data) {
+  const thumbnailCacheKey2 = buildThumbnailCacheKey(result),
+    dataUrl = String(data || '').trim();
+  if (!thumbnailCacheKey2 || !isInlineImageDataUrl(dataUrl)) return false;
   return (
-    await saveThumbnailRecord(_0x13a2f6, { dataUrl: _0x272169, updatedAt: Date.now(), version: 1 }),
+    await saveThumbnailRecord(thumbnailCacheKey2, { dataUrl: dataUrl, updatedAt: Date.now(), version: 1 }),
     true
   );
 }
-export async function migrateLegacyThumbnail(_0xee7b73) {
-  if (!_0xee7b73 || !isInlineImageDataUrl(_0xee7b73.thumbUrl)) return false;
-  if (!hasStableThumbnailFallback(_0xee7b73)) return false;
-  const _0x4e5107 = await getThumbnail(_0xee7b73);
-  if (_0x4e5107) return true;
-  return await setThumbnail(_0xee7b73, _0xee7b73.thumbUrl);
+export async function migrateLegacyThumbnail(enabled3) {
+  if (!enabled3 || !isInlineImageDataUrl(enabled3.thumbUrl)) return false;
+  if (!hasStableThumbnailFallback(enabled3)) return false;
+  const thumbnail = await getThumbnail(enabled3);
+  if (thumbnail) return true;
+  return await setThumbnail(enabled3, enabled3.thumbUrl);
 }
-async function migrateInlineThumbField(_0x353288) {
-  if (!_0x353288 || typeof _0x353288 !== 'object') return false;
+async function migrateInlineThumbField(enabled4) {
+  if (!enabled4 || typeof enabled4 !== 'object') return false;
   try {
-    if (!(await migrateLegacyThumbnail(_0x353288))) return false;
-    return (delete _0x353288.thumbUrl, true);
-  } catch (_0x1df22d) {
-    return (console.warn('[thumbnailCacheService] 旧缩略图迁移失败，已保留原始 thumbUrl', _0x1df22d), false);
+    if (!(await migrateLegacyThumbnail(enabled4))) return false;
+    return (delete enabled4.thumbUrl, true);
+  } catch (options) {
+    return (console.warn('[thumbnailCacheService] 旧缩略图迁移失败，已保留原始 thumbUrl', options), false);
   }
 }
-async function migrateNodeLikeInPlace(_0x1e33d5) {
-  if (!_0x1e33d5 || typeof _0x1e33d5 !== 'object') return false;
-  let _0x652017 = false;
-  if (await migrateInlineThumbField(_0x1e33d5)) _0x652017 = true;
-  if (Array.isArray(_0x1e33d5.images))
-    for (const _0x17d855 of _0x1e33d5.images) {
-      if (await migrateInlineThumbField(_0x17d855)) _0x652017 = true;
+async function migrateNodeLikeInPlace(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object') return false;
+  let target = false;
+  if (await migrateInlineThumbField(enabled5)) target = true;
+  if (Array.isArray(enabled5.images))
+    for (const source of enabled5.images) {
+      if (await migrateInlineThumbField(source)) target = true;
     }
-  if (Array.isArray(_0x1e33d5.videos))
-    for (const _0xc7076 of _0x1e33d5.videos) {
-      if (await migrateInlineThumbField(_0xc7076)) _0x652017 = true;
+  if (Array.isArray(enabled5.videos))
+    for (const next of enabled5.videos) {
+      if (await migrateInlineThumbField(next)) target = true;
     }
-  if (Array.isArray(_0x1e33d5.cells))
-    for (const _0x45ee43 of _0x1e33d5.cells) {
-      if (await migrateInlineThumbField(_0x45ee43)) _0x652017 = true;
+  if (Array.isArray(enabled5.cells))
+    for (const current of enabled5.cells) {
+      if (await migrateInlineThumbField(current)) target = true;
     }
-  return _0x652017;
+  return target;
 }
-export async function migrateLegacyThumbnailsInMultiData(_0x2b1fe4) {
-  if (!_0x2b1fe4 || typeof _0x2b1fe4 !== 'object') return { changed: false, multiData: _0x2b1fe4 };
-  const _0xe43283 =
+export async function migrateLegacyThumbnailsInMultiData(multiData) {
+  if (!multiData || typeof multiData !== 'object') return { changed: false, multiData: multiData };
+  const multiData2 =
     typeof structuredClone === 'function'
-      ? structuredClone(_0x2b1fe4)
-      : JSON.parse(JSON.stringify(_0x2b1fe4));
-  let _0x39a7ca = false;
-  const _0x1695f1 = Array.isArray(_0xe43283.canvases) ? _0xe43283.canvases : [];
-  for (const _0x16c361 of _0x1695f1) {
-    const _0x5aacf2 = Array.isArray(_0x16c361?.nodes)
-      ? _0x16c361.nodes
-      : _0x16c361?.nodes && typeof _0x16c361.nodes === 'object'
-        ? Object.values(_0x16c361.nodes)
+      ? structuredClone(multiData)
+      : JSON.parse(JSON.stringify(multiData));
+  let changed = false;
+  const entry = Array.isArray(multiData2.canvases) ? multiData2.canvases : [];
+  for (const record of entry) {
+    const payload = Array.isArray(record?.nodes)
+      ? record.nodes
+      : record?.nodes && typeof record.nodes === 'object'
+        ? Object.values(record.nodes)
         : [];
-    for (const _0x39a932 of _0x5aacf2) {
-      if (await migrateNodeLikeInPlace(_0x39a932)) _0x39a7ca = true;
+    for (const handle of payload) {
+      if (await migrateNodeLikeInPlace(handle)) changed = true;
     }
   }
-  return { changed: _0x39a7ca, multiData: _0xe43283 };
+  return { changed: changed, multiData: multiData2 };
 }

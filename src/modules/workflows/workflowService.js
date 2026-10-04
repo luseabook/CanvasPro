@@ -13,54 +13,54 @@ import { isDataImageCover, isSvgDataImageCover } from './workflowCovers.js';
 import { normalizeWorkflowEntity, normalizeWorkflowList } from './workflowSelectors.js';
 import { localPathToUrl, pickResultLocalPath } from '../../utils/localMediaPath.js';
 import { t } from '../../i18n/index.js';
-function workflowServiceText(_0x3ef179, _0x145e4b = {}) {
-  return t('workflows.service.' + _0x3ef179, _0x145e4b);
+function workflowServiceText(value, item = {}) {
+  return t('workflows.service.' + value, item);
 }
-async function persistCoverIfNeeded(_0x1fcb27) {
-  if (!_0x1fcb27 || !isDataImageCover(_0x1fcb27.cover) || isSvgDataImageCover(_0x1fcb27.cover))
-    return _0x1fcb27;
-  const _0x31036b = await saveWorkflowThumbToServer({ workflowId: _0x1fcb27.id, dataUrl: _0x1fcb27.cover }),
-    _0x29bbb3 = String(_0x31036b?.url || '').trim() || localPathToUrl(pickResultLocalPath(_0x31036b));
-  return _0x29bbb3 ? { ..._0x1fcb27, cover: _0x29bbb3 } : _0x1fcb27;
+async function persistCoverIfNeeded(workflowId) {
+  if (!workflowId || !isDataImageCover(workflowId.cover) || isSvgDataImageCover(workflowId.cover))
+    return workflowId;
+  const response = await saveWorkflowThumbToServer({ workflowId: workflowId.id, dataUrl: workflowId.cover }),
+    cover = String(response?.url || '').trim() || localPathToUrl(pickResultLocalPath(response));
+  return cover ? { ...workflowId, cover: cover } : workflowId;
 }
 export async function loadWorkflowsFromServer() {
-  const _0x52bdcb = await fetchWorkflowsFromServer();
-  return normalizeWorkflowList(_0x52bdcb);
+  const fetchWorkflowsFromServer2 = await fetchWorkflowsFromServer();
+  return normalizeWorkflowList(fetchWorkflowsFromServer2);
 }
-export async function saveNewWorkflowFromCanvas(_0x4a5831, _0x50e4cb) {
-  const _0x3c076c = createWorkflowFromCanvas(_0x4a5831, _0x50e4cb),
-    _0x5bd410 = await persistCoverIfNeeded(_0x3c076c);
-  return (await saveWorkflowToServer(_0x5bd410), normalizeWorkflowEntity(_0x5bd410));
+export async function saveNewWorkflowFromCanvas(key, index) {
+  const workflowFromCanvas = createWorkflowFromCanvas(key, index),
+    persistCoverIfNeeded2 = await persistCoverIfNeeded(workflowFromCanvas);
+  return (await saveWorkflowToServer(persistCoverIfNeeded2), normalizeWorkflowEntity(persistCoverIfNeeded2));
 }
-export async function saveUpdatedWorkflowFromCanvas(_0x5dd8b4, _0x308e81, _0x33cde6) {
-  const _0x4ca3ae = updateWorkflowFromCanvas(_0x5dd8b4, _0x308e81, _0x33cde6),
-    _0x51db6b = await persistCoverIfNeeded(_0x4ca3ae);
-  return (await saveWorkflowToServer(_0x51db6b), normalizeWorkflowEntity(_0x51db6b));
+export async function saveUpdatedWorkflowFromCanvas(result, data, options) {
+  const updateWorkflowFromCanvas2 = updateWorkflowFromCanvas(result, data, options),
+    persistCoverIfNeeded3 = await persistCoverIfNeeded(updateWorkflowFromCanvas2);
+  return (await saveWorkflowToServer(persistCoverIfNeeded3), normalizeWorkflowEntity(persistCoverIfNeeded3));
 }
-export async function saveWorkflowMeta(_0x2dd054, _0x3bc241) {
-  const _0x1f2d5d = normalizeWorkflowMeta(_0x3bc241, _0x2dd054);
-  if (!_0x1f2d5d.name) throw new Error(workflowServiceText('nameRequired'));
-  const _0x2df204 = normalizeWorkflowEntity({ ...(_0x2dd054 || {}), ..._0x1f2d5d, updatedAt: Date.now() });
-  if (!_0x2df204?.id) throw new Error(workflowServiceText('workflowMissing'));
-  const _0x17f785 = await persistCoverIfNeeded(_0x2df204);
-  return (await saveWorkflowToServer(_0x17f785), normalizeWorkflowEntity(_0x17f785));
+export async function saveWorkflowMeta(target, source) {
+  const error = normalizeWorkflowMeta(source, target);
+  if (!error.name) throw new Error(workflowServiceText('nameRequired'));
+  const workflowEntity = normalizeWorkflowEntity({ ...(target || {}), ...error, updatedAt: Date.now() });
+  if (!workflowEntity?.id) throw new Error(workflowServiceText('workflowMissing'));
+  const persistCoverIfNeeded4 = await persistCoverIfNeeded(workflowEntity);
+  return (await saveWorkflowToServer(persistCoverIfNeeded4), normalizeWorkflowEntity(persistCoverIfNeeded4));
 }
-export async function saveWorkflowUsage(_0x255b93, _0x793f36 = Date.now()) {
-  const _0x49333b = normalizeWorkflowEntity({ ...(_0x255b93 || {}), lastUsedAt: _0x793f36 });
-  if (!_0x49333b) return null;
-  return (await saveWorkflowToServer(_0x49333b), _0x49333b);
+export async function saveWorkflowUsage(next, lastUsedAt = Date.now()) {
+  const workflowEntity2 = normalizeWorkflowEntity({ ...(next || {}), lastUsedAt: lastUsedAt });
+  if (!workflowEntity2) return null;
+  return (await saveWorkflowToServer(workflowEntity2), workflowEntity2);
 }
-export async function renameWorkflow(_0x18c79a, _0x1bded1) {
-  const _0x1d11a5 = String(_0x1bded1 || '').trim();
-  if (!_0x1d11a5) throw new Error(workflowServiceText('nameRequired'));
-  const _0x273d2f = normalizeWorkflowEntity({ ...(_0x18c79a || {}), name: _0x1d11a5, updatedAt: Date.now() });
-  if (!_0x273d2f?.id) throw new Error(workflowServiceText('workflowMissing'));
-  return (await saveWorkflowToServer(_0x273d2f), _0x273d2f);
+export async function renameWorkflow(current, entry) {
+  const name = String(entry || '').trim();
+  if (!name) throw new Error(workflowServiceText('nameRequired'));
+  const workflowEntity3 = normalizeWorkflowEntity({ ...(current || {}), name: name, updatedAt: Date.now() });
+  if (!workflowEntity3?.id) throw new Error(workflowServiceText('workflowMissing'));
+  return (await saveWorkflowToServer(workflowEntity3), workflowEntity3);
 }
-export async function deleteWorkflow(_0x48c38b) {
-  const _0x527b2a = String(_0x48c38b || '').trim();
-  if (!_0x527b2a) throw new Error(workflowServiceText('workflowMissing'));
-  const _0x1309a9 = await deleteWorkflowFromServer(_0x527b2a);
-  if (!_0x1309a9) throw new Error(workflowServiceText('deleteFailed'));
+export async function deleteWorkflow(record) {
+  const enabled = String(record || '').trim();
+  if (!enabled) throw new Error(workflowServiceText('workflowMissing'));
+  const deleteWorkflowFromServer2 = await deleteWorkflowFromServer(enabled);
+  if (!deleteWorkflowFromServer2) throw new Error(workflowServiceText('deleteFailed'));
   return true;
 }

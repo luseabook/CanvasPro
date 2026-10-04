@@ -2,62 +2,56 @@ export const PROMPT_PRESET_USER_INPUT_PLACEHOLDER = '{用户输入}';
 export const PROMPT_PRESET_TEMPLATE_TYPE_STATIC = 'static';
 export const PROMPT_PRESET_TEMPLATE_TYPE_CONDITIONAL_BY_IMAGE_INPUT = 'conditionalByImageInput';
 const PROMPT_PRESET_USER_INPUT_PATTERN = /\{\{?\s*用户输入(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g;
-function isPlainTemplateObject(_0x538c49) {
-  return _0x538c49 !== null && typeof _0x538c49 === 'object' && !Array.isArray(_0x538c49);
+function isPlainTemplateObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
-function resolveContextFlag(_0x29f67e, _0x44ba9e) {
-  const _0x4f4563 = _0x29f67e?.[_0x44ba9e];
-  return typeof _0x4f4563 === 'function' ? !!_0x4f4563() : _0x4f4563 === true;
+function resolveContextFlag(item, key) {
+  const run = item?.[key];
+  return typeof run === 'function' ? !!run() : run === true;
 }
-export function isConditionalPromptPresetTemplate(_0x480b28 = null) {
+export function isConditionalPromptPresetTemplate(value2 = null) {
   return (
-    isPlainTemplateObject(_0x480b28) &&
-    _0x480b28.type === PROMPT_PRESET_TEMPLATE_TYPE_CONDITIONAL_BY_IMAGE_INPUT
+    isPlainTemplateObject(value2) && value2.type === PROMPT_PRESET_TEMPLATE_TYPE_CONDITIONAL_BY_IMAGE_INPUT
   );
 }
-export function isStaticPromptPresetTemplate(_0x29b291 = null) {
-  return isPlainTemplateObject(_0x29b291) && _0x29b291.type === PROMPT_PRESET_TEMPLATE_TYPE_STATIC;
+export function isStaticPromptPresetTemplate(value3 = null) {
+  return isPlainTemplateObject(value3) && value3.type === PROMPT_PRESET_TEMPLATE_TYPE_STATIC;
 }
-export function isObjectPromptPresetTemplate(_0x866cf0 = null) {
-  return isStaticPromptPresetTemplate(_0x866cf0) || isConditionalPromptPresetTemplate(_0x866cf0);
+export function isObjectPromptPresetTemplate(value4 = null) {
+  return isStaticPromptPresetTemplate(value4) || isConditionalPromptPresetTemplate(value4);
 }
-export function requiresPromptPresetInput(_0x42844b = null) {
-  if (isConditionalPromptPresetTemplate(_0x42844b)) return true;
-  if (isStaticPromptPresetTemplate(_0x42844b)) return _0x42844b.requireInput === true;
+export function requiresPromptPresetInput(value5 = null) {
+  if (isConditionalPromptPresetTemplate(value5)) return true;
+  if (isStaticPromptPresetTemplate(value5)) return value5.requireInput === true;
   return false;
 }
-export function hasPromptPresetTemplateContent(_0x5508a7 = null) {
-  if (typeof _0x5508a7 === 'string') return _0x5508a7.trim().length > 0;
-  if (isStaticPromptPresetTemplate(_0x5508a7)) return String(_0x5508a7.text || '').trim().length > 0;
-  if (isConditionalPromptPresetTemplate(_0x5508a7))
+export function hasPromptPresetTemplateContent(response = null) {
+  if (typeof response === 'string') return response.trim().length > 0;
+  if (isStaticPromptPresetTemplate(response)) return String(response.text || '').trim().length > 0;
+  if (isConditionalPromptPresetTemplate(response))
     return (
-      String(_0x5508a7.imageInputTemplate || '').trim().length > 0 ||
-      String(_0x5508a7.textInputTemplate || '').trim().length > 0
+      String(response.imageInputTemplate || '').trim().length > 0 ||
+      String(response.textInputTemplate || '').trim().length > 0
     );
   return false;
 }
-export function getPromptPresetTemplateEmptyInputMessage(_0x32e042 = null) {
-  return requiresPromptPresetInput(_0x32e042) ? String(_0x32e042.emptyInputMessage || '') : '';
+export function getPromptPresetTemplateEmptyInputMessage(value6 = null) {
+  return requiresPromptPresetInput(value6) ? String(value6.emptyInputMessage || '') : '';
 }
-export function resolvePromptPresetTemplate(_0x2b03ef = '', _0x5d85f8 = '', _0x935a73 = {}) {
-  const _0x27fca8 = String(_0x5d85f8 ?? '').trim();
-  if (isStaticPromptPresetTemplate(_0x2b03ef)) {
-    const _0x383607 = resolveContextFlag(_0x935a73, 'hasImageInput');
-    if (_0x2b03ef.requireInput === true && !_0x27fca8 && !_0x383607) return '';
-    return resolvePromptPresetTemplate(_0x2b03ef.text || '', _0x27fca8, _0x935a73);
+export function resolvePromptPresetTemplate(response2 = '', index = '', result = {}) {
+  const enabled = String(index ?? '').trim();
+  if (isStaticPromptPresetTemplate(response2)) {
+    const contextFlag = resolveContextFlag(result, 'hasImageInput');
+    if (response2.requireInput === true && !enabled && !contextFlag) return '';
+    return resolvePromptPresetTemplate(response2.text || '', enabled, result);
   }
-  if (isConditionalPromptPresetTemplate(_0x2b03ef)) {
-    const _0x5954fb = resolveContextFlag(_0x935a73, 'hasImageInput');
-    if (_0x5954fb)
-      return resolvePromptPresetTemplate(_0x2b03ef.imageInputTemplate || '', _0x27fca8, _0x935a73);
-    if (_0x27fca8)
-      return resolvePromptPresetTemplate(_0x2b03ef.textInputTemplate || '', _0x27fca8, _0x935a73);
+  if (isConditionalPromptPresetTemplate(response2)) {
+    const contextFlag2 = resolveContextFlag(result, 'hasImageInput');
+    if (contextFlag2) return resolvePromptPresetTemplate(response2.imageInputTemplate || '', enabled, result);
+    if (enabled) return resolvePromptPresetTemplate(response2.textInputTemplate || '', enabled, result);
     return '';
   }
-  const _0x42d88d = String(_0x2b03ef ?? '');
-  if (!_0x42d88d) return _0x27fca8;
-  return _0x42d88d.replace(
-    PROMPT_PRESET_USER_INPUT_PATTERN,
-    (_0x925d1a, _0x42e4e4) => _0x27fca8 || _0x42e4e4 || '',
-  );
+  const enabled2 = String(response2 ?? '');
+  if (!enabled2) return enabled;
+  return enabled2.replace(PROMPT_PRESET_USER_INPUT_PATTERN, (data, options) => enabled || options || '');
 }

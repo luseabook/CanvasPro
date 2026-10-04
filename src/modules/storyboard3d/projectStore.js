@@ -1,1 +1,140 @@
-import{cloneStoryboard3DProject,createStoryboard3DProject,getActiveStoryboard3DScene,migrateStoryboard3DProject}from'./projectModel.js';function createEmitter(){const _0x4fd251=new Set();return{'emit'(_0x52c34d,_0x2c2b87){_0x4fd251["forEach"](_0x2d3b26=>_0x2d3b26(_0x52c34d,_0x2c2b87));},'subscribe'(_0xc24b72){if(typeof _0xc24b72!=='function')return()=>{};return _0x4fd251["add"](_0xc24b72),()=>_0x4fd251["delete"](_0xc24b72);},'clear'(){_0x4fd251['clear']();}};}export function createStoryboard3DProjectStore(_0x411248,{now:now=()=>Date['now'](),idFactory:_0x2c65fe,onPersist:_0x440166}={}){const _0x9716da=createEmitter();let _0x1158ca=migrateStoryboard3DProject(_0x411248,{'now':now(),'idFactory':_0x2c65fe}),_0x3d3a55="saved",_0x32c003=0x0;function _0x13a8b3(){return cloneStoryboard3DProject(_0x1158ca);}function _0x33e852(_0x18ac7e,_0x5b00a9={}){_0x9716da["emit"](_0x13a8b3(),{'reason':_0x18ac7e,'saveStatus':_0x3d3a55,..._0x5b00a9});}function _0x44b0f7(_0x5b57b8,_0x5529ea){if(_0x5b57b8!==_0x32c003)return;_0x3d3a55="saved",_0x33e852(_0x5529ea,{'persisted':!![]});}function _0x332b4a(_0x2c4bd1,_0x4f6245,_0x4b56ab){if(_0x2c4bd1!==_0x32c003)return;_0x3d3a55="error",_0x33e852(_0x4f6245,{'persisted':![],'error':_0x4b56ab});}function _0xf00c98(_0x5261aa){const _0x58c564=++_0x32c003;_0x3d3a55="saving";const _0x47cff6=_0x13a8b3();_0x33e852(_0x5261aa,{'persisted':![]});if(typeof _0x440166!=="function")return _0x44b0f7(_0x58c564,_0x5261aa),_0x47cff6;try{const _0x33e9ed=_0x440166(_0x47cff6,{'reason':_0x5261aa,'revision':_0x58c564});_0x33e9ed&&typeof _0x33e9ed["then"]==="function"?_0x33e9ed["then"](()=>_0x44b0f7(_0x58c564,_0x5261aa),_0x32f73c=>_0x332b4a(_0x58c564,_0x5261aa,_0x32f73c)):_0x44b0f7(_0x58c564,_0x5261aa);}catch(_0x3f6eb7){_0x332b4a(_0x58c564,_0x5261aa,_0x3f6eb7);}return _0x47cff6;}function _0x469377(_0x557c1f,_0x5ba837="replace-project",{shouldPersist:shouldPersist=!![]}={}){_0x1158ca=migrateStoryboard3DProject(_0x557c1f,{'now':now(),'idFactory':_0x2c65fe});if(shouldPersist)return _0xf00c98(_0x5ba837);return _0x3d3a55='saved',_0x33e852(_0x5ba837,{'persisted':!![]}),_0x13a8b3();}function _0x35cb9(_0x22ccbc,_0x4344bf){const _0x44ea3f=_0x13a8b3();return _0x4344bf(_0x44ea3f),_0x44ea3f["updatedAt"]=now(),_0x1158ca=migrateStoryboard3DProject(_0x44ea3f,{'now':_0x44ea3f["updatedAt"],'idFactory':_0x2c65fe}),_0xf00c98(_0x22ccbc);}return{'getSnapshot':_0x13a8b3,'getSaveStatus'(){return _0x3d3a55;},'subscribe':_0x9716da["subscribe"],'load'(_0xc038c9){return _0x469377(_0xc038c9,"load-project",{'shouldPersist':!![]});},'replaceProject'(_0x49182d,_0xa5fa39="replace-project"){return _0x469377(_0x49182d,_0xa5fa39,{'shouldPersist':!![]});},'updateProject'(_0x28ad01,_0x29e09e){if(typeof _0x29e09e!=="function")return _0x13a8b3();return _0x35cb9(String(_0x28ad01||"update-project"),_0x29e09e);},'save'(){return _0xf00c98("manual-save");},'createNew'(_0x42df6d={}){return _0x469377(createStoryboard3DProject({..._0x42df6d,'now':now(),'idFactory':_0x2c65fe}),'create-project',{'shouldPersist':!![]});},'renameProject'(_0x126676){const _0x279806=String(_0x126676||'')["trim"]();if(!_0x279806||_0x279806===_0x1158ca["name"])return _0x13a8b3();return _0x35cb9("rename-project",_0x4ba2eb=>{_0x4ba2eb['name']=_0x279806;});},'selectScene'(_0xb5b7fa){const _0x2e47ec=String(_0xb5b7fa||'')["trim"]();if(!_0x2e47ec||_0x2e47ec===_0x1158ca["activeSceneId"])return _0x13a8b3();if(!_0x1158ca["scenes"]["some"](_0x42e6d5=>_0x42e6d5['id']===_0x2e47ec))return _0x13a8b3();return _0x35cb9('select-scene',_0x2ca42f=>{_0x2ca42f["activeSceneId"]=_0x2e47ec;});},'selectShot'(_0x1f6379){const _0x4c3bd4=String(_0x1f6379||'')["trim"](),_0x4e3733=getActiveStoryboard3DScene(_0x1158ca);if(!_0x4e3733||!_0x4e3733["shots"]["some"](_0x180664=>_0x180664['id']===_0x4c3bd4))return _0x13a8b3();if(_0x4e3733["activeShotId"]===_0x4c3bd4)return _0x13a8b3();return _0x35cb9('select-shot',_0x48a269=>{const _0x33fde8=_0x48a269['scenes']["find"](_0x515ae3=>_0x515ae3['id']===_0x48a269["activeSceneId"]);if(_0x33fde8)_0x33fde8["activeShotId"]=_0x4c3bd4;});},'destroy'(){_0x9716da["clear"]();}};}
+import {
+  cloneStoryboard3DProject,
+  createStoryboard3DProject,
+  getActiveStoryboard3DScene,
+  migrateStoryboard3DProject,
+} from './projectModel.js';
+function createEmitter() {
+  const map = new Set();
+  return {
+    emit(value, item) {
+      map['forEach']((handler) => handler(value, item));
+    },
+    subscribe(key) {
+      if (typeof key !== 'function') return () => {};
+      return (map['add'](key), () => map['delete'](key));
+    },
+    clear() {
+      map['clear']();
+    },
+  };
+}
+export function createStoryboard3DProjectStore(
+  index,
+  { now: now = () => Date['now'](), idFactory: idFactory, onPersist: onPersist } = {},
+) {
+  const emitter = createEmitter();
+  let migrateStoryboard3DProject2 = migrateStoryboard3DProject(index, { now: now(), idFactory: idFactory }),
+    result = 'saved',
+    data = 0x0;
+  function run() {
+    return cloneStoryboard3DProject(migrateStoryboard3DProject2);
+  }
+  function run2(options, args = {}) {
+    emitter['emit'](run(), { reason: options, saveStatus: result, ...args });
+  }
+  function run3(target, source) {
+    if (target !== data) return;
+    ((result = 'saved'), run2(source, { persisted: !![] }));
+  }
+  function run4(next, current, entry) {
+    if (next !== data) return;
+    ((result = 'error'), run2(current, { persisted: ![], error: entry }));
+  }
+  function run5(record) {
+    const payload = ++data;
+    result = 'saving';
+    const handle = run();
+    run2(record, { persisted: ![] });
+    if (typeof onPersist !== 'function') return (run3(payload, record), handle);
+    try {
+      const state = onPersist(handle, { reason: record, revision: payload });
+      state && typeof state['then'] === 'function'
+        ? state['then'](
+            () => run3(payload, record),
+            (config) => run4(payload, record, config),
+          )
+        : run3(payload, record);
+    } catch (scope) {
+      run4(payload, record, scope);
+    }
+    return handle;
+  }
+  function run6(input, output = 'replace-project', { shouldPersist: shouldPersist = !![] } = {}) {
+    migrateStoryboard3DProject2 = migrateStoryboard3DProject(input, { now: now(), idFactory: idFactory });
+    if (shouldPersist) return run5(output);
+    return ((result = 'saved'), run2(output, { persisted: !![] }), run());
+  }
+  function run7(value2, handler2) {
+    const value3 = run();
+    return (
+      handler2(value3),
+      (value3['updatedAt'] = now()),
+      (migrateStoryboard3DProject2 = migrateStoryboard3DProject(value3, {
+        now: value3['updatedAt'],
+        idFactory: idFactory,
+      })),
+      run5(value2)
+    );
+  }
+  return {
+    getSnapshot: run,
+    getSaveStatus() {
+      return result;
+    },
+    subscribe: emitter['subscribe'],
+    load(value4) {
+      return run6(value4, 'load-project', { shouldPersist: !![] });
+    },
+    replaceProject(value5, value6 = 'replace-project') {
+      return run6(value5, value6, { shouldPersist: !![] });
+    },
+    updateProject(value7, value8) {
+      if (typeof value8 !== 'function') return run();
+      return run7(String(value7 || 'update-project'), value8);
+    },
+    save() {
+      return run5('manual-save');
+    },
+    createNew(args2 = {}) {
+      return run6(
+        createStoryboard3DProject({ ...args2, now: now(), idFactory: idFactory }),
+        'create-project',
+        { shouldPersist: !![] },
+      );
+    },
+    renameProject(value9) {
+      const enabled = String(value9 || '')['trim']();
+      if (!enabled || enabled === migrateStoryboard3DProject2['name']) return run();
+      return run7('rename-project', (error) => {
+        error['name'] = enabled;
+      });
+    },
+    selectScene(value10) {
+      const enabled2 = String(value10 || '')['trim']();
+      if (!enabled2 || enabled2 === migrateStoryboard3DProject2['activeSceneId']) return run();
+      if (!migrateStoryboard3DProject2['scenes']['some']((value11) => value11['id'] === enabled2))
+        return run();
+      return run7('select-scene', (value12) => {
+        value12['activeSceneId'] = enabled2;
+      });
+    },
+    selectShot(value13) {
+      const value14 = String(value13 || '')['trim'](),
+        activeStoryboard3DScene = getActiveStoryboard3DScene(migrateStoryboard3DProject2);
+      if (
+        !activeStoryboard3DScene ||
+        !activeStoryboard3DScene['shots']['some']((value15) => value15['id'] === value14)
+      )
+        return run();
+      if (activeStoryboard3DScene['activeShotId'] === value14) return run();
+      return run7('select-shot', (value16) => {
+        const value17 = value16['scenes']['find']((value18) => value18['id'] === value16['activeSceneId']);
+        if (value17) value17['activeShotId'] = value14;
+      });
+    },
+    destroy() {
+      emitter['clear']();
+    },
+  };
+}

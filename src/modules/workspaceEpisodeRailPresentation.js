@@ -1,22 +1,22 @@
-function escapeHtml(_0x74b8d) {
-  return String(_0x74b8d ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&#39;');
 }
-function normalizeText(_0x3c3fa0) {
-  return String(_0x3c3fa0 ?? '')['trim']();
+function normalizeText(item) {
+  return String(item ?? '')['trim']();
 }
-function renderDataAttributes(_0x53bde1 = {}) {
-  return Object['entries'](_0x53bde1 || {})
-    ['map'](([_0x49ad89, _0x387cb6]) => {
-      const _0x183183 = normalizeText(_0x49ad89)['toLowerCase']();
-      if (!/^data-[a-z][a-z0-9-]*$/u['test'](_0x183183)) return '';
-      if (_0x387cb6 === ![] || _0x387cb6 == null) return '';
-      if (_0x387cb6 === !![]) return '\x20' + _0x183183;
-      return '\x20' + _0x183183 + '=\x22' + escapeHtml(_0x387cb6) + '\x22';
+function renderDataAttributes(options = {}) {
+  return Object['entries'](options || {})
+    ['map'](([key, index]) => {
+      const text = normalizeText(key)['toLowerCase']();
+      if (!/^data-[a-z][a-z0-9-]*$/u['test'](text)) return '';
+      if (index === ![] || index == null) return '';
+      if (index === !![]) return '\x20' + text;
+      return '\x20' + text + '=\x22' + escapeHtml(index) + '\x22';
     })
     ['join']('');
 }
@@ -29,21 +29,21 @@ export function renderWorkspaceEpisodeRail({
   listData: listData = {},
   getButtonData: getButtonData = () => ({}),
 } = {}) {
-  const _0x1f62c0 = normalizeText(selectedId),
-    _0x1212b8 = (Array['isArray'](items) ? items : [])
-      ['map']((_0x4cbe25, _0x4db411) => {
-        const _0x2a6232 = normalizeText(_0x4cbe25?.['number']) || String(_0x4db411 + 0x1);
+  const text2 = normalizeText(selectedId),
+    list = (Array['isArray'](items) ? items : [])
+      ['map']((busy, result) => {
+        const number = normalizeText(busy?.['number']) || String(result + 0x1);
         return {
-          ..._0x4cbe25,
-          id: normalizeText(_0x4cbe25?.['id']),
-          number: _0x2a6232,
-          title: normalizeText(_0x4cbe25?.['title']) || '第\x20' + _0x2a6232 + '\x20集',
-          meta: normalizeText(_0x4cbe25?.['meta']) || '0',
-          busy: _0x4cbe25?.['busy'] === !![],
-          disabled: _0x4cbe25?.['disabled'] === !![],
+          ...busy,
+          id: normalizeText(busy?.['id']),
+          number: number,
+          title: normalizeText(busy?.['title']) || '第\x20' + number + '\x20集',
+          meta: normalizeText(busy?.['meta']) || '0',
+          busy: busy?.['busy'] === !![],
+          disabled: busy?.['disabled'] === !![],
         };
       })
-      ['filter']((_0x134684) => _0x134684['id']);
+      ['filter']((data) => data['id']);
   return (
     '<aside\x20class=\x22workspace-episode-rail\x22\x20data-workspace-episode-rail' +
     renderDataAttributes(asideData) +
@@ -52,34 +52,34 @@ export function renderWorkspaceEpisodeRail({
     '">\n    <header><span>' +
     escapeHtml(label) +
     '</span><strong>' +
-    _0x1212b8['length'] +
+    list['length'] +
     '</strong></header>\n    <div class="workspace-episode-rail-list" data-workspace-episode-rail-list' +
     renderDataAttributes(listData) +
     '>\x0a\x20\x20\x20\x20\x20\x20' +
-    _0x1212b8['map']((_0x571bf2) => {
-      const _0xa4eeec = _0x571bf2['id'] === _0x1f62c0;
+    list['map']((el) => {
+      const target = el['id'] === text2;
       return (
         '<button type="button" class="' +
-        (_0xa4eeec ? 'is-active' : '') +
+        (target ? 'is-active' : '') +
         '" data-workspace-episode-rail-item="' +
-        escapeHtml(_0x571bf2['id']) +
+        escapeHtml(el['id']) +
         '\x22' +
-        renderDataAttributes(getButtonData(_0x571bf2)) +
+        renderDataAttributes(getButtonData(el)) +
         ' aria-pressed="' +
-        _0xa4eeec +
+        target +
         '\x22' +
-        (_0xa4eeec ? ' aria-current="page"' : '') +
-        (_0x571bf2['disabled'] ? ' disabled aria-disabled="true"' : '') +
+        (target ? ' aria-current="page"' : '') +
+        (el['disabled'] ? ' disabled aria-disabled="true"' : '') +
         ' aria-label="第 ' +
-        escapeHtml(_0x571bf2['number']) +
+        escapeHtml(el['number']) +
         ' 集：' +
-        escapeHtml(_0x571bf2['title']) +
+        escapeHtml(el['title']) +
         '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>' +
-        escapeHtml(_0x571bf2['number']) +
+        escapeHtml(el['number']) +
         '</span>\n          ' +
-        (_0x571bf2['busy'] ? '<i class="storyboard-script-loading-spinner" aria-hidden="true"></i>' : '') +
+        (el['busy'] ? '<i class="storyboard-script-loading-spinner" aria-hidden="true"></i>' : '') +
         '\n          <small>' +
-        escapeHtml(_0x571bf2['meta']) +
+        escapeHtml(el['meta']) +
         '</small>\n        </button>'
       );
     })['join']('') +

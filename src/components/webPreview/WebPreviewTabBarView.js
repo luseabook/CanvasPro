@@ -5,10 +5,10 @@ import {
 } from '../../modules/webPreviewTabs.js';
 import { createIcon } from './webPreviewDomUtils.js';
 export class WebPreviewTabBarView {
-  constructor({ onActivate: _0x34dedd, onClose: _0x286cee, onAdd: _0x4289b1 } = {}) {
-    ((this._onActivate = _0x34dedd),
-      (this._onClose = _0x286cee),
-      (this._onAdd = _0x4289b1),
+  constructor({ onActivate: onActivate, onClose: onClose, onAdd: onAdd } = {}) {
+    ((this._onActivate = onActivate),
+      (this._onClose = onClose),
+      (this._onAdd = onAdd),
       (this._root = document.createElement('div')),
       (this._root.className = 'web-preview-tabbar'),
       (this._tabsWrap = document.createElement('div')),
@@ -23,49 +23,49 @@ export class WebPreviewTabBarView {
   get ['element']() {
     return this._root;
   }
-  ['setTabs'](_0x274082 = {}) {
-    const _0x1aed64 = normalizeWebPreviewTabs(_0x274082);
+  ['setTabs'](options = {}) {
+    const args = normalizeWebPreviewTabs(options);
     (this._tabsWrap.replaceChildren(
-      ..._0x1aed64.tabs.map((_0xa801c1) => this._createTabButton(_0xa801c1, _0x1aed64.activeTabId)),
+      ...args.tabs.map((item) => this._createTabButton(item, args.activeTabId)),
       this._addButton,
     ),
-      (this._addButton.disabled = _0x1aed64.tabs.length >= WEB_PREVIEW_MAX_TABS),
-      (this._addButton.hidden = _0x1aed64.tabs.length >= WEB_PREVIEW_MAX_TABS));
+      (this._addButton.disabled = args.tabs.length >= WEB_PREVIEW_MAX_TABS),
+      (this._addButton.hidden = args.tabs.length >= WEB_PREVIEW_MAX_TABS));
   }
-  ['_createTabButton'](_0x1915b9, _0x5cd0ee) {
-    const _0x546fe4 = document.createElement('div');
-    _0x546fe4.className = 'web-preview-tab';
-    if (_0x1915b9.id === _0x5cd0ee) _0x546fe4.classList.add('is-active');
-    const _0x1af7e8 = document.createElement('button');
-    ((_0x1af7e8.type = 'button'),
-      (_0x1af7e8.className = 'web-preview-tab-main'),
-      _0x1af7e8.addEventListener('click', () => this._onActivate?.(_0x1915b9.id)));
-    if (_0x1915b9.faviconUrl) {
-      const _0x24e83c = document.createElement('img');
-      ((_0x24e83c.className = 'web-preview-tab-favicon'),
-        (_0x24e83c.src = _0x1915b9.faviconUrl),
-        (_0x24e83c.alt = ''),
-        (_0x24e83c.decoding = 'async'),
-        (_0x24e83c.loading = 'lazy'),
-        (_0x24e83c.referrerPolicy = 'no-referrer'),
-        _0x24e83c.addEventListener('error', () => _0x24e83c.remove()),
-        _0x1af7e8.appendChild(_0x24e83c));
+  ['_createTabButton'](value, key) {
+    const el = document.createElement('div');
+    el.className = 'web-preview-tab';
+    if (value.id === key) el.classList.add('is-active');
+    const el2 = document.createElement('button');
+    ((el2.type = 'button'),
+      (el2.className = 'web-preview-tab-main'),
+      el2.addEventListener('click', () => this._onActivate?.(value.id)));
+    if (value.faviconUrl) {
+      const el3 = document.createElement('img');
+      ((el3.className = 'web-preview-tab-favicon'),
+        (el3.src = value.faviconUrl),
+        (el3.alt = ''),
+        (el3.decoding = 'async'),
+        (el3.loading = 'lazy'),
+        (el3.referrerPolicy = 'no-referrer'),
+        el3.addEventListener('error', () => el3.remove()),
+        el2.appendChild(el3));
     }
-    const _0x3f2003 = document.createElement('span');
-    ((_0x3f2003.className = 'web-preview-tab-title'),
-      (_0x3f2003.textContent = getWebPreviewTabDisplayTitle(_0x1915b9)),
-      _0x1af7e8.appendChild(_0x3f2003));
-    const _0x4de98f = document.createElement('button');
+    const el4 = document.createElement('span');
+    ((el4.className = 'web-preview-tab-title'),
+      (el4.textContent = getWebPreviewTabDisplayTitle(value)),
+      el2.appendChild(el4));
+    const el5 = document.createElement('button');
     return (
-      (_0x4de98f.type = 'button'),
-      (_0x4de98f.className = 'web-preview-tab-close'),
-      _0x4de98f.appendChild(createIcon('M18 6 6 18M6 6l12 12', { size: 13 })),
-      _0x4de98f.addEventListener('click', (_0x48aadf) => {
-        (_0x48aadf.stopPropagation(), this._onClose?.(_0x1915b9.id));
+      (el5.type = 'button'),
+      (el5.className = 'web-preview-tab-close'),
+      el5.appendChild(createIcon('M18 6 6 18M6 6l12 12', { size: 13 })),
+      el5.addEventListener('click', (event) => {
+        (event.stopPropagation(), this._onClose?.(value.id));
       }),
-      _0x546fe4.appendChild(_0x1af7e8),
-      _0x546fe4.appendChild(_0x4de98f),
-      _0x546fe4
+      el.appendChild(el2),
+      el.appendChild(el5),
+      el
     );
   }
 }

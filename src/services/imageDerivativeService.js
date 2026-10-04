@@ -1,91 +1,87 @@
 import { localPathToUrl, normalizeLocalPath } from '../utils/localMediaPath.js';
-function firstNonEmptyString(..._0x43a65f) {
-  for (const _0x5afbc2 of _0x43a65f) {
-    const _0xd4d406 = normalizeLocalPath(_0x5afbc2);
-    if (_0xd4d406) return _0xd4d406;
+function firstNonEmptyString(...args) {
+  for (const value of args) {
+    const localPath = normalizeLocalPath(value);
+    if (localPath) return localPath;
   }
   return '';
 }
-function toPositiveInt(_0x14730a) {
-  const _0x5380bf = Number(_0x14730a);
-  if (!Number.isFinite(_0x5380bf) || _0x5380bf <= 0) return 0;
-  return Math.max(1, Math.round(_0x5380bf));
+function toPositiveInt(item) {
+  const count = Number(item);
+  if (!Number.isFinite(count) || count <= 0) return 0;
+  return Math.max(1, Math.round(count));
 }
-export function toLocalPathUrl(_0x11449a) {
-  return localPathToUrl(_0x11449a);
+export function toLocalPathUrl(key) {
+  return localPathToUrl(key);
 }
-export function normalizeImageDerivativeFields(_0x38efb3 = {}) {
-  const _0x1a737e = firstNonEmptyString(_0x38efb3?.localPath),
-    _0x3b6db5 = firstNonEmptyString(_0x38efb3?.originalLocalPath, _0x1a737e),
-    _0x3671c7 = firstNonEmptyString(_0x38efb3?.displayLocalPath),
-    _0x31bb98 = firstNonEmptyString(_0x38efb3?.thumbLocalPath),
-    _0xd5f95c = toPositiveInt(_0x38efb3?.originalWidth),
-    _0x4bd594 = toPositiveInt(_0x38efb3?.originalHeight);
+export function normalizeImageDerivativeFields(options = {}) {
+  const localPath2 = firstNonEmptyString(options?.localPath),
+    originalLocalPath = firstNonEmptyString(options?.originalLocalPath, localPath2),
+    displayLocalPath = firstNonEmptyString(options?.displayLocalPath),
+    thumbLocalPath = firstNonEmptyString(options?.thumbLocalPath),
+    originalWidth = toPositiveInt(options?.originalWidth),
+    originalHeight = toPositiveInt(options?.originalHeight);
   return {
-    localPath: _0x1a737e,
-    originalLocalPath: _0x3b6db5,
-    displayLocalPath: _0x3671c7,
-    thumbLocalPath: _0x31bb98,
-    originalWidth: _0xd5f95c,
-    originalHeight: _0x4bd594,
+    localPath: localPath2,
+    originalLocalPath: originalLocalPath,
+    displayLocalPath: displayLocalPath,
+    thumbLocalPath: thumbLocalPath,
+    originalWidth: originalWidth,
+    originalHeight: originalHeight,
   };
 }
-export function hasImageDerivativeFields(_0x3c9ad4 = {}) {
+export function hasImageDerivativeFields(options2 = {}) {
   return Boolean(
-    firstNonEmptyString(
-      _0x3c9ad4?.originalLocalPath,
-      _0x3c9ad4?.displayLocalPath,
-      _0x3c9ad4?.thumbLocalPath,
-    ) ||
-    toPositiveInt(_0x3c9ad4?.originalWidth) ||
-    toPositiveInt(_0x3c9ad4?.originalHeight),
+    firstNonEmptyString(options2?.originalLocalPath, options2?.displayLocalPath, options2?.thumbLocalPath) ||
+    toPositiveInt(options2?.originalWidth) ||
+    toPositiveInt(options2?.originalHeight),
   );
 }
-export function needsImageDerivatives(_0x1862bf = {}) {
-  const _0x56f760 = normalizeImageDerivativeFields(_0x1862bf),
-    _0x55be8b = _0x56f760.originalLocalPath || _0x56f760.localPath;
-  if (!_0x55be8b || /\.svg$/i.test(_0x55be8b)) return false;
-  return [_0x56f760.displayLocalPath, _0x56f760.thumbLocalPath].some(
-    (_0xed7eae) => !_0xed7eae || _0xed7eae === _0x55be8b,
+export function needsImageDerivatives(options3 = {}) {
+  const imageDerivativeFields = normalizeImageDerivativeFields(options3),
+    enabled = imageDerivativeFields.originalLocalPath || imageDerivativeFields.localPath;
+  if (!enabled || /\.svg$/i.test(enabled)) return false;
+  return [imageDerivativeFields.displayLocalPath, imageDerivativeFields.thumbLocalPath].some(
+    (enabled2) => !enabled2 || enabled2 === enabled,
   );
 }
-export function buildImageNodeStorageFields(_0x541646 = {}) {
-  const _0x1c8e63 = normalizeImageDerivativeFields(_0x541646),
-    _0x44090a = {
-      localPath: _0x1c8e63.localPath || _0x1c8e63.originalLocalPath || '',
-      originalLocalPath: _0x1c8e63.originalLocalPath || '',
-      displayLocalPath: _0x1c8e63.displayLocalPath || '',
-      thumbLocalPath: _0x1c8e63.thumbLocalPath || '',
+export function buildImageNodeStorageFields(options4 = {}) {
+  const localPath3 = normalizeImageDerivativeFields(options4),
+    index = {
+      localPath: localPath3.localPath || localPath3.originalLocalPath || '',
+      originalLocalPath: localPath3.originalLocalPath || '',
+      displayLocalPath: localPath3.displayLocalPath || '',
+      thumbLocalPath: localPath3.thumbLocalPath || '',
     };
   return (
-    _0x1c8e63.originalWidth > 0 && (_0x44090a.originalWidth = _0x1c8e63.originalWidth),
-    _0x1c8e63.originalHeight > 0 && (_0x44090a.originalHeight = _0x1c8e63.originalHeight),
-    _0x44090a
+    localPath3.originalWidth > 0 && (index.originalWidth = localPath3.originalWidth),
+    localPath3.originalHeight > 0 && (index.originalHeight = localPath3.originalHeight),
+    index
   );
 }
-export function pickCanvasImageLocalPath(_0x3009b6 = {}) {
-  const _0x51ec1f = normalizeImageDerivativeFields(_0x3009b6);
+export function pickCanvasImageLocalPath(options5 = {}) {
+  const imageDerivativeFields2 = normalizeImageDerivativeFields(options5);
   return firstNonEmptyString(
-    _0x51ec1f.displayLocalPath,
-    _0x51ec1f.originalLocalPath,
-    _0x51ec1f.localPath,
-    _0x51ec1f.thumbLocalPath,
+    imageDerivativeFields2.displayLocalPath,
+    imageDerivativeFields2.originalLocalPath,
+    imageDerivativeFields2.localPath,
+    imageDerivativeFields2.thumbLocalPath,
   );
 }
-export function pickCanvasThumbLocalPath(_0x455412 = {}) {
-  const _0x4fe3ea = normalizeImageDerivativeFields(_0x455412);
+export function pickCanvasThumbLocalPath(options6 = {}) {
+  const imageDerivativeFields3 = normalizeImageDerivativeFields(options6);
   return firstNonEmptyString(
-    _0x4fe3ea.thumbLocalPath,
-    _0x4fe3ea.displayLocalPath,
-    _0x4fe3ea.originalLocalPath,
-    _0x4fe3ea.localPath,
+    imageDerivativeFields3.thumbLocalPath,
+    imageDerivativeFields3.displayLocalPath,
+    imageDerivativeFields3.originalLocalPath,
+    imageDerivativeFields3.localPath,
   );
 }
-export function pickPreviewImageLocalPath(_0x7e5ce4 = {}) {
-  const _0xd40c57 = normalizeImageDerivativeFields(_0x7e5ce4);
-  return firstNonEmptyString(_0xd40c57.originalLocalPath, _0xd40c57.localPath);
+export function pickPreviewImageLocalPath(options7 = {}) {
+  const imageDerivativeFields4 = normalizeImageDerivativeFields(options7);
+  return firstNonEmptyString(imageDerivativeFields4.originalLocalPath, imageDerivativeFields4.localPath);
 }
-export function pickPreviewFallbackLocalPath(_0x278e55 = {}) {
-  const _0x3768e5 = normalizeImageDerivativeFields(_0x278e55);
-  return firstNonEmptyString(_0x3768e5.displayLocalPath, _0x3768e5.thumbLocalPath);
+export function pickPreviewFallbackLocalPath(options8 = {}) {
+  const imageDerivativeFields5 = normalizeImageDerivativeFields(options8);
+  return firstNonEmptyString(imageDerivativeFields5.displayLocalPath, imageDerivativeFields5.thumbLocalPath);
 }

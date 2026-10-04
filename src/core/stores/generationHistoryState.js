@@ -15,8 +15,8 @@ const RUNNING = new Set([
     'recovering',
   ]),
   STATUS_FIELDS = ['jobStatus', 'rhTaskStatus', 'dreaminaTaskStatus', 'dreaminaTaskPhase', 'asyncTaskStatus'];
-function hasResult(_0x2be661) {
-  if (!_0x2be661 || _0x2be661['error']) return ![];
+function hasResult(enabled) {
+  if (!enabled || enabled['error']) return ![];
   return [
     'imageUrl',
     'videoUrl',
@@ -30,30 +30,30 @@ function hasResult(_0x2be661) {
     'thumbId',
     'sourceId',
     'outputText',
-  ]['some']((_0xd02610) => typeof _0x2be661[_0xd02610] === 'string' && _0x2be661[_0xd02610]['trim']());
+  ]['some']((value) => typeof enabled[value] === 'string' && enabled[value]['trim']());
 }
-function normalizeUnownedGeneration(_0x4a7721) {
-  const _0x4ac532 =
-    _0x4a7721['isGenerating'] === !![] ||
-    _0x4a7721['rhTaskRecovering'] === !![] ||
-    _0x4a7721['dreaminaTaskRecovering'] === !![] ||
-    _0x4a7721['asyncTaskRecovering'] === !![] ||
-    STATUS_FIELDS['some']((_0x3ec6d4) =>
+function normalizeUnownedGeneration(item) {
+  const enabled2 =
+    item['isGenerating'] === !![] ||
+    item['rhTaskRecovering'] === !![] ||
+    item['dreaminaTaskRecovering'] === !![] ||
+    item['asyncTaskRecovering'] === !![] ||
+    STATUS_FIELDS['some']((key) =>
       RUNNING['has'](
-        String(_0x4a7721[_0x3ec6d4] || '')
+        String(item[key] || '')
           ['trim']()
           ['toLowerCase'](),
       ),
     );
-  if (!_0x4ac532) return;
-  const _0x1a9e0d =
-    hasResult(_0x4a7721) ||
+  if (!enabled2) return;
+  const jobStatus =
+    hasResult(item) ||
     ['images', 'videos', 'audios']['some'](
-      (_0x472fa2) => Array['isArray'](_0x4a7721[_0x472fa2]) && _0x4a7721[_0x472fa2]['some'](hasResult),
+      (index) => Array['isArray'](item[index]) && item[index]['some'](hasResult),
     );
-  Object['assign'](_0x4a7721, buildIdleGenerationProtocolPatch(), {
+  Object['assign'](item, buildIdleGenerationProtocolPatch(), {
     isGenerating: ![],
-    jobStatus: _0x1a9e0d ? 'success' : null,
+    jobStatus: jobStatus ? 'success' : null,
     jobError: null,
     statusMessage: '',
     rhStatusMessage: null,
@@ -61,35 +61,35 @@ function normalizeUnownedGeneration(_0x4a7721) {
   });
 }
 export function createGenerationHistoryState() {
-  const _0x1fff6e = new Map();
+  const map = new Map();
   return {
-    record(_0x3b71e0, _0x16625c, { history: _0x398183 } = {}) {
-      if (_0x398183 !== 'preserve' && !_0x1fff6e['has'](_0x3b71e0)) return;
-      const _0x3e468a = _0x1fff6e['get'](_0x3b71e0) || new Set();
-      for (const _0x23046e of Object['keys'](_0x16625c)) {
-        if (_0x23046e === 'id' || _0x23046e === '_bizRev') continue;
-        if (_0x398183 === 'preserve') _0x3e468a['add'](_0x23046e);
-        else _0x3e468a['delete'](_0x23046e);
+    record(result, data, { history: history } = {}) {
+      if (history !== 'preserve' && !map['has'](result)) return;
+      const map2 = map['get'](result) || new Set();
+      for (const options of Object['keys'](data)) {
+        if (options === 'id' || options === '_bizRev') continue;
+        if (history === 'preserve') map2['add'](options);
+        else map2['delete'](options);
       }
-      if (_0x3e468a['size']) _0x1fff6e['set'](_0x3b71e0, _0x3e468a);
-      else _0x1fff6e['delete'](_0x3b71e0);
+      if (map2['size']) map['set'](result, map2);
+      else map['delete'](result);
     },
-    restore(_0x1e810d, _0x549e03) {
-      normalizeUnownedGeneration(_0x1e810d);
-      if (!_0x549e03 || _0x549e03['type'] !== _0x1e810d['type']) return;
-      for (const _0x1970f8 of _0x1fff6e['get'](_0x1e810d['id']) || []) {
-        if (Object['hasOwn'](_0x549e03, _0x1970f8)) _0x1e810d[_0x1970f8] = _0x549e03[_0x1970f8];
-        else delete _0x1e810d[_0x1970f8];
+    restore(target, enabled3) {
+      normalizeUnownedGeneration(target);
+      if (!enabled3 || enabled3['type'] !== target['type']) return;
+      for (const source of map['get'](target['id']) || []) {
+        if (Object['hasOwn'](enabled3, source)) target[source] = enabled3[source];
+        else delete target[source];
       }
     },
-    delete(_0x43cf1d) {
-      _0x1fff6e['delete'](_0x43cf1d);
+    delete(next) {
+      map['delete'](next);
     },
     clear() {
-      _0x1fff6e['clear']();
+      map['clear']();
     },
-    prune(_0x175f01) {
-      for (const _0x385f44 of _0x1fff6e['keys']()) if (!_0x175f01[_0x385f44]) _0x1fff6e['delete'](_0x385f44);
+    prune(enabled4) {
+      for (const current of map['keys']()) if (!enabled4[current]) map['delete'](current);
     },
   };
 }

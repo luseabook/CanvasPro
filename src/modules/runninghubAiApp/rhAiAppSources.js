@@ -53,30 +53,30 @@ export const SOURCE_TYPE_META = Object['freeze']({
     ...COMFY_UI_WORKFLOW_SHARED_SOURCE_META,
   }),
 });
-export function normalizeSourceType(_0xdd628d) {
-  const _0x3cf1a9 = String(_0xdd628d || '')['trim']();
-  return SOURCE_TYPE_KEYS['includes'](_0x3cf1a9) ? _0x3cf1a9 : '';
+export function normalizeSourceType(value) {
+  const item = String(value || '')['trim']();
+  return SOURCE_TYPE_KEYS['includes'](item) ? item : '';
 }
-export function getSourceMeta(_0x57581a) {
-  return SOURCE_TYPE_META[normalizeSourceType(_0x57581a)] || null;
+export function getSourceMeta(key) {
+  return SOURCE_TYPE_META[normalizeSourceType(key)] || null;
 }
-export function isComfyUiSource(_0x3ae0b2) {
-  const _0x1d8cfd = normalizeSourceType(_0x3ae0b2);
-  return _0x1d8cfd === SOURCE_TYPES['comfyuiLocal'] || _0x1d8cfd === SOURCE_TYPES['comfyuiCloud'];
+export function isComfyUiSource(index) {
+  const sourceType = normalizeSourceType(index);
+  return sourceType === SOURCE_TYPES['comfyuiLocal'] || sourceType === SOURCE_TYPES['comfyuiCloud'];
 }
-export function getComfyUiBaseUrlMode(_0x2ebc70) {
-  return normalizeSourceType(_0x2ebc70) === SOURCE_TYPES['comfyuiCloud'] ? 'cloud' : 'local';
+export function getComfyUiBaseUrlMode(result) {
+  return normalizeSourceType(result) === SOURCE_TYPES['comfyuiCloud'] ? 'cloud' : 'local';
 }
-export function getComfyUiSourceTypeFromBaseUrlMode(_0x25d8ad) {
-  return String(_0x25d8ad || '')
+export function getComfyUiSourceTypeFromBaseUrlMode(data) {
+  return String(data || '')
     ['trim']()
     ['toLowerCase']() === 'cloud'
     ? SOURCE_TYPES['comfyuiCloud']
     : SOURCE_TYPES['comfyuiLocal'];
 }
-export function getComfyUiBaseUrlModeLabel(_0x242825) {
-  return getComfyUiBaseUrlMode(_0x242825) === 'cloud' ? '云端' : '本地';
+export function getComfyUiBaseUrlModeLabel(options) {
+  return getComfyUiBaseUrlMode(options) === 'cloud' ? '云端' : '本地';
 }
-export function isRunningHubSource(_0x34fe99) {
-  return _0x34fe99 === SOURCE_TYPES['runninghub'] || _0x34fe99 === SOURCE_TYPES['runninghubWorkflow'];
+export function isRunningHubSource(target) {
+  return target === SOURCE_TYPES['runninghub'] || target === SOURCE_TYPES['runninghubWorkflow'];
 }

@@ -7,102 +7,101 @@ import { createPanorama360NodeData, createPanoramaSceneNodeData } from '../panor
 import { createWhiteboardNodeData } from '../whiteboard/whiteboardNodeData.js';
 import { buildSourceMediaNodePayload, getAIGenerationNodeSize } from '../../services/fileService.js';
 export function buildAppCanvasNodeData({
-  id: _0x6e813c,
-  type: _0x5561e3,
-  x: _0x2c7322,
-  y: _0x320975,
-  width: _0x9b965f,
-  height: _0x3e8a2a,
-  name: _0x53a533,
+  id: id,
+  type: type,
+  x: x,
+  y: y,
+  width: width,
+  height: height,
+  name: name,
   extra: extra = {},
-  ..._0x29fb55
+  ...args
 }) {
-  if (_0x5561e3 === 'panorama-scene')
+  if (type === 'panorama-scene')
     return createPanoramaSceneNodeData({
-      id: _0x6e813c,
-      x: _0x2c7322,
-      y: _0x320975,
-      width: _0x9b965f,
-      height: _0x3e8a2a,
-      name: _0x53a533,
+      id: id,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      name: name,
     });
-  if (_0x5561e3 === 'panorama-360')
+  if (type === 'panorama-360')
     return createPanorama360NodeData({
-      id: _0x6e813c,
-      x: _0x2c7322,
-      y: _0x320975,
-      width: _0x9b965f,
-      height: _0x3e8a2a,
-      name: _0x53a533,
+      id: id,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      name: name,
     });
-  if (_0x5561e3 === 'storyboard-script')
+  if (type === 'storyboard-script')
     return createStoryboardScriptNodeData({
-      id: _0x6e813c,
-      x: _0x2c7322,
-      y: _0x320975,
-      width: _0x9b965f,
-      height: _0x3e8a2a,
-      name: _0x53a533,
+      id: id,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      name: name,
     });
-  if (_0x5561e3 === 'storyboard')
+  if (type === 'storyboard')
     return createEmptyStoryboardNodeData({
-      id: _0x6e813c,
-      x: _0x2c7322,
-      y: _0x320975,
-      width: _0x9b965f,
-      height: _0x3e8a2a,
-      name: _0x53a533,
+      id: id,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      name: name,
     });
-  if (_0x5561e3 === 'collage')
+  if (type === 'collage')
     return createEmptyCollageNodeData({
-      id: _0x6e813c,
-      x: _0x2c7322,
-      y: _0x320975,
-      width: _0x9b965f,
-      height: _0x3e8a2a,
-      name: _0x53a533 || t('canvasInteraction.grids.collageName'),
+      id: id,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      name: name || t('canvasInteraction.grids.collageName'),
     });
-  if (_0x5561e3 === 'whiteboard')
+  if (type === 'whiteboard')
     return createWhiteboardNodeData({
-      id: _0x6e813c,
-      x: _0x2c7322,
-      y: _0x320975,
-      width: _0x9b965f,
-      height: _0x3e8a2a,
-      name: _0x53a533 || t('nodeCreation.items.whiteboard.defaultName'),
+      id: id,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      name: name || t('nodeCreation.items.whiteboard.defaultName'),
     });
-  if (_0x5561e3 === 'comment-note')
+  if (type === 'comment-note')
     return {
-      id: _0x6e813c,
-      type: _0x5561e3,
-      x: _0x2c7322,
-      y: _0x320975,
-      width: _0x9b965f,
-      height: _0x3e8a2a,
+      id: id,
+      type: type,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
       name: '',
       content: '',
       style: createDefaultCommentNoteStyle(),
       ...extra,
     };
-  const _0x199b1d = {
-    id: _0x6e813c,
-    type: _0x5561e3,
-    x: _0x2c7322,
-    y: _0x320975,
-    width: _0x9b965f,
-    height: _0x3e8a2a,
-    name: _0x53a533,
-    ..._0x29fb55,
+  const box = {
+    id: id,
+    type: type,
+    x: x,
+    y: y,
+    width: width,
+    height: height,
+    name: name,
+    ...args,
     ...extra,
   };
-  (_0x5561e3 === 'ai-image' || _0x5561e3 === 'ai-video') &&
-    !Object['prototype']['hasOwnProperty']['call'](_0x199b1d, 'aspectRatio') &&
-    (_0x199b1d['aspectRatio'] = '自适应');
-  if (_0x5561e3 === 'ai-image' || _0x5561e3 === 'ai-video') {
-    const _0x43984e = getAIGenerationNodeSize(_0x9b965f, _0x3e8a2a);
-    ((_0x199b1d['width'] = _0x43984e['width']), (_0x199b1d['height'] = _0x43984e['height']));
+  (type === 'ai-image' || type === 'ai-video') &&
+    !Object['prototype']['hasOwnProperty']['call'](box, 'aspectRatio') &&
+    (box['aspectRatio'] = '自适应');
+  if (type === 'ai-image' || type === 'ai-video') {
+    const box2 = getAIGenerationNodeSize(width, height);
+    ((box['width'] = box2['width']), (box['height'] = box2['height']));
   }
-  if (_0x5561e3 === 'source-image' || _0x5561e3 === 'source-video')
-    return buildSourceMediaNodePayload(_0x199b1d);
-  return _0x199b1d;
+  if (type === 'source-image' || type === 'source-video') return buildSourceMediaNodePayload(box);
+  return box;
 }

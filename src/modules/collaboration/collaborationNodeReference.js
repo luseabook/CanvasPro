@@ -1,1 +1,80 @@
-import{resolveCanvasImageLowZoomUrl,resolveCanvasVideoPosterUrl}from'../../services/canvasMediaLocalService.js';import{createContextMenuIcon}from'../../components/contextMenuIcon.js';import{reviewElement}from'./collaborationReviewDom.js';export function nodeReferencePresentation(_0x52787b,_0xb91bd8='节点'){if(!_0x52787b)return{'name':_0xb91bd8,'kind':"action",'label':"节点已删除",'url':''};const _0x5aa522=String(_0x52787b["type"]||''),_0x119a5e=_0x5aa522["includes"]("audio")?"audio":_0x5aa522["includes"]("video")?"video":_0x5aa522["includes"]("image")?'image':'text',_0x25e567=Array['isArray'](_0x52787b["images"])?_0x52787b['images'][Math["max"](0x0,Number(_0x52787b['mainImageIndex'])||0x0)]||_0x52787b['images'][0x0]:null,_0x2f6398=_0x119a5e==="image"?resolveCanvasImageLowZoomUrl(_0x25e567||_0x52787b)||resolveCanvasImageLowZoomUrl(_0x52787b):resolveCanvasVideoPosterUrl(_0x52787b);return{'name':_0x52787b['name']||_0xb91bd8,'kind':_0x119a5e,'label':{'image':"图片节点",'video':"视频节点",'audio':"音频节点",'text':'节点'}[_0x119a5e],'url':_0x2f6398};}export function updateNodeReference(_0x5a162b,_0x527149,_0x2af4fa,{compact:compact=![],onRemove:_0x4c107b,onOpen:_0xc8e45e}={}){const _0x263464=nodeReferencePresentation(_0x527149,_0x2af4fa),_0x47a8cb=JSON["stringify"]([_0x263464,compact,!!_0x4c107b]);if(_0x5a162b["dataset"]['referenceSignature']===_0x47a8cb)return;_0x5a162b["dataset"]["referenceSignature"]=_0x47a8cb,_0x5a162b["classList"]["add"]("collaboration-node-reference"),_0x5a162b['classList']["toggle"]("is-compact",compact),_0x5a162b['classList']['toggle']("ref-thumb-wrap",compact),_0x5a162b["classList"]["toggle"]('is-missing',!_0x527149),_0x5a162b["setAttribute"]("aria-label",''+_0x263464["name"]+(_0x527149?"，定位节点":"，节点已删除"));const _0x549f10=reviewElement("span","collaboration-node-reference-preview");if(compact)_0x549f10["classList"]["add"]("ref-thumb-media");_0x549f10["append"](createContextMenuIcon(_0x263464["kind"]));if(_0x263464['url']){const _0x54327e=reviewElement("img");_0x54327e['alt']='',_0x54327e["loading"]='lazy',_0x54327e["decoding"]="async",_0x54327e['addEventListener']("error",()=>_0x54327e["remove"](),{'once':!![]}),_0x54327e['src']=_0x263464['url'],_0x549f10["append"](_0x54327e);}const _0x12ee67=reviewElement("span",'collaboration-node-reference-text');_0x12ee67["append"](reviewElement('span',"collaboration-node-reference-name",_0x263464["name"]),reviewElement('span',"collaboration-node-reference-kind",_0x263464["label"]));if(_0x4c107b){const _0x549878=reviewElement("button","collaboration-reference-open");_0x549878["setAttribute"]('aria-label',_0x5a162b['getAttribute']('aria-label')),_0x549878["append"](_0x549f10,_0x12ee67),_0x549878["addEventListener"]("click",_0xc8e45e);const _0x161bc1=reviewElement("button","collaboration-reference-remove ref-thumb-delete",'×');_0x161bc1["setAttribute"]("aria-label","移除引用 "+_0x263464["name"]),_0x161bc1["addEventListener"]("click",_0x11a965=>{_0x11a965["stopPropagation"](),_0x4c107b();}),_0x5a162b["replaceChildren"](_0x549878,_0x161bc1);}else _0x5a162b["replaceChildren"](_0x549f10,_0x12ee67,...compact?[]:[createContextMenuIcon("action")]);}
+import {
+  resolveCanvasImageLowZoomUrl,
+  resolveCanvasVideoPosterUrl,
+} from '../../services/canvasMediaLocalService.js';
+import { createContextMenuIcon } from '../../components/contextMenuIcon.js';
+import { reviewElement } from './collaborationReviewDom.js';
+export function nodeReferencePresentation(error, value = '节点') {
+  if (!error) return { name: value, kind: 'action', label: '节点已删除', url: '' };
+  const item = String(error['type'] || ''),
+    key = item['includes']('audio')
+      ? 'audio'
+      : item['includes']('video')
+        ? 'video'
+        : item['includes']('image')
+          ? 'image'
+          : 'text',
+    index = Array['isArray'](error['images'])
+      ? error['images'][Math['max'](0x0, Number(error['mainImageIndex']) || 0x0)] || error['images'][0x0]
+      : null,
+    result =
+      key === 'image'
+        ? resolveCanvasImageLowZoomUrl(index || error) || resolveCanvasImageLowZoomUrl(error)
+        : resolveCanvasVideoPosterUrl(error);
+  return {
+    name: error['name'] || value,
+    kind: key,
+    label: { image: '图片节点', video: '视频节点', audio: '音频节点', text: '节点' }[key],
+    url: result,
+  };
+}
+export function updateNodeReference(
+  el,
+  enabled,
+  data,
+  { compact: compact = ![], onRemove: onRemove, onOpen: onOpen } = {},
+) {
+  const response = nodeReferencePresentation(enabled, data),
+    options = JSON['stringify']([response, compact, !!onRemove]);
+  if (el['dataset']['referenceSignature'] === options) return;
+  ((el['dataset']['referenceSignature'] = options),
+    el['classList']['add']('collaboration-node-reference'),
+    el['classList']['toggle']('is-compact', compact),
+    el['classList']['toggle']('ref-thumb-wrap', compact),
+    el['classList']['toggle']('is-missing', !enabled),
+    el['setAttribute']('aria-label', '' + response['name'] + (enabled ? '，定位节点' : '，节点已删除')));
+  const reviewElement2 = reviewElement('span', 'collaboration-node-reference-preview');
+  if (compact) reviewElement2['classList']['add']('ref-thumb-media');
+  reviewElement2['append'](createContextMenuIcon(response['kind']));
+  if (response['url']) {
+    const el2 = reviewElement('img');
+    ((el2['alt'] = ''),
+      (el2['loading'] = 'lazy'),
+      (el2['decoding'] = 'async'),
+      el2['addEventListener']('error', () => el2['remove'](), { once: !![] }),
+      (el2['src'] = response['url']),
+      reviewElement2['append'](el2));
+  }
+  const reviewElement3 = reviewElement('span', 'collaboration-node-reference-text');
+  reviewElement3['append'](
+    reviewElement('span', 'collaboration-node-reference-name', response['name']),
+    reviewElement('span', 'collaboration-node-reference-kind', response['label']),
+  );
+  if (onRemove) {
+    const reviewElement4 = reviewElement('button', 'collaboration-reference-open');
+    (reviewElement4['setAttribute']('aria-label', el['getAttribute']('aria-label')),
+      reviewElement4['append'](reviewElement2, reviewElement3),
+      reviewElement4['addEventListener']('click', onOpen));
+    const reviewElement5 = reviewElement('button', 'collaboration-reference-remove ref-thumb-delete', '×');
+    (reviewElement5['setAttribute']('aria-label', '移除引用 ' + response['name']),
+      reviewElement5['addEventListener']('click', (target) => {
+        (target['stopPropagation'](), onRemove());
+      }),
+      el['replaceChildren'](reviewElement4, reviewElement5));
+  } else
+    el['replaceChildren'](
+      reviewElement2,
+      reviewElement3,
+      ...(compact ? [] : [createContextMenuIcon('action')]),
+    );
+}

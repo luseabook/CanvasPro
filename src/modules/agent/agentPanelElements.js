@@ -1,29 +1,29 @@
-export function createAgentElement(_0x1dd04a, _0x3b3f09 = '', _0x51cb4f = '') {
-  const _0x277c0b = document['createElement'](_0x1dd04a);
-  if (_0x3b3f09) _0x277c0b['className'] = _0x3b3f09;
-  if (_0x51cb4f) _0x277c0b['textContent'] = _0x51cb4f;
-  return _0x277c0b;
+export function createAgentElement(value, item = '', key = '') {
+  const el = document['createElement'](value);
+  if (item) el['className'] = item;
+  if (key) el['textContent'] = key;
+  return el;
 }
 export function createAgentButton(
-  _0x5eb2ec,
-  _0x2a7f91,
+  index,
+  result,
   { title: title = '', icon: icon = '', disabled: disabled = ![] } = {},
 ) {
-  const _0x5695fc = createAgentElement('button', _0x5eb2ec);
-  _0x5695fc['type'] = 'button';
-  title && ((_0x5695fc['title'] = title), _0x5695fc['setAttribute']('aria-label', title));
+  const el2 = createAgentElement('button', index);
+  el2['type'] = 'button';
+  title && ((el2['title'] = title), el2['setAttribute']('aria-label', title));
   icon
-    ? ((_0x5695fc['innerHTML'] = icon),
-      _0x2a7f91 && _0x5695fc['appendChild'](createAgentElement('span', 'agent-btn-label', _0x2a7f91)))
-    : (_0x5695fc['textContent'] = _0x2a7f91);
-  _0x5695fc['disabled'] = disabled;
-  if (disabled) _0x5695fc['setAttribute']('aria-disabled', 'true');
-  return _0x5695fc;
+    ? ((el2['innerHTML'] = icon),
+      result && el2['appendChild'](createAgentElement('span', 'agent-btn-label', result)))
+    : (el2['textContent'] = result);
+  el2['disabled'] = disabled;
+  if (disabled) el2['setAttribute']('aria-disabled', 'true');
+  return el2;
 }
-export function agentIconSvg(_0x4bbc2b) {
-  const _0x1ec22c =
+export function agentIconSvg(data) {
+  const options =
       'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"',
-    _0x35f3f1 = {
+    target = {
       plus: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
       history:
         '<path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path><path d="M12 7v5l3 2"></path>',
@@ -47,11 +47,5 @@ export function agentIconSvg(_0x4bbc2b) {
       folder: '<path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3Z"></path>',
       edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>',
     };
-  return (
-    '<svg class="agent-icon" width="18" height="18" ' +
-    _0x1ec22c +
-    '>' +
-    (_0x35f3f1[_0x4bbc2b] || '') +
-    '</svg>'
-  );
+  return '<svg class="agent-icon" width="18" height="18" ' + options + '>' + (target[data] || '') + '</svg>';
 }
