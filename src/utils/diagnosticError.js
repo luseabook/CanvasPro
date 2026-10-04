@@ -2,38 +2,31 @@ const MAX_ERROR_CHAIN_LENGTH = 0x4,
   MAX_ERROR_MESSAGE_LENGTH = 0x7d0,
   MAX_ERROR_STACK_LENGTH = 0x2710,
   ERROR_METADATA_KEYS = ['type', 'provider', 'code', 'status', 'retryable'];
-function boundedText(_0x150138, _0x5be576) {
-  const _0x4e9339 = typeof _0x150138 === 'string' ? _0x150138 : '';
-  return _0x4e9339['length'] > _0x5be576
-    ? _0x4e9339['slice'](0x0, _0x5be576) + '...\x20[truncated]'
-    : _0x4e9339;
+function boundedText(value, item) {
+  const list = typeof value === 'string' ? value : '';
+  return list['length'] > item ? list['slice'](0x0, item) + '...\x20[truncated]' : list;
 }
-function serializeError(_0x134ad9, _0x4d5d78, _0xe9e4f3) {
-  if (_0x4d5d78 >= MAX_ERROR_CHAIN_LENGTH) return '[MaxDepth]';
-  const _0x4d5ffa = _0x134ad9 !== null && typeof _0x134ad9 === 'object';
-  if (_0x4d5ffa && _0xe9e4f3['has'](_0x134ad9)) return '[Circular]';
-  if (_0x4d5ffa) _0xe9e4f3['add'](_0x134ad9);
-  const _0x358cd5 = {
-    name: boundedText(_0x134ad9?.['name'], 0xa0) || 'Error',
-    message: boundedText(
-      _0x4d5ffa ? _0x134ad9['message'] : String(_0x134ad9 ?? ''),
-      MAX_ERROR_MESSAGE_LENGTH,
-    ),
-    stack: boundedText(_0x134ad9?.['stack'], MAX_ERROR_STACK_LENGTH),
+function serializeError(error, key, map) {
+  if (key >= MAX_ERROR_CHAIN_LENGTH) return '[MaxDepth]';
+  const index = error !== null && typeof error === 'object';
+  if (index && map['has'](error)) return '[Circular]';
+  if (index) map['add'](error);
+  const error2 = {
+    name: boundedText(error?.['name'], 0xa0) || 'Error',
+    message: boundedText(index ? error['message'] : String(error ?? ''), MAX_ERROR_MESSAGE_LENGTH),
+    stack: boundedText(error?.['stack'], MAX_ERROR_STACK_LENGTH),
   };
-  for (const _0x19637c of ERROR_METADATA_KEYS) {
-    const _0x4b12ee = _0x134ad9?.[_0x19637c];
-    if (typeof _0x4b12ee === 'string')
-      _0x358cd5[_0x19637c] = boundedText(_0x4b12ee, MAX_ERROR_MESSAGE_LENGTH);
-    else
-      (typeof _0x4b12ee === 'number' || typeof _0x4b12ee === 'boolean') && (_0x358cd5[_0x19637c] = _0x4b12ee);
+  for (const result of ERROR_METADATA_KEYS) {
+    const data = error?.[result];
+    if (typeof data === 'string') error2[result] = boundedText(data, MAX_ERROR_MESSAGE_LENGTH);
+    else (typeof data === 'number' || typeof data === 'boolean') && (error2[result] = data);
   }
-  _0x134ad9?.['cause'] !== undefined &&
-    _0x134ad9['cause'] !== null &&
-    (_0x358cd5['cause'] = serializeError(_0x134ad9['cause'], _0x4d5d78 + 0x1, _0xe9e4f3));
-  if (_0x4d5ffa) _0xe9e4f3['delete'](_0x134ad9);
-  return _0x358cd5;
+  error?.['cause'] !== undefined &&
+    error['cause'] !== null &&
+    (error2['cause'] = serializeError(error['cause'], key + 0x1, map));
+  if (index) map['delete'](error);
+  return error2;
 }
-export function serializeDiagnosticError(_0x20acd9) {
-  return serializeError(_0x20acd9, 0x0, new Set());
+export function serializeDiagnosticError(options) {
+  return serializeError(options, 0x0, new Set());
 }

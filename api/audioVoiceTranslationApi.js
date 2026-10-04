@@ -17,13 +17,13 @@ export async function translateAudioVoiceSegments({
   segments: segments = [],
   request: request = generateText,
 } = {}) {
-  const _0x4a57ac = getAudioVoiceTranslationLanguage(languageId);
-  if (!_0x4a57ac) throw new Error('不支持的目标语言。');
+  const language = getAudioVoiceTranslationLanguage(languageId);
+  if (!language) throw new Error('不支持的目标语言。');
   if (typeof request !== 'function') throw new Error('翻译请求不可用。');
-  const _0x38c0dd = await request({
+  const request2 = await request({
     provider: AUDIO_VOICE_TRANSLATION_PROVIDER_ID,
     model: AUDIO_VOICE_TRANSLATION_MODEL_ID,
-    prompt: buildAudioVoiceTranslationPrompt({ language: _0x4a57ac, segments: segments }),
+    prompt: buildAudioVoiceTranslationPrompt({ language: language, segments: segments }),
     systemPrompt: AUDIO_VOICE_TRANSLATION_SYSTEM_PROMPT,
     structuredOutput: createAudioVoiceTranslationStructuredOutput(segments),
     thinking: { type: 'disabled' },
@@ -31,5 +31,5 @@ export async function translateAudioVoiceSegments({
     maxOutputTokens: 0x1000,
     timeoutMs: 0x3 * 0x3c * 0x3e8,
   });
-  return parseAudioVoiceTranslationResult(_0x38c0dd, segments);
+  return parseAudioVoiceTranslationResult(request2, segments);
 }

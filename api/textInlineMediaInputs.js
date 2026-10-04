@@ -1,17 +1,17 @@
-export async function encodeTextMediaInputs(_0x3721dc, _0x5ed506, _0x48747e) {
-  const _0xa8600b = [];
-  for (const _0x3b3a72 of _0x3721dc) {
-    if (new RegExp('^data:' + _0x5ed506 + '/[^;]+;base64,', 'i')['test'](_0x3b3a72)) {
-      _0xa8600b['push'](_0x3b3a72);
+export async function encodeTextMediaInputs(value, item, handler) {
+  const list = [];
+  for (const key of value) {
+    if (new RegExp('^data:' + item + '/[^;]+;base64,', 'i')['test'](key)) {
+      list['push'](key);
       continue;
     }
-    const _0x3405b5 = await _0x48747e(_0x3b3a72);
-    let _0x32359a = String(_0x3405b5['type'] || '')
+    const enabled = await handler(key);
+    let enabled2 = String(enabled['type'] || '')
       ['split'](';', 0x1)[0x0]
       ['toLowerCase']();
-    if (!_0x32359a || _0x32359a === 'application/octet-stream') {
-      const _0x5da421 = String(_0x3b3a72)['split'](/[?#]/, 0x1)[0x0]['split']('.')['pop']()['toLowerCase']();
-      _0x32359a =
+    if (!enabled2 || enabled2 === 'application/octet-stream') {
+      const index = String(key)['split'](/[?#]/, 0x1)[0x0]['split']('.')['pop']()['toLowerCase']();
+      enabled2 =
         {
           png: 'image/png',
           jpg: 'image/jpeg',
@@ -28,18 +28,18 @@ export async function encodeTextMediaInputs(_0x3721dc, _0x5ed506, _0x48747e) {
           mpg: 'video/mpeg',
           avi: 'video/avi',
           '3gp': 'video/3gpp',
-        }[_0x5da421] || '';
+        }[index] || '';
     }
-    if (!_0x3405b5['size'] || !_0x32359a['startsWith'](_0x5ed506 + '/'))
+    if (!enabled['size'] || !enabled2['startsWith'](item + '/'))
       throw new Error(
-        'Invalid\x20' + _0x5ed506 + '\x20input:\x20missing\x20media\x20content\x20or\x20MIME\x20type',
+        'Invalid\x20' + item + '\x20input:\x20missing\x20media\x20content\x20or\x20MIME\x20type',
       );
-    const _0xd27c28 = new Uint8Array(await _0x3405b5['arrayBuffer']()),
-      _0x49143b = [];
-    for (let _0x3187e3 = 0x0; _0x3187e3 < _0xd27c28['length']; _0x3187e3 += 0x8000) {
-      _0x49143b['push'](String['fromCharCode'](..._0xd27c28['subarray'](_0x3187e3, _0x3187e3 + 0x8000)));
+    const list2 = new Uint8Array(await enabled['arrayBuffer']()),
+      list3 = [];
+    for (let result = 0x0; result < list2['length']; result += 0x8000) {
+      list3['push'](String['fromCharCode'](...list2['subarray'](result, result + 0x8000)));
     }
-    _0xa8600b['push']('data:' + _0x32359a + ';base64,' + btoa(_0x49143b['join']('')));
+    list['push']('data:' + enabled2 + ';base64,' + btoa(list3['join']('')));
   }
-  return _0xa8600b;
+  return list;
 }

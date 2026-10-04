@@ -13,9 +13,9 @@ import { initDiagnosticsSettings } from './settings/diagnosticsSettings.js';
 import { initImageInputUploadQualitySettings } from './settings/imageInputUploadQualitySettings.js';
 import { initCompletionSoundSettings } from './settings/completionSoundSettings.js';
 const SettingsManager = {
-  init(_0xa4c932 = {}) {
+  init(uiStore = {}) {
     (initSettingsPanelEvents(),
-      initAppearanceSettings({ uiStore: _0xa4c932.uiStore }),
+      initAppearanceSettings({ uiStore: uiStore.uiStore }),
       initCanvasAlignmentSettings(),
       initNodeBehaviorSettings(),
       initImageInputUploadQualitySettings(),
@@ -23,7 +23,7 @@ const SettingsManager = {
       initApiSettings(),
       initFileSaveSettings(),
       initLocalAssetCleanupSettings(),
-      initDiagnosticsSettings({ graphStore: _0xa4c932.graphStore }));
+      initDiagnosticsSettings({ graphStore: uiStore.graphStore }));
   },
   applyGridDotsPref: applyGridDotsPref,
   applyGridDotsPrefFromStorage: applyGridDotsPrefFromStorage,

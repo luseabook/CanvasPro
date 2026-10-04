@@ -1,38 +1,38 @@
 export function registerAppIpcHandlers({
-  ipcMain: _0x91da6a,
-  getAppVersion: _0x5476f0,
-  getStableDeviceId: _0x4c7565,
-  getUpdaterController: _0x139e85,
-  getBackgroundCompletionNotifier: _0x3087e5,
+  ipcMain: ipcMain,
+  getAppVersion: getAppVersion,
+  getStableDeviceId: getStableDeviceId,
+  getUpdaterController: getUpdaterController,
+  getBackgroundCompletionNotifier: getBackgroundCompletionNotifier,
 }) {
-  (_0x91da6a.handle('app:getVersion', () => {
-    return _0x5476f0();
+  (ipcMain.handle('app:getVersion', () => {
+    return getAppVersion();
   }),
-    _0x91da6a.handle('app:getDeviceId', (_0x59f7a1, _0x3326bb = {}) => {
-      return _0x4c7565(_0x3326bb);
+    ipcMain.handle('app:getDeviceId', (value, item = {}) => {
+      return getStableDeviceId(item);
     }),
-    _0x91da6a.handle('appUpdater:getState', () => {
-      return _0x139e85().getState();
+    ipcMain.handle('appUpdater:getState', () => {
+      return getUpdaterController().getState();
     }),
-    _0x91da6a.handle('appUpdater:checkForUpdates', async () => {
-      return _0x139e85().checkForUpdates({ manual: true });
+    ipcMain.handle('appUpdater:checkForUpdates', async () => {
+      return getUpdaterController().checkForUpdates({ manual: true });
     }),
-    _0x91da6a.handle('appUpdater:quitAndInstall', () => {
-      return _0x139e85().installDownloadedUpdate();
+    ipcMain.handle('appUpdater:quitAndInstall', () => {
+      return getUpdaterController().installDownloadedUpdate();
     }),
-    _0x91da6a.handle('appUpdater:downloadUpdate', async () => {
-      return _0x139e85().downloadUpdate();
+    ipcMain.handle('appUpdater:downloadUpdate', async () => {
+      return getUpdaterController().downloadUpdate();
     }),
-    _0x91da6a.handle('notification:showGenerationComplete', (_0x642e1b, _0x4f2a07 = {}) => {
-      const _0x2c022e = _0x3087e5?.();
-      if (!_0x2c022e || typeof _0x2c022e.showGenerationComplete !== 'function')
+    ipcMain.handle('notification:showGenerationComplete', (key, index = {}) => {
+      const enabled = getBackgroundCompletionNotifier?.();
+      if (!enabled || typeof enabled.showGenerationComplete !== 'function')
         return { success: true, shown: false, reason: 'unavailable' };
-      return _0x2c022e.showGenerationComplete(_0x4f2a07 || {});
+      return enabled.showGenerationComplete(index || {});
     }),
-    _0x91da6a.handle('notification:updateGlobalShortcut', (_0x3f51a9, _0x2d8be4 = {}) =>
-      _0x3087e5?.()?.updateGlobalShortcut(_0x2d8be4 || {}),
+    ipcMain.handle('notification:updateGlobalShortcut', (result, data = {}) =>
+      getBackgroundCompletionNotifier?.()?.updateGlobalShortcut(data || {}),
     ),
-    _0x91da6a.handle('notification:acknowledge', (_0x1c7d3a, _0x4ae690 = {}) =>
-      _0x3087e5?.()?.acknowledge(_0x4ae690 || {}),
+    ipcMain.handle('notification:acknowledge', (options, target = {}) =>
+      getBackgroundCompletionNotifier?.()?.acknowledge(target || {}),
     ));
 }

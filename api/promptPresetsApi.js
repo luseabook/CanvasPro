@@ -1,8 +1,8 @@
 import { get, post } from './requester.js';
 export async function fetchPromptPresetsFromServer() {
   try {
-    const _0x4f3040 = await get('/api/v2/user/presets', { provider: 'local' });
-    return _0x4f3040 && typeof _0x4f3040 === 'object' ? _0x4f3040 : {};
+    const get2 = await get('/api/v2/user/presets', { provider: 'local' });
+    return get2 && typeof get2 === 'object' ? get2 : {};
   } catch {
     return {};
   }
@@ -25,10 +25,10 @@ export async function savePromptPresetSettingsToServer({
   );
 }
 export async function savePromptPresetToServer({
-  nodeType: _0x8f146b,
-  title: _0x2ad7ff,
+  nodeType: nodeType,
+  title: title,
   desc: desc = '',
-  template: _0x427a75,
+  template: template,
   triggerMode: triggerMode = '',
   thumbnailDataUrl: thumbnailDataUrl = '',
   thumbLocalPath: thumbLocalPath = '',
@@ -38,10 +38,10 @@ export async function savePromptPresetToServer({
   return await post(
     '/api/v2/user/presets/save',
     {
-      nodeType: _0x8f146b,
-      title: _0x2ad7ff,
+      nodeType: nodeType,
+      title: title,
       desc: desc,
-      template: _0x427a75,
+      template: template,
       triggerMode: triggerMode,
       thumbnailDataUrl: thumbnailDataUrl,
       thumbLocalPath: thumbLocalPath,
@@ -51,10 +51,10 @@ export async function savePromptPresetToServer({
     { provider: 'local' },
   );
 }
-export async function deletePromptPresetFromServer({ nodeType: _0x20b78c, title: _0x45eda9 } = {}) {
+export async function deletePromptPresetFromServer({ nodeType: nodeType2, title: title2 } = {}) {
   return await post(
     '/api/v2/user/presets/delete',
-    { nodeType: _0x20b78c, title: _0x45eda9 },
+    { nodeType: nodeType2, title: title2 },
     { provider: 'local' },
   );
 }

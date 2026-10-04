@@ -5,40 +5,40 @@ const STORAGE_KEY = 'aiCanvas.agentModelSettings.v1',
     temperature: 0,
     executionMode: 'manual',
   });
-function getWindowObject(_0x5f3768) {
-  if (_0x5f3768) return _0x5f3768;
+function getWindowObject(value) {
+  if (value) return value;
   if (typeof window !== 'undefined') return window;
   return null;
 }
-function normalizeSettings(_0x3e0052 = {}) {
-  const _0x4d94c7 = String(_0x3e0052.executionMode || '').trim() === 'auto' ? 'auto' : 'manual';
+function normalizeSettings(options = {}) {
+  const executionMode = String(options.executionMode || '').trim() === 'auto' ? 'auto' : 'manual';
   return {
-    provider: String(_0x3e0052.provider || '').trim(),
-    model: String(_0x3e0052.model || '').trim(),
-    temperature: Number.isFinite(Number(_0x3e0052.temperature))
-      ? Math.max(0, Math.min(2, Number(_0x3e0052.temperature)))
+    provider: String(options.provider || '').trim(),
+    model: String(options.model || '').trim(),
+    temperature: Number.isFinite(Number(options.temperature))
+      ? Math.max(0, Math.min(2, Number(options.temperature)))
       : DEFAULT_AGENT_MODEL_SETTINGS.temperature,
-    executionMode: _0x4d94c7,
+    executionMode: executionMode,
   };
 }
 export function createAgentModelSettings({ windowObject: windowObject = undefined } = {}) {
-  const _0x5e1303 = getWindowObject(windowObject);
-  function _0x492d89() {
+  const windowObject2 = getWindowObject(windowObject);
+  function getSettings() {
     try {
-      const _0x2e87e3 = _0x5e1303?.localStorage?.getItem?.(STORAGE_KEY);
-      if (!_0x2e87e3) return { ...DEFAULT_AGENT_MODEL_SETTINGS };
-      return normalizeSettings({ ...DEFAULT_AGENT_MODEL_SETTINGS, ...JSON.parse(_0x2e87e3) });
+      const enabled = windowObject2?.localStorage?.getItem?.(STORAGE_KEY);
+      if (!enabled) return { ...DEFAULT_AGENT_MODEL_SETTINGS };
+      return normalizeSettings({ ...DEFAULT_AGENT_MODEL_SETTINGS, ...JSON.parse(enabled) });
     } catch {
       return { ...DEFAULT_AGENT_MODEL_SETTINGS };
     }
   }
-  function _0x5703ea(_0x30988e = {}) {
-    const _0x221997 = normalizeSettings({ ..._0x492d89(), ..._0x30988e });
+  function updateSettings(args = {}) {
+    const settings = normalizeSettings({ ...getSettings(), ...args });
     try {
-      _0x5e1303?.localStorage?.setItem?.(STORAGE_KEY, JSON.stringify(_0x221997));
+      windowObject2?.localStorage?.setItem?.(STORAGE_KEY, JSON.stringify(settings));
     } catch {}
-    return _0x221997;
+    return settings;
   }
-  return { getSettings: _0x492d89, updateSettings: _0x5703ea };
+  return { getSettings: getSettings, updateSettings: updateSettings };
 }
 export { DEFAULT_AGENT_MODEL_SETTINGS };

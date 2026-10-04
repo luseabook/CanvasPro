@@ -1,54 +1,48 @@
 import { get, post } from './requester.js';
 const DEFAULT_LONG_TIMEOUT = 0x493e0;
-export async function prepareSam3Matting(_0x528cc7, _0x52e383 = {}) {
+export async function prepareSam3Matting(value, signal = {}) {
   return (
-    await post('/api/v2/matting/sam3/prepare', _0x528cc7 || {}, {
+    await post('/api/v2/matting/sam3/prepare', value || {}, {
       provider: 'local',
-      signal: _0x52e383.signal,
-      timeout: _0x52e383.timeout ?? DEFAULT_LONG_TIMEOUT,
+      signal: signal.signal,
+      timeout: signal.timeout ?? DEFAULT_LONG_TIMEOUT,
     }),
     true
   );
 }
-export async function fetchSam3RuntimeInfo(_0x156118 = {}) {
+export async function fetchSam3RuntimeInfo(signal2 = {}) {
   return await get('/api/v2/matting/sam3/info', {
     provider: 'local',
-    signal: _0x156118.signal,
-    timeout: _0x156118.timeout,
+    signal: signal2.signal,
+    timeout: signal2.timeout,
   });
 }
-export async function segmentSam3Raw(_0x1e7e34, _0x44b7c9 = {}) {
+export async function segmentSam3Raw(item, signal3 = {}) {
   try {
-    const _0x2e29c9 = await post('/api/v2/matting/sam3/segment_raw', _0x1e7e34 || {}, {
+    const blob = await post('/api/v2/matting/sam3/segment_raw', item || {}, {
       provider: 'local',
-      signal: _0x44b7c9.signal,
-      timeout: _0x44b7c9.timeout ?? DEFAULT_LONG_TIMEOUT,
+      signal: signal3.signal,
+      timeout: signal3.timeout ?? DEFAULT_LONG_TIMEOUT,
       responseType: 'blob',
       returnMeta: true,
     });
     return {
-      blob: _0x2e29c9?.data || null,
-      status: Number(_0x2e29c9?.status) || 0,
-      headers: _0x2e29c9?.headers || null,
-      contentType: String(
-        _0x2e29c9?.headers?.get('Content-Type') || _0x2e29c9?.headers?.get('content-type') || '',
-      ),
-      maskWidth: Number(
-        _0x2e29c9?.headers?.get('X-Mask-Width') || _0x2e29c9?.headers?.get('x-mask-width') || NaN,
-      ),
-      maskHeight: Number(
-        _0x2e29c9?.headers?.get('X-Mask-Height') || _0x2e29c9?.headers?.get('x-mask-height') || NaN,
-      ),
+      blob: blob?.data || null,
+      status: Number(blob?.status) || 0,
+      headers: blob?.headers || null,
+      contentType: String(blob?.headers?.get('Content-Type') || blob?.headers?.get('content-type') || ''),
+      maskWidth: Number(blob?.headers?.get('X-Mask-Width') || blob?.headers?.get('x-mask-width') || NaN),
+      maskHeight: Number(blob?.headers?.get('X-Mask-Height') || blob?.headers?.get('x-mask-height') || NaN),
     };
-  } catch (_0x2a7cf6) {
-    if (Number(_0x2a7cf6?.status) === 0x194) return null;
-    throw _0x2a7cf6;
+  } catch (response) {
+    if (Number(response?.status) === 0x194) return null;
+    throw response;
   }
 }
-export async function segmentSam3(_0x141a89, _0x2fe1f2 = {}) {
-  return await post('/api/v2/matting/sam3/segment', _0x141a89 || {}, {
+export async function segmentSam3(key, signal4 = {}) {
+  return await post('/api/v2/matting/sam3/segment', key || {}, {
     provider: 'local',
-    signal: _0x2fe1f2.signal,
-    timeout: _0x2fe1f2.timeout ?? DEFAULT_LONG_TIMEOUT,
+    signal: signal4.signal,
+    timeout: signal4.timeout ?? DEFAULT_LONG_TIMEOUT,
   });
 }

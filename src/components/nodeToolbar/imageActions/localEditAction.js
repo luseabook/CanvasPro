@@ -1,42 +1,41 @@
 import { t } from '../../../i18n/index.js';
-function imageToolbarText(_0x30036a) {
-  return t('nodeToolbar.image.' + _0x30036a);
+function imageToolbarText(value) {
+  return t('nodeToolbar.image.' + value);
 }
-export function bindImageLocalEditAction(_0x51a754) {
+export function bindImageLocalEditAction(item) {
   const {
-      toolbarEl: _0x38aa5a,
-      nodeId: _0x4e7e2f,
-      ImageAnnotateController: _0x554b7b,
-      bindRunningHubToolbarTaskButton: _0x441390,
-      cancelRunningHubResultTask: _0x58eb8c,
-      findRunningHubToolbarTaskForNode: _0x1622f6,
-    } = _0x51a754,
-    _0x25f693 = _0x38aa5a['querySelector']('.act-local-edit');
-  if (!_0x25f693) return;
-  _0x441390({
-    button: _0x25f693,
-    getTask: () => _0x1622f6(_0x4e7e2f, { taskTypes: ['image-repaint', 'image-erase'] }),
-    cancelTask: (_0x1e1014) => {
-      const _0x37c7f3 = _0x1e1014['node']?.['rhToolbarTaskType'] === 'image-erase' ? 'erase' : 'repaint';
-      return _0x58eb8c(_0x1e1014, {
-        name: imageToolbarText(_0x37c7f3 + 'CancelledName'),
-        outputText: imageToolbarText(_0x37c7f3 + 'CancelledOutput'),
-        notifyMessage: imageToolbarText(_0x37c7f3 + 'CancelledToast'),
+      toolbarEl: toolbarEl,
+      nodeId: nodeId,
+      ImageAnnotateController: ImageAnnotateController,
+      bindRunningHubToolbarTaskButton: bindRunningHubToolbarTaskButton,
+      cancelRunningHubResultTask: cancelRunningHubResultTask,
+      findRunningHubToolbarTaskForNode: findRunningHubToolbarTaskForNode,
+    } = item,
+    button = toolbarEl['querySelector']('.act-local-edit');
+  if (!button) return;
+  bindRunningHubToolbarTaskButton({
+    button: button,
+    getTask: () => findRunningHubToolbarTaskForNode(nodeId, { taskTypes: ['image-repaint', 'image-erase'] }),
+    cancelTask: (key) => {
+      const index = key['node']?.['rhToolbarTaskType'] === 'image-erase' ? 'erase' : 'repaint';
+      return cancelRunningHubResultTask(key, {
+        name: imageToolbarText(index + 'CancelledName'),
+        outputText: imageToolbarText(index + 'CancelledOutput'),
+        notifyMessage: imageToolbarText(index + 'CancelledToast'),
       });
     },
     cancelTooltip: imageToolbarText('cancelLocalEdit'),
     eventTypes: ['click', 'image-local-edit-open'],
   });
-  const _0x2bf111 = (_0x284726) => {
-    (_0x284726['stopPropagation'](), window['v2FocusOnNode']?.(_0x4e7e2f));
-    const _0x21209d = _0x284726['detail']?.['scene'];
-    _0x554b7b['init'](_0x4e7e2f, {
-      scene: _0x21209d === 'repaint' || _0x21209d === 'erase' ? _0x21209d : 'local-edit',
+  const result = (event) => {
+    (event['stopPropagation'](), window['v2FocusOnNode']?.(nodeId));
+    const scene = event['detail']?.['scene'];
+    ImageAnnotateController['init'](nodeId, {
+      scene: scene === 'repaint' || scene === 'erase' ? scene : 'local-edit',
       submitLabel: imageToolbarText('generate'),
       submitBusyLabel: imageToolbarText('generating'),
       submitNoop: !![],
     });
   };
-  (_0x25f693['addEventListener']('click', _0x2bf111),
-    _0x25f693['addEventListener']('image-local-edit-open', _0x2bf111));
+  (button['addEventListener']('click', result), button['addEventListener']('image-local-edit-open', result));
 }

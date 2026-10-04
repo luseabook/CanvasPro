@@ -9,8 +9,8 @@ const EXPLICIT_CREATIVE_CREATE_PATTERNS = Object['freeze']([
     /\b(?:select|upload|attach|provide)\b.{0,20}\b(?:node|file|input|source|reference (?:image|video|audio))\b/i,
     /\b(?:text-to-video|image-to-video)\b.{0,24}\b(?:or|which|choose)\b/i,
   ]);
-function matchesAny(_0x19a675, _0x5a46ff) {
-  return _0x5a46ff['some']((_0x58d782) => _0x58d782['test'](_0x19a675));
+function matchesAny(value, list) {
+  return list['some']((item) => item['test'](value));
 }
 export function shouldUseCreativeDefaults({
   userMessage: userMessage = '',
@@ -19,15 +19,15 @@ export function shouldUseCreativeDefaults({
   toolResultCount: toolResultCount = 0x0,
 } = {}) {
   if (plan?.['status'] !== 'need_clarification' || Number(toolResultCount || 0x0) > 0x0) return ![];
-  const _0x4f9a7f = String(userMessage || '')['trim']();
-  if (!matchesAny(_0x4f9a7f, EXPLICIT_CREATIVE_CREATE_PATTERNS)) return ![];
-  const _0x41eaad = new Set(
+  const key = String(userMessage || '')['trim']();
+  if (!matchesAny(key, EXPLICIT_CREATIVE_CREATE_PATTERNS)) return ![];
+  const map = new Set(
     (Array['isArray'](agentContext?.['commands']) ? agentContext['commands'] : [])
-      ['map']((_0xa780d0) => String(_0xa780d0?.['id'] || _0xa780d0 || '')['trim']())
+      ['map']((index) => String(index?.['id'] || index || '')['trim']())
       ['filter'](Boolean),
   );
-  if (!_0x41eaad['has']('node.create')) return ![];
-  const _0x30038b = String(plan?.['question'] || plan?.['reply'] || '')['trim']();
-  if (matchesAny(_0x30038b, NON_INFERABLE_INPUT_PATTERNS)) return ![];
+  if (!map['has']('node.create')) return ![];
+  const result = String(plan?.['question'] || plan?.['reply'] || '')['trim']();
+  if (matchesAny(result, NON_INFERABLE_INPUT_PATTERNS)) return ![];
   return !![];
 }

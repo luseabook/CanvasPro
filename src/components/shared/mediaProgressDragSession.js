@@ -1,48 +1,48 @@
 export function startMediaProgressDragSession({
   target: target = globalThis['window'],
   pointerId: pointerId = null,
-  onMove: _0x275201,
-  onEnd: _0x5d07c3,
-  onCancel: onCancel = _0x5d07c3,
+  onMove: onMove,
+  onEnd: onEnd,
+  onCancel: onCancel = onEnd,
   capture: capture = !![],
 } = {}) {
-  let _0x3b8c4a = !![];
-  const _0xaeeb44 = (_0x4222c1) =>
-      pointerId == null || _0x4222c1?.['pointerId'] == null || _0x4222c1['pointerId'] === pointerId,
-    _0x92d8c1 = (_0x5db957) => {
-      if (!_0x3b8c4a || !_0xaeeb44(_0x5db957)) return;
-      _0x275201?.(_0x5db957);
+  let enabled = !![];
+  const run = (event) =>
+      pointerId == null || event?.['pointerId'] == null || event['pointerId'] === pointerId,
+    value = (item) => {
+      if (!enabled || !run(item)) return;
+      onMove?.(item);
     },
-    _0x3e8c4f = () => {
-      if (!_0x3b8c4a) return ![];
+    dispose = () => {
+      if (!enabled) return ![];
       return (
-        (_0x3b8c4a = ![]),
-        target?.['removeEventListener']?.('pointermove', _0x92d8c1, capture),
-        target?.['removeEventListener']?.('pointerup', _0x176646, capture),
-        target?.['removeEventListener']?.('pointercancel', _0x343cf4, capture),
-        target?.['removeEventListener']?.('blur', _0x343cf4, capture),
+        (enabled = ![]),
+        target?.['removeEventListener']?.('pointermove', value, capture),
+        target?.['removeEventListener']?.('pointerup', key, capture),
+        target?.['removeEventListener']?.('pointercancel', cancel, capture),
+        target?.['removeEventListener']?.('blur', cancel, capture),
         !![]
       );
     },
-    _0x176646 = (_0x21181d) => {
-      if (!_0xaeeb44(_0x21181d) || !_0x3e8c4f()) return;
-      _0x5d07c3?.(_0x21181d);
+    key = (index) => {
+      if (!run(index) || !dispose()) return;
+      onEnd?.(index);
     },
-    _0x343cf4 = (_0x5eb44a) => {
-      if (_0x5eb44a?.['type'] !== 'blur' && !_0xaeeb44(_0x5eb44a)) return;
-      if (!_0x3e8c4f()) return;
-      onCancel?.(_0x5eb44a);
+    cancel = (result) => {
+      if (result?.['type'] !== 'blur' && !run(result)) return;
+      if (!dispose()) return;
+      onCancel?.(result);
     };
   return (
-    target?.['addEventListener']?.('pointermove', _0x92d8c1, capture),
-    target?.['addEventListener']?.('pointerup', _0x176646, capture),
-    target?.['addEventListener']?.('pointercancel', _0x343cf4, capture),
-    target?.['addEventListener']?.('blur', _0x343cf4, capture),
+    target?.['addEventListener']?.('pointermove', value, capture),
+    target?.['addEventListener']?.('pointerup', key, capture),
+    target?.['addEventListener']?.('pointercancel', cancel, capture),
+    target?.['addEventListener']?.('blur', cancel, capture),
     {
-      cancel: _0x343cf4,
-      dispose: _0x3e8c4f,
+      cancel: cancel,
+      dispose: dispose,
       get active() {
-        return _0x3b8c4a;
+        return enabled;
       },
     }
   );

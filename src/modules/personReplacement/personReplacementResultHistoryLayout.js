@@ -1,42 +1,40 @@
 const SIZE = '--person-replacement-results-height';
 export function createPersonReplacementResultHistoryLayout() {
-  let _0x2ab9f1 = null,
-    _0x13f19d = null,
-    _0x5084f6 = null;
-  const _0x17ca06 = (_0x37f810, _0x25b613 = !![]) => {
-      if (!_0x2ab9f1) return [];
-      if (!_0x25b613) _0x2ab9f1['classList']['add']('is-results-layout-static');
-      _0x2ab9f1['style']['setProperty'](SIZE, _0x37f810 + 'px');
-      const _0x3dedc2 = (_0x2ab9f1['getAnimations']?.() || [])['filter'](
-        (_0x1d403b) => _0x1d403b['transitionProperty'] === SIZE,
-      );
-      if (!_0x25b613) _0x2ab9f1['classList']['remove']('is-results-layout-static');
-      return _0x3dedc2;
+  let el = null,
+    el2 = null,
+    value = null;
+  const run = (item, enabled = !![]) => {
+      if (!el) return [];
+      if (!enabled) el['classList']['add']('is-results-layout-static');
+      el['style']['setProperty'](SIZE, item + 'px');
+      const key = (el['getAnimations']?.() || [])['filter']((index) => index['transitionProperty'] === SIZE);
+      if (!enabled) el['classList']['remove']('is-results-layout-static');
+      return key;
     },
-    _0x160381 = () => {
-      (_0x5084f6?.['disconnect'](), (_0x5084f6 = null), (_0x13f19d = null));
+    handler = () => {
+      (value?.['disconnect'](), (value = null), (el2 = null));
     },
-    _0x410a00 = () => {
-      const _0x293cb9 = _0x13f19d?.['getBoundingClientRect']?.()['height'];
-      if (Number['isFinite'](_0x293cb9)) _0x17ca06(_0x293cb9);
+    handler2 = () => {
+      const result = el2?.['getBoundingClientRect']?.()['height'];
+      if (Number['isFinite'](result)) run(result);
     };
   return Object['freeze']({
-    show(_0x2468a1) {
-      const _0x83489f = _0x2468a1?.['closest']?.('.person-replacement-middle-layout');
-      _0x83489f !== _0x2ab9f1 && (_0x160381(), _0x17ca06(0x0, ![]), (_0x2ab9f1 = _0x83489f));
-      const _0xb9cde7 = _0x2468a1?.['querySelector']?.('.person-replacement-result-history-content');
-      if (_0xb9cde7 !== _0x13f19d) {
-        (_0x160381(), (_0x13f19d = _0xb9cde7));
-        const _0x224e61 = _0x2468a1?.['ownerDocument']?.['defaultView']?.['ResizeObserver'];
-        _0x13f19d && _0x224e61 && ((_0x5084f6 = new _0x224e61(_0x410a00)), _0x5084f6['observe'](_0x13f19d));
+    show(el3) {
+      const data = el3?.['closest']?.('.person-replacement-middle-layout');
+      data !== el && (handler(), run(0x0, ![]), (el = data));
+      const options = el3?.['querySelector']?.('.person-replacement-result-history-content');
+      if (options !== el2) {
+        (handler(), (el2 = options));
+        const run2 = el3?.['ownerDocument']?.['defaultView']?.['ResizeObserver'];
+        el2 && run2 && ((value = new run2(handler2)), value['observe'](el2));
       }
-      _0x410a00();
+      handler2();
     },
     hide({ animate: animate = ![] } = {}) {
-      return (_0x160381(), _0x17ca06(0x0, animate));
+      return (handler(), run(0x0, animate));
     },
     destroy() {
-      (_0x160381(), _0x17ca06(0x0, ![]), (_0x2ab9f1 = null));
+      (handler(), run(0x0, ![]), (el = null));
     },
   });
 }

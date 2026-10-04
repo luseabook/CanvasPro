@@ -1,8 +1,8 @@
 import { createToolbarHtml, createToolbarIconButton } from './buttonFactory.js';
 import { STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG } from './storyboardScriptToolbarIcon.js';
 import { t } from '../../i18n/index.js';
-function textToolbarText(_0xc0e0bc) {
-  return t('nodeToolbar.text.' + _0xc0e0bc);
+function textToolbarText(value) {
+  return t('nodeToolbar.text.' + value);
 }
 export const TEXT_TOOLBAR_HTML = createToolbarHtml({
   toolbarClass: 'v2-text-toolbar',

@@ -1,1 +1,51 @@
-import{isStorySeedance25PromptMode}from'../../src/domain/storyGeneration/promptModes.js';import{normalizeStringArray,normalizeText}from'../utils/storyGenerationValues.js';const STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS=0x320;function buildStoryEpisodeSceneSpatialAnchor(_0x3db29e={},_0x22788e=null){const _0x5777bb=[_0x22788e?.['description'],_0x22788e?.["prompt"],_0x3db29e?.["description"]]['map'](normalizeText)['filter'](Boolean);return[...new Set(_0x5777bb)]["join"]('；')["slice"](0x0,STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS);}export function createStoryEpisodeSplitCompactSceneCatalog(_0x3c1edc=[],{includeSpatialAnchors:includeSpatialAnchors=![]}={}){const _0x1d9bb=[];return(Array["isArray"](_0x3c1edc)?_0x3c1edc:[])['filter'](_0x4b662f=>normalizeText(_0x4b662f?.['kind'])==="scene")["forEach"](_0x1c406=>{const _0xe7eacb=Array["isArray"](_0x1c406?.["appearances"])?_0x1c406["appearances"]['filter'](_0x325627=>normalizeText(_0x325627?.["ref"])):[],_0x3a1354=_0xe7eacb["find"](_0x572f21=>normalizeText(_0x572f21?.["ref"])===normalizeText(_0x1c406?.["baseAppearanceRef"]))||_0xe7eacb[0x0]||null,_0x24e1e5=includeSpatialAnchors?buildStoryEpisodeSceneSpatialAnchor(_0x1c406,_0x3a1354):'';_0x1d9bb["push"]({'code':'s'+(_0x1d9bb['length']+0x1),'name':normalizeText(_0x1c406?.["name"]),..._0x24e1e5?{'spatialAnchor':_0x24e1e5}:{},'assetName':normalizeText(_0x1c406?.["name"]),'ref':normalizeText(_0x3a1354?.["ref"])||normalizeText(_0x1c406?.["ref"]),'assetRef':normalizeText(_0x1c406?.["ref"]),'kind':"scene",'sourceSceneRefs':normalizeStringArray(_0x1c406?.['sourceSceneRefs'])});}),_0x1d9bb;}export function createStoryEpisodeSplitPromptSceneCatalog(_0x57439c=[],_0x1693d0=''){return createStoryEpisodeSplitCompactSceneCatalog(_0x57439c,{'includeSpatialAnchors':isStorySeedance25PromptMode(_0x1693d0)})['map'](({code:_0x3b68d4,name:_0x502bf9,spatialAnchor:_0x3b7e1a})=>({'code':_0x3b68d4,'name':_0x502bf9,..._0x3b7e1a?{'spatialAnchor':_0x3b7e1a}:{}}));}
+import { isStorySeedance25PromptMode } from '../../src/domain/storyGeneration/promptModes.js';
+import { normalizeStringArray, normalizeText } from '../utils/storyGenerationValues.js';
+const STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS = 0x320;
+function buildStoryEpisodeSceneSpatialAnchor(options = {}, value = null) {
+  const item = [value?.['description'], value?.['prompt'], options?.['description']]
+    ['map'](normalizeText)
+    ['filter'](Boolean);
+  return [...new Set(item)]['join']('；')['slice'](0x0, STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS);
+}
+export function createStoryEpisodeSplitCompactSceneCatalog(
+  list = [],
+  { includeSpatialAnchors: includeSpatialAnchors = ![] } = {},
+) {
+  const list2 = [];
+  return (
+    (Array['isArray'](list) ? list : [])
+      ['filter']((key) => normalizeText(key?.['kind']) === 'scene')
+      ['forEach']((index) => {
+        const result = Array['isArray'](index?.['appearances'])
+            ? index['appearances']['filter']((data) => normalizeText(data?.['ref']))
+            : [],
+          target =
+            result['find'](
+              (source) => normalizeText(source?.['ref']) === normalizeText(index?.['baseAppearanceRef']),
+            ) ||
+            result[0x0] ||
+            null,
+          args = includeSpatialAnchors ? buildStoryEpisodeSceneSpatialAnchor(index, target) : '';
+        list2['push']({
+          code: 's' + (list2['length'] + 0x1),
+          name: normalizeText(index?.['name']),
+          ...(args ? { spatialAnchor: args } : {}),
+          assetName: normalizeText(index?.['name']),
+          ref: normalizeText(target?.['ref']) || normalizeText(index?.['ref']),
+          assetRef: normalizeText(index?.['ref']),
+          kind: 'scene',
+          sourceSceneRefs: normalizeStringArray(index?.['sourceSceneRefs']),
+        });
+      }),
+    list2
+  );
+}
+export function createStoryEpisodeSplitPromptSceneCatalog(list3 = [], next = '') {
+  return createStoryEpisodeSplitCompactSceneCatalog(list3, {
+    includeSpatialAnchors: isStorySeedance25PromptMode(next),
+  })['map'](({ code: code, name: name, spatialAnchor: spatialAnchor }) => ({
+    code: code,
+    name: name,
+    ...(spatialAnchor ? { spatialAnchor: spatialAnchor } : {}),
+  }));
+}

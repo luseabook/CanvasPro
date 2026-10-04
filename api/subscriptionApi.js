@@ -2,50 +2,50 @@ import { requester } from './requester.js';
 const SUBSCRIPTION_STATUS_PATH = '/api/v2/subscription/status',
   SUBSCRIPTION_ACTIVATE_PATH = '/api/v2/subscription/activate',
   SUBSCRIPTION_CLEAR_AUTHORIZATION_PATH = '/api/v2/subscription/authorization/clear';
-function buildDeviceIdHeaders(_0x380c00) {
-  const _0x46bf0f = String(_0x380c00 || '').trim();
-  return _0x46bf0f ? { 'X-AIC-Device-Id': _0x46bf0f } : {};
+function buildDeviceIdHeaders(value) {
+  const item = String(value || '').trim();
+  return item ? { 'X-AIC-Device-Id': item } : {};
 }
-export async function fetchSubscriptionStatus(_0x5f4507, _0xef5699 = '') {
-  const _0x339600 = String(_0x5f4507 || '').trim(),
-    _0x2d3278 = _0x339600 ? '?installId=' + encodeURIComponent(_0x339600) : '';
+export async function fetchSubscriptionStatus(key, index = '') {
+  const result = String(key || '').trim(),
+    data = result ? '?installId=' + encodeURIComponent(result) : '';
   return await requester({
-    url: '' + SUBSCRIPTION_STATUS_PATH + _0x2d3278,
+    url: '' + SUBSCRIPTION_STATUS_PATH + data,
     method: 'GET',
     provider: 'local',
     timeout: 0x3a98,
-    headers: buildDeviceIdHeaders(_0xef5699),
+    headers: buildDeviceIdHeaders(index),
   });
 }
-export async function activateCdkey(_0x27e34c) {
-  const _0x3ecef1 = String(_0x27e34c?.installId || '').trim(),
-    _0x4c7bd1 = String(_0x27e34c?.cdkey || '').trim(),
-    _0x2beb8a = String(_0x27e34c?.deviceId || '').trim();
+export async function activateCdkey(options) {
+  const installId = String(options?.installId || '').trim(),
+    cdkey = String(options?.cdkey || '').trim(),
+    deviceId = String(options?.deviceId || '').trim();
   return await requester({
     url: SUBSCRIPTION_ACTIVATE_PATH,
     method: 'POST',
     provider: 'local',
     timeout: 0x4e20,
-    headers: { 'Content-Type': 'application/json', ...buildDeviceIdHeaders(_0x2beb8a) },
+    headers: { 'Content-Type': 'application/json', ...buildDeviceIdHeaders(deviceId) },
     body: JSON.stringify({
-      installId: _0x3ecef1,
-      cdkey: _0x4c7bd1,
-      ...(_0x2beb8a ? { deviceId: _0x2beb8a } : {}),
+      installId: installId,
+      cdkey: cdkey,
+      ...(deviceId ? { deviceId: deviceId } : {}),
     }),
   });
 }
-export async function clearSubscriptionAuthorization(_0x5c32fb = {}) {
-  const _0x44aa70 = String(_0x5c32fb?.installId || '').trim(),
-    _0x414e44 = String(_0x5c32fb?.deviceId || '').trim();
+export async function clearSubscriptionAuthorization(options2 = {}) {
+  const installId2 = String(options2?.installId || '').trim(),
+    deviceId2 = String(options2?.deviceId || '').trim();
   return await requester({
     url: SUBSCRIPTION_CLEAR_AUTHORIZATION_PATH,
     method: 'POST',
     provider: 'local',
     timeout: 0x3a98,
-    headers: { 'Content-Type': 'application/json', ...buildDeviceIdHeaders(_0x414e44) },
+    headers: { 'Content-Type': 'application/json', ...buildDeviceIdHeaders(deviceId2) },
     body: JSON.stringify({
-      ...(_0x44aa70 ? { installId: _0x44aa70 } : {}),
-      ...(_0x414e44 ? { deviceId: _0x414e44 } : {}),
+      ...(installId2 ? { installId: installId2 } : {}),
+      ...(deviceId2 ? { deviceId: deviceId2 } : {}),
     }),
   });
 }

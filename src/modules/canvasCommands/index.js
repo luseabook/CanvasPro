@@ -18,16 +18,16 @@ import { registerModelParamCommands } from './modelParamCommands.js';
 import { registerPromptCommands } from './promptCommands.js';
 import { registerSelectionCommands } from './selectionCommands.js';
 import { registerViewportCommands } from './viewportCommands.js';
-export function registerDefaultCanvasCommands(_0x2d1c8a = commandRegistry) {
+export function registerDefaultCanvasCommands(value = commandRegistry) {
   return (
-    registerGraphCommands(_0x2d1c8a),
-    registerSelectionCommands(_0x2d1c8a),
-    registerViewportCommands(_0x2d1c8a),
-    registerPromptCommands(_0x2d1c8a),
-    registerModelParamCommands(_0x2d1c8a),
-    registerLayoutCommands(_0x2d1c8a),
-    registerGenerationCommands(_0x2d1c8a),
-    _0x2d1c8a
+    registerGraphCommands(value),
+    registerSelectionCommands(value),
+    registerViewportCommands(value),
+    registerPromptCommands(value),
+    registerModelParamCommands(value),
+    registerLayoutCommands(value),
+    registerGenerationCommands(value),
+    value
   );
 }
 registerDefaultCanvasCommands(commandRegistry);

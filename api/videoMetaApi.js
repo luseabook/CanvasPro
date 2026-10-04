@@ -1,48 +1,48 @@
 import { post } from './apiBase.js';
-function _createLimiter(_0x2241a6) {
-  let _0x53b80e = 0;
-  const _0x1249d9 = [];
-  return function _0x2955b9(_0x5e1f2d) {
-    return new Promise((_0x6cb662, _0x4c3eb7) => {
-      const _0x567226 = () => {
-        (_0x53b80e++,
+function _createLimiter(value) {
+  let item = 0;
+  const list = [];
+  return function run(key) {
+    return new Promise((handler, handler2) => {
+      const run2 = () => {
+        (item++,
           Promise.resolve()
-            .then(_0x5e1f2d)
+            .then(key)
             .then(
-              (_0x1228d0) => {
-                _0x53b80e--;
-                if (_0x1249d9.length && _0x53b80e < _0x2241a6) _0x1249d9.shift()();
-                _0x6cb662(_0x1228d0);
+              (index) => {
+                item--;
+                if (list.length && item < value) list.shift()();
+                handler(index);
               },
-              (_0x40818b) => {
-                _0x53b80e--;
-                if (_0x1249d9.length && _0x53b80e < _0x2241a6) _0x1249d9.shift()();
-                _0x4c3eb7(_0x40818b);
+              (result) => {
+                item--;
+                if (list.length && item < value) list.shift()();
+                handler2(result);
               },
             ));
       };
-      if (_0x53b80e < _0x2241a6) _0x567226();
-      else _0x1249d9.push(_0x567226);
+      if (item < value) run2();
+      else list.push(run2);
     });
   };
 }
 const _runLimited = _createLimiter(2),
   _inflight = new Map();
-export async function fetchVideoMetaFromServer(_0x5f4df2) {
-  const _0x510f24 = String(_0x5f4df2 || '').trim();
-  if (!_0x510f24) throw new Error('src 不能为空');
-  const _0x316392 = _inflight.get(_0x510f24);
-  if (_0x316392) return _0x316392;
-  let _0xf2e782;
+export async function fetchVideoMetaFromServer(data) {
+  const src = String(data || '').trim();
+  if (!src) throw new Error('src 不能为空');
+  const options = _inflight.get(src);
+  if (options) return options;
+  let _runLimited2;
   return (
-    (_0xf2e782 = _runLimited(async () => {
-      const _0xf9df5c = await post('/api/v2/video/meta', { src: _0x510f24 });
-      if (!_0xf9df5c.success) throw new Error(_0xf9df5c.error || '请求失败');
-      return _0xf9df5c.data;
+    (_runLimited2 = _runLimited(async () => {
+      const response = await post('/api/v2/video/meta', { src: src });
+      if (!response.success) throw new Error(response.error || '请求失败');
+      return response.data;
     }).finally(() => {
-      if (_inflight.get(_0x510f24) === _0xf2e782) _inflight.delete(_0x510f24);
+      if (_inflight.get(src) === _runLimited2) _inflight.delete(src);
     })),
-    _inflight.set(_0x510f24, _0xf2e782),
-    _0xf2e782
+    _inflight.set(src, _runLimited2),
+    _runLimited2
   );
 }

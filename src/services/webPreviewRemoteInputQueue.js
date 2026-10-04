@@ -1,51 +1,50 @@
-function isMouseInputType(_0x4558f8, _0x23090f) {
-  return _0x4558f8?.['kind'] === 'mouse' && _0x4558f8?.['type'] === _0x23090f;
+function isMouseInputType(value, item) {
+  return value?.['kind'] === 'mouse' && value?.['type'] === item;
 }
 
-function mergePendingInput(_0xde52e7, _0x4ffc29) {
-  if (isMouseInputType(_0xde52e7, 'mouseMoved') && isMouseInputType(_0x4ffc29, 'mouseMoved'))
-    return { ..._0x4ffc29 };
-  if (isMouseInputType(_0xde52e7, 'mouseWheel') && isMouseInputType(_0x4ffc29, 'mouseWheel'))
+function mergePendingInput(event, event2) {
+  if (isMouseInputType(event, 'mouseMoved') && isMouseInputType(event2, 'mouseMoved')) return { ...event2 };
+  if (isMouseInputType(event, 'mouseWheel') && isMouseInputType(event2, 'mouseWheel'))
     return {
-      ..._0x4ffc29,
-      deltaX: (Number(_0xde52e7['deltaX']) || 0x0) + (Number(_0x4ffc29['deltaX']) || 0x0),
-      deltaY: (Number(_0xde52e7['deltaY']) || 0x0) + (Number(_0x4ffc29['deltaY']) || 0x0),
+      ...event2,
+      deltaX: (Number(event['deltaX']) || 0x0) + (Number(event2['deltaX']) || 0x0),
+      deltaY: (Number(event['deltaY']) || 0x0) + (Number(event2['deltaY']) || 0x0),
     };
   return null;
 }
 
-export function createWebPreviewRemoteInputQueue({ send: _0xd03016 } = {}) {
-  if (typeof _0xd03016 !== 'function') throw new TypeError('Web preview remote input sender is required');
-  const _0x6c3c58 = [];
-  let _0x2fa7ca = ![],
-    _0x844c9f = ![];
-  const _0x1d1874 = async () => {
-    if (_0x2fa7ca || _0x844c9f) return;
-    _0x2fa7ca = !![];
+export function createWebPreviewRemoteInputQueue({ send: send } = {}) {
+  if (typeof send !== 'function') throw new TypeError('Web preview remote input sender is required');
+  const list = [];
+  let key = ![],
+    enabled = ![];
+  const run = async () => {
+    if (key || enabled) return;
+    key = !![];
     try {
-      while (!_0x844c9f && _0x6c3c58['length'] > 0x0) {
-        const _0x198bab = _0x6c3c58['shift']();
+      while (!enabled && list['length'] > 0x0) {
+        const index = list['shift']();
         try {
-          await _0xd03016(_0x198bab);
+          await send(index);
         } catch {}
       }
     } finally {
-      _0x2fa7ca = ![];
-      if (!_0x844c9f && _0x6c3c58['length'] > 0x0) void _0x1d1874();
+      key = ![];
+      if (!enabled && list['length'] > 0x0) void run();
     }
   };
   return {
-    enqueue(_0x43bb95 = {}) {
-      if (_0x844c9f || !_0x43bb95 || typeof _0x43bb95 !== 'object') return ![];
-      const _0x19e2a2 = { ..._0x43bb95 },
-        _0x221471 = _0x6c3c58['length'] - 0x1,
-        _0x272738 = _0x221471 >= 0x0 ? mergePendingInput(_0x6c3c58[_0x221471], _0x19e2a2) : null;
-      if (_0x272738) _0x6c3c58[_0x221471] = _0x272738;
-      else _0x6c3c58['push'](_0x19e2a2);
-      return (void _0x1d1874(), !![]);
+    enqueue(args = {}) {
+      if (enabled || !args || typeof args !== 'object') return ![];
+      const result = { ...args },
+        count = list['length'] - 0x1,
+        data = count >= 0x0 ? mergePendingInput(list[count], result) : null;
+      if (data) list[count] = data;
+      else list['push'](result);
+      return (void run(), !![]);
     },
     dispose() {
-      ((_0x844c9f = !![]), (_0x6c3c58['length'] = 0x0));
+      ((enabled = !![]), (list['length'] = 0x0));
     },
   };
 }

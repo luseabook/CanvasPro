@@ -1,6 +1,6 @@
 import { canUseDiagnostics, logDiagnosticEvent } from './diagnosticsService.js';
 export function createImageLoadDiagnostics(
-  _0x4ba18d,
+  consumer,
   {
     enabled: enabled = canUseDiagnostics(),
     now: now = () => performance['now'](),
@@ -10,52 +10,52 @@ export function createImageLoadDiagnostics(
   } = {},
 ) {
   if (!enabled) return { mark() {}, finish() {} };
-  const _0xad2c70 = now(),
-    _0xfe2537 = [];
-  let _0x1c3226 = ![],
-    _0x3ffe40;
-  function _0x25ec4f(_0x294208) {
+  const startedAt = now(),
+    list = [];
+  let enabled2 = ![],
+    timer;
+  function run(reason) {
     void report({
       type: 'image.presentation_timing',
       level: 'info',
       message: 'Image presentation stage timing',
       context: {
-        consumer: _0x4ba18d,
-        startedAt: _0xad2c70,
-        reason: _0x294208,
-        elapsedMs: Math['round'](now() - _0xad2c70),
-        events: [..._0xfe2537],
+        consumer: consumer,
+        startedAt: startedAt,
+        reason: reason,
+        elapsedMs: Math['round'](now() - startedAt),
+        events: [...list],
       },
     });
   }
   return (
-    (_0x3ffe40 = schedule(() => {
-      if (!_0x1c3226) _0x25ec4f('after-two-seconds');
+    (timer = schedule(() => {
+      if (!enabled2) run('after-two-seconds');
     }, 0x7d0)),
-    _0x3ffe40?.['unref']?.(),
+    timer?.['unref']?.(),
     {
-      mark(_0x29b5ea, _0x1b8822 = {}) {
-        if (_0x1c3226) return;
-        if (_0xfe2537['length'] >= 0x14) _0xfe2537['shift']();
-        _0xfe2537['push']({ stage: _0x29b5ea, elapsedMs: Math['round'](now() - _0xad2c70), ..._0x1b8822 });
-        if (_0x29b5ea === 'paint-opportunity') _0x25ec4f(_0x29b5ea);
+      mark(stage, args = {}) {
+        if (enabled2) return;
+        if (list['length'] >= 0x14) list['shift']();
+        list['push']({ stage: stage, elapsedMs: Math['round'](now() - startedAt), ...args });
+        if (stage === 'paint-opportunity') run(stage);
       },
       finish() {
-        if (_0x1c3226) return;
-        ((_0x1c3226 = !![]), cancel(_0x3ffe40), _0x25ec4f('closed'));
+        if (enabled2) return;
+        ((enabled2 = !![]), cancel(timer), run('closed'));
       },
     }
   );
 }
-export function getImageLoadTiming(_0x2e8e29) {
-  const _0x40366f = globalThis['performance']
-    ?.['getEntriesByName']?.(_0x2e8e29['currentSrc'] || _0x2e8e29['src'])
+export function getImageLoadTiming(width) {
+  const resourceDurationMs = globalThis['performance']
+    ?.['getEntriesByName']?.(width['currentSrc'] || width['src'])
     ?.['at'](-0x1);
   return {
-    width: _0x2e8e29['naturalWidth'] || 0x0,
-    height: _0x2e8e29['naturalHeight'] || 0x0,
-    resourceDurationMs: _0x40366f ? Math['round'](_0x40366f['duration']) : null,
-    transferBytes: _0x40366f?.['transferSize'] ?? null,
+    width: width['naturalWidth'] || 0x0,
+    height: width['naturalHeight'] || 0x0,
+    resourceDurationMs: resourceDurationMs ? Math['round'](resourceDurationMs['duration']) : null,
+    transferBytes: resourceDurationMs?.['transferSize'] ?? null,
     documentVisible: globalThis['document']?.['visibilityState'] || 'unknown',
   };
 }

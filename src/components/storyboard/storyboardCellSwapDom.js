@@ -1,43 +1,43 @@
-function restorePendingSource(_0x49bc75, _0x579db9, _0x4f6f0d) {
-  if (_0x579db9) _0x49bc75.__storyboardPendingSrc = _0x4f6f0d;
-  else delete _0x49bc75.__storyboardPendingSrc;
+function restorePendingSource(value, item, key) {
+  if (item) value.__storyboardPendingSrc = key;
+  else delete value.__storyboardPendingSrc;
 }
-export function applyImmediateStoryboardCellSwap(_0xa48880, _0x2e7bcd, _0x1c3892) {
-  const _0x270ef = Number(_0x2e7bcd),
-    _0x349a93 = Number(_0x1c3892),
-    _0x46b507 = () => {};
+export function applyImmediateStoryboardCellSwap(list, index, result) {
+  const count = Number(index),
+    count2 = Number(result),
+    revert = () => {};
   if (
-    !Number.isInteger(_0x270ef) ||
-    !Number.isInteger(_0x349a93) ||
-    _0x270ef === _0x349a93 ||
-    _0x270ef < 0 ||
-    _0x349a93 < 0 ||
-    !_0xa48880 ||
-    _0x270ef >= _0xa48880.length ||
-    _0x349a93 >= _0xa48880.length
+    !Number.isInteger(count) ||
+    !Number.isInteger(count2) ||
+    count === count2 ||
+    count < 0 ||
+    count2 < 0 ||
+    !list ||
+    count >= list.length ||
+    count2 >= list.length
   )
-    return { ok: false, revert: _0x46b507 };
-  const _0xb2b150 = _0xa48880[_0x270ef]?.querySelector?.('.cell-content-wrap') || null,
-    _0x5c9cf1 = _0xa48880[_0x349a93]?.querySelector?.('.cell-content-wrap') || null;
-  if (!_0xb2b150 || !_0x5c9cf1) return { ok: false, revert: _0x46b507 };
-  const _0x155a6e = Array.from(_0xb2b150.childNodes || []),
-    _0x3059b6 = Array.from(_0x5c9cf1.childNodes || []),
-    _0x30f24a = _0xb2b150.__storyboardPendingSrc,
-    _0x3fa165 = _0x5c9cf1.__storyboardPendingSrc,
-    _0x5800ff = Object.prototype.hasOwnProperty.call(_0xb2b150, '__storyboardPendingSrc'),
-    _0xeacfac = Object.prototype.hasOwnProperty.call(_0x5c9cf1, '__storyboardPendingSrc');
-  (_0xb2b150.replaceChildren(..._0x3059b6),
-    _0x5c9cf1.replaceChildren(..._0x155a6e),
-    delete _0xb2b150.__storyboardPendingSrc,
-    delete _0x5c9cf1.__storyboardPendingSrc);
-  let _0xef81af = false;
-  const _0x469060 = () => {
-    if (_0xef81af) return;
-    ((_0xef81af = true),
-      _0xb2b150.replaceChildren(..._0x155a6e),
-      _0x5c9cf1.replaceChildren(..._0x3059b6),
-      restorePendingSource(_0xb2b150, _0x5800ff, _0x30f24a),
-      restorePendingSource(_0x5c9cf1, _0xeacfac, _0x3fa165));
+    return { ok: false, revert: revert };
+  const enabled = list[count]?.querySelector?.('.cell-content-wrap') || null,
+    enabled2 = list[count2]?.querySelector?.('.cell-content-wrap') || null;
+  if (!enabled || !enabled2) return { ok: false, revert: revert };
+  const args = Array.from(enabled.childNodes || []),
+    args2 = Array.from(enabled2.childNodes || []),
+    data = enabled.__storyboardPendingSrc,
+    options = enabled2.__storyboardPendingSrc,
+    target = Object.prototype.hasOwnProperty.call(enabled, '__storyboardPendingSrc'),
+    source = Object.prototype.hasOwnProperty.call(enabled2, '__storyboardPendingSrc');
+  (enabled.replaceChildren(...args2),
+    enabled2.replaceChildren(...args),
+    delete enabled.__storyboardPendingSrc,
+    delete enabled2.__storyboardPendingSrc);
+  let next = false;
+  const revert2 = () => {
+    if (next) return;
+    ((next = true),
+      enabled.replaceChildren(...args),
+      enabled2.replaceChildren(...args2),
+      restorePendingSource(enabled, target, data),
+      restorePendingSource(enabled2, source, options));
   };
-  return { ok: true, revert: _0x469060 };
+  return { ok: true, revert: revert2 };
 }

@@ -1,14 +1,14 @@
 import appStore from '../../core/stores/appStore.js';
 import * as generationTaskRuntime from '../../core/generationTaskRuntime.js';
 import nodeRuntimeRegistry_2 from '../../core/nodeRuntimeRegistry.js';
-function resolveWindowObject(_0xb95136) {
-  if (_0xb95136) return _0xb95136;
+function resolveWindowObject(value) {
+  if (value) return value;
   if (typeof window !== 'undefined') return window;
   return null;
 }
 export function createCanvasCommandContext({
-  store: _0x313339 = appStore,
-  graphStore: graphStore = _0x313339,
+  store: store = appStore,
+  graphStore: graphStore = store,
   canvasNodeFlows: canvasNodeFlows = null,
   createNodeAtCursor: createNodeAtCursor = canvasNodeFlows?.createNodeAtCursor,
   executeCommand: executeCommand = null,
@@ -17,13 +17,13 @@ export function createCanvasCommandContext({
   getNodeDefaultSize: getNodeDefaultSize = null,
   getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType = null,
   generationRuntime: generationRuntime = generationTaskRuntime,
-  nodeRuntimeRegistry: _0x9a24a = nodeRuntimeRegistry_2,
+  nodeRuntimeRegistry: nodeRuntimeRegistry = nodeRuntimeRegistry_2,
   windowObject: windowObject = undefined,
   commandRegistry: commandRegistry = null,
   recordCommand: recordCommand = null,
 } = {}) {
   return {
-    store: _0x313339,
+    store: store,
     graphStore: graphStore,
     canvasNodeFlows: canvasNodeFlows,
     createNodeAtCursor: createNodeAtCursor,
@@ -33,7 +33,7 @@ export function createCanvasCommandContext({
     getNodeDefaultSize: getNodeDefaultSize,
     getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType,
     generationRuntime: generationRuntime,
-    nodeRuntimeRegistry: _0x9a24a,
+    nodeRuntimeRegistry: nodeRuntimeRegistry,
     windowObject: resolveWindowObject(windowObject),
     commandRegistry: commandRegistry,
     recordCommand: recordCommand,

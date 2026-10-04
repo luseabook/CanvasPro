@@ -5,45 +5,45 @@ export async function runStoryEpisodeScriptBatchQueue({
   isLive: isLive = () => !![],
   isCancellationRequested: isCancellationRequested = () => ![],
   beforeTarget: beforeTarget = () => {},
-  runTarget: _0x209f3f,
+  runTarget: runTarget,
   afterTarget: afterTarget = () => {},
 } = {}) {
-  const _0x2b7a6b = Array['isArray'](targets) ? [...targets] : [];
-  if (typeof _0x209f3f !== 'function') throw new TypeError('runTarget 必须是函数。');
-  let _0xad1d6c = 0x0;
-  for (let _0x16b1f0 = 0x0; _0x16b1f0 < _0x2b7a6b['length']; _0x16b1f0 += 0x1) {
-    if (!isLive()) return { status: 'interrupted', completed: _0xad1d6c, cancelled: 0x0 };
-    const _0x48b6da = _0x2b7a6b[_0x16b1f0];
+  const total = Array['isArray'](targets) ? [...targets] : [];
+  if (typeof runTarget !== 'function') throw new TypeError('runTarget 必须是函数。');
+  let completed = 0x0;
+  for (let index = 0x0; index < total['length']; index += 0x1) {
+    if (!isLive()) return { status: 'interrupted', completed: completed, cancelled: 0x0 };
+    const target = total[index];
     await beforeTarget({
-      target: _0x48b6da,
-      index: _0x16b1f0,
-      completed: _0xad1d6c,
-      total: _0x2b7a6b['length'],
-      pendingTargets: _0x2b7a6b['slice'](_0x16b1f0),
+      target: target,
+      index: index,
+      completed: completed,
+      total: total['length'],
+      pendingTargets: total['slice'](index),
     });
-    const _0x1645c6 = await _0x209f3f(_0x48b6da, {
-      index: _0x16b1f0,
-      completed: _0xad1d6c,
-      total: _0x2b7a6b['length'],
+    const enabled = await runTarget(target, {
+      index: index,
+      completed: completed,
+      total: total['length'],
     });
-    if (!_0x1645c6 || !isLive()) return { status: 'interrupted', completed: _0xad1d6c, cancelled: 0x0 };
-    _0xad1d6c += 0x1;
-    const _0x1572c6 = Boolean(isCancellationRequested(batchId)),
-      _0x5108a8 = _0x1572c6 ? [] : _0x2b7a6b['slice'](_0xad1d6c);
+    if (!enabled || !isLive()) return { status: 'interrupted', completed: completed, cancelled: 0x0 };
+    completed += 0x1;
+    const cancelRequested = Boolean(isCancellationRequested(batchId)),
+      pendingTargets = cancelRequested ? [] : total['slice'](completed);
     await afterTarget({
-      target: _0x48b6da,
-      index: _0x16b1f0,
-      completed: _0xad1d6c,
-      total: _0x2b7a6b['length'],
-      cancelRequested: _0x1572c6,
-      pendingTargets: _0x5108a8,
+      target: target,
+      index: index,
+      completed: completed,
+      total: total['length'],
+      cancelRequested: cancelRequested,
+      pendingTargets: pendingTargets,
     });
-    if (_0x1572c6)
+    if (cancelRequested)
       return {
         status: 'cancelled',
-        completed: _0xad1d6c,
-        cancelled: Math['max'](0x0, _0x2b7a6b['length'] - _0xad1d6c),
+        completed: completed,
+        cancelled: Math['max'](0x0, total['length'] - completed),
       };
   }
-  return { status: 'completed', completed: _0xad1d6c, cancelled: 0x0 };
+  return { status: 'completed', completed: completed, cancelled: 0x0 };
 }

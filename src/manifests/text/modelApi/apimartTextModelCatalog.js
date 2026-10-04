@@ -40,13 +40,13 @@ export const apimartAdditionalTextModels = Object['freeze'](
       icon: 'deepseek',
       mediaPolicy: 'text-only',
     },
-  ]['map']((_0x1c7946, _0x5ec125) =>
+  ]['map']((args, value) =>
     Object['freeze']({
-      ..._0x1c7946,
-      modelId: 'apimart/' + _0x1c7946['model'],
-      executionId: 'apimart.model-api.text.' + _0x1c7946['model']['replaceAll']('.', '-') + '.v1',
+      ...args,
+      modelId: 'apimart/' + args['model'],
+      executionId: 'apimart.model-api.text.' + args['model']['replaceAll']('.', '-') + '.v1',
       subtitle: 'APIMart\x20chat\x20completion\x20model\x20API',
-      order: 0x5a + _0x5ec125,
+      order: 0x5a + value,
     }),
   ),
 );

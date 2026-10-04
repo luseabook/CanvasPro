@@ -1,1 +1,63 @@
-import{describeGraphMutation}from'./graphMutationImpact.js';const MUTATIONS=new Set(["addNode","updateNodePosition","moveNodes","moveNodesByOffsets","deleteNodes",'updateNodeData',"updateNodesData","swapStoryboardCells","addEdge","removeEdge","updateEdgesBatch","groupNodes","renameNode"]),REPLACEMENTS=new Set(["loadState",'loadHistorySnapshot','hydrate',"hydrateTrustedSnapshot"]);export function withGraphMutationBoundary(_0x3a2adb){let _0x50a011=null,_0x14f566=0x0;const _0x43232d={..._0x3a2adb};for(const _0x226dbc of[...MUTATIONS,...REPLACEMENTS]){if(typeof _0x3a2adb[_0x226dbc]!=="function")continue;_0x43232d[_0x226dbc]=(..._0x4eb22d)=>{const _0xee17a2=_0x14f566?null:_0x50a011,_0x26de94=_0xee17a2&&MUTATIONS["has"](_0x226dbc)?describeGraphMutation(_0x226dbc,_0x4eb22d,_0x3a2adb["getStateRaw"]()):null;if(REPLACEMENTS['has'](_0x226dbc)){if(_0xee17a2?.["beforeReplace"]?.(_0x226dbc,_0x4eb22d)===![])throw new Error("请先完成协作同步或结束当前生成任务");}else{if(_0xee17a2?.["before"]?.(_0x26de94)===![])throw new Error("当前协作画布不可编辑，或节点正在被其他成员编辑");}const _0x3ee52d=_0x3a2adb[_0x226dbc](..._0x4eb22d);if(MUTATIONS["has"](_0x226dbc))_0xee17a2?.["after"]?.(_0x26de94);return _0x3ee52d;};}return _0x43232d["setGraphMutationPolicy"]=_0x16beed=>{if(_0x16beed&&_0x50a011&&_0x16beed!==_0x50a011)throw new Error("Graph mutation policy already installed");return _0x50a011=_0x16beed,()=>{if(_0x50a011===_0x16beed)_0x50a011=null;};},_0x43232d["getGraphMutationPolicy"]=()=>_0x50a011,_0x43232d["withGraphMutationBypass"]=_0x98c998=>{_0x14f566+=0x1;try{return _0x98c998();}finally{_0x14f566-=0x1;}},_0x43232d;}
+import { describeGraphMutation } from './graphMutationImpact.js';
+const MUTATIONS = new Set([
+    'addNode',
+    'updateNodePosition',
+    'moveNodes',
+    'moveNodesByOffsets',
+    'deleteNodes',
+    'updateNodeData',
+    'updateNodesData',
+    'swapStoryboardCells',
+    'addEdge',
+    'removeEdge',
+    'updateEdgesBatch',
+    'groupNodes',
+    'renameNode',
+  ]),
+  REPLACEMENTS = new Set(['loadState', 'loadHistorySnapshot', 'hydrate', 'hydrateTrustedSnapshot']);
+export function withGraphMutationBoundary(args) {
+  let value = null,
+    item = 0x0;
+  const key = { ...args };
+  for (const index of [...MUTATIONS, ...REPLACEMENTS]) {
+    if (typeof args[index] !== 'function') continue;
+    key[index] = (...args2) => {
+      const result = item ? null : value,
+        data =
+          result && MUTATIONS['has'](index)
+            ? describeGraphMutation(index, args2, args['getStateRaw']())
+            : null;
+      if (REPLACEMENTS['has'](index)) {
+        if (result?.['beforeReplace']?.(index, args2) === ![])
+          throw new Error('请先完成协作同步或结束当前生成任务');
+      } else {
+        if (result?.['before']?.(data) === ![])
+          throw new Error('当前协作画布不可编辑，或节点正在被其他成员编辑');
+      }
+      const options = args[index](...args2);
+      if (MUTATIONS['has'](index)) result?.['after']?.(data);
+      return options;
+    };
+  }
+  return (
+    (key['setGraphMutationPolicy'] = (target) => {
+      if (target && value && target !== value) throw new Error('Graph mutation policy already installed');
+      return (
+        (value = target),
+        () => {
+          if (value === target) value = null;
+        }
+      );
+    }),
+    (key['getGraphMutationPolicy'] = () => value),
+    (key['withGraphMutationBypass'] = (handler) => {
+      item += 0x1;
+      try {
+        return handler();
+      } finally {
+        item -= 0x1;
+      }
+    }),
+    key
+  );
+}
