@@ -1,12 +1,12 @@
 # 孤立模块清单（已落地但从入口不可达）
 
-> 由 `docs/TRACKING.md` 维护。**本表是 2026-09-28 第 126 批的实测结果**，不再是按批次累加的估算：
+> 由 `docs/TRACKING.md` 维护。**本表是 2026-09-28 第 126 批的实测结果**（第 150 批接线后删 9 件、重算 474 / 1238），不再是按批次累加的估算：
 > 从 `index.html` 的 `<script type="module">`、`package.json` 的 `main`（`electron/main.js`）、以及按运行期加载约定补的入口（`electron/*preload*.cjs`、`db/migrations/*.cjs`、`knexfile.cjs`、`main.js`）出发，
 > 沿相对 `import` / `export … from` / 动态 `import()` / `new URL("…js", import.meta.url)` 做全图遍历，走不到的非测试 JS 模块都列在这里。
 > 脚本与证据：`deobf-tools/b126/reach.mjs`、`reach-report.txt`、`reach-orphans.json`；方法说明见 `docs/b126-reachability.md`。
 
 > scope：**1238** 个非测试 JS 模块（`src/`、`api/`、`electron/`、`db/` 加根级 `*.js`/`*.cjs`；排除 `*.test.js` / `*_test.js` / `*.spec.js`、`node_modules/`、`deobfuscated/`、`vendor/`、`user/`、`data/`、`output/`、`build/`、`dist/`、`tools/`、`backend/`）。
-> 可达 **755** / 孤立 **483** / 断链 **0** / 解析失败 **0**（断链为 0 说明整个仓库的相对 import 都能解析到实际文件）。
+> 可达 **764** / 孤立 **474** / 断链 **0** / 解析失败 **0**（断链为 0 说明整个仓库的相对 import 都能解析到实际文件）。第 150 批接线 9 件后重算：canvasCommands 组 4 件清零、panoramaSceneNode 组 5 件接通。
 > 另有 5 个 `vendor/three/**` 文件可达，不计入 scope。
 
 > 某个模块接线后，从本表删掉它，并同步 `docs/TRACKING.md` §5 的计数。重算：`node deobf-tools/b126/reach.mjs`。
@@ -23,7 +23,7 @@
 | `src/services/` | 19 |
 | `electron/` | 18 |
 | `src/modules/app/` | 18 |
-| `src/modules/panoramaSceneNode/` | 10 |
+| `src/modules/panoramaSceneNode/` | 5 |
 | `src/core/` | 9 |
 | `src/modules/settings/` | 8 |
 | `src/modules/runninghubAiApp/` | 7 |
@@ -31,7 +31,6 @@
 | `api/` | 4 |
 | `api/utils/` | 4 |
 | `src/hooks/` | 4 |
-| `src/modules/canvasCommands/` | 4 |
 | `src/modules/nodeManager/` | 4 |
 | `src/modules/videoRetake/` | 4 |
 | `src/utils/` | 4 |
@@ -91,9 +90,9 @@ appWindowSizePolicy.js、backendStartupMonitor.js、canvasRuntimeMode.js、chrom
 
 agentMaterialUpload.js、apiConfigAutoSave.js、appActivityTracking.js、appCanvasDropImport.js、appDebugApis.js、appTopbarCustomProviderPresentation.js、canvasWorkspacePresentation.js、comfyUiConnectionSettings.js、completionNavigation.js、globalScreenshotBridge.js、iconButtonMotion.js、modelCatalogProviderCard.js、nativeContextMenuGuard.js、projectContext.js、providerStatusTooltipController.js、sourceNodeNameBackfill.js、subscriptionStateWatcher.js、workspaceCacheIdleScheduler.js
 
-## `src/modules/panoramaSceneNode/`（10）
+## `src/modules/panoramaSceneNode/`（5）
 
-articulatedCharacterModel.js、cameraTimeline.js、characterBodyProfile.js、poseCatalog.js、scene3dGizmoVisual.js、scene3dPanoramaBridgeTexture.js、scene3dPanoramaTexture.js、scene3dProceduralAssetVisual.js、sceneAssetCatalog.js、transformInteractionAdapter.js
+cameraTimeline.js、poseCatalog.js、scene3dProceduralAssetVisual.js、sceneAssetCatalog.js、transformInteractionAdapter.js
 
 ## `src/core/`（9）
 
@@ -122,10 +121,6 @@ storyAssetPublicText.js、storyGenerationValues.js、storySceneIdentity.js、str
 ## `src/hooks/`（4）
 
 index.js、useHistory.js、useSelection.js、useViewport.js
-
-## `src/modules/canvasCommands/`（4）
-
-mediaToolCommands.js、nodeExportCommands.js、storyboardCommands.js、taskCommands.js
 
 ## `src/modules/nodeManager/`（4）
 
