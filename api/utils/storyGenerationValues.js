@@ -1,10 +1,10 @@
-export function normalizeText(_0x529ca3) {
-  return String(_0x529ca3 || '')['trim']();
+export function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-export function normalizeStringArray(_0x148f2c) {
-  return Array['isArray'](_0x148f2c) ? [...new Set(_0x148f2c['map'](normalizeText)['filter'](Boolean))] : [];
+export function normalizeStringArray(list) {
+  return Array['isArray'](list) ? [...new Set(list['map'](normalizeText)['filter'](Boolean))] : [];
 }
-export function normalizePositiveNumber(_0x3e0665) {
-  const _0x1753c0 = Number(_0x3e0665);
-  return Number['isFinite'](_0x1753c0) && _0x1753c0 > 0x0 ? _0x1753c0 : 0x0;
+export function normalizePositiveNumber(item) {
+  const count = Number(item);
+  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
 }

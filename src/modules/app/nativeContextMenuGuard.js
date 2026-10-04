@@ -1,12 +1,12 @@
-export function installNativeContextMenuGuard(_0x2bc96a = globalThis['window']) {
-  if (!_0x2bc96a?.['addEventListener']) return () => {};
-  const _0x8d0001 = (_0x1902b8) => {
-    _0x1902b8?.['preventDefault']?.();
+export function installNativeContextMenuGuard(el = globalThis['window']) {
+  if (!el?.['addEventListener']) return () => {};
+  const value = (item) => {
+    item?.['preventDefault']?.();
   };
   return (
-    _0x2bc96a['addEventListener']('contextmenu', _0x8d0001),
+    el['addEventListener']('contextmenu', value),
     () => {
-      _0x2bc96a['removeEventListener']?.('contextmenu', _0x8d0001);
+      el['removeEventListener']?.('contextmenu', value);
     }
   );
 }

@@ -25,6 +25,10 @@ for (const [from, to] of Object.entries(mapping)) {
     console.error('mapping value is not a plain identifier: ' + from + ' -> ' + String(to));
     process.exit(2);
   }
+  if (/^_0x[0-9a-f]{4,}$/.test(to)) {
+    console.error('mapping value is itself an obfuscated name: ' + from + ' -> ' + to);
+    process.exit(2);
+  }
 }
 
 const source = fs.readFileSync(targetPath, 'utf8');

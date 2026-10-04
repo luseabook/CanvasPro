@@ -1,4 +1,4 @@
-export function isStoryCollaborationProject(_0x11759f) {
-  const _0x17bd8a = _0x11759f?.['project']?.['collaboration']?.['stage'];
-  return _0x17bd8a === 'writing' || _0x17bd8a === 'confirmed';
+export function isStoryCollaborationProject(value) {
+  const item = value?.['project']?.['collaboration']?.['stage'];
+  return item === 'writing' || item === 'confirmed';
 }

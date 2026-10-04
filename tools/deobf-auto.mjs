@@ -117,6 +117,40 @@ function main() {
   for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*(?:===|!==|==|!=|<=|>=|<|>)\s*[0-9]/g)) comparedToNumber.add(match[1]);
   for (const match of source.matchAll(/!\s*(_0x[0-9a-f]{4,})\b/g)) booleanOnly.add(match[1]);
 
+  // Shape evidence: a literal or constructor on the right hand side, or the
+  // default value of a parameter, says more than a bare fallback name.
+  const shape = new Map();
+  const setShape = (name, kind) => {
+    if (!shape.has(name)) shape.set(name, kind);
+  };
+  const SHAPE_PATTERNS = [
+    [/=\s*new Map\s*\(/, 'map'],
+    [/=\s*new Set\s*\(/, 'set'],
+    [/=\s*new WeakMap\s*\(/, 'weakMap'],
+    [/=\s*\[\]/, 'list'],
+    [/=\s*\{\}/, 'object'],
+    [/=\s*''/, 'text'],
+    [/=\s*(?:!\[\]|false)\b/, 'enabled'],
+    [/=\s*(?:0x0|0)\b/, 'count'],
+    [/=\s*document\s*\./, 'el'],
+    [/=\s*new Error\s*\(/, 'error'],
+  ];
+  for (const [pattern, kind] of SHAPE_PATTERNS) {
+    const finder = new RegExp('\\b(_0x[0-9a-f]{4,})\\s*' + pattern.source.slice(1), 'g');
+    for (const match of source.matchAll(finder)) setShape(match[1], kind);
+  }
+  for (const match of source.matchAll(/\(\s*(_0x[0-9a-f]{4,})\s*=\s*(\{\}|\[\]|null|!\[\])\s*[,)]/g)) {
+    setShape(match[1], { '{}': 'options', '[]': 'list', null: 'value', '![]': 'enabled' }[match[2]]);
+  }
+  // Callback parameters of the array helpers iterate items.
+  const callbackParam = new Set();
+  for (const match of source.matchAll(/\.(?:map|filter|forEach|some|every|find|findIndex|reduce|flatMap|sort)\s*\(\s*(?:\(\s*)?(_0x[0-9a-f]{4,})\b/g)) {
+    callbackParam.add(match[1]);
+  }
+  // Anything holding the canvas node table is store state.
+  const stateLike = new Set();
+  for (const match of source.matchAll(/\b(_0x[0-9a-f]{4,})\s*\[\s*'(?:nodes|edges|selectedNodeIds)'\s*\]/g)) stateLike.add(match[1]);
+
   const used = new Set();
   const map = {};
   const reasons = {};
@@ -162,7 +196,7 @@ function main() {
     if (fromFactory.has(name)) {
       const callee = fromFactory.get(name);
       const isBuiltin = /^(String|Number|Boolean|Array|Object|JSON|Math|Date|Set|Map|WeakMap|Promise|parseInt|parseFloat)$/.test(callee);
-      if (!isBuiltin) {
+      if (!isBuiltin && !/^_0x/.test(callee)) {
         // `urlToLocalPath` -> LocalPath, `normalizeLocalPath` -> LocalPath,
         // `firstNode` -> Node; keep the noun's original casing.
         let stem = callee.replace(/^[a-z][A-Za-z0-9]*To(?=[A-Z])/, '');
@@ -185,6 +219,25 @@ function main() {
     if (comparedToNumber.has(name)) {
       map[name] = unique('count', used);
       reasons[name] = 'compared with a number';
+      continue;
+    }
+
+    if (stateLike.has(name)) {
+      map[name] = unique('state', used);
+      reasons[name] = 'holds nodes/edges';
+      continue;
+    }
+
+    if (shape.has(name)) {
+      const kind = shape.get(name);
+      map[name] = unique(kind, used);
+      reasons[name] = 'shape: ' + kind;
+      continue;
+    }
+
+    if (callbackParam.has(name)) {
+      map[name] = unique('item', used);
+      reasons[name] = 'array callback parameter';
       continue;
     }
 

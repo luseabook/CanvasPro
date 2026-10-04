@@ -7,7 +7,7 @@ export function getCustomTextModels() {
     return [];
   }
 }
-export function saveCustomTextModels(_0x41340f) {
+export function saveCustomTextModels(value) {
   if (typeof localStorage === 'undefined') return;
-  localStorage.setItem(CUSTOM_TEXT_MODELS_KEY, JSON.stringify(_0x41340f));
+  localStorage.setItem(CUSTOM_TEXT_MODELS_KEY, JSON.stringify(value));
 }

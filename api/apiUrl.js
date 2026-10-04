@@ -4,10 +4,10 @@ export function getApiBase() {
   } catch {}
   return '';
 }
-export function buildApiUrl(_0x174b15) {
-  const _0x1a7c60 = getApiBase(),
-    _0xbda103 = String(_0x174b15 || '');
-  if (!_0xbda103) return _0x1a7c60 || '';
-  if (!_0xbda103.startsWith('/')) return _0x1a7c60 + '/' + _0xbda103;
-  return '' + _0x1a7c60 + _0xbda103;
+export function buildApiUrl(value) {
+  const apiBase = getApiBase(),
+    enabled = String(value || '');
+  if (!enabled) return apiBase || '';
+  if (!enabled.startsWith('/')) return apiBase + '/' + enabled;
+  return '' + apiBase + enabled;
 }

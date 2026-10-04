@@ -6,8 +6,8 @@ export async function fetchStoryWorkspaceFromServer() {
     provider: 'local',
   });
 }
-export async function saveStoryWorkspaceToServer(_0x39187d) {
-  return await post(STORY_WORKSPACE_USER_FILE, _0x39187d || {}, {
+export async function saveStoryWorkspaceToServer(value) {
+  return await post(STORY_WORKSPACE_USER_FILE, value || {}, {
     provider: 'local',
   });
 }

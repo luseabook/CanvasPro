@@ -4,9 +4,9 @@ export const WEB_PREVIEW_MIN_SIZE = Object.freeze({
   width: WEB_PREVIEW_MIN_WIDTH,
   height: WEB_PREVIEW_MIN_HEIGHT,
 });
-export function clampWebPreviewNodeSize(_0xc76fc3 = {}) {
+export function clampWebPreviewNodeSize(box = {}) {
   return {
-    width: Math.max(WEB_PREVIEW_MIN_WIDTH, Number(_0xc76fc3.width) || 0),
-    height: Math.max(WEB_PREVIEW_MIN_HEIGHT, Number(_0xc76fc3.height) || 0),
+    width: Math.max(WEB_PREVIEW_MIN_WIDTH, Number(box.width) || 0),
+    height: Math.max(WEB_PREVIEW_MIN_HEIGHT, Number(box.height) || 0),
   };
 }

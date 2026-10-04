@@ -1,15 +1,15 @@
 import { normalizeTutorialCatalog } from './tutorialCatalog.js';
 const KEY = 'aicanvas.tutorial-content.v1';
-export function readTutorialCache(_0x358173) {
+export function readTutorialCache(value) {
   try {
-    return normalizeTutorialCatalog(JSON['parse'](_0x358173['getItem'](KEY)));
+    return normalizeTutorialCatalog(JSON['parse'](value['getItem'](KEY)));
   } catch {
     return null;
   }
 }
-export function writeTutorialCache(_0x5146bc, _0x612fb2) {
+export function writeTutorialCache(item, key) {
   try {
-    return (_0x5146bc['setItem'](KEY, JSON['stringify'](normalizeTutorialCatalog(_0x612fb2))), !![]);
+    return (item['setItem'](KEY, JSON['stringify'](normalizeTutorialCatalog(key))), !![]);
   } catch {
     return ![];
   }

@@ -1,4 +1,4 @@
-export function containWorkspaceContextMenu(_0x1d77c1) {
-  if (!_0x1d77c1) return ![];
-  return (_0x1d77c1['preventDefault']?.(), _0x1d77c1['stopPropagation']?.(), !![]);
+export function containWorkspaceContextMenu(event) {
+  if (!event) return ![];
+  return (event['preventDefault']?.(), event['stopPropagation']?.(), !![]);
 }
