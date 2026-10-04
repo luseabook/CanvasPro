@@ -1,523 +1,955 @@
 import {
-  BufferGeometry,
-  FileLoader,
-  Float32BufferAttribute,
-  Group,
-  LineBasicMaterial,
-  LineSegments,
-  Loader,
-  Material,
-  Mesh,
-  MeshPhongMaterial,
-  Points,
-  PointsMaterial,
-  Vector3,
-  Color,
-  SRGBColorSpace,
+	BufferGeometry,
+	FileLoader,
+	Float32BufferAttribute,
+	Group,
+	LineBasicMaterial,
+	LineSegments,
+	Loader,
+	Material,
+	Mesh,
+	MeshPhongMaterial,
+	Points,
+	PointsMaterial,
+	Vector3,
+	Color,
+	SRGBColorSpace
 } from '../../../three.module.js';
-const _object_pattern = /^[og]\s*(.+)?/,
-  _material_library_pattern = /^mtllib /,
-  _material_use_pattern = /^usemtl /,
-  _map_use_pattern = /^usemap /,
-  _face_vertex_data_separator_pattern = /\s+/,
-  _vA = new Vector3(),
-  _vB = new Vector3(),
-  _vC = new Vector3(),
-  _ab = new Vector3(),
-  _cb = new Vector3(),
-  _color = new Color();
+
+// o object_name | g group_name
+const _object_pattern = /^[og]\s*(.+)?/;
+// mtllib file_reference
+const _material_library_pattern = /^mtllib /;
+// usemtl material_name
+const _material_use_pattern = /^usemtl /;
+// usemap map_name
+const _map_use_pattern = /^usemap /;
+const _face_vertex_data_separator_pattern = /\s+/;
+
+const _vA = new Vector3();
+const _vB = new Vector3();
+const _vC = new Vector3();
+
+const _ab = new Vector3();
+const _cb = new Vector3();
+
+const _color = new Color();
+
 function ParserState() {
-  const _0x496982 = {
-    objects: [],
-    object: {},
-    vertices: [],
-    normals: [],
-    colors: [],
-    uvs: [],
-    materials: {},
-    materialLibraries: [],
-    startObject: function (_0x2b2c56, _0x5a620e) {
-      if (this['object'] && this['object']['fromDeclaration'] === ![]) {
-        ((this['object']['name'] = _0x2b2c56), (this['object']['fromDeclaration'] = _0x5a620e !== ![]));
-        return;
-      }
-      const _0x263103 =
-        this['object'] && typeof this['object']['currentMaterial'] === 'function'
-          ? this['object']['currentMaterial']()
-          : undefined;
-      this['object'] &&
-        typeof this['object']['_finalize'] === 'function' &&
-        this['object']['_finalize'](!![]);
-      this['object'] = {
-        name: _0x2b2c56 || '',
-        fromDeclaration: _0x5a620e !== ![],
-        geometry: { vertices: [], normals: [], colors: [], uvs: [], hasUVIndices: ![] },
-        materials: [],
-        smooth: !![],
-        startMaterial: function (_0x7c3845, _0x175b70) {
-          const _0x4b08b7 = this['_finalize'](![]);
-          _0x4b08b7 &&
-            (_0x4b08b7['inherited'] || _0x4b08b7['groupCount'] <= 0x0) &&
-            this['materials']['splice'](_0x4b08b7['index'], 0x1);
-          const _0x22808b = {
-            index: this['materials']['length'],
-            name: _0x7c3845 || '',
-            mtllib:
-              Array['isArray'](_0x175b70) && _0x175b70['length'] > 0x0
-                ? _0x175b70[_0x175b70['length'] - 0x1]
-                : '',
-            smooth: _0x4b08b7 !== undefined ? _0x4b08b7['smooth'] : this['smooth'],
-            groupStart: _0x4b08b7 !== undefined ? _0x4b08b7['groupEnd'] : 0x0,
-            groupEnd: -0x1,
-            groupCount: -0x1,
-            inherited: ![],
-            clone: function (_0x5cd311) {
-              const _0x57a0f9 = {
-                index: typeof _0x5cd311 === 'number' ? _0x5cd311 : this['index'],
-                name: this['name'],
-                mtllib: this['mtllib'],
-                smooth: this['smooth'],
-                groupStart: 0x0,
-                groupEnd: -0x1,
-                groupCount: -0x1,
-                inherited: ![],
-              };
-              return ((_0x57a0f9['clone'] = this['clone']['bind'](_0x57a0f9)), _0x57a0f9);
-            },
-          };
-          return (this['materials']['push'](_0x22808b), _0x22808b);
-        },
-        currentMaterial: function () {
-          if (this['materials']['length'] > 0x0) return this['materials'][this['materials']['length'] - 0x1];
-          return undefined;
-        },
-        _finalize: function (_0x43286d) {
-          const _0x4c3d6d = this['currentMaterial']();
-          _0x4c3d6d &&
-            _0x4c3d6d['groupEnd'] === -0x1 &&
-            ((_0x4c3d6d['groupEnd'] = this['geometry']['vertices']['length'] / 0x3),
-            (_0x4c3d6d['groupCount'] = _0x4c3d6d['groupEnd'] - _0x4c3d6d['groupStart']),
-            (_0x4c3d6d['inherited'] = ![]));
-          if (_0x43286d && this['materials']['length'] > 0x1)
-            for (let _0x2b166d = this['materials']['length'] - 0x1; _0x2b166d >= 0x0; _0x2b166d--) {
-              this['materials'][_0x2b166d]['groupCount'] <= 0x0 &&
-                this['materials']['splice'](_0x2b166d, 0x1);
-            }
-          return (
-            _0x43286d &&
-              this['materials']['length'] === 0x0 &&
-              this['materials']['push']({ name: '', smooth: this['smooth'] }),
-            _0x4c3d6d
-          );
-        },
-      };
-      if (_0x263103 && _0x263103['name'] && typeof _0x263103['clone'] === 'function') {
-        const _0x21bb78 = _0x263103['clone'](0x0);
-        ((_0x21bb78['inherited'] = !![]), this['object']['materials']['push'](_0x21bb78));
-      }
-      this['objects']['push'](this['object']);
-    },
-    finalize: function () {
-      this['object'] &&
-        typeof this['object']['_finalize'] === 'function' &&
-        this['object']['_finalize'](!![]);
-    },
-    parseVertexIndex: function (_0x511027, _0x57016e) {
-      const _0x459c43 = parseInt(_0x511027, 0xa);
-      return (_0x459c43 >= 0x0 ? _0x459c43 - 0x1 : _0x459c43 + _0x57016e / 0x3) * 0x3;
-    },
-    parseNormalIndex: function (_0x53f003, _0x512611) {
-      const _0x157d1d = parseInt(_0x53f003, 0xa);
-      return (_0x157d1d >= 0x0 ? _0x157d1d - 0x1 : _0x157d1d + _0x512611 / 0x3) * 0x3;
-    },
-    parseUVIndex: function (_0xb2d94f, _0x3488e5) {
-      const _0x1ff6bc = parseInt(_0xb2d94f, 0xa);
-      return (_0x1ff6bc >= 0x0 ? _0x1ff6bc - 0x1 : _0x1ff6bc + _0x3488e5 / 0x2) * 0x2;
-    },
-    addVertex: function (_0x441be8, _0x5ba25e, _0x261766) {
-      const _0x360832 = this['vertices'],
-        _0x36221c = this['object']['geometry']['vertices'];
-      (_0x36221c['push'](_0x360832[_0x441be8 + 0x0], _0x360832[_0x441be8 + 0x1], _0x360832[_0x441be8 + 0x2]),
-        _0x36221c['push'](_0x360832[_0x5ba25e + 0x0], _0x360832[_0x5ba25e + 0x1], _0x360832[_0x5ba25e + 0x2]),
-        _0x36221c['push'](
-          _0x360832[_0x261766 + 0x0],
-          _0x360832[_0x261766 + 0x1],
-          _0x360832[_0x261766 + 0x2],
-        ));
-    },
-    addVertexPoint: function (_0x1e6b41) {
-      const _0x1a43c1 = this['vertices'],
-        _0x210c2d = this['object']['geometry']['vertices'];
-      _0x210c2d['push'](_0x1a43c1[_0x1e6b41 + 0x0], _0x1a43c1[_0x1e6b41 + 0x1], _0x1a43c1[_0x1e6b41 + 0x2]);
-    },
-    addVertexLine: function (_0x244b1f) {
-      const _0x234f4e = this['vertices'],
-        _0xe40233 = this['object']['geometry']['vertices'];
-      _0xe40233['push'](_0x234f4e[_0x244b1f + 0x0], _0x234f4e[_0x244b1f + 0x1], _0x234f4e[_0x244b1f + 0x2]);
-    },
-    addNormal: function (_0x544c24, _0x255a2b, _0x52c017) {
-      const _0x12c26e = this['normals'],
-        _0xe88b17 = this['object']['geometry']['normals'];
-      (_0xe88b17['push'](_0x12c26e[_0x544c24 + 0x0], _0x12c26e[_0x544c24 + 0x1], _0x12c26e[_0x544c24 + 0x2]),
-        _0xe88b17['push'](_0x12c26e[_0x255a2b + 0x0], _0x12c26e[_0x255a2b + 0x1], _0x12c26e[_0x255a2b + 0x2]),
-        _0xe88b17['push'](
-          _0x12c26e[_0x52c017 + 0x0],
-          _0x12c26e[_0x52c017 + 0x1],
-          _0x12c26e[_0x52c017 + 0x2],
-        ));
-    },
-    addFaceNormal: function (_0x364c57, _0x180a43, _0xc1adbc) {
-      const _0x253c29 = this['vertices'],
-        _0x5936e1 = this['object']['geometry']['normals'];
-      (_vA['fromArray'](_0x253c29, _0x364c57),
-        _vB['fromArray'](_0x253c29, _0x180a43),
-        _vC['fromArray'](_0x253c29, _0xc1adbc),
-        _cb['subVectors'](_vC, _vB),
-        _ab['subVectors'](_vA, _vB),
-        _cb['cross'](_ab),
-        _cb['normalize'](),
-        _0x5936e1['push'](_cb['x'], _cb['y'], _cb['z']),
-        _0x5936e1['push'](_cb['x'], _cb['y'], _cb['z']),
-        _0x5936e1['push'](_cb['x'], _cb['y'], _cb['z']));
-    },
-    addColor: function (_0xd2372a, _0x59556b, _0x571683) {
-      const _0x5d0daa = this['colors'],
-        _0x174d4c = this['object']['geometry']['colors'];
-      if (_0x5d0daa[_0xd2372a] !== undefined)
-        _0x174d4c['push'](_0x5d0daa[_0xd2372a + 0x0], _0x5d0daa[_0xd2372a + 0x1], _0x5d0daa[_0xd2372a + 0x2]);
-      if (_0x5d0daa[_0x59556b] !== undefined)
-        _0x174d4c['push'](_0x5d0daa[_0x59556b + 0x0], _0x5d0daa[_0x59556b + 0x1], _0x5d0daa[_0x59556b + 0x2]);
-      if (_0x5d0daa[_0x571683] !== undefined)
-        _0x174d4c['push'](_0x5d0daa[_0x571683 + 0x0], _0x5d0daa[_0x571683 + 0x1], _0x5d0daa[_0x571683 + 0x2]);
-    },
-    addUV: function (_0x20db2c, _0x17504d, _0x57038c) {
-      const _0x5b2213 = this['uvs'],
-        _0x378fed = this['object']['geometry']['uvs'];
-      (_0x378fed['push'](_0x5b2213[_0x20db2c + 0x0], _0x5b2213[_0x20db2c + 0x1]),
-        _0x378fed['push'](_0x5b2213[_0x17504d + 0x0], _0x5b2213[_0x17504d + 0x1]),
-        _0x378fed['push'](_0x5b2213[_0x57038c + 0x0], _0x5b2213[_0x57038c + 0x1]));
-    },
-    addDefaultUV: function () {
-      const _0x3f7db3 = this['object']['geometry']['uvs'];
-      (_0x3f7db3['push'](0x0, 0x0), _0x3f7db3['push'](0x0, 0x0), _0x3f7db3['push'](0x0, 0x0));
-    },
-    addUVLine: function (_0x4760b2) {
-      const _0x496222 = this['uvs'],
-        _0x288ceb = this['object']['geometry']['uvs'];
-      _0x288ceb['push'](_0x496222[_0x4760b2 + 0x0], _0x496222[_0x4760b2 + 0x1]);
-    },
-    addFace: function (
-      _0x5833c3,
-      _0x4c231c,
-      _0x6d0ba1,
-      _0x37e8d9,
-      _0x296e4d,
-      _0x130862,
-      _0x186c91,
-      _0x6c0851,
-      _0x4d5d14,
-    ) {
-      const _0x4d74a0 = this['vertices']['length'];
-      let _0x161ac8 = this['parseVertexIndex'](_0x5833c3, _0x4d74a0),
-        _0xda16e7 = this['parseVertexIndex'](_0x4c231c, _0x4d74a0),
-        _0x208219 = this['parseVertexIndex'](_0x6d0ba1, _0x4d74a0);
-      (this['addVertex'](_0x161ac8, _0xda16e7, _0x208219), this['addColor'](_0x161ac8, _0xda16e7, _0x208219));
-      if (_0x186c91 !== undefined && _0x186c91 !== '') {
-        const _0x201d40 = this['normals']['length'];
-        ((_0x161ac8 = this['parseNormalIndex'](_0x186c91, _0x201d40)),
-          (_0xda16e7 = this['parseNormalIndex'](_0x6c0851, _0x201d40)),
-          (_0x208219 = this['parseNormalIndex'](_0x4d5d14, _0x201d40)),
-          this['addNormal'](_0x161ac8, _0xda16e7, _0x208219));
-      } else this['addFaceNormal'](_0x161ac8, _0xda16e7, _0x208219);
-      if (_0x37e8d9 !== undefined && _0x37e8d9 !== '') {
-        const _0x102a2d = this['uvs']['length'];
-        ((_0x161ac8 = this['parseUVIndex'](_0x37e8d9, _0x102a2d)),
-          (_0xda16e7 = this['parseUVIndex'](_0x296e4d, _0x102a2d)),
-          (_0x208219 = this['parseUVIndex'](_0x130862, _0x102a2d)),
-          this['addUV'](_0x161ac8, _0xda16e7, _0x208219),
-          (this['object']['geometry']['hasUVIndices'] = !![]));
-      } else this['addDefaultUV']();
-    },
-    addPointGeometry: function (_0x205c50) {
-      this['object']['geometry']['type'] = 'Points';
-      const _0x1d3315 = this['vertices']['length'];
-      for (let _0x2a2dec = 0x0, _0x3d0aa4 = _0x205c50['length']; _0x2a2dec < _0x3d0aa4; _0x2a2dec++) {
-        const _0x10833b = this['parseVertexIndex'](_0x205c50[_0x2a2dec], _0x1d3315);
-        (this['addVertexPoint'](_0x10833b), this['addColor'](_0x10833b));
-      }
-    },
-    addLineGeometry: function (_0x3d2ad4, _0x548abc) {
-      this['object']['geometry']['type'] = 'Line';
-      const _0x237eb0 = this['vertices']['length'],
-        _0x12eb29 = this['uvs']['length'];
-      for (let _0x52d130 = 0x0, _0x9bf314 = _0x3d2ad4['length']; _0x52d130 < _0x9bf314; _0x52d130++) {
-        this['addVertexLine'](this['parseVertexIndex'](_0x3d2ad4[_0x52d130], _0x237eb0));
-      }
-      for (let _0x3ba76c = 0x0, _0x2d7729 = _0x548abc['length']; _0x3ba76c < _0x2d7729; _0x3ba76c++) {
-        this['addUVLine'](this['parseUVIndex'](_0x548abc[_0x3ba76c], _0x12eb29));
-      }
-    },
-  };
-  return (_0x496982['startObject']('', ![]), _0x496982);
+
+	const state = {
+		objects: [],
+		object: {},
+
+		vertices: [],
+		normals: [],
+		colors: [],
+		uvs: [],
+
+		materials: {},
+		materialLibraries: [],
+
+		startObject: function ( name, fromDeclaration ) {
+
+			// If the current object (initial from reset) is not from a g/o declaration in the parsed
+			// file. We need to use it for the first parsed g/o to keep things in sync.
+			if ( this.object && this.object.fromDeclaration === false ) {
+
+				this.object.name = name;
+				this.object.fromDeclaration = ( fromDeclaration !== false );
+				return;
+
+			}
+
+			const previousMaterial = ( this.object && typeof this.object.currentMaterial === 'function' ? this.object.currentMaterial() : undefined );
+
+			if ( this.object && typeof this.object._finalize === 'function' ) {
+
+				this.object._finalize( true );
+
+			}
+
+			this.object = {
+				name: name || '',
+				fromDeclaration: ( fromDeclaration !== false ),
+
+				geometry: {
+					vertices: [],
+					normals: [],
+					colors: [],
+					uvs: [],
+					hasUVIndices: false
+				},
+				materials: [],
+				smooth: true,
+
+				startMaterial: function ( name, libraries ) {
+
+					const previous = this._finalize( false );
+
+					// New usemtl declaration overwrites an inherited material, except if faces were declared
+					// after the material, then it must be preserved for proper MultiMaterial continuation.
+					if ( previous && ( previous.inherited || previous.groupCount <= 0 ) ) {
+
+						this.materials.splice( previous.index, 1 );
+
+					}
+
+					const material = {
+						index: this.materials.length,
+						name: name || '',
+						mtllib: ( Array.isArray( libraries ) && libraries.length > 0 ? libraries[ libraries.length - 1 ] : '' ),
+						smooth: ( previous !== undefined ? previous.smooth : this.smooth ),
+						groupStart: ( previous !== undefined ? previous.groupEnd : 0 ),
+						groupEnd: - 1,
+						groupCount: - 1,
+						inherited: false,
+
+						clone: function ( index ) {
+
+							const cloned = {
+								index: ( typeof index === 'number' ? index : this.index ),
+								name: this.name,
+								mtllib: this.mtllib,
+								smooth: this.smooth,
+								groupStart: 0,
+								groupEnd: - 1,
+								groupCount: - 1,
+								inherited: false
+							};
+							cloned.clone = this.clone.bind( cloned );
+							return cloned;
+
+						}
+					};
+
+					this.materials.push( material );
+
+					return material;
+
+				},
+
+				currentMaterial: function () {
+
+					if ( this.materials.length > 0 ) {
+
+						return this.materials[ this.materials.length - 1 ];
+
+					}
+
+					return undefined;
+
+				},
+
+				_finalize: function ( end ) {
+
+					const lastMultiMaterial = this.currentMaterial();
+					if ( lastMultiMaterial && lastMultiMaterial.groupEnd === - 1 ) {
+
+						lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
+						lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
+						lastMultiMaterial.inherited = false;
+
+					}
+
+					// Ignore objects tail materials if no face declarations followed them before a new o/g started.
+					if ( end && this.materials.length > 1 ) {
+
+						for ( let mi = this.materials.length - 1; mi >= 0; mi -- ) {
+
+							if ( this.materials[ mi ].groupCount <= 0 ) {
+
+								this.materials.splice( mi, 1 );
+
+							}
+
+						}
+
+					}
+
+					// Guarantee at least one empty material, this makes the creation later more straight forward.
+					if ( end && this.materials.length === 0 ) {
+
+						this.materials.push( {
+							name: '',
+							smooth: this.smooth
+						} );
+
+					}
+
+					return lastMultiMaterial;
+
+				}
+			};
+
+			// Inherit previous objects material.
+			// Spec tells us that a declared material must be set to all objects until a new material is declared.
+			// If a usemtl declaration is encountered while this new object is being parsed, it will
+			// overwrite the inherited material. Exception being that there was already face declarations
+			// to the inherited material, then it will be preserved for proper MultiMaterial continuation.
+
+			if ( previousMaterial && previousMaterial.name && typeof previousMaterial.clone === 'function' ) {
+
+				const declared = previousMaterial.clone( 0 );
+				declared.inherited = true;
+				this.object.materials.push( declared );
+
+			}
+
+			this.objects.push( this.object );
+
+		},
+
+		finalize: function () {
+
+			if ( this.object && typeof this.object._finalize === 'function' ) {
+
+				this.object._finalize( true );
+
+			}
+
+		},
+
+		parseVertexIndex: function ( value, len ) {
+
+			const index = parseInt( value, 10 );
+			return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
+
+		},
+
+		parseNormalIndex: function ( value, len ) {
+
+			const index = parseInt( value, 10 );
+			return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
+
+		},
+
+		parseUVIndex: function ( value, len ) {
+
+			const index = parseInt( value, 10 );
+			return ( index >= 0 ? index - 1 : index + len / 2 ) * 2;
+
+		},
+
+		addVertex: function ( a, b, c ) {
+
+			const src = this.vertices;
+			const dst = this.object.geometry.vertices;
+
+			dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
+			dst.push( src[ b + 0 ], src[ b + 1 ], src[ b + 2 ] );
+			dst.push( src[ c + 0 ], src[ c + 1 ], src[ c + 2 ] );
+
+		},
+
+		addVertexPoint: function ( a ) {
+
+			const src = this.vertices;
+			const dst = this.object.geometry.vertices;
+
+			dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
+
+		},
+
+		addVertexLine: function ( a ) {
+
+			const src = this.vertices;
+			const dst = this.object.geometry.vertices;
+
+			dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
+
+		},
+
+		addNormal: function ( a, b, c ) {
+
+			const src = this.normals;
+			const dst = this.object.geometry.normals;
+
+			dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
+			dst.push( src[ b + 0 ], src[ b + 1 ], src[ b + 2 ] );
+			dst.push( src[ c + 0 ], src[ c + 1 ], src[ c + 2 ] );
+
+		},
+
+		addFaceNormal: function ( a, b, c ) {
+
+			const src = this.vertices;
+			const dst = this.object.geometry.normals;
+
+			_vA.fromArray( src, a );
+			_vB.fromArray( src, b );
+			_vC.fromArray( src, c );
+
+			_cb.subVectors( _vC, _vB );
+			_ab.subVectors( _vA, _vB );
+			_cb.cross( _ab );
+
+			_cb.normalize();
+
+			dst.push( _cb.x, _cb.y, _cb.z );
+			dst.push( _cb.x, _cb.y, _cb.z );
+			dst.push( _cb.x, _cb.y, _cb.z );
+
+		},
+
+		addColor: function ( a, b, c ) {
+
+			const src = this.colors;
+			const dst = this.object.geometry.colors;
+
+			if ( src[ a ] !== undefined ) dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
+			if ( src[ b ] !== undefined ) dst.push( src[ b + 0 ], src[ b + 1 ], src[ b + 2 ] );
+			if ( src[ c ] !== undefined ) dst.push( src[ c + 0 ], src[ c + 1 ], src[ c + 2 ] );
+
+		},
+
+		addUV: function ( a, b, c ) {
+
+			const src = this.uvs;
+			const dst = this.object.geometry.uvs;
+
+			dst.push( src[ a + 0 ], src[ a + 1 ] );
+			dst.push( src[ b + 0 ], src[ b + 1 ] );
+			dst.push( src[ c + 0 ], src[ c + 1 ] );
+
+		},
+
+		addDefaultUV: function () {
+
+			const dst = this.object.geometry.uvs;
+
+			dst.push( 0, 0 );
+			dst.push( 0, 0 );
+			dst.push( 0, 0 );
+
+		},
+
+		addUVLine: function ( a ) {
+
+			const src = this.uvs;
+			const dst = this.object.geometry.uvs;
+
+			dst.push( src[ a + 0 ], src[ a + 1 ] );
+
+		},
+
+		addFace: function ( a, b, c, ua, ub, uc, na, nb, nc ) {
+
+			const vLen = this.vertices.length;
+
+			let ia = this.parseVertexIndex( a, vLen );
+			let ib = this.parseVertexIndex( b, vLen );
+			let ic = this.parseVertexIndex( c, vLen );
+
+			this.addVertex( ia, ib, ic );
+			this.addColor( ia, ib, ic );
+
+			// normals
+
+			if ( na !== undefined && na !== '' ) {
+
+				const nLen = this.normals.length;
+
+				ia = this.parseNormalIndex( na, nLen );
+				ib = this.parseNormalIndex( nb, nLen );
+				ic = this.parseNormalIndex( nc, nLen );
+
+				this.addNormal( ia, ib, ic );
+
+			} else {
+
+				this.addFaceNormal( ia, ib, ic );
+
+			}
+
+			// uvs
+
+			if ( ua !== undefined && ua !== '' ) {
+
+				const uvLen = this.uvs.length;
+
+				ia = this.parseUVIndex( ua, uvLen );
+				ib = this.parseUVIndex( ub, uvLen );
+				ic = this.parseUVIndex( uc, uvLen );
+
+				this.addUV( ia, ib, ic );
+
+				this.object.geometry.hasUVIndices = true;
+
+			} else {
+
+				// add placeholder values (for inconsistent face definitions)
+
+				this.addDefaultUV();
+
+			}
+
+		},
+
+		addPointGeometry: function ( vertices ) {
+
+			this.object.geometry.type = 'Points';
+
+			const vLen = this.vertices.length;
+
+			for ( let vi = 0, l = vertices.length; vi < l; vi ++ ) {
+
+				const index = this.parseVertexIndex( vertices[ vi ], vLen );
+
+				this.addVertexPoint( index );
+				this.addColor( index );
+
+			}
+
+		},
+
+		addLineGeometry: function ( vertices, uvs ) {
+
+			this.object.geometry.type = 'Line';
+
+			const vLen = this.vertices.length;
+			const uvLen = this.uvs.length;
+
+			for ( let vi = 0, l = vertices.length; vi < l; vi ++ ) {
+
+				this.addVertexLine( this.parseVertexIndex( vertices[ vi ], vLen ) );
+
+			}
+
+			for ( let uvi = 0, l = uvs.length; uvi < l; uvi ++ ) {
+
+				this.addUVLine( this.parseUVIndex( uvs[ uvi ], uvLen ) );
+
+			}
+
+		}
+
+	};
+
+	state.startObject( '', false );
+
+	return state;
+
 }
+
+
+/**
+ * A loader for the OBJ format.
+ *
+ * The [OBJ format]{@link https://en.wikipedia.org/wiki/Wavefront_.obj_file} is a simple data-format that
+ * represents 3D geometry in a human readable format as the position of each vertex, the UV position of
+ * each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list
+ * of vertices, and texture vertices.
+ *
+ * ```js
+ * const loader = new OBJLoader();
+ * const object = await loader.loadAsync( 'models/monster.obj' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+ */
 class OBJLoader extends Loader {
-  constructor(_0x3a910e) {
-    (super(_0x3a910e), (this['materials'] = null));
-  }
-  ['load'](_0x199088, _0x3a4205, _0x5a8c6a, _0xc6dac7) {
-    const _0x1e88ee = this,
-      _0x215b53 = new FileLoader(this['manager']);
-    (_0x215b53['setPath'](this['path']),
-      _0x215b53['setRequestHeader'](this['requestHeader']),
-      _0x215b53['setWithCredentials'](this['withCredentials']),
-      _0x215b53['load'](
-        _0x199088,
-        function (_0x5607ac) {
-          try {
-            _0x3a4205(_0x1e88ee['parse'](_0x5607ac));
-          } catch (_0x3d087b) {
-            (_0xc6dac7 ? _0xc6dac7(_0x3d087b) : console['error'](_0x3d087b),
-              _0x1e88ee['manager']['itemError'](_0x199088));
-          }
-        },
-        _0x5a8c6a,
-        _0xc6dac7,
-      ));
-  }
-  ['setMaterials'](_0xf3dece) {
-    return ((this['materials'] = _0xf3dece), this);
-  }
-  ['parse'](_0x3dec21) {
-    const _0x4880b3 = new ParserState();
-    _0x3dec21['indexOf']('\x0d\x0a') !== -0x1 && (_0x3dec21 = _0x3dec21['replace'](/\r\n/g, '\x0a'));
-    _0x3dec21['indexOf']('\x5c\x0a') !== -0x1 && (_0x3dec21 = _0x3dec21['replace'](/\\\n/g, ''));
-    const _0x476e66 = _0x3dec21['split']('\x0a');
-    let _0x2268ea = [];
-    for (let _0x24a7cb = 0x0, _0x54831c = _0x476e66['length']; _0x24a7cb < _0x54831c; _0x24a7cb++) {
-      const _0x28f4a2 = _0x476e66[_0x24a7cb]['trimStart']();
-      if (_0x28f4a2['length'] === 0x0) continue;
-      const _0x477ef7 = _0x28f4a2['charAt'](0x0);
-      if (_0x477ef7 === '#') continue;
-      if (_0x477ef7 === 'v') {
-        const _0x53d167 = _0x28f4a2['split'](_face_vertex_data_separator_pattern);
-        switch (_0x53d167[0x0]) {
-          case 'v':
-            _0x4880b3['vertices']['push'](
-              parseFloat(_0x53d167[0x1]),
-              parseFloat(_0x53d167[0x2]),
-              parseFloat(_0x53d167[0x3]),
-            );
-            _0x53d167['length'] >= 0x7
-              ? (_color['setRGB'](
-                  parseFloat(_0x53d167[0x4]),
-                  parseFloat(_0x53d167[0x5]),
-                  parseFloat(_0x53d167[0x6]),
-                  SRGBColorSpace,
-                ),
-                _0x4880b3['colors']['push'](_color['r'], _color['g'], _color['b']))
-              : _0x4880b3['colors']['push'](undefined, undefined, undefined);
-            break;
-          case 'vn':
-            _0x4880b3['normals']['push'](
-              parseFloat(_0x53d167[0x1]),
-              parseFloat(_0x53d167[0x2]),
-              parseFloat(_0x53d167[0x3]),
-            );
-            break;
-          case 'vt':
-            _0x4880b3['uvs']['push'](parseFloat(_0x53d167[0x1]), parseFloat(_0x53d167[0x2]));
-            break;
-        }
-      } else {
-        if (_0x477ef7 === 'f') {
-          const _0x3cc7ef = _0x28f4a2['slice'](0x1)['trim'](),
-            _0x1374d8 = _0x3cc7ef['split'](_face_vertex_data_separator_pattern),
-            _0x3b07dd = [];
-          for (let _0x17d993 = 0x0, _0x46928d = _0x1374d8['length']; _0x17d993 < _0x46928d; _0x17d993++) {
-            const _0x4a22d8 = _0x1374d8[_0x17d993];
-            if (_0x4a22d8['length'] > 0x0) {
-              const _0x216d6f = _0x4a22d8['split']('/');
-              _0x3b07dd['push'](_0x216d6f);
-            }
-          }
-          const _0x26a595 = _0x3b07dd[0x0];
-          for (
-            let _0x3631b6 = 0x1, _0x4dd7c5 = _0x3b07dd['length'] - 0x1;
-            _0x3631b6 < _0x4dd7c5;
-            _0x3631b6++
-          ) {
-            const _0x2893fd = _0x3b07dd[_0x3631b6],
-              _0x551b82 = _0x3b07dd[_0x3631b6 + 0x1];
-            _0x4880b3['addFace'](
-              _0x26a595[0x0],
-              _0x2893fd[0x0],
-              _0x551b82[0x0],
-              _0x26a595[0x1],
-              _0x2893fd[0x1],
-              _0x551b82[0x1],
-              _0x26a595[0x2],
-              _0x2893fd[0x2],
-              _0x551b82[0x2],
-            );
-          }
-        } else {
-          if (_0x477ef7 === 'l') {
-            const _0x22ad4f = _0x28f4a2['substring'](0x1)['trim']()['split']('\x20');
-            let _0x382c94 = [];
-            const _0x450afa = [];
-            if (_0x28f4a2['indexOf']('/') === -0x1) _0x382c94 = _0x22ad4f;
-            else
-              for (let _0x1dd52d = 0x0, _0x44ed4a = _0x22ad4f['length']; _0x1dd52d < _0x44ed4a; _0x1dd52d++) {
-                const _0x58fd4b = _0x22ad4f[_0x1dd52d]['split']('/');
-                if (_0x58fd4b[0x0] !== '') _0x382c94['push'](_0x58fd4b[0x0]);
-                if (_0x58fd4b[0x1] !== '') _0x450afa['push'](_0x58fd4b[0x1]);
-              }
-            _0x4880b3['addLineGeometry'](_0x382c94, _0x450afa);
-          } else {
-            if (_0x477ef7 === 'p') {
-              const _0x3a07b2 = _0x28f4a2['slice'](0x1)['trim'](),
-                _0x2911ed = _0x3a07b2['split']('\x20');
-              _0x4880b3['addPointGeometry'](_0x2911ed);
-            } else {
-              if ((_0x2268ea = _object_pattern['exec'](_0x28f4a2)) !== null) {
-                const _0x55fb5d = ('\x20' + _0x2268ea[0x0]['slice'](0x1)['trim']())['slice'](0x1);
-                _0x4880b3['startObject'](_0x55fb5d);
-              } else {
-                if (_material_use_pattern['test'](_0x28f4a2))
-                  _0x4880b3['object']['startMaterial'](
-                    _0x28f4a2['substring'](0x7)['trim'](),
-                    _0x4880b3['materialLibraries'],
-                  );
-                else {
-                  if (_material_library_pattern['test'](_0x28f4a2))
-                    _0x4880b3['materialLibraries']['push'](_0x28f4a2['substring'](0x7)['trim']());
-                  else {
-                    if (_map_use_pattern['test'](_0x28f4a2))
-                      console['warn'](
-                        'THREE.OBJLoader:\x20Rendering\x20identifier\x20\x22usemap\x22\x20not\x20supported.\x20Textures\x20must\x20be\x20defined\x20in\x20MTL\x20files.',
-                      );
-                    else {
-                      if (_0x477ef7 === 's') {
-                        _0x2268ea = _0x28f4a2['split']('\x20');
-                        if (_0x2268ea['length'] > 0x1) {
-                          const _0x4bcf22 = _0x2268ea[0x1]['trim']()['toLowerCase']();
-                          _0x4880b3['object']['smooth'] = _0x4bcf22 !== '0' && _0x4bcf22 !== 'off';
-                        } else _0x4880b3['object']['smooth'] = !![];
-                        const _0x3e0ca3 = _0x4880b3['object']['currentMaterial']();
-                        if (_0x3e0ca3) _0x3e0ca3['smooth'] = _0x4880b3['object']['smooth'];
-                      } else {
-                        if (_0x28f4a2 === '\x00') continue;
-                        console['warn'](
-                          'THREE.OBJLoader:\x20Unexpected\x20line:\x20\x22' + _0x28f4a2 + '\x22',
-                        );
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    _0x4880b3['finalize']();
-    const _0x89c056 = new Group();
-    _0x89c056['materialLibraries'] = []['concat'](_0x4880b3['materialLibraries']);
-    const _0xa0778b = !(
-      _0x4880b3['objects']['length'] === 0x1 &&
-      _0x4880b3['objects'][0x0]['geometry']['vertices']['length'] === 0x0
-    );
-    if (_0xa0778b === !![])
-      for (
-        let _0x2314f3 = 0x0, _0x1be563 = _0x4880b3['objects']['length'];
-        _0x2314f3 < _0x1be563;
-        _0x2314f3++
-      ) {
-        const _0x19e809 = _0x4880b3['objects'][_0x2314f3],
-          _0x5ac128 = _0x19e809['geometry'],
-          _0x8b6d2e = _0x19e809['materials'],
-          _0x40b2ca = _0x5ac128['type'] === 'Line',
-          _0x319342 = _0x5ac128['type'] === 'Points';
-        let _0x14f6c2 = ![];
-        if (_0x5ac128['vertices']['length'] === 0x0) continue;
-        const _0x3c8e43 = new BufferGeometry();
-        _0x3c8e43['setAttribute']('position', new Float32BufferAttribute(_0x5ac128['vertices'], 0x3));
-        _0x5ac128['normals']['length'] > 0x0 &&
-          _0x3c8e43['setAttribute']('normal', new Float32BufferAttribute(_0x5ac128['normals'], 0x3));
-        _0x5ac128['colors']['length'] > 0x0 &&
-          ((_0x14f6c2 = !![]),
-          _0x3c8e43['setAttribute']('color', new Float32BufferAttribute(_0x5ac128['colors'], 0x3)));
-        _0x5ac128['hasUVIndices'] === !![] &&
-          _0x3c8e43['setAttribute']('uv', new Float32BufferAttribute(_0x5ac128['uvs'], 0x2));
-        const _0x5ae5b7 = [];
-        for (let _0x2c38cc = 0x0, _0x147313 = _0x8b6d2e['length']; _0x2c38cc < _0x147313; _0x2c38cc++) {
-          const _0xa0c5fc = _0x8b6d2e[_0x2c38cc],
-            _0x527dba = _0xa0c5fc['name'] + '_' + _0xa0c5fc['smooth'] + '_' + _0x14f6c2;
-          let _0xb1caef = _0x4880b3['materials'][_0x527dba];
-          if (this['materials'] !== null) {
-            _0xb1caef = this['materials']['create'](_0xa0c5fc['name']);
-            if (_0x40b2ca && _0xb1caef && !(_0xb1caef instanceof LineBasicMaterial)) {
-              const _0x2b561a = new LineBasicMaterial();
-              (Material['prototype']['copy']['call'](_0x2b561a, _0xb1caef),
-                _0x2b561a['color']['copy'](_0xb1caef['color']),
-                (_0xb1caef = _0x2b561a));
-            } else {
-              if (_0x319342 && _0xb1caef && !(_0xb1caef instanceof PointsMaterial)) {
-                const _0x8899fa = new PointsMaterial({ size: 0xa, sizeAttenuation: ![] });
-                (Material['prototype']['copy']['call'](_0x8899fa, _0xb1caef),
-                  _0x8899fa['color']['copy'](_0xb1caef['color']),
-                  (_0x8899fa['map'] = _0xb1caef['map']),
-                  (_0xb1caef = _0x8899fa));
-              }
-            }
-          }
-          if (_0xb1caef === undefined) {
-            if (_0x40b2ca) _0xb1caef = new LineBasicMaterial();
-            else
-              _0x319342
-                ? (_0xb1caef = new PointsMaterial({ size: 0x1, sizeAttenuation: ![] }))
-                : (_0xb1caef = new MeshPhongMaterial());
-            ((_0xb1caef['name'] = _0xa0c5fc['name']),
-              (_0xb1caef['flatShading'] = _0xa0c5fc['smooth'] ? ![] : !![]),
-              (_0xb1caef['vertexColors'] = _0x14f6c2),
-              (_0x4880b3['materials'][_0x527dba] = _0xb1caef));
-          }
-          _0x5ae5b7['push'](_0xb1caef);
-        }
-        let _0x458b15;
-        if (_0x5ae5b7['length'] > 0x1) {
-          for (let _0x37b2a2 = 0x0, _0x1eed9d = _0x8b6d2e['length']; _0x37b2a2 < _0x1eed9d; _0x37b2a2++) {
-            const _0x407ae0 = _0x8b6d2e[_0x37b2a2];
-            _0x3c8e43['addGroup'](_0x407ae0['groupStart'], _0x407ae0['groupCount'], _0x37b2a2);
-          }
-          if (_0x40b2ca) _0x458b15 = new LineSegments(_0x3c8e43, _0x5ae5b7);
-          else
-            _0x319342
-              ? (_0x458b15 = new Points(_0x3c8e43, _0x5ae5b7))
-              : (_0x458b15 = new Mesh(_0x3c8e43, _0x5ae5b7));
-        } else {
-          if (_0x40b2ca) _0x458b15 = new LineSegments(_0x3c8e43, _0x5ae5b7[0x0]);
-          else
-            _0x319342
-              ? (_0x458b15 = new Points(_0x3c8e43, _0x5ae5b7[0x0]))
-              : (_0x458b15 = new Mesh(_0x3c8e43, _0x5ae5b7[0x0]));
-        }
-        ((_0x458b15['name'] = _0x19e809['name']), _0x89c056['add'](_0x458b15));
-      }
-    else {
-      if (_0x4880b3['vertices']['length'] > 0x0) {
-        const _0x903ce1 = new PointsMaterial({ size: 0x1, sizeAttenuation: ![] }),
-          _0x5959b = new BufferGeometry();
-        _0x5959b['setAttribute']('position', new Float32BufferAttribute(_0x4880b3['vertices'], 0x3));
-        _0x4880b3['colors']['length'] > 0x0 &&
-          _0x4880b3['colors'][0x0] !== undefined &&
-          (_0x5959b['setAttribute']('color', new Float32BufferAttribute(_0x4880b3['colors'], 0x3)),
-          (_0x903ce1['vertexColors'] = !![]));
-        const _0x1c7f65 = new Points(_0x5959b, _0x903ce1);
-        _0x89c056['add'](_0x1c7f65);
-      }
-    }
-    return _0x89c056;
-  }
+
+	/**
+	 * Constructs a new OBJ loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
+
+		super( manager );
+
+		/**
+		 * A reference to a material creator.
+		 *
+		 * @type {?MaterialCreator}
+		 * @default null
+		 */
+		this.materials = null;
+
+	}
+
+	/**
+	 * Starts loading from the given URL and passes the loaded OBJ asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
+	load( url, onLoad, onProgress, onError ) {
+
+		const scope = this;
+
+		const loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
+		loader.load( url, function ( text ) {
+
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
+
+		}, onProgress, onError );
+
+	}
+
+	/**
+	 * Sets the material creator for this OBJ. This object is loaded via {@link MTLLoader}.
+	 *
+	 * @param {MaterialCreator} materials - An object that creates the materials for this OBJ.
+	 * @return {OBJLoader} A reference to this loader.
+	 */
+	setMaterials( materials ) {
+
+		this.materials = materials;
+
+		return this;
+
+	}
+
+	/**
+	 * Parses the given OBJ data and returns the resulting group.
+	 *
+	 * @param {string} text - The raw OBJ data as a string.
+	 * @return {Group} The parsed OBJ.
+	 */
+	parse( text ) {
+
+		const state = new ParserState();
+
+		if ( text.indexOf( '\r\n' ) !== - 1 ) {
+
+			// This is faster than String.split with regex that splits on both
+			text = text.replace( /\r\n/g, '\n' );
+
+		}
+
+		if ( text.indexOf( '\\\n' ) !== - 1 ) {
+
+			// join lines separated by a line continuation character (\)
+			text = text.replace( /\\\n/g, '' );
+
+		}
+
+		const lines = text.split( '\n' );
+		let result = [];
+
+		for ( let i = 0, l = lines.length; i < l; i ++ ) {
+
+			const line = lines[ i ].trimStart();
+
+			if ( line.length === 0 ) continue;
+
+			const lineFirstChar = line.charAt( 0 );
+
+			// @todo invoke passed in handler if any
+			if ( lineFirstChar === '#' ) continue; // skip comments
+
+			if ( lineFirstChar === 'v' ) {
+
+				const data = line.split( _face_vertex_data_separator_pattern );
+
+				switch ( data[ 0 ] ) {
+
+					case 'v':
+						state.vertices.push(
+							parseFloat( data[ 1 ] ),
+							parseFloat( data[ 2 ] ),
+							parseFloat( data[ 3 ] )
+						);
+						if ( data.length >= 7 ) {
+
+							_color.setRGB(
+								parseFloat( data[ 4 ] ),
+								parseFloat( data[ 5 ] ),
+								parseFloat( data[ 6 ] ),
+								SRGBColorSpace
+							);
+
+							state.colors.push( _color.r, _color.g, _color.b );
+
+						} else {
+
+							// if no colors are defined, add placeholders so color and vertex indices match
+
+							state.colors.push( undefined, undefined, undefined );
+
+						}
+
+						break;
+					case 'vn':
+						state.normals.push(
+							parseFloat( data[ 1 ] ),
+							parseFloat( data[ 2 ] ),
+							parseFloat( data[ 3 ] )
+						);
+						break;
+					case 'vt':
+						state.uvs.push(
+							parseFloat( data[ 1 ] ),
+							parseFloat( data[ 2 ] )
+						);
+						break;
+
+				}
+
+			} else if ( lineFirstChar === 'f' ) {
+
+				const lineData = line.slice( 1 ).trim();
+				const vertexData = lineData.split( _face_vertex_data_separator_pattern );
+				const faceVertices = [];
+
+				// Parse the face vertex data into an easy to work with format
+
+				for ( let j = 0, jl = vertexData.length; j < jl; j ++ ) {
+
+					const vertex = vertexData[ j ];
+
+					if ( vertex.length > 0 ) {
+
+						const vertexParts = vertex.split( '/' );
+						faceVertices.push( vertexParts );
+
+					}
+
+				}
+
+				// Draw an edge between the first vertex and all subsequent vertices to form an n-gon
+
+				const v1 = faceVertices[ 0 ];
+
+				for ( let j = 1, jl = faceVertices.length - 1; j < jl; j ++ ) {
+
+					const v2 = faceVertices[ j ];
+					const v3 = faceVertices[ j + 1 ];
+
+					state.addFace(
+						v1[ 0 ], v2[ 0 ], v3[ 0 ],
+						v1[ 1 ], v2[ 1 ], v3[ 1 ],
+						v1[ 2 ], v2[ 2 ], v3[ 2 ]
+					);
+
+				}
+
+			} else if ( lineFirstChar === 'l' ) {
+
+				const lineParts = line.substring( 1 ).trim().split( ' ' );
+				let lineVertices = [];
+				const lineUVs = [];
+
+				if ( line.indexOf( '/' ) === - 1 ) {
+
+					lineVertices = lineParts;
+
+				} else {
+
+					for ( let li = 0, llen = lineParts.length; li < llen; li ++ ) {
+
+						const parts = lineParts[ li ].split( '/' );
+
+						if ( parts[ 0 ] !== '' ) lineVertices.push( parts[ 0 ] );
+						if ( parts[ 1 ] !== '' ) lineUVs.push( parts[ 1 ] );
+
+					}
+
+				}
+
+				state.addLineGeometry( lineVertices, lineUVs );
+
+			} else if ( lineFirstChar === 'p' ) {
+
+				const lineData = line.slice( 1 ).trim();
+				const pointData = lineData.split( ' ' );
+
+				state.addPointGeometry( pointData );
+
+			} else if ( ( result = _object_pattern.exec( line ) ) !== null ) {
+
+				// o object_name
+				// or
+				// g group_name
+
+				// WORKAROUND: https://bugs.chromium.org/p/v8/issues/detail?id=2869
+				// let name = result[ 0 ].slice( 1 ).trim();
+				const name = ( ' ' + result[ 0 ].slice( 1 ).trim() ).slice( 1 );
+
+				state.startObject( name );
+
+			} else if ( _material_use_pattern.test( line ) ) {
+
+				// material
+
+				state.object.startMaterial( line.substring( 7 ).trim(), state.materialLibraries );
+
+			} else if ( _material_library_pattern.test( line ) ) {
+
+				// mtl file
+
+				state.materialLibraries.push( line.substring( 7 ).trim() );
+
+			} else if ( _map_use_pattern.test( line ) ) {
+
+				// the line is parsed but ignored since the loader assumes textures are defined MTL files
+				// (according to https://www.okino.com/conv/imp_wave.htm, 'usemap' is the old-style Wavefront texture reference method)
+
+				console.warn( 'THREE.OBJLoader: Rendering identifier "usemap" not supported. Textures must be defined in MTL files.' );
+
+			} else if ( lineFirstChar === 's' ) {
+
+				result = line.split( ' ' );
+
+				// smooth shading
+
+				// @todo Handle files that have varying smooth values for a set of faces inside one geometry,
+				// but does not define a usemtl for each face set.
+				// This should be detected and a dummy material created (later MultiMaterial and geometry groups).
+				// This requires some care to not create extra material on each smooth value for "normal" obj files.
+				// where explicit usemtl defines geometry groups.
+				// Example asset: examples/models/obj/cerberus/Cerberus.obj
+
+				/*
+					 * http://paulbourke.net/dataformats/obj/
+					 *
+					 * From chapter "Grouping" Syntax explanation "s group_number":
+					 * "group_number is the smoothing group number. To turn off smoothing groups, use a value of 0 or off.
+					 * Polygonal elements use group numbers to put elements in different smoothing groups. For free-form
+					 * surfaces, smoothing groups are either turned on or off; there is no difference between values greater
+					 * than 0."
+					 */
+				if ( result.length > 1 ) {
+
+					const value = result[ 1 ].trim().toLowerCase();
+					state.object.smooth = ( value !== '0' && value !== 'off' );
+
+				} else {
+
+					// ZBrush can produce "s" lines #11707
+					state.object.smooth = true;
+
+				}
+
+				const material = state.object.currentMaterial();
+				if ( material ) material.smooth = state.object.smooth;
+
+			} else {
+
+				// Handle null terminated files without exception
+				if ( line === '\0' ) continue;
+
+				console.warn( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
+
+			}
+
+		}
+
+		state.finalize();
+
+		const container = new Group();
+		container.materialLibraries = [].concat( state.materialLibraries );
+
+		const hasPrimitives = ! ( state.objects.length === 1 && state.objects[ 0 ].geometry.vertices.length === 0 );
+
+		if ( hasPrimitives === true ) {
+
+			for ( let i = 0, l = state.objects.length; i < l; i ++ ) {
+
+				const object = state.objects[ i ];
+				const geometry = object.geometry;
+				const materials = object.materials;
+				const isLine = ( geometry.type === 'Line' );
+				const isPoints = ( geometry.type === 'Points' );
+				let hasVertexColors = false;
+
+				// Skip o/g line declarations that did not follow with any faces
+				if ( geometry.vertices.length === 0 ) continue;
+
+				const buffergeometry = new BufferGeometry();
+
+				buffergeometry.setAttribute( 'position', new Float32BufferAttribute( geometry.vertices, 3 ) );
+
+				if ( geometry.normals.length > 0 ) {
+
+					buffergeometry.setAttribute( 'normal', new Float32BufferAttribute( geometry.normals, 3 ) );
+
+				}
+
+				if ( geometry.colors.length > 0 ) {
+
+					hasVertexColors = true;
+					buffergeometry.setAttribute( 'color', new Float32BufferAttribute( geometry.colors, 3 ) );
+
+				}
+
+				if ( geometry.hasUVIndices === true ) {
+
+					buffergeometry.setAttribute( 'uv', new Float32BufferAttribute( geometry.uvs, 2 ) );
+
+				}
+
+				// Create materials
+
+				const createdMaterials = [];
+
+				for ( let mi = 0, miLen = materials.length; mi < miLen; mi ++ ) {
+
+					const sourceMaterial = materials[ mi ];
+					const materialHash = sourceMaterial.name + '_' + sourceMaterial.smooth + '_' + hasVertexColors;
+					let material = state.materials[ materialHash ];
+
+					if ( this.materials !== null ) {
+
+						material = this.materials.create( sourceMaterial.name );
+
+						// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
+						if ( isLine && material && ! ( material instanceof LineBasicMaterial ) ) {
+
+							const materialLine = new LineBasicMaterial();
+							Material.prototype.copy.call( materialLine, material );
+							materialLine.color.copy( material.color );
+							material = materialLine;
+
+						} else if ( isPoints && material && ! ( material instanceof PointsMaterial ) ) {
+
+							const materialPoints = new PointsMaterial( { size: 10, sizeAttenuation: false } );
+							Material.prototype.copy.call( materialPoints, material );
+							materialPoints.color.copy( material.color );
+							materialPoints.map = material.map;
+							material = materialPoints;
+
+						}
+
+					}
+
+					if ( material === undefined ) {
+
+						if ( isLine ) {
+
+							material = new LineBasicMaterial();
+
+						} else if ( isPoints ) {
+
+							material = new PointsMaterial( { size: 1, sizeAttenuation: false } );
+
+						} else {
+
+							material = new MeshPhongMaterial();
+
+						}
+
+						material.name = sourceMaterial.name;
+						material.flatShading = sourceMaterial.smooth ? false : true;
+						material.vertexColors = hasVertexColors;
+
+						state.materials[ materialHash ] = material;
+
+					}
+
+					createdMaterials.push( material );
+
+				}
+
+				// Create mesh
+
+				let mesh;
+
+				if ( createdMaterials.length > 1 ) {
+
+					for ( let mi = 0, miLen = materials.length; mi < miLen; mi ++ ) {
+
+						const sourceMaterial = materials[ mi ];
+						buffergeometry.addGroup( sourceMaterial.groupStart, sourceMaterial.groupCount, mi );
+
+					}
+
+					if ( isLine ) {
+
+						mesh = new LineSegments( buffergeometry, createdMaterials );
+
+					} else if ( isPoints ) {
+
+						mesh = new Points( buffergeometry, createdMaterials );
+
+					} else {
+
+						mesh = new Mesh( buffergeometry, createdMaterials );
+
+					}
+
+				} else {
+
+					if ( isLine ) {
+
+						mesh = new LineSegments( buffergeometry, createdMaterials[ 0 ] );
+
+					} else if ( isPoints ) {
+
+						mesh = new Points( buffergeometry, createdMaterials[ 0 ] );
+
+					} else {
+
+						mesh = new Mesh( buffergeometry, createdMaterials[ 0 ] );
+
+					}
+
+				}
+
+				mesh.name = object.name;
+
+				container.add( mesh );
+
+			}
+
+		} else {
+
+			// if there is only the default parser state object with no geometry data, interpret data as point cloud
+
+			if ( state.vertices.length > 0 ) {
+
+				const material = new PointsMaterial( { size: 1, sizeAttenuation: false } );
+
+				const buffergeometry = new BufferGeometry();
+
+				buffergeometry.setAttribute( 'position', new Float32BufferAttribute( state.vertices, 3 ) );
+
+				if ( state.colors.length > 0 && state.colors[ 0 ] !== undefined ) {
+
+					buffergeometry.setAttribute( 'color', new Float32BufferAttribute( state.colors, 3 ) );
+					material.vertexColors = true;
+
+				}
+
+				const points = new Points( buffergeometry, material );
+				container.add( points );
+
+			}
+
+		}
+
+		return container;
+
+	}
+
 }
+
 export { OBJLoader };

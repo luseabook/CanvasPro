@@ -1,287 +1,532 @@
-import { Vector3, Vector4 } from '../../../three.module.js';
-function findSpan(_0x31c3ad, _0x19cb71, _0x3d943c) {
-  const _0x3f7dcf = _0x3d943c['length'] - _0x31c3ad - 0x1;
-  if (_0x19cb71 >= _0x3d943c[_0x3f7dcf]) return _0x3f7dcf - 0x1;
-  if (_0x19cb71 <= _0x3d943c[_0x31c3ad]) return _0x31c3ad;
-  let _0x531a3f = _0x31c3ad,
-    _0x1e9c3f = _0x3f7dcf,
-    _0x11ea29 = Math['floor']((_0x531a3f + _0x1e9c3f) / 0x2);
-  while (_0x19cb71 < _0x3d943c[_0x11ea29] || _0x19cb71 >= _0x3d943c[_0x11ea29 + 0x1]) {
-    (_0x19cb71 < _0x3d943c[_0x11ea29] ? (_0x1e9c3f = _0x11ea29) : (_0x531a3f = _0x11ea29),
-      (_0x11ea29 = Math['floor']((_0x531a3f + _0x1e9c3f) / 0x2)));
-  }
-  return _0x11ea29;
+import {
+	Vector3,
+	Vector4
+} from '../../../three.module.js';
+
+/**
+ * @module NURBSUtils
+ * @three_import import * as NURBSUtils from 'three/addons/curves/NURBSUtils.js';
+ */
+
+/**
+ * Finds knot vector span.
+ *
+ * @param {number} p - The degree.
+ * @param {number} u - The parametric value.
+ * @param {Array<number>} U - The knot vector.
+ * @return {number} The span.
+ */
+function findSpan( p, u, U ) {
+
+	const n = U.length - p - 1;
+
+	if ( u >= U[ n ] ) {
+
+		return n - 1;
+
+	}
+
+	if ( u <= U[ p ] ) {
+
+		return p;
+
+	}
+
+	let low = p;
+	let high = n;
+	let mid = Math.floor( ( low + high ) / 2 );
+
+	while ( u < U[ mid ] || u >= U[ mid + 1 ] ) {
+
+		if ( u < U[ mid ] ) {
+
+			high = mid;
+
+		} else {
+
+			low = mid;
+
+		}
+
+		mid = Math.floor( ( low + high ) / 2 );
+
+	}
+
+	return mid;
+
 }
-function calcBasisFunctions(_0x3a83f0, _0x4acad0, _0x2f3e46, _0x2d97df) {
-  const _0x33e63d = [],
-    _0x553ad8 = [],
-    _0x476680 = [];
-  _0x33e63d[0x0] = 0x1;
-  for (let _0x102c9f = 0x1; _0x102c9f <= _0x2f3e46; ++_0x102c9f) {
-    ((_0x553ad8[_0x102c9f] = _0x4acad0 - _0x2d97df[_0x3a83f0 + 0x1 - _0x102c9f]),
-      (_0x476680[_0x102c9f] = _0x2d97df[_0x3a83f0 + _0x102c9f] - _0x4acad0));
-    let _0x30a62b = 0x0;
-    for (let _0x51c1a8 = 0x0; _0x51c1a8 < _0x102c9f; ++_0x51c1a8) {
-      const _0x1eca60 = _0x476680[_0x51c1a8 + 0x1],
-        _0x4111d9 = _0x553ad8[_0x102c9f - _0x51c1a8],
-        _0x35a8bc = _0x33e63d[_0x51c1a8] / (_0x1eca60 + _0x4111d9);
-      ((_0x33e63d[_0x51c1a8] = _0x30a62b + _0x1eca60 * _0x35a8bc), (_0x30a62b = _0x4111d9 * _0x35a8bc));
-    }
-    _0x33e63d[_0x102c9f] = _0x30a62b;
-  }
-  return _0x33e63d;
+
+/**
+ * Calculates basis functions. See The NURBS Book, page 70, algorithm A2.2.
+ *
+ * @param {number} span - The span in which `u` lies.
+ * @param {number} u - The parametric value.
+ * @param {number} p - The degree.
+ * @param {Array<number>} U - The knot vector.
+ * @return {Array<number>} Array[p+1] with basis functions values.
+ */
+function calcBasisFunctions( span, u, p, U ) {
+
+	const N = [];
+	const left = [];
+	const right = [];
+	N[ 0 ] = 1.0;
+
+	for ( let j = 1; j <= p; ++ j ) {
+
+		left[ j ] = u - U[ span + 1 - j ];
+		right[ j ] = U[ span + j ] - u;
+
+		let saved = 0.0;
+
+		for ( let r = 0; r < j; ++ r ) {
+
+			const rv = right[ r + 1 ];
+			const lv = left[ j - r ];
+			const temp = N[ r ] / ( rv + lv );
+			N[ r ] = saved + rv * temp;
+			saved = lv * temp;
+
+		}
+
+		N[ j ] = saved;
+
+	}
+
+	return N;
+
 }
-function calcBSplinePoint(_0x5fa714, _0x4a9c38, _0x594af8, _0x3ef2fc) {
-  const _0x399a47 = findSpan(_0x5fa714, _0x3ef2fc, _0x4a9c38),
-    _0x4a2ae4 = calcBasisFunctions(_0x399a47, _0x3ef2fc, _0x5fa714, _0x4a9c38),
-    _0x1ab0bc = new Vector4(0x0, 0x0, 0x0, 0x0);
-  for (let _0x32fabc = 0x0; _0x32fabc <= _0x5fa714; ++_0x32fabc) {
-    const _0x1d4e75 = _0x594af8[_0x399a47 - _0x5fa714 + _0x32fabc],
-      _0x241ff5 = _0x4a2ae4[_0x32fabc],
-      _0x264515 = _0x1d4e75['w'] * _0x241ff5;
-    ((_0x1ab0bc['x'] += _0x1d4e75['x'] * _0x264515),
-      (_0x1ab0bc['y'] += _0x1d4e75['y'] * _0x264515),
-      (_0x1ab0bc['z'] += _0x1d4e75['z'] * _0x264515),
-      (_0x1ab0bc['w'] += _0x1d4e75['w'] * _0x241ff5));
-  }
-  return _0x1ab0bc;
+
+/**
+ * Calculates B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
+ *
+ * @param {number} p - The degree of the B-Spline.
+ * @param {Array<number>} U - The knot vector.
+ * @param {Array<Vector4>} P - The control points
+ * @param {number} u - The parametric point.
+ * @return {Vector4} The point for given `u`.
+ */
+function calcBSplinePoint( p, U, P, u ) {
+
+	const span = findSpan( p, u, U );
+	const N = calcBasisFunctions( span, u, p, U );
+	const C = new Vector4( 0, 0, 0, 0 );
+
+	for ( let j = 0; j <= p; ++ j ) {
+
+		const point = P[ span - p + j ];
+		const Nj = N[ j ];
+		const wNj = point.w * Nj;
+		C.x += point.x * wNj;
+		C.y += point.y * wNj;
+		C.z += point.z * wNj;
+		C.w += point.w * Nj;
+
+	}
+
+	return C;
+
 }
-function calcBasisFunctionDerivatives(_0x3a60bb, _0x32fb23, _0x1c36e3, _0x5eb782, _0x4da4bb) {
-  const _0x216700 = [];
-  for (let _0x422928 = 0x0; _0x422928 <= _0x1c36e3; ++_0x422928) _0x216700[_0x422928] = 0x0;
-  const _0x5929f6 = [];
-  for (let _0xfc12f9 = 0x0; _0xfc12f9 <= _0x5eb782; ++_0xfc12f9)
-    _0x5929f6[_0xfc12f9] = _0x216700['slice'](0x0);
-  const _0x383fc9 = [];
-  for (let _0x5bc327 = 0x0; _0x5bc327 <= _0x1c36e3; ++_0x5bc327)
-    _0x383fc9[_0x5bc327] = _0x216700['slice'](0x0);
-  _0x383fc9[0x0][0x0] = 0x1;
-  const _0x26037f = _0x216700['slice'](0x0),
-    _0x2c6b74 = _0x216700['slice'](0x0);
-  for (let _0x1ca99b = 0x1; _0x1ca99b <= _0x1c36e3; ++_0x1ca99b) {
-    ((_0x26037f[_0x1ca99b] = _0x32fb23 - _0x4da4bb[_0x3a60bb + 0x1 - _0x1ca99b]),
-      (_0x2c6b74[_0x1ca99b] = _0x4da4bb[_0x3a60bb + _0x1ca99b] - _0x32fb23));
-    let _0x13de09 = 0x0;
-    for (let _0x5787e1 = 0x0; _0x5787e1 < _0x1ca99b; ++_0x5787e1) {
-      const _0x3761a6 = _0x2c6b74[_0x5787e1 + 0x1],
-        _0x13e602 = _0x26037f[_0x1ca99b - _0x5787e1];
-      _0x383fc9[_0x1ca99b][_0x5787e1] = _0x3761a6 + _0x13e602;
-      const _0x30816c = _0x383fc9[_0x5787e1][_0x1ca99b - 0x1] / _0x383fc9[_0x1ca99b][_0x5787e1];
-      ((_0x383fc9[_0x5787e1][_0x1ca99b] = _0x13de09 + _0x3761a6 * _0x30816c),
-        (_0x13de09 = _0x13e602 * _0x30816c));
-    }
-    _0x383fc9[_0x1ca99b][_0x1ca99b] = _0x13de09;
-  }
-  for (let _0x1e308e = 0x0; _0x1e308e <= _0x1c36e3; ++_0x1e308e) {
-    _0x5929f6[0x0][_0x1e308e] = _0x383fc9[_0x1e308e][_0x1c36e3];
-  }
-  for (let _0xc3bca0 = 0x0; _0xc3bca0 <= _0x1c36e3; ++_0xc3bca0) {
-    let _0x34f429 = 0x0,
-      _0x4bc218 = 0x1;
-    const _0x111d93 = [];
-    for (let _0x305e5c = 0x0; _0x305e5c <= _0x1c36e3; ++_0x305e5c) {
-      _0x111d93[_0x305e5c] = _0x216700['slice'](0x0);
-    }
-    _0x111d93[0x0][0x0] = 0x1;
-    for (let _0x7f4677 = 0x1; _0x7f4677 <= _0x5eb782; ++_0x7f4677) {
-      let _0x41a3a6 = 0x0;
-      const _0x9eed5a = _0xc3bca0 - _0x7f4677,
-        _0x202c40 = _0x1c36e3 - _0x7f4677;
-      _0xc3bca0 >= _0x7f4677 &&
-        ((_0x111d93[_0x4bc218][0x0] = _0x111d93[_0x34f429][0x0] / _0x383fc9[_0x202c40 + 0x1][_0x9eed5a]),
-        (_0x41a3a6 = _0x111d93[_0x4bc218][0x0] * _0x383fc9[_0x9eed5a][_0x202c40]));
-      const _0xcd4d4b = _0x9eed5a >= -0x1 ? 0x1 : -_0x9eed5a,
-        _0x34d70d = _0xc3bca0 - 0x1 <= _0x202c40 ? _0x7f4677 - 0x1 : _0x1c36e3 - _0xc3bca0;
-      for (let _0x113668 = _0xcd4d4b; _0x113668 <= _0x34d70d; ++_0x113668) {
-        ((_0x111d93[_0x4bc218][_0x113668] =
-          (_0x111d93[_0x34f429][_0x113668] - _0x111d93[_0x34f429][_0x113668 - 0x1]) /
-          _0x383fc9[_0x202c40 + 0x1][_0x9eed5a + _0x113668]),
-          (_0x41a3a6 += _0x111d93[_0x4bc218][_0x113668] * _0x383fc9[_0x9eed5a + _0x113668][_0x202c40]));
-      }
-      _0xc3bca0 <= _0x202c40 &&
-        ((_0x111d93[_0x4bc218][_0x7f4677] =
-          -_0x111d93[_0x34f429][_0x7f4677 - 0x1] / _0x383fc9[_0x202c40 + 0x1][_0xc3bca0]),
-        (_0x41a3a6 += _0x111d93[_0x4bc218][_0x7f4677] * _0x383fc9[_0xc3bca0][_0x202c40]));
-      _0x5929f6[_0x7f4677][_0xc3bca0] = _0x41a3a6;
-      const _0x33dd7c = _0x34f429;
-      ((_0x34f429 = _0x4bc218), (_0x4bc218 = _0x33dd7c));
-    }
-  }
-  let _0x51c867 = _0x1c36e3;
-  for (let _0x282dbb = 0x1; _0x282dbb <= _0x5eb782; ++_0x282dbb) {
-    for (let _0x159afd = 0x0; _0x159afd <= _0x1c36e3; ++_0x159afd) {
-      _0x5929f6[_0x282dbb][_0x159afd] *= _0x51c867;
-    }
-    _0x51c867 *= _0x1c36e3 - _0x282dbb;
-  }
-  return _0x5929f6;
+
+/**
+ * Calculates basis functions derivatives. See The NURBS Book, page 72, algorithm A2.3.
+ *
+ * @param {number} span - The span in which `u` lies.
+ * @param {number} u - The parametric point.
+ * @param {number} p - The degree.
+ * @param {number} n - number of derivatives to calculate
+ * @param {Array<number>} U - The knot vector.
+ * @return {Array<Array<number>>} An array[n+1][p+1] with basis functions derivatives.
+ */
+function calcBasisFunctionDerivatives( span, u, p, n, U ) {
+
+	const zeroArr = [];
+	for ( let i = 0; i <= p; ++ i )
+		zeroArr[ i ] = 0.0;
+
+	const ders = [];
+
+	for ( let i = 0; i <= n; ++ i )
+		ders[ i ] = zeroArr.slice( 0 );
+
+	const ndu = [];
+
+	for ( let i = 0; i <= p; ++ i )
+		ndu[ i ] = zeroArr.slice( 0 );
+
+	ndu[ 0 ][ 0 ] = 1.0;
+
+	const left = zeroArr.slice( 0 );
+	const right = zeroArr.slice( 0 );
+
+	for ( let j = 1; j <= p; ++ j ) {
+
+		left[ j ] = u - U[ span + 1 - j ];
+		right[ j ] = U[ span + j ] - u;
+
+		let saved = 0.0;
+
+		for ( let r = 0; r < j; ++ r ) {
+
+			const rv = right[ r + 1 ];
+			const lv = left[ j - r ];
+			ndu[ j ][ r ] = rv + lv;
+
+			const temp = ndu[ r ][ j - 1 ] / ndu[ j ][ r ];
+			ndu[ r ][ j ] = saved + rv * temp;
+			saved = lv * temp;
+
+		}
+
+		ndu[ j ][ j ] = saved;
+
+	}
+
+	for ( let j = 0; j <= p; ++ j ) {
+
+		ders[ 0 ][ j ] = ndu[ j ][ p ];
+
+	}
+
+	for ( let r = 0; r <= p; ++ r ) {
+
+		let s1 = 0;
+		let s2 = 1;
+
+		const a = [];
+		for ( let i = 0; i <= p; ++ i ) {
+
+			a[ i ] = zeroArr.slice( 0 );
+
+		}
+
+		a[ 0 ][ 0 ] = 1.0;
+
+		for ( let k = 1; k <= n; ++ k ) {
+
+			let d = 0.0;
+			const rk = r - k;
+			const pk = p - k;
+
+			if ( r >= k ) {
+
+				a[ s2 ][ 0 ] = a[ s1 ][ 0 ] / ndu[ pk + 1 ][ rk ];
+				d = a[ s2 ][ 0 ] * ndu[ rk ][ pk ];
+
+			}
+
+			const j1 = ( rk >= - 1 ) ? 1 : - rk;
+			const j2 = ( r - 1 <= pk ) ? k - 1 : p - r;
+
+			for ( let j = j1; j <= j2; ++ j ) {
+
+				a[ s2 ][ j ] = ( a[ s1 ][ j ] - a[ s1 ][ j - 1 ] ) / ndu[ pk + 1 ][ rk + j ];
+				d += a[ s2 ][ j ] * ndu[ rk + j ][ pk ];
+
+			}
+
+			if ( r <= pk ) {
+
+				a[ s2 ][ k ] = - a[ s1 ][ k - 1 ] / ndu[ pk + 1 ][ r ];
+				d += a[ s2 ][ k ] * ndu[ r ][ pk ];
+
+			}
+
+			ders[ k ][ r ] = d;
+
+			const j = s1;
+			s1 = s2;
+			s2 = j;
+
+		}
+
+	}
+
+	let r = p;
+
+	for ( let k = 1; k <= n; ++ k ) {
+
+		for ( let j = 0; j <= p; ++ j ) {
+
+			ders[ k ][ j ] *= r;
+
+		}
+
+		r *= p - k;
+
+	}
+
+	return ders;
+
 }
-function calcBSplineDerivatives(_0x56fe33, _0x228070, _0x40f600, _0x3c7f87, _0x252461) {
-  const _0x13d3f9 = _0x252461 < _0x56fe33 ? _0x252461 : _0x56fe33,
-    _0x46bdc8 = [],
-    _0x1d1ab9 = findSpan(_0x56fe33, _0x3c7f87, _0x228070),
-    _0x4ce4db = calcBasisFunctionDerivatives(_0x1d1ab9, _0x3c7f87, _0x56fe33, _0x13d3f9, _0x228070),
-    _0x470126 = [];
-  for (let _0xe0abd3 = 0x0; _0xe0abd3 < _0x40f600['length']; ++_0xe0abd3) {
-    const _0x577494 = _0x40f600[_0xe0abd3]['clone'](),
-      _0x58aa67 = _0x577494['w'];
-    ((_0x577494['x'] *= _0x58aa67),
-      (_0x577494['y'] *= _0x58aa67),
-      (_0x577494['z'] *= _0x58aa67),
-      (_0x470126[_0xe0abd3] = _0x577494));
-  }
-  for (let _0xba168e = 0x0; _0xba168e <= _0x13d3f9; ++_0xba168e) {
-    const _0x4a8398 = _0x470126[_0x1d1ab9 - _0x56fe33]
-      ['clone']()
-      ['multiplyScalar'](_0x4ce4db[_0xba168e][0x0]);
-    for (let _0x1c27f1 = 0x1; _0x1c27f1 <= _0x56fe33; ++_0x1c27f1) {
-      _0x4a8398['add'](
-        _0x470126[_0x1d1ab9 - _0x56fe33 + _0x1c27f1]
-          ['clone']()
-          ['multiplyScalar'](_0x4ce4db[_0xba168e][_0x1c27f1]),
-      );
-    }
-    _0x46bdc8[_0xba168e] = _0x4a8398;
-  }
-  for (let _0x36b3b4 = _0x13d3f9 + 0x1; _0x36b3b4 <= _0x252461 + 0x1; ++_0x36b3b4) {
-    _0x46bdc8[_0x36b3b4] = new Vector4(0x0, 0x0, 0x0);
-  }
-  return _0x46bdc8;
+
+/**
+ * Calculates derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
+ *
+ * @param {number} p - The degree.
+ * @param {Array<number>} U - The knot vector.
+ * @param {Array<Vector4>} P - The control points
+ * @param {number} u - The parametric point.
+ * @param {number} nd - The number of derivatives.
+ * @return {Array<Vector4>} An array[d+1] with derivatives.
+ */
+function calcBSplineDerivatives( p, U, P, u, nd ) {
+
+	const du = nd < p ? nd : p;
+	const CK = [];
+	const span = findSpan( p, u, U );
+	const nders = calcBasisFunctionDerivatives( span, u, p, du, U );
+	const Pw = [];
+
+	for ( let i = 0; i < P.length; ++ i ) {
+
+		const point = P[ i ].clone();
+		const w = point.w;
+
+		point.x *= w;
+		point.y *= w;
+		point.z *= w;
+
+		Pw[ i ] = point;
+
+	}
+
+	for ( let k = 0; k <= du; ++ k ) {
+
+		const point = Pw[ span - p ].clone().multiplyScalar( nders[ k ][ 0 ] );
+
+		for ( let j = 1; j <= p; ++ j ) {
+
+			point.add( Pw[ span - p + j ].clone().multiplyScalar( nders[ k ][ j ] ) );
+
+		}
+
+		CK[ k ] = point;
+
+	}
+
+	for ( let k = du + 1; k <= nd + 1; ++ k ) {
+
+		CK[ k ] = new Vector4( 0, 0, 0 );
+
+	}
+
+	return CK;
+
 }
-function calcKoverI(_0x18cf2d, _0x31f4fc) {
-  let _0x35a9b2 = 0x1;
-  for (let _0x5be8de = 0x2; _0x5be8de <= _0x18cf2d; ++_0x5be8de) {
-    _0x35a9b2 *= _0x5be8de;
-  }
-  let _0x16e5e0 = 0x1;
-  for (let _0x1733b4 = 0x2; _0x1733b4 <= _0x31f4fc; ++_0x1733b4) {
-    _0x16e5e0 *= _0x1733b4;
-  }
-  for (let _0x2cc3c0 = 0x2; _0x2cc3c0 <= _0x18cf2d - _0x31f4fc; ++_0x2cc3c0) {
-    _0x16e5e0 *= _0x2cc3c0;
-  }
-  return _0x35a9b2 / _0x16e5e0;
+
+/**
+ * Calculates "K over I".
+ *
+ * @param {number} k - The K value.
+ * @param {number} i - The I value.
+ * @return {number} k!/(i!(k-i)!)
+ */
+function calcKoverI( k, i ) {
+
+	let nom = 1;
+
+	for ( let j = 2; j <= k; ++ j ) {
+
+		nom *= j;
+
+	}
+
+	let denom = 1;
+
+	for ( let j = 2; j <= i; ++ j ) {
+
+		denom *= j;
+
+	}
+
+	for ( let j = 2; j <= k - i; ++ j ) {
+
+		denom *= j;
+
+	}
+
+	return nom / denom;
+
 }
-function calcRationalCurveDerivatives(_0xa140e0) {
-  const _0x10d969 = _0xa140e0['length'],
-    _0x11404e = [],
-    _0x479694 = [];
-  for (let _0x280dd4 = 0x0; _0x280dd4 < _0x10d969; ++_0x280dd4) {
-    const _0x2ee4dd = _0xa140e0[_0x280dd4];
-    ((_0x11404e[_0x280dd4] = new Vector3(_0x2ee4dd['x'], _0x2ee4dd['y'], _0x2ee4dd['z'])),
-      (_0x479694[_0x280dd4] = _0x2ee4dd['w']));
-  }
-  const _0xcff529 = [];
-  for (let _0x15b1f7 = 0x0; _0x15b1f7 < _0x10d969; ++_0x15b1f7) {
-    const _0x34a11d = _0x11404e[_0x15b1f7]['clone']();
-    for (let _0x525cb9 = 0x1; _0x525cb9 <= _0x15b1f7; ++_0x525cb9) {
-      _0x34a11d['sub'](
-        _0xcff529[_0x15b1f7 - _0x525cb9]
-          ['clone']()
-          ['multiplyScalar'](calcKoverI(_0x15b1f7, _0x525cb9) * _0x479694[_0x525cb9]),
-      );
-    }
-    _0xcff529[_0x15b1f7] = _0x34a11d['divideScalar'](_0x479694[0x0]);
-  }
-  return _0xcff529;
+
+/**
+ * Calculates derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.
+ *
+ * @param {Array<Vector4>} Pders - Array with derivatives.
+ * @return {Array<Vector3>} An array with derivatives for rational curve.
+ */
+function calcRationalCurveDerivatives( Pders ) {
+
+	const nd = Pders.length;
+	const Aders = [];
+	const wders = [];
+
+	for ( let i = 0; i < nd; ++ i ) {
+
+		const point = Pders[ i ];
+		Aders[ i ] = new Vector3( point.x, point.y, point.z );
+		wders[ i ] = point.w;
+
+	}
+
+	const CK = [];
+
+	for ( let k = 0; k < nd; ++ k ) {
+
+		const v = Aders[ k ].clone();
+
+		for ( let i = 1; i <= k; ++ i ) {
+
+			v.sub( CK[ k - i ].clone().multiplyScalar( calcKoverI( k, i ) * wders[ i ] ) );
+
+		}
+
+		CK[ k ] = v.divideScalar( wders[ 0 ] );
+
+	}
+
+	return CK;
+
 }
-function calcNURBSDerivatives(_0x4f0c89, _0x5cd074, _0x4dd74f, _0x49cf9a, _0x3232ba) {
-  const _0x2b9737 = calcBSplineDerivatives(_0x4f0c89, _0x5cd074, _0x4dd74f, _0x49cf9a, _0x3232ba);
-  return calcRationalCurveDerivatives(_0x2b9737);
+
+/**
+ * Calculates NURBS curve derivatives. See The NURBS Book, page 127, algorithm A4.2.
+ *
+ * @param {number} p - The degree.
+ * @param {Array<number>} U - The knot vector.
+ * @param {Array<Vector4>} P - The control points in homogeneous space.
+ * @param {number} u - The parametric point.
+ * @param {number} nd - The number of derivatives.
+ * @return {Array<Vector3>} array with derivatives for rational curve.
+ */
+function calcNURBSDerivatives( p, U, P, u, nd ) {
+
+	const Pders = calcBSplineDerivatives( p, U, P, u, nd );
+	return calcRationalCurveDerivatives( Pders );
+
 }
-function calcSurfacePoint(
-  _0x33f604,
-  _0x5716e0,
-  _0x2a264f,
-  _0x551286,
-  _0x1dd60f,
-  _0x292f38,
-  _0x266581,
-  _0x23dff1,
-) {
-  const _0x51bfda = findSpan(_0x33f604, _0x292f38, _0x2a264f),
-    _0x28f5db = findSpan(_0x5716e0, _0x266581, _0x551286),
-    _0x4ce519 = calcBasisFunctions(_0x51bfda, _0x292f38, _0x33f604, _0x2a264f),
-    _0x4329b5 = calcBasisFunctions(_0x28f5db, _0x266581, _0x5716e0, _0x551286),
-    _0x1065dd = [];
-  for (let _0x2de5c5 = 0x0; _0x2de5c5 <= _0x5716e0; ++_0x2de5c5) {
-    _0x1065dd[_0x2de5c5] = new Vector4(0x0, 0x0, 0x0, 0x0);
-    for (let _0x1e2989 = 0x0; _0x1e2989 <= _0x33f604; ++_0x1e2989) {
-      const _0x2d4013 =
-          _0x1dd60f[_0x51bfda - _0x33f604 + _0x1e2989][_0x28f5db - _0x5716e0 + _0x2de5c5]['clone'](),
-        _0x22edbf = _0x2d4013['w'];
-      ((_0x2d4013['x'] *= _0x22edbf),
-        (_0x2d4013['y'] *= _0x22edbf),
-        (_0x2d4013['z'] *= _0x22edbf),
-        _0x1065dd[_0x2de5c5]['add'](_0x2d4013['multiplyScalar'](_0x4ce519[_0x1e2989])));
-    }
-  }
-  const _0x3c4813 = new Vector4(0x0, 0x0, 0x0, 0x0);
-  for (let _0x149bd1 = 0x0; _0x149bd1 <= _0x5716e0; ++_0x149bd1) {
-    _0x3c4813['add'](_0x1065dd[_0x149bd1]['multiplyScalar'](_0x4329b5[_0x149bd1]));
-  }
-  (_0x3c4813['divideScalar'](_0x3c4813['w']),
-    _0x23dff1['set'](_0x3c4813['x'], _0x3c4813['y'], _0x3c4813['z']));
+
+/**
+ * Calculates a rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
+ *
+ * @param {number} p - The first degree of B-Spline surface.
+ * @param {number} q - The second degree of B-Spline surface.
+ * @param {Array<number>} U - The first knot vector.
+ * @param {Array<number>} V - The second knot vector.
+ * @param {Array<Array<Vector4>>} P - The control points in homogeneous space.
+ * @param {number} u - The first parametric point.
+ * @param {number} v - The second parametric point.
+ * @param {Vector3} target - The target vector.
+ */
+function calcSurfacePoint( p, q, U, V, P, u, v, target ) {
+
+	const uspan = findSpan( p, u, U );
+	const vspan = findSpan( q, v, V );
+	const Nu = calcBasisFunctions( uspan, u, p, U );
+	const Nv = calcBasisFunctions( vspan, v, q, V );
+	const temp = [];
+
+	for ( let l = 0; l <= q; ++ l ) {
+
+		temp[ l ] = new Vector4( 0, 0, 0, 0 );
+		for ( let k = 0; k <= p; ++ k ) {
+
+			const point = P[ uspan - p + k ][ vspan - q + l ].clone();
+			const w = point.w;
+			point.x *= w;
+			point.y *= w;
+			point.z *= w;
+			temp[ l ].add( point.multiplyScalar( Nu[ k ] ) );
+
+		}
+
+	}
+
+	const Sw = new Vector4( 0, 0, 0, 0 );
+	for ( let l = 0; l <= q; ++ l ) {
+
+		Sw.add( temp[ l ].multiplyScalar( Nv[ l ] ) );
+
+	}
+
+	Sw.divideScalar( Sw.w );
+	target.set( Sw.x, Sw.y, Sw.z );
+
 }
-function calcVolumePoint(
-  _0x5ad63e,
-  _0x2db2a6,
-  _0x2864ff,
-  _0x1e1eeb,
-  _0x47f26a,
-  _0x2efa18,
-  _0x9d71ae,
-  _0x1b0778,
-  _0x5c5b1c,
-  _0x4e3b17,
-  _0x4502b7,
-) {
-  const _0x1a0686 = findSpan(_0x5ad63e, _0x1b0778, _0x1e1eeb),
-    _0x436301 = findSpan(_0x2db2a6, _0x5c5b1c, _0x47f26a),
-    _0x5b9724 = findSpan(_0x2864ff, _0x4e3b17, _0x2efa18),
-    _0x3a8f00 = calcBasisFunctions(_0x1a0686, _0x1b0778, _0x5ad63e, _0x1e1eeb),
-    _0x5aad13 = calcBasisFunctions(_0x436301, _0x5c5b1c, _0x2db2a6, _0x47f26a),
-    _0x151de9 = calcBasisFunctions(_0x5b9724, _0x4e3b17, _0x2864ff, _0x2efa18),
-    _0x28b30d = [];
-  for (let _0x344ae5 = 0x0; _0x344ae5 <= _0x2864ff; ++_0x344ae5) {
-    _0x28b30d[_0x344ae5] = [];
-    for (let _0x531410 = 0x0; _0x531410 <= _0x2db2a6; ++_0x531410) {
-      _0x28b30d[_0x344ae5][_0x531410] = new Vector4(0x0, 0x0, 0x0, 0x0);
-      for (let _0x140b75 = 0x0; _0x140b75 <= _0x5ad63e; ++_0x140b75) {
-        const _0x3f0dad =
-            _0x9d71ae[_0x1a0686 - _0x5ad63e + _0x140b75][_0x436301 - _0x2db2a6 + _0x531410][
-              _0x5b9724 - _0x2864ff + _0x344ae5
-            ]['clone'](),
-          _0x147b25 = _0x3f0dad['w'];
-        ((_0x3f0dad['x'] *= _0x147b25),
-          (_0x3f0dad['y'] *= _0x147b25),
-          (_0x3f0dad['z'] *= _0x147b25),
-          _0x28b30d[_0x344ae5][_0x531410]['add'](_0x3f0dad['multiplyScalar'](_0x3a8f00[_0x140b75])));
-      }
-    }
-  }
-  const _0x3adbf7 = new Vector4(0x0, 0x0, 0x0, 0x0);
-  for (let _0x41cc1e = 0x0; _0x41cc1e <= _0x2864ff; ++_0x41cc1e) {
-    for (let _0x34d477 = 0x0; _0x34d477 <= _0x2db2a6; ++_0x34d477) {
-      _0x3adbf7['add'](
-        _0x28b30d[_0x41cc1e][_0x34d477]['multiplyScalar'](_0x151de9[_0x41cc1e])['multiplyScalar'](
-          _0x5aad13[_0x34d477],
-        ),
-      );
-    }
-  }
-  (_0x3adbf7['divideScalar'](_0x3adbf7['w']),
-    _0x4502b7['set'](_0x3adbf7['x'], _0x3adbf7['y'], _0x3adbf7['z']));
+
+/**
+ * Calculates a rational B-Spline volume point. See The NURBS Book, page 134, algorithm A4.3.
+ *
+ * @param {number} p - The first degree of B-Spline surface.
+ * @param {number} q - The second degree of B-Spline surface.
+ * @param {number} r - The third degree of B-Spline surface.
+ * @param {Array<number>} U - The first knot vector.
+ * @param {Array<number>} V - The second knot vector.
+ * @param {Array<number>} W - The third knot vector.
+ * @param {Array<Array<Array<Vector4>>>} P - The control points in homogeneous space.
+ * @param {number} u - The first parametric point.
+ * @param {number} v - The second parametric point.
+ * @param {number} w - The third parametric point.
+ * @param {Vector3} target - The target vector.
+ */
+function calcVolumePoint( p, q, r, U, V, W, P, u, v, w, target ) {
+
+	const uspan = findSpan( p, u, U );
+	const vspan = findSpan( q, v, V );
+	const wspan = findSpan( r, w, W );
+	const Nu = calcBasisFunctions( uspan, u, p, U );
+	const Nv = calcBasisFunctions( vspan, v, q, V );
+	const Nw = calcBasisFunctions( wspan, w, r, W );
+	const temp = [];
+
+	for ( let m = 0; m <= r; ++ m ) {
+
+		temp[ m ] = [];
+
+		for ( let l = 0; l <= q; ++ l ) {
+
+			temp[ m ][ l ] = new Vector4( 0, 0, 0, 0 );
+			for ( let k = 0; k <= p; ++ k ) {
+
+				const point = P[ uspan - p + k ][ vspan - q + l ][ wspan - r + m ].clone();
+				const w = point.w;
+				point.x *= w;
+				point.y *= w;
+				point.z *= w;
+				temp[ m ][ l ].add( point.multiplyScalar( Nu[ k ] ) );
+
+			}
+
+		}
+
+	}
+
+	const Sw = new Vector4( 0, 0, 0, 0 );
+	for ( let m = 0; m <= r; ++ m ) {
+
+		for ( let l = 0; l <= q; ++ l ) {
+
+			Sw.add( temp[ m ][ l ].multiplyScalar( Nw[ m ] ).multiplyScalar( Nv[ l ] ) );
+
+		}
+
+	}
+
+	Sw.divideScalar( Sw.w );
+	target.set( Sw.x, Sw.y, Sw.z );
+
 }
+
 export {
-  findSpan,
-  calcBasisFunctions,
-  calcBSplinePoint,
-  calcBasisFunctionDerivatives,
-  calcBSplineDerivatives,
-  calcKoverI,
-  calcRationalCurveDerivatives,
-  calcNURBSDerivatives,
-  calcSurfacePoint,
-  calcVolumePoint,
+	findSpan,
+	calcBasisFunctions,
+	calcBSplinePoint,
+	calcBasisFunctionDerivatives,
+	calcBSplineDerivatives,
+	calcKoverI,
+	calcRationalCurveDerivatives,
+	calcNURBSDerivatives,
+	calcSurfacePoint,
+	calcVolumePoint,
 };
