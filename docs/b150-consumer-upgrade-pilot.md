@@ -193,3 +193,39 @@ HEAD 原件同样必挂，属循环导入 + 求值顺序的环境性产物；应
    后续升代批的目录测试按「落地文件的全部下游所在目录」枚举。
 2. **`window is not defined`（bare 导入）是浏览器目标文件的既有环境特征**——HEAD 同样
    必挂（videoToolbar 18 处、interaction.js 60 处 window 引用），不作为闸门失败依据。
+
+## 10. 第 154 批续：gain≥2 干净件全取（13 取 11）
+
+候选重算（`deobf-tools/b154/find-candidates.mjs`）：排除已归因失败件 / 受保护件 / 不可单件后，
+剩余干净候选 45 件；取授权目录内 gain≥2（可接通孤立件数）的全部 13 件。
+
+| 文件 | 改名 | 归因失败 | 结果 |
+| --- | --- | --- | --- |
+| `components/aigenText/textGenerationResultRenderer.js` | 28 | 0 | **保留** |
+| `components/SourceAudioNode.js` | 136 | 0 | **保留** |
+| `components/video-node/resultRenderModule.js` | 525 | 7 | **回滚**（video result render 6 + AIGenVideoNode 连带 1） |
+| `components/video-node/previewControlsModule.js` | 202 | 1 | **回滚** |
+| `modules/agent/agentActionExecutor.js` | 63 | 0 | **保留** |
+| `modules/agent/agentContextBuilder.js` | 104 | 0 | **保留** |
+| `modules/AssetManager.js` | 1,062 | 0 | **保留** |
+| `modules/imageAnnotate/rendering.js` | 185 | 0 | **保留** |
+| `modules/ImageCropController.js` | 261 | 0 | **保留**（导出超集 +4） |
+| `modules/ImageFreeAngleController.js` | 171 | 0 | **保留** |
+| `modules/ImageMattingController.js` | 327 | 0 | **保留** |
+| `modules/panoramaSceneNode/sceneNodeActions.js` | 682 | 0 | **保留** |
+| `modules/shortcuts.js` | 253 | 0 | **保留** |
+
+机械工序 13/13 全过（共改名 3,999、闸门 PASS、导出面 0 丢弃、`_0x` 残留 0）。
+保留 11 件后：孤立 313 → **291**（368 口径累计接通 **77**）；483 口径删 16 件为 **445/1238**，
+`imageAnnotate` 组清零。全量 **11185/11184/0**——零失败，连基线 3 例 installerSafety 偶发也未复现。
+
+**两条新经验**：
+1. **目录测试既有失败要先用 stash 在 HEAD 上复核**——`src/services/desktopProjectFileStore`
+   5 例在该目录测试跑法下 HEAD 同挂（全量沙箱跑法可通过），属于环境性既有失败，
+   不能记到本批头上。
+2. **`node --check` 暂存件要先补 `{"type":"module"}` 标记**——裸暂存目录里 ESM 文件会全部
+   误报语法错误（import 语句不被识别），与文件本身无关。
+
+**口径提示**：483 口径（scope 1238）为手工维护账，与 reach 脚本现口径（scope 1992，
+孤立 291）已不同源；组表历史欠账（b150–153 的 22 件未逐组摊销）已在合计行一次理平（445），
+组间分布以头部叙述为准。

@@ -7,6 +7,8 @@
 
 - 2026-10-04（151 批·接线第 2 小样）：升代 `src/core` 干净件 6 取 5（rendererResizePreview、viewportFocus、viewportPanPreview、stores/legacyKernelStore、stores/facadeStore，改名 1092、导出面不变），再接通孤立 11 件（368 口径 356→345；483 口径删 previewCommitSession 为 473/1238）。generationTaskRuntime 自身测试回归已回滚。发现既有雷：stores/runtime.js 与 legacyKernelStore 循环导入、直连入口 TDZ（HEAD 同挂，非本批引入）。全量 11185/11185/0，基线 3 个 installerSafety 失败本轮未复现（偶发），改动相关新增 0。
 
+- 2026-10-04（150 批·接线小样）：实况核查证明 433 条接线边无一可「只补 import」，真动作是升代在用消费方（`docs/wiring-reality-check.md`）。小样 5 件：落地 2 件（canvasCommands/index.js、scene3dBridge.js，改名 828、导出面不变）接通孤立 12 件（368→356；483 口径删 9 件）；taskOrchestrationModule.impl（16 例）与 uiModule.impl（3 例）行为回归回滚；vendorVideoModelApiManifests 受依赖闭包约束不可单件。全量 11185/11182/3 与基线逐条一致，零新增。专题 `docs/b150-consumer-upgrade-pilot.md`。
+
 - 2026-09-29（暂停跟踪）：提交并推送 `4c3bc6c` 后，按用户要求停止 watcher PID 14788，取消 `.vscode/tasks.json` 的 `folderOpen` 自动启动，并在 `AGENTS.md`、本文件写明暂停状态；恢复前不运行任何跟踪登记命令。
 
 - 2026-09-29（恢复跟踪）：按用户要求移除 `AGENTS.md` 与 `docs/TRACKING.md` 的暂停说明，恢复 `.vscode/tasks.json` 的 `folderOpen` 自动启动；已执行 `--by session-start` 补记暂停期间 #0134，并恢复自动监视进程。

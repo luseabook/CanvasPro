@@ -1,27 +1,30 @@
+import { openDebugRequestWindow } from './debugRequestWindow.js';
 import appStore from '../core/stores/appStore.js';
+import {
+  bindImageFunctionControls,
+  getImageFunctionRequestSettings,
+  getImageFunctionSelection,
+  renderImageFunctionControls,
+} from './imageFunctionControls.js';
 import { generateId } from '../core/math.js';
 import { getImage } from './storage.js';
 import { buildGenerateImageRequest, generateImage } from '../../api/aiImageApi.js';
+import { isAdaptiveRatioLabel } from '../../api/imageRatioPolicy.js';
 import { cancelRunningHubTask } from '../../api/runninghubTaskApi.js';
 import { ensureConfig, getProviderConfig } from '../../api/configApi.js';
 import { calcSafeSpawnPosNearNode } from './nodeSpawn.js';
-import { buildSourceMediaNodePayload, getAutoMediaSizeByShortSide } from '../services/fileService.js';
 import {
-  bindImageFunctionModeMenu,
+  buildSourceMediaNodePayload,
+  getAutoMediaSizeByShortSide,
+  getNodeDefaultSize,
+} from '../services/fileService.js';
+import {
   buildImageFreeAngleModelCatalog,
-  bindImageFunctionModelMenu,
-  buildImageFunctionModeControlHTML,
-  buildImageFunctionModelMenuHTML,
-  closeImageFunctionModelSubmenus,
   getDefaultImageFreeAngleModelState,
   getImageFunctionModelDisplayName,
-  getImageFunctionModelTriggerIconHTML,
   isImageFreeAngleOnlyModel,
-  resolveImageFunctionModelByMode,
-  syncImageFunctionModeControl,
-  syncImageFunctionModelMenuActive,
 } from './imageFunctionModelMenu.js';
-import { DEBUG_WRENCH_ICON_HTML, formatFinalApiDebugRequest } from '../utils/debugRequestPreview.js';
+import { DEBUG_WRENCH_ICON_HTML, buildFinalApiDebugPreview } from '../utils/debugRequestPreview.js';
 import { localPathToUrl, pickResultLocalPath } from '../utils/localMediaPath.js';
 import { GENERATE_CANCEL_ICON_HTML } from './previewGenerateButtonUi.js';
 import {
@@ -29,6 +32,11 @@ import {
   buildImageGenerationResultPatch,
 } from '../components/aigenImage/imageGenerationResultRenderer.js';
 import { buildGenerationCancelledPatch, buildGenerationStartPatch } from '../core/generationTaskLifecycle.js';
+import {
+  buildAsyncTaskPatch,
+  buildDreaminaTaskPatch,
+  buildRunningHubTaskPatch,
+} from '../core/generationTaskProtocolState.js';
 import { isTaskCancelled } from '../core/generationTaskUiState.js';
 import {
   isDreaminaImageTaskModel,
@@ -38,18 +46,22 @@ import {
   shouldUseRunningHubOpenapiQuery,
 } from './imageTaskModelResolver.js';
 import { onLocaleChange, t } from '../i18n/index.js';
+import {
+  resolveImageFreeAngleAspectRatio,
+  resolveImageFreeAngleSourceSize,
+} from './imageFreeAngleAspectRatio.js';
 const FREE_ANGLE_DISTANCE_MIN = 0.1,
-  FREE_ANGLE_DISTANCE_MAX = 2,
+  FREE_ANGLE_DISTANCE_MAX = 0x2,
   FREE_ANGLE_VISUAL_SCALE_MIN = 0.7,
   FREE_ANGLE_PREVIOUS_DISTANCE_ONE_VISUAL_SCALE =
     FREE_ANGLE_VISUAL_SCALE_MIN +
-    (1 - FREE_ANGLE_DISTANCE_MIN) * (2.65 / (FREE_ANGLE_DISTANCE_MAX - FREE_ANGLE_DISTANCE_MIN));
+    (0x1 - FREE_ANGLE_DISTANCE_MIN) * (2.65 / (FREE_ANGLE_DISTANCE_MAX - FREE_ANGLE_DISTANCE_MIN));
 function _computeGenerationDuration(enabled) {
-  if (!enabled) return 0;
-  if (typeof enabled.generationDuration === 'number') return enabled.generationDuration;
-  const count = Number(enabled.generationStartTime);
-  if (!Number.isFinite(count) || count <= 0) return 0;
-  return Math.max(0, Date.now() - count);
+  if (!enabled) return 0x0;
+  if (typeof enabled['generationDuration'] === 'number') return enabled['generationDuration'];
+  const count = Number(enabled['generationStartTime']);
+  if (!Number['isFinite'](count) || count <= 0x0) return 0x0;
+  return Math['max'](0x0, Date['now']() - count);
 }
 function _isRunningHubTaskModel(value, item) {
   return isRunningHubImageTaskModel(value, item);
@@ -60,7 +72,10 @@ function _isDreaminaTaskModel(key, index) {
 function freeAngleText(result, data = {}) {
   return t('imageFreeAngle.' + result, data);
 }
-function buildFreeAngleOutputText(model, { rotation: rotation, pitch: pitch, scale: scale } = {}) {
+function buildFreeAngleOutputText(
+  model,
+  { rotation: rotation, pitch: pitch, scale: scale } = {},
+) {
   return freeAngleText('output.angle', {
     model: model,
     rotation: rotation,
@@ -74,65 +89,64 @@ function _resolveImageProvider(options, target = '') {
 function _buildRunningHubTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0,
-  recovering: recovering = false,
-  useOpenapiQuery: useOpenapiQuery = false,
+  startedAt: startedAt = 0x0,
+  recovering: recovering = ![],
+  useOpenapiQuery: useOpenapiQuery = ![],
 } = {}) {
-  return {
-    rhTaskId: String(taskId || '').trim(),
-    rhTaskStatus: String(status || 'pending').trim() || 'pending',
-    rhTaskStartedAt: Number(startedAt || 0),
-    rhTaskRecovering: recovering === true,
-    rhTaskUseOpenapiQuery: useOpenapiQuery === true,
-  };
+  return buildRunningHubTaskPatch({
+    taskId: taskId,
+    status: status,
+    startedAt: startedAt,
+    recovering: recovering,
+    useOpenapiQuery: useOpenapiQuery,
+  });
 }
 function _buildDreaminaTaskPatch({
   submitId: submitId = '',
   status: status = 'pending',
   phase: phase = 'generating',
   label: label = freeAngleText('task.generating'),
-  startedAt: startedAt = 0,
-  recovering: recovering = false,
+  startedAt: startedAt = 0x0,
+  recovering: recovering = ![],
 } = {}) {
-  return {
-    dreaminaSubmitId: String(submitId || '').trim(),
-    dreaminaTaskStatus: String(status || 'pending').trim() || 'pending',
-    dreaminaTaskPhase: String(phase || 'generating').trim() || 'generating',
-    dreaminaTaskLabel:
-      String(label || freeAngleText('task.generating')).trim() || freeAngleText('task.generating'),
-    dreaminaTaskStartedAt: Number(startedAt || 0),
-    dreaminaTaskLastCheckedAt: Date.now(),
-    dreaminaTaskRecovering: recovering === true,
-    dreaminaTaskLastRaw: {},
-  };
+  return buildDreaminaTaskPatch({
+    submitId: submitId,
+    status: status,
+    phase: phase,
+    label: label,
+    startedAt: startedAt,
+    recovering: recovering,
+    defaultLabel: freeAngleText('task.generating'),
+  });
 }
 function _buildAsyncTaskPatch({
   provider: provider = '',
   kind: kind = 'image',
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0,
-  recovering: recovering = false,
+  startedAt: startedAt = 0x0,
+  recovering: recovering = ![],
 } = {}) {
-  return {
-    asyncTaskProvider: String(provider || '').trim(),
-    asyncTaskKind: String(kind || 'image').trim() || 'image',
-    asyncTaskId: String(taskId || '').trim(),
-    asyncTaskStatus: String(status || 'pending').trim() || 'pending',
-    asyncTaskStartedAt: Number(startedAt || 0),
-    asyncTaskRecovering: recovering === true,
-  };
+  return buildAsyncTaskPatch({
+    provider: provider,
+    kind: kind,
+    taskId: taskId,
+    status: status,
+    startedAt: startedAt,
+    recovering: recovering,
+  });
 }
 function _persistRunningHubResumeCache() {
   try {
-    window._triggerLocalCacheSave?.();
+    window['_triggerLocalCacheSave']?.();
   } catch {}
 }
 export function createRunningHubTaskStateMachine() {
   const apiKey = {
-      active: false,
-      cancelRequested: false,
+      active: ![],
+      cancelRequested: ![],
       apiKey: '',
+      providerProfileId: '',
       taskId: '',
       abortController: null,
       outNodeId: '',
@@ -143,66 +157,73 @@ export function createRunningHubTaskStateMachine() {
       originTitle: '',
     },
     bindButton = (el) => {
-      if (!el || apiKey.originHtml) return;
-      ((apiKey.originHtml = el.innerHTML),
-        (apiKey.originColor = el.style.color || ''),
-        (apiKey.originTooltip = el.dataset.tooltip || ''),
-        (apiKey.originAria = el.getAttribute('aria-label') || ''),
-        (apiKey.originTitle = el.title || ''));
+      if (!el || apiKey['originHtml']) return;
+      ((apiKey['originHtml'] = el['innerHTML']),
+        (apiKey['originColor'] = el['style']['color'] || ''),
+        (apiKey['originTooltip'] = el['dataset']['tooltip'] || ''),
+        (apiKey['originAria'] = el['getAttribute']('aria-label') || ''),
+        (apiKey['originTitle'] = el['title'] || ''));
     },
     handler = (el2) => {
       if (!el2) return;
       (bindButton(el2),
-        (el2.style.color = 'var(--red)'),
-        (el2.dataset.tooltip = freeAngleText('runningTask.clickCancel')),
-        el2.setAttribute('aria-label', freeAngleText('runningTask.cancel')),
-        (el2.title = freeAngleText('runningTask.clickCancelTask')),
-        (el2.innerHTML = GENERATE_CANCEL_ICON_HTML));
+        (el2['style']['color'] = 'var(--red)'),
+        (el2['dataset']['tooltip'] = freeAngleText('runningTask.clickCancel')),
+        el2['setAttribute']('aria-label', freeAngleText('runningTask.cancel')),
+        (el2['title'] = freeAngleText('runningTask.clickCancelTask')),
+        (el2['innerHTML'] = GENERATE_CANCEL_ICON_HTML));
     },
     handler2 = (el3) => {
       if (!el3) return;
-      if (apiKey.originHtml) el3.innerHTML = apiKey.originHtml;
-      el3.style.color = apiKey.originColor || '';
-      if (apiKey.originTooltip) el3.dataset.tooltip = apiKey.originTooltip;
-      else delete el3.dataset.tooltip;
-      if (apiKey.originAria) el3.setAttribute('aria-label', apiKey.originAria);
-      else el3.removeAttribute('aria-label');
-      el3.title = apiKey.originTitle || '';
+      if (apiKey['originHtml']) el3['innerHTML'] = apiKey['originHtml'];
+      el3['style']['color'] = apiKey['originColor'] || '';
+      if (apiKey['originTooltip']) el3['dataset']['tooltip'] = apiKey['originTooltip'];
+      else delete el3['dataset']['tooltip'];
+      if (apiKey['originAria']) el3['setAttribute']('aria-label', apiKey['originAria']);
+      else el3['removeAttribute']('aria-label');
+      el3['title'] = apiKey['originTitle'] || '';
     },
     activate = ({
       button: button,
       apiKey: apiKey2,
+      providerProfileId: providerProfileId,
       abortController: abortController,
       outNodeId: outNodeId,
     }) => {
-      ((apiKey.active = true),
-        (apiKey.cancelRequested = false),
-        (apiKey.apiKey = apiKey2 || ''),
-        (apiKey.taskId = ''),
-        (apiKey.abortController = abortController || null),
-        (apiKey.outNodeId = outNodeId || ''),
+      ((apiKey['active'] = !![]),
+        (apiKey['cancelRequested'] = ![]),
+        (apiKey['apiKey'] = apiKey2 || ''),
+        (apiKey['providerProfileId'] = String(providerProfileId || '')['trim']()),
+        (apiKey['taskId'] = ''),
+        (apiKey['abortController'] = abortController || null),
+        (apiKey['outNodeId'] = outNodeId || ''),
         handler(button));
     },
     setTaskId = (source) => {
-      apiKey.taskId = source ? String(source) : '';
+      apiKey['taskId'] = source ? String(source) : '';
     },
-    isCancelled = () => !!apiKey.cancelRequested || !!apiKey.abortController?.signal?.aborted,
+    isCancelled = () =>
+      !!apiKey['cancelRequested'] || !!apiKey['abortController']?.['signal']?.['aborted'],
     cancel = async () => {
-      apiKey.cancelRequested = true;
+      apiKey['cancelRequested'] = !![];
       try {
-        apiKey.abortController?.abort?.();
+        apiKey['abortController']?.['abort']?.();
       } catch {}
-      apiKey.apiKey &&
-        apiKey.taskId &&
-        (await cancelRunningHubTask({ apiKey: apiKey.apiKey, taskId: apiKey.taskId }));
+      apiKey['apiKey'] &&
+        apiKey['taskId'] &&
+        (await cancelRunningHubTask({
+          apiKey: apiKey['apiKey'],
+          taskId: apiKey['taskId'],
+          providerProfileId: apiKey['providerProfileId'],
+        }));
     },
     finalizeCancelledNode = ({ nodeId: nodeId, name: name, outputText: outputText }) => {
-      const enabled2 = nodeId || apiKey.outNodeId;
+      const enabled2 = nodeId || apiKey['outNodeId'];
       if (!enabled2) return;
-      const enabled3 = appStore.getState().nodes?.[enabled2];
+      const enabled3 = appStore['getState']()['nodes']?.[enabled2];
       if (!enabled3) return;
       const duration = _computeGenerationDuration(enabled3);
-      appStore.updateNodeData(enabled2, {
+      appStore['updateNodeData'](enabled2, {
         ...buildGenerationCancelledPatch({ duration: duration }),
         name: name,
         outputText: outputText,
@@ -210,12 +231,13 @@ export function createRunningHubTaskStateMachine() {
       });
     },
     reset = (next) => {
-      ((apiKey.active = false),
-        (apiKey.cancelRequested = false),
-        (apiKey.apiKey = ''),
-        (apiKey.taskId = ''),
-        (apiKey.abortController = null),
-        (apiKey.outNodeId = ''),
+      ((apiKey['active'] = ![]),
+        (apiKey['cancelRequested'] = ![]),
+        (apiKey['apiKey'] = ''),
+        (apiKey['providerProfileId'] = ''),
+        (apiKey['taskId'] = ''),
+        (apiKey['abortController'] = null),
+        (apiKey['outNodeId'] = ''),
         handler2(next));
     };
   return {
@@ -230,143 +252,147 @@ export function createRunningHubTaskStateMachine() {
   };
 }
 const ImageFreeAngleController = {
-  active: false,
+  active: ![],
   nodeId: null,
   nodeData: null,
-  state: { rotation: 35, pitch: 20, scale: 0.5, pan: { x: 0, y: 0 } },
+  state: { rotation: 0x23, pitch: 0x14, scale: 0.5, pan: { x: 0x0, y: 0x0 } },
   containerEl: null,
   cubeEl: null,
   imageWrapEl: null,
   onDone: null,
   _unsubscribeLocale: null,
   async render(current, entry, record, payload, handle) {
-    const state = appStore.getStateRaw(),
-      enabled4 = state.nodes?.[current];
+    const state = appStore['getStateRaw'](),
+      enabled4 = state['nodes']?.[current];
     if (!enabled4) return;
-    if (this.active && this.nodeId === current) return;
-    this.active && this.nodeId !== current && this._exit();
-    ((this.active = true),
-      (this.nodeId = current),
-      (this.nodeData = enabled4),
-      (this.containerEl = entry),
-      (this.onDone = record),
-      (this.onGenerate = payload),
-      (this.triggerBtn = handle));
-    this.triggerBtn &&
-      ((this._oldTriggerContent = this.triggerBtn.innerHTML),
-      (this._oldTriggerTooltip = this.triggerBtn.getAttribute('data-tooltip')),
-      (this._oldTriggerAriaLabel = this.triggerBtn.getAttribute('aria-label')),
-      (this._oldTriggerTitle = this.triggerBtn.getAttribute('title')),
-      (this.triggerBtn.innerHTML =
+    if (this['active'] && this['nodeId'] === current) return;
+    this['active'] && this['nodeId'] !== current && this['_exit']();
+    ((this['active'] = !![]),
+      (this['nodeId'] = current),
+      (this['nodeData'] = enabled4),
+      (this['containerEl'] = entry),
+      (this['onDone'] = record),
+      (this['onGenerate'] = payload),
+      (this['triggerBtn'] = handle));
+    this['triggerBtn'] &&
+      ((this['_oldTriggerContent'] = this['triggerBtn']['innerHTML']),
+      (this['_oldTriggerTooltip'] = this['triggerBtn']['getAttribute']('data-tooltip')),
+      (this['_oldTriggerAriaLabel'] = this['triggerBtn']['getAttribute']('aria-label')),
+      (this['_oldTriggerTitle'] = this['triggerBtn']['getAttribute']('title')),
+      (this['triggerBtn']['innerHTML'] =
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'),
-      this.triggerBtn.setAttribute('data-tooltip', freeAngleText('actions.exit')),
-      this.triggerBtn.setAttribute('aria-label', freeAngleText('actions.exitControl')),
-      this.triggerBtn.setAttribute('title', freeAngleText('actions.exitControl')),
-      this.triggerBtn.classList.add('ftb-btn-exit'));
-    ((this.state = { rotation: 35, pitch: 20, scale: 0.5, pan: { x: 0, y: 0 } }),
-      (this._modelCatalog = buildImageFreeAngleModelCatalog()));
-    const defaultImageFreeAngleModelState = getDefaultImageFreeAngleModelState(this._modelCatalog);
-    ((this._currentModel = defaultImageFreeAngleModelState.model || 'nano-banana'),
-      (this._currentProvider = defaultImageFreeAngleModelState.provider || 'grsai'),
-      await this._createUI(),
-      this._bindEvents(),
-      (this._unsubscribeLocale = onLocaleChange(() => this._syncLocaleTexts())),
-      this._syncLocaleTexts(),
-      this._updateView());
+      this['triggerBtn']['setAttribute']('data-tooltip', freeAngleText('actions.exit')),
+      this['triggerBtn']['setAttribute']('aria-label', freeAngleText('actions.exitControl')),
+      this['triggerBtn']['setAttribute']('title', freeAngleText('actions.exitControl')),
+      this['triggerBtn']['classList']['add']('ftb-btn-exit'));
+    ((this['state'] = { rotation: 0x23, pitch: 0x14, scale: 0.5, pan: { x: 0x0, y: 0x0 } }),
+      (this['_modelCatalog'] = buildImageFreeAngleModelCatalog()));
+    const defaultImageFreeAngleModelState = getDefaultImageFreeAngleModelState(this['_modelCatalog']);
+    ((this['_currentModel'] = defaultImageFreeAngleModelState['model'] || 'nano-banana-2-lite'),
+      (this['_currentProvider'] = defaultImageFreeAngleModelState['provider'] || 'grsai'),
+      this['_createUI'](),
+      this['_bindEvents'](),
+      (this['_unsubscribeLocale'] = onLocaleChange(() => this['_syncLocaleTexts']())),
+      this['_syncLocaleTexts'](),
+      this['_updateView']());
   },
-  async _createUI() {
-    const el4 = this.containerEl;
-    el4.innerHTML = '';
-    const el5 = document.createElement('div');
-    el5.className = 'v2-free-angle-embedded';
+  _createUI() {
+    const el4 = this['containerEl'];
+    el4['innerHTML'] = '';
+    const el5 = document['createElement']('div');
+    el5['className'] = 'v2-free-angle-embedded';
     let config =
-      this.nodeData.imageUrl ||
-      this.nodeData.sourceUrl ||
-      this.nodeData.thumbUrl ||
-      this.nodeData.src ||
-      localPathToUrl(this.nodeData.localPath);
-    if (this.nodeData.thumbId)
-      try {
-        const image = await getImage(this.nodeData.thumbId);
-        if (image) config = URL.createObjectURL(image);
-      } catch (scope) {
-        console.error('FA load blob failed', scope);
+      this['nodeData']['imageUrl'] ||
+      this['nodeData']['sourceUrl'] ||
+      this['nodeData']['thumbUrl'] ||
+      this['nodeData']['src'] ||
+      localPathToUrl(this['nodeData']['localPath']);
+    const scope = this['_modelCatalog'] || buildImageFreeAngleModelCatalog();
+    ((this['_modelCatalog'] = scope),
+      (this['_functionSelection'] = getImageFunctionSelection(
+        this['_currentModel'],
+        this['nodeData'],
+        this['nodeData']['imageSize'] || '2K',
+      )),
+      (el5['innerHTML'] =
+        '\n      <div class="fa-header">\n        <span class="fa-title">' +
+        freeAngleText('panel.title') +
+        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22fa-close-btn\x22>×</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-preview-area\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22fa-reset-btn\x22>' +
+        freeAngleText('actions.reset') +
+        '</button>\n          <div class="fa-cube-container">\n            <div class="fa-cube">\n              <div class="fa-cube-face face-front">\n                <img src="' +
+        config +
+        '" class="fa-face-img" />\n              </div>\n              <div class="fa-cube-face face-back">' +
+        freeAngleText('cube.back') +
+        '</div>\n              <div class="fa-cube-face face-right">' +
+        freeAngleText('cube.right') +
+        '</div>\n              <div class="fa-cube-face face-left">' +
+        freeAngleText('cube.left') +
+        '</div>\n              <div class="fa-cube-face face-top">' +
+        freeAngleText('cube.top') +
+        '</div>\n              <div class="fa-cube-face face-bottom">' +
+        freeAngleText('cube.bottom') +
+        '</div>\n            </div>\n          </div>\n        </div>\n        <div class="fa-controls">\n          <div class="fa-control-item">\n            <div class="fa-control-label-row" style="display:flex;justify-content:space-between;">\n              <span class="fa-label fa-label-rotation">' +
+        freeAngleText('controls.rotation') +
+        '</span>\n              <span class="fa-value" id="val-rotation">35.0°</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-rotation" min="0" max="360" step="0.5" value="35">\n          </div>\n          <div class="fa-control-item">\n            <div class="fa-control-label-row" style="display:flex;justify-content:space-between;">\n              <span class="fa-label fa-label-pitch">' +
+        freeAngleText('controls.pitch') +
+        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22fa-value\x22\x20id=\x22val-pitch\x22>20.0°</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22range\x22\x20class=\x22fa-slider\x22\x20id=\x22sld-pitch\x22\x20min=\x22-30\x22\x20max=\x2260\x22\x20step=\x220.5\x22\x20value=\x2220\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-control-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-control-label-row\x22\x20style=\x22display:flex;justify-content:space-between;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22fa-label\x20fa-label-distance\x22>' +
+        freeAngleText('controls.distance') +
+        '</span>\n              <span class="fa-value" id="val-scale">0.50</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-scale" min="0.1" max="2" step="0.05" value="0.5">\n          </div>\n          <div class="fa-footer">\n            ' +
+        renderImageFunctionControls(this['_functionSelection'], scope) +
+        '\n            <div class="fa-footer-actions">\n              <button type="button" class="fa-debug-btn debug-wrench-btn" title="' +
+        freeAngleText('actions.debugApiParams') +
+        '">\n                ' +
+        DEBUG_WRENCH_ICON_HTML +
+        '\n              </button>\n              <button class="fa-gen-btn img-gen-btn" title="' +
+        freeAngleText('actions.generate') +
+        '">\n                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>\n              </button>\n            </div>\n          </div>\n        </div>\n      </div>\n    '),
+      (el5['querySelector']('.fa-close-btn')['onclick'] = () => this['_exit']()),
+      el5['addEventListener']('click', (event) => {
+        event['stopPropagation']();
+      }),
+      el5['addEventListener']('mousedown', (event2) => {
+        event2['stopPropagation']();
+      }),
+      el4['appendChild'](el5),
+      (this['cubeEl'] = el5['querySelector']('.fa-cube')),
+      (this['wrapperEl'] = el5));
+    const imageEl = el5['querySelector']('.fa-face-img');
+    this['nodeData']['thumbId'] &&
+      imageEl &&
+      void this['_hydrateFaceImageFromStorage']({
+        nodeId: this['nodeId'],
+        thumbId: this['nodeData']['thumbId'],
+        imageEl: imageEl,
+      });
+  },
+  async _hydrateFaceImageFromStorage({ nodeId: nodeId2, thumbId: thumbId, imageEl: imageEl2 }) {
+    try {
+      const image = await getImage(thumbId);
+      if (!image) return;
+      const input = URL['createObjectURL'](image);
+      if (!this['active'] || this['nodeId'] !== nodeId2 || imageEl2?.['isConnected'] === ![]) {
+        URL['revokeObjectURL'](input);
+        return;
       }
-    const modelCatalog = this._modelCatalog || buildImageFreeAngleModelCatalog();
-    this._modelCatalog = modelCatalog;
-    const imageFunctionModelMenuHTML = buildImageFunctionModelMenuHTML({
-      activeModel: this._currentModel,
-      activeProvider: this._currentProvider,
-      modelCatalog: modelCatalog,
-    });
-    ((el5.innerHTML =
-      '\n      <div class="fa-header">\n        <span class="fa-title">' +
-      freeAngleText('panel.title') +
-      '</span>\n        <button class="fa-close-btn">×</button>\n      </div>\n      <div class="fa-content">\n        <div class="fa-preview-area">\n          <button class="fa-reset-btn">' +
-      freeAngleText('actions.reset') +
-      '</button>\n          <div class="fa-cube-container">\n            <div class="fa-cube">\n              <div class="fa-cube-face face-front">\n                <img src="' +
-      config +
-      '" class="fa-face-img" />\n              </div>\n              <div class="fa-cube-face face-back">' +
-      freeAngleText('cube.back') +
-      '</div>\n              <div class="fa-cube-face face-right">' +
-      freeAngleText('cube.right') +
-      '</div>\n              <div class="fa-cube-face face-left">' +
-      freeAngleText('cube.left') +
-      '</div>\n              <div class="fa-cube-face face-top">' +
-      freeAngleText('cube.top') +
-      '</div>\n              <div class="fa-cube-face face-bottom">' +
-      freeAngleText('cube.bottom') +
-      '</div>\n            </div>\n          </div>\n        </div>\n        <div class="fa-controls">\n          <div class="fa-control-item">\n            <div class="fa-control-label-row" style="display:flex;justify-content:space-between;">\n              <span class="fa-label fa-label-rotation">' +
-      freeAngleText('controls.rotation') +
-      '</span>\n              <span class="fa-value" id="val-rotation">35.0°</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-rotation" min="0" max="360" step="0.5" value="35">\n          </div>\n          <div class="fa-control-item">\n            <div class="fa-control-label-row" style="display:flex;justify-content:space-between;">\n              <span class="fa-label fa-label-pitch">' +
-      freeAngleText('controls.pitch') +
-      '</span>\n              <span class="fa-value" id="val-pitch">20.0°</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-pitch" min="-30" max="60" step="0.5" value="20">\n          </div>\n          <div class="fa-control-item">\n             <div class="fa-control-label-row" style="display:flex;justify-content:space-between;">\n              <span class="fa-label fa-label-distance">' +
-      freeAngleText('controls.distance') +
-      '</span>\n              <span class="fa-value" id="val-scale">0.50</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-scale" min="0.1" max="2" step="0.05" value="0.5">\n          </div>\n          <div class="fa-footer">\n            <div class="fa-model-select image-function-model-select">\n              <button type="button" class="fa-model-btn img-pill-btn image-function-model-trigger">\n                ' +
-      this._getModelIconHtml(this._currentModel, this._currentProvider) +
-      '\n                <span class="fa-model-label">' +
-      getImageFunctionModelDisplayName(this._currentModel, modelCatalog) +
-      '</span>\n                <svg class="fa-model-chevron image-function-model-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>\n              </button>\n              <div class="fa-model-menu floating-menu image-function-model-menu">\n                ' +
-      imageFunctionModelMenuHTML +
-      '\n              </div>\n            </div>\n            ' +
-      buildImageFunctionModeControlHTML({
-        model: this._currentModel,
-        provider: this._currentProvider,
-        imageSize: this.nodeData?.imageSize || '2K',
-        wrapClass: 'fa-mode-select',
-        buttonClass: 'fa-mode-btn img-pill-btn',
-      }) +
-      '\n            <div class="fa-footer-actions">\n              <button type="button" class="fa-debug-btn debug-wrench-btn" title="' +
-      freeAngleText('actions.debugApiParams') +
-      '">\n                ' +
-      DEBUG_WRENCH_ICON_HTML +
-      '\n              </button>\n              <button class="fa-gen-btn img-gen-btn" title="' +
-      freeAngleText('actions.generate') +
-      '">\n                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>\n              </button>\n            </div>\n          </div>\n        </div>\n      </div>\n    '),
-      (el5.querySelector('.fa-close-btn').onclick = () => this._exit()),
-      el5.addEventListener('click', (event) => {
-        event.stopPropagation();
-      }),
-      el5.addEventListener('mousedown', (event2) => {
-        event2.stopPropagation();
-      }),
-      el4.appendChild(el5),
-      (this.cubeEl = el5.querySelector('.fa-cube')),
-      (this.wrapperEl = el5));
+      (String(this['_faceImageObjectUrl'] || '')['startsWith']('blob:') &&
+        URL['revokeObjectURL'](this['_faceImageObjectUrl']),
+        (this['_faceImageObjectUrl'] = input),
+        (imageEl2['src'] = input));
+    } catch (output) {}
   },
   _syncLocaleTexts() {
-    this.triggerBtn?.classList?.contains('ftb-btn-exit') &&
-      (this.triggerBtn.setAttribute('data-tooltip', freeAngleText('actions.exit')),
-      this.triggerBtn.setAttribute('aria-label', freeAngleText('actions.exitControl')),
-      this.triggerBtn.setAttribute('title', freeAngleText('actions.exitControl')));
-    if (!this.wrapperEl) return;
-    const run = (input, output) => {
-        const el6 = this.wrapperEl.querySelector(input);
-        if (el6) el6.textContent = output;
+    this['triggerBtn']?.['classList']?.['contains']('ftb-btn-exit') &&
+      (this['triggerBtn']['setAttribute']('data-tooltip', freeAngleText('actions.exit')),
+      this['triggerBtn']['setAttribute']('aria-label', freeAngleText('actions.exitControl')),
+      this['triggerBtn']['setAttribute']('title', freeAngleText('actions.exitControl')));
+    if (!this['wrapperEl']) return;
+    const run = (value2, value3) => {
+        const el6 = this['wrapperEl']['querySelector'](value2);
+        if (el6) el6['textContent'] = value3;
       },
-      handler3 = (value2, value3) => {
-        const value4 = this.wrapperEl.querySelector(value2);
-        if (value4) value4.title = value3;
+      handler3 = (value4, value5) => {
+        const value6 = this['wrapperEl']['querySelector'](value4);
+        if (value6) value6['title'] = value5;
       };
     (run('.fa-title', freeAngleText('panel.title')),
       run('.fa-reset-btn', freeAngleText('actions.reset')),
@@ -382,310 +408,220 @@ const ImageFreeAngleController = {
       handler3('.fa-gen-btn', freeAngleText('actions.generate')));
   },
   _updateView() {
-    if (!this.active) return;
-    const { rotation: rotation2, pitch: pitch2, scale: scale2 } = this.state,
-      value5 = ((rotation2 % 0x168) + 0x168) % 0x168;
-    ((this.wrapperEl.querySelector('#val-rotation').textContent = value5.toFixed(1) + '°'),
-      (this.wrapperEl.querySelector('#val-pitch').textContent = pitch2.toFixed(1) + '°'),
-      (this.wrapperEl.querySelector('#val-scale').textContent = '' + scale2.toFixed(2)),
-      (this.wrapperEl.querySelector('#sld-rotation').value = value5),
-      (this.wrapperEl.querySelector('#sld-pitch').value = pitch2),
-      (this.wrapperEl.querySelector('#sld-scale').value = scale2),
-      (this.cubeEl.style.transform = 'rotateX(' + -pitch2 + 'deg) rotateY(' + (value5 - 0x168) + 'deg)'));
-    const value6 =
+    if (!this['active']) return;
+    const { rotation: rotation2, pitch: pitch2, scale: scale2 } = this['state'],
+      value7 = ((rotation2 % 0x168) + 0x168) % 0x168;
+    ((this['wrapperEl']['querySelector']('#val-rotation')['textContent'] = value7['toFixed'](0x1) + '°'),
+      (this['wrapperEl']['querySelector']('#val-pitch')['textContent'] = pitch2['toFixed'](0x1) + '°'),
+      (this['wrapperEl']['querySelector']('#val-scale')['textContent'] = '' + scale2['toFixed'](0x2)),
+      (this['wrapperEl']['querySelector']('#sld-rotation')['value'] = value7),
+      (this['wrapperEl']['querySelector']('#sld-pitch')['value'] = pitch2),
+      (this['wrapperEl']['querySelector']('#sld-scale')['value'] = scale2),
+      (this['cubeEl']['style']['transform'] =
+        'rotateX(' + -pitch2 + 'deg) rotateY(' + (value7 - 0x168) + 'deg)'));
+    const value8 =
       FREE_ANGLE_VISUAL_SCALE_MIN +
       (scale2 - FREE_ANGLE_DISTANCE_MIN) *
         ((FREE_ANGLE_PREVIOUS_DISTANCE_ONE_VISUAL_SCALE - FREE_ANGLE_VISUAL_SCALE_MIN) /
           (FREE_ANGLE_DISTANCE_MAX - FREE_ANGLE_DISTANCE_MIN));
-    this.cubeEl.parentElement.style.transform = 'scale(' + value6 + ')';
+    this['cubeEl']['parentElement']['style']['transform'] = 'scale(' + value8 + ')';
   },
   _bindEvents() {
-    const root = this.wrapperEl;
-    ((root.querySelector('#sld-rotation').oninput = (event3) => {
-      ((this.state.rotation = parseFloat(event3.target.value)), this._updateView());
+    const el7 = this['wrapperEl'];
+    ((el7['querySelector']('#sld-rotation')['oninput'] = (event3) => {
+      ((this['state']['rotation'] = parseFloat(event3['target']['value'])), this['_updateView']());
     }),
-      (root.querySelector('#sld-pitch').oninput = (event4) => {
-        ((this.state.pitch = parseFloat(event4.target.value)), this._updateView());
+      (el7['querySelector']('#sld-pitch')['oninput'] = (event4) => {
+        ((this['state']['pitch'] = parseFloat(event4['target']['value'])), this['_updateView']());
       }),
-      (root.querySelector('#sld-scale').oninput = (event5) => {
-        ((this.state.scale = parseFloat(event5.target.value)), this._updateView());
+      (el7['querySelector']('#sld-scale')['oninput'] = (event5) => {
+        ((this['state']['scale'] = parseFloat(event5['target']['value'])), this['_updateView']());
       }),
-      (root.querySelector('.fa-reset-btn').onclick = () => {
-        ((this.state = { rotation: 35, pitch: 20, scale: 0.5, pan: { x: 0, y: 0 } }), this._updateView());
+      (el7['querySelector']('.fa-reset-btn')['onclick'] = () => {
+        ((this['state'] = { rotation: 0x23, pitch: 0x14, scale: 0.5, pan: { x: 0x0, y: 0x0 } }),
+          this['_updateView']());
       }));
-    const value7 = root.querySelector('.fa-preview-area');
-    let enabled5 = false,
-      enabled6 = false,
-      box = { x: 0, y: 0 };
-    value7.onmousedown = (x) => {
-      enabled5 = true;
-      if (x.button === 2) enabled6 = true;
-      ((box = { x: x.clientX, y: x.clientY }), x.preventDefault(), x.stopPropagation());
+    const value9 = el7['querySelector']('.fa-preview-area');
+    let enabled5 = ![],
+      enabled6 = ![],
+      box = { x: 0x0, y: 0x0 };
+    value9['onmousedown'] = (x) => {
+      enabled5 = !![];
+      if (x['button'] === 0x2) enabled6 = !![];
+      ((box = { x: x['clientX'], y: x['clientY'] }),
+        x['preventDefault'](),
+        x['stopPropagation']());
     };
-    const value8 = (x2) => {
+    const value10 = (x2) => {
         if (!enabled5) return;
-        const value9 = x2.clientX - box.x,
-          value10 = x2.clientY - box.y;
-        ((box = { x: x2.clientX, y: x2.clientY }),
-          enabled6 && ((this.state.pan.x += value9), (this.state.pan.y += value10)),
+        const value11 = x2['clientX'] - box['x'],
+          value12 = x2['clientY'] - box['y'];
+        ((box = { x: x2['clientX'], y: x2['clientY'] }),
+          enabled6 && ((this['state']['pan']['x'] += value11), (this['state']['pan']['y'] += value12)),
           !enabled6 &&
-            ((this.state.rotation += value9 * 0.5),
-            (this.state.pitch += value10 * 0.5),
-            (this.state.pitch = Math.max(-30, Math.min(60, this.state.pitch)))),
-          this._updateView());
+            ((this['state']['rotation'] += value11 * 0.5),
+            (this['state']['pitch'] += value12 * 0.5),
+            (this['state']['pitch'] = Math['max'](-0x1e, Math['min'](0x3c, this['state']['pitch'])))),
+          this['_updateView']());
       },
-      value11 = () => {
-        ((enabled5 = false), (enabled6 = false));
+      value13 = () => {
+        ((enabled5 = ![]), (enabled6 = ![]));
       };
-    (window.addEventListener('mousemove', value8),
-      window.addEventListener('mouseup', value11),
-      (this._cleanupHandlers = () => {
-        (window.removeEventListener('mousemove', value8), window.removeEventListener('mouseup', value11));
+    (window['addEventListener']('mousemove', value10),
+      window['addEventListener']('mouseup', value13),
+      (this['_cleanupHandlers'] = () => {
+        (window['removeEventListener']('mousemove', value10),
+          window['removeEventListener']('mouseup', value13));
       }),
-      (value7.onwheel = (event6) => {
-        (event6.preventDefault(), event6.stopPropagation());
-        const value12 = event6.deltaY > 0 ? -0.05 : 0.05;
-        ((this.state.scale = Math.max(0.1, Math.min(2, this.state.scale + value12))), this._updateView());
+      (value9['onwheel'] = (event6) => {
+        (event6['preventDefault'](), event6['stopPropagation']());
+        const value14 = event6['deltaY'] > 0x0 ? -0.05 : 0.05;
+        ((this['state']['scale'] = Math['max'](0.1, Math['min'](0x2, this['state']['scale'] + value14))),
+          this['_updateView']());
       }),
-      (value7.oncontextmenu = (event7) => event7.preventDefault()),
-      (root.querySelector('.fa-gen-btn').onclick = () => this._handleGenerate()),
-      (root.querySelector('.fa-debug-btn').onclick = (event8) => {
-        (event8.stopPropagation(), this._handleDebug());
-      }));
-    const el7 = root.querySelector('.fa-model-btn'),
-      modelMenu = root.querySelector('.fa-model-menu'),
-      el8 = root.querySelector('.fa-mode-btn'),
-      modeMenu = root.querySelector('.image-function-mode-menu'),
-      value13 = this._modelCatalog || buildImageFreeAngleModelCatalog(),
-      imageSize = () => this.nodeData?.imageSize || '2K';
-    el7.onclick = (event9) => {
-      event9.stopPropagation();
-      const value14 = modelMenu.style.display === 'block' || modelMenu.style.display === 'flex';
-      value14
-        ? ((modelMenu.style.display = 'none'), closeImageFunctionModelSubmenus(modelMenu))
-        : ((modelMenu.style.display = 'block'), modeMenu?.classList.remove('show'));
-    };
-    const run2 = () =>
-        syncImageFunctionModeControl({
-          root: root,
-          model: this._currentModel,
-          provider: this._currentProvider,
-          imageSize: imageSize(),
-        }),
-      handler4 = (value15, value16) => {
-        const model2 = String(value15 || '').trim(),
-          provider2 = _resolveImageProvider(model2, value16);
-        if (!model2 || !provider2) return;
-        ((this._currentModel = model2), (this._currentProvider = provider2));
-        const value17 = this._getModelIconHtml(model2, provider2),
-          imageFunctionModelDisplayName = getImageFunctionModelDisplayName(model2, value13);
-        ((el7.innerHTML =
-          '\n        ' +
-          value17 +
-          '\n        <span class="fa-model-label">' +
-          imageFunctionModelDisplayName +
-          '</span>\n        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;margin-left:2px;"><polyline points="6 9 12 15 18 9"/></svg>\n      '),
-          syncImageFunctionModelMenuActive({ modelMenu: modelMenu, model: model2, provider: provider2 }),
-          run2(),
-          (modelMenu.style.display = 'none'),
-          closeImageFunctionModelSubmenus(modelMenu),
-          this.nodeId &&
-            !isImageFreeAngleOnlyModel(model2) &&
-            appStore.updateNodeData(this.nodeId, { model: model2, provider: provider2 }));
-      },
-      bindImageFunctionModelMenu2 = bindImageFunctionModelMenu({
-        modelMenu: modelMenu,
-        onSelect: ({ model: model3, provider: provider3 }) => handler4(model3, provider3),
-        closeMenu: () => {
-          modelMenu.style.display = 'none';
+      (value9['oncontextmenu'] = (event7) => event7['preventDefault']()),
+      (el7['querySelector']('.fa-gen-btn')['onclick'] = () => this['_handleGenerate']()),
+      (el7['querySelector']('.fa-debug-btn')['onclick'] = (event8) => {
+        (event8['stopPropagation'](), this['_handleDebug']());
+      }),
+      (this['_functionControls'] = bindImageFunctionControls(el7, {
+        selection: this['_functionSelection'],
+        onChange: (model2) => {
+          ((this['_functionSelection'] = model2),
+            (this['_currentModel'] = model2['modelId']),
+            (this['_currentProvider'] = model2['provider']),
+            !isImageFreeAngleOnlyModel(model2['modelId']) &&
+              appStore['updateNodeData'](this['nodeId'], {
+                model: model2['modelId'],
+                provider: model2['provider'],
+                generationParams: model2['generationParams'],
+                generationParamsByModel: model2['generationParamsByModel'],
+                providerProfileId: model2['providerProfileId'],
+                providerProfileIdByModel: model2['providerProfileIdByModel'],
+              }));
         },
-      }),
-      bindImageFunctionModeMenu2 = bindImageFunctionModeMenu({
-        modeMenu: modeMenu,
-        onSelect: ({ mode: mode }) => {
-          const imageFunctionModelByMode = resolveImageFunctionModelByMode({
-            model: this._currentModel,
-            provider: this._currentProvider,
-            imageSize: imageSize(),
-            mode: mode,
-          });
-          if (!imageFunctionModelByMode?.model) return;
-          (handler4(imageFunctionModelByMode.model, imageFunctionModelByMode.provider),
-            modeMenu?.classList.remove('show'));
-        },
-      });
-    ((this._cleanupSubmenuClick = () => {
-      (bindImageFunctionModelMenu2?.(), bindImageFunctionModeMenu2?.());
-    }),
-      el8?.addEventListener('click', (event10) => {
-        event10.stopPropagation();
-        if (el8.closest('.image-function-mode-wrap')?.classList.contains('is-hidden')) return;
-        (modeMenu?.classList.toggle('show'),
-          (modelMenu.style.display = 'none'),
-          closeImageFunctionModelSubmenus(modelMenu));
-      }),
-      run2());
-    const value18 = (event11) => {
-      !el7.contains(event11.target) &&
-        !modelMenu.contains(event11.target) &&
-        !el8?.contains(event11.target) &&
-        !modeMenu?.contains(event11.target) &&
-        ((modelMenu.style.display = 'none'),
-        modeMenu?.classList.remove('show'),
-        closeImageFunctionModelSubmenus(modelMenu));
-    };
-    (document.addEventListener('mousedown', value18),
-      (this._cleanupModelMenu = () => {
-        document.removeEventListener('mousedown', value18);
-      }));
-  },
-  _getModelIconHtml(value19, value20 = '') {
-    return getImageFunctionModelTriggerIconHTML(
-      value19,
-      _resolveImageProvider(value19, value20),
-      this._modelCatalog || buildImageFreeAngleModelCatalog(),
-    );
+      })));
   },
   _exit() {
-    if (!this.active) return;
-    ((this.active = false), (this.nodeId = null));
-    this._unsubscribeLocale && (this._unsubscribeLocale(), (this._unsubscribeLocale = null));
-    if (this._cleanupHandlers) this._cleanupHandlers();
-    if (this._cleanupModelMenu) this._cleanupModelMenu();
-    if (this._cleanupSubmenuClick) this._cleanupSubmenuClick();
-    if (this.containerEl) this.containerEl.innerHTML = '';
-    this.triggerBtn &&
-      ((this.triggerBtn.innerHTML = this._oldTriggerContent),
-      this._oldTriggerTooltip != null
-        ? this.triggerBtn.setAttribute('data-tooltip', this._oldTriggerTooltip)
-        : this.triggerBtn.removeAttribute('data-tooltip'),
-      this._oldTriggerAriaLabel != null
-        ? this.triggerBtn.setAttribute('aria-label', this._oldTriggerAriaLabel)
-        : this.triggerBtn.removeAttribute('aria-label'),
-      this._oldTriggerTitle != null
-        ? this.triggerBtn.setAttribute('title', this._oldTriggerTitle)
-        : this.triggerBtn.removeAttribute('title'),
-      this.triggerBtn.classList.remove('ftb-btn-exit'));
-    ((this._oldTriggerContent = null),
-      (this._oldTriggerTooltip = null),
-      (this._oldTriggerAriaLabel = null),
-      (this._oldTriggerTitle = null),
-      (this._modelCatalog = null));
-    if (this.onDone) this.onDone();
+    if (!this['active']) return;
+    (this['_functionControls']?.['destroy'](),
+      (this['_functionControls'] = null),
+      (this['active'] = ![]),
+      (this['nodeId'] = null));
+    String(this['_faceImageObjectUrl'] || '')['startsWith']('blob:') &&
+      URL['revokeObjectURL'](this['_faceImageObjectUrl']);
+    this['_faceImageObjectUrl'] = '';
+    this['_unsubscribeLocale'] && (this['_unsubscribeLocale'](), (this['_unsubscribeLocale'] = null));
+    if (this['_cleanupHandlers']) this['_cleanupHandlers']();
+    if (this['_cleanupModelMenu']) this['_cleanupModelMenu']();
+    if (this['_cleanupSubmenuClick']) this['_cleanupSubmenuClick']();
+    if (this['containerEl']) this['containerEl']['innerHTML'] = '';
+    this['triggerBtn'] &&
+      ((this['triggerBtn']['innerHTML'] = this['_oldTriggerContent']),
+      this['_oldTriggerTooltip'] != null
+        ? this['triggerBtn']['setAttribute']('data-tooltip', this['_oldTriggerTooltip'])
+        : this['triggerBtn']['removeAttribute']('data-tooltip'),
+      this['_oldTriggerAriaLabel'] != null
+        ? this['triggerBtn']['setAttribute']('aria-label', this['_oldTriggerAriaLabel'])
+        : this['triggerBtn']['removeAttribute']('aria-label'),
+      this['_oldTriggerTitle'] != null
+        ? this['triggerBtn']['setAttribute']('title', this['_oldTriggerTitle'])
+        : this['triggerBtn']['removeAttribute']('title'),
+      this['triggerBtn']['classList']['remove']('ftb-btn-exit'));
+    ((this['_oldTriggerContent'] = null),
+      (this['_oldTriggerTooltip'] = null),
+      (this['_oldTriggerAriaLabel'] = null),
+      (this['_oldTriggerTitle'] = null),
+      (this['_modelCatalog'] = null));
+    if (this['onDone']) this['onDone']();
   },
   async _handleGenerate() {
-    if (!this.nodeId) return;
-    const { rotation: rotation3, pitch: pitch3, scale: scale3 } = this.state;
-    appStore.updateNodeData(this.nodeId, {
+    if (!this['nodeId']) return;
+    const { rotation: rotation3, pitch: pitch3, scale: scale3 } = this['state'];
+    appStore['updateNodeData'](this['nodeId'], {
       cameraAngle: { rotation: rotation3, pitch: pitch3, scale: scale3 },
     });
-    const value21 = appStore.getStateRaw(),
-      imageSize2 = value21.nodes?.[this.nodeId];
-    if (!imageSize2) return;
-    let model4 = this._currentModel || 'nano-banana-2';
-    const provider4 = _resolveImageProvider(model4, this._currentProvider || imageSize2.provider);
+    const state2 = appStore['getStateRaw'](),
+      imageSize = state2['nodes']?.[this['nodeId']];
+    if (!imageSize) return;
+    let model3 = this['_currentModel'] || 'nano-banana-2';
+    const imageSize2 = getImageFunctionRequestSettings(this['_functionSelection']),
+      provider2 = _resolveImageProvider(model3, this['_currentProvider'] || imageSize['provider']);
     let inputUrls = null;
-    const el9 = document.getElementById(this.nodeId);
-    if (el9) {
-      const value22 = el9.querySelector('img');
-      value22 && (inputUrls = value22.src);
+    const el8 = document['getElementById'](this['nodeId']);
+    if (el8) {
+      const value15 = el8['querySelector']('img');
+      value15 && (inputUrls = value15['src']);
     }
-    !inputUrls && imageSize2.imageUrl && (inputUrls = imageSize2.imageUrl);
-    !inputUrls && imageSize2.outputImage && (inputUrls = imageSize2.outputImage);
-    let aspectRatio = imageSize2.aspectRatio || '1:1';
-    if (aspectRatio === '自适应' || aspectRatio === 'auto' || aspectRatio === '1:1') {
-      if (inputUrls) {
-        let enabled7 = imageSize2.imgWidth || imageSize2.naturalWidth || 0,
-          enabled8 = imageSize2.imgHeight || imageSize2.naturalHeight || 0;
-        !enabled7 &&
-          imageSize2.src &&
-          imageSize2.type === 'source-image' &&
-          ((enabled7 = imageSize2.originalWidth || 0), (enabled8 = imageSize2.originalHeight || 0));
-        if (!enabled7 || !enabled8) {
-          const el10 = document.getElementById(this.nodeId);
-          if (el10) {
-            const value23 = el10.querySelector('img');
-            value23 &&
-              value23.naturalWidth &&
-              value23.naturalHeight &&
-              ((enabled7 = value23.naturalWidth), (enabled8 = value23.naturalHeight));
-          }
-        }
-        if (enabled7 && enabled8) {
-          const value24 = enabled7 / enabled8,
-            list = [
-              { label: '1:1', calc: 1 / 1 },
-              { label: '9:16', calc: 9 / 16 },
-              { label: '16:9', calc: 16 / 9 },
-              { label: '3:4', calc: 3 / 4 },
-              { label: '4:3', calc: 4 / 3 },
-              { label: '3:2', calc: 3 / 2 },
-              { label: '2:3', calc: 2 / 3 },
-              { label: '5:4', calc: 5 / 4 },
-              { label: '4:5', calc: 4 / 5 },
-              { label: '21:9', calc: 21 / 9 },
-            ];
-          let value25 = list[0],
-            value26 = Math.abs(value24 - value25.calc);
-          for (let value27 = 1; value27 < list.length; value27++) {
-            const value28 = Math.abs(value24 - list[value27].calc);
-            value28 < value26 && ((value26 = value28), (value25 = list[value27]));
-          }
-          aspectRatio = value25.label;
-        }
-      }
-    }
-    await ensureConfig();
-    const providerConfig = getProviderConfig(provider4);
-    let apiKey3 = '';
-    if (provider4 === 'runninghub')
-      apiKey3 = isRunningHubModelApiImageTask(model4, provider4)
-        ? providerConfig.modelApiKey || ''
-        : providerConfig.apiKey || '';
-    else
-      provider4 === 'runninghubwf'
-        ? (apiKey3 = providerConfig.apiKey || '')
-        : (apiKey3 = providerConfig.apiKey || window._appApiKey || '');
-    const value29 = {
-        prompt: '',
-        model: model4,
+    !inputUrls && imageSize['imageUrl'] && (inputUrls = imageSize['imageUrl']);
+    !inputUrls && imageSize['outputImage'] && (inputUrls = imageSize['outputImage']);
+    const aspectRatio = imageSize['aspectRatio'] || '',
+      isAdaptiveRatioLabel2 = isAdaptiveRatioLabel(aspectRatio),
+      sourceSize = resolveImageFreeAngleSourceSize(imageSize, el8?.['querySelector']('img')),
+      aspectRatio2 = resolveImageFreeAngleAspectRatio({
         aspectRatio: aspectRatio,
-        imageSize: imageSize2.imageSize || '2K',
-        batchSize: 1,
+        provider: provider2,
+        model: model3,
+        imageSize: imageSize2['imageSize'] || imageSize['imageSize'] || '2K',
+        sourceSize: sourceSize,
+      });
+    await ensureConfig();
+    const providerConfig = getProviderConfig(imageSize2['providerProfileId'] || provider2);
+    let apiKey3 = '';
+    if (provider2 === 'runninghub')
+      apiKey3 = isRunningHubModelApiImageTask(model3, provider2)
+        ? providerConfig['modelApiKey'] || ''
+        : providerConfig['apiKey'] || '';
+    else
+      provider2 === 'runninghubwf'
+        ? (apiKey3 = providerConfig['apiKey'] || '')
+        : (apiKey3 = providerConfig['apiKey'] || window['_appApiKey'] || '');
+    const value16 = {
+        prompt: '',
+        model: model3,
+        aspectRatio: aspectRatio2,
+        imageSize: imageSize['imageSize'] || '2K',
+        ...imageSize2,
+        batchSize: 0x1,
         inputUrls: inputUrls ? [inputUrls] : [],
         apiKey: apiKey3,
-        provider: provider4,
+        provider: provider2,
         cameraAngle: { rotation: rotation3, pitch: pitch3, scale: scale3 },
       },
-      startedAt2 = Date.now(),
-      _isRunningHubTaskModel2 = _isRunningHubTaskModel(model4, provider4),
-      _isDreaminaTaskModel2 = _isDreaminaTaskModel(model4, provider4),
-      value30 = !_isRunningHubTaskModel2 && !_isDreaminaTaskModel2,
-      provider5 = String(provider4 || '')
-        .trim()
-        .toLowerCase(),
-      useOpenapiQuery2 = shouldUseRunningHubOpenapiQuery(model4, provider4);
+      startedAt2 = Date['now'](),
+      _isRunningHubTaskModel2 = _isRunningHubTaskModel(model3, provider2),
+      _isDreaminaTaskModel2 = _isDreaminaTaskModel(model3, provider2),
+      value17 = !_isRunningHubTaskModel2 && !_isDreaminaTaskModel2,
+      provider3 = String(provider2 || '')
+        ['trim']()
+        ['toLowerCase'](),
+      useOpenapiQuery2 = shouldUseRunningHubOpenapiQuery(model3, provider2);
     let width = 0x120,
       height = 0x120;
-    const list2 = aspectRatio.split(':');
-    if (list2.length === 2) {
-      const value31 = parseFloat(list2[0]),
-        value32 = parseFloat(list2[1]);
-      if (value31 && value32) {
-        const box2 = getAutoMediaSizeByShortSide(value31, value32);
-        ((width = box2.width), (height = box2.height));
-      }
+    const value18 = aspectRatio2['split'](':'),
+      box2 =
+        isAdaptiveRatioLabel2 && sourceSize
+          ? sourceSize
+          : { width: parseFloat(value18[0x0]), height: parseFloat(value18[0x1]) };
+    if (box2['width'] > 0x0 && box2['height'] > 0x0) {
+      const box3 = getAutoMediaSizeByShortSide(box2['width'], box2['height']);
+      ((width = box3['width']), (height = box3['height']));
     }
-    const { x: x3, y: y } = calcSafeSpawnPosNearNode(value21.nodes, imageSize2, width, height),
+    const { x: x3, y: y } = calcSafeSpawnPosNearNode(
+        state2['nodes'],
+        imageSize,
+        width,
+        height,
+      ),
       id = generateId('source-image-rotate'),
-      handler5 = () => {
-        return isTaskCancelled(appStore.getState().nodes?.[id]);
+      handler4 = () => {
+        return isTaskCancelled(appStore['getState']()['nodes']?.[id]);
       },
-      imageFunctionModelDisplayName2 = getImageFunctionModelDisplayName(
-        model4,
-        this._modelCatalog || buildImageFreeAngleModelCatalog(),
+      imageFunctionModelDisplayName = getImageFunctionModelDisplayName(
+        model3,
+        this['_modelCatalog'] || buildImageFreeAngleModelCatalog(),
       );
-    appStore.addNode(
+    appStore['addNode'](
       buildSourceMediaNodePayload({
         id: id,
         type: 'source-image',
@@ -696,18 +632,14 @@ const ImageFreeAngleController = {
         name: freeAngleText('output.generatingName'),
         src: '',
         ...buildGenerationStartPatch({ startedAt: startedAt2 }),
-        ...(_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value30
-          ? { provider: provider4, model: model4 }
-          : {}),
-        ...(_isRunningHubTaskModel2
-          ? { rhSourceNodeId: imageSize2.id, rhToolbarTaskType: 'image-free-angle' }
-          : {}),
+        ...(_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value17 ? { provider: provider2, model: model3 } : {}),
+        ...(_isRunningHubTaskModel2 ? { rhSourceNodeId: imageSize['id'], rhToolbarTaskType: 'image-free-angle' } : {}),
         ...(_isRunningHubTaskModel2
           ? _buildRunningHubTaskPatch({
               taskId: '',
               status: 'pending',
               startedAt: startedAt2,
-              recovering: false,
+              recovering: ![],
               useOpenapiQuery: useOpenapiQuery2,
             })
           : {}),
@@ -718,200 +650,216 @@ const ImageFreeAngleController = {
               phase: 'generating',
               label: freeAngleText('task.submitting'),
               startedAt: startedAt2,
-              recovering: false,
+              recovering: ![],
             })
           : {}),
-        ...(value30
+        ...(value17
           ? _buildAsyncTaskPatch({
-              provider: provider5,
+              provider: provider3,
               kind: 'image',
               taskId: '',
               status: 'pending',
               startedAt: startedAt2,
-              recovering: false,
+              recovering: ![],
             })
           : {}),
-        outputText: buildFreeAngleOutputText(imageFunctionModelDisplayName2, {
+        outputText: buildFreeAngleOutputText(imageFunctionModelDisplayName, {
           rotation: rotation3,
           pitch: pitch3,
           scale: scale3,
         }),
       }),
     );
-    (_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value30) && _persistRunningHubResumeCache();
-    appStore.setSelectedNodes([id]);
-    typeof window.v2FocusOnNodes === 'function'
-      ? window.v2FocusOnNodes([imageSize2.id, id])
-      : window.v2FocusOnNode?.(id);
+    (_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value17) && _persistRunningHubResumeCache();
+    appStore['setSelectedNodes']([id]);
     try {
-      const generateImage2 = await generateImage(value29, {
-        onTaskMeta: ({ taskId: taskId2, useOpenapiQuery: useOpenapiQuery3, provider: provider6 }) => {
-          const taskId3 = String(taskId2 || '').trim();
+      const generateImage2 = await generateImage(value16, {
+        onTaskMeta: ({
+          taskId: taskId2,
+          useOpenapiQuery: useOpenapiQuery3,
+          provider: provider4,
+          providerProfileId: providerProfileId2,
+          rhProviderProfileId: rhProviderProfileId,
+        }) => {
+          const taskId3 = String(taskId2 || '')['trim']();
           if (!taskId3) return;
-          const enabled9 = appStore.getState().nodes?.[id];
-          if (!enabled9) return;
-          if (handler5()) return;
+          const enabled7 = appStore['getState']()['nodes']?.[id];
+          if (!enabled7) return;
+          if (handler4()) return;
           if (_isRunningHubTaskModel2) {
-            (appStore.updateNodeData(id, {
+            const taskProviderProfileId = String(providerProfileId2 || rhProviderProfileId || '')['trim']();
+            (appStore['updateNodeData'](id, {
+              ...(taskProviderProfileId
+                ? {
+                    taskProviderProfileId: taskProviderProfileId,
+                    providerProfileId: taskProviderProfileId,
+                    rhProviderProfileId: taskProviderProfileId,
+                  }
+                : {}),
               ..._buildRunningHubTaskPatch({
                 taskId: taskId3,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: false,
-                useOpenapiQuery: useOpenapiQuery3 === true,
+                recovering: ![],
+                useOpenapiQuery: useOpenapiQuery3 === !![],
               }),
             }),
               _persistRunningHubResumeCache());
             return;
           }
           if (_isDreaminaTaskModel2) {
-            (appStore.updateNodeData(id, {
+            (appStore['updateNodeData'](id, {
               ..._buildDreaminaTaskPatch({
                 submitId: taskId3,
                 status: 'pending',
                 phase: 'generating',
                 label: freeAngleText('task.generating'),
                 startedAt: startedAt2,
-                recovering: false,
+                recovering: ![],
               }),
             }),
               _persistRunningHubResumeCache());
             return;
           }
-          value30 &&
-            (appStore.updateNodeData(id, {
+          value17 &&
+            (appStore['updateNodeData'](id, {
               ..._buildAsyncTaskPatch({
-                provider: String(provider6 || enabled9?.asyncTaskProvider || provider5).trim(),
+                provider: String(provider4 || enabled7?.['asyncTaskProvider'] || provider3)['trim'](),
                 kind: 'image',
                 taskId: taskId3,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: false,
+                recovering: ![],
               }),
             }),
             _persistRunningHubResumeCache());
         },
-        onTaskId: (value33) => {
-          const taskId4 = String(value33 || '').trim();
+        onTaskId: (value19) => {
+          const taskId4 = String(value19 || '')['trim']();
           if (!taskId4) return;
-          const useOpenapiQuery4 = appStore.getState().nodes?.[id];
+          const useOpenapiQuery4 = appStore['getState']()['nodes']?.[id];
           if (!useOpenapiQuery4) return;
-          if (handler5()) return;
+          if (handler4()) return;
           if (_isRunningHubTaskModel2) {
-            (appStore.updateNodeData(id, {
+            (appStore['updateNodeData'](id, {
               ..._buildRunningHubTaskPatch({
                 taskId: taskId4,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: false,
-                useOpenapiQuery: useOpenapiQuery4?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
+                recovering: ![],
+                useOpenapiQuery: useOpenapiQuery4?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
               }),
             }),
               _persistRunningHubResumeCache());
             return;
           }
           if (_isDreaminaTaskModel2) {
-            (appStore.updateNodeData(id, {
+            (appStore['updateNodeData'](id, {
               ..._buildDreaminaTaskPatch({
                 submitId: taskId4,
                 status: 'pending',
                 phase: 'generating',
                 label: freeAngleText('task.generating'),
                 startedAt: startedAt2,
-                recovering: false,
+                recovering: ![],
               }),
             }),
               _persistRunningHubResumeCache());
             return;
           }
-          value30 &&
-            (appStore.updateNodeData(id, {
+          value17 &&
+            (appStore['updateNodeData'](id, {
               ..._buildAsyncTaskPatch({
-                provider: String(useOpenapiQuery4?.asyncTaskProvider || provider5).trim(),
+                provider: String(useOpenapiQuery4?.['asyncTaskProvider'] || provider3)['trim'](),
                 kind: 'image',
                 taskId: taskId4,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: false,
+                recovering: ![],
               }),
             }),
             _persistRunningHubResumeCache());
         },
       });
-      if (handler5()) return;
+      if (handler4()) return;
       const sourceUrl =
-        generateImage2 &&
-        generateImage2.isBatch &&
-        Array.isArray(generateImage2.images) &&
-        generateImage2.images[0]
-          ? generateImage2.images[0]
+        generateImage2 && generateImage2['isBatch'] && Array['isArray'](generateImage2['images']) && generateImage2['images'][0x0]
+          ? generateImage2['images'][0x0]
           : generateImage2;
-      if (sourceUrl?.error) throw new Error(String(sourceUrl.error));
+      if (sourceUrl?.['error']) throw new Error(String(sourceUrl['error']));
       const localPath = pickResultLocalPath(sourceUrl),
         src =
-          localPathToUrl(localPath) || sourceUrl?.sourceUrl || sourceUrl?.imageUrl || sourceUrl?.url || '';
+          localPathToUrl(localPath) ||
+          sourceUrl?.['sourceUrl'] ||
+          sourceUrl?.['imageUrl'] ||
+          sourceUrl?.['url'] ||
+          '';
       if (!src) throw new Error(freeAngleText('errors.noGeneratedImageUrl'));
-      const run3 = (value34) => {
-          const value35 = String(value34 || ''),
-            value36 = value35.split('/').pop() || '';
-          return value36;
+      const run2 = (value20) => {
+          const value21 = String(value20 || ''),
+            value22 = value21['split']('/')['pop']() || '';
+          return value22;
         },
-        taskId5 = appStore.getState().nodes?.[id],
-        duration2 = taskId5?.generationStartTime ? Date.now() - taskId5.generationStartTime : 0,
+        taskId5 = appStore['getState']()['nodes']?.[id],
+        duration2 = taskId5?.['generationStartTime']
+          ? Date['now']() - taskId5['generationStartTime']
+          : 0x0,
         args = buildImageGenerationResultPatch(
           {
             ...sourceUrl,
             localPath: localPath,
-            sourceUrl: sourceUrl?.sourceUrl || sourceUrl?.imageUrl || src,
-            imageUrl: sourceUrl?.imageUrl || sourceUrl?.sourceUrl || src,
-            thumbUrl: sourceUrl?.thumbUrl || sourceUrl?.sourceUrl || sourceUrl?.imageUrl || '',
+            sourceUrl: sourceUrl?.['sourceUrl'] || sourceUrl?.['imageUrl'] || src,
+            imageUrl: sourceUrl?.['imageUrl'] || sourceUrl?.['sourceUrl'] || src,
+            thumbUrl: sourceUrl?.['thumbUrl'] || sourceUrl?.['sourceUrl'] || sourceUrl?.['imageUrl'] || '',
           },
           { startedAt: startedAt2, duration: duration2 },
         );
-      (appStore.updateNodeData(id, {
+      (appStore['updateNodeData'](id, {
         ...args,
         name: freeAngleText('output.resultName'),
         src: src,
-        fileName: localPath ? run3(localPath) : '',
+        fileName: localPath ? run2(localPath) : '',
         ...(_isRunningHubTaskModel2
           ? _buildRunningHubTaskPatch({
-              taskId: taskId5?.rhTaskId || '',
+              taskId: taskId5?.['rhTaskId'] || '',
               status: 'success',
               startedAt: startedAt2,
-              recovering: false,
-              useOpenapiQuery: taskId5?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
+              recovering: ![],
+              useOpenapiQuery: taskId5?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
             })
           : {}),
         ...(_isDreaminaTaskModel2
           ? _buildDreaminaTaskPatch({
-              submitId: taskId5?.dreaminaSubmitId || '',
+              submitId: taskId5?.['dreaminaSubmitId'] || '',
               status: 'success',
               phase: 'done',
               label: freeAngleText('task.completed'),
               startedAt: startedAt2,
-              recovering: false,
+              recovering: ![],
             })
           : {}),
-        ...(value30
+        ...(value17
           ? _buildAsyncTaskPatch({
-              provider: taskId5?.asyncTaskProvider || provider5,
+              provider: taskId5?.['asyncTaskProvider'] || provider3,
               kind: 'image',
-              taskId: taskId5?.asyncTaskId || '',
+              taskId: taskId5?.['asyncTaskId'] || '',
               status: 'success',
               startedAt: startedAt2,
-              recovering: false,
+              recovering: ![],
             })
           : {}),
       }),
-        (_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value30) && _persistRunningHubResumeCache(),
-        window.showToast?.(freeAngleText('toasts.success'), 'success'));
+        (_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value17) && _persistRunningHubResumeCache(),
+        window['showToast']?.(freeAngleText('toasts.success'), 'success'));
     } catch (error) {
-      if (handler5()) return;
-      const taskId6 = appStore.getState().nodes?.[id];
+      if (handler4()) return;
+      const taskId6 = appStore['getState']()['nodes']?.[id];
       if (taskId6) {
-        const duration3 = taskId6?.generationStartTime ? Date.now() - taskId6.generationStartTime : 0,
-          error2 = error?.message || freeAngleText('errors.unknown');
-        (appStore.updateNodeData(id, {
+        const duration3 = taskId6?.['generationStartTime']
+            ? Date['now']() - taskId6['generationStartTime']
+            : 0x0,
+          error2 = error?.['message'] || freeAngleText('errors.unknown');
+        (appStore['updateNodeData'](id, {
           ...buildImageGenerationFailurePatch({
             error: error2,
             startedAt: startedAt2,
@@ -921,145 +869,99 @@ const ImageFreeAngleController = {
           src: '',
           ...(_isRunningHubTaskModel2
             ? _buildRunningHubTaskPatch({
-                taskId: taskId6?.rhTaskId || '',
+                taskId: taskId6?.['rhTaskId'] || '',
                 status: 'failed',
                 startedAt: startedAt2,
-                recovering: false,
-                useOpenapiQuery: taskId6?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
+                recovering: ![],
+                useOpenapiQuery: taskId6?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
               })
             : {}),
           ...(_isDreaminaTaskModel2
             ? _buildDreaminaTaskPatch({
-                submitId: taskId6?.dreaminaSubmitId || '',
+                submitId: taskId6?.['dreaminaSubmitId'] || '',
                 status: 'failed',
                 phase: 'failed',
                 label: error2 || freeAngleText('task.failed'),
                 startedAt: startedAt2,
-                recovering: false,
+                recovering: ![],
               })
             : {}),
-          ...(value30
+          ...(value17
             ? _buildAsyncTaskPatch({
-                provider: taskId6?.asyncTaskProvider || provider5,
+                provider: taskId6?.['asyncTaskProvider'] || provider3,
                 kind: 'image',
-                taskId: taskId6?.asyncTaskId || '',
+                taskId: taskId6?.['asyncTaskId'] || '',
                 status: 'failed',
                 startedAt: startedAt2,
-                recovering: false,
+                recovering: ![],
               })
             : {}),
           outputText: freeAngleText('output.failedReason', { error: error2 }),
         }),
-          (_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value30) && _persistRunningHubResumeCache());
+          (_isRunningHubTaskModel2 || _isDreaminaTaskModel2 || value17) && _persistRunningHubResumeCache());
       }
-      window.showToast?.(
-        freeAngleText('toasts.failed', { error: error?.message || freeAngleText('errors.unknown') }),
+      window['showToast']?.(
+        freeAngleText('toasts.failed', { error: error?.['message'] || freeAngleText('errors.unknown') }),
         'error',
       );
     }
   },
   async _handleDebug() {
-    if (!this.nodeId) return;
-    const value37 = appStore.getStateRaw(),
-      imageSize3 = value37.nodes?.[this.nodeId];
-    if (!imageSize3) return;
-    let model5 = this._currentModel || 'nano-banana-2';
-    const provider7 = _resolveImageProvider(model5, this._currentProvider || imageSize3.provider),
-      { rotation: rotation4, pitch: pitch4, scale: scale4 } = this.state;
+    if (!this['nodeId']) return;
+    const state3 = appStore['getStateRaw'](),
+      aspectRatio3 = state3['nodes']?.[this['nodeId']];
+    if (!aspectRatio3) return;
+    let model4 = this['_currentModel'] || 'nano-banana-2';
+    const imageSize3 = getImageFunctionRequestSettings(this['_functionSelection']),
+      provider5 = _resolveImageProvider(model4, this['_currentProvider'] || aspectRatio3['provider']),
+      { rotation: rotation4, pitch: pitch4, scale: scale4 } = this['state'];
     let inputUrls2 = null;
-    const el11 = document.getElementById(this.nodeId);
-    if (el11) {
-      const value38 = el11.querySelector('img');
-      value38 && (inputUrls2 = value38.src);
+    const el9 = document['getElementById'](this['nodeId']);
+    if (el9) {
+      const value23 = el9['querySelector']('img');
+      value23 && (inputUrls2 = value23['src']);
     }
-    !inputUrls2 && imageSize3.imageUrl && (inputUrls2 = imageSize3.imageUrl);
-    !inputUrls2 && imageSize3.outputImage && (inputUrls2 = imageSize3.outputImage);
-    let aspectRatio2 = imageSize3.aspectRatio || '1:1';
-    if (aspectRatio2 === '自适应' || aspectRatio2 === 'auto' || aspectRatio2 === '1:1') {
-      if (inputUrls2) {
-        let enabled10 = imageSize3.imgWidth || imageSize3.naturalWidth || 0,
-          enabled11 = imageSize3.imgHeight || imageSize3.naturalHeight || 0;
-        !enabled10 &&
-          imageSize3.src &&
-          imageSize3.type === 'source-image' &&
-          ((enabled10 = imageSize3.originalWidth || 0), (enabled11 = imageSize3.originalHeight || 0));
-        if (!enabled10 || !enabled11) {
-          if (el11) {
-            const value39 = el11.querySelector('img');
-            value39 &&
-              value39.naturalWidth &&
-              value39.naturalHeight &&
-              ((enabled10 = value39.naturalWidth), (enabled11 = value39.naturalHeight));
-          }
-        }
-        if (enabled10 && enabled11) {
-          const value40 = enabled10 / enabled11,
-            list3 = [
-              { label: '1:1', calc: 1 / 1 },
-              { label: '9:16', calc: 9 / 16 },
-              { label: '16:9', calc: 16 / 9 },
-              { label: '3:4', calc: 3 / 4 },
-              { label: '4:3', calc: 4 / 3 },
-              { label: '3:2', calc: 3 / 2 },
-              { label: '2:3', calc: 2 / 3 },
-              { label: '5:4', calc: 5 / 4 },
-              { label: '4:5', calc: 4 / 5 },
-              { label: '21:9', calc: 21 / 9 },
-            ];
-          let value41 = list3[0],
-            value42 = Math.abs(value40 - value41.calc);
-          for (let value43 = 1; value43 < list3.length; value43++) {
-            const value44 = Math.abs(value40 - list3[value43].calc);
-            value44 < value42 && ((value42 = value44), (value41 = list3[value43]));
-          }
-          aspectRatio2 = value41.label;
-        }
-      }
-    }
+    !inputUrls2 && aspectRatio3['imageUrl'] && (inputUrls2 = aspectRatio3['imageUrl']);
+    !inputUrls2 && aspectRatio3['outputImage'] && (inputUrls2 = aspectRatio3['outputImage']);
+    const sourceSize2 = resolveImageFreeAngleSourceSize(aspectRatio3, el9?.['querySelector']('img')),
+      aspectRatio4 = resolveImageFreeAngleAspectRatio({
+        aspectRatio: aspectRatio3['aspectRatio'] || '',
+        provider: provider5,
+        model: model4,
+        imageSize: imageSize3['imageSize'] || aspectRatio3['imageSize'] || '2K',
+        sourceSize: sourceSize2,
+      });
     await ensureConfig();
-    const providerConfig2 = getProviderConfig(provider7);
+    const providerConfig2 = getProviderConfig(imageSize3['providerProfileId'] || provider5);
     let apiKey4 = '';
-    if (provider7 === 'runninghub')
-      apiKey4 = isRunningHubModelApiImageTask(model5, provider7)
-        ? providerConfig2.modelApiKey || ''
-        : providerConfig2.apiKey || '';
+    if (provider5 === 'runninghub')
+      apiKey4 = isRunningHubModelApiImageTask(model4, provider5)
+        ? providerConfig2['modelApiKey'] || ''
+        : providerConfig2['apiKey'] || '';
     else
-      provider7 === 'runninghubwf'
-        ? (apiKey4 = providerConfig2.apiKey || '')
-        : (apiKey4 = providerConfig2.apiKey || window._appApiKey || '');
-    const value45 = {
+      provider5 === 'runninghubwf'
+        ? (apiKey4 = providerConfig2['apiKey'] || '')
+        : (apiKey4 = providerConfig2['apiKey'] || window['_appApiKey'] || '');
+    const value24 = {
       prompt: '',
-      model: model5,
-      aspectRatio: aspectRatio2,
-      imageSize: imageSize3.imageSize || '2K',
-      batchSize: 1,
+      model: model4,
+      aspectRatio: aspectRatio4,
+      imageSize: aspectRatio3['imageSize'] || '2K',
+      ...imageSize3,
+      batchSize: 0x1,
       inputUrls: inputUrls2 ? [inputUrls2] : [],
       apiKey: apiKey4,
-      provider: provider7,
+      provider: provider5,
       cameraAngle: { rotation: rotation4, pitch: pitch4, scale: scale4 },
     };
     try {
-      const generateImageRequest = await buildGenerateImageRequest(value45),
-        outputText2 = formatFinalApiDebugRequest(generateImageRequest),
-        { x: x4, y: y2 } = calcSafeSpawnPosNearNode(value37.nodes, imageSize3, 0x17c, 0x12c);
-      let enabled12 = Object.values(value37.nodes).find((item2) => item2.type === 'debug');
-      !enabled12
-        ? appStore.addNode({
-            id: 'debug-' + Date.now(),
-            type: 'debug',
-            x: x4,
-            y: y2,
-            width: 0x17c,
-            height: 0x12c,
-            name: freeAngleText('debug.nodeName'),
-            outputText: outputText2,
-          })
-        : appStore.updateNodeData(enabled12.id, { outputText: outputText2, x: x4, y: y2 });
+      const generateImageRequest = await buildGenerateImageRequest(value24);
+      openDebugRequestWindow(buildFinalApiDebugPreview(generateImageRequest));
     } catch (error3) {
-      (console.error('[ImageFreeAngleController] 调试请求构建失败:', error3),
-        window.showToast?.(
+      (console['error']('[ImageFreeAngleController] 调试请求构建失败:', error3),
+        window['showToast']?.(
           freeAngleText('toasts.debugBuildFailed', {
-            error: error3?.message || freeAngleText('errors.unknown'),
+            error: error3?.['message'] || freeAngleText('errors.unknown'),
           }),
           'error',
         ));
