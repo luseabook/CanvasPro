@@ -270,6 +270,22 @@ export function dataPositions(tokens) {
   return { memberOrKey, shorthand, dataIndices };
 }
 
+// Names that cannot be used as a binding. The list mixes ES reserved words with
+// the strict-mode restrictions, because every file here is an ES module and
+// modules are always strict. A destructuring key may legitimately be one of
+// these (`{ enum: value }` is fine), so a rename source position can hold one —
+// the target position cannot.
+export const RESERVED_BINDING_NAMES = new Set([
+  'break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default',
+  'delete', 'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for',
+  'function', 'if', 'import', 'in', 'instanceof', 'new', 'null', 'return',
+  'super', 'switch', 'this', 'throw', 'true', 'try', 'typeof', 'var', 'void',
+  'while', 'with', 'yield',
+  'implements', 'interface', 'let', 'package', 'private', 'protected', 'public',
+  'static', 'await',
+  'arguments', 'eval',
+]);
+
 // Decodes a string literal to its value, so that `"a"` and `'a'` compare equal.
 // Prettier rewrites quote style, and quote style is not part of the semantics.
 export function stringValue(text) {

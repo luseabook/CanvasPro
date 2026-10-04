@@ -19,7 +19,7 @@
 // Anything the lexer cannot see (comment edits, formatting) is ignored on
 // purpose; every other transformation is rejected.
 import fs from 'node:fs';
-import { lex, withBrackets, dataPositions, stringValue } from './deobf-lex.mjs';
+import { lex, withBrackets, dataPositions, stringValue, RESERVED_BINDING_NAMES } from './deobf-lex.mjs';
 
 // Prettier only emits a trailing comma in multi-line argument lists, arrays,
 // object literals and parameter lists. Whether the list ended up on one line is
@@ -176,6 +176,19 @@ function main() {
     failures.push(
       'identifiers used as member names or object keys must not be renamed: ' +
         [...new Set(badPositions)].slice(0, 10).join(', '),
+    );
+  }
+
+  // A binding name may not be a reserved word. The token stream cannot see this,
+  // because both sides lex as plain identifiers, so `{ enum: _0x1 }` renaming its
+  // binding to `enum` would pass the stream comparison and then fail to parse.
+  const reservedTargets = [];
+  for (const [from, to] of rename) {
+    if (from !== to && RESERVED_BINDING_NAMES.has(to)) reservedTargets.push(from + ' -> ' + to);
+  }
+  if (reservedTargets.length) {
+    failures.push(
+      'rename target is a reserved word: ' + reservedTargets.slice(0, 10).join(', '),
     );
   }
 

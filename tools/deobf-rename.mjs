@@ -8,6 +8,7 @@
 // are replaced, nothing else. Verify the result afterwards with
 // tools/deobf-verify.mjs against the pre-rename copy.
 import fs from 'node:fs';
+import { RESERVED_BINDING_NAMES } from './deobf-lex.mjs';
 
 const [targetPath, mappingPath] = process.argv.slice(2);
 if (!targetPath || !mappingPath) {
@@ -27,6 +28,10 @@ for (const [from, to] of Object.entries(mapping)) {
   }
   if (/^_0x[0-9a-f]{4,}$/.test(to)) {
     console.error('mapping value is itself an obfuscated name: ' + from + ' -> ' + to);
+    process.exit(2);
+  }
+  if (RESERVED_BINDING_NAMES.has(to)) {
+    console.error('mapping value is a reserved word and cannot be a binding: ' + from + ' -> ' + to);
     process.exit(2);
   }
 }

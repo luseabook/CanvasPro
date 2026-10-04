@@ -18,7 +18,7 @@
 // The map is injective: no two names collapse onto the same identifier, so a
 // rename can never introduce a redeclaration in an overlapping scope.
 import fs from 'node:fs';
-import { lex, withBrackets, dataPositions } from './deobf-lex.mjs';
+import { lex, withBrackets, dataPositions, RESERVED_BINDING_NAMES } from './deobf-lex.mjs';
 
 const OBF = /_0x[0-9a-f]{4,}/g;
 
@@ -47,8 +47,12 @@ const CATEGORIES = [
 const FALLBACKS = ['value', 'item', 'key', 'index', 'result', 'data', 'options', 'target', 'source', 'next', 'current', 'entry', 'record', 'payload', 'handle', 'state', 'config', 'scope', 'input', 'output'];
 
 function unique(base, used) {
-  const cleaned = String(base).replace(/[^A-Za-z0-9_$]/g, '') || 'value';
-  const safe = /^[0-9]/.test(cleaned) ? 'v' + cleaned : cleaned;
+  let cleaned = String(base).replace(/[^A-Za-z0-9_$]/g, '') || 'value';
+  if (/^[0-9]/.test(cleaned)) cleaned = 'v' + cleaned;
+  // A binding name cannot be a reserved word. `{ enum: _0x1 }` offers `enum` as a
+  // name, and `const { enum: enum }` is a SyntaxError, so derive a usable one.
+  if (RESERVED_BINDING_NAMES.has(cleaned)) cleaned = cleaned + 'Value';
+  const safe = cleaned;
   if (!used.has(safe)) {
     used.add(safe);
     return safe;
