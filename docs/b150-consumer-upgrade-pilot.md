@@ -353,3 +353,41 @@ manifests 聚合件（modelRegistry gain 5、vendorTextModelApiManifests gain 4 
   `projectPackage/fullProjectPackageSession`、`annotateCloneAction`、`api/mediaTaskHistoryApi`、`services/nodeMediaExportService`
   —— 均被新控制器取代（**镜像内亦零消费方**），孤立化即与 0.7.16 对齐，非功能回归（本表不计入 483 口径）。
 - 483 口径删 34 件为 **403 / 1238**；全量 **11185/11182/3** 零回归。
+
+## 14. 第 161 批：剩件可行性判定（只落 1 件）
+
+b157 之后接线停摆。本批重新评估两个候选集（b157 回滚的 12 件 + 13 件从未评估的新候选），
+定出「逐件接线」的收益边界。全文与逐件失败矩阵见 `docs/b161-consumer-upgrade-sweep.md`。
+
+### 14.1 方法学：add-one 的测试集合必须包含交叉影响测试
+
+本批踩了一个很贵的坑，务必记住：
+
+- 对 13 件候选做**第一次 add-one**（单件落地 → 只跑**同名测试**）→ 7 件「0 失败」，看着全干净。
+- 但 7 件整体落地跑**全量** → **11,157/36**（基线 11,190/3），**净增 33 例**。
+
+即「只跑同名测试」的 add-one 会产生**假阴性**：升代件的影响落在**别的**测试文件里。
+可靠的探测集要把**交叉影响文件**一起跑。定位办法：从全量分片输出的 `failures[]` 用例名
+反查测试文件（`grep -rl --include='*.test.js' -F "<用例名>" .`），本批共 9 个交叉文件，
+与 6 个同名文件合成 **15 个文件的探测集**。
+
+同理，leave-one-out 的结论也要用同一集合复核（本批两法结论一致：`taskOrchestrationModule.impl`
+与 `dreaminaVideoManifest` 是主责件，`removeAction`/`keyingAction` 零责）。
+
+### 14.2 失败只有两类
+
+| 类型 | 形态 | 例 |
+| --- | --- | --- |
+| 契约/规格变更 | 断言值不匹配 | `'9:16' !== '自适应'`（实现已按新规格解析） |
+| 装配失配 | Promise 永不 settle / 抛异常 | `failureType: 'cancelledByParent'`（22 例集中在 `generationTaskRuntime`） |
+
+两者都说明这批消费方与 0.7.16 的其他件是一个整体，**不能按件切**。
+
+### 14.3 结果
+
+- 12 件整体落地 = 基线 420/417/3 → 420/350/70，**净增 67**（54 断言 + 13 异常）→ 全部回滚。
+- 13 件新候选中只有 **`videoActions/removeAction.js`** 在 15 文件探测集下 **0 失败**，落地后
+  全量 **11193 / 11190 / 3** 与基线逐条一致；其余 12 件回滚。
+- 孤立 **201 → 200**（断链 0）。
+- **收益已到极限**：后续要么整代升代（改测试）、要么真机验证驱动，见专题 §6 的 A/B/C。
+
