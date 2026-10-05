@@ -366,6 +366,19 @@ export const desktopBridge = {
     writeRecoverySnapshot: (...args15) =>
       desktopBridge['project']['api']?.['writeRecoverySnapshot']?.(...args15) ??
       chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot', args15[0]),
+    // A compatibility-guarded writer. Deliberately a getter that yields `undefined`
+    // when the host does not implement the guard: the renderer must be able to tell
+    // "this host is too old to write safely" apart from "this host is available"
+    // before it persists a recovery snapshot.
+    get writeRecoverySnapshotIfCompatible() {
+      const hostApi = desktopBridge['project']['api'];
+      if (isFunction(hostApi?.['writeRecoverySnapshotIfCompatible']))
+        return (...args) => hostApi['writeRecoverySnapshotIfCompatible'](...args);
+      if (desktopBridge['isChromeShell'])
+        return (...args) =>
+          chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot-if-compatible', args[0]);
+      return undefined;
+    },
     getRecoverySnapshotInfo: (...args16) =>
       desktopBridge['project']['api']?.['getRecoverySnapshotInfo']?.(...args16) ??
       chromeShellPost('/api/v2/desktop/project/get-recovery-snapshot-info', args16[0]),

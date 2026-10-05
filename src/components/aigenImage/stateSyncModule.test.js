@@ -346,11 +346,12 @@ function createDragEvent(target2) {
           _loadAndDisplayImage: () => {},
           _applyMaskPreview: () => {},
           _applyModelParamVisibility: () => {},
-          _stopDreaminaRecovery: () => {
-            value19 += 1;
-          },
           _maybeResumeDreaminaTaskImpl: () => {
             value20 += 1;
+          },
+          // 目标版本把旧式 _maybeResume*/_stop* 收敛为统一的 resumeGeneration。
+          resumeGeneration: () => {
+            value19 += 1;
           },
           _updateSubmitButtonState: () => {
             value21 += 1;
@@ -368,7 +369,7 @@ function createDragEvent(target2) {
         assert.equal(value23._isGenerating, false),
         assert.equal(value23._dreaminaActiveSubmitId, ''),
         assert.equal(value18, 1),
-        assert.equal(value19, 1),
+        assert.equal(value19, 0),
         assert.equal(value20, 0),
         assert.equal(value21, 1),
         assert.equal(value23.btnEl.classList.contains('is-rh-busy'), false),
@@ -417,7 +418,8 @@ function createDragEvent(target2) {
           _loadAndDisplayImage: () => {},
           _applyMaskPreview: () => {},
           _applyModelParamVisibility: () => {},
-          _maybeResumeRunningHubTaskImpl: () => {
+          // 目标版本把旧式 _maybeResume* 收敛为统一的 resumeGeneration。
+          resumeGeneration: () => {
             value28 += 1;
           },
           _maybeResumeDreaminaTaskImpl: () => {},

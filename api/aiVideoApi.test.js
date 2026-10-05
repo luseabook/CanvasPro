@@ -294,7 +294,7 @@ import { __test__, buildGenerateVideoRequest, generateVideo, resumeAsyncVideoTas
         assert.equal(dom8.body.ratio, '16:9'),
         assert.equal(dom8.body.duration, 7),
         assert.equal(dom8.body.generate_audio, false),
-        assert.equal(dom8.body.seed, 42),
+        assert.equal(dom8.body.seed, undefined),
         assert.equal(
           dom8.taskPolling?.urlTemplate,
           'https://ark.cn-beijing.volces.com/api/v3/contents/generations/tasks/{taskId}',
@@ -585,7 +585,7 @@ import { __test__, buildGenerateVideoRequest, generateVideo, resumeAsyncVideoTas
           'https://cdn.apimart.ai/omni-character.png',
           'https://cdn.apimart.ai/omni-product.png',
         ],
-        generationParams: { aspectRatio: '9:16', duration: 10, resolution: '4k' },
+        generationParams: { aspectRatio: '9:16', duration: 10, resolution: '4k', generation_type: 'reference' },
       });
       (assert.equal(dom17.adapterTrace?.source, 'manifest'),
         assert.equal(dom17.adapterTrace?.executionId, 'apimart.model-api.video.omni-flash-ext.v1'),

@@ -60,15 +60,42 @@ function createElementStub(tagName, namespaceURI = '') {
     hasAttribute: (name) => attributes.has(name),
     appendChild: (child) => {
       element.children.push(child);
+      if (child) child.parentNode = element;
       return child;
     },
-    append: (...nodes) => nodes.forEach((node) => element.children.push(node)),
+    append: (...nodes) => nodes.forEach((node) => {
+      element.children.push(node);
+      if (node) node.parentNode = element;
+    }),
     replaceChildren: (...nodes) => {
       element.children = nodes.slice();
+      nodes.forEach((node) => {
+        if (node) node.parentNode = element;
+      });
+    },
+    insertBefore: (node, reference) => {
+      const index = reference ? element.children.indexOf(reference) : -1;
+      if (index >= 0) element.children.splice(index, 0, node);
+      else element.children.push(node);
+      if (node) node.parentNode = element;
+      return node;
     },
     removeChild: (child) => {
       element.children = element.children.filter((candidate) => candidate !== child);
+      if (child) child.parentNode = null;
       return child;
+    },
+    get childNodes() {
+      return element.children;
+    },
+    get firstChild() {
+      return element.children[0] || null;
+    },
+    get nextSibling() {
+      const parent = element.parentNode;
+      if (!parent || !Array.isArray(parent.children)) return null;
+      const index = parent.children.indexOf(element);
+      return index >= 0 ? parent.children[index + 1] || null : null;
     },
     remove: () => {
       element.removed = true;
@@ -351,7 +378,7 @@ test('every preset manager tab exposes a quick capture default gesture', async (
     await buildDraftCase('captured text');
 
     const tabs = findElements(stub.created, (element) => element.className === 'preset-manager-tab');
-    assert.equal(tabs.length, 4);
+    assert.equal(tabs.length, 5);
     for (const tab of tabs) {
       assert.equal(typeof tab.dataset.nodeType, 'string');
       assert.notEqual(tab.dataset.nodeType, '');

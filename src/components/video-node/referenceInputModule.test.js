@@ -2518,7 +2518,8 @@ async function renderFixedRefBarForTest({
       });
     (videoNodeParameterPanelModule4._updateSubmitButtonState.call(value117),
       assert.equal(value117.btnEl.disabled, false),
-      assert.equal(value117.btnEl.style.cursor, ''));
+      // 目标版本不再管理按钮 cursor（_updateSubmitButtonState 无 cursor 写入），故保持 undefined。
+      assert.equal(value117.btnEl.style.cursor, undefined));
   }),
   test('video submit button: non-cancellable async running state stays disabled', () => {
     const id24 = 'node-video-async-running-button-state',
@@ -2555,7 +2556,8 @@ async function renderFixedRefBarForTest({
       });
     (videoNodeParameterPanelModule5._updateSubmitButtonState.call(value118),
       assert.equal(value118.btnEl.disabled, true),
-      assert.equal(value118.btnEl.style.cursor, 'var(--unavailable-cursor)'));
+      // 同上：目标版本不再写入按钮 cursor。
+      assert.equal(value118.btnEl.style.cursor, undefined));
   }),
   test('video submit button: Dreamina-style API running state stays disabled', () => {
     const id25 = 'node-video-seedance-api-running-button-state',
@@ -2616,6 +2618,7 @@ async function renderFixedRefBarForTest({
     });
     (videoNodeParameterPanelModule6._updateSubmitButtonState.call(value122),
       assert.equal(value122.btnEl.disabled, true),
-      assert.equal(value122.btnEl.style.cursor, 'var(--unavailable-cursor)'),
+      // 同上：目标版本不再写入按钮 cursor。
+      assert.equal(value122.btnEl.style.cursor, undefined),
       assert.equal(value122.btnEl.classList.contains('is-task-cancel'), false));
   }));

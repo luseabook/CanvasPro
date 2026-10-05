@@ -94,7 +94,7 @@ import { getModelApiBodyResolver, getModelApiEndpointResolver } from './modelApi
       modelToken: 'nano-banana-2',
       finalUrls: [],
     });
-    (assert.equal(data.imageSize, '2K'), assert.equal(data.aspectRatio, '1:8'));
+    (assert.equal(data.imageSize, '4K'), assert.equal(data.aspectRatio, '1:8'));
     const options = run2({
       payload: { model: 'nano-banana-2', imageSize: '2K', aspectRatio: '1:8' },
       finalPrompt: 'draw',

@@ -1,3 +1,4 @@
+import { openDebugRequestWindow } from '../../modules/debugRequestWindow.js';
 import {
   APIMART_DREAMINA_VIDEO_DEFAULT_MODEL,
   buildDreaminaStyleVideoNodeNormalizationPatch,
@@ -18,12 +19,7 @@ import {
   resolveDreaminaVideoTaskType,
   validateDreaminaVideoRouteSelection,
 } from '../../modules/dreaminaVideoModelHelper.js';
-import {
-  getModelManifest,
-  normalizeProviderId,
-  resolveModelExecution,
-  resolveModelProvider,
-} from '../../manifests/index.js';
+import { normalizeProviderId, resolveModelExecution, resolveModelProvider } from '../../manifests/index.js';
 import {
   buildFixedInputAssetSlotMap,
   getFixedInputSlotConfigFromManifest,
@@ -31,33 +27,81 @@ import {
 } from '../../modules/fixedInputAssetRefs.js';
 import { flushPromptHtmlCommit, resolvePromptTextWithTextRefs } from '../../modules/nodePromptShared.js';
 import { resolveEffectiveInputKind } from '../../modules/modelInputPolicy.js';
-import { DEBUG_WRENCH_ICON_HTML, formatFinalApiDebugRequest } from '../../utils/debugRequestPreview.js';
+import { getGenerationRatioSizeWithDom } from '../../modules/generationRatioSource.js';
+import { DEBUG_WRENCH_ICON_HTML, buildFinalApiDebugPreview } from '../../utils/debugRequestPreview.js';
+import { getNodeDefaultSize } from '../../services/fileService.js';
+import { releasePayloadObjectUrlLease } from '../../services/payloadObjectUrlLease.js';
 import { resolveGenerationButtonMode } from '../../core/generationTaskUiState.js';
+import { showRunningHubMediaUploadGuideForError } from '../../modules/runningHubMediaUploadGuide.js';
+import {
+  applyModelCredentialButtonState,
+  bindModelCredentialMenu,
+  resetModelCredentialButtonState,
+  syncModelCredentialMenu,
+} from '../../modules/modelCredentialUi.js';
 import {
   resetGenerateButtonIdleUi,
   setGenerateButtonCancellableUi,
   setGenerateButtonLoadingUi,
 } from '../../modules/previewGenerateButtonUi.js';
+import { evaluateGenerationPromptBoundary } from '../../modules/generationPromptPolicy.js';
+import { getSegmentRetakeValidation } from '../../modules/videoRetake/segmentRetakeSession.js';
 import {
-  buildModelUiSchemaDefaultParams,
+  decorateSegmentRetakeParameterNodeData,
+  decorateSegmentRetakeParameterSchemaFields,
+  getSegmentRetakeAllowedModelIdsForNode,
+  isSegmentRetakeEditing,
+} from '../../modules/videoRetake/segmentRetakeModelPolicy.js';
+import { rememberSegmentRetakeModelSelection } from '../../modules/videoRetake/segmentRetakeModelPreference.js';
+import {
+  buildUiSchemaParamPatch,
   bindUiSchemaFieldControls,
   bindModelUiSchemaControls,
-  hasModelUiSchema,
+  hasVisibleModelUiSchema,
   renderModelUiSchemaControls,
   renderUiSchemaFields,
-  sanitizeModelUiSchemaParams,
   syncModelUiSchemaControls,
 } from '../aigenImage/uiSchemaRenderer.js';
 import {
   applyImageSchemaRatioResizeAnimation,
+  animateImageSchemaRatioResizeFlip,
+  armImageSchemaRatioResizeAnimation,
+  buildGenerationModelSelectionPayload,
   buildImageSchemaAspectRatioDisplayPatch,
-} from '../aigenImage/uiModuleModelHelpers.js';
-import { renderNodeModelMenu, renderNodeModelTrigger } from '../shared/nodeModelMenu.js';
+  GENERATION_MANUAL_DISPLAY_SIZE_FIELD,
+  GENERATION_RATIO_RESIZE_ANIMATION_MS,
+} from '../shared/generationDisplayPolicy.js';
+import {
+  VIDEO_DISPLAY_RATIO_RESULT_FIELDS,
+  buildVideoSchemaAspectRatioDisplayPatch,
+} from './videoSchemaAspectRatioDisplayPatch.js';
+import {
+  restoreLegacyVideoRatioPopupAfterSync,
+  syncLegacyVideoRatioFooter,
+} from './legacyVideoRatioPopup.js';
+import {
+  isRunningHubVideoWorkflowModel,
+  resolveVideoAdvancedSchemaTarget,
+} from './videoAdvancedSchemaTarget.js';
+import { renderNodeModelTrigger } from '../shared/nodeModelMenu.js';
+import {
+  bindLazyVideoModelMenu,
+  buildVideoModelMenuHTML,
+  renderVideoModelTriggerIconHTML,
+} from './modelSelectorShared.js';
 import {
   bindNodeFooterController,
-  bindNodeSubmenus,
   closeNodeFooterMenus,
+  syncNodeFooterAdvancedButtonState,
+  positionNodeAdvancedPanel,
 } from '../shared/nodeFooterControls.js';
+import { ADVANCED_SETTINGS_TUNE_ICON_MARKUP } from '../sharedIconMarkup.js';
+import { bindGenerationNodeFooterLifecycle } from '../shared/generationNodeFooterLifecycle.js';
+import {
+  RH_AI_APP_PERSISTENT_ADVANCED_CLASS,
+  isRunningHubAiAppManifest,
+  shouldAllowEmptyCustomAiAppInputs,
+} from '../shared/rhAiAppNodeBehavior.js';
 import {
   buildVideoWorkflowDisplayParamsPatch,
   buildVideoWorkflowGenerationParamsPatch,
@@ -74,11 +118,16 @@ import {
   buildAgnesVideoMenuItemsHtml,
   buildApimartVideoMenuItemsHtml,
   buildApimartVideoLogoHTML,
+  buildCustomProviderVideoLogoHTML,
+  buildCustomProviderVideoMenuGroups,
+  getComfyUiVideoWorkflowIconHtml,
+  buildComfyUiVideoWorkflowMenuGroups,
   buildDreaminaVideoLogoHTML,
   buildDreaminaOfficialVideoMenuItems,
   buildDreaminaTaskModelMenuHtml,
   buildRunningHubVideoModelApiMenuItems,
   buildRunningHubVideoWorkflowMenuItems,
+  buildRhAiAppVideoMenuItems,
   buildVolcengineOfficialVideoMenuItems,
   buildVolcengineVideoLogoHTML,
   getDefaultRunningHubVideoWorkflowModelId,
@@ -97,497 +146,62 @@ import {
   getDreaminaEffectiveNodeData,
   resolveDreaminaRememberedRouteModel,
 } from './dreaminaParameterSchema.js';
-import { t } from '../../i18n/index.js';
-import { translateManifestText } from '../../i18n/manifestText.js';
-const VIDEO_ADAPTIVE_RATIO_VALUE = '自适应',
-  VIDEO_MODE_ALL_REFERENCE_VALUE = '全能参考',
-  VIDEO_MODE_FIRST_LAST_VALUE = '首尾帧';
-function videoPanelText(value, item = {}) {
-  return t('videoNode.parameterPanel.' + value, item);
+import { renderVideoFooterShell } from './footerShell.js';
+import {
+  buildRhWorkflowFieldPatch,
+  buildVideoModelApiModelSelectionPatch,
+  getManifestInputPolicyEdgeIdsToRemove,
+  getPanelModelManifest,
+  isHappyHorsePanelModel,
+} from './parameterPanelModelSelectionPolicy.js';
+import {
+  DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER,
+  VIDEO_MODE_ALL_REFERENCE_VALUE,
+  VIDEO_MODE_FIRST_LAST_VALUE,
+  formatVideoRatioResolutionLabel,
+  getDreaminaProviderLabel,
+  getVideoCancelTooltip,
+  getVideoGenerateTitle,
+  getVideoModeLabel,
+  manifestFixedSlotVisibilityReferencesField,
+  manifestHelpVariantsReferenceField,
+  manifestPromptVariantsReferenceField,
+  resolveVideoAdaptiveRatioSource,
+  resolveVideoModelApiFooterPlacementOrder,
+  resolveVideoPromptPlaceholder,
+  shouldShowVideoPromptInput,
+  videoPanelText,
+  wrapUiSchemaPlacementControls,
+} from './parameterPanelPresentationPolicy.js';
+function bindVideoPanelEvent(el, value, item, key) {
+  if (!el || typeof key !== 'function') return;
+  const index = '__videoPanel_' + value + '_' + item,
+    result = el[index];
+  if (result) el['removeEventListener'](value, result);
+  ((el[index] = key), el['addEventListener'](value, key));
 }
-function getVideoGenerateTitle() {
-  return videoPanelText('generateTitle');
+function bindVideoPanelClick(data, options, target) {
+  bindVideoPanelEvent(data, 'click', options, target);
 }
-function getVideoCancelTooltip() {
-  return videoPanelText('cancelTooltip');
+function bindVideoPanelInput(source, next, current) {
+  bindVideoPanelEvent(source, 'input', next, current);
 }
-function getDefaultVideoPromptPlaceholder() {
-  return videoPanelText('defaultPromptPlaceholder');
-}
-function formatVideoAspectRatioLabel(key) {
-  const enabled = String(key || '').trim();
-  if (!enabled || enabled === VIDEO_ADAPTIVE_RATIO_VALUE) return videoPanelText('adaptive');
-  return enabled;
-}
-function formatVideoRatioResolutionLabel(index, resolution) {
-  return videoPanelText('ratioResolutionLabel', {
-    aspectRatio: formatVideoAspectRatioLabel(index),
-    resolution: resolution,
-  });
-}
-function getVideoModeLabel(result) {
-  const data = String(result || '').trim() || VIDEO_MODE_ALL_REFERENCE_VALUE;
-  if (data === VIDEO_MODE_ALL_REFERENCE_VALUE) return videoPanelText('mode.allReference');
-  if (data === VIDEO_MODE_FIRST_LAST_VALUE) return videoPanelText('mode.firstLastFrame');
-  return data;
-}
-function getDreaminaProviderLabel(options) {
-  const target = String(options || '')
-    .trim()
-    .toLowerCase();
-  if (target === 'dreamina') return videoPanelText('providers.dreamina');
-  if (target === 'volcengine') return videoPanelText('providers.volcengine');
-  return videoPanelText('providers.default');
-}
-const APIMART_KLING_V3_OMNI_MODEL_ID = 'apimart/kling-v3-omni',
-  HAPPYHORSE_BODY_RESOLVERS = new Set(['apimartHappyHorseVideo', 'runninghubHappyHorseVideo']),
-  WAN27_BODY_RESOLVERS = new Set(['apimartWan27Video', 'runninghubWan27Video']),
-  RH_WORKFLOW_DISPLAY_FIELD_IDS = new Set([
-    'rhVideoResolution',
-    'rhVideoFps',
-    'rhVideoFrames',
-    'rhVideoSeconds',
-  ]),
-  RH_V54_BOOLEAN_FIELD_IDS = new Set(['rhBlendIntoScene', 'rhSubtractSubject', 'rhMaskRect']),
-  RH_WORKFLOW_BOOLEAN_FIELD_IDS = new Set([...RH_V54_BOOLEAN_FIELD_IDS, 'rhEnableMask']);
 function getDefaultVideoModelId() {
   return getDefaultRunningHubVideoWorkflowModelId();
 }
-function normalizeRhVideoFpsByPolicy(source, next) {
-  return source?.sourceFrameCountFps === 'v54' ? normalizeRhV54Fps(next) : normalizeRhStandardFps(next);
+function normalizeRhVideoFpsByPolicy(entry, record) {
+  return entry?.['sourceFrameCountFps'] === 'v54'
+    ? normalizeRhV54Fps(record)
+    : normalizeRhStandardFps(record);
 }
-function findPreferredVideoEdge(list, current) {
-  return list.find((item2) => {
-    const entry = current?.nodes?.[item2?.sourceId],
-      record = String(entry?.type || '');
-    return record === 'source-video' || record === 'video' || record === 'ai-video';
+function findPreferredVideoEdge(list, payload) {
+  return list['find']((handle) => {
+    const state = payload?.['nodes']?.[handle?.['sourceId']],
+      config = String(state?.['type'] || '');
+    return config === 'source-video' || config === 'video' || config === 'ai-video';
   });
 }
-function normalizeRhV54SingleControlPreset(payload) {
-  const handle = String(payload ?? '').trim();
-  return handle === 'efficiency' || handle === 'stable' || handle === 'quality' ? handle : 'efficiency';
-}
-function normalizeRhV54SpecialModeValue(state) {
-  const config = String(state ?? '').trim();
-  return config === 'longVideoOverlay' || config === 'cameraMove' ? config : null;
-}
-function normalizeRhV54MaskExpandValue(scope) {
-  const input = Number(scope);
-  return Number.isFinite(input) ? Math.max(-9999, Math.min(9999, Math.trunc(input))) : 25;
-}
-function normalizeRhV54BreastJiggleValue(output) {
-  const value2 = Number(output);
-  if (!Number.isFinite(value2)) return 0;
-  return Math.max(0, Math.min(1, Math.round(value2 * 20) / 20));
-}
-function isApimartPanelModel(options2 = {}, value3 = '') {
-  const providerHint = String(options2?.provider || '')
-      .trim()
-      .toLowerCase(),
-    value4 = String(options2?.model || '').trim(),
-    modelExecution =
-      resolveModelExecution(value4, { providerHint: providerHint }) || resolveModelExecution(value4),
-    value5 = String(
-      modelExecution?.canonicalModelId || modelExecution?.modelManifest?.modelId || value4,
-    ).trim(),
-    enabled2 = String(modelExecution?.modelManifest?.provider || providerHint)
-      .trim()
-      .toLowerCase();
-  return value5 === value3 && (!enabled2 || enabled2 === 'apimart');
-}
-function isHappyHorsePanelModel(options3 = {}) {
-  return isPanelModelUsingBodyResolver(options3, HAPPYHORSE_BODY_RESOLVERS);
-}
-function isPanelModelUsingBodyResolver(options4 = {}, map = new Set()) {
-  const providerHint2 = String(options4?.provider || '')
-      .trim()
-      .toLowerCase(),
-    value6 = String(options4?.model || '').trim(),
-    modelExecution2 =
-      resolveModelExecution(value6, { providerHint: providerHint2 }) || resolveModelExecution(value6),
-    value7 = String(modelExecution2?.executionManifest?.extensions?.bodyResolver || '').trim();
-  return value7 && map.has(value7);
-}
-function isWan27PanelModel(options5 = {}) {
-  return isPanelModelUsingBodyResolver(options5, WAN27_BODY_RESOLVERS);
-}
-function isKlingV3OmniPanelModel(options6 = {}) {
-  return isApimartPanelModel(options6, APIMART_KLING_V3_OMNI_MODEL_ID);
-}
-function getPanelModelManifest(providerHint3 = {}) {
-  const enabled3 = String(providerHint3?.model || '').trim();
-  if (!enabled3) return null;
-  const modelExecution3 =
-    resolveModelExecution(enabled3, { providerHint: providerHint3?.provider }) ||
-    resolveModelExecution(enabled3);
-  return modelExecution3?.modelManifest || getModelManifest(enabled3) || null;
-}
-function getManifestConditionFieldValue(options7 = {}, value8 = '') {
-  const enabled4 = String(value8 || '').trim();
-  if (!enabled4) return undefined;
-  const plainGenerationParams = getPlainGenerationParams(options7?.generationParams);
-  if (Object.prototype.hasOwnProperty.call(plainGenerationParams, enabled4))
-    return plainGenerationParams[enabled4];
-  if (Object.prototype.hasOwnProperty.call(options7 || {}, enabled4)) return options7[enabled4];
-  const list2 = enabled4.split('.').filter(Boolean);
-  if (list2.length <= 1) return undefined;
-  let enabled5 = options7;
-  for (const value9 of list2) {
-    if (!enabled5 || typeof enabled5 !== 'object') return undefined;
-    enabled5 = enabled5[value9];
-  }
-  return enabled5;
-}
-function manifestConditionMatches(el, value10 = {}) {
-  if (Array.isArray(el)) return el.some((item3) => manifestConditionMatches(item3, value10));
-  if (!el || typeof el !== 'object') return false;
-  if (Array.isArray(el.any)) return el.any.some((item4) => manifestConditionMatches(item4, value10));
-  if (Array.isArray(el.all)) return el.all.every((item5) => manifestConditionMatches(item5, value10));
-  const enabled6 = String(el.field || el.param || '').trim();
-  if (!enabled6) return false;
-  const manifestConditionFieldValue = getManifestConditionFieldValue(value10, enabled6),
-    list3 = Array.isArray(el.values)
-      ? el.values
-      : Object.prototype.hasOwnProperty.call(el, 'value')
-        ? [el.value]
-        : [];
-  if (list3.length === 0) return Boolean(manifestConditionFieldValue);
-  return list3.some(
-    (item6) =>
-      manifestConditionFieldValue === item6 ||
-      String(manifestConditionFieldValue ?? '') === String(item6 ?? ''),
-  );
-}
-function resolveManifestPromptPlaceholder(enabled7, value11 = {}) {
-  if (!enabled7 || typeof enabled7 !== 'object') return '';
-  const value12 = Array.isArray(enabled7.variants) ? enabled7.variants : [];
-  for (const value13 of value12) {
-    if (value13 && typeof value13 === 'object' && manifestConditionMatches(value13.when, value11)) {
-      const translateManifestText2 = translateManifestText(value13.placeholder || '').trim();
-      if (translateManifestText2) return translateManifestText2;
-    }
-  }
-  return translateManifestText(enabled7.placeholder || '').trim();
-}
-export function resolveVideoPromptPlaceholder(
-  value14,
-  value15 = {},
-  defaultVideoPromptPlaceholder = getDefaultVideoPromptPlaceholder(),
-) {
-  const manifestPromptPlaceholder = resolveManifestPromptPlaceholder(value14?.prompt, value15);
-  return manifestPromptPlaceholder || String(defaultVideoPromptPlaceholder || '').trim();
-}
-export function shouldShowVideoPromptInput(enabled8) {
-  if (!enabled8 || typeof enabled8 !== 'object') return true;
-  if (enabled8?.prompt?.visible === false) return false;
-  if (enabled8?.prompt?.hidden === true) return false;
-  return true;
-}
-function fieldConditionReferences(list4, value16) {
-  const enabled9 = String(value16 || '').trim();
-  if (Array.isArray(list4)) return list4.some((item7) => fieldConditionReferences(item7, enabled9));
-  if (!enabled9 || !list4 || typeof list4 !== 'object') return false;
-  if (String(list4.field || list4.param || '').trim() === enabled9) return true;
-  return ['all', 'any'].some(
-    (item8) =>
-      Array.isArray(list4[item8]) && list4[item8].some((item9) => fieldConditionReferences(item9, enabled9)),
-  );
-}
-function manifestHelpVariantsReferenceField(value17, value18) {
-  const list5 = Array.isArray(value17?.help?.variants) ? value17.help.variants : [];
-  return list5.some((item10) => fieldConditionReferences(item10?.when, value18));
-}
-function manifestPromptVariantsReferenceField(value19, value20) {
-  const list6 = Array.isArray(value19?.prompt?.variants) ? value19.prompt.variants : [];
-  return list6.some((item11) => fieldConditionReferences(item11?.when, value20));
-}
-function manifestFixedSlotVisibilityReferencesField(value21, value22) {
-  const list7 = Array.isArray(value21?.inputSlots?.fixedSlots) ? value21.inputSlots.fixedSlots : [];
-  return list7.some(
-    (item12) =>
-      fieldConditionReferences(item12?.showWhen, value22) ||
-      fieldConditionReferences(item12?.hideWhen, value22),
-  );
-}
-function normalizeHappyHorsePanelMode(value23) {
-  const value24 = String(value23 || '')
-    .trim()
-    .toLowerCase();
-  return value24 === 'image' || value24 === 'reference' || value24 === 'edit' ? value24 : 'auto';
-}
-function normalizeWan27PanelMode(value25) {
-  const value26 = String(value25 || '')
-    .trim()
-    .toLowerCase();
-  return value26 === 'video' || value26 === 'reference' || value26 === 'edit' ? value26 : 'image';
-}
-function normalizeKlingV3OmniPanelMode(value27) {
-  const value28 = String(value27 || '')
-    .trim()
-    .toLowerCase();
-  return value28 === 'reference' || value28 === 'edit' ? value28 : 'image';
-}
-function getPanelInputKind(value29, value30) {
-  const effectiveInputKind = resolveEffectiveInputKind(value29, value30);
-  if (effectiveInputKind) return effectiveInputKind;
-  const list8 = String(value29?.type || '').toLowerCase();
-  if (list8.includes('video')) return 'video';
-  if (list8.includes('image')) return 'image';
-  if (list8.includes('audio')) return 'audio';
-  if (list8.includes('text')) return 'text';
-  return '';
-}
-function getHappyHorseModeEdgeIdsToRemove({
-  nextMode: nextMode,
-  inEdges: inEdges = [],
-  nodes: nodes = {},
-} = {}) {
-  const happyHorsePanelMode = normalizeHappyHorsePanelMode(nextMode),
-    list9 = [];
-  let count = 0,
-    count2 = 0;
-  for (const value31 of Array.isArray(inEdges) ? inEdges : []) {
-    const value32 = nodes?.[value31?.sourceId],
-      panelInputKind = getPanelInputKind(value32, value31);
-    if (panelInputKind === 'video') {
-      if (happyHorsePanelMode === 'edit' && count2 < 1) count2 += 1;
-      else value31?.id && list9.push(value31.id);
-      continue;
-    }
-    if (panelInputKind === 'image') {
-      if (happyHorsePanelMode === 'image') {
-        if (count < 1) count += 1;
-        else {
-          if (value31?.id) list9.push(value31.id);
-        }
-      } else {
-        if (happyHorsePanelMode === 'edit') {
-          if (count < 5) count += 1;
-          else {
-            if (value31?.id) list9.push(value31.id);
-          }
-        } else {
-          if (happyHorsePanelMode === 'reference') {
-            if (count < 9) count += 1;
-            else {
-              if (value31?.id) list9.push(value31.id);
-            }
-          }
-        }
-      }
-      continue;
-    }
-    panelInputKind === 'audio' && value31?.id && list9.push(value31.id);
-  }
-  return list9;
-}
-function getWan27ModeEdgeIdsToRemove({ nextMode: nextMode2, inEdges: inEdges = [], nodes: nodes = {} } = {}) {
-  const wan27PanelMode = normalizeWan27PanelMode(nextMode2),
-    list10 = [];
-  let count3 = 0,
-    count4 = 0,
-    count5 = 0;
-  for (const value33 of Array.isArray(inEdges) ? inEdges : []) {
-    const value34 = nodes?.[value33?.sourceId],
-      panelInputKind2 = getPanelInputKind(value34, value33);
-    if (panelInputKind2 === 'image') {
-      if (wan27PanelMode === 'image' && count3 < 2) count3 += 1;
-      else {
-        if (wan27PanelMode === 'reference' && count3 < 1) count3 += 1;
-        else value33?.id && list10.push(value33.id);
-      }
-      continue;
-    }
-    if (panelInputKind2 === 'video') {
-      if (wan27PanelMode === 'video' && count4 < 1) count4 += 1;
-      else {
-        if (wan27PanelMode === 'reference' && count4 < 1) count4 += 1;
-        else {
-          if (wan27PanelMode === 'edit' && count4 < 2) count4 += 1;
-          else value33?.id && list10.push(value33.id);
-        }
-      }
-      continue;
-    }
-    if (panelInputKind2 === 'audio') {
-      if ((wan27PanelMode === 'image' || wan27PanelMode === 'reference') && count5 < 1) count5 += 1;
-      else value33?.id && list10.push(value33.id);
-    }
-  }
-  return list10;
-}
-function getKlingV3OmniModeEdgeIdsToRemove({
-  nextMode: nextMode3,
-  inEdges: inEdges = [],
-  nodes: nodes = {},
-} = {}) {
-  const klingV3OmniPanelMode = normalizeKlingV3OmniPanelMode(nextMode3),
-    list11 = [];
-  let count6 = 0,
-    count7 = 0;
-  for (const value35 of Array.isArray(inEdges) ? inEdges : []) {
-    const value36 = nodes?.[value35?.sourceId],
-      panelInputKind3 = getPanelInputKind(value36, value35);
-    if (panelInputKind3 === 'image') {
-      if (klingV3OmniPanelMode === 'image' && count6 < 2) count6 += 1;
-      else {
-        if (klingV3OmniPanelMode === 'reference' && count6 < 1) count6 += 1;
-        else value35?.id && list11.push(value35.id);
-      }
-      continue;
-    }
-    if (panelInputKind3 === 'video') {
-      if ((klingV3OmniPanelMode === 'reference' || klingV3OmniPanelMode === 'edit') && count7 < 1)
-        count7 += 1;
-      else value35?.id && list11.push(value35.id);
-      continue;
-    }
-    panelInputKind3 === 'audio' && value35?.id && list11.push(value35.id);
-  }
-  return list11;
-}
-function buildSchemaParamsPatch(value37, value38, value39 = {}) {
-  const generationParams = {
-      ...getPlainGenerationParams(value37?.generationParams),
-      ...getPlainGenerationParams(value39?.generationParams),
-      ...(value38 && typeof value38 === 'object' ? value38 : {}),
-    },
-    value40 = { generationParams: generationParams },
-    value41 = String(value37?.model || '').trim();
-  return (
-    value41 &&
-      (value40.generationParamsByModel = {
-        ...getPlainGenerationParams(value37?.generationParamsByModel),
-        [value41]: generationParams,
-      }),
-    value40
-  );
-}
-function getUiSchemaFieldIds(value42) {
-  const modelManifest = getModelManifest(value42);
-  return new Set(
-    (Array.isArray(modelManifest?.uiSchema?.fields) ? modelManifest.uiSchema.fields : [])
-      .map((item13) => String(item13?.id || '').trim())
-      .filter(Boolean),
-  );
-}
-const DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER = Object.freeze(['resolution', 'mode']);
-function resolveVideoModelApiFooterPlacementOrder(options8 = {}) {
-  const map2 = new Set(DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER),
-    list12 = [],
-    list13 = Array.isArray(options8?.uiSchema?.footerPlacementOrder)
-      ? options8.uiSchema.footerPlacementOrder
-      : [];
-  return (
-    list13.forEach((item14) => {
-      const value43 = String(item14 || '')
-        .trim()
-        .toLowerCase();
-      map2.has(value43) && !list12.includes(value43) && list12.push(value43);
-    }),
-    DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER.forEach((item15) => {
-      if (!list12.includes(item15)) list12.push(item15);
-    }),
-    list12
-  );
-}
-function wrapUiSchemaPlacementControls(value44) {
-  return value44 ? '<div class="ui-schema-placement">' + value44 + '</div>' : '';
-}
-function sanitizeVideoModelApiParams(value45, value46 = {}, value47 = {}) {
-  const plainGenerationParams2 = getPlainGenerationParams(value46);
-  try {
-    return sanitizeModelUiSchemaParams(value45, plainGenerationParams2, value47);
-  } catch {
-    return plainGenerationParams2;
-  }
-}
-export function buildVideoModelApiModelSelectionPatch(
-  options9 = {},
-  value48 = '',
-  provider = null,
-  value49 = {},
-) {
-  const model = String(value48 || '').trim();
-  if (!model) return {};
-  const value50 = String(options9?.model || '').trim(),
-    generationParamsByModel = getPlainGenerationParams(options9?.generationParamsByModel);
-  value50 &&
-    (generationParamsByModel[value50] = sanitizeVideoModelApiParams(value50, options9?.generationParams, {
-      includeDefaults: false,
-    }));
-  const list14 = getUiSchemaFieldIds(model),
-    args = buildModelUiSchemaDefaultParams(model),
-    args2 = getPlainGenerationParams(generationParamsByModel[model]),
-    value51 = Object.prototype.hasOwnProperty.call(value49, 'generationParams'),
-    args3 = value51 ? getPlainGenerationParams(value49.generationParams) : {},
-    args4 = {};
-  Object.entries(value49 || {}).forEach(([value52, value53]) => {
-    if (list14.has(value52)) args4[value52] = value53;
-  });
-  const value54 = { ...args, ...args2, ...args3, ...args4 },
-    value55 = Object.fromEntries(Object.entries(value54).filter(([value56]) => list14.has(value56))),
-    generationParams2 = sanitizeVideoModelApiParams(model, value55, { includeDefaults: true }),
-    { generationParams: generationParams3, ...args5 } = value49 || {},
-    args6 = { ...args5 };
-  return (
-    list14.forEach((item16) => {
-      delete args6[item16];
-    }),
-    {
-      ...args6,
-      model: model,
-      provider: provider,
-      generationParams: generationParams2,
-      generationParamsByModel: generationParamsByModel,
-    }
-  );
-}
-function buildRhWorkflowFieldPatch(value57, value58, value59, value60 = {}) {
-  const value61 = String(value58 || '').trim();
-  if (RH_WORKFLOW_DISPLAY_FIELD_IDS.has(value61)) return { [value61]: value59 };
-  if (value61 === 'rhSingleControlPreset' || value61 === 'rhControlMode') {
-    const value62 = String(value59 || '').trim(),
-      args7 =
-        value62 === 'multi'
-          ? { rhControlMode: 'multi', rhSingleControlPreset: null }
-          : { rhControlMode: 'single', rhSingleControlPreset: normalizeRhV54SingleControlPreset(value62) };
-    return { ...buildSchemaParamsPatch(value57, args7, value60), ...args7 };
-  }
-  if (RH_WORKFLOW_BOOLEAN_FIELD_IDS.has(value61)) {
-    const value63 = value59 === true || String(value59) === 'true',
-      args8 = { [value61]: value63 };
-    return { ...buildSchemaParamsPatch(value57, args8, value60), ...args8 };
-  }
-  if (value61 === 'rhSpecialMode') {
-    const plainGenerationParams3 = getPlainGenerationParams(value57?.generationParams),
-      rhV54SpecialModeValue = normalizeRhV54SpecialModeValue(
-        plainGenerationParams3.rhSpecialMode !== undefined
-          ? plainGenerationParams3.rhSpecialMode
-          : value57?.rhSpecialMode,
-      ),
-      rhV54SpecialModeValue2 = normalizeRhV54SpecialModeValue(value59),
-      rhSpecialMode = rhV54SpecialModeValue === rhV54SpecialModeValue2 ? null : rhV54SpecialModeValue2,
-      args9 = { rhSpecialMode: rhSpecialMode };
-    return { ...buildSchemaParamsPatch(value57, args9, value60), ...args9 };
-  }
-  if (value61 === 'rhMaskExpand') {
-    const rhMaskExpand = normalizeRhV54MaskExpandValue(value59),
-      value64 = { rhMaskExpand: rhMaskExpand };
-    return {
-      ...buildSchemaParamsPatch(value57, value64, value60),
-      rhMaskExpand: rhMaskExpand,
-      rhMaskExpandTouched: true,
-    };
-  }
-  if (value61 === 'rhBreastJiggle') {
-    const rhBreastJiggle = normalizeRhV54BreastJiggleValue(value59),
-      value65 = { rhBreastJiggle: rhBreastJiggle };
-    return { ...buildSchemaParamsPatch(value57, value65, value60), rhBreastJiggle: rhBreastJiggle };
-  }
-  return {};
-}
-export function createVideoNodeParameterPanelModule(value66) {
+export function createVideoNodeParameterPanelModule(scope) {
   const {
     store: store,
     api: api,
@@ -597,863 +211,941 @@ export function createVideoNodeParameterPanelModule(value66) {
     getDisplayedMediaSizeFromNode: getDisplayedMediaSizeFromNode,
     activateMenuKeyboard: activateMenuKeyboard,
     isVideoVipModel: isVideoVipModel,
-  } = value66;
-  class value67 {
-    ['_getRhVideoAdvancedSchemaNodeData'](options10 = {}) {
-      const value68 = String(options10?.model || '').trim(),
-        runningHubVideoParameterPanelPolicy = getRunningHubVideoParameterPanelPolicy(value68);
-      let args10 = options10;
-      if (runningHubVideoParameterPanelPolicy.sourceFrameCountFps) {
-        const rhVideoFpsByPolicy = normalizeRhVideoFpsByPolicy(
-          runningHubVideoParameterPanelPolicy,
-          options10?.rhVideoFps,
-        );
-        args10 = {
-          ...args10,
-          rhVideoSourceFrameCount: this._getRhV5SourceVideoFrameCount?.(rhVideoFpsByPolicy) || 0,
+    readStoreState: readStoreState = () => store['getStateRaw']?.() || store['getState']?.() || {},
+  } = scope;
+  class input {
+    ['_getRhVideoAdvancedSchemaNodeData'](options2 = {}) {
+      const output = String(options2?.['model'] || '')['trim'](),
+        runningHubVideoParameterPanelPolicy = getRunningHubVideoParameterPanelPolicy(output);
+      let args = options2;
+      if (runningHubVideoParameterPanelPolicy['sourceFrameCountFps']) {
+        const rhVideoFpsByPolicy = normalizeRhVideoFpsByPolicy(runningHubVideoParameterPanelPolicy, options2?.['rhVideoFps']);
+        args = {
+          ...args,
+          rhVideoSourceFrameCount: this['_getRhV5SourceVideoFrameCount']?.(rhVideoFpsByPolicy) || 0,
         };
       }
-      if (runningHubVideoParameterPanelPolicy.maskVideoDisablesSubtractSubject !== true) return args10;
-      const enabled10 = (store.getIncomingEdges(this.nodeId) || []).some((item17) => {
-        const value69 = String(item17?.refSlot || '').trim();
-        return value69 === 'videoMask' || value69 === 'maskVideo';
+      if (runningHubVideoParameterPanelPolicy['maskVideoDisablesSubtractSubject'] !== !![]) return args;
+      const enabled = (store['getIncomingEdges'](this['nodeId']) || [])['some']((value2) => {
+        const value3 = String(value2?.['refSlot'] || '')['trim']();
+        return value3 === 'videoMask' || value3 === 'maskVideo';
       });
-      if (!enabled10) return args10;
+      if (!enabled) return args;
       return {
-        ...args10,
-        rhV54HasMaskVideo: true,
-        rhSubtractSubject: false,
+        ...args,
+        rhV54HasMaskVideo: !![],
+        rhSubtractSubject: ![],
         generationParams: {
-          ...getPlainGenerationParams(args10?.generationParams),
-          rhSubtractSubject: false,
+          ...getPlainGenerationParams(args?.['generationParams']),
+          rhSubtractSubject: ![],
         },
       };
     }
-    ['_buildVideoModelMenuHtml'](value70 = '') {
-      const activeModel = String(value70 || this._data?.model || '').trim() || getDefaultVideoModelId();
-      return renderNodeModelMenu({
-        kind: 'video',
-        activeModel: activeModel,
-        items: [
-          ...buildDreaminaOfficialVideoMenuItems(),
-          ...buildVolcengineOfficialVideoMenuItems(activeModel, this._data?.provider),
-        ],
-        groups: [
-          {
-            id: 'apimart-video',
-            headerClass: 'apimart-video-group-header',
-            submenuClass: 'apimart-video-submenu',
-            toggleAttr: 'data-apimart-video-toggle',
-            label: 'APIMart',
-            subtitle: '视频生成模型',
-            iconHtml: buildApimartVideoLogoHTML(20),
-            itemsHtml: buildApimartVideoMenuItemsHtml(activeModel, this._data?.provider),
-          },
-          {
-            id: 'agnes-video',
-            headerClass: 'agnes-video-group-header',
-            submenuClass: 'agnes-video-submenu',
-            toggleAttr: 'data-agnes-video-toggle',
-            label: 'Agnes AI',
-            subtitle: 'Video model API',
-            iconHtml: buildAgnesVideoLogoHTML(20),
-            itemsHtml: buildAgnesVideoMenuItemsHtml(activeModel),
-          },
-          {
-            id: 'runninghub',
-            label: 'RunningHUB工作流',
-            subtitle: 'AI 工作流',
-            icon: 'images/RH.png',
-            iconAlt: 'runninghub',
-            itemsHtml: buildRunningHubVideoWorkflowMenuItems(activeModel),
-          },
-          {
-            id: 'runninghub-model',
-            label: 'RunningHUB模型',
-            subtitle: '标准模型 API',
-            icon: 'images/RH.png',
-            iconAlt: 'runninghub',
-            itemsHtml: buildRunningHubVideoModelApiMenuItems(activeModel),
-          },
-        ],
+    ['_buildVideoModelMenuHtml'](activeModel = '') {
+      const allowedModelIds = getSegmentRetakeAllowedModelIdsForNode(this['_data']);
+      return buildVideoModelMenuHTML({
+        activeModel: activeModel || this['_data']?.['model'],
+        provider: this['_data']?.['provider'],
+        subscriptionState:
+          (typeof store['getStateRaw'] === 'function'
+            ? store['getStateRaw']()
+            : store['getState']())?.['subscription'] || {},
+        allowedModelIds: allowedModelIds,
+      });
+    }
+    ['_getVideoAdvancedSchemaTarget'](value4 = this['_data']) {
+      return resolveVideoAdvancedSchemaTarget(value4, {
+        fallbackNodeData: this['_data'],
+        buildRunningHubNodeData: (value5) => this['_getRhVideoAdvancedSchemaNodeData'](value5),
+      });
+    }
+    ['_renderVideoAdvancedControlsHtml'](value6 = this['_data']) {
+      const placement = this['_getVideoAdvancedSchemaTarget'](value6);
+      return placement
+        ? renderModelUiSchemaControls(placement['modelId'], placement['nodeData'], {
+            placement: placement['placement'],
+          })
+        : '';
+    }
+    ['_hasVisibleVideoAdvancedControls'](value7 = this['_data']) {
+      const placement2 = this['_getVideoAdvancedSchemaTarget'](value7);
+      return (
+        !!placement2 &&
+        hasVisibleModelUiSchema(placement2['modelId'], placement2['nodeData'], {
+          placement: placement2['placement'],
+        })
+      );
+    }
+    ['_renderFooterShell'](value8) {
+      renderVideoFooterShell(this, value8, {
+        DEBUG_WRENCH_ICON_HTML: DEBUG_WRENCH_ICON_HTML,
+        getDefaultVideoModelId: getDefaultVideoModelId,
+        getDisplayModelName: getDisplayModelName,
+        getVideoCancelTooltip: getVideoCancelTooltip,
+        getVideoGenerateTitle: getVideoGenerateTitle,
+        renderNodeModelTrigger: renderNodeModelTrigger,
+        videoPanelText: videoPanelText,
       });
     }
     ['_renderFooterImpl'](el2) {
-      let value71 = false;
-      const el3 = el2.querySelector('.rh-vram-adv-panel');
-      el3 && (value71 = el3.classList.contains('show'));
-      const value72 = this._isDreaminaVideoNode(this._data)
-        ? this._syncDreaminaTaskState(this._data, { syncStore: true })
-        : null;
-      value72?.nodeData && (this._data = value72.nodeData);
-      const enabled11 = Boolean(value72),
-        list15 = String(this._data.model || '').trim() || getDefaultVideoModelId();
-      if (isRunningHubVideoWorkflowManifest(list15)) {
-        const args11 = buildVideoWorkflowGenerationParamsPatch(this._data, list15),
-          args12 = buildVideoWorkflowDisplayParamsPatch(list15, args11.generationParams, {
+      if (el2?.['dataset']) delete el2['dataset']['deferredDetailsShell'];
+      let value9 = ![];
+      const el3 = el2['querySelector']('.rh-vram-adv-panel');
+      el3 && (value9 = el3['classList']['contains']('show'));
+      const decorateSegmentRetakeParameterNodeData2 = decorateSegmentRetakeParameterNodeData(this['_data']),
+        value10 = this['_isDreaminaVideoNode'](decorateSegmentRetakeParameterNodeData2)
+          ? this['_syncDreaminaTaskState'](decorateSegmentRetakeParameterNodeData2, { syncStore: !decorateSegmentRetakeParameterNodeData2?.['segmentRetake'] })
+          : null;
+      if (value10?.['nodeData'])
+        this['_data'] = decorateSegmentRetakeParameterNodeData(value10['nodeData']);
+      const decorateSegmentRetakeParameterNodeData3 = decorateSegmentRetakeParameterNodeData(this['_data']),
+        enabled2 = Boolean(value10),
+        model = String(this['_data']['model'] || '')['trim']() || getDefaultVideoModelId(),
+        panelModelManifest = getPanelModelManifest({ ...this['_data'], model: model }),
+        isRunningHubAiAppManifest2 = isRunningHubAiAppManifest(panelModelManifest),
+        value11 = !enabled2 && isRunningHubAiAppManifest2;
+      if (isRunningHubVideoWorkflowManifest(model)) {
+        const args2 = buildVideoWorkflowGenerationParamsPatch(this['_data'], model),
+          args3 = buildVideoWorkflowDisplayParamsPatch(model, args2['generationParams'], {
             v54FpsOptions: getRhV54FpsOptions(),
           }),
-          value73 = Object.entries(args12).some(([value74, value75]) => this._data?.[value74] !== value75);
+          value12 = Object['entries'](args3)['some'](
+            ([value13, value14]) => this['_data']?.[value13] !== value14,
+          );
         if (
-          args11.generationParams &&
+          args2['generationParams'] &&
           (!arePlainObjectsEqual(
-            args11.generationParams,
-            getPlainGenerationParams(this._data.generationParams),
+            args2['generationParams'],
+            getPlainGenerationParams(this['_data']['generationParams']),
           ) ||
             !arePlainObjectsEqual(
-              args11.generationParamsByModel,
-              getPlainGenerationParams(this._data.generationParamsByModel),
+              args2['generationParamsByModel'],
+              getPlainGenerationParams(this['_data']['generationParamsByModel']),
             ) ||
-            value73)
+            value12)
         ) {
-          const args13 = { ...args11, ...args12 };
-          (store.updateNodeData(this.nodeId, args13), (this._data = { ...this._data, ...args13 }));
+          const args4 = { ...args2, ...args3 };
+          (store['updateNodeData'](this['nodeId'], args4),
+            (this['_data'] = { ...this['_data'], ...args4 }));
         }
       }
-      const value76 = list15.includes('seedance'),
-        value77 = value72?.nodeData?.resolution || this._data.resolution || (value76 ? '720p' : '1080p'),
-        value78 = this._getModelParamVisibility(list15, this._data.provider),
-        enabled12 = this._isRunninghubWorkflowModel(list15, this._data.provider),
-        value79 = this._resolveModelExecution(list15, this._data.provider),
-        value80 =
-          !enabled11 &&
-          !enabled12 &&
-          value79?.modelManifest?.adapterType === 'modelApi' &&
-          value79?.modelManifest?.kind === 'video',
-        value81 = value80
-          ? String(value79?.canonicalModelId || value79?.modelManifest?.modelId || list15).trim()
-          : list15,
-        value82 = enabled12,
-        value83 = value82
-          ? renderModelUiSchemaControls(list15, this._data, {
+      const value15 = model['includes']('seedance'),
+        value16 =
+          value10?.['nodeData']?.['resolution'] ||
+          this['_data']['resolution'] ||
+          (value15 ? '720p' : '1080p'),
+        value17 = this['_getModelParamVisibility'](model, this['_data']['provider']),
+        enabled3 = this['_isRunninghubWorkflowModel'](model, this['_data']['provider']),
+        value18 = this['_resolveModelExecution'](model, this['_data']['provider']),
+        enabled4 = !enabled2 && panelModelManifest?.['kind'] !== 'video',
+        enabled5 =
+          !enabled2 &&
+          !enabled3 &&
+          value18?.['modelManifest']?.['adapterType'] === 'modelApi' &&
+          value18?.['modelManifest']?.['kind'] === 'video',
+        value19 = !enabled2 && !enabled3 && !isRunningHubAiAppManifest2 && !enabled5 && !enabled4,
+        value20 = enabled5
+          ? String(value18?.['canonicalModelId'] || value18?.['modelManifest']?.['modelId'] || model)[
+              'trim'
+            ]()
+          : model,
+        value21 = enabled3,
+        value22 = value21
+          ? renderModelUiSchemaControls(model, this['_data'], {
               placement: 'instance',
               variant: 'instanceToggle',
             })
           : '',
-        hasRunningHubVideoWorkflowUiPlacement2 = hasRunningHubVideoWorkflowUiPlacement(
-          list15,
-          'videoAdvanced',
-        ),
-        hasRunningHubVideoWorkflowUiPlacement3 = hasRunningHubVideoWorkflowUiPlacement(list15, 'videoParams'),
-        hasRunningHubVideoWorkflowUiPlacement4 = hasRunningHubVideoWorkflowUiPlacement(list15, 'resolution'),
-        value84 = hasRunningHubVideoWorkflowUiPlacement3
-          ? this._getRhVideoAdvancedSchemaNodeData(this._data)
-          : this._data,
-        value85 = hasRunningHubVideoWorkflowUiPlacement3
-          ? renderModelUiSchemaControls(list15, value84, {
+        hasRunningHubVideoWorkflowUiPlacement2 = hasRunningHubVideoWorkflowUiPlacement(model, 'videoParams'),
+        hasRunningHubVideoWorkflowUiPlacement3 = hasRunningHubVideoWorkflowUiPlacement(model, 'resolution'),
+        value23 = hasRunningHubVideoWorkflowUiPlacement2 ? this['_getRhVideoAdvancedSchemaNodeData'](this['_data']) : this['_data'],
+        value24 = hasRunningHubVideoWorkflowUiPlacement2
+          ? renderModelUiSchemaControls(model, value23, {
               placement: 'videoParams',
-              unwrap: true,
-              rhVideoFpsOptions: getRunningHubVideoWorkflowFpsOptions(list15, {
+              unwrap: !![],
+              rhVideoFpsOptions: getRunningHubVideoWorkflowFpsOptions(model, {
                 v54FpsOptions: getRhV54FpsOptions(),
               }),
             })
           : '',
-        value86 = hasRunningHubVideoWorkflowUiPlacement4
-          ? renderModelUiSchemaControls(list15, value84, { placement: 'resolution' })
+        value25 = hasRunningHubVideoWorkflowUiPlacement3
+          ? renderModelUiSchemaControls(model, value23, { placement: 'resolution' })
           : '',
-        value87 = value80 ? renderModelUiSchemaControls(value81, this._data, { placement: 'mode' }) : '',
-        value88 = value80
-          ? renderModelUiSchemaControls(value81, this._data, { placement: 'resolution' })
+        value26 = enabled5 ? renderModelUiSchemaControls(value20, decorateSegmentRetakeParameterNodeData3, { placement: 'mode' }) : '',
+        value27 = enabled5
+          ? renderModelUiSchemaControls(value20, decorateSegmentRetakeParameterNodeData3, { placement: 'resolution' })
           : '',
-        value89 = value80 ? renderModelUiSchemaControls(value81, this._data, { placement: 'advanced' }) : '',
-        value90 = value80 && hasModelUiSchema(value81, { placement: 'advanced' }),
-        value91 = hasRunningHubVideoWorkflowUiPlacement2 || value90,
-        iconHtml = this._getModelIconHTML(list15, this._data.provider),
-        value92 = this._getRatioIconHTML(this._data.aspectRatio || '自适应'),
-        formatVideoRatioResolutionLabel2 = formatVideoRatioResolutionLabel(this._data.aspectRatio, value77),
-        value93 =
+        value28 =
+          enabled3 || isRunningHubAiAppManifest2
+            ? renderModelUiSchemaControls(model, this['_data'], { placement: 'mode' })
+            : '',
+        value29 = this['_hasVisibleVideoAdvancedControls'](this['_data']),
+        value30 = value29 ? this['_renderVideoAdvancedControlsHtml'](this['_data']) : '',
+        iconHtml = this['_getModelIconHTML'](model, this['_data']['provider']),
+        value31 = this['_getRatioIconHTML'](this['_data']['aspectRatio'] || '自适应'),
+        formatVideoRatioResolutionLabel2 = formatVideoRatioResolutionLabel(this['_data']['aspectRatio'], value16),
+        value32 =
           '\n                <div class="img-rp-quality-area">\n                  <div class="img-rp-section-label">' +
           videoPanelText('resolution') +
           '</div>\n                  <div class="img-rp-quality-segmented">\n                    <button type="button" class="img-rp-quality-item ' +
-          (value77 === '480p' ? 'active' : '') +
+          (value16 === '480p' ? 'active' : '') +
           ' ' +
-          (value76 ? 'is-disabled' : '') +
+          (value15 ? 'is-disabled' : '') +
           '" data-value="480p" ' +
-          (value76 ? 'disabled title="' + videoPanelText('resolutionUnavailable') + '"' : '') +
+          (value15 ? 'disabled title="' + videoPanelText('resolutionUnavailable') + '"' : '') +
           '>480p</button>\n                    <button type="button" class="img-rp-quality-item ' +
-          (value77 === '720p' ? 'active' : '') +
+          (value16 === '720p' ? 'active' : '') +
           '" data-value="720p">720p</button>\n                    <button type="button" class="img-rp-quality-item ' +
-          (value77 === '1080p' ? 'active' : '') +
+          (value16 === '1080p' ? 'active' : '') +
           ' ' +
-          (value76 ? 'is-disabled' : '') +
+          (value15 ? 'is-disabled' : '') +
           '" data-value="1080p" ' +
-          (value76 ? 'disabled title="' + videoPanelText('resolutionUnavailable') + '"' : '') +
+          (value15 ? 'disabled title="' + videoPanelText('resolutionUnavailable') + '"' : '') +
           '>1080p</button>\n                  </div>\n                </div>\n                <div class="img-rp-ratio-area">\n                  <div class="img-rp-section-label">' +
           videoPanelText('aspectRatio') +
           '</div>\n                  <div class="img-rp-ratio-split">\n                    <div class="img-rp-ratio-left">\n                      <button type="button" class="img-rp-large-adaptive active" data-label="自适应" data-w="1" data-h="1">\n                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>\n                        <span>' +
           videoPanelText('adaptive') +
           '</span>\n                      </button>\n                    </div>\n                    <div class="img-rp-ratio-right">\n                      <button type="button" class="img-rp-ratio-item" data-label="1:1" data-w="1" data-h="1"><span class="img-rp-icon img-rp-sq"></span><span>1:1</span></button>\n                      <button type="button" class="img-rp-ratio-item" data-label="9:16" data-w="9" data-h="16"><span class="img-rp-icon img-rp-tall"></span><span>9:16</span></button>\n                      <button type="button" class="img-rp-ratio-item" data-label="16:9" data-w="16" data-h="9"><span class="img-rp-icon img-rp-wide"></span><span>16:9</span></button>\n                      <button type="button" class="img-rp-ratio-item" data-label="3:4" data-w="3" data-h="4"><span class="img-rp-icon img-rp-p34"></span><span>3:4</span></button>\n                      <button type="button" class="img-rp-ratio-item" data-label="4:3" data-w="4" data-h="3"><span class="img-rp-icon img-rp-l43"></span><span>4:3</span></button>\n                      <button type="button" class="img-rp-ratio-item is-disabled" data-label="3:2" data-w="3" data-h="2" disabled><span class="img-rp-icon img-rp-l32"></span><span>3:2</span></button>\n                      <button type="button" class="img-rp-ratio-item is-disabled" data-label="2:3" data-w="2" data-h="3" disabled><span class="img-rp-icon img-rp-p23"></span><span>2:3</span></button>\n                      <button type="button" class="img-rp-ratio-item is-disabled" data-label="5:4" data-w="5" data-h="4" disabled><span class="img-rp-icon img-rp-l54"></span><span>5:4</span></button>\n                      <button type="button" class="img-rp-ratio-item is-disabled" data-label="4:5" data-w="4" data-h="5" disabled><span class="img-rp-icon img-rp-p45"></span><span>4:5</span></button>\n                      <button type="button" class="img-rp-ratio-item" data-label="21:9" data-w="21" data-h="9"><span class="img-rp-icon img-rp-ultra"></span><span>21:9</span></button>\n                    </div>\n                  </div>\n                </div>\n      ',
-        list16 = value80
-          ? resolveVideoModelApiFooterPlacementOrder(value79?.modelManifest)
+        list2 = enabled5
+          ? resolveVideoModelApiFooterPlacementOrder(value18?.['modelManifest'])
           : DEFAULT_VIDEO_MODEL_API_FOOTER_PLACEMENT_ORDER,
-        count8 = list16.indexOf('mode'),
-        count9 = list16.indexOf('resolution'),
-        value94 = value80 && value87 && count8 >= 0 && count9 >= 0 && count8 < count9,
-        wrapUiSchemaPlacementControls2 = wrapUiSchemaPlacementControls(value87),
-        wrapUiSchemaPlacementControls3 = wrapUiSchemaPlacementControls(value88);
-      el2.innerHTML =
+        count = list2['indexOf']('mode'),
+        count2 = list2['indexOf']('resolution'),
+        value33 = enabled5 && value26 && count >= 0 && count2 >= 0 && count < count2,
+        wrapUiSchemaPlacementControls2 = wrapUiSchemaPlacementControls(value26),
+        wrapUiSchemaPlacementControls3 = wrapUiSchemaPlacementControls(value27),
+        wrapUiSchemaPlacementControls4 = wrapUiSchemaPlacementControls(value28);
+      el2['innerHTML'] =
         '\n          <div class="img-model-pills">\n            <div class="img-model-wrap">\n              ' +
-        renderNodeModelTrigger({ iconHtml: iconHtml, label: getDisplayModelName(list15) }) +
+        renderNodeModelTrigger({ iconHtml: iconHtml, label: getDisplayModelName(model) }) +
         '\n              <div class="floating-menu img-model-menu node-model-menu" data-node-menu-kind="video" data-lazy-model-menu="video"></div>\n            </div>\n            ' +
-        (enabled11 ? '' : value94 ? wrapUiSchemaPlacementControls2 : '') +
+        (enabled4
+          ? '<button type="button" class="img-pill-btn" data-video-model-unavailable="true" disabled aria-disabled="true" title="' +
+            videoPanelText('modelUnavailable') +
+            '">' +
+            videoPanelText('modelUnavailable') +
+            '</button>'
+          : '') +
         '\n            ' +
-        (enabled11 ? '' : hasRunningHubVideoWorkflowUiPlacement3 && value85 ? value85 : '') +
+        (enabled2 ? '' : wrapUiSchemaPlacementControls4) +
         '\n            ' +
-        (enabled11
+        (enabled2 || value11 ? '' : value33 ? wrapUiSchemaPlacementControls2 : '') +
+        '\n            ' +
+        (enabled2 || value11 ? '' : hasRunningHubVideoWorkflowUiPlacement2 && value24 ? value24 : '') +
+        '\n            ' +
+        (enabled2 || value11
           ? ''
-          : value86
-            ? wrapUiSchemaPlacementControls(value86)
-            : !hasRunningHubVideoWorkflowUiPlacement3 && value88
+          : value25
+            ? wrapUiSchemaPlacementControls(value25)
+            : !hasRunningHubVideoWorkflowUiPlacement2 && value27
               ? wrapUiSchemaPlacementControls3
-              : !hasRunningHubVideoWorkflowUiPlacement3
+              : value19
                 ? '<div class="img-ratio-wrap"' +
-                  (value78.ratio ? '' : ' hidden') +
+                  (value17['ratio'] ? '' : ' hidden') +
                   '>\n              <button type="button" class="img-pill-btn img-ratio-btn">\n                <span class="img-ratio-icon-slot">' +
-                  value92 +
+                  value31 +
                   '</span>\n                <span class="img-ratio-label">' +
                   formatVideoRatioResolutionLabel2 +
                   '</span>\n              </button>\n              <div class="img-ratio-popup">\n                ' +
-                  value93 +
+                  value32 +
                   '\n              </div>\n            </div>'
                 : '') +
         '\n            ' +
-        (enabled11
+        (enabled2 || value11 || enabled4
           ? ''
-          : value80
-            ? value94
+          : enabled5
+            ? value33
               ? ''
-              : value87
+              : value26
                 ? wrapUiSchemaPlacementControls2
                 : ''
-            : '<div class="vid-mode-wrap"' +
-              (value78.mode ? '' : ' hidden') +
-              '>\n              <button type="button" class="img-pill-btn vid-mode-btn">\n                <span class="vid-mode-label">' +
-              getVideoModeLabel(this._data.mode) +
-              '</span>\n              </button>\n              <div class="floating-menu vid-mode-menu">\n                <div class="floating-menu-item video-mode-item ' +
-              (!this._data.mode || this._data.mode === VIDEO_MODE_ALL_REFERENCE_VALUE ? 'active' : '') +
-              '" data-value="' +
-              VIDEO_MODE_ALL_REFERENCE_VALUE +
-              '">\n                  <svg class="video-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>\n                  <span class="floating-menu-label">' +
-              videoPanelText('mode.allReference') +
-              '</span>\n                </div>\n                <div class="floating-menu-item video-mode-item ' +
-              (this._data.mode === VIDEO_MODE_FIRST_LAST_VALUE ? 'active' : '') +
-              '" data-value="' +
-              VIDEO_MODE_FIRST_LAST_VALUE +
-              '">\n                  <svg class="video-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 17h10"/></svg>\n                  <span class="floating-menu-label">' +
-              videoPanelText('mode.firstLastFrame') +
-              '</span>\n                </div>\n              </div>\n            </div>') +
+            : value19
+              ? '<div class="vid-mode-wrap"' +
+                (value17['mode'] ? '' : ' hidden') +
+                '>\n              <button type="button" class="img-pill-btn vid-mode-btn">\n                <span class="vid-mode-label">' +
+                getVideoModeLabel(this['_data']['mode']) +
+                '</span>\n              </button>\n              <div class="floating-menu vid-mode-menu">\n                <div class="floating-menu-item video-mode-item ' +
+                (!this['_data']['mode'] || this['_data']['mode'] === VIDEO_MODE_ALL_REFERENCE_VALUE
+                  ? 'active'
+                  : '') +
+                '" data-value="' +
+                VIDEO_MODE_ALL_REFERENCE_VALUE +
+                '">\n                  <svg class="video-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>\n                  <span class="floating-menu-label">' +
+                videoPanelText('mode.allReference') +
+                '</span>\n                </div>\n                <div class="floating-menu-item video-mode-item ' +
+                (this['_data']['mode'] === VIDEO_MODE_FIRST_LAST_VALUE ? 'active' : '') +
+                '" data-value="' +
+                VIDEO_MODE_FIRST_LAST_VALUE +
+                '">\n                  <svg class="video-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 17h10"/></svg>\n                  <span class="floating-menu-label">' +
+                videoPanelText('mode.firstLastFrame') +
+                '</span>\n                </div>\n              </div>\n            </div>'
+              : '') +
         '\n            ' +
-        (enabled11 || value80
-          ? ''
-          : '<div class="vid-duration-wrap"' +
-            (value78.duration ? '' : ' hidden') +
+        (value19
+          ? '<div class="vid-duration-wrap"' +
+            (value17['duration'] ? '' : ' hidden') +
             '>\n              <button type="button" class="img-pill-btn vid-duration-btn">\n                <span class="vid-duration-label">' +
-            (this._data.duration || '5') +
+            (this['_data']['duration'] || '5') +
             'S</span>\n              </button>\n              <div class="floating-menu vid-duration-pop">\n                <div class="vid-duration-title">' +
             videoPanelText('duration') +
             '</div>\n                <input type="range" class="vid-duration-slider" min="4" max="15" step="1" value="' +
-            (this._data.duration || 5) +
-            '">\n                <div class="vid-duration-bounds">\n                  <span class="vid-duration-min">4S</span>\n                  <span class="vid-duration-max">15S</span>\n                </div>\n              </div>\n            </div>') +
-        '\n          </div>\n          <div class="prompt-actions">\n            <button type="button" class="img-pill-btn rh-adv2-btn"' +
-        (value91 ? '' : ' hidden') +
-        '>\n              <span class="rh-adv2-label">' +
+            (this['_data']['duration'] || 5) +
+            '">\n                <div class="vid-duration-bounds">\n                  <span class="vid-duration-min">4S</span>\n                  <span class="vid-duration-max">15S</span>\n                </div>\n              </div>\n            </div>'
+          : '') +
+        '\n          </div>\n          <div class="prompt-actions">\n            <button type="button" class="img-pill-btn rh-adv2-btn advanced-settings-icon-button" data-tooltip="' +
         videoPanelText('advancedSettings') +
-        '</span>\n            </button>\n            <div class="ui-schema-placement ui-schema-instance-slot"' +
-        (value82 && value83 ? '' : ' hidden') +
+        '" aria-label="' +
+        videoPanelText('advancedSettings') +
+        '" aria-expanded="false"' +
+        (value29 ? '' : ' hidden') +
+        '>' +
+        ADVANCED_SETTINGS_TUNE_ICON_MARKUP +
+        '</button>\n            <div class="ui-schema-placement ui-schema-instance-slot"' +
+        (value21 && value22 ? '' : ' hidden') +
         '>\n              ' +
-        value83 +
+        value22 +
         '\n            </div>\n            <button type="button" class="prompt-submit debug-wrench-btn" title="' +
         videoPanelText('debugApiParams') +
         '">\n              ' +
         DEBUG_WRENCH_ICON_HTML +
         '\n            </button>\n                  <button type="button" class="prompt-submit img-gen-btn" ' +
-        (enabled12
-          ? 'data-tooltip="' + getVideoCancelTooltip() + '"'
-          : 'title="' + getVideoGenerateTitle() + '"') +
+        (enabled4
+          ? 'disabled aria-disabled="true" title="' +
+            videoPanelText('modelUnavailable') +
+            '"'
+          : enabled3
+            ? 'data-tooltip="' + getVideoCancelTooltip() + '"'
+            : 'title="' + getVideoGenerateTitle() + '"') +
         '>\n                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>\n                  </button>\n          </div>';
-      const value95 = this._getRhVideoAdvancedSchemaNodeData(this._data),
-        value96 = hasRunningHubVideoWorkflowUiPlacement2
-          ? renderModelUiSchemaControls(list15, value95, { placement: 'videoAdvanced' })
-          : value89,
-        value97 = value96
-          ? '\n          <div class="rh-vram-adv-panel">\n            ' +
-            value96 +
-            '\n          </div>\n        '
-          : '';
-      value72 && this._decorateDreaminaFooter(el2, value72);
-      if (value97) el2.insertAdjacentHTML('beforeend', value97);
-      ((this.rhVramAdvPanelEl = el2.querySelector('.rh-vram-adv-panel')),
-        this._uiSchemaCleanup?.(),
-        (this._uiSchemaCleanup = value72
+      const value34 = value30
+        ? '\n          <div class="rh-vram-adv-panel">\n            ' +
+          value30 +
+          '\n          </div>\n        '
+        : '';
+      value10 && this['_decorateDreaminaFooter'](el2, value10);
+      if (value34) el2['insertAdjacentHTML']('beforeend', value34);
+      ((this['rhVramAdvPanelEl'] = el2['querySelector']('.rh-vram-adv-panel')),
+        this['_uiSchemaCleanup']?.(),
+        (this['_uiSchemaCleanup'] = value10
           ? bindUiSchemaFieldControls(el2, {
               getNodeData: () =>
-                this._getDreaminaEffectiveNodeData(
-                  store.getState?.().nodes?.[this.nodeId] || this._data || {},
+                decorateSegmentRetakeParameterNodeData(
+                  this['_getDreaminaEffectiveNodeData'](
+                    store['getState']?.()['nodes']?.[this['nodeId']] || this['_data'] || {},
+                  ),
                 ),
-              commitFieldValue: (value98, value99, value100) =>
-                this._commitDreaminaSchemaField(value98, value99, value100),
+              commitFieldValue: (value35, value36, value37) =>
+                this['_commitDreaminaSchemaField'](value35, value36, value37),
             })
           : bindModelUiSchemaControls(el2, {
-              nodeId: this.nodeId,
-              nodeData: this._data,
+              nodeId: this['nodeId'],
+              nodeData: this['_data'],
               store: store,
-              decorateNodeData: (value101) => this._getRhVideoAdvancedSchemaNodeData(value101),
-              buildPatch: (value102, value103, nextMode4, value104) => {
-                const value105 = String(value103 || '').trim();
-                let list17 = [];
-                if (isHappyHorsePanelModel(value102) && value105 === 'happyhorse_mode') {
-                  const nodes2 = store.getState?.() || {};
-                  list17 = getHappyHorseModeEdgeIdsToRemove({
-                    nextMode: nextMode4,
-                    inEdges: store.getIncomingEdges?.(this.nodeId) || [],
-                    nodes: nodes2.nodes || {},
-                  });
-                } else {
-                  if (isWan27PanelModel(value102) && value105 === 'wan27_mode') {
-                    const nodes3 = store.getState?.() || {};
-                    list17 = getWan27ModeEdgeIdsToRemove({
-                      nextMode: nextMode4,
-                      inEdges: store.getIncomingEdges?.(this.nodeId) || [],
-                      nodes: nodes3.nodes || {},
-                    });
-                  } else {
-                    if (isKlingV3OmniPanelModel(value102) && value105 === 'kling_v3_omni_mode') {
-                      const nodes4 = store.getState?.() || {};
-                      list17 = getKlingV3OmniModeEdgeIdsToRemove({
-                        nextMode: nextMode4,
-                        inEdges: store.getIncomingEdges?.(this.nodeId) || [],
-                        nodes: nodes4.nodes || {},
-                      });
-                    }
-                  }
-                }
-                if (list17.length > 0) {
+              decorateNodeData: (value38) =>
+                decorateSegmentRetakeParameterNodeData(this['_getRhVideoAdvancedSchemaNodeData'](value38)),
+              buildPatch: (latest, value39, value40, value41) => {
+                const fieldId = String(value39 || '')['trim'](),
+                  nodes = store['getState']?.() || {},
+                  remove = getManifestInputPolicyEdgeIdsToRemove({
+                    latest: latest,
+                    fieldId: fieldId,
+                    value: value40,
+                    inEdges: store['getIncomingEdges']?.(this['nodeId']) || [],
+                    nodes: nodes['nodes'] || {},
+                  }),
+                  list3 = Array['isArray'](remove) ? remove : [];
+                if (list3['length'] > 0) {
                   const run = () => {
-                    list17.forEach((item18) => store.removeEdge?.(item18));
+                    list3['forEach']((value42) => store['removeEdge']?.(value42));
                   };
-                  if (typeof store.batch === 'function') store.batch(run);
+                  if (typeof store['batch'] === 'function') store['batch'](run);
                   else run();
                 }
                 return {
-                  ...buildRhWorkflowFieldPatch(value102, value103, nextMode4, value104),
-                  ...this._buildModelApiAspectRatioDisplayPatch(value102, value103, nextMode4, value104),
-                  ...this._buildRunningHubWorkflowAspectRatioDisplayPatch(
-                    value102,
-                    value103,
-                    nextMode4,
-                    value104,
+                  ...buildRhWorkflowFieldPatch(latest, value39, value40, value41),
+                  ...this['_buildModelApiAspectRatioDisplayPatch'](
+                    latest,
+                    value39,
+                    value40,
+                    value41,
+                  ),
+                  ...this['_buildRunningHubWorkflowAspectRatioDisplayPatch'](
+                    latest,
+                    value39,
+                    value40,
+                    value41,
                   ),
                 };
               },
-              afterCommit: (value106, value107, value108) => {
-                const value109 = String(value106 || '').trim(),
-                  panelModelManifest = getPanelModelManifest(value108),
-                  manifestHelpVariantsReferenceField2 = manifestHelpVariantsReferenceField(
-                    panelModelManifest,
-                    value109,
-                  ),
-                  manifestPromptVariantsReferenceField2 = manifestPromptVariantsReferenceField(
-                    panelModelManifest,
-                    value109,
-                  ),
-                  manifestFixedSlotVisibilityReferencesField2 = manifestFixedSlotVisibilityReferencesField(
-                    panelModelManifest,
-                    value109,
-                  );
-                (manifestHelpVariantsReferenceField2 ||
-                  manifestPromptVariantsReferenceField2 ||
-                  manifestFixedSlotVisibilityReferencesField2) &&
-                  ((this._data = { ...(this._data || {}), ...(value108 || {}) }),
-                  manifestHelpVariantsReferenceField2 && this._syncGenerationNodeHelpTip?.(),
-                  manifestPromptVariantsReferenceField2 && this._syncDreaminaPromptPlaceholder?.(this._data),
-                  manifestFixedSlotVisibilityReferencesField2 && this._renderRefBar?.(),
-                  this._updateSubmitButtonState?.());
+              afterCommit: (value43, value44, value45) => {
+                const value46 = String(value43 || '')['trim'](),
+                  panelModelManifest2 = getPanelModelManifest(value45),
+                  manifestHelpVariantsReferenceField2 = manifestHelpVariantsReferenceField(panelModelManifest2, value46),
+                  manifestPromptVariantsReferenceField2 = manifestPromptVariantsReferenceField(panelModelManifest2, value46),
+                  manifestFixedSlotVisibilityReferencesField2 = manifestFixedSlotVisibilityReferencesField(panelModelManifest2, value46);
+                (manifestHelpVariantsReferenceField2 || manifestPromptVariantsReferenceField2 || manifestFixedSlotVisibilityReferencesField2) &&
+                  ((this['_data'] = { ...(this['_data'] || {}), ...(value45 || {}) }),
+                  manifestHelpVariantsReferenceField2 && this['_syncGenerationNodeHelpTip']?.(),
+                  manifestPromptVariantsReferenceField2 && this['_syncDreaminaPromptPlaceholder']?.(this['_data']),
+                  manifestFixedSlotVisibilityReferencesField2 && this['_renderRefBar']?.(),
+                  this['_updateSubmitButtonState']?.());
               },
             })),
-        this._footerControllerCleanup?.(),
-        (this._footerControllerCleanup = bindNodeFooterController(el2)),
-        value71 && this.rhVramAdvPanelEl && this.rhVramAdvPanelEl.classList.add('show'),
-        (this.btnEl = el2.querySelector('.img-gen-btn')),
-        this._bindFooterEvents(el2));
+        value9 &&
+          value29 &&
+          this['rhVramAdvPanelEl'] &&
+          this['rhVramAdvPanelEl']['classList']['add']('show'),
+        syncNodeFooterAdvancedButtonState(el2),
+        (this['btnEl'] = el2['querySelector']('.img-gen-btn')),
+        this['_bindFooterEvents'](el2));
+    }
+    ['_ensureVideoAdvancedPanel'](el4) {
+      if (!el4) return null;
+      const el5 =
+          (this['rhVramAdvPanelEl'] &&
+          (typeof el4['contains'] !== 'function' || el4['contains'](this['rhVramAdvPanelEl']))
+            ? this['rhVramAdvPanelEl']
+            : null) || el4['querySelector']?.('.rh-vram-adv-panel'),
+        value47 = store['getState']?.()['nodes']?.[this['nodeId']] || this['_data'] || {};
+      if (!this['_hasVisibleVideoAdvancedControls'](value47))
+        return (
+          el5?.['classList']?.['remove']('show', RH_AI_APP_PERSISTENT_ADVANCED_CLASS),
+          syncNodeFooterAdvancedButtonState(el4),
+          null
+        );
+      if (el5) return ((this['rhVramAdvPanelEl'] = el5), el5);
+      const value48 = this['_renderVideoAdvancedControlsHtml'](value47);
+      return (
+        el4['insertAdjacentHTML']?.(
+          'beforeend',
+          '\n          <div class="rh-vram-adv-panel">\n            ' +
+            value48 +
+            '\n          </div>\n        ',
+        ),
+        (this['rhVramAdvPanelEl'] = el4['querySelector']?.('.rh-vram-adv-panel') || null),
+        this['rhVramAdvPanelEl']
+      );
     }
     ['_runVipRetryOnce'](handler) {
-      let value110 = false;
+      let value49 = ![];
       return () => {
-        if (value110) return;
-        ((value110 = true), (this._vipSelectionRetryInProgress = true));
+        if (value49) return;
+        ((value49 = !![]), (this['_vipSelectionRetryInProgress'] = !![]));
         try {
           handler();
         } finally {
-          this._vipSelectionRetryInProgress = false;
+          this['_vipSelectionRetryInProgress'] = ![];
         }
       };
     }
-    ['_guardVipSelection'](value111, value112 = null, value113 = null) {
-      const modelId = String(value111 || '');
-      let provider2 = '',
-        onSuccess = value113;
-      typeof value112 === 'function' ? (onSuccess = value112) : (provider2 = String(value112 || '').trim());
-      if (!isVideoVipModel(modelId, provider2)) return true;
-      const run2 = window.isModelAllowedBySubscription,
-        value114 = typeof run2 === 'function' ? run2(modelId, provider2) : true;
-      if (value114) return true;
-      if (this._vipSelectionRetryInProgress) return false;
+    ['_guardVipSelection'](value50, value51 = null, value52 = null) {
+      const modelId = String(value50 || '');
+      let provider = '',
+        onSuccess = value52;
+      typeof value51 === 'function'
+        ? (onSuccess = value51)
+        : (provider = String(value51 || '')['trim']());
+      if (!isVideoVipModel(modelId, provider)) return !![];
+      const run2 = window['isModelAllowedBySubscription'],
+        value53 = typeof run2 === 'function' ? run2(modelId, provider) : !![];
+      if (value53) return !![];
+      if (this['_vipSelectionRetryInProgress']) return ![];
       return (
-        typeof window.openSubscriptionDialog === 'function'
-          ? window.openSubscriptionDialog({ modelId: modelId, provider: provider2, onSuccess: onSuccess })
-          : window.showToast?.(videoPanelText('vipRequired'), 'warn'),
-        false
+        typeof window['openSubscriptionDialog'] === 'function'
+          ? window['openSubscriptionDialog']({
+              modelId: modelId,
+              provider: provider,
+              onSuccess: onSuccess,
+            })
+          : window['showToast']?.(videoPanelText('vipRequired'), 'warn'),
+        ![]
       );
     }
-    ['_bindFooterEvents'](el4) {
-      const el5 = el4.querySelector('.img-model-btn-trigger'),
-        el6 = el4.querySelector('.img-model-menu'),
-        el7 = el4.querySelector('.dreamina-task-model-btn'),
-        el8 = el4.querySelector('.dreamina-task-model-menu'),
-        el9 = el4.querySelector('.img-ratio-btn'),
-        el10 = el4.querySelector('.img-ratio-popup'),
-        el11 = el4.querySelector('.img-ratio-label'),
-        el12 = el4.querySelector('.img-ratio-icon-slot'),
-        value115 = el4.querySelector('.vid-mode-btn'),
-        el13 = el4.querySelector('.vid-mode-menu'),
-        el14 = el4.querySelector('.vid-mode-label'),
-        value116 = el4.querySelector('.vid-duration-btn'),
-        el15 = el4.querySelector('.vid-duration-pop'),
-        el16 = el4.querySelector('.vid-duration-slider'),
-        el17 = el4.querySelector('.vid-duration-label'),
-        value117 = el4.querySelector('.rh-adv2-btn'),
-        el18 = el4.querySelector('.rh-vram-adv-panel'),
-        handler2 = () => {
-          el10?.classList.remove('show');
-          if (el10) el10.style.display = '';
-        },
+    ['_bindFooterEvents'](el6) {
+      this['_footerControllerCleanup']?.();
+      const trigger = el6['querySelector']('.img-model-btn-trigger'),
+        menu = el6['querySelector']('.img-model-menu'),
+        value54 = {
+          listenConfigChanges: ![],
+          getProviderProfileId: () => {
+            const value55 = store['getState']?.()?.['nodes']?.[this['nodeId']] || this['_data'] || {};
+            return value55['providerProfileId'] || value55['rhProviderProfileId'] || '';
+          },
+        };
+      (this['_modelCredentialMenuCleanup']?.(),
+        (this['_modelCredentialMenuCleanup'] = bindModelCredentialMenu(menu, value54)));
+      const el7 = el6['querySelector']('.dreamina-task-model-btn'),
+        el8 = el6['querySelector']('.dreamina-task-model-menu'),
+        el9 = el6['querySelector']('.img-ratio-btn:not([data-ui-schema-menu-trigger])'),
+        fallbackPopup = el6['querySelector']('.img-ratio-popup'),
+        fallbackLabel = el6['querySelector']('.img-ratio-label'),
+        fallbackIconSlot = el6['querySelector']('.img-ratio-icon-slot'),
+        value56 = el6['querySelector']('.vid-mode-btn'),
+        el10 = el6['querySelector']('.vid-mode-menu'),
+        el11 = el6['querySelector']('.vid-mode-label'),
+        value57 = el6['querySelector']('.vid-duration-btn'),
+        el12 = el6['querySelector']('.vid-duration-pop'),
+        el13 = el6['querySelector']('.vid-duration-slider'),
+        el14 = el6['querySelector']('.vid-duration-label'),
+        el15 = el6['querySelector']('.rh-adv2-btn'),
+        handler2 = () => this['_ensureVideoAdvancedPanel'](el6),
         handler3 = () => {
-          el15?.classList.remove('show');
-          if (el15) el15.style.display = '';
+          fallbackPopup?.['classList']['remove']('show');
         },
-        enabled13 = this._isDreaminaVideoNode(this._data),
-        value118 = enabled13
-          ? this._getDreaminaEffectiveNodeData(this._data)
-          : this._getRhVideoAdvancedSchemaNodeData(this._data);
-      syncModelUiSchemaControls(el4, value118);
-      const run3 = (value119) => {
-          const value120 = {
-            ...(store.getState().nodes?.[this.nodeId] || this._data || {}),
-            ...(value119 && typeof value119 === 'object' ? value119 : {}),
+        handler4 = () => {
+          el12?.['classList']['remove']('show');
+        },
+        enabled6 = this['_isDreaminaVideoNode'](this['_data']),
+        decorateSegmentRetakeParameterNodeData4 = decorateSegmentRetakeParameterNodeData(
+          enabled6
+            ? this['_getDreaminaEffectiveNodeData'](this['_data'])
+            : this['_getRhVideoAdvancedSchemaNodeData'](this['_data']),
+        );
+      syncModelUiSchemaControls(el6, decorateSegmentRetakeParameterNodeData4);
+      const run3 = (payload2) => {
+          const nodeData = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
+            { payload: payload3, displayPatch: displayPatch = {} } = buildGenerationModelSelectionPayload({
+              payload: payload2,
+              store: store,
+              nodeId: this['nodeId'],
+              nodeData: nodeData,
+              fallbackNodeData: this['_data'],
+              minSide: getAIGenerationNodeSize()['width'],
+              inputKinds: ['image', 'video'],
+              resultMediaElement: this['videoEl'],
+              resultFields: VIDEO_DISPLAY_RATIO_RESULT_FIELDS,
+            });
+          Object['keys'](displayPatch)['length'] > 0 &&
+            applyImageSchemaRatioResizeAnimation(this, {
+              nodeId: this['nodeId'],
+              previewEl: this['previewEl'],
+              nodeData: nodeData,
+              patch: displayPatch,
+            });
+          const value58 = {
+            ...(store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {}),
+            ...payload3,
           };
           return (
-            store.updateNodeData(this.nodeId, value119),
-            (this._data = value120),
-            (this._lastFooterSig = ''),
-            this._renderFooter(el4),
-            value120
+            store['updateNodeData'](this['nodeId'], payload3),
+            (this['_data'] = value58),
+            rememberSegmentRetakeModelSelection(nodeData, value58['model']),
+            (this['_lastFooterSig'] = ''),
+            this['_renderFooter'](el6),
+            value58
           );
         },
-        handler4 = () => store.getState().nodes?.[this.nodeId] || this._data || {},
-        handler5 = ({
+        handler5 = () => store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
+        handler6 = ({
           model: model2,
-          provider: provider3,
-          useRememberedRouteModel: useRememberedRouteModel = false,
+          provider: provider2,
+          useRememberedRouteModel: useRememberedRouteModel = ![],
         } = {}) => {
-          const enabled14 = String(model2 || '').trim();
-          if (!enabled14) return null;
-          const value121 = handler4(),
-            value122 = this._getDreaminaEffectiveNodeData(value121),
-            value123 = this._syncDreaminaTaskState(value121, { syncStore: false }),
-            aspectRatio = value123?.nodeData || value122 || value121,
-            provider4 = resolveDreaminaStyleVideoProvider(
-              enabled14,
-              provider3 || aspectRatio?.provider || 'dreamina',
+          const enabled7 = String(model2 || '')['trim']();
+          if (!enabled7) return null;
+          const value59 = handler5(),
+            value60 = this['_getDreaminaEffectiveNodeData'](value59),
+            value61 = this['_syncDreaminaTaskState'](value59, { syncStore: ![] }),
+            aspectRatio = value61?.['nodeData'] || value60 || value59,
+            provider3 = resolveDreaminaStyleVideoProvider(
+              enabled7,
+              provider2 || aspectRatio?.['provider'] || 'dreamina',
             ),
             taskType =
-              value123?.resolvedTaskType || this._getResolvedDreaminaTaskType(aspectRatio, value123?.summary),
+              value61?.['resolvedTaskType'] ||
+              this['_getResolvedDreaminaTaskType'](aspectRatio, value61?.['summary']),
             routeMode =
-              value123?.routeMode ||
-              normalizeDreaminaVideoRouteMode(aspectRatio?.dreaminaRouteMode, aspectRatio?.mode),
-            fallbackModel = ensureDreaminaStyleVideoModelForTask(taskType, enabled14, provider4) || enabled14,
-            model3 = useRememberedRouteModel
-              ? resolveDreaminaRememberedRouteModel(aspectRatio, {
-                  provider: provider4,
-                  routeMode: routeMode,
-                  taskType: taskType,
-                  fallbackModel: fallbackModel,
-                }) || fallbackModel
-              : fallbackModel,
-            resolution2 = normalizeDreaminaStyleVideoResolution(
+              value61?.['routeMode'] ||
+              normalizeDreaminaVideoRouteMode(aspectRatio?.['dreaminaRouteMode'], aspectRatio?.['mode']),
+            list4 = value59?.['segmentRetake']
+              ? getDreaminaTaskModelMenuItems(taskType, provider3, {
+                  allowedModelIds: getSegmentRetakeAllowedModelIdsForNode(value59),
+                })
+              : [],
+            value62 = list4['some']((value63) => value63['model'] === enabled7)
+              ? enabled7
+              : list4[0]?.['model'] || enabled7,
+            fallbackModel = ensureDreaminaStyleVideoModelForTask(taskType, value62, provider3) || value62,
+            model3 = list4['length']
+              ? value62
+              : useRememberedRouteModel
+                ? resolveDreaminaRememberedRouteModel(aspectRatio, {
+                    provider: provider3,
+                    routeMode: routeMode,
+                    taskType: taskType,
+                    fallbackModel: fallbackModel,
+                  }) || fallbackModel
+                : fallbackModel,
+            resolution = normalizeDreaminaStyleVideoResolution(
               taskType,
               model3,
-              aspectRatio?.resolution || aspectRatio?.videoSize,
-              provider4,
+              aspectRatio?.['resolution'] || aspectRatio?.['videoSize'],
+              provider3,
             ),
             duration = normalizeDreaminaStyleVideoDuration(
               taskType,
               model3,
-              aspectRatio?.duration,
-              provider4,
+              aspectRatio?.['duration'],
+              provider3,
             ),
-            args14 = { provider: provider4, model: model3 };
+            args5 = { provider: provider3, model: model3 };
           return run3({
-            ...args14,
-            ...this._buildDreaminaModelSelectionParamPatch(aspectRatio, {
+            ...args5,
+            ...this['_buildDreaminaModelSelectionParamPatch'](aspectRatio, {
               model: model3,
-              provider: provider4,
+              provider: provider3,
               taskType: taskType,
               fallbackValues: {
                 dreaminaRouteMode: routeMode,
-                aspectRatio: aspectRatio?.aspectRatio,
-                ...(resolution2 ? { resolution: resolution2 } : {}),
+                aspectRatio: aspectRatio?.['aspectRatio'],
+                ...(resolution ? { resolution: resolution } : {}),
                 duration: duration,
               },
             }),
           });
-        };
-      let bindNodeSubmenus2 = null;
-      const run4 = () => {
-        if (!el6) return null;
-        if (el6.dataset.lazyMounted === '1') return el6;
-        const value124 = handler4(),
-          value125 = String(value124?.model || this._data?.model || '').trim() || getDefaultVideoModelId(),
-          el19 = document.createElement('template');
-        el19.innerHTML = this._buildVideoModelMenuHtml(value125).trim();
-        const el20 = el19.content.firstElementChild;
-        return (
-          (el6.innerHTML = el20?.innerHTML || ''),
-          (el6.dataset.lazyMounted = '1'),
-          (el6.dataset.nodeMenuKind = el20?.dataset?.nodeMenuKind || 'video'),
-          bindNodeSubmenus2?.(),
-          (bindNodeSubmenus2 = bindNodeSubmenus(el6)),
-          el6
-        );
-      };
-      el5 &&
-        el6 &&
-        el5.addEventListener('click', (event) => {
-          event.stopPropagation();
-          const el21 = run4();
-          if (!el21) return;
-          const value126 = !el21.classList.contains('show');
-          (closeNodeFooterMenus(el4, el6),
-            el8?.classList.remove('show'),
-            el21.classList.toggle('show', value126));
-          if (value126) activateMenuKeyboard(el21);
+        },
+        bindLazyVideoModelMenu2 = bindLazyVideoModelMenu({
+          trigger: trigger,
+          menu: menu,
+          getActiveModel: () =>
+            String(handler5()?.['model'] || this['_data']?.['model'] || '')['trim']() ||
+            getDefaultVideoModelId(),
+          renderMenuHtml: (value64) => this['_buildVideoModelMenuHtml'](value64),
+          onPrepared: (value65) => {
+            void syncModelCredentialMenu(value65, value54);
+          },
+        });
+      trigger &&
+        menu &&
+        trigger['addEventListener']('click', (event) => {
+          event['stopPropagation']();
+          const el16 = bindLazyVideoModelMenu2['prepareNow']();
+          if (!el16) return;
+          const value66 = !el16['classList']['contains']('show');
+          (closeNodeFooterMenus(el6, menu),
+            el8?.['classList']['remove']('show'),
+            el16['classList']['toggle']('show', value66));
+          if (value66) activateMenuKeyboard(el16);
         });
       el9 &&
-        el10 &&
-        (el9.onclick = (event2) => {
-          event2.stopPropagation();
-          if (el9.disabled || !String(el10.innerHTML || '').trim()) return;
-          ((el10.style.display = ''),
-            el10.classList.toggle('show'),
-            el6.classList.remove('show'),
-            el8?.classList.remove('show'));
-          if (el13) el13.classList.remove('show');
-          (handler3(), el18?.classList.remove('show'));
+        fallbackPopup &&
+        bindVideoPanelClick(el9, 'ratio-trigger', (event2) => {
+          event2['stopPropagation']();
+          if (el9['disabled'] || !String(fallbackPopup['innerHTML'] || '')['trim']()) return;
+          (fallbackPopup['classList']['toggle']('show'),
+            menu['classList']['remove']('show'),
+            el8?.['classList']['remove']('show'));
+          if (el10) el10['classList']['remove']('show');
+          (handler4(), handler2()?.['classList']['remove']('show'));
         });
       el7 &&
         el8 &&
-        (el7.onclick = (event3) => {
-          event3.stopPropagation();
-          if (el7.disabled) return;
-          (el8.classList.toggle('show'), el6.classList.remove('show'), handler2());
-          if (el13) el13.classList.remove('show');
-          (handler3(),
-            el18?.classList.remove('show'),
-            el8.classList.contains('show') && activateMenuKeyboard(el8));
+        bindVideoPanelClick(el7, 'dreamina-task-model-trigger', (event3) => {
+          event3['stopPropagation']();
+          if (el7['disabled']) return;
+          (el8['classList']['toggle']('show'), menu['classList']['remove']('show'), handler3());
+          if (el10) el10['classList']['remove']('show');
+          (handler4(),
+            handler2()?.['classList']['remove']('show'),
+            el8['classList']['contains']('show') && activateMenuKeyboard(el8));
         });
-      value115 &&
-        el13 &&
-        (value115.onclick = (event4) => {
-          (event4.stopPropagation(),
-            el13.classList.toggle('show'),
-            el6.classList.remove('show'),
-            el8?.classList.remove('show'),
-            handler2(),
+      value56 &&
+        el10 &&
+        bindVideoPanelClick(value56, 'mode-trigger', (event4) => {
+          (event4['stopPropagation'](),
+            el10['classList']['toggle']('show'),
+            menu['classList']['remove']('show'),
+            el8?.['classList']['remove']('show'),
             handler3(),
-            el18?.classList.remove('show'),
-            el13.classList.contains('show') && activateMenuKeyboard(el13));
+            handler4(),
+            handler2()?.['classList']['remove']('show'),
+            el10['classList']['contains']('show') && activateMenuKeyboard(el10));
         });
-      value116 &&
-        el15 &&
-        (value116.onclick = (event5) => {
-          (event5.stopPropagation(),
-            (el15.style.display = ''),
-            el15.classList.toggle('show'),
-            el6.classList.remove('show'),
-            el8?.classList.remove('show'),
-            handler2());
-          if (el13) el13.classList.remove('show');
-          el18?.classList.remove('show');
+      value57 &&
+        el12 &&
+        bindVideoPanelClick(value57, 'duration-trigger', (event5) => {
+          (event5['stopPropagation'](),
+            el12['classList']['toggle']('show'),
+            menu['classList']['remove']('show'),
+            el8?.['classList']['remove']('show'),
+            handler3());
+          if (el10) el10['classList']['remove']('show');
+          handler2()?.['classList']['remove']('show');
         });
-      const run5 = () => {
-        (el6?.classList.remove('show'),
-          el6?.querySelectorAll('.node-model-submenu, .node-menu-submenu').forEach((el22) => {
-            el22.style.display = 'none';
-          }));
+      const run4 = () => {
+        closeNodeFooterMenus(el6);
       };
-      (el6?.addEventListener('click', (event6) => {
-        event6.stopPropagation();
-        const el23 = event6.target?.closest?.('.floating-menu-item');
-        if (!el23 || !el6.contains(el23)) return;
-        if (el23.hasAttribute('data-node-menu-submenu')) return;
-        if (el23.closest('.apimart-video-submenu')) {
-          const model4 = el23.dataset.value || APIMART_DREAMINA_VIDEO_DEFAULT_MODEL;
+      (menu?.['addEventListener']('click', (event6) => {
+        event6['stopPropagation']();
+        const providerProfileId = event6['target']?.['closest']?.('.floating-menu-item');
+        if (!providerProfileId || !menu['contains'](providerProfileId)) return;
+        if (providerProfileId['hasAttribute']('data-node-menu-submenu')) return;
+        if (providerProfileId['closest']('.apimart-video-submenu')) {
+          const model4 = providerProfileId['dataset']['value'] || APIMART_DREAMINA_VIDEO_DEFAULT_MODEL;
           if (isApimartDreaminaVideoModel(model4, 'apimart')) {
-            handler5({ model: model4, provider: 'apimart', useRememberedRouteModel: true });
+            handler6({ model: model4, provider: 'apimart', useRememberedRouteModel: !![] });
             return;
           }
         }
-        if (el23.closest('.runninghub-submenu')) {
-          if (el23.dataset.disabled === 'true') {
-            (window.showToast?.(videoPanelText('videoGenerationUnavailable'), 'warn'), run5());
+        if (providerProfileId['closest']('.runninghub-submenu')) {
+          if (providerProfileId['dataset']['disabled'] === 'true') {
+            (window['showToast']?.(videoPanelText('videoGenerationUnavailable'), 'warn'), run4());
             return;
           }
-          const model5 = el23.dataset.value;
+          const model5 = providerProfileId['dataset']['value'];
           if (!model5) return;
-          const value127 = this._runVipRetryOnce(() => el23.click());
-          if (!this._guardVipSelection(model5, value127)) {
-            run5();
+          const value67 = this['_runVipRetryOnce'](() => providerProfileId['click']());
+          if (!this['_guardVipSelection'](model5, value67)) {
+            run4();
             return;
           }
-          const provider5 = el23.dataset.provider || null,
-            value128 = store.getState().nodes?.[this.nodeId] || {},
-            value129 = { model: model5, provider: provider5 };
-          if (this._isRunninghubWorkflowModel(model5, provider5))
-            Object.assign(
-              value129,
-              buildVideoWorkflowModelSelectionPatch(value128, model5, {
-                preserveMaskTouchedState: true,
+          const provider4 = providerProfileId['dataset']['provider'] || null,
+            value68 = store['getState']()['nodes']?.[this['nodeId']] || {},
+            value69 = {
+              model: model5,
+              provider: provider4,
+              providerProfileId: providerProfileId['dataset']['credentialResolvedProviderProfileId'] || undefined,
+            };
+          if (this['_isRunninghubWorkflowModel'](model5, provider4))
+            Object['assign'](
+              value69,
+              buildVideoWorkflowModelSelectionPatch(value68, model5, {
+                preserveMaskTouchedState: !![],
                 v54FpsOptions: getRhV54FpsOptions(),
               }),
             );
           else {
-            const modelExecution4 = resolveModelExecution(model5, { providerHint: provider5 });
-            modelExecution4?.modelManifest?.kind === 'video' &&
-              modelExecution4?.modelManifest?.adapterType === 'modelApi' &&
-              Object.assign(
-                value129,
+            const modelExecution = resolveModelExecution(model5, { providerHint: provider4 });
+            modelExecution?.['modelManifest']?.['kind'] === 'video' &&
+              modelExecution?.['modelManifest']?.['adapterType'] === 'modelApi' &&
+              Object['assign'](
+                value69,
                 buildVideoModelApiModelSelectionPatch(
-                  value128,
-                  modelExecution4.canonicalModelId || model5,
-                  provider5 || modelExecution4?.modelManifest?.provider || null,
-                  value129,
+                  value68,
+                  modelExecution['canonicalModelId'] || model5,
+                  provider4 || modelExecution?.['modelManifest']?.['provider'] || null,
+                  value69,
                 ),
               );
           }
-          run3(value129);
+          run3(value69);
           return;
         }
-        if (el23.dataset.disabled === 'true') {
-          (window.showToast?.(videoPanelText('videoGenerationUnavailable'), 'warn'), run5());
+        if (providerProfileId['dataset']['disabled'] === 'true') {
+          (window['showToast']?.(videoPanelText('videoGenerationUnavailable'), 'warn'), run4());
           return;
         }
-        const model6 = el23.dataset.value;
+        const model6 = providerProfileId['dataset']['value'];
         if (!model6) return;
-        const value130 = el23.dataset.provider || 'dreamina';
-        if (isDreaminaStyleVideoModel(model6, value130)) {
-          const provider6 = resolveDreaminaStyleVideoProvider(model6, value130),
-            value131 = this._runVipRetryOnce(() => el23.click());
-          if (!this._guardVipSelection(model6, provider6, value131)) {
-            run5();
+        const value70 = providerProfileId['dataset']['provider'] || 'dreamina';
+        if (isDreaminaStyleVideoModel(model6, value70)) {
+          const provider5 = resolveDreaminaStyleVideoProvider(model6, value70),
+            value71 = this['_runVipRetryOnce'](() => providerProfileId['click']());
+          if (!this['_guardVipSelection'](model6, provider5, value71)) {
+            run4();
             return;
           }
-          handler5({ model: model6, provider: provider6, useRememberedRouteModel: true });
+          handler6({ model: model6, provider: provider5, useRememberedRouteModel: !![] });
           return;
         }
-        const value132 = this._runVipRetryOnce(() => el23.click());
-        if (!this._guardVipSelection(model6, value132)) {
-          run5();
+        const value72 = this['_runVipRetryOnce'](() => providerProfileId['click']());
+        if (!this['_guardVipSelection'](model6, value72)) {
+          run4();
           return;
         }
-        const providerHint4 = { model: model6 };
-        providerHint4.provider = el23.dataset.provider || null;
-        const value133 = store.getState().nodes?.[this.nodeId] || {};
-        if (this._isRunninghubWorkflowModel(model6, providerHint4.provider))
-          Object.assign(
-            providerHint4,
-            buildVideoWorkflowModelSelectionPatch(value133, model6, {
+        const providerHint = { model: model6 };
+        providerHint['provider'] = providerProfileId['dataset']['provider'] || null;
+        const value73 = store['getState']()['nodes']?.[this['nodeId']] || {};
+        if (this['_isRunninghubWorkflowModel'](model6, providerHint['provider']))
+          Object['assign'](
+            providerHint,
+            buildVideoWorkflowModelSelectionPatch(value73, model6, {
               v54FpsOptions: getRhV54FpsOptions(),
             }),
           );
         else {
-          const modelExecution5 = resolveModelExecution(model6, { providerHint: providerHint4.provider });
-          modelExecution5?.modelManifest?.kind === 'video' &&
-            modelExecution5?.modelManifest?.adapterType === 'modelApi' &&
-            Object.assign(
-              providerHint4,
+          const modelExecution2 = resolveModelExecution(model6, { providerHint: providerHint['provider'] });
+          modelExecution2?.['modelManifest']?.['kind'] === 'video' &&
+            modelExecution2?.['modelManifest']?.['adapterType'] === 'modelApi' &&
+            Object['assign'](
+              providerHint,
               buildVideoModelApiModelSelectionPatch(
-                value133,
-                modelExecution5.canonicalModelId || model6,
-                providerHint4.provider || modelExecution5?.modelManifest?.provider || null,
-                providerHint4,
+                value73,
+                modelExecution2['canonicalModelId'] || model6,
+                providerHint['provider'] || modelExecution2?.['modelManifest']?.['provider'] || null,
+                providerHint,
               ),
             );
         }
-        (model6.includes('seedance') &&
-          (!this._data.resolution || this._data.resolution !== '720p') &&
-          (providerHint4.resolution = '720p'),
-          run3(providerHint4));
+        (model6['includes']('seedance') &&
+          (!this['_data']['resolution'] || this['_data']['resolution'] !== '720p') &&
+          (providerHint['resolution'] = '720p'),
+          run3(providerHint));
       }),
-        el8?.querySelectorAll('.floating-menu-item').forEach(
-          (el24) =>
-            (el24.onclick = () => {
-              if (el24.dataset.disabled === 'true') {
-                (window.showToast?.(videoPanelText('smartMultiframeUnavailable'), 'warn'),
-                  el8.classList.remove('show'));
-                return;
-              }
-              const model7 = String(el24.dataset.value || '').trim();
-              if (!model7) return;
-              const provider7 = resolveDreaminaStyleVideoProvider(
-                  model7,
-                  el24.dataset.provider || this._data?.provider || 'dreamina',
-                ),
-                value134 = this._runVipRetryOnce(() => el24.click());
-              if (!this._guardVipSelection(model7, provider7, value134)) {
-                el8.classList.remove('show');
-                return;
-              }
-              handler5({ model: model7, provider: provider7, useRememberedRouteModel: false });
-            }),
+        el8?.['querySelectorAll']('.floating-menu-item')['forEach']((el17) =>
+          bindVideoPanelClick(el17, 'dreamina-task-model-item', () => {
+            if (el17['dataset']['disabled'] === 'true') {
+              (window['showToast']?.(videoPanelText('smartMultiframeUnavailable'), 'warn'),
+                el8['classList']['remove']('show'));
+              return;
+            }
+            const model7 = String(el17['dataset']['value'] || '')['trim']();
+            if (!model7) return;
+            const provider6 = resolveDreaminaStyleVideoProvider(
+                model7,
+                el17['dataset']['provider'] || this['_data']?.['provider'] || 'dreamina',
+              ),
+              value74 = this['_runVipRetryOnce'](() => el17['click']());
+            if (!this['_guardVipSelection'](model7, provider6, value74)) {
+              el8['classList']['remove']('show');
+              return;
+            }
+            handler6({ model: model7, provider: provider6, useRememberedRouteModel: ![] });
+          }),
         ));
-      value117 &&
-        el18 &&
-        ((value117.onclick = (event7) => {
-          event7.stopPropagation();
-          const value135 = !el18.classList.contains('show');
-          ((el18.style.display = ''),
-            el18.classList.toggle('show', value135),
-            el6.classList.remove('show'),
-            handler2());
-          if (el13) el13.classList.remove('show');
-          handler3();
-        }),
-        (el18.onclick = (event8) => event8.stopPropagation()));
-      el13 &&
-        el14 &&
-        el13.querySelectorAll('.floating-menu-item').forEach(
-          (el25) =>
-            (el25.onclick = () => {
-              if (enabled13) {
-                const dreaminaVideoRouteMode = normalizeDreaminaVideoRouteMode(
-                  el25.dataset.routeMode || el25.dataset.value,
-                );
-                if (!dreaminaVideoRouteMode) return;
-                (this._commitDreaminaRouteMode(dreaminaVideoRouteMode, this._data),
-                  el13.classList.remove('show'));
-                return;
-              }
-              const mode = el25.dataset.value;
-              (store.updateNodeData(this.nodeId, { mode: mode }),
-                (el14.textContent = getVideoModeLabel(mode)),
-                el13.classList.remove('show'),
-                el13
-                  .querySelectorAll('.floating-menu-item')
-                  .forEach((el26) => el26.classList.toggle('active', el26 === el25)));
-            }),
+      if (el15) {
+        bindVideoPanelClick(el15, 'rh-advanced-trigger', (event7) => {
+          event7['stopPropagation']();
+          const el18 = handler2();
+          if (!el18) return;
+          const value75 = !el18['classList']['contains']('show');
+          el18['classList']['toggle']('show', value75);
+          if (value75) positionNodeAdvancedPanel(el18);
+          (el15['setAttribute']?.('aria-expanded', String(value75)),
+            menu['classList']['remove']('show'),
+            handler3());
+          if (el10) el10['classList']['remove']('show');
+          handler4();
+        });
+        const value76 = handler2();
+        value76 &&
+          bindVideoPanelClick(value76, 'rh-advanced-panel-stop', (event8) =>
+            event8['stopPropagation'](),
+          );
+      }
+      el10 &&
+        el11 &&
+        el10['querySelectorAll']('.floating-menu-item')['forEach']((el19) =>
+          bindVideoPanelClick(el19, 'mode-item', () => {
+            if (enabled6) {
+              const dreaminaVideoRouteMode = normalizeDreaminaVideoRouteMode(
+                el19['dataset']['routeMode'] || el19['dataset']['value'],
+              );
+              if (!dreaminaVideoRouteMode) return;
+              (this['_commitDreaminaRouteMode'](dreaminaVideoRouteMode, this['_data']),
+                el10['classList']['remove']('show'));
+              return;
+            }
+            const mode = el19['dataset']['value'];
+            (store['updateNodeData'](this['nodeId'], { mode: mode }),
+              (el11['textContent'] = getVideoModeLabel(mode)),
+              el10['classList']['remove']('show'),
+              el10['querySelectorAll']('.floating-menu-item')['forEach']((el20) =>
+                el20['classList']['toggle']('active', el20 === el19),
+              ));
+          }),
         );
-      if (enabled13 && el13) {
-        const value136 = () => {
+      if (enabled6 && el10) {
+        const value77 = () => {
           const dreaminaTransitionPrompts = [];
-          el13.querySelectorAll('.dreamina-transition-prompt').forEach((el27) => {
-            const value137 = Number(el27.dataset.index);
-            Number.isFinite(value137) && (dreaminaTransitionPrompts[value137] = el27.value);
+          el10['querySelectorAll']('.dreamina-transition-prompt')['forEach']((el21) => {
+            const value78 = Number(el21['dataset']['index']);
+            Number['isFinite'](value78) && (dreaminaTransitionPrompts[value78] = el21['value']);
           });
           const dreaminaTransitionDurations = [];
-          (el13.querySelectorAll('.dreamina-transition-duration').forEach((el28) => {
-            const value138 = Number(el28.dataset.index);
-            Number.isFinite(value138) && (dreaminaTransitionDurations[value138] = el28.value);
+          (el10['querySelectorAll']('.dreamina-transition-duration')['forEach']((el22) => {
+            const value79 = Number(el22['dataset']['index']);
+            Number['isFinite'](value79) && (dreaminaTransitionDurations[value79] = el22['value']);
           }),
-            store.updateNodeData(this.nodeId, {
+            store['updateNodeData'](this['nodeId'], {
               dreaminaTransitionPrompts: dreaminaTransitionPrompts,
               dreaminaTransitionDurations: dreaminaTransitionDurations,
             }));
         };
-        (el13.querySelectorAll('.dreamina-transition-prompt').forEach((el29) => {
-          (el29.addEventListener('input', value136),
-            el29.addEventListener('click', (event9) => event9.stopPropagation()));
+        (el10['querySelectorAll']('.dreamina-transition-prompt')['forEach']((el23) => {
+          (el23['addEventListener']('input', value77),
+            el23['addEventListener']('click', (event9) => event9['stopPropagation']()));
         }),
-          el13.querySelectorAll('.dreamina-transition-duration').forEach((el30) => {
-            (el30.addEventListener('input', value136),
-              el30.addEventListener('change', value136),
-              el30.addEventListener('click', (event10) => event10.stopPropagation()));
+          el10['querySelectorAll']('.dreamina-transition-duration')['forEach']((el24) => {
+            (el24['addEventListener']('input', value77),
+              el24['addEventListener']('change', value77),
+              el24['addEventListener']('click', (event10) => event10['stopPropagation']()));
           }));
       }
-      el16 &&
-        el17 &&
-        (el16.oninput = () => {
-          if (enabled13) {
-            const value139 = this._syncDreaminaTaskState(this._data, { syncStore: false }),
-              value140 = value139?.resolvedTaskType || this._getResolvedDreaminaTaskType(),
+      el13 &&
+        el14 &&
+        bindVideoPanelInput(el13, 'duration-slider', () => {
+          if (enabled6) {
+            const value80 = this['_syncDreaminaTaskState'](this['_data'], { syncStore: ![] }),
+              value81 = value80?.['resolvedTaskType'] || this['_getResolvedDreaminaTaskType'](),
               dreaminaStyleVideoProvider = resolveDreaminaStyleVideoProvider(
-                this._data?.model,
-                this._data?.provider,
+                this['_data']?.['model'],
+                this['_data']?.['provider'],
               ),
               dreaminaStyleVideoModelForTask = ensureDreaminaStyleVideoModelForTask(
-                value140,
-                this._data?.model,
+                value81,
+                this['_data']?.['model'],
                 dreaminaStyleVideoProvider,
               ),
               duration2 = normalizeDreaminaStyleVideoDuration(
-                value140,
+                value81,
                 dreaminaStyleVideoModelForTask,
-                el16.value,
+                el13['value'],
                 dreaminaStyleVideoProvider,
               );
-            ((el17.textContent = duration2 + 'S'),
-              this._commitDreaminaParamValues({ duration: duration2 }, this._data));
+            ((el14['textContent'] = duration2 + 'S'),
+              this['_commitDreaminaParamValues']({ duration: duration2 }, this['_data']));
             return;
           }
-          const value141 = el16.value;
-          ((el17.textContent = value141 + 'S'),
-            store.updateNodeData(this.nodeId, { duration: parseInt(value141, 10) }));
+          const value82 = el13['value'];
+          ((el14['textContent'] = value82 + 'S'),
+            store['updateNodeData'](this['nodeId'], { duration: parseInt(value82, 10) }));
         });
-      el11 &&
-        el10?.querySelectorAll('.img-rp-quality-item').forEach(
-          (resolution3) =>
-            (resolution3.onclick = () => {
-              if (resolution3.hasAttribute('disabled')) return;
-              if (resolution3.closest('[data-ui-schema-field]')) return;
-              if (enabled13 && resolution3.dataset.dreaminaKind === 'resolution') {
-                const resolution4 = String(resolution3.dataset.value || '').trim();
-                if (!resolution4) return;
-                this._commitDreaminaParamValues({ resolution: resolution4 }, this._data);
-                const value142 = {
-                    ...this._getDreaminaEffectiveNodeData(
-                      store.getState().nodes?.[this.nodeId] || this._data || {},
-                    ),
-                  },
-                  value143 = this._getDreaminaRatioDisplayState(value142);
-                el11.textContent =
-                  value143?.ratioLabelText ||
-                  formatVideoRatioResolutionLabel(value142.aspectRatio || '1:1', resolution4);
-                el12 &&
-                  (el12.innerHTML = this._getRatioIconHTML(
-                    value143?.ratioIconLabel || value142.aspectRatio || '1:1',
-                  ));
-                const el31 = resolution3.parentElement;
-                (el31
-                  ?.querySelectorAll('.img-rp-quality-item')
-                  .forEach((el32) => el32.classList.remove('active')),
-                  resolution3.classList.add('active'));
-                return;
-              }
-              (store.updateNodeData(this.nodeId, { resolution: resolution3.dataset.value }),
-                (el11.textContent = formatVideoRatioResolutionLabel(
-                  this._data.aspectRatio,
-                  resolution3.dataset.value,
-                )));
-              const el33 = resolution3.parentElement;
-              (el33
-                ?.querySelectorAll('.img-rp-quality-item')
-                .forEach((el34) => el34.classList.remove('active')),
-                resolution3.classList.add('active'));
-            }),
+      fallbackLabel &&
+        fallbackPopup?.['querySelectorAll']('.img-rp-quality-item')['forEach']((resolution2) =>
+          bindVideoPanelClick(resolution2, 'ratio-quality-item', () => {
+            if (resolution2['hasAttribute']('disabled')) return;
+            if (resolution2['closest']('[data-ui-schema-field]')) return;
+            if (enabled6 && resolution2['dataset']['dreaminaKind'] === 'resolution') {
+              const resolution3 = String(resolution2['dataset']['value'] || '')['trim']();
+              if (!resolution3) return;
+              this['_commitDreaminaParamValues']({ resolution: resolution3 }, this['_data']);
+              const value83 = {
+                  ...this['_getDreaminaEffectiveNodeData'](
+                    store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
+                  ),
+                },
+                value84 = this['_getDreaminaRatioDisplayState'](value83);
+              fallbackLabel['textContent'] =
+                value84?.['ratioLabelText'] ||
+                formatVideoRatioResolutionLabel(value83['aspectRatio'] || '1:1', resolution3);
+              fallbackIconSlot &&
+                (fallbackIconSlot['innerHTML'] = this['_getRatioIconHTML'](
+                  value84?.['ratioIconLabel'] || value83['aspectRatio'] || '1:1',
+                ));
+              const el25 = resolution2['parentElement'];
+              (el25?.['querySelectorAll']('.img-rp-quality-item')['forEach']((el26) =>
+                el26['classList']['remove']('active'),
+              ),
+                resolution2['classList']['add']('active'));
+              return;
+            }
+            (store['updateNodeData'](this['nodeId'], { resolution: resolution2['dataset']['value'] }),
+              (fallbackLabel['textContent'] = formatVideoRatioResolutionLabel(
+                this['_data']['aspectRatio'],
+                resolution2['dataset']['value'],
+              )));
+            const el27 = resolution2['parentElement'];
+            (el27?.['querySelectorAll']('.img-rp-quality-item')['forEach']((el28) =>
+              el28['classList']['remove']('active'),
+            ),
+              resolution2['classList']['add']('active'));
+          }),
         );
-      const duration3 = 280,
-        handler6 = (value144) => {
-          const enabled15 = String(value144 || '').trim();
-          if (!enabled15 || enabled15 === '自适应') return { w: 1, h: 1, label: '自适应' };
-          const label = enabled15.match(/^(\d+(?:\.\d+)?)\s*:\s*(\d+(?:\.\d+)?)$/);
+      const run5 = (value85) => {
+          const enabled8 = String(value85 || '')['trim']();
+          if (!enabled8 || enabled8 === '自适应') return { w: 1, h: 1, label: '自适应' };
+          const label = enabled8['match'](/^(\d+(?:\.\d+)?)\s*:\s*(\d+(?:\.\d+)?)$/);
           if (!label) return null;
           return {
             w: parseFloat(label[1]),
@@ -1461,700 +1153,637 @@ export function createVideoNodeParameterPanelModule(value66) {
             label: label[1] + ':' + label[2],
           };
         },
-        handler7 = (value145 = '', enabled16 = false) => {
-          const value146 = String(value145 || '').trim(),
-            value147 = !!enabled16 || value146 === '自适应';
-          el4
-            .querySelectorAll('.img-rp-ratio-item,.img-rp-large-adaptive')
-            .forEach((el35) => el35.classList.remove('active'));
-          if (value147) {
-            el4.querySelector('.img-rp-large-adaptive')?.classList.add('active');
+        handler7 = (value86 = '', enabled9 = ![]) => {
+          const value87 = String(value86 || '')['trim'](),
+            value88 = !!enabled9 || value87 === '自适应';
+          el6['querySelectorAll'](
+            '.img-rp-ratio-item:not([data-ui-schema-value]),.img-rp-large-adaptive:not([data-ui-schema-value])',
+          )['forEach']((el29) => el29['classList']['remove']('active'));
+          if (value88) {
+            el6['querySelector']('.img-rp-large-adaptive:not([data-ui-schema-value])')?.['classList'][
+              'add'
+            ]('active');
             return;
           }
-          el4
-            .querySelectorAll('.img-rp-ratio-item')
-            .forEach((el36) =>
-              el36.classList.toggle('active', String(el36.dataset.label || '').trim() === value146),
-            );
+          el6['querySelectorAll']('.img-rp-ratio-item:not([data-ui-schema-value])')['forEach'](
+            (el30) =>
+              el30['classList']['toggle'](
+                'active',
+                String(el30['dataset']['label'] || '')['trim']() === value87,
+              ),
+          );
         },
-        handler8 = (value148, value149, aspectRatio2, value150 = {}) => {
-          const value151 = value150?.persistAspectRatio !== false,
-            handler9 = (value152) => {
-              const el37 = document.getElementById(this.nodeId);
-              if (!el37) return;
-              el37.classList.add('is-ratio-animating');
-              if (this._ratioAnimTimer) clearTimeout(this._ratioAnimTimer);
-              this._ratioAnimTimer = setTimeout(() => {
-                const el38 = document.getElementById(this.nodeId);
-                if (el38) el38.classList.remove('is-ratio-animating');
-                this._ratioAnimTimer = null;
-              }, value152 + 80);
-            },
-            value153 = this._data.width || 300,
-            value154 = this._data.height || 300,
-            box = getAIGenerationNodeSize(value148, value149),
-            width = box.width,
-            height = box.height,
-            count10 = width - value153,
-            count11 = height - value154;
-          if (count10 !== 0 || count11 !== 0) handler9(duration3);
-          const value155 = {
-            width: width,
-            height: height,
-            x: Math.round(this._data.x - count10 / 2),
-            y: Math.round(this._data.y - count11),
+        handler8 = (value89, value90, aspectRatio2, value91 = {}) => {
+          const value92 = value91?.['persistAspectRatio'] !== ![],
+            enabled10 = value91?.['forceManualDisplaySize'] === !![],
+            box = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {};
+          if (!enabled10 && box?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === !![]) return;
+          const width = box['width'] || this['_data']['width'] || 300,
+            height = box['height'] || this['_data']['height'] || 300,
+            box2 = getAIGenerationNodeSize(value89, value90),
+            width2 = box2['width'],
+            height2 = box2['height'],
+            count3 = width2 - width,
+            count4 = height2 - height;
+          (count3 !== 0 || count4 !== 0) &&
+            armImageSchemaRatioResizeAnimation(this, this['nodeId'], GENERATION_RATIO_RESIZE_ANIMATION_MS);
+          const args6 = {
+            width: width2,
+            height: height2,
+            x: Math['round']((box['x'] ?? this['_data']['x'] ?? 0) - count3 / 2),
+            y: Math['round']((box['y'] ?? this['_data']['y'] ?? 0) - count4),
           };
-          value151 &&
-            (this._isDreaminaVideoNode(this._data)
-              ? Object.assign(
-                  value155,
-                  this._buildDreaminaParamPatch(this._data, { aspectRatio: aspectRatio2 }),
+          enabled10 && (args6[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] = ![]);
+          value92 &&
+            (this['_isDreaminaVideoNode'](this['_data'])
+              ? Object['assign'](
+                  args6,
+                  this['_buildDreaminaParamPatch'](this['_data'], { aspectRatio: aspectRatio2 }),
                 )
-              : (value155.aspectRatio = aspectRatio2));
-          store.updateNodeData(this.nodeId, value155);
-          const value156 = store.getState().nodes?.[this.nodeId] || this._data || {},
-            value157 = this._getDreaminaRatioDisplayState(value156);
-          el11 &&
-            (el11.textContent =
-              value157?.ratioLabelText ||
-              formatVideoRatioResolutionLabel(aspectRatio2, value156.resolution || '1080p'));
-          el12 && (el12.innerHTML = this._getRatioIconHTML(value157?.ratioIconLabel || aspectRatio2));
-          ((this.previewEl.style.transition = 'none'),
-            (this.previewEl.style.transformOrigin = 'bottom center'),
-            (this.previewEl.style.transform =
-              'scaleX(' + value153 / width + ') scaleY(' + value154 / height + ')'),
-            void this.previewEl.offsetWidth);
-          if (this._ratioFlipAnim) this._ratioFlipAnim.cancel();
-          const transform = 'scaleX(' + value153 / width + ') scaleY(' + value154 / height + ')';
-          this._ratioFlipAnim = this.previewEl.animate([{ transform: transform }, { transform: 'none' }], {
-            duration: duration3,
-            easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            fill: 'forwards',
-          });
-          const value158 = () => {
-            ((this._ratioFlipAnim = null),
-              (this.previewEl.style.transformOrigin = ''),
-              (this.previewEl.style.transform = ''));
+              : (args6['aspectRatio'] = aspectRatio2));
+          store['updateNodeData'](this['nodeId'], args6);
+          const value93 = store['getState']()['nodes']?.[this['nodeId']] || {
+            ...box,
+            ...args6,
           };
-          ((this._ratioFlipAnim.onfinish = value158), (this._ratioFlipAnim.oncancel = value158));
+          this['_data'] = value93;
+          const value94 = this['_getDreaminaRatioDisplayState'](value93),
+            footer = this['footerEl'] || el6,
+            labelText =
+              value94?.['ratioLabelText'] ||
+              formatVideoRatioResolutionLabel(aspectRatio2, value93['resolution'] || '1080p'),
+            iconHtml2 = this['_getRatioIconHTML'](value94?.['ratioIconLabel'] || aspectRatio2);
+          (syncLegacyVideoRatioFooter({
+            footer: footer,
+            fallbackLabel: fallbackLabel,
+            fallbackIconSlot: fallbackIconSlot,
+            labelText: labelText,
+            iconHtml: iconHtml2,
+          }),
+            restoreLegacyVideoRatioPopupAfterSync({ footer: footer, fallbackPopup: fallbackPopup }),
+            animateImageSchemaRatioResizeFlip(this, {
+              nodeId: this['nodeId'],
+              previewEl: this['previewEl'],
+              nodeData: { width: width, height: height },
+              patch: { width: width2, height: height2 },
+              ms: GENERATION_RATIO_RESIZE_ANIMATION_MS,
+              deferStart: ![],
+            }));
         },
-        handler10 = (value159, value160 = {}) => {
-          const enabled17 = handler6(value159);
-          if (!enabled17) return;
-          (handler8(enabled17.w, enabled17.h, enabled17.label, value160), handler7(enabled17.label, false));
+        handler9 = (value95, value96 = {}) => {
+          const enabled11 = run5(value95);
+          if (!enabled11) return;
+          (handler8(enabled11['w'], enabled11['h'], enabled11['label'], value96),
+            handler7(enabled11['label'], ![]));
         };
-      !enabled13 &&
-        el4.querySelectorAll('.img-rp-ratio-item').forEach(
-          (el39) =>
-            (el39.onclick = () => {
+      !enabled6 &&
+        el6['querySelectorAll']('.img-rp-ratio-item:not([data-ui-schema-value])')['forEach'](
+          (el31) =>
+            bindVideoPanelClick(el31, 'ratio-item', () => {
               if (
-                el39.hasAttribute('disabled') ||
-                el39.classList.contains('disabled') ||
-                el39.getAttribute('aria-disabled') === 'true'
+                el31['hasAttribute']('disabled') ||
+                el31['classList']['contains']('disabled') ||
+                el31['getAttribute']('aria-disabled') === 'true'
               )
                 return;
-              handler10(el39.dataset.label);
+              handler9(el31['dataset']['label'], { forceManualDisplaySize: !![] });
             }),
         );
-      const run6 = () => {
-        const value161 = store.getState(),
-          value162 = value161.nodes?.[this.nodeId],
-          value163 = String(value162?.model || ''),
-          runningHubVideoParameterPanelPolicy2 =
-            getRunningHubVideoParameterPanelPolicy(value163).adaptiveRatio || {},
-          value164 =
-            runningHubVideoParameterPanelPolicy2.preferSlot &&
-            runningHubVideoParameterPanelPolicy2.preferVideoKind === true &&
-            runningHubVideoParameterPanelPolicy2.fallbackSquareWhenNoVideo !== true,
-          value165 =
-            runningHubVideoParameterPanelPolicy2.preferSlot &&
-            runningHubVideoParameterPanelPolicy2.preferVideoKind !== true,
-          value166 =
-            runningHubVideoParameterPanelPolicy2.preferSlot &&
-            runningHubVideoParameterPanelPolicy2.preferVideoKind === true &&
-            runningHubVideoParameterPanelPolicy2.fallbackSquareWhenNoVideo === true;
-        let list18 = store.getIncomingEdges(this.nodeId);
-        runningHubVideoParameterPanelPolicy2.scopeTargetEdges === true &&
-          (list18 = list18.filter((item19) => item19?.targetId === this.nodeId));
-        const run7 = (value167, value168) => {
-          const count12 = Number(value167),
-            count13 = Number(value168);
-          if (!(Number.isFinite(count12) && count12 > 0)) return false;
-          if (!(Number.isFinite(count13) && count13 > 0)) return false;
-          return (handler8(count12, count13, '自适应'), true);
+      const run6 = (options3 = {}) => {
+        const nodes2 = store['getState'](),
+          nodeData2 = nodes2['nodes']?.[this['nodeId']],
+          value97 = String(nodeData2?.['model'] || ''),
+          adaptivePolicy = getRunningHubVideoParameterPanelPolicy(value97)['adaptiveRatio'] || {};
+        let inEdges = store['getIncomingEdges'](this['nodeId']);
+        adaptivePolicy['scopeTargetEdges'] === !![] &&
+          (inEdges = inEdges['filter']((value98) => value98?.['targetId'] === this['nodeId']));
+        inEdges = inEdges['filter']((value99) => {
+          const list5 = String(value99?.['refSlot'] || '')['toLowerCase']();
+          if (list5['includes']('mask')) return ![];
+          const effectiveInputKind = resolveEffectiveInputKind(
+            nodes2['nodes']?.[value99?.['sourceId']],
+            value99,
+          );
+          return effectiveInputKind === 'image' || effectiveInputKind === 'video';
+        });
+        const run7 = (value100, value101) => {
+          const count5 = Number(value100),
+            count6 = Number(value101);
+          if (!(Number['isFinite'](count5) && count5 > 0)) return ![];
+          if (!(Number['isFinite'](count6) && count6 > 0)) return ![];
+          return (handler8(count5, count6, '自适应', options3), !![]);
         };
-        if (list18.length > 0) {
-          let value169 = list18[0];
-          if (value164) {
-            const value170 = list18.find((item20) => String(item20?.refSlot || '') === 'sourceVideo');
-            if (value170) value169 = value170;
-            else {
-              const value171 = list18.find((item21) => {
-                const value172 = value161.nodes?.[item21?.sourceId],
-                  value173 = String(value172?.type || '');
-                return value173 === 'source-video' || value173 === 'video' || value173 === 'ai-video';
-              });
-              if (value171) value169 = value171;
-            }
-          } else {
-            if (value165 || value166) {
-              const value174 = list18.find((item22) => String(item22?.refSlot || '') === 'sourceVideo');
-              if (value174) value169 = value174;
-              else {
-                if (value166) {
-                  const value175 = list18.find((item23) => {
-                    const value176 = value161.nodes?.[item23?.sourceId],
-                      value177 = String(value176?.type || '');
-                    return value177 === 'source-video' || value177 === 'video' || value177 === 'ai-video';
-                  });
-                  if (value175) value169 = value175;
-                  else {
-                    handler8(1, 1, '自适应');
-                    return;
-                  }
-                }
-              }
-            }
+        if (inEdges['length'] > 0) {
+          const videoAdaptiveRatioSource = resolveVideoAdaptiveRatioSource({
+            inEdges: inEdges,
+            nodes: nodes2['nodes'],
+            nodeData: nodeData2,
+            adaptivePolicy: adaptivePolicy,
+          });
+          if (videoAdaptiveRatioSource['fallbackSquare']) {
+            handler8(1, 1, '自适应', options3);
+            return;
           }
-          const value178 = value169.sourceId,
-            box2 = value161.nodes[value178],
-            value179 = String(box2?.type || ''),
-            value180 = value179 === 'ai-video' || value179 === 'source-video' || value179 === 'video';
-          if (value180) {
-            const value181 = getDisplayedMediaSizeFromNode(value178, 'video'),
-              value182 = Number(value181?.w || 0),
-              value183 = Number(value181?.h || 0);
-            if (run7(value182, value183)) return;
-            const value184 = Number(value169?.sourceMediaW || 0),
-              value185 = Number(value169?.sourceMediaH || 0);
-            if (run7(value184, value185)) return;
-            const value186 = Number(box2?.mainVideoIndex),
-              value187 = Number.isFinite(value186) ? Math.max(0, Math.trunc(value186)) : 0,
-              list19 = Array.isArray(box2?.videos) ? box2.videos : [];
-            let value188 = value187;
-            const value189 = String(value169?.sourceMediaKey || '').trim();
-            if (value189 && list19.length) {
-              const count14 = list19.findIndex((item24) => {
-                const value190 =
-                  String(item24?.localPath || '').trim() || String(item24?.videoUrl || '').trim();
-                return value190 === value189;
+          const edge = videoAdaptiveRatioSource['edge'];
+          if (!edge) return;
+          const nodeId = edge['sourceId'],
+            nodeData3 = nodes2['nodes'][nodeId],
+            box3 = getGenerationRatioSizeWithDom({
+              nodeId: nodeId,
+              nodeData: nodeData3,
+              edge: edge,
+              includeNodeFrame: !![],
+            });
+          if (run7(box3?.['width'], box3?.['height'])) return;
+          const value102 = String(nodeData3?.['type'] || ''),
+            value103 = value102 === 'ai-video' || value102 === 'source-video' || value102 === 'video';
+          if (value103) {
+            const value104 = getDisplayedMediaSizeFromNode(nodeId, 'video'),
+              value105 = Number(value104?.['w'] || 0),
+              value106 = Number(value104?.['h'] || 0);
+            if (run7(value105, value106)) return;
+            const value107 = Number(edge?.['sourceMediaW'] || 0),
+              value108 = Number(edge?.['sourceMediaH'] || 0);
+            if (run7(value107, value108)) return;
+            const value109 = Number(nodeData3?.['mainVideoIndex']),
+              value110 = Number['isFinite'](value109) ? Math['max'](0, Math['trunc'](value109)) : 0,
+              list6 = Array['isArray'](nodeData3?.['videos']) ? nodeData3['videos'] : [];
+            let value111 = value110;
+            const value112 = String(edge?.['sourceMediaKey'] || '')['trim']();
+            if (value112 && list6['length']) {
+              const count7 = list6['findIndex']((value113) => {
+                const value114 =
+                  String(value113?.['localPath'] || '')['trim']() ||
+                  String(value113?.['videoUrl'] || '')['trim']();
+                return value114 === value112;
               });
-              if (count14 >= 0) value188 = count14;
+              if (count7 >= 0) value111 = count7;
             }
-            const value191 = list19[value188],
-              value192 = Number(value191?.videoWidth || 0),
-              value193 = Number(value191?.videoHeight || 0);
-            if (run7(value192, value193)) return;
-            const value194 = Number(box2?.selectedVideoWidth || 0),
-              value195 = Number(box2?.selectedVideoHeight || 0);
-            if (run7(value194, value195)) return;
-            const value196 = ++this._adaptiveSrcRetryToken;
+            const value115 = list6[value111],
+              value116 = Number(value115?.['videoWidth'] || 0),
+              value117 = Number(value115?.['videoHeight'] || 0);
+            if (run7(value116, value117)) return;
+            const value118 = Number(nodeData3?.['selectedVideoWidth'] || 0),
+              value119 = Number(nodeData3?.['selectedVideoHeight'] || 0);
+            if (run7(value118, value119)) return;
+            const value120 = ++this['_adaptiveSrcRetryToken'];
             (setTimeout(() => {
-              if (value196 !== this._adaptiveSrcRetryToken) return;
-              const enabled18 = store.getState().nodes?.[this.nodeId];
-              if (!enabled18) return;
-              const value197 = this._getDreaminaEffectiveNodeData(enabled18);
-              if (String(value197.aspectRatio || '自适应') !== '自适应') return;
-              const value198 = store.getState().nodes?.[value178];
-              if (value198) {
-                const value199 = Number(value169?.sourceMediaW || 0),
-                  value200 = Number(value169?.sourceMediaH || 0);
-                if (run7(value199, value200)) return;
-                const value201 = Number(value198.mainVideoIndex),
-                  value202 = Number.isFinite(value201) ? Math.max(0, Math.trunc(value201)) : 0,
-                  list20 = Array.isArray(value198.videos) ? value198.videos : [];
-                let value203 = value202;
-                const value204 = String(value169?.sourceMediaKey || '').trim();
-                if (value204 && list20.length) {
-                  const count15 = list20.findIndex((item25) => {
-                    const value205 =
-                      String(item25?.localPath || '').trim() || String(item25?.videoUrl || '').trim();
-                    return value205 === value204;
+              if (value120 !== this['_adaptiveSrcRetryToken']) return;
+              const enabled12 = store['getState']()['nodes']?.[this['nodeId']];
+              if (!enabled12) return;
+              const value121 = this['_getDreaminaEffectiveNodeData'](enabled12);
+              if (String(value121['aspectRatio'] || '自适应') !== '自适应') return;
+              const value122 = store['getState']()['nodes']?.[nodeId];
+              if (value122) {
+                const value123 = Number(edge?.['sourceMediaW'] || 0),
+                  value124 = Number(edge?.['sourceMediaH'] || 0);
+                if (run7(value123, value124)) return;
+                const value125 = Number(value122['mainVideoIndex']),
+                  value126 = Number['isFinite'](value125)
+                    ? Math['max'](0, Math['trunc'](value125))
+                    : 0,
+                  list7 = Array['isArray'](value122['videos']) ? value122['videos'] : [];
+                let value127 = value126;
+                const value128 = String(edge?.['sourceMediaKey'] || '')['trim']();
+                if (value128 && list7['length']) {
+                  const count8 = list7['findIndex']((value129) => {
+                    const value130 =
+                      String(value129?.['localPath'] || '')['trim']() ||
+                      String(value129?.['videoUrl'] || '')['trim']();
+                    return value130 === value128;
                   });
-                  if (count15 >= 0) value203 = count15;
+                  if (count8 >= 0) value127 = count8;
                 }
-                const value206 = list20[value203],
-                  value207 = Number(value206?.videoWidth || 0),
-                  value208 = Number(value206?.videoHeight || 0);
-                if (run7(value207, value208)) return;
-                const value209 = Number(value198.selectedVideoWidth || 0),
-                  value210 = Number(value198.selectedVideoHeight || 0);
-                if (run7(value209, value210)) return;
+                const value131 = list7[value127],
+                  value132 = Number(value131?.['videoWidth'] || 0),
+                  value133 = Number(value131?.['videoHeight'] || 0);
+                if (run7(value132, value133)) return;
+                const value134 = Number(value122['selectedVideoWidth'] || 0),
+                  value135 = Number(value122['selectedVideoHeight'] || 0);
+                if (run7(value134, value135)) return;
               }
-              const value211 = getDisplayedMediaSizeFromNode(value178, 'video'),
-                count16 = Number(value211?.w || 0),
-                count17 = Number(value211?.h || 0);
-              if (count16 > 0 && count17 > 0) handler8(count16, count17, '自适应');
+              const value136 = getDisplayedMediaSizeFromNode(nodeId, 'video'),
+                count9 = Number(value136?.['w'] || 0),
+                count10 = Number(value136?.['h'] || 0);
+              if (count9 > 0 && count10 > 0) handler8(count9, count10, '自适应', options3);
             }, 160),
-              handler8(1, 1, '自适应'));
+              handler8(1, 1, '自适应', options3));
             return;
           }
-          const value212 = getDisplayedMediaSizeFromNode(value178, 'image'),
-            value213 = Number(value212?.w || 0),
-            value214 = Number(value212?.h || 0);
-          if (run7(value213, value214)) return;
-          if (box2) {
-            const value215 = Number(box2.width || 0),
-              value216 = Number(box2.height || 0);
-            if (run7(value215, value216)) return;
+          const value137 = getDisplayedMediaSizeFromNode(nodeId, 'image'),
+            value138 = Number(value137?.['w'] || 0),
+            value139 = Number(value137?.['h'] || 0);
+          if (run7(value138, value139)) return;
+          if (nodeData3) {
+            const value140 = Number(nodeData3['width'] || 0),
+              value141 = Number(nodeData3['height'] || 0);
+            if (run7(value140, value141)) return;
           }
-          handler8(1, 1, '自适应');
+          handler8(1, 1, '自适应', options3);
           return;
         }
-        const value217 = Boolean(
-          (value162?.videos && value162.videos.length) ||
-          value162?.localPath ||
-          value162?.thumbUrl ||
-          value162?.videoUrl ||
-          value162?.src,
+        const value142 = Boolean(
+          (nodeData2?.['videos'] && nodeData2['videos']['length']) ||
+          nodeData2?.['localPath'] ||
+          nodeData2?.['thumbUrl'] ||
+          nodeData2?.['videoUrl'] ||
+          nodeData2?.['src'],
         );
-        if (value217) {
-          const value218 = this.videoEl?.videoWidth || 0,
-            value219 = this.videoEl?.videoHeight || 0;
-          if (run7(value218, value219)) return;
+        if (value142) {
+          const value143 = this['videoEl']?.['videoWidth'] || 0,
+            value144 = this['videoEl']?.['videoHeight'] || 0;
+          if (run7(value143, value144)) return;
           return;
         }
-        handler8(1, 1, '自适应');
+        handler8(1, 1, '自适应', options3);
       };
-      ((this._runAdaptiveRatio = () => {
-        const value220 = store.getState().nodes?.[this.nodeId] || this._data || {};
-        if (this._isRunninghubWorkflowModel(value220?.model, value220?.provider)) return;
-        const el40 = el4.querySelector('.img-rp-large-adaptive');
-        if (this._isDreaminaVideoNode(value220)) {
-          (this._commitDreaminaSchemaAspectRatio('自适应', value220),
-            handler7('自适应', true),
-            el40?.classList.add('active'));
+      ((this['_runAdaptiveRatio'] = (options4 = {}) => {
+        const value145 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
+          el32 = el6['querySelector']('.img-rp-large-adaptive:not([data-ui-schema-value])');
+        if (this['_isDreaminaVideoNode'](value145)) {
+          (this['_commitDreaminaSchemaAspectRatio']('自适应', value145, options4),
+            handler7('自适应', !![]),
+            el32?.['classList']['add']('active'));
           return;
         }
-        (run6(), handler7('自适应', true), el40?.classList.add('active'));
+        (run6(options4), handler7('自适应', !![]), el32?.['classList']['add']('active'));
       }),
-        (this._applyStoredAspectRatio = () => {
-          const value221 = store.getState().nodes?.[this.nodeId] || this._data || {},
-            value222 = this._getDreaminaRatioDisplayState(value221),
-            value223 = String(value222?.currentRatio || '').trim() || '自适应';
-          if (value223 === '自适应') {
-            this._runAdaptiveRatio?.();
+        (this['_applyStoredAspectRatio'] = () => {
+          const value146 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
+            value147 = this['_getDreaminaRatioDisplayState'](value146),
+            value148 = String(value147?.['currentRatio'] || '')['trim']() || '自适应';
+          if (value148 === '自适应') {
+            this['_runAdaptiveRatio']?.();
             return;
           }
-          handler10(value223, { persistAspectRatio: true });
+          handler9(value148, { persistAspectRatio: !![] });
         }),
-        (this._applyDreaminaSchemaAspectRatio = (value224) => {
-          const value225 = store.getState().nodes?.[this.nodeId] || this._data || {};
-          this._commitDreaminaSchemaAspectRatio(value224, value225);
+        (this['_applyDreaminaSchemaAspectRatio'] = (value149) => {
+          const value150 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {};
+          this['_commitDreaminaSchemaAspectRatio'](value149, value150, { forceManualDisplaySize: !![] });
         }));
-      const value226 = el4.querySelector('.img-rp-large-adaptive');
-      value226 && !enabled13 && (value226.onclick = () => this._runAdaptiveRatio());
-      this.btnEl.onclick = () => {
-        (flushPromptHtmlCommit(this), this._handleGenerateOrCancel());
-      };
-      const el41 = el4.querySelector('.debug-wrench-btn');
-      el41?.addEventListener('click', async (event11) => {
-        (event11.stopPropagation(), flushPromptHtmlCommit(this));
-        const enabled19 = await this._buildPayload();
-        if (!enabled19) {
-          window.showToast?.(videoPanelText('missingPromptOrReference'), 'warn');
-          return;
-        }
-        try {
-          const value227 = await api.buildGenerateVideoRequest(enabled19),
-            outputText = formatFinalApiDebugRequest(value227),
-            value228 = store.getState(),
-            x = this._data.x + (this._data.width || 380) + 50,
-            y = this._data.y;
-          let enabled20 = Object.values(value228.nodes).find((item26) => item26.type === 'debug');
-          (!enabled20
-            ? store.addNode({
-                id: 'debug-' + Date.now(),
-                type: 'debug',
-                x: x,
-                y: y,
-                width: 380,
-                height: 300,
-                name: videoPanelText('debugNodeName'),
-                outputText: outputText,
-              })
-            : store.updateNodeData(enabled20.id, { outputText: outputText, x: x, y: y }),
-            window.showToast?.(videoPanelText('debugParamsShown'), 'warn'));
-        } catch (error) {
-          window.showToast?.(videoPanelText('buildRequestFailed', { error: error.message }), 'error');
-        }
+      const value151 = el6['querySelector']('.img-rp-large-adaptive:not([data-ui-schema-value])');
+      value151 &&
+        !enabled6 &&
+        bindVideoPanelClick(value151, 'adaptive-ratio', () =>
+          this['_runAdaptiveRatio']({ forceManualDisplaySize: !![] }),
+        );
+      bindVideoPanelClick(this['btnEl'], 'submit', () => {
+        (flushPromptHtmlCommit(this), this['_handleGenerateOrCancel']());
       });
-      !this._docClickBound &&
-        (document.addEventListener('click', () => {
-          if (this._suppressDocClickOnce) {
-            this._suppressDocClickOnce = false;
-            return;
-          }
-          const el42 = this.footerEl;
-          if (!el42) return;
-          (closeNodeFooterMenus(el42),
-            el42.querySelector('.img-model-menu')?.classList.remove('show'),
-            el42.querySelector('.dreamina-task-model-menu')?.classList.remove('show'));
-          const el43 = el42.querySelector('.img-ratio-popup');
-          el43?.classList.remove('show');
-          if (el43) el43.style.display = '';
-          el42.querySelector('.vid-mode-menu')?.classList.remove('show');
-          const el44 = el42.querySelector('.vid-duration-pop');
-          el44?.classList.remove('show');
-          if (el44) el44.style.display = '';
-          el42.querySelector('.rh-vram-adv-panel')?.classList.remove('show');
+      const el33 = el6['querySelector']('.debug-wrench-btn');
+      el33?.['addEventListener']('click', (event11) => {
+        event11['stopPropagation']();
+        if (globalThis['window']?.['DEV_MODE'] !== !![]) return;
+        (flushPromptHtmlCommit(this),
+          openDebugRequestWindow({
+            prepare: async () => {
+              const enabled13 = await this['_buildPayload']();
+              if (!enabled13) throw new Error('请先填写提示词或连接参考素材。');
+              try {
+                return buildFinalApiDebugPreview(await api['buildGenerateVideoRequest'](enabled13));
+              } finally {
+                releasePayloadObjectUrlLease(enabled13);
+              }
+            },
+          }));
+      });
+      const run8 = bindNodeFooterController(el6, {
+          onDocumentClick: (value152, { isInsideRoot: isInsideRoot }) => {
+            const el34 = this['footerEl'];
+            if (!el34) return;
+            if (isInsideRoot) closeNodeFooterMenus(el34);
+            (el34['querySelector']('.img-model-menu')?.['classList']['remove']('show'),
+              el34['querySelector']('.dreamina-task-model-menu')?.['classList']['remove']('show'));
+            const el35 = el34['querySelector']('.img-ratio-popup');
+            (el35?.['classList']['remove']('show'),
+              el34['querySelector']('.vid-mode-menu')?.['classList']['remove']('show'));
+            const el36 = el34['querySelector']('.vid-duration-pop');
+            el36?.['classList']['remove']('show');
+            const el37 = el34['querySelector']('.rh-vram-adv-panel');
+            (!el37?.['classList']?.['contains']?.(RH_AI_APP_PERSISTENT_ADVANCED_CLASS) &&
+              el37?.['classList']['remove']('show'),
+              syncNodeFooterAdvancedButtonState(el34));
+          },
         }),
-        (this._docClickBound = true));
-      if (el10) el10.onclick = (event12) => event12.stopPropagation();
-      if (el15) el15.onclick = (event13) => event13.stopPropagation();
-      if (el13) el13.onclick = (event14) => event14.stopPropagation();
-      if (el8) el8.onclick = (event15) => event15.stopPropagation();
+        value153 = () => {
+          (bindLazyVideoModelMenu2['destroy'](), run8());
+        };
+      this['_footerControllerCleanup'] = bindGenerationNodeFooterLifecycle(this, value153);
+      if (fallbackPopup)
+        bindVideoPanelClick(fallbackPopup, 'ratio-popup-stop', (event12) => event12['stopPropagation']());
+      if (el12)
+        bindVideoPanelClick(el12, 'duration-popup-stop', (event13) => event13['stopPropagation']());
+      if (el10)
+        bindVideoPanelClick(el10, 'mode-menu-stop', (event14) => event14['stopPropagation']());
+      if (el8)
+        bindVideoPanelClick(el8, 'dreamina-task-model-menu-stop', (event15) =>
+          event15['stopPropagation'](),
+        );
     }
-    ['_isDreaminaVideoNode'](value229 = this._data) {
-      return isDreaminaStyleVideoModel(value229?.model, value229?.provider);
+    ['_isDreaminaVideoNode'](value154 = this['_data']) {
+      return isDreaminaStyleVideoModel(value154?.['model'], value154?.['provider']);
     }
-    ['_getDreaminaEffectiveNodeData'](value230 = this._data) {
-      return getDreaminaEffectiveNodeData(value230);
+    ['_getDreaminaEffectiveNodeData'](value155 = this['_data']) {
+      return getDreaminaEffectiveNodeData(value155);
     }
-    ['_buildDreaminaParamPatch'](value231 = this._data, value232 = {}) {
-      return buildDreaminaParamPatch(value231, value232);
+    ['_buildDreaminaParamPatch'](value156 = this['_data'], value157 = {}) {
+      return buildDreaminaParamPatch(value156, value157);
     }
-    ['_buildDreaminaModelSelectionParamPatch'](value233 = this._data, value234 = {}) {
-      return buildDreaminaModelSelectionParamPatch(value233, value234);
+    ['_buildDreaminaModelSelectionParamPatch'](value158 = this['_data'], value159 = {}) {
+      return buildDreaminaModelSelectionParamPatch(value158, value159);
     }
-    ['_commitDreaminaParamValues'](options11 = {}, value235 = this._data, args15 = {}) {
-      const args16 =
-          this._getDreaminaEffectiveNodeData(value235) ||
-          this._getDreaminaEffectiveNodeData(store.getState().nodes?.[this.nodeId] || this._data || {}),
-        value236 = { ...args16, ...args15 },
-        args17 = this._buildDreaminaParamPatch(value236, options11),
-        args18 = { ...(args15 && typeof args15 === 'object' ? args15 : {}), ...args17 };
+    ['_commitDreaminaParamValues'](options5 = {}, value160 = this['_data'], args7 = {}) {
+      const args8 =
+          this['_getDreaminaEffectiveNodeData'](value160) ||
+          this['_getDreaminaEffectiveNodeData'](
+            store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
+          ),
+        value161 = { ...args8, ...args7 },
+        args9 = this['_buildDreaminaParamPatch'](value161, options5),
+        args10 = { ...(args7 && typeof args7 === 'object' ? args7 : {}), ...args9 };
       return (
-        store.updateNodeData(this.nodeId, args18),
-        (this._data = this._getDreaminaEffectiveNodeData({ ...args16, ...args18 })),
-        this._data
+        store['updateNodeData'](this['nodeId'], args10),
+        (this['_data'] = this['_getDreaminaEffectiveNodeData']({ ...args8, ...args10 })),
+        this['_data']
       );
     }
-    ['_commitDreaminaRouteMode'](nextRouteMode, baseNodeData = this._data) {
-      const nodes5 = store.getState(),
-        el45 = buildDreaminaRouteModeUpdate({
+    ['_commitDreaminaRouteMode'](nextRouteMode, baseNodeData = this['_data']) {
+      const nodes3 = store['getState'](),
+        el38 = buildDreaminaRouteModeUpdate({
           nextRouteMode: nextRouteMode,
           baseNodeData: baseNodeData,
-          incoming: store.getIncomingEdges(this.nodeId) || [],
-          nodes: nodes5.nodes || {},
+          incoming: store['getIncomingEdges'](this['nodeId']) || [],
+          nodes: nodes3['nodes'] || {},
         });
-      if (el45.disabled)
+      if (el38['disabled'])
         return (
-          window.showToast?.(videoPanelText('smartMultiframeUnavailable'), 'warn'),
-          (this._data = el45.nodeData),
-          this._data
+          window['showToast']?.(videoPanelText('smartMultiframeUnavailable'), 'warn'),
+          (this['_data'] = el38['nodeData']),
+          this['_data']
         );
-      const list21 = Array.isArray(el45.edgeIdsToRemove) ? el45.edgeIdsToRemove : [],
-        args19 = el45.patch || {};
+      const list8 = Array['isArray'](el38['edgeIdsToRemove']) ? el38['edgeIdsToRemove'] : [],
+        args11 = el38['patch'] || {};
       return (
-        (list21.length > 0 || Object.keys(args19).length > 0) &&
-          store.batch(() => {
-            (list21.forEach((item27) => store.removeEdge(item27)),
-              Object.keys(args19).length > 0 && store.updateNodeData(this.nodeId, args19));
+        (list8['length'] > 0 || Object['keys'](args11)['length'] > 0) &&
+          store['batch'](() => {
+            (list8['forEach']((value162) => store['removeEdge'](value162)),
+              Object['keys'](args11)['length'] > 0 &&
+                store['updateNodeData'](this['nodeId'], args11));
           }),
-        (this._data = el45.nodeData || this._getDreaminaEffectiveNodeData({ ...baseNodeData, ...args19 })),
-        this._data
+        (this['_data'] =
+          el38['nodeData'] || this['_getDreaminaEffectiveNodeData']({ ...baseNodeData, ...args11 })),
+        this['_data']
       );
     }
-    ['_commitDreaminaSchemaField'](value237, value238, value239 = this._data) {
-      const value240 = String(value237 || '').trim(),
-        value241 = this._getDreaminaEffectiveNodeData(value239);
-      if (value240 === 'dreaminaRouteMode') return this._commitDreaminaRouteMode(value238, value241);
-      const value242 = this._getResolvedDreaminaTaskType(value241),
-        dreaminaStyleVideoProvider2 = resolveDreaminaStyleVideoProvider(value241?.model, value241?.provider),
-        dreaminaStyleVideoModelForTask2 = ensureDreaminaStyleVideoModelForTask(
-          value242,
-          value241?.model,
-          dreaminaStyleVideoProvider2,
-        );
-      if (value240 === 'resolution') {
-        const resolution5 = normalizeDreaminaStyleVideoResolution(
-          value242,
-          dreaminaStyleVideoModelForTask2,
-          value238,
-          dreaminaStyleVideoProvider2,
-        );
-        return this._commitDreaminaParamValues({ resolution: resolution5 }, value241);
+    ['_commitDreaminaSchemaField'](value163, value164, value165 = this['_data']) {
+      const value166 = String(value163 || '')['trim'](),
+        args12 = this['_getDreaminaEffectiveNodeData'](value165);
+      if (value166 === 'dreaminaRouteMode') return this['_commitDreaminaRouteMode'](value164, args12);
+      const value167 = this['_getResolvedDreaminaTaskType'](args12),
+        dreaminaStyleVideoProvider2 = resolveDreaminaStyleVideoProvider(args12?.['model'], args12?.['provider']),
+        dreaminaStyleVideoModelForTask2 = ensureDreaminaStyleVideoModelForTask(value167, args12?.['model'], dreaminaStyleVideoProvider2);
+      if (value166 === 'resolution') {
+        const resolution4 = normalizeDreaminaStyleVideoResolution(value167, dreaminaStyleVideoModelForTask2, value164, dreaminaStyleVideoProvider2);
+        return this['_commitDreaminaParamValues']({ resolution: resolution4 }, args12);
       }
-      if (value240 === 'duration') {
-        const duration4 = normalizeDreaminaStyleVideoDuration(
-          value242,
-          dreaminaStyleVideoModelForTask2,
-          value238,
-          dreaminaStyleVideoProvider2,
-        );
-        return this._commitDreaminaParamValues({ duration: duration4 }, value241);
+      if (value166 === 'duration') {
+        const duration3 = normalizeDreaminaStyleVideoDuration(value167, dreaminaStyleVideoModelForTask2, value164, dreaminaStyleVideoProvider2);
+        return this['_commitDreaminaParamValues']({ duration: duration3 }, args12);
       }
-      if (value240 === 'aspectRatio') return this._commitDreaminaSchemaAspectRatio(value238, value241);
-      return value241;
-    }
-    ['_normalizeDreaminaNodeData'](value243, value244 = {}) {
-      const value245 = value244?.syncStore !== false,
-        args20 = this._getDreaminaEffectiveNodeData(value243),
-        dreaminaStyleVideoNodeNormalizationPatch = buildDreaminaStyleVideoNodeNormalizationPatch(args20);
-      if (!dreaminaStyleVideoNodeNormalizationPatch) return args20;
-      const args21 = buildDreaminaStorePatchFromNormalization(
-          args20,
-          dreaminaStyleVideoNodeNormalizationPatch,
-        ),
-        value246 = this._getDreaminaEffectiveNodeData({ ...args20, ...args21 }),
-        value247 = store.getState().nodes?.[this.nodeId];
+      if (value166 === 'aspectRatio')
+        return this['_commitDreaminaSchemaAspectRatio'](value164, args12, {
+          forceManualDisplaySize: !![],
+        });
+      const args13 = buildUiSchemaParamPatch(args12, value166, value164);
       return (
-        value245 && value247 && Object.keys(args21).length > 0 && store.updateNodeData(this.nodeId, args21),
-        value246
+        store['updateNodeData'](this['nodeId'], args13),
+        (this['_data'] = this['_getDreaminaEffectiveNodeData']({ ...args12, ...args13 })),
+        this['_data']
       );
     }
-    ['_getDreaminaReferenceSummary'](value248 = this._data) {
-      const value249 = store.getIncomingEdges(this.nodeId) || [],
-        value250 = store.getState().nodes || {},
+    ['_normalizeDreaminaNodeData'](value168, value169 = {}) {
+      const value170 = value169?.['syncStore'] !== ![],
+        args14 = this['_getDreaminaEffectiveNodeData'](value168),
+        dreaminaStyleVideoNodeNormalizationPatch = buildDreaminaStyleVideoNodeNormalizationPatch(args14);
+      if (!dreaminaStyleVideoNodeNormalizationPatch) return args14;
+      const args15 = buildDreaminaStorePatchFromNormalization(args14, dreaminaStyleVideoNodeNormalizationPatch),
+        value171 = this['_getDreaminaEffectiveNodeData']({ ...args14, ...args15 }),
+        storeState = readStoreState()['nodes']?.[this['nodeId']];
+      return (
+        value170 &&
+          storeState &&
+          Object['keys'](args15)['length'] > 0 &&
+          store['updateNodeData'](this['nodeId'], args15),
+        value171
+      );
+    }
+    ['_getDreaminaReferenceSummary'](value172 = this['_data']) {
+      const value173 = store['getIncomingEdges'](this['nodeId']) || [],
+        storeState2 = readStoreState()['nodes'] || {},
         items = [];
-      for (const value251 of value249) {
-        const response = value250?.[value251.sourceId];
+      for (const value174 of value173) {
+        const response = storeState2?.[value174['sourceId']];
         if (!response) continue;
-        const list22 = String(response.type || '');
+        const list9 = String(response['type'] || '');
         let kind = '';
-        if (list22.includes('video')) kind = 'video';
+        if (list9['includes']('video')) kind = 'video';
         else {
-          if (list22.includes('audio')) kind = 'audio';
+          if (list9['includes']('audio')) kind = 'audio';
           else {
-            if (list22.includes('image')) kind = 'image';
+            if (list9['includes']('image')) kind = 'image';
             else {
-              if (list22.includes('text')) kind = 'text';
+              if (list9['includes']('text')) kind = 'text';
             }
           }
         }
         if (!kind) continue;
         if (kind === 'image') {
-          const enabled21 =
-            !!response.thumbId ||
-            !!response.thumbUrl ||
-            !!response.imageUrl ||
-            !!response.src ||
-            !!response.localPath;
-          if (!enabled21) continue;
+          const enabled14 =
+            !!response['thumbId'] ||
+            !!response['thumbUrl'] ||
+            !!response['imageUrl'] ||
+            !!response['src'] ||
+            !!response['localPath'];
+          if (!enabled14) continue;
         } else {
           if (kind === 'video') {
-            const enabled22 =
-              (Array.isArray(response.videos) && response.videos.length > 0) ||
-              !!response.thumbId ||
-              !!response.thumbUrl ||
-              !!response.videoUrl ||
-              !!response.src ||
-              !!response.localPath;
-            if (!enabled22) continue;
+            const enabled15 =
+              (Array['isArray'](response['videos']) && response['videos']['length'] > 0) ||
+              !!response['thumbId'] ||
+              !!response['thumbUrl'] ||
+              !!response['videoUrl'] ||
+              !!response['src'] ||
+              !!response['localPath'];
+            if (!enabled15) continue;
           } else {
             if (kind === 'audio') {
-              const enabled23 = !!response.audioUrl || !!response.src || !!response.localPath;
-              if (!enabled23) continue;
+              const enabled16 = !!response['audioUrl'] || !!response['src'] || !!response['localPath'];
+              if (!enabled16) continue;
             } else {
               if (kind === 'text') {
-                const enabled24 = !!String(
-                  response.outputText || response.text || response.content || '',
-                ).trim();
-                if (!enabled24) continue;
+                const enabled17 = !!String(
+                  response['outputText'] || response['text'] || response['content'] || '',
+                )['trim']();
+                if (!enabled17) continue;
               }
             }
           }
         }
-        items.push({
-          edgeId: String(value251.id || ''),
-          sourceId: String(value251.sourceId || ''),
+        items['push']({
+          edgeId: String(value174['id'] || ''),
+          sourceId: String(value174['sourceId'] || ''),
           kind: kind,
-          refSlot: String(value251.refSlot || ''),
+          refSlot: String(value174['refSlot'] || ''),
         });
       }
-      const images = items.filter((item28) => item28.kind === 'image'),
-        videos = items.filter((item29) => item29.kind === 'video'),
-        audios = items.filter((item30) => item30.kind === 'audio'),
-        texts = items.filter((item31) => item31.kind === 'text');
+      const images = items['filter']((value175) => value175['kind'] === 'image'),
+        videos = items['filter']((value176) => value176['kind'] === 'video'),
+        audios = items['filter']((value177) => value177['kind'] === 'audio'),
+        texts = items['filter']((value178) => value178['kind'] === 'text');
       return {
         items: items,
         images: images,
         videos: videos,
         audios: audios,
         texts: texts,
-        imageCount: images.length,
-        videoCount: videos.length,
-        audioCount: audios.length,
-        textCount: texts.length,
-        signature: items
-          .map(
-            (item32, value252) =>
-              value252 +
-              ':' +
-              item32.edgeId +
-              ':' +
-              item32.sourceId +
-              ':' +
-              item32.kind +
-              ':' +
-              item32.refSlot,
-          )
-          .join('|'),
+        imageCount: images['length'],
+        videoCount: videos['length'],
+        audioCount: audios['length'],
+        textCount: texts['length'],
+        signature: items['map'](
+          (value179, value180) =>
+            value180 +
+            ':' +
+            value179['edgeId'] +
+            ':' +
+            value179['sourceId'] +
+            ':' +
+            value179['kind'] +
+            ':' +
+            value179['refSlot'],
+        )['join']('|'),
       };
     }
-    ['_getResolvedDreaminaTaskType'](value253 = this._data, value254 = null) {
-      if (!this._isDreaminaVideoNode(value253)) return '';
-      const value255 = this._getDreaminaEffectiveNodeData(value253),
-        imageCount = value254 || this._getDreaminaReferenceSummary(value255);
+    ['_getResolvedDreaminaTaskType'](value181 = this['_data'], value182 = null) {
+      if (!this['_isDreaminaVideoNode'](value181)) return '';
+      const value183 = this['_getDreaminaEffectiveNodeData'](value181),
+        imageCount = value182 || this['_getDreaminaReferenceSummary'](value183);
       return resolveDreaminaVideoTaskType({
-        routeMode: normalizeDreaminaVideoRouteMode(value255?.dreaminaRouteMode, value255?.mode),
-        imageCount: imageCount.imageCount,
-        videoCount: imageCount.videoCount,
-        audioCount: imageCount.audioCount,
+        routeMode: normalizeDreaminaVideoRouteMode(value183?.['dreaminaRouteMode'], value183?.['mode']),
+        imageCount: imageCount['imageCount'],
+        videoCount: imageCount['videoCount'],
+        audioCount: imageCount['audioCount'],
       });
     }
-    ['_commitDreaminaSchemaAspectRatio'](value256, value257 = this._data) {
-      const nodeData = this._getDreaminaEffectiveNodeData(value257),
-        ratioValue = normalizeDreaminaVideoAspectRatio(value256, { preserveAdaptive: true }),
-        patch = buildImageSchemaAspectRatioDisplayPatch({
+    ['_commitDreaminaSchemaAspectRatio'](value184, value185 = this['_data'], value186 = {}) {
+      const nodeData4 = this['_getDreaminaEffectiveNodeData'](value185),
+        enabled18 = value186?.['forceManualDisplaySize'] === !![],
+        aspectRatio3 = normalizeDreaminaVideoAspectRatio(value184, { preserveAdaptive: !![] });
+      if (!enabled18 && nodeData4?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === !![]) {
+        const args16 = this['_buildDreaminaParamPatch'](nodeData4, { aspectRatio: aspectRatio3 });
+        return (
+          store['updateNodeData'](this['nodeId'], args16),
+          (this['_data'] = this['_getDreaminaEffectiveNodeData']({ ...nodeData4, ...args16 })),
+          this['_data']
+        );
+      }
+      const patch = buildImageSchemaAspectRatioDisplayPatch({
           store: store,
-          nodeId: this.nodeId,
-          nodeData: nodeData,
-          fallbackNodeData: this._data,
-          ratioValue: ratioValue,
-          minSide: getAIGenerationNodeSize().width,
+          nodeId: this['nodeId'],
+          nodeData: nodeData4,
+          fallbackNodeData: this['_data'],
+          ratioValue: aspectRatio3,
+          minSide: getAIGenerationNodeSize()['width'],
           inputKinds: ['image', 'video'],
-          resultMediaElement: this.videoEl,
-          resultFields: ['videos', 'localPath', 'thumbUrl', 'videoUrl', 'src'],
+          resultMediaElement: this['videoEl'],
+          resultFields: VIDEO_DISPLAY_RATIO_RESULT_FIELDS,
         }),
-        args22 = this._buildDreaminaParamPatch(nodeData, { aspectRatio: ratioValue }),
-        args23 = { ...patch, ...args22 };
+        args17 = this['_buildDreaminaParamPatch'](nodeData4, { aspectRatio: aspectRatio3 }),
+        args18 = {
+          ...(enabled18 ? { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![] } : {}),
+          ...patch,
+          ...args17,
+        };
       return (
         applyImageSchemaRatioResizeAnimation(this, {
-          nodeId: this.nodeId,
-          previewEl: this.previewEl,
-          nodeData: nodeData,
+          nodeId: this['nodeId'],
+          previewEl: this['previewEl'],
+          nodeData: nodeData4,
           patch: patch,
         }),
-        store.updateNodeData(this.nodeId, args23),
-        (this._data = this._getDreaminaEffectiveNodeData({ ...nodeData, ...args23 })),
-        this._data
+        store['updateNodeData'](this['nodeId'], args18),
+        (this['_data'] = this['_getDreaminaEffectiveNodeData']({ ...nodeData4, ...args18 })),
+        this['_data']
       );
     }
-    ['_buildModelApiAspectRatioDisplayPatch'](nodeData2, value258, value259, value260 = {}) {
-      const enabled25 = String(value258 || '').trim();
-      if (!enabled25) return {};
-      const value261 = this._resolveModelExecution(nodeData2?.model, nodeData2?.provider);
-      if (
-        value261?.modelManifest?.kind !== 'video' ||
-        value261?.modelManifest?.adapterType !== 'modelApi' ||
-        value261?.executionManifest?.adapterType !== 'modelApi'
-      )
-        return {};
-      const list23 = Array.isArray(value261?.modelManifest?.uiSchema?.fields)
-          ? value261.modelManifest.uiSchema.fields
-          : [],
-        value262 = list23.find((item33) => String(item33?.id || '').trim() === enabled25);
-      if (enabled25 !== 'aspectRatio' && value262?.displayRole !== 'aspectRatio') return {};
-      const plainGenerationParams4 = getPlainGenerationParams(value260?.generationParams),
-        value263 = Object.prototype.hasOwnProperty.call(plainGenerationParams4, enabled25)
-          ? plainGenerationParams4[enabled25]
-          : Object.prototype.hasOwnProperty.call(plainGenerationParams4, 'aspectRatio')
-            ? plainGenerationParams4.aspectRatio
-            : value259,
-        ratioValue2 = String(value263 || '').trim();
-      if (!ratioValue2) return {};
-      const patch2 = buildImageSchemaAspectRatioDisplayPatch({
+    ['_buildModelApiAspectRatioDisplayPatch'](latestNodeData, fieldId2, value187, schemaPatch = {}) {
+      const resolved = this['_resolveModelExecution'](latestNodeData?.['model'], latestNodeData?.['provider']);
+      return buildVideoSchemaAspectRatioDisplayPatch({
+        owner: this,
         store: store,
-        nodeId: this.nodeId,
-        nodeData: nodeData2,
-        fallbackNodeData: this._data,
-        ratioValue: ratioValue2,
-        minSide: getAIGenerationNodeSize().width,
-        inputKinds: ['image', 'video'],
-        resultMediaElement: this.videoEl,
-        resultFields: ['videos', 'localPath', 'thumbUrl', 'videoUrl', 'src'],
+        nodeId: this['nodeId'],
+        latestNodeData: latestNodeData,
+        fallbackNodeData: this['_data'],
+        resolved: resolved,
+        fieldId: fieldId2,
+        value: value187,
+        schemaPatch: schemaPatch,
+        adapterType: 'modelApi',
+        minSide: getAIGenerationNodeSize()['width'],
+        previewEl: this['previewEl'],
+        resultMediaElement: this['videoEl'],
       });
-      return (
-        applyImageSchemaRatioResizeAnimation(this, {
-          nodeId: this.nodeId,
-          previewEl: this.previewEl,
-          nodeData: nodeData2,
-          patch: patch2,
-        }),
-        { aspectRatio: ratioValue2, ...patch2 }
-      );
     }
-    ['_buildRunningHubWorkflowAspectRatioDisplayPatch'](nodeData3, value264, value265, value266 = {}) {
-      const enabled26 = String(value264 || '').trim();
-      if (!enabled26) return {};
-      const value267 = this._resolveModelExecution(nodeData3?.model, nodeData3?.provider);
-      if (
-        value267?.modelManifest?.kind !== 'video' ||
-        value267?.modelManifest?.adapterType !== 'workflow' ||
-        value267?.executionManifest?.adapterType !== 'workflow'
-      )
-        return {};
-      const list24 = Array.isArray(value267?.modelManifest?.uiSchema?.fields)
-          ? value267.modelManifest.uiSchema.fields
-          : [],
-        value268 = list24.find((item34) => String(item34?.id || '').trim() === enabled26);
-      if (enabled26 !== 'aspectRatio' && value268?.displayRole !== 'aspectRatio') return {};
-      const plainGenerationParams5 = getPlainGenerationParams(value266?.generationParams),
-        value269 = Object.prototype.hasOwnProperty.call(plainGenerationParams5, enabled26)
-          ? plainGenerationParams5[enabled26]
-          : Object.prototype.hasOwnProperty.call(plainGenerationParams5, 'aspectRatio')
-            ? plainGenerationParams5.aspectRatio
-            : value265,
-        ratioValue3 = String(value269 || '').trim();
-      if (!ratioValue3) return {};
-      const patch3 = buildImageSchemaAspectRatioDisplayPatch({
+    ['_buildRunningHubWorkflowAspectRatioDisplayPatch'](latestNodeData2, fieldId3, value188, schemaPatch2 = {}) {
+      const resolved2 = this['_resolveModelExecution'](latestNodeData2?.['model'], latestNodeData2?.['provider']);
+      return buildVideoSchemaAspectRatioDisplayPatch({
+        owner: this,
         store: store,
-        nodeId: this.nodeId,
-        nodeData: nodeData3,
-        fallbackNodeData: this._data,
-        ratioValue: ratioValue3,
-        minSide: getAIGenerationNodeSize().width,
-        inputKinds: ['image', 'video'],
-        resultMediaElement: this.videoEl,
-        resultFields: ['videos', 'localPath', 'thumbUrl', 'videoUrl', 'src'],
+        nodeId: this['nodeId'],
+        latestNodeData: latestNodeData2,
+        fallbackNodeData: this['_data'],
+        resolved: resolved2,
+        fieldId: fieldId3,
+        value: value188,
+        schemaPatch: schemaPatch2,
+        adapterType: 'workflow',
+        minSide: getAIGenerationNodeSize()['width'],
+        previewEl: this['previewEl'],
+        resultMediaElement: this['videoEl'],
       });
-      return (
-        applyImageSchemaRatioResizeAnimation(this, {
-          nodeId: this.nodeId,
-          previewEl: this.previewEl,
-          nodeData: nodeData3,
-          patch: patch3,
-        }),
-        { aspectRatio: ratioValue3, ...patch3 }
-      );
     }
-    ['_getDreaminaRatioDisplayState'](value270 = this._data, value271 = null) {
-      if (!this._isDreaminaVideoNode(value270)) return null;
-      const value272 = value271 || this._syncDreaminaTaskState(value270, { syncStore: false }),
-        nodeData4 = value272?.nodeData || value270,
-        summary = value272?.summary || this._getDreaminaReferenceSummary(nodeData4),
+    ['_getDreaminaRatioDisplayState'](value189 = this['_data'], value190 = null) {
+      if (!this['_isDreaminaVideoNode'](value189)) return null;
+      const value191 = value190 || this['_syncDreaminaTaskState'](value189, { syncStore: ![] }),
+        nodeData5 = value191?.['nodeData'] || value189,
+        summary = value191?.['summary'] || this['_getDreaminaReferenceSummary'](nodeData5),
         resolvedTaskType =
-          value272?.resolvedTaskType || this._getResolvedDreaminaTaskType(nodeData4, summary),
+          value191?.['resolvedTaskType'] || this['_getResolvedDreaminaTaskType'](nodeData5, summary),
         currentModel =
-          ensureDreaminaStyleVideoModelForTask(resolvedTaskType, nodeData4?.model, nodeData4?.provider) ||
-          normalizeDreaminaStyleVideoModel(nodeData4?.model, nodeData4?.provider),
+          ensureDreaminaStyleVideoModelForTask(resolvedTaskType, nodeData5?.['model'], nodeData5?.['provider']) ||
+          normalizeDreaminaStyleVideoModel(nodeData5?.['model'], nodeData5?.['provider']),
         currentResolution = normalizeDreaminaStyleVideoResolution(
           resolvedTaskType,
           currentModel,
-          nodeData4?.resolution || nodeData4?.videoSize,
-          nodeData4?.provider,
+          nodeData5?.['resolution'] || nodeData5?.['videoSize'],
+          nodeData5?.['provider'],
         ),
-        value273 = String(nodeData4?.aspectRatio || '').trim(),
+        value192 = String(nodeData5?.['aspectRatio'] || '')['trim'](),
         currentRatio =
-          value273 === '自适应' || value273 === '自适应' || value273 === 'auto'
+          value192 === '自适应' || value192 === '自适应' || value192 === 'auto'
             ? '自适应'
-            : value273 === '5:4'
+            : value192 === '5:4'
               ? '4:3'
-              : value273 === '4:5'
+              : value192 === '4:5'
                 ? '3:4'
-                : value273
-                  ? normalizeDreaminaVideoAspectRatio(value273)
+                : value192
+                  ? normalizeDreaminaVideoAspectRatio(value192)
                   : '自适应',
-        resolutionOptions = getDreaminaStyleVideoResolutionOptions(
-          resolvedTaskType,
-          currentModel,
-          nodeData4?.provider,
-        ),
-        hasImageRefs = Number(summary?.imageCount || 0) > 0;
+        resolutionOptions = getDreaminaStyleVideoResolutionOptions(resolvedTaskType, currentModel, nodeData5?.['provider']),
+        hasImageRefs = Number(summary?.['imageCount'] || 0) > 0;
       return {
-        nodeData: nodeData4,
+        nodeData: nodeData5,
         summary: summary,
         resolvedTaskType: resolvedTaskType,
         currentModel: currentModel,
@@ -2166,282 +1795,266 @@ export function createVideoNodeParameterPanelModule(value66) {
         ratioIconLabel: currentRatio,
       };
     }
-    ['_syncDreaminaTaskState'](nodeData5 = this._data, value274 = {}) {
-      if (!this._isDreaminaVideoNode(nodeData5))
+    ['_syncDreaminaTaskState'](nodeData6 = this['_data'], value193 = {}) {
+      if (!this['_isDreaminaVideoNode'](nodeData6))
         return {
-          nodeData: nodeData5,
-          summary: this._getDreaminaReferenceSummary(nodeData5),
+          nodeData: nodeData6,
+          summary: this['_getDreaminaReferenceSummary'](nodeData6),
           resolvedTaskType: '',
           routeMode: '',
         };
-      const syncStore = value274?.syncStore !== false;
-      let nodeData6 = this._normalizeDreaminaNodeData(nodeData5, { syncStore: syncStore });
-      const imageCount2 = this._getDreaminaReferenceSummary(nodeData6),
-        routeMode2 = normalizeDreaminaVideoRouteMode(nodeData6?.dreaminaRouteMode, nodeData6?.mode),
+      const syncStore = value193?.['syncStore'] !== ![];
+      let nodeData7 = this['_normalizeDreaminaNodeData'](nodeData6, { syncStore: syncStore });
+      const imageCount2 = this['_getDreaminaReferenceSummary'](nodeData7),
+        routeMode2 = normalizeDreaminaVideoRouteMode(nodeData7?.['dreaminaRouteMode'], nodeData7?.['mode']),
         resolvedTaskType2 = resolveDreaminaVideoTaskType({
           routeMode: routeMode2,
-          imageCount: imageCount2.imageCount,
-          videoCount: imageCount2.videoCount,
-          audioCount: imageCount2.audioCount,
+          imageCount: imageCount2['imageCount'],
+          videoCount: imageCount2['videoCount'],
+          audioCount: imageCount2['audioCount'],
         }),
-        value275 = {};
+        value194 = {};
       if (resolvedTaskType2 !== 'multiframe2video') {
-        const dreaminaStyleVideoProvider3 = resolveDreaminaStyleVideoProvider(
-            nodeData6?.model,
-            nodeData6?.provider,
-          ),
-          dreaminaStyleVideoModelForTask3 = ensureDreaminaStyleVideoModelForTask(
-            resolvedTaskType2,
-            nodeData6?.model,
-            dreaminaStyleVideoProvider3,
-          );
+        const dreaminaStyleVideoProvider3 = resolveDreaminaStyleVideoProvider(nodeData7?.['model'], nodeData7?.['provider']),
+          dreaminaStyleVideoModelForTask3 = ensureDreaminaStyleVideoModelForTask(resolvedTaskType2, nodeData7?.['model'], dreaminaStyleVideoProvider3);
         dreaminaStyleVideoModelForTask3 &&
-          dreaminaStyleVideoModelForTask3 !== String(nodeData6?.model || '').trim() &&
-          (value275.model = dreaminaStyleVideoModelForTask3);
+          dreaminaStyleVideoModelForTask3 !== String(nodeData7?.['model'] || '')['trim']() &&
+          (value194['model'] = dreaminaStyleVideoModelForTask3);
         const dreaminaStyleVideoResolution = normalizeDreaminaStyleVideoResolution(
           resolvedTaskType2,
-          dreaminaStyleVideoModelForTask3 || nodeData6?.model,
-          nodeData6?.resolution || nodeData6?.videoSize,
+          dreaminaStyleVideoModelForTask3 || nodeData7?.['model'],
+          nodeData7?.['resolution'] || nodeData7?.['videoSize'],
           dreaminaStyleVideoProvider3,
         );
         dreaminaStyleVideoResolution &&
-          dreaminaStyleVideoResolution !== String(nodeData6?.resolution || '').trim() &&
-          (value275.resolution = dreaminaStyleVideoResolution);
+          dreaminaStyleVideoResolution !== String(nodeData7?.['resolution'] || '')['trim']() &&
+          (value194['resolution'] = dreaminaStyleVideoResolution);
         const dreaminaStyleVideoDuration = normalizeDreaminaStyleVideoDuration(
           resolvedTaskType2,
-          dreaminaStyleVideoModelForTask3 || nodeData6?.model,
-          nodeData6?.duration,
+          dreaminaStyleVideoModelForTask3 || nodeData7?.['model'],
+          nodeData7?.['duration'],
           dreaminaStyleVideoProvider3,
         );
-        Number(dreaminaStyleVideoDuration) !== Number(nodeData6?.duration) &&
-          (value275.duration = dreaminaStyleVideoDuration);
+        Number(dreaminaStyleVideoDuration) !== Number(nodeData7?.['duration']) && (value194['duration'] = dreaminaStyleVideoDuration);
       }
-      if (imageCount2.imageCount <= 0) {
-        const dreaminaVideoAspectRatio = normalizeDreaminaVideoAspectRatio(nodeData6?.aspectRatio, {
-          preserveAdaptive: true,
+      if (imageCount2['imageCount'] <= 0) {
+        const dreaminaVideoAspectRatio = normalizeDreaminaVideoAspectRatio(nodeData7?.['aspectRatio'], {
+          preserveAdaptive: !![],
         });
-        dreaminaVideoAspectRatio !== String(nodeData6?.aspectRatio || '').trim() &&
-          String(nodeData6?.aspectRatio || '').trim() &&
-          (value275.aspectRatio = dreaminaVideoAspectRatio);
+        dreaminaVideoAspectRatio !== String(nodeData7?.['aspectRatio'] || '')['trim']() &&
+          String(nodeData7?.['aspectRatio'] || '')['trim']() &&
+          (value194['aspectRatio'] = dreaminaVideoAspectRatio);
       }
-      routeMode2 !== String(nodeData6?.dreaminaRouteMode || '').trim() &&
-        (value275.dreaminaRouteMode = routeMode2);
-      const dreaminaStyleVideoProvider4 = resolveDreaminaStyleVideoProvider(
-        nodeData6?.model,
-        nodeData6?.provider,
-      );
-      String(nodeData6?.provider || '')
-        .trim()
-        .toLowerCase() !== dreaminaStyleVideoProvider4 && (value275.provider = dreaminaStyleVideoProvider4);
-      if (Object.keys(value275).length > 0) {
-        const args24 = buildDreaminaStorePatchFromNormalization(nodeData6, value275);
-        nodeData6 = this._getDreaminaEffectiveNodeData({ ...nodeData6, ...args24 });
-        const value276 = store.getState().nodes?.[this.nodeId];
-        syncStore && value276 && store.updateNodeData(this.nodeId, args24);
+      routeMode2 !== String(nodeData7?.['dreaminaRouteMode'] || '')['trim']() &&
+        (value194['dreaminaRouteMode'] = routeMode2);
+      const dreaminaStyleVideoProvider4 = resolveDreaminaStyleVideoProvider(nodeData7?.['model'], nodeData7?.['provider']);
+      String(nodeData7?.['provider'] || '')
+        ['trim']()
+        ['toLowerCase']() !== dreaminaStyleVideoProvider4 && (value194['provider'] = dreaminaStyleVideoProvider4);
+      if (Object['keys'](value194)['length'] > 0) {
+        const args19 = buildDreaminaStorePatchFromNormalization(nodeData7, value194);
+        nodeData7 = this['_getDreaminaEffectiveNodeData']({ ...nodeData7, ...args19 });
+        const value195 = store['getState']()['nodes']?.[this['nodeId']];
+        syncStore && value195 && store['updateNodeData'](this['nodeId'], args19);
       }
-      return {
-        nodeData: nodeData6,
-        summary: imageCount2,
-        resolvedTaskType: resolvedTaskType2,
-        routeMode: routeMode2,
-      };
+      return { nodeData: nodeData7, summary: imageCount2, resolvedTaskType: resolvedTaskType2, routeMode: routeMode2 };
     }
-    ['_syncDreaminaPromptPlaceholder'](value277 = this._data) {
-      if (!this.promptEl) return;
-      const value278 = this.promptEl.dataset || (this.promptEl.dataset = {});
-      if (!this._isDreaminaVideoNode(value277)) {
-        const value279 = this._resolveModelExecution(value277?.model, value277?.provider);
-        value278.placeholder = resolveVideoPromptPlaceholder(value279?.modelManifest, value277);
+    ['_syncDreaminaPromptPlaceholder'](value196 = this['_data']) {
+      if (!this['promptEl']) return;
+      const value197 = this['promptEl']['dataset'] || (this['promptEl']['dataset'] = {});
+      if (!this['_isDreaminaVideoNode'](value196)) {
+        const value198 = this['_resolveModelExecution'](value196?.['model'], value196?.['provider']);
+        value197['placeholder'] = resolveVideoPromptPlaceholder(value198?.['modelManifest'], value196);
         return;
       }
-      const value280 = this._getDreaminaEffectiveNodeData(value277),
-        dreaminaVideoRouteMode2 = normalizeDreaminaVideoRouteMode(
-          value280?.dreaminaRouteMode,
-          value280?.mode,
-        );
-      value278.placeholder =
+      const value199 = this['_getDreaminaEffectiveNodeData'](value196),
+        dreaminaVideoRouteMode2 = normalizeDreaminaVideoRouteMode(value199?.['dreaminaRouteMode'], value199?.['mode']);
+      value197['placeholder'] =
         dreaminaVideoRouteMode2 === 'frames2video'
           ? videoPanelText('dreaminaPrompt.frames2video')
           : videoPanelText('dreaminaPrompt.reference');
     }
-    ['_decorateDreaminaFooter'](el46, value281) {
-      const value282 = value281 || this._syncDreaminaTaskState(this._data, { syncStore: false }),
-        args25 = value282?.nodeData || this._data,
-        resolutionOptions2 = this._getDreaminaRatioDisplayState(args25, value282),
-        value283 = resolutionOptions2?.resolvedTaskType || value282?.resolvedTaskType || 'text2video',
-        dreaminaRouteMode = value282?.routeMode || 'auto',
-        value284 =
-          resolutionOptions2?.summary || value282?.summary || this._getDreaminaReferenceSummary(args25),
-        dreaminaVideoTaskParamVisibility = getDreaminaVideoTaskParamVisibility(value283),
-        provider8 = resolveDreaminaStyleVideoProvider(args25?.model, args25?.provider),
+    ['_decorateDreaminaFooter'](el39, value200) {
+      const value201 =
+          value200 ||
+          this['_syncDreaminaTaskState'](decorateSegmentRetakeParameterNodeData(this['_data']), {
+            syncStore: ![],
+          }),
+        args20 = decorateSegmentRetakeParameterNodeData(value201?.['nodeData'] || this['_data']),
+        resolutionOptions2 = this['_getDreaminaRatioDisplayState'](args20, value201),
+        value202 = resolutionOptions2?.['resolvedTaskType'] || value201?.['resolvedTaskType'] || 'text2video',
+        dreaminaRouteMode = args20?.['dreaminaRouteMode'] || value201?.['routeMode'] || 'auto',
+        value203 =
+          resolutionOptions2?.['summary'] || value201?.['summary'] || this['_getDreaminaReferenceSummary'](args20),
+        dreaminaVideoTaskParamVisibility = getDreaminaVideoTaskParamVisibility(value202),
+        provider7 = resolveDreaminaStyleVideoProvider(args20?.['model'], args20?.['provider']),
         model8 =
-          resolutionOptions2?.currentModel ||
-          ensureDreaminaStyleVideoModelForTask(value283, args25?.model, provider8) ||
-          normalizeDreaminaStyleVideoModel(args25?.model, provider8),
-        resolution6 =
-          resolutionOptions2?.currentResolution ||
-          normalizeDreaminaStyleVideoResolution(
-            value283,
-            model8,
-            args25?.resolution || args25?.videoSize,
-            provider8,
-          ),
-        aspectRatio3 =
-          resolutionOptions2?.currentRatio || normalizeDreaminaVideoAspectRatio(args25?.aspectRatio),
-        duration5 = normalizeDreaminaStyleVideoDuration(value283, model8, args25?.duration, provider8),
-        durationRange = getDreaminaStyleVideoDurationRange(value283, model8, provider8),
-        el47 = el46.querySelector('.img-model-pills'),
-        el48 = el46.querySelector('.img-model-wrap'),
-        value285 = el46.querySelector('.img-model-btn-trigger'),
-        el49 = el46.querySelector('.img-model-label'),
-        el50 = el46.querySelector('.img-model-menu');
-      if (el48) el48.hidden = false;
-      el49 && (el49.textContent = getDreaminaProviderLabel(provider8));
-      if (value285) {
-        const value286 = this._getModelIconHTML(model8, provider8),
-          value287 = value285.firstElementChild;
-        if (value287) value287.outerHTML = value286;
-        else value285.insertAdjacentHTML('afterbegin', value286);
+          resolutionOptions2?.['currentModel'] ||
+          ensureDreaminaStyleVideoModelForTask(value202, args20?.['model'], provider7) ||
+          normalizeDreaminaStyleVideoModel(args20?.['model'], provider7),
+        resolution5 = isSegmentRetakeEditing(args20)
+          ? args20?.['resolution']
+          : resolutionOptions2?.['currentResolution'] ||
+            normalizeDreaminaStyleVideoResolution(
+              value202,
+              model8,
+              args20?.['resolution'] || args20?.['videoSize'],
+              provider7,
+            ),
+        aspectRatio4 =
+          resolutionOptions2?.['currentRatio'] || normalizeDreaminaVideoAspectRatio(args20?.['aspectRatio']),
+        duration4 = isSegmentRetakeEditing(args20)
+          ? args20?.['duration']
+          : normalizeDreaminaStyleVideoDuration(value202, model8, args20?.['duration'], provider7),
+        durationRange = getDreaminaStyleVideoDurationRange(value202, model8, provider7),
+        el40 = el39['querySelector']('.img-model-pills'),
+        el41 = el39['querySelector']('.img-model-wrap'),
+        value204 = el39['querySelector']('.img-model-btn-trigger'),
+        el42 = el39['querySelector']('.img-model-label'),
+        el43 = el39['querySelector']('.img-model-menu');
+      if (el41) el41['hidden'] = ![];
+      el42 && (el42['textContent'] = getDreaminaProviderLabel(provider7));
+      if (value204) {
+        const value205 = this['_getModelIconHTML'](model8, provider7),
+          value206 = value204['firstElementChild'];
+        if (value206) value206['outerHTML'] = value205;
+        else value204['insertAdjacentHTML']('afterbegin', value205);
       }
-      el50?.querySelectorAll('.floating-menu-item').forEach((el51) => {
-        const value288 = String(el51.dataset.value || '').trim(),
-          value289 = String(el51.dataset.provider || '')
-            .trim()
-            .toLowerCase(),
-          value290 =
-            provider8 === 'dreamina'
-              ? value289 === 'dreamina' || value288 === 'dreamina/text2video'
-              : provider8 === 'apimart'
-                ? value289 === 'apimart' && isApimartDreaminaVideoModel(value288, value289)
-                : value289 === provider8 && isDreaminaStyleVideoModel(value288, value289);
-        el51.classList.toggle('active', value290);
+      el43?.['querySelectorAll']('.floating-menu-item')['forEach']((el44) => {
+        const value207 = String(el44['dataset']['value'] || '')['trim'](),
+          value208 = String(el44['dataset']['provider'] || '')
+            ['trim']()
+            ['toLowerCase'](),
+          value209 =
+            provider7 === 'dreamina'
+              ? value208 === 'dreamina' || value207 === 'dreamina/text2video'
+              : provider7 === 'apimart'
+                ? value208 === 'apimart' && isApimartDreaminaVideoModel(value207, value208)
+                : value208 === provider7 && isDreaminaStyleVideoModel(value207, value208);
+        el44['classList']['toggle']('active', value209);
       });
-      let el52 = el46.querySelector('.dreamina-task-model-wrap');
-      !el52 &&
-        ((el52 = document.createElement('div')),
-        (el52.className = 'dreamina-task-model-wrap'),
-        (el52.innerHTML =
+      let el45 = el39['querySelector']('.dreamina-task-model-wrap');
+      !el45 &&
+        ((el45 = document['createElement']('div')),
+        (el45['className'] = 'dreamina-task-model-wrap'),
+        (el45['innerHTML'] =
           '\n        <button type="button" class="img-pill-btn dreamina-task-model-btn">\n          <span class="dreamina-task-model-label"></span>\n        </button>\n        <div class="floating-menu dreamina-task-model-menu"></div>\n      '),
-        el48?.insertAdjacentElement('afterend', el52));
-      const el53 = el52.querySelector('.dreamina-task-model-btn'),
-        el54 = el52.querySelector('.dreamina-task-model-label'),
-        el55 = el52.querySelector('.dreamina-task-model-menu'),
-        dreaminaTaskModelMenuMeta = getDreaminaTaskModelMenuMeta(model8, provider8);
-      el54 &&
-        (el54.textContent =
-          dreaminaTaskModelMenuMeta?.title ||
-          getDisplayModelName(model8 || getDreaminaStyleVideoDefaultModel(value283, provider8)));
-      el55 && (el55.innerHTML = buildDreaminaTaskModelMenuHtml(model8, value283, provider8));
-      const value291 =
+        el41?.['insertAdjacentElement']('afterend', el45));
+      const el46 = el45['querySelector']('.dreamina-task-model-btn'),
+        el47 = el45['querySelector']('.dreamina-task-model-label'),
+        el48 = el45['querySelector']('.dreamina-task-model-menu'),
+        allowedModelIds2 = getSegmentRetakeAllowedModelIdsForNode(args20),
+        dreaminaTaskModelMenuMeta = getDreaminaTaskModelMenuMeta(model8, provider7);
+      el47 &&
+        (el47['textContent'] =
+          dreaminaTaskModelMenuMeta?.['title'] ||
+          getDisplayModelName(model8 || getDreaminaStyleVideoDefaultModel(value202, provider7)));
+      el48 &&
+        (el48['innerHTML'] = buildDreaminaTaskModelMenuHtml(model8, value202, provider7, {
+          allowedModelIds: allowedModelIds2,
+        }));
+      const value210 =
         !isDreaminaVideoRouteModeEnabled(dreaminaRouteMode) ||
-        getDreaminaTaskModelMenuItems(value283, provider8).length <= 0;
-      el53 && (el53.disabled = value291);
-      (el46.querySelector('.img-ratio-wrap')?.remove(),
-        el46.querySelector('.vid-mode-wrap')?.remove(),
-        el46.querySelector('.vid-duration-wrap')?.remove(),
-        el46.querySelectorAll('[data-dreamina-video-param-schema]').forEach((el56) => el56.remove()));
-      const value292 = this._getDreaminaEffectiveNodeData({
-          ...args25,
-          provider: provider8,
-          model: model8,
-          generationParams: {
-            ...getPlainGenerationParams(args25?.generationParams),
-            dreaminaRouteMode: dreaminaRouteMode,
-            aspectRatio: aspectRatio3,
-            duration: duration5,
-            ...(resolution6 ? { resolution: resolution6 } : {}),
-          },
-        }),
+        getDreaminaTaskModelMenuItems(value202, provider7, { allowedModelIds: allowedModelIds2 })['length'] <= 0;
+      el46 && (el46['disabled'] = value210);
+      (el39['querySelector']('.img-ratio-wrap')?.['remove'](),
+        el39['querySelector']('.vid-mode-wrap')?.['remove'](),
+        el39['querySelector']('.vid-duration-wrap')?.['remove'](),
+        el39['querySelectorAll']('[data-dreamina-video-param-schema]')['forEach']((el49) =>
+          el49['remove'](),
+        ));
+      const decorateSegmentRetakeParameterNodeData5 = decorateSegmentRetakeParameterNodeData(
+          this['_getDreaminaEffectiveNodeData']({
+            ...args20,
+            provider: provider7,
+            model: model8,
+            generationParams: {
+              ...getPlainGenerationParams(args20?.['generationParams']),
+              dreaminaRouteMode: dreaminaRouteMode,
+              aspectRatio: aspectRatio4,
+              duration: duration4,
+              ...(resolution5 ? { resolution: resolution5 } : {}),
+            },
+          }),
+        ),
         dreaminaParamSchemaFields = buildDreaminaParamSchemaFields({
           routeMode: dreaminaRouteMode,
-          currentRatio: aspectRatio3,
-          currentResolution: resolution6,
-          currentDuration: duration5,
+          currentRatio: aspectRatio4,
+          currentResolution: resolution5,
+          currentDuration: duration4,
           durationRange: durationRange,
-          resolutionOptions: resolutionOptions2?.resolutionOptions || [],
+          resolutionOptions: resolutionOptions2?.['resolutionOptions'] || [],
         }),
-        handler11 = (value293, list25, args26 = {}) => {
-          if (!list25.length) return null;
-          const renderUiSchemaFields2 = renderUiSchemaFields(list25, value292, {
+        decorateSegmentRetakeParameterSchemaFields2 = decorateSegmentRetakeParameterSchemaFields(args20, dreaminaParamSchemaFields),
+        handler10 = (value211, list10, args21 = {}) => {
+          if (!list10['length']) return null;
+          const renderUiSchemaFields2 = renderUiSchemaFields(list10, decorateSegmentRetakeParameterNodeData5, {
             sourceId: 'dreamina-video-normal-params',
-            ...args26,
+            ...args21,
           });
           if (!renderUiSchemaFields2) return null;
-          const el57 = document.createElement('div');
+          const el50 = document['createElement']('div');
           return (
-            (el57.className = 'ui-schema-placement ' + value293),
-            (el57.dataset.dreaminaVideoParamSchema = '1'),
-            (el57.innerHTML = renderUiSchemaFields2),
-            el57
+            (el50['className'] = 'ui-schema-placement ' + value211),
+            (el50['dataset']['dreaminaVideoParamSchema'] = '1'),
+            (el50['innerHTML'] = renderUiSchemaFields2),
+            el50
           );
         },
-        value294 = dreaminaVideoTaskParamVisibility.mode
-          ? handler11('dreamina-video-mode-schema', [dreaminaParamSchemaFields.mode])
+        value212 = dreaminaVideoTaskParamVisibility['mode'] ? handler10('dreamina-video-mode-schema', [decorateSegmentRetakeParameterSchemaFields2['mode']]) : null,
+        value213 = dreaminaVideoTaskParamVisibility['ratio']
+          ? handler10('dreamina-video-ratio-schema', [decorateSegmentRetakeParameterSchemaFields2['resolution'], decorateSegmentRetakeParameterSchemaFields2['aspectRatio']], {
+              placement: 'resolution',
+            })
           : null,
-        value295 = dreaminaVideoTaskParamVisibility.ratio
-          ? handler11(
-              'dreamina-video-ratio-schema',
-              [dreaminaParamSchemaFields.resolution, dreaminaParamSchemaFields.aspectRatio],
-              {
-                placement: 'resolution',
-              },
-            )
-          : null,
-        value296 = dreaminaVideoTaskParamVisibility.duration
-          ? handler11('dreamina-video-duration-schema', [dreaminaParamSchemaFields.duration])
+        value214 = dreaminaVideoTaskParamVisibility['duration']
+          ? handler10('dreamina-video-duration-schema', [decorateSegmentRetakeParameterSchemaFields2['duration']])
           : null;
-      if (el47) {
-        const list26 = [el48, el52, value294, value295, value296].filter(Boolean);
-        list26.forEach((item35) => el47.appendChild(item35));
+      if (el40) {
+        const list11 = [el41, el45, value212, value213, value214]['filter'](Boolean);
+        list11['forEach']((value215) => el40['appendChild'](value215));
       }
-      this._syncDreaminaPromptPlaceholder(value292);
+      this['_syncDreaminaPromptPlaceholder'](decorateSegmentRetakeParameterNodeData5);
     }
-    ['_resolveModelExecution'](value297, providerHint5) {
+    ['_resolveModelExecution'](value216, providerHint2) {
       return (
-        resolveModelExecution(value297, { providerHint: providerHint5 }) ||
-        resolveModelExecution(value297) ||
+        resolveModelExecution(value216, { providerHint: providerHint2 }) ||
+        resolveModelExecution(value216) ||
         null
       );
     }
-    ['_getModelProviderId'](value298, value299) {
-      const value300 = this._resolveModelExecution(value298, value299),
-        providerId = normalizeProviderId(value300?.modelManifest?.provider);
+    ['_getModelProviderId'](value217, value218) {
+      const value219 = this['_resolveModelExecution'](value217, value218),
+        providerId = normalizeProviderId(value219?.['modelManifest']?.['provider']);
       if (providerId) return providerId;
-      return resolveModelProvider(value298, value299, { allowPrefixInference: false }) || null;
+      return resolveModelProvider(value217, value218, { allowPrefixInference: ![] }) || null;
     }
-    ['_isRunninghubWorkflowModel'](value301, value302) {
-      const value303 = this._resolveModelExecution(value301, value302);
-      return (
-        normalizeProviderId(value303?.modelManifest?.provider) === 'runninghubwf' &&
-        value303?.modelManifest?.adapterType === 'workflow' &&
-        value303?.executionManifest?.adapterType === 'workflow'
-      );
+    ['_isRunninghubWorkflowModel'](value220, value221) {
+      return isRunningHubVideoWorkflowModel(value220, value221);
     }
-    ['_getModelIconHTML'](value304, value305) {
-      const value306 = this._resolveModelExecution(value304, value305),
-        value307 = this._getModelProviderId(value304, value305);
-      if (value307 === 'apimart') return buildApimartVideoLogoHTML(12);
-      if (value307 === 'volcengine') return buildVolcengineVideoLogoHTML(12);
-      if (value307 === 'dreamina' || value306?.modelManifest?.extensions?.dreaminaStyleVideo)
-        return buildDreaminaVideoLogoHTML(12);
-      const value308 = value307 ? PROVIDERS_META?.[value307]?.logoPath : null;
-      if (value308) return '<img src="' + value308 + '" class="node-menu-icon-small" alt="' + value307 + '">';
-      return '<div class="node-menu-icon-small node-menu-icon-badge video-model-fallback-icon">VM</div>';
+    ['_getModelIconHTML'](model9, provider8) {
+      return renderVideoModelTriggerIconHTML({
+        model: model9,
+        provider: provider8,
+        providersMeta: PROVIDERS_META,
+        resolveExecution: (value222, value223) => this['_resolveModelExecution'](value222, value223),
+        resolveProviderId: (value224, value225) => this['_getModelProviderId'](value224, value225),
+      });
     }
-    ['_getModelParamVisibility'](value309, value310) {
-      if (isDreaminaStyleVideoModel(value309, value310)) {
-        const value311 = this._getResolvedDreaminaTaskType();
-        return getDreaminaVideoTaskParamVisibility(value311);
+    ['_getModelParamVisibility'](value226, value227) {
+      if (isDreaminaStyleVideoModel(value226, value227)) {
+        const value228 = this['_getResolvedDreaminaTaskType']();
+        return getDreaminaVideoTaskParamVisibility(value228);
       }
-      const value312 = this._getModelProviderId(value309, value310);
-      if (value312 === 'runninghub' || value312 === 'runninghubwf')
-        return { ratio: true, mode: false, duration: false };
-      return { ratio: true, mode: true, duration: true };
+      const value229 = this['_getModelProviderId'](value226, value227);
+      if (value229 === 'runninghub' || value229 === 'runninghubwf')
+        return { ratio: !![], mode: ![], duration: ![] };
+      return { ratio: !![], mode: !![], duration: !![] };
     }
-    ['_getRatioIconHTML'](value313) {
-      if (value313 === '自适应')
+    ['_getRatioIconHTML'](value230) {
+      if (value230 === '自适应')
         return '<svg class="video-ratio-auto-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>';
-      const value314 = {
+      const value231 = {
           '1:1': 'img-rp-sq',
           '9:16': 'img-rp-tall',
           '16:9': 'img-rp-wide',
@@ -2453,134 +2066,194 @@ export function createVideoNodeParameterPanelModule(value66) {
           '4:5': 'img-rp-p45',
           '21:9': 'img-rp-ultra',
         },
-        value315 = value314[value313] || 'img-rp-sq';
-      return '<span class="img-rp-icon video-ratio-icon ' + value315 + '"></span>';
+        value232 = value231[value230] || 'img-rp-sq';
+      return '<span class="img-rp-icon video-ratio-icon ' + value232 + '"></span>';
     }
     ['_updateSubmitButtonState']() {
-      if (!this.btnEl) return;
-      const value316 = typeof store.getState === 'function' ? store.getState() : {},
-        nodes6 = value316?.nodes || {},
-        inEdges2 = typeof store.getIncomingEdges === 'function' ? store.getIncomingEdges(this.nodeId) : [],
-        value317 = nodes6?.[this.nodeId] || this._data || {},
-        cancellable = this._isRunninghubWorkflowModel(value317?.model, value317?.provider),
-        el58 = resolveGenerationButtonMode(value317, {
-          cancellable: cancellable,
-          cancelInFlight: this._rhCancelInFlight === true,
-        });
-      if (el58.busy) {
-        if (cancellable) {
-          const title = getVideoCancelTooltip();
-          setGenerateButtonCancellableUi(this.btnEl, {
-            title: title,
-            tooltip: title,
-            ariaLabel: videoPanelText('cancelGenerateAria'),
-            color: 'var(--red)',
-            busy: true,
-          });
-        } else {
-          const title2 = getVideoGenerateTitle();
-          setGenerateButtonLoadingUi(this.btnEl, { title: title2, disabled: true, ariaLabel: title2 });
-        }
-        ((this.btnEl.disabled = el58.disabled), (this.btnEl.style.cursor = el58.cursor));
+      if (!this['btnEl']) return;
+      if (this['_segmentRetakePreparing'] === !![]) {
+        const title = getVideoGenerateTitle();
+        (setGenerateButtonLoadingUi(this['btnEl'], {
+          title: title,
+          disabled: !![],
+          ariaLabel: title,
+        }),
+          this['btnEl']['setAttribute']?.('aria-busy', 'true'));
         return;
       }
-      resetGenerateButtonIdleUi(this.btnEl, getVideoGenerateTitle());
-      const promptTextWithTextRefs = resolvePromptTextWithTextRefs({
-        promptEl: this.promptEl,
+      const value233 =
+          typeof store['getStateRaw'] === 'function'
+            ? store['getStateRaw']()
+            : typeof store['getState'] === 'function'
+              ? store['getState']()
+              : {},
+        nodes4 = value233?.['nodes'] || {},
+        inEdges2 =
+          typeof store['getIncomingEdges'] === 'function'
+            ? store['getIncomingEdges'](this['nodeId'])
+            : [],
+        modelId2 = decorateSegmentRetakeParameterNodeData(
+          nodes4?.[this['nodeId']] || this['_data'] || {},
+        ),
+        cancellable = this['_isRunninghubWorkflowModel'](modelId2?.['model'], modelId2?.['provider']),
+        el51 = resolveGenerationButtonMode(modelId2, {
+          cancellable: cancellable,
+          cancelInFlight: this['_rhCancelInFlight'] === !![],
+        });
+      if (el51['busy']) {
+        if (cancellable) {
+          const title2 = getVideoCancelTooltip();
+          setGenerateButtonCancellableUi(this['btnEl'], {
+            title: title2,
+            tooltip: title2,
+            ariaLabel: videoPanelText('cancelGenerateAria'),
+            color: 'var(--red)',
+            busy: !![],
+          });
+        } else {
+          const title3 = getVideoGenerateTitle();
+          setGenerateButtonLoadingUi(this['btnEl'], {
+            title: title3,
+            disabled: !![],
+            ariaLabel: title3,
+          });
+        }
+        this['btnEl']['disabled'] = el51['disabled'];
+        return;
+      }
+      (resetGenerateButtonIdleUi(this['btnEl'], getVideoGenerateTitle()),
+        resetModelCredentialButtonState(this['btnEl']));
+      const run9 = () =>
+        applyModelCredentialButtonState(this['btnEl'], {
+          modelId: modelId2?.['model'],
+          provider: modelId2?.['provider'],
+          providerProfileId: modelId2?.['providerProfileId'] || modelId2?.['rhProviderProfileId'],
+        });
+      if (
+        !this['_isDreaminaVideoNode'](modelId2) &&
+        getPanelModelManifest(modelId2)?.['kind'] !== 'video'
+      ) {
+        const videoPanelText2 = videoPanelText('modelUnavailable');
+        ((this['btnEl']['disabled'] = !![]),
+          (this['btnEl']['title'] = videoPanelText2),
+          this['btnEl']['setAttribute']?.('aria-label', videoPanelText2));
+        return;
+      }
+      const promptText = resolvePromptTextWithTextRefs({
+        promptEl: this['promptEl'],
         inEdges: inEdges2,
-        nodes: nodes6,
+        nodes: nodes4,
       });
-      if (this._isDreaminaVideoNode(value317)) {
-        const value318 = this._syncDreaminaTaskState(value317, { syncStore: true });
-        this._data = value318.nodeData || this._data;
-        const imageCount3 = value318.summary || this._getDreaminaReferenceSummary(),
-          taskType2 = value318.resolvedTaskType || this._getResolvedDreaminaTaskType(),
-          routeMode3 = value318.routeMode || 'multimodal2video';
+      if (modelId2['segmentRetake'] && !getSegmentRetakeValidation(modelId2['segmentRetake'])['ok']) {
+        this['btnEl']['disabled'] = !![];
+        return;
+      }
+      if (this['_isDreaminaVideoNode'](modelId2)) {
+        const value234 = this['_syncDreaminaTaskState'](modelId2, {
+          syncStore: !modelId2?.['segmentRetake'],
+        });
+        this['_data'] = decorateSegmentRetakeParameterNodeData(value234['nodeData'] || this['_data']);
+        const imageCount3 = value234['summary'] || this['_getDreaminaReferenceSummary'](),
+          taskType2 = value234['resolvedTaskType'] || this['_getResolvedDreaminaTaskType'](),
+          routeMode3 = value234['routeMode'] || 'multimodal2video';
         if (!isDreaminaVideoRouteModeEnabled(routeMode3)) {
-          ((this.btnEl.disabled = true), (this.btnEl.style.cursor = 'var(--unavailable-cursor)'));
+          this['btnEl']['disabled'] = !![];
           return;
         }
         const validateDreaminaVideoRouteSelection2 = validateDreaminaVideoRouteSelection({
           routeMode: routeMode3,
           taskType: taskType2,
-          imageCount: imageCount3.imageCount,
-          videoCount: imageCount3.videoCount,
-          audioCount: imageCount3.audioCount,
+          model: modelId2?.['model'],
+          provider: modelId2?.['provider'],
+          imageCount: imageCount3['imageCount'],
+          videoCount: imageCount3['videoCount'],
+          audioCount: imageCount3['audioCount'],
         });
-        let enabled27 = !validateDreaminaVideoRouteSelection2;
-        if (enabled27) {
-          if (taskType2 === 'text2video') enabled27 = !!promptTextWithTextRefs;
+        let enabled19 = !validateDreaminaVideoRouteSelection2;
+        if (enabled19) {
+          if (taskType2 === 'text2video') enabled19 = !!promptText;
           else {
-            if (taskType2 === 'image2video')
-              enabled27 = !!promptTextWithTextRefs && imageCount3.imageCount === 1;
+            if (taskType2 === 'image2video') enabled19 = !!promptText && imageCount3['imageCount'] === 1;
             else {
-              if (taskType2 === 'frames2video')
-                enabled27 = !!promptTextWithTextRefs && imageCount3.imageCount === 2;
+              if (taskType2 === 'frames2video') enabled19 = !!promptText && imageCount3['imageCount'] === 2;
               else {
-                if (taskType2 === 'multiframe2video') enabled27 = false;
+                if (taskType2 === 'multiframe2video') enabled19 = ![];
                 else
                   taskType2 === 'multimodal2video' &&
-                    (enabled27 = imageCount3.imageCount > 0 || imageCount3.videoCount > 0);
+                    (enabled19 =
+                      !!promptText &&
+                      (imageCount3['imageCount'] > 0 ||
+                        imageCount3['videoCount'] > 0 ||
+                        imageCount3['audioCount'] > 0));
               }
             }
           }
         }
-        ((this.btnEl.disabled = !enabled27),
-          (this.btnEl.style.cursor = this.btnEl.disabled ? 'var(--unavailable-cursor)' : ''));
+        this['btnEl']['disabled'] = !enabled19;
+        if (enabled19) run9();
         return;
       }
-      const enabled28 = !!inEdges2.length;
-      if (isHappyHorsePanelModel(value317)) {
-        ((this.btnEl.disabled = !promptTextWithTextRefs),
-          (this.btnEl.style.cursor = this.btnEl.disabled ? 'var(--unavailable-cursor)' : ''));
+      const run10 = () =>
+        evaluateGenerationPromptBoundary({
+          model: modelId2?.['model'],
+          provider: modelId2?.['provider'],
+          promptText: promptText,
+          hasInput: ![],
+        })['ok'];
+      if (isHappyHorsePanelModel(modelId2)) {
+        this['btnEl']['disabled'] = !promptText;
+        if (promptText) run9();
         return;
       }
-      const fixedInputConfig = getFixedInputSlotConfigFromManifest(this._data || {}),
-        list27 = (fixedInputConfig?.fixedSlots || []).filter((item36) => item36?.required === true),
-        list28 = (fixedInputConfig?.exclusiveGroups || []).filter(
-          (item37) => item37?.required === true || Number(item37?.min || 0) > 0,
+      const shouldAllowEmptyCustomAiAppInputs2 = shouldAllowEmptyCustomAiAppInputs(getPanelModelManifest(modelId2)),
+        fixedInputConfig = getFixedInputSlotConfigFromManifest(this['_data'] || {}),
+        list12 = (fixedInputConfig?.['fixedSlots'] || [])['filter'](
+          (value235) => value235?.['required'] === !![],
+        ),
+        list13 = (fixedInputConfig?.['exclusiveGroups'] || [])['filter'](
+          (value236) => value236?.['required'] === !![] || Number(value236?.['min'] || 0) > 0,
         );
-      if (list27.length > 0 || list28.length > 0) {
-        const nodeData7 = nodes6?.[this.nodeId] || this._data || {},
+      if (!shouldAllowEmptyCustomAiAppInputs2 && (list12['length'] > 0 || list13['length'] > 0)) {
+        const nodeData8 = nodes4?.[this['nodeId']] || this['_data'] || {},
           occupiedSlots = new Set(),
-          map3 = new Set(fixedInputConfig.visibleSlots || []);
+          map = new Set(fixedInputConfig['visibleSlots'] || []);
         for (const refSlot of inEdges2) {
-          const sourceNode = nodes6[refSlot.sourceId];
+          const sourceNode = nodes4[refSlot['sourceId']];
           if (!sourceNode) continue;
           const kind2 = resolveEffectiveInputKind(sourceNode, refSlot),
             { slot: slot } = resolveFixedInputSlotForRef({
               fixedInputConfig: fixedInputConfig,
-              refSlot: refSlot?.refSlot,
+              refSlot: refSlot?.['refSlot'],
               kind: kind2,
               occupiedSlots: occupiedSlots,
               sourceNode: sourceNode,
             });
-          if (slot && map3.has(slot)) occupiedSlots.add(slot);
+          if (slot && map['has'](slot)) occupiedSlots['add'](slot);
         }
-        const fixedInputAssetSlotMap = buildFixedInputAssetSlotMap(this.promptEl, {
-            slotOrderByType: fixedInputConfig.slotOrderByType,
-            visibleSlots: fixedInputConfig.visibleSlots,
-            exclusiveGroups: fixedInputConfig.exclusiveGroups,
-            slotById: fixedInputConfig.slotById,
+        const fixedInputAssetSlotMap = buildFixedInputAssetSlotMap(this['promptEl'], {
+            slotOrderByType: fixedInputConfig['slotOrderByType'],
+            visibleSlots: fixedInputConfig['visibleSlots'],
+            exclusiveGroups: fixedInputConfig['exclusiveGroups'],
+            slotById: fixedInputConfig['slotById'],
             occupiedSlots: occupiedSlots,
-            nodeData: nodeData7,
+            nodeData: nodeData8,
           }),
-          value319 = list27.every((item38) => {
-            const enabled29 = String(item38?.id || '').trim();
-            return !!enabled29 && (occupiedSlots.has(enabled29) || !!fixedInputAssetSlotMap[enabled29]);
+          value237 = list12['every']((value238) => {
+            const enabled20 = String(value238?.['id'] || '')['trim']();
+            return !!enabled20 && (occupiedSlots['has'](enabled20) || !!fixedInputAssetSlotMap[enabled20]);
           }),
-          value320 = list28.every((item39) => {
-            const list29 = Array.isArray(item39?.slots) ? item39.slots : [];
-            return list29.some((item40) => occupiedSlots.has(item40) || !!fixedInputAssetSlotMap[item40]);
+          value239 = list13['every']((value240) => {
+            const list14 = Array['isArray'](value240?.['slots']) ? value240['slots'] : [];
+            return list14['some']((value241) => occupiedSlots['has'](value241) || !!fixedInputAssetSlotMap[value241]);
           }),
-          enabled30 = value319 && value320;
-        ((this.btnEl.disabled = !enabled30),
-          (this.btnEl.style.cursor = this.btnEl.disabled ? 'var(--unavailable-cursor)' : ''));
+          value242 = value237 && value239;
+        this['btnEl']['disabled'] = !(value242 && run10());
+        if (!this['btnEl']['disabled']) run9();
         return;
       }
-      ((this.btnEl.disabled = cancellable ? false : !promptTextWithTextRefs && !enabled28),
-        (this.btnEl.style.cursor = this.btnEl.disabled ? 'var(--unavailable-cursor)' : ''));
+      this['btnEl']['disabled'] = !run10();
+      if (!this['btnEl']['disabled']) run9();
     }
   }
-  return value67.prototype;
+  return input['prototype'];
 }

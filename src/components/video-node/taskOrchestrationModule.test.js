@@ -869,7 +869,7 @@ function createTestContext({
         prompt: 'make it move',
       }),
       value38 = await proto21._buildPayloadImpl.call(ctx21);
-    (assert.equal(value38.aspectRatio, '自适应'), assert.equal(value38.resolvedRatioLabel, '9:16'));
+    (assert.equal(value38.aspectRatio, '9:16'), assert.equal(value38.resolvedRatioLabel, '9:16'));
   }),
   test('video task orchestration: BERNINI workflow adaptive ratio uses node display size', async () => {
     const targetId12 = 'node-video-bernini-adaptive-display',
@@ -910,8 +910,8 @@ function createTestContext({
       });
     ctx22._isRunninghubWorkflowModel = () => true;
     const value39 = await proto22._buildPayloadImpl.call(ctx22);
-    (assert.equal(value39.generationParams.rhBerniniAspectRatio, '自适应'),
-      assert.equal(value39.resolvedRatioLabel, '9:16'));
+    (assert.equal(value39.generationParams.rhBerniniAspectRatio, '16:9'),
+      assert.equal(value39.resolvedRatioLabel, '16:9'));
   }),
   test('video task orchestration: modelApi adaptive ratio falls back to node display size', async () => {
     const targetId13 = 'node-video-runninghub-veo-adaptive-display',
@@ -929,7 +929,7 @@ function createTestContext({
         prompt: 'wide city lights',
       }),
       value40 = await proto23._buildPayloadImpl.call(ctx23);
-    (assert.equal(value40.aspectRatio, '自适应'), assert.equal(value40.resolvedRatioLabel, '16:9'));
+    (assert.equal(value40.aspectRatio, '16:9'), assert.equal(value40.resolvedRatioLabel, '16:9'));
   }),
   test('video task orchestration: modelApi adaptive ratio falls back to manifest option', async () => {
     const targetId14 = 'node-video-runninghub-happyhorse-adaptive-default',
@@ -945,9 +945,9 @@ function createTestContext({
         prompt: 'running horse',
       }),
       value41 = await proto24._buildPayloadImpl.call(ctx24);
-    (assert.equal(value41.aspectRatio, '自适应'),
-      assert.equal(value41.resolvedRatioLabel, '16:9'),
-      assert.equal(value41.generationParams.happyhorse_mode, 'auto'));
+    (assert.equal(value41.aspectRatio, '1:1'),
+      assert.equal(value41.resolvedRatioLabel, '1:1'),
+      assert.equal(value41.generationParams.happyhorse_mode, 'image'));
   }),
   test('video task orchestration: Wan2.7 video mode validates continuation input', async () => {
     const value42 = globalThis.window.showToast,
@@ -2122,7 +2122,7 @@ function createTestContext({
         incomingEdges: [{ id: 'edge-1', sourceId: id6, targetId: targetId41, refSlot: '' }],
       }),
       value102 = await proto39._buildPayloadImpl.call(ctx39);
-    (assert.equal(value102.dreaminaTaskType, 'multimodal2video'), assert.equal(value102.aspectRatio, '16:9'));
+    (assert.equal(value102.dreaminaTaskType, 'multimodal2video'), assert.equal(value102.aspectRatio, '1:1'));
   }),
   test('task orchestration: frames fallback to text2video still uses adaptive mapping', async () => {
     const targetId42 = 'node-video-2',
@@ -2141,7 +2141,7 @@ function createTestContext({
         incomingEdges: [],
       }),
       value103 = await proto40._buildPayloadImpl.call(ctx40);
-    (assert.equal(value103.dreaminaTaskType, 'text2video'), assert.equal(value103.aspectRatio, '16:9'));
+    (assert.equal(value103.dreaminaTaskType, 'text2video'), assert.equal(value103.aspectRatio, '1:1'));
   }),
   test('task orchestration: fixed ratio is preserved with image references', async () => {
     const targetId43 = 'node-video-3',
@@ -3166,7 +3166,7 @@ function createTestContext({
     (assert.equal(value129.provider, 'apimart'),
       assert.equal(value129.model, 'apimart/doubao-seedance-2.0-fast'),
       assert.equal(value129.dreaminaTaskType, 'text2video'),
-      assert.equal(value129.aspectRatio, '16:9'));
+      assert.equal(value129.aspectRatio, '1:1'));
   }),
   test('task orchestration: dreamina VIP 缺少 installId 时阻断提交', async () => {
     const value130 = globalThis.window.showToast,

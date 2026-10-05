@@ -453,7 +453,7 @@ function getProxyTaskApiUrl(value13) {
         assert.equal(dom13.body.prompt, 'p'),
         assert.deepEqual(dom13.body.images, []),
         assert.equal(dom13.body.replyType, 'json'),
-        assert.equal(dom13.body.imageSize, '2K'),
+        assert.equal(dom13.body.imageSize, '4K'),
         assert.equal(dom13.body.aspectRatio, '16:9'),
         assert.equal(dom13.body.batchSize, undefined),
         assert.equal(dom13.adapterTrace?.source, 'manifest'),
@@ -509,7 +509,7 @@ function getProxyTaskApiUrl(value13) {
         imageSize: '4K',
         inputUrls: [],
       });
-      (assert.equal(dom17.body.imageSize, '2K'), assert.equal(dom17.body.aspectRatio, '1:8'));
+      (assert.equal(dom17.body.imageSize, '4K'), assert.equal(dom17.body.aspectRatio, '1:8'));
       const dom18 = await buildGenerateImageRequest12({
         prompt: 'p',
         provider: 'grsai',

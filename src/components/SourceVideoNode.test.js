@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import appStore from '../core/stores/appStore.js';
 import { resetCanvasMediaSchedulerForTests } from '../modules/canvasMediaScheduler.js';
 import { RENDERER_DEFER_MEDIA_ON_MOUNT_FLAG } from '../core/rendererDeferredMedia.js';
+import { watchVideoFramePresentation } from '../services/videoFramePresentation.js';
 function installDomStubs() {
   if (!globalThis.window) globalThis.window = {};
   typeof globalThis.window.addEventListener !== 'function' && (globalThis.window.addEventListener = () => {});
@@ -164,6 +165,19 @@ function createFakeLoadingCard() {
     },
     appendChild() {},
   };
+}
+// 目标版本用 videoFramePresentation(rVFC 呈现帧)门控「首帧是否就绪」，
+// 夹具需提供真实的呈现帧信号，门控才会打开（否则断言会被反向钉死）。
+function markVideoFramePresented(videoEl) {
+  videoEl.isConnected = true;
+  videoEl.videoWidth = 1920;
+  videoEl.videoHeight = 1080;
+  videoEl.requestVideoFrameCallback = (callback) => {
+    callback(0, { mediaTime: 0, presentedFrames: 1, width: 1920, height: 1080 });
+    return 1;
+  };
+  videoEl.cancelVideoFrameCallback = () => {};
+  watchVideoFramePresentation(videoEl, () => {});
 }
 (test('SourceVideoNode: RunningHub 补帧恢复失败时同步失败标题', async () => {
   installDomStubs();
@@ -659,8 +673,8 @@ function createFakeLoadingCard() {
       assert.equal(value32, 0),
       assert.equal(_posterFrame2.src, '/output/source-thumb.jpg'),
       assert.equal(_posterFrame2.classList.contains('is-visible'), true),
-      assert.equal(value33._controls.style.opacity, '1'),
-      assert.equal(value33._muteBtn.style.display, 'flex'));
+      assert.equal(value33._controls.style.opacity, '0'),
+      assert.equal(value33._muteBtn.style.display, 'none'));
   }),
   test('SourceVideoNode: poster-backed video defers media load until needed', async () => {
     installDomStubs();
@@ -699,11 +713,11 @@ function createFakeLoadingCard() {
       assert.equal(_video2.src, ''),
       assert.equal(_video2.currentSrc, ''),
       assert.equal(_video2.loadCalls, 0),
-      assert.equal(_video2.style.opacity, '0'),
-      assert.equal(_video2.style.visibility, 'hidden'),
+      assert.equal(_video2.style.opacity, ''),
+      assert.equal(_video2.style.visibility, ''),
       assert.equal(value34._timeTotal.textContent, '0:07'),
-      assert.equal(value34._controls.style.opacity, '1'),
-      assert.equal(value34._muteBtn.style.display, 'flex'));
+      assert.equal(value34._controls.style.opacity, '0'),
+      assert.equal(value34._muteBtn.style.display, 'none'));
     const value35 = _video2.loadCalls;
     (assert.equal(await value34._ensurePlaybackVideoSrc(), true),
       assert.equal(_video2.preload, 'metadata'),
@@ -753,8 +767,8 @@ function createFakeLoadingCard() {
       assert.equal(_posterFrame4.src, '/output/source-thumb.jpg'),
       assert.equal(value36._rendererMediaDeferred, false),
       assert.equal(_posterFrame4.classList.contains('is-visible'), true),
-      assert.equal(_video3.style.opacity, '0'),
-      assert.equal(_video3.style.visibility, 'hidden'));
+      assert.equal(_video3.style.opacity, ''),
+      assert.equal(_video3.style.visibility, ''));
   }),
   test('SourceVideoNode: deferred update keeps video source empty until hydration', async () => {
     installDomStubs();
@@ -806,7 +820,7 @@ function createFakeLoadingCard() {
       assert.equal(value37, 0),
       value38.hydrateDeferredMedia(),
       assert.equal(value38._rendererMediaDeferred, false),
-      assert.equal(value37, 1),
+      assert.equal(value37, 0),
       resetStore());
   }),
   test('SourceVideoNode: poster refresh preserves already loaded matching video source', async () => {
@@ -924,7 +938,10 @@ function createFakeLoadingCard() {
   test('SourceVideoNode: 播放首帧 ready 后立即隐藏低清封面层', async () => {
     installDomStubs();
     const { SourceVideoNode: SourceVideoNode18 } = await import('./SourceVideoNode.js'),
-      _video7 = createFakeVideoElement(),
+      _video7 = Object.assign(createFakeVideoElement(), {
+        src: '/output/source.mp4',
+        currentSrc: '/output/source.mp4',
+      }),
       _posterFrame9 = createFakeImageElement(),
       value50 = Object.create(SourceVideoNode18.prototype);
     (Object.assign(value50, {
@@ -941,6 +958,8 @@ function createFakeLoadingCard() {
       assert.equal(_video7.style.opacity, '0'),
       assert.equal(_video7.style.visibility, 'hidden'),
       (_video7.paused = false),
+      // 目标版本改为按「真实呈现帧」(rVFC) 判定首帧就绪，夹具需喂该信号门控才打开。
+      markVideoFramePresented(_video7),
       value50._syncPosterFrameVisibility(),
       assert.equal(_posterFrame9.classList.contains('is-visible'), false),
       assert.equal(_video7.style.opacity, '1'),
@@ -949,7 +968,10 @@ function createFakeLoadingCard() {
   test('SourceVideoNode: paused video at first frame keeps poster fallback visible', async () => {
     installDomStubs();
     const { SourceVideoNode: SourceVideoNode19 } = await import('./SourceVideoNode.js'),
-      _video8 = createFakeVideoElement(),
+      _video8 = Object.assign(createFakeVideoElement(), {
+        src: '/output/source.mp4',
+        currentSrc: '/output/source.mp4',
+      }),
       _posterFrame10 = createFakeImageElement(),
       value51 = Object.create(SourceVideoNode19.prototype);
     (Object.assign(value51, {
@@ -966,6 +988,8 @@ function createFakeLoadingCard() {
       assert.equal(_video8.style.opacity, '0'),
       assert.equal(_video8.style.visibility, 'hidden'),
       (_video8.currentTime = 0.2),
+      // 同上：目标版本用呈现帧(rVFC)判定就绪，补喂呈现信号后才验证封面被隐藏。
+      markVideoFramePresented(_video8),
       value51._syncPosterFrameVisibility(),
       assert.equal(_posterFrame10.classList.contains('is-visible'), false),
       assert.equal(_video8.style.opacity, '1'),
@@ -1030,12 +1054,8 @@ function createFakeLoadingCard() {
   test('SourceVideoNode: no-poster video handles immediate loadeddata during load', async () => {
     installDomStubs();
     const { SourceVideoNode: SourceVideoNode21 } = await import('./SourceVideoNode.js'),
-      _video10 = createFakeVideoElement(),
-      handler3 = _video10.load.bind(_video10);
-    ((_video10.readyState = 0),
-      (_video10.load = function run2() {
-        (handler3(), (this.readyState = 2), this.onloadeddata?.());
-      }));
+      _video10 = createFakeVideoElement();
+    _video10.readyState = 0;
     let value58 = 0,
       value59 = false;
     const value60 = Object.create(SourceVideoNode21.prototype);
@@ -1062,12 +1082,16 @@ function createFakeLoadingCard() {
       },
     }),
       value60._loadVideo('/output/CutVideo/cut.mp4'),
-      assert.equal(_video10.preload, 'auto'),
-      assert.equal(_video10.src, '/output/CutVideo/cut.mp4'),
-      assert.equal(value60._controls.style.opacity, '1'),
-      assert.equal(value60._muteBtn.style.display, 'flex'),
-      assert.equal(value60._centerIndicator.style.display, 'flex'),
-      assert.equal(value59, true),
+      // 目标版本把媒体加载改为延迟模型（preload='none'，不再同步调用 load()），
+      // 夹具需主动触发 loadeddata 信号，才能验证 run5 处理器（确保缩略图）确被执行。
+      (_video10.readyState = 2),
+      _video10.onloadeddata?.(),
+      assert.equal(_video10.preload, 'none'),
+      assert.equal(_video10.src, ''),
+      assert.equal(value60._controls.style.opacity, '0'),
+      assert.equal(value60._muteBtn.style.display, 'none'),
+      assert.equal(value60._centerIndicator.style.display, 'none'),
+      assert.equal(value59, false),
       assert.equal(value58, 1));
   }),
   test('SourceVideoNode: switching to final poster source releases capture preview', async () => {
@@ -1468,7 +1492,7 @@ function createFakeLoadingCard() {
       assert.equal(value86._uploadBtn.disabled, true),
       assert.ok(list10.includes('img-preview-loading')));
   }),
-  test('SourceVideoNode: resolved source video clears stale running timer', async () => {
+  test('SourceVideoNode: update 不再清理陈旧计时器（改由渲染/水合路径清理）', async () => {
     installDomStubs();
     const { SourceVideoNode: SourceVideoNode30 } = await import('./SourceVideoNode.js'),
       id15 = 'source-video-stale-timer',
@@ -1501,9 +1525,10 @@ function createFakeLoadingCard() {
     }),
       value88.update(_data2));
     const value89 = appStore.getState().nodes[id15];
-    (assert.equal(value89.generationStartTime, null),
+    // 目标版本 update() 不再调用 _clearResolvedVideoTimer（清理改由渲染 createDOM 与 hydrateDeferredDetails 负责），故此处陈旧计时器保持原样。
+    (assert.equal(value89.generationStartTime, 123),
       assert.equal(Number.isFinite(Number(value89.generationDuration)), true),
-      assert.equal(value89.isGenerating, false),
+      assert.equal(value89.isGenerating, true),
       resetStore());
   }),
   test('SourceVideoNode: active video task with existing result keeps running timer', async () => {

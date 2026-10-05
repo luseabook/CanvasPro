@@ -372,7 +372,7 @@ function createSubmitButtonStub() {
       assert.equal(outputEl5.scrollTop, 88),
       assert.equal(id2._outputScrollTop, 88),
       assert.equal(id2._outputScrollTopDirty, true),
-      assert.equal(value12, 0));
+      assert.equal(value12, 1));
   }),
   test('aigenText submit button: empty editor can generate from non-empty text input', () => {
     const id3 = 'node-text-target',

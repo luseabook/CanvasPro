@@ -29,12 +29,12 @@ import {
   getDreaminaEffectiveNodeData,
   resolveDreaminaRememberedRouteModel,
 } from './dreaminaParameterSchema.js';
+import { createVideoNodeParameterPanelModule } from './parameterPanelModule.js';
 import {
-  buildVideoModelApiModelSelectionPatch,
-  createVideoNodeParameterPanelModule,
   resolveVideoPromptPlaceholder,
   shouldShowVideoPromptInput,
-} from './parameterPanelModule.js';
+} from './parameterPanelPresentationPolicy.js';
+import { buildVideoModelApiModelSelectionPatch } from './parameterPanelModelSelectionPolicy.js';
 import {
   buildApimartVideoMenuItemsHtml,
   buildApimartVideoLogoHTML,
@@ -986,7 +986,7 @@ function extractMenuModelOrder(item) {
   }),
   test('video parameter panel lazy mounts provider model menu', () => {
     const panel = createVideoNodeParameterPanelModule({
-      store: {},
+      store: { getStateRaw: () => ({}), getState: () => ({}) },
       api: {},
       getDisplayModelName: (id) => id,
       PROVIDERS_META: {},
@@ -1000,7 +1000,7 @@ function extractMenuModelOrder(item) {
     });
     for (const text of [
       'RunningHUB工作流',
-      'RunningHUB模型',
+      'RunningHub模型',
       'APIMart',
       'data-provider="apimart"',
       'data-provider="runninghubwf"',
