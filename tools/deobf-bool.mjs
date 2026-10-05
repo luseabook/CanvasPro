@@ -96,7 +96,12 @@ export function applyEdits(source, edits) {
   let out = '';
   let cursor = 0;
   for (const edit of edits) {
-    out += source.slice(cursor, edit.start) + edit.text;
+    // `return![]` is valid, but splicing `false` in without a separator yields
+    // `returnfalse`: one identifier, silently different code. Keep the token
+    // boundary whenever the replacement would otherwise fuse with the byte before it.
+    const previous = source[edit.start - 1] ?? '';
+    const separator = /[A-Za-z0-9_$.]/.test(previous) ? ' ' : '';
+    out += source.slice(cursor, edit.start) + separator + edit.text;
     cursor = edit.end;
   }
   return out + source.slice(cursor);

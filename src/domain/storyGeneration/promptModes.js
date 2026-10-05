@@ -44,6 +44,15 @@ export function normalizeStoryPromptMode(item, { allowDeveloperModes: allowDevel
     ? text
     : STORY_PROMPT_MODE_SEEDANCE_2_0;
 }
+export const STORY_DEFAULT_PROMPT_MODE = STORY_PROMPT_MODE_SEEDANCE_2_0;
+export function isStoryPromptModeSelectable(key, { allowDeveloperModes: allowDeveloperModes = false } = {}) {
+  return STORY_PROMPT_MODE_OPTIONS['some'](
+    (el) => el['value'] === normalizeText(key)['toLowerCase']() && (allowDeveloperModes || el['enabled']),
+  );
+}
+export function getStoryPromptModeMaxClipSeconds(value) {
+  return isStorySeedance25PromptMode(value) || isStoryWan30PromptMode(value) ? 30 : 15;
+}
 export function getStoryPromptModeLabel(key) {
   const text2 = normalizeText(key)['toLowerCase']();
   return (

@@ -1458,7 +1458,7 @@ function findMatchingEpisode(value229, value230, value231) {
 function normalizeExistingClips(list37 = []) {
   return Array['isArray'](list37) ? list37['map']((args25) => ({ ...args25 })) : [];
 }
-function hasStoryClipVideoResult(options12 = {}) {
+export function hasStoryClipVideoResult(options12 = {}) {
   if (
     normalizeText(options12?.['result']?.['videoUrl'] || options12?.['videoUrl'] || options12?.['resultUrl'])
   )

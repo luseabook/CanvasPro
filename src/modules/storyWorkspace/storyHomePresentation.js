@@ -35,6 +35,8 @@ import {
   normalizeStoryPromptMode,
   normalizeStoryScriptMode,
 } from './storyProjectPlanning.js';
+import { getStoryHomePromptMode } from './storyHomePromptMode.js';
+import { isStoryPromptModeSelectable } from '../../domain/storyGeneration/promptModes.js';
 import { getStoryProjectHomeEntries } from './storyProjectSession.js';
 import { getStoryVideoInputTextModelOptions } from './storyWorkspaceModelCatalog.js';
 import {
@@ -763,3 +765,6 @@ function resolveStoryProjectCoverImageUrls(value33, value34 = null) {
     ['filter']((value38, value39, list6) => value38 && list6['indexOf'](value38) === value39)
     ['slice'](0, 3);
 }
+
+export const STORY_REPLICATION_PROMPT_MODE_HINT='按你准备用于生成视频的模型选择。格式决定提示词结构和每段时长上限；生成或重新生成分镜时生效，切换不会修改已有提示词和视频，无需重新分析原片。';
+export function renderStoryPromptModePicker(value12,{field:field='promptMode',value:value=getStoryHomePromptMode(value12),busy:busy=false,hint:hint='',label:label="单片段提示词模式",triggerLabel:triggerLabel=''}={}){const run=value13=>isStoryPromptModeSelectable(value13,{'allowDeveloperModes':value12["developerModeAvailable"]===true});return renderStoryPlanningPicker({'field':field,'label':label,'triggerLabel':triggerLabel,'value':value,'hint':hint,'iconMarkup':"<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 3h8l4 4v14H6z\"/><path d=\"M14 3v4h4M9 11h6M9 15h6M9 18h3\"/></svg>",'options':STORY_PROMPT_MODE_OPTIONS["map"](value14=>value14["value"]),'disabledOptions':STORY_PROMPT_MODE_OPTIONS["filter"](value15=>busy||!run(value15["value"]))["map"](value16=>value16["value"]),'disabledOptionHints':Object["fromEntries"](STORY_PROMPT_MODE_OPTIONS['filter'](value17=>!run(value17["value"]))["map"](value18=>[value18["value"],"开启开发者模式后可选"])),'formatOption':getStoryPromptModeLabel,'singleColumn':true});}

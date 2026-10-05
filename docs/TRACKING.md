@@ -369,11 +369,11 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-05（169 批 **复刻工作室落地**）：裁决「只要复刻工作室」。① **复刻工作室 ≠ 替换工作室**——它是
-  `workspaceModeCoordinator.js` 的 5 个**平级**模式之一（`replication`），经 `main.js` 走 `storyWorkspaceApi`；替换工作室是 `personReplacement/`
-  独立模块。② **授权无需另建**：现有授权码链路已全在，官方账号/积分层（15 件）**不需要**。
-  **3 改 + 62 新**：gate 清单加 `replicationStudio`、删掉复刻的 dev 门、徽章对齐 `beta`+`VIP`、45 件复刻文件经四道闸门落地 + 传递闭包补 17 件。
-  零回归：**11215/11186/28** 与基线逐条一致。未启动应用；29 件未升。详见 `docs/b169-replication-studio.md`。
+- 2026-10-06（170 批·**启动链排障 + 方案二收窄**）：真机验证查出 b169 会让应用**无法启动**（`npm test` 抓不到）。3 处根因均早于本批：
+  `deobf-bool.mjs` 缺 token 分隔致 `returnfalse`（18 文件 66 处）、`projectBootstrap.js` 调不存在的 `bindLogoProjectSave()`、
+  `history.js` 被截断丢了 `reset`/`createCheckpoint`/`undoToCheckpoint`。**方案二**：用户裁决不做整文件替换——回退 9 件升级，
+  只补 13 个缺失导出，保住现有产品行为。25 件改动。**验证**：闭包 512 件 / 0 缺失；闸门 PASS、MD5 未变；回归 **11186/28** 与基线**逐条一致**。
+  应用仍起不来（缺 rail 元素）。详见 `docs/b170-startup-chain.md`。
 
 ## 12. 变更记录机制（**已冻结**）
 

@@ -38,7 +38,7 @@ function normalizeStoryH3LiteralTag(index = '') {
   const result = '' + enabled[1][0]['toUpperCase']() + enabled[1]['slice'](1)['toLowerCase']();
   return '<' + result + ' ' + enabled[2] + '>';
 }
-function protectStoryH3LiteralTags(data = '') {
+export function protectStoryH3LiteralTags(data = '') {
   const options = [],
     target = String(data || '')['replace'](STORY_H3_LITERAL_TAG_PATTERN, (source, next) => {
       const storyH3LiteralTag = normalizeStoryH3LiteralTag(next);

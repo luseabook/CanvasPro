@@ -36,7 +36,6 @@ export function bootstrapAppProject({
     applySourceNamesFromFileNameToCanvas: applySourceNamesFromFileNameToCanvas,
   });
   return (
-    onBeforeUnload.bindLogoProjectSave(),
     onBeforeUnload.bindHeaderProjectNameAutoSave(),
     onBeforeUnload.bindPersistRevisionAutoSave(),
     registerAppGlobalEvents({

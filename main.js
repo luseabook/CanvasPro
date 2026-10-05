@@ -170,7 +170,7 @@ import { initTaskCenterManager } from './src/modules/TaskCenterManager.js';
 import { initAudioVoicePanel } from './src/modules/audioVoicePanel.js';
 import { initStoryWorkspace } from './src/modules/storyWorkspace/storyWorkspace.js';
 import { showStoryWorkspaceBetaNotice } from './src/modules/storyWorkspace/storyWorkspaceBetaNotice.js';
-import { showReplicationWorkspaceBetaNotice } from './src/modules/storyWorkspace/replicationWorkspaceBetaNotice.js';
+import { createReplicationWorkspaceAccess } from './src/modules/storyWorkspace/replicationWorkspaceAccess.js';
 import { guardStoryModelTaskCredentials } from './src/modules/storyWorkspace/storyModelCredentialGuard.js';
 import { createReplacementStudioApplication } from './src/modules/personReplacement/personReplacementApplication.js';
 import { createPersonReplacementPromptEnhancementIntegration } from './src/modules/personReplacement/personReplacementPromptEnhancementIntegration.js';
@@ -580,9 +580,9 @@ const getCanvasPresentationContext = () => {
     onActivated: () => showStoryWorkspaceBetaNotice({ documentObject: document, windowObject: window }),
   },
   replicationWorkspace: {
+    ...createReplicationWorkspaceAccess({ documentObject: document, windowObject: window }),
     activate: (args9) => storyWorkspaceApi?.activate?.({ ...args9, surface: 'replication' }),
     deactivate: (current) => storyWorkspaceApi?.deactivate?.(current),
-    onActivated: () => showReplicationWorkspaceBetaNotice({ documentObject: document, windowObject: window }),
   },
   storyboard3DWorkspace: {
     isAvailable: () => isStoryboard3DWorkspaceAvailable(window),

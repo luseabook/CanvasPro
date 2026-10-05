@@ -30,6 +30,7 @@ export function showWorkspaceBetaNotice({
   storageKey: storageKey = '',
   title: title = '',
   message: message = '',
+  onConfirm: onConfirm = null,
 } = {}) {
   if (!documentObject?.['body']) return false;
   if (hasSeenWorkspaceBetaNotice(windowObject, storageKey)) return false;
@@ -61,6 +62,7 @@ export function showWorkspaceBetaNotice({
     handler = () => {
       if (options) return;
       ((options = true), documentObject['removeEventListener']('keydown', target, true), el2['remove']());
+      onConfirm?.();
     };
   return (
     (el2['_workspaceNoticeClose'] = handler),
