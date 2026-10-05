@@ -1831,8 +1831,8 @@ function generateUUID() {
 	const d2 = Math.random() * 0xffffffff | 0;
 	const d3 = Math.random() * 0xffffffff | 0;
 	const uuid = _lut[ d0 & 0xff ] + _lut[ d0 >> 8 & 0xff ] + _lut[ d0 >> 16 & 0xff ] + _lut[ d0 >> 24 & 0xff ] + '-' +
-			_lut[ d1 & 0xff ] + _lut[ d1 >> 8 & 0xff ] + '-' + _lut[ d1 >> 16 & 0x0f | 64 ] + _lut[ d1 >> 24 & 0xff ] + '-' +
-			_lut[ d2 & 0x3f | 128 ] + _lut[ d2 >> 8 & 0xff ] + '-' + _lut[ d2 >> 16 & 0xff ] + _lut[ d2 >> 24 & 0xff ] +
+			_lut[ d1 & 0xff ] + _lut[ d1 >> 8 & 0xff ] + '-' + _lut[ d1 >> 16 & 0x0f | 0x40 ] + _lut[ d1 >> 24 & 0xff ] + '-' +
+			_lut[ d2 & 0x3f | 0x80 ] + _lut[ d2 >> 8 & 0xff ] + '-' + _lut[ d2 >> 16 & 0xff ] + _lut[ d2 >> 24 & 0xff ] +
 			_lut[ d3 & 0xff ] + _lut[ d3 >> 8 & 0xff ] + _lut[ d3 >> 16 & 0xff ] + _lut[ d3 >> 24 & 0xff ];
 
 	// .toLowerCase() here flattens concatenated strings to save heap memory space.
@@ -17540,45 +17540,45 @@ function _generateTables() {
 		if ( e < -27 ) {
 
 			baseTable[ i ] = 0x0000;
-			baseTable[ i | 256 ] = 32768;
+			baseTable[ i | 0x100 ] = 0x8000;
 			shiftTable[ i ] = 24;
-			shiftTable[ i | 256 ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
 
 			// small number (denorm)
 
 		} else if ( e < -14 ) {
 
 			baseTable[ i ] = 0x0400 >> ( - e - 14 );
-			baseTable[ i | 256 ] = ( 0x0400 >> ( - e - 14 ) ) | 32768;
+			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
 			shiftTable[ i ] = - e - 1;
-			shiftTable[ i | 256 ] = - e - 1;
+			shiftTable[ i | 0x100 ] = - e - 1;
 
 			// normal number
 
 		} else if ( e <= 15 ) {
 
 			baseTable[ i ] = ( e + 15 ) << 10;
-			baseTable[ i | 256 ] = ( ( e + 15 ) << 10 ) | 32768;
+			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
 			shiftTable[ i ] = 13;
-			shiftTable[ i | 256 ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
 
 			// large number (Infinity, -Infinity)
 
 		} else if ( e < 128 ) {
 
-			baseTable[ i ] = 31744;
-			baseTable[ i | 256 ] = 64512;
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
 			shiftTable[ i ] = 24;
-			shiftTable[ i | 256 ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
 
 			// stay (NaN, Infinity, -Infinity)
 
 		} else {
 
-			baseTable[ i ] = 31744;
-			baseTable[ i | 256 ] = 64512;
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
 			shiftTable[ i ] = 13;
-			shiftTable[ i | 256 ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
 
 		}
 

@@ -68,7 +68,7 @@ for (var i = 0; i < 32768; ++i) {
     var x = ((i & 0xAAAA) >> 1) | ((i & 0x5555) << 1);
     x = ((x & 0xCCCC) >> 2) | ((x & 0x3333) << 2);
     x = ((x & 0xF0F0) >> 4) | ((x & 0x0F0F) << 4);
-    rev[i] = (((x & 65280) >> 8) | ((x & 0x00FF) << 8)) >> 1;
+    rev[i] = (((x & 0xFF00) >> 8) | ((x & 0x00FF) << 8)) >> 1;
 }
 // create huffman tree from u8 "map": index -> code length for code index
 // mb (max bits) must be at most 15
@@ -798,7 +798,7 @@ var adler = function () {
         },
         d: function () {
             a %= 65521, b %= 65521;
-            return (a & 255) << 24 | (a & 65280) << 8 | (b & 255) << 8 | (b >> 8);
+            return (a & 255) << 24 | (a & 0xFF00) << 8 | (b & 255) << 8 | (b >> 8);
         }
     };
 };
